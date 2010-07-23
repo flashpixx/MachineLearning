@@ -29,24 +29,23 @@ int main(int argc, char *argv[]) {
     namespace linalg    = boost::numeric::bindings::lapack;
     namespace ublas     = boost::numeric::ublas;
     
-    
+    /*
     ublas::vector<std::size_t> y(3);
     y(0) = 0;
     y(1) = 3;
-    y(5) = 5;
-    
-    y.data();
+    y(2) = 5;
     
     ublas::indirect_array<> ia(3);
-
+    std::cout << y << std::endl;
+    
     
     ublas::matrix<double> x = tl::matrix::random<double>(6);
-    
     std::cout << x << std::endl;
-    std::cout <<  ublas::project(x, ia, ia) << std::endl;
     
+    //std::cout <<  ublas::project(x, ia, ia) << std::endl;
+    */
     
-    //tl::files::hdf o("blub.hdf5");
+    tl::files::hdf o("blub.hdf5");
     //std::cout << o.readString("/string") << std::endl;
 	//std::vector<std::string> x = o.readStringVector("/stringarray");
     //ublas::vector<double> x = o.readVector<double>("/vector", H5::PredType::NATIVE_DOUBLE);
@@ -64,7 +63,7 @@ int main(int argc, char *argv[]) {
     */
     
     // ==== LLE ====
-    /*
+    
     ublas::matrix<double> data = o.readMatrix<double>("/pcadata", H5::PredType::NATIVE_DOUBLE); 
     
     dist::euclid<double> d;
@@ -73,7 +72,7 @@ int main(int argc, char *argv[]) {
     
     tl::files::hdf f("lle.hdf5", true);
     f.write<double>( "/data",  l.map(data), H5::PredType::NATIVE_DOUBLE );  
-    */  
+      
 	
 	// ==== LDA ====
     /*
