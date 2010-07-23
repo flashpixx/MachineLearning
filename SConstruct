@@ -185,22 +185,20 @@ def readLibs(pEnv, pPath):
     libremove   = pEnv["libremovestring"].split(pEnv["seperator"])
     
     for i in lstdir :
-        if not(os.path.isfile( os.path.join(pPath, i) )) or os.path.islink( os.path.join(pPath, i) ) :
+        if not(os.path.isfile( os.path.join(pPath, i) )) :
             continue
             
         for n in pEnv["libsuffix"] :
-            if n in i :
+            if i.endswith(n) :
                 
-                # add ad the beginning and end # because prefix and suffix
-                # should be remove only there
-                c = "#" + i + "#"
-                if env["libremovesuffix"] :
-                    c = c.replace( n+"#", "")
+                c = i
+                if env["libremovesuffix"] and c.endswith(n) :
+                    c = c.replace( n, "")
 
                 for x in libremove :
-                    c = c.replace( "#"+x, "")
-                    
-                c = c.replace("#", "")
+                    if c.startswith(x) :
+                        c = c.replace( x, "")
+                        
                 lst.append(c)
 
     #für Python < 2.4: lst = dict(map(lambda i: (i,1),lst)).keys()
