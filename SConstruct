@@ -6,7 +6,7 @@ import glob
 #=== function for os configuration ===================================================================================================
 
 # constante for showing messages during compiling
-SHOWCONFIG = False
+SHOWCONFIG = True
 # using CPUs for compiling
 COMPILECPU = 6
 
@@ -146,6 +146,20 @@ def showList(pName, pLST) :
         msg(lc + i)
         lc = "                       "
 
+#remove item from list if exists
+def rmListItem( pList, pItem ) :
+    la = pList
+
+    if type(pItem) == type([]) :
+        for i in pItem :
+            if i in la :
+                la.remove(i)
+    else :
+        if pItem in la :
+            la.remove(pItem)
+    
+    return la
+
 
 # seperated the string with the environmental
 # seperation which is set in the environmental
@@ -251,7 +265,7 @@ atlaspath = getListPattern("atlas", library_path, True)
 if atlaspath :
     atlaslibs = readLibs(env, atlaspath)
     # remove ptcblas, not 
-    atlaslibs.remove("ptcblas")
+    atlaslibs = rmListItem(atlaslibs, "ptcblas")
     msg("atlas is located in ["+atlaspath+"]\n")
     showList("atlas libs", atlaslibs)
 else :
@@ -264,10 +278,7 @@ hdfpath = getListPattern("hdf", library_path, True)
 if hdfpath :
     hdflibs = readLibs(env, hdfpath)
     #remove hdf5.6, hdf5_cpp.6, hdf5_hl.6, hdf5_hl_cpp.6
-    hdflibs.remove("hdf5.6")
-    hdflibs.remove("hdf5_cpp.6")
-    hdflibs.remove("hdf5_hl.6")
-    hdflibs.remove("hdf5_hl_cpp.6");
+    hdflibs = rmListItem(hdflibs, ["hdf5.6", "hdf5_cpp.6", "hdf5_hl.6", "hdf5_hl_cpp.6"])
     msg("hdf is located in ["+hdfpath+"]\n")
     showList("hdf libs", hdflibs)
 else :
