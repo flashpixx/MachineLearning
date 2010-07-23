@@ -27,7 +27,7 @@ def configuration_posix(config) :
     config["compileflags"]      = "-D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS -O2 -Wall -ftree-vectorize"
     config["include"]           = os.environ["CPPPATH"]
     config["libpath"]           = os.environ["LIBRARY_PATH"]
-    config["libs"]              = "cryptopp"
+    config["libs"]              = ""
     config["libsuffix"]         = [".lib", ".a"]
     config["libremovestring"]   = "lib"
     config["libremovesuffix"]   = True  
