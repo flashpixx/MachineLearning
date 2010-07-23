@@ -28,7 +28,7 @@ def configuration_posix(config) :
     config["include"]           = os.environ["CPPPATH"]
     config["libpath"]           = os.environ["LIBRARY_PATH"]
     config["libs"]              = ""
-    config["libsuffix"]         = [".lib", ".a"]
+    config["libsuffix"]         = [".so", ".a"]
     config["libremovestring"]   = "lib"
     config["libremovesuffix"]   = True  
     
@@ -191,13 +191,18 @@ def readLibs(pEnv, pPath):
         for n in pEnv["libsuffix"] :
             if n in i :
                 
-                c = i
+                # add ad the beginning and end # because prefix and suffix
+                # should be remove only there
+                c = "#" + i + "#"
                 if env["libremovesuffix"] :
-                    c = c.replace(n, "")
-                    
+                    c = c.replace( n+"#", "")
+
                 for x in libremove :
-                    c = c.replace(x, "")
+                    c = c.replace( "#"+x, "")
+                    
+                c = c.replace("#", "")
                 lst.append(c)
+
     #für Python < 2.4: lst = dict(map(lambda i: (i,1),lst)).keys()
     lst = list(set(lst))
     lst.sort()
