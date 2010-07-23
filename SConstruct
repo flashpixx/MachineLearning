@@ -6,13 +6,13 @@ import glob
 #=== function for os configuration ===================================================================================================
 
 # constante for showing messages during compiling
-SHOWCONFIG = True
+SHOWCONFIG = False
 # using CPUs for compiling
 COMPILECPU = 6
 
 def configuration_macosx(config) :
     config["seperator"]         = ":"
-    config["compiler"]          = "g++"
+    config["compiler"]          = "mpic++"
     config["compileflags"]      = "-D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS -O2 -Wall -ftree-vectorize"
     config["include"]           = os.environ["CPPPATH"]
     config["libpath"]           = os.environ["LIBRARY_PATH"]
@@ -23,7 +23,7 @@ def configuration_macosx(config) :
     
 def configuration_posix(config) :
     config["seperator"]         = ":"
-    config["compiler"]          = "g++"
+    config["compiler"]          = "mpic++"
     config["compileflags"]      = "-D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS -O2 -Wall -ftree-vectorize"
     config["include"]           = os.environ["CPPPATH"]
     config["libpath"]           = os.environ["LIBRARY_PATH"]
@@ -39,7 +39,7 @@ def configuration_win32(config) :
     config["include"]           = os.environ["INCLUDE"]
     config["libpath"]           = os.environ["LIBS"]
     config["libs"]              = ""
-    config["libsuffix"]         = ".lib"
+    config["libsuffix"]         = ""
     config["libremovestring"]   = ""
     config["libremovesuffix"]   = False 
 #=======================================================================================================================================
