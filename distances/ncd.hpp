@@ -174,7 +174,7 @@ namespace machinelearning { namespace distances {
             
             // create deflate to cache
             if (i==0)
-                l_cache(0) = deflate(p_isfile, p_strvec[i]);
+                l_cache(i) = deflate(p_isfile, p_strvec[i]);
             
             // diagonal elements are always zero
             l_distances(i,i) = 0;

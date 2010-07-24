@@ -45,7 +45,28 @@ int main(int argc, char *argv[]) {
     //std::cout <<  ublas::project(x, ia, ia) << std::endl;
     */
     
-    tl::files::hdf o("blub.hdf5");
+    
+    ublas::matrix<double> x(3,3);
+    x(0,0)=1;     x(0,1)=12;  x(0,2)=20;
+    x(1,0)=2;     x(1,1)=2;   x(1,2)=9;
+    x(2,0)=3;     x(2,1)=3;   x(2,2)=4;
+    
+    ublas::matrix<double> y(3,3);
+    y(0,0)=6;
+    y(1,1)=17;
+    y(2,2)=33;
+    
+    
+    ublas::vector<double> l_eigenvalues;
+    ublas::matrix<double> l_eigenvectors;
+    tl::lapack::eigen<double>(x, l_eigenvalues, l_eigenvectors);
+    
+    std::cout << l_eigenvalues << std::endl;
+    std::cout << std::endl;
+    std::cout << l_eigenvectors << std::endl;
+    
+    
+    //tl::files::hdf o("blub.hdf5");
     //std::cout << o.readString("/string") << std::endl;
 	//std::vector<std::string> x = o.readStringVector("/stringarray");
     //ublas::vector<double> x = o.readVector<double>("/vector", H5::PredType::NATIVE_DOUBLE);
@@ -63,7 +84,7 @@ int main(int argc, char *argv[]) {
     */
     
     // ==== LLE ====
-    
+    /*
     ublas::matrix<double> data = o.readMatrix<double>("/pcadata", H5::PredType::NATIVE_DOUBLE); 
     
     dist::euclid<double> d;
@@ -72,7 +93,7 @@ int main(int argc, char *argv[]) {
     
     tl::files::hdf f("lle.hdf5", true);
     f.write<double>( "/data",  l.map(data), H5::PredType::NATIVE_DOUBLE );  
-      
+    */
 	
 	// ==== LDA ====
     /*

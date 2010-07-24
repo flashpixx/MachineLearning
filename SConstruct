@@ -267,8 +267,8 @@ atlaslibs = []
 atlaspath = getListPattern("atlas", library_path, True)
 if atlaspath :
     atlaslibs = readLibs(env, atlaspath)
-    # remove ptcblas, not 
-    atlaslibs = rmListItem(atlaslibs, "ptcblas")
+    # remove ptcblas
+    atlaslibs = rmListItem(atlaslibs, ["ptcblas", "ptf77blas", "f77blas"])
     msg("atlas is located in ["+atlaspath+"]\n")
     showList("atlas libs", atlaslibs)
 else :
@@ -310,3 +310,4 @@ SetOption('num_jobs',   int(os.environ.get('NUM_CPU', COMPILECPU)))
 
 # get all cpp-files and compile
 env.Program( getRekusivFiles(os.curdir, ".cpp", ["gui"]), LIBS=alllibs, LIBPATH=library_path )
+
