@@ -229,9 +229,12 @@ namespace machinelearning { namespace tools {
         linalg::geev( 'N', 'V', l_matrix, l_eigval,  l_tmp1,l_tmp2,  l_eigvec, linalg::optimal_workspace() );
         
 		// normalize every eigenvector
-		for(std::size_t i=0; i < l_eigvec.size2(); ++i)
-			ublas::column(l_eigvec, i) /= blas::nrm2( static_cast< ublas::vector<T> >(ublas::column(l_eigvec, i)) );
-		
+		for(std::size_t i=0; i < l_eigvec.size2(); ++i) {
+			const T l_val = blas::nrm2( static_cast< ublas::vector<T> >(ublas::column(l_eigvec, i)) );
+            if (!function::isNumericalZero<T>(l_val))
+                    ublas::column(l_eigvec, i) /= l_val;
+		}
+            
         // we must copy the reference
         p_eigvec = l_eigvec;
         p_eigval = l_eigval;
@@ -253,7 +256,7 @@ namespace machinelearning { namespace tools {
         // create result structures
         ublas::matrix<T, ublas::column_major> l_eigvec(l_matrix.size1(), l_matrix.size2());
         ublas::vector<T> l_eigval(l_matrix.size1());
-        ublas::vector<T> l_div(l_eigval.size());
+        ublas::vector<T> l_div(l_matrix.size1());
         
         // need temporary structures
         ublas::vector<T> l_tmp1(l_eigval.size());
@@ -263,13 +266,16 @@ namespace machinelearning { namespace tools {
         linalg::ggev( 'N', 'V', l_matrix, l_diag, l_eigval,  l_tmp1,  l_div,  l_tmp2,  l_eigvec, linalg::optimal_workspace() );
         
         // calculate eigenvalues
-        std::size_t n=0;
-        BOOST_FOREACH( T& i, l_eigval)
-            i /= l_div(n++);
-		
+        for(std::size_t i=0; i < l_eigval.size(); ++i)
+            if (!function::isNumericalZero<T>(l_div(i)))
+                l_eigval(i) /= l_div(i);
+  		
 		// normalize every eigenvector
-		for(std::size_t i=0; i < l_eigvec.size2(); ++i)
-			ublas::column(l_eigvec, i) /= blas::nrm2( static_cast< ublas::vector<T> >(ublas::column(l_eigvec, i)) );
+		for(std::size_t i=0; i < l_eigvec.size2(); ++i) {
+			const T l_val = blas::nrm2( static_cast< ublas::vector<T> >(ublas::column(l_eigvec, i)) );
+            if (!function::isNumericalZero<T>(l_val))
+                ublas::column(l_eigvec, i) /= l_val;
+        }
 		
         
         // we must copy the reference
