@@ -97,7 +97,7 @@ namespace machinelearning { namespace dimensionreduce { namespace supervised {
     template<typename T, typename L> inline ublas::matrix<T> lda<T, L>::map( const ublas::matrix<T>& p_data, const std::vector<L>& p_label )
     {
         if (p_data.size1() != p_label.size())
-            throw exception::samesize("matrix rows", "label size");
+            throw exception::matrix("matrix rows and label size are not equal");
         
         
         // create a unique label vector

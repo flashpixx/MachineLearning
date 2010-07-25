@@ -28,10 +28,6 @@ namespace machinelearning { namespace exception {
     greaterthanzero::greaterthanzero( const std::string& p_str ) : std::invalid_argument("argument ["+p_str+"] must be greater than zero") {}
     
     greaterthan::greaterthan( const std::string& p_str1, const std::string& p_str2 ) : std::invalid_argument("argument ["+p_str1+"] must be greater than ["+p_str2+"]") {}
-    
-    matrixsymmetric::matrixsymmetric( void ) : std::invalid_argument("matrix must be symmetric (same size of rows and columns)") {}
-    
-    samesize::samesize( const std::string& p_str1, const std::string& p_str2 ) : std::invalid_argument("argument ["+p_str1+"] and argument ["+p_str2+"] don't have the same size") {}
 
     initialization::initialization( const std::string& p_str ) : std::range_error("value ["+p_str+"] is not initialisized") {}
     
@@ -45,9 +41,7 @@ namespace machinelearning { namespace exception {
     
     templatevirtual::templatevirtual( const std::string& p_str ) : std::runtime_error("virtual method ["+p_str+"] must not be called") {}
     
-    lapack::lapack( const std::string& p_str ) : std::runtime_error("lineare algebra package error"+( (!p_str.empty()) ? " ["+p_str+"]" : "" )) {}  
-    
-    numeric::numeric( const std::string& p_str ) : std::runtime_error("numeric error"+( (!p_str.empty()) ? " ["+p_str+"]" : "" )) {}  
+    matrix::matrix( const std::string& p_str ) : std::runtime_error("matrix error"+( (!p_str.empty()) ? " ["+p_str+"]" : "" )) {}  
     
     
 };};

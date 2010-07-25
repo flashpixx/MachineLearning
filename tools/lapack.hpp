@@ -80,13 +80,10 @@ namespace machinelearning { namespace tools {
      **/    
     template<typename T> inline void lapack::eigen( const ublas::matrix<T>& p_matrix, const ublas::matrix<T>& p_diag, ublas::vector<T>& p_eigval )
     {
-        if (p_matrix.size1() != p_matrix.size2())
-            throw exception::matrixsymmetric();
-        if (p_diag.size1() != p_diag.size2())
-            throw exception::matrixsymmetric();
-        
+        if (  (p_matrix.size1() != p_matrix.size2()) || (p_diag.size1() != p_diag.size2())  )
+            throw exception::matrix("matrix are not symmetric");
         if ( (p_matrix.size1() != p_diag.size1()) || (p_matrix.size2() != p_diag.size2()) )
-            throw exception::samesize("matrix", "diagonal matrix");  
+            throw exception::matrix("both matrices have not the same size");  
         
         ublas::matrix<T> l_eigvec;
         symGeneralEigenDecomposition(p_matrix, p_diag, p_eigval, l_eigvec);
@@ -101,13 +98,10 @@ namespace machinelearning { namespace tools {
      **/    
     template<typename T> inline void lapack::eigen( const ublas::matrix<T>& p_matrix, const ublas::matrix<T>& p_diag, ublas::matrix<T>& p_eigvec )
     {
-        if (p_matrix.size1() != p_matrix.size2())
-            throw exception::matrixsymmetric();
-        if (p_diag.size1() != p_diag.size2())
-            throw exception::matrixsymmetric();
-        
+        if (  (p_matrix.size1() != p_matrix.size2()) || (p_diag.size1() != p_diag.size2())  )
+            throw exception::matrix("matrix are not symmetric");
         if ( (p_matrix.size1() != p_diag.size1()) || (p_matrix.size2() != p_diag.size2()) )
-            throw exception::samesize("matrix", "diagonal matrix");  
+            throw exception::matrix("both matrices have not the same size");  
         
         ublas::vector<T> l_eigval;
         symGeneralEigenDecomposition(p_matrix, p_diag, l_eigval, p_eigvec);
@@ -123,13 +117,10 @@ namespace machinelearning { namespace tools {
      **/
     template<typename T> inline void lapack::eigen( const ublas::matrix<T>& p_matrix, const ublas::matrix<T>& p_diag, ublas::vector<T>& p_eigval, ublas::matrix<T>& p_eigvec )
     {
-        if (p_matrix.size1() != p_matrix.size2())
-            throw exception::matrixsymmetric();
-        if (p_diag.size1() != p_diag.size2())
-            throw exception::matrixsymmetric();
-        
+        if (  (p_matrix.size1() != p_matrix.size2()) || (p_diag.size1() != p_diag.size2())  )
+            throw exception::matrix("matrix are not symmetric");
         if ( (p_matrix.size1() != p_diag.size1()) || (p_matrix.size2() != p_diag.size2()) )
-            throw exception::samesize("matrix", "diagonal matrix");
+            throw exception::matrix("both matrices have not the same size");
         
         symGeneralEigenDecomposition(p_matrix, p_diag, p_eigval, p_eigvec);
     }
@@ -144,7 +135,7 @@ namespace machinelearning { namespace tools {
     template<typename T> inline void lapack::eigen( const ublas::matrix<T>& p_matrix, ublas::vector<T>& p_eigval, ublas::matrix<T>& p_eigvec )
     {
         if (p_matrix.size1() != p_matrix.size2())
-            throw exception::matrixsymmetric();
+            throw exception::matrix("matrix are not symmetric");
         
         symEigenDecomposition( p_matrix, p_eigval, p_eigvec );
     }
@@ -159,7 +150,7 @@ namespace machinelearning { namespace tools {
     template<typename T> inline void lapack::eigen( const ublas::matrix<T>& p_matrix, ublas::matrix<T>& p_eigvec )
     {
         if (p_matrix.size1() != p_matrix.size2())
-            throw exception::matrixsymmetric();
+            throw exception::matrix("matrix are not symmetric");
         
         ublas::vector<T> l_eigval;
         symEigenDecomposition( p_matrix, l_eigval, p_eigvec );
@@ -175,7 +166,7 @@ namespace machinelearning { namespace tools {
     template<typename T> inline void lapack::eigen( const ublas::matrix<T>& p_matrix, ublas::vector<T>& p_eigval )
     {
         if (p_matrix.size1() != p_matrix.size2())
-            throw exception::matrixsymmetric();
+            throw exception::matrix("matrix are not symmetric");
     
         ublas::matrix<T> l_eigvec;
         symEigenDecomposition( p_matrix, p_eigval, l_eigvec );

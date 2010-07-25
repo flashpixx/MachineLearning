@@ -212,9 +212,9 @@ namespace machinelearning { namespace clustering { namespace supervised {
         if (p_iterations == 0)
             throw exception::greaterthanzero("iterations");
         if (p_labels.size() != p_data.size1())
-            throw exception::samesize("label vector", "matrix rows");
+            throw exception::matrix("matrix rows and label size are not equal");
         if (p_data.size2() != m_prototypes.size2())
-            throw exception::samesize("data dimension", "prototype dimension");
+            throw exception::matrix("data and prototype dimension are not equal");
         if (p_lambda <= 0)
             throw exception::greaterthanzero("lambda");
         if (p_eta <= 0)
@@ -294,7 +294,7 @@ namespace machinelearning { namespace clustering { namespace supervised {
     template<typename T, typename L> inline std::vector<L> rlvq<T, L>::use( const ublas::matrix<T>& p_data ) const
     {
         if (p_data.size2() != m_prototypes.size2())
-            throw exception::samesize("data dimension", "prototype dimension");
+            throw exception::matrix("data and prototype dimension are not equal");
         
         ublas::scalar_vector<T> l_ones(m_prototypes.size1(), 1);
         std::vector<L> l_labels( p_data.size1() );

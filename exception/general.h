@@ -28,22 +28,19 @@
 #include <stdexcept>
 #include <exception>
 
+
 namespace machinelearning { namespace exception {
 
     class greaterthanzero  : public std::invalid_argument   { public : greaterthanzero( const std::string& ); };
     class greaterthan      : public std::invalid_argument   { public : greaterthan( const std::string&, const std::string& ); };
-    class matrixsymmetric  : public std::invalid_argument   { public : matrixsymmetric( void ); };
-    class samesize         : public std::invalid_argument   { public : samesize( const std::string&, const std::string& ); };
     class initialization   : public std::range_error        { public : initialization( const std::string& ); };
     class iostreamopen     : public std::ios_base::failure  { public : iostreamopen( const std::string& ); };
     class iostreamempty    : public std::ios_base::failure  { public : iostreamempty( const std::string& ); };
+    
+    
+    
     class templatevirtual  : public std::runtime_error      { public : templatevirtual( const std::string& ); };
-    
-    
-    
-    class lapack           : public std::runtime_error      { public : lapack( const std::string& ); };
-    class numeric          : public std::runtime_error      { public : numeric( const std::string& ); };
-    
+    class matrix           : public std::runtime_error      { public : matrix( const std::string& ); };
     
 };};
 

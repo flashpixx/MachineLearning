@@ -186,7 +186,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         if (p_iterations == 0)
             throw exception::greaterthanzero("iterations");
         if (p_data.size2() != m_prototypes.size2())
-            throw exception::samesize("data dimension", "prototype dimension");
+            throw exception::matrix("data and prototype dimension are not equal");
         if (p_lambda <= 0)
             throw exception::greaterthanzero("lambda");
         
