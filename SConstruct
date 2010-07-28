@@ -20,6 +20,8 @@ def configuration_macosx(config) :
     config["libsuffix"]         = [".dylib", ".a"]
     config["libremovestring"]   = "lib"
     config["libremovesuffix"]   = True  
+    config["ldremove"]          = ["boost_python", "hdf5.6", "hdf5_cpp.6", "hdf5_hl.6", "hdf5_hl_cpp.6", "ptcblas", "ptf77blas", "f77blas"]
+    
     
 def configuration_posix(config) :
     config["seperator"]         = ":"
@@ -31,6 +33,8 @@ def configuration_posix(config) :
     config["libsuffix"]         = [".so", ".a"]
     config["libremovestring"]   = "lib"
     config["libremovesuffix"]   = True  
+    config["ldremove"]          = ["boost_python", "hdf5.6", "hdf5_cpp.6", "hdf5_hl.6", "hdf5_hl_cpp.6", "ptcblas", "ptf77blas", "f77blas"]
+
     
 def configuration_win32(config) :
     config["seperator"]         = ";"
@@ -117,6 +121,7 @@ def checkSysConfig():
     env["libsuffix"]        = config["libsuffix"].split(config["seperator"])
     env["libremovesuffix"]  = config["libremovesuffix"]
     env["libremovestring"]  = config["libremovestring"]
+    env["ldremove"]         = config["ldremove"]
 
     # only *.o files will be clean ??
     #env.NoClean( getRekusivFiles(os.curdir, ".o") )
@@ -256,8 +261,6 @@ boostlibs = []
 boostpath = getListPattern("boost", library_path, True)
 if boostpath :
     boostlibs = readLibs(env, boostpath)
-    boostlibs = rmListItem(boostlibs, "boost_python")
-    
     msg("boost is located in ["+boostpath+"]\n")
     showList("boost libs", boostlibs)
 else :
@@ -269,8 +272,6 @@ atlaslibs = []
 atlaspath = getListPattern("atlas", library_path, True)
 if atlaspath :
     atlaslibs = readLibs(env, atlaspath)
-    atlaslibs = rmListItem(atlaslibs, ["ptcblas", "ptf77blas", "f77blas"])
-
     msg("atlas is located in ["+atlaspath+"]\n")
     showList("atlas libs", atlaslibs)
 else :
@@ -282,8 +283,6 @@ hdflibs = []
 hdfpath = getListPattern("hdf", library_path, True)
 if hdfpath :
     hdflibs = readLibs(env, hdfpath)
-    hdflibs = rmListItem(hdflibs, ["hdf5.6", "hdf5_cpp.6", "hdf5_hl.6", "hdf5_hl_cpp.6"])
-
     msg("hdf is located in ["+hdfpath+"]\n")
     showList("hdf libs", hdflibs)
 else :
@@ -303,6 +302,9 @@ alllibs.extend(general_libs)
 alllibs.extend(boostlibs)
 alllibs.extend(atlaslibs)
 alllibs.extend(hdflibs)
+
+alllibs = rmListItem(alllibs, env["ldremove"])
+
 #für Python < 2.4: alllibs = dict(map(lambda i: (i,1),alllibs)).keys()
 alllibs = list(set(alllibs))
 
