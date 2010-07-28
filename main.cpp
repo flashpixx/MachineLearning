@@ -73,7 +73,7 @@ int main(int argc, char *argv[]) {
     std::cout << l_eigenvectors << std::endl;
     */
     
-    tl::files::hdf o("blub.hdf5");
+    //tl::files::hdf o("blub.hdf5");
     //std::cout << o.readString("/string") << std::endl;
 	//std::vector<std::string> x = o.readStringVector("/stringarray");
     //ublas::vector<double> x = o.readVector<double>("/vector", H5::PredType::NATIVE_DOUBLE);
@@ -193,7 +193,7 @@ int main(int argc, char *argv[]) {
     
      
     //=============== NCD ================
-    /*
+    
     std::vector< std:: string > val(4);
     val[0] = "main.cpp";
     val[1] = "tools/files/hdf.hpp";
@@ -206,7 +206,7 @@ int main(int argc, char *argv[]) {
     
     dist::ncd v(dist::ncd::bzip2);
     std::cout << "BZip2: " << v.calculate<double>(val, true) << std::endl;
-    */
+    
     
     return EXIT_SUCCESS;
 }

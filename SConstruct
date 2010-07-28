@@ -12,7 +12,7 @@ COMPILECPU = 6
 
 def configuration_macosx(config) :
     config["seperator"]         = ":"
-    config["compiler"]          = "mpic++"
+    config["compiler"]          = "g++"
     config["compileflags"]      = "-D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS -O2 -Wall -ftree-vectorize"
     config["include"]           = os.environ["CPPPATH"]
     config["libpath"]           = os.environ["LIBRARY_PATH"]
@@ -23,7 +23,7 @@ def configuration_macosx(config) :
     
 def configuration_posix(config) :
     config["seperator"]         = ":"
-    config["compiler"]          = "mpic++"
+    config["compiler"]          = "g++"
     config["compileflags"]      = "-D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS -O2 -Wall -ftree-vectorize"
     config["include"]           = os.environ["CPPPATH"]
     config["libpath"]           = os.environ["LIBRARY_PATH"]
@@ -256,6 +256,8 @@ boostlibs = []
 boostpath = getListPattern("boost", library_path, True)
 if boostpath :
     boostlibs = readLibs(env, boostpath)
+    boostlibs = rmListItem(boostlibs, "boost_python")
+    
     msg("boost is located in ["+boostpath+"]\n")
     showList("boost libs", boostlibs)
 else :
@@ -267,8 +269,8 @@ atlaslibs = []
 atlaspath = getListPattern("atlas", library_path, True)
 if atlaspath :
     atlaslibs = readLibs(env, atlaspath)
-    # remove ptcblas
     atlaslibs = rmListItem(atlaslibs, ["ptcblas", "ptf77blas", "f77blas"])
+
     msg("atlas is located in ["+atlaspath+"]\n")
     showList("atlas libs", atlaslibs)
 else :
@@ -280,8 +282,8 @@ hdflibs = []
 hdfpath = getListPattern("hdf", library_path, True)
 if hdfpath :
     hdflibs = readLibs(env, hdfpath)
-    #remove hdf5.6, hdf5_cpp.6, hdf5_hl.6, hdf5_hl_cpp.6
     hdflibs = rmListItem(hdflibs, ["hdf5.6", "hdf5_cpp.6", "hdf5_hl.6", "hdf5_hl_cpp.6"])
+
     msg("hdf is located in ["+hdfpath+"]\n")
     showList("hdf libs", hdflibs)
 else :
