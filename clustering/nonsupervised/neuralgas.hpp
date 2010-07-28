@@ -220,7 +220,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             // adapt value
             for(std::size_t n=0; n < l_adaptmatrix.size2(); ++n) {
                 ublas::vector<T> l_col = ublas::column(l_adaptmatrix, n);
-                l_col                 = tools::vector::rank( l_col );
+                l_col                  = tools::vector::rank( l_col );
                 
                 // calculate adapt value
                 BOOST_FOREACH( T& p, l_col)
@@ -288,7 +288,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         // determine nearest prototype
         for(std::size_t i=0; i < m_prototypes.size2(); ++i) {
             ublas::vector<T> l_col                  = ublas::column(l_distance, i);
-            const ublas::vector<std::size_t> l_rank = tools::vector::rankIndex( l_col );
+            const ublas::indirect_array<> l_rank    = tools::vector::rankIndex( l_col );
             l_vec.push_back( static_cast<T>(l_rank(0)) );
         }
             

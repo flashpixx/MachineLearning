@@ -241,7 +241,7 @@ namespace machinelearning { namespace clustering { namespace supervised {
                 
                 // calculate weighted distance and rank vector elements, the first element is the index of the winner prototype
                 ublas::vector<T> l_distance             = m_distance->calculate( m_prototypes, ublas::outer_prod( l_ones, ublas::row(p_data, j) ), l_lambda );
-                const ublas::vector<std::size_t> l_rank = tools::vector::rankIndex( l_distance );
+                const ublas::indirect_array<> l_rank    = tools::vector::rankIndex( l_distance );
                 
                 // calculate adapt values
                 const ublas::vector<T> l_winnerdelta    = ublas::row(p_data, j) - ublas::row(m_prototypes, l_rank(0) );
@@ -303,7 +303,7 @@ namespace machinelearning { namespace clustering { namespace supervised {
             
             // calculate distance from datapoint to all prototyps and rank position
             ublas::vector<T> l_distance          = m_distance->calculate( m_prototypes, ublas::outer_prod( l_ones, ublas::row(p_data, i) )  );
-            ublas::vector<std::size_t> l_rank    = tools::vector::rankIndex( l_distance );
+            ublas::indirect_array<> l_rank       = tools::vector::rankIndex( l_distance );
             
             // add neuron label
             l_labels[i] = m_neuronlabels[ l_rank(0) ];

@@ -183,11 +183,10 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             // iterate over the columns and ranks every column
             l_adaptmatrix.clear();
             for(std::size_t n=0; n < l_distances.size2(); ++n) {
-                ublas::vector<T> l_vec               = ublas::column(l_distances, n);
-                ublas::vector<std::size_t> l_rank    = tools::vector::rankIndex( l_vec );
+                ublas::vector<T> l_vec = ublas::column(l_distances, n);
 
                 // set winner
-                l_adaptmatrix(l_rank(0), n)         = 1;
+                l_adaptmatrix(tools::vector::rankIndex( l_vec )(0), n) = static_cast<T>(1);
             }
             
             
