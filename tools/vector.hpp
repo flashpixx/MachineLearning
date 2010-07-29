@@ -86,7 +86,7 @@ namespace machinelearning { namespace tools {
             template<typename T> static std::vector<T> unique( const std::vector<T>& p_vec );
             template<typename T> static ublas::vector<std::size_t> rank( ublas::vector<T>& );
             template<typename T> static ublas::vector<std::size_t> rankIndexVector( ublas::vector<T>& );
-            template<typename T> static ublas::indirect_array<> rankIndex( ublas::vector<T>& );
+            template<typename T> static ublas::indirect_array< std::vector<std::size_t> > rankIndex( ublas::vector<T>& );
          
     };
     
@@ -248,20 +248,12 @@ namespace machinelearning { namespace tools {
      * @param p_vec vector with elements
      * @return index array
      **/
-    template<typename T> inline ublas::indirect_array<> vector::rankIndex( ublas::vector<T>& p_vec )
+    template<typename T> inline ublas::indirect_array< std::vector<std::size_t> > vector::rankIndex( ublas::vector<T>& p_vec )
     {
-        ublas::indirect_array<> l_idx(p_vec.size());
         std::vector<std::size_t> l_temp(boost::counting_iterator<std::size_t>(0), boost::counting_iterator<std::size_t>(p_vec.size()));
         std::sort( l_temp.begin(), l_temp.end(), lam::var(p_vec)[lam::_1] < lam::var(p_vec)[lam::_2]);
         
-        //std::copy(l_temp.begin(), l_temp.end(), l_idx.begin());
-        
-        
-        for(std::size_t i=0; i < l_idx.size(); ++i)
-            l_idx[i] = l_temp[i];
-        
-         
-        return l_idx;
+        return ublas::indirect_array< std::vector<std::size_t> >(p_vec.size(), l_temp);
     }
     
 };};

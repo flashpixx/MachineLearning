@@ -29,28 +29,7 @@ int main(int argc, char *argv[]) {
     namespace linalg    = boost::numeric::bindings::lapack;
     namespace ublas     = boost::numeric::ublas;
     
-    
-    /*
-    ublas::vector<double> y = tl::vector::random<double>(10);
-    std::cout << y << std::endl;
-    
-    
-    ublas::indirect_array<> x = tl::vector::rankIndex(y);
-    
-    ublas::vector<std::size_t> y(3);
-    y(0) = 0;
-    y(1) = 3;
-    y(2) = 5;
-    
-    ublas::indirect_array<> ia(3);
-    std::cout << y << std::endl;
-    
-    
-    ublas::matrix<double> x = tl::matrix::random<double>(6);
-    std::cout << x << std::endl;
-    
-    //std::cout <<  ublas::project(x, ia, ia) << std::endl;
-    */
+
     
     /*
     ublas::matrix<double> x(3,3);
@@ -189,11 +168,11 @@ int main(int argc, char *argv[]) {
         std::vector< ublas::matrix<double> > p = vq.getLoggedPrototypes();
         for(std::size_t i=0; i < p.size(); ++i)
             f.write<double>("/log" + boost::lexical_cast<std::string>( i ), p[i], H5::PredType::NATIVE_DOUBLE );
-    }*/
-    
+    }
+    */
      
     //=============== NCD ================
-    
+    /*
     std::vector< std:: string > val(4);
     val[0] = "main.cpp";
     val[1] = "tools/files/hdf.hpp";
@@ -206,7 +185,7 @@ int main(int argc, char *argv[]) {
     
     dist::ncd v(dist::ncd::bzip2);
     std::cout << "BZip2: " << v.calculate<double>(val, true) << std::endl;
-    
+    */
     
     return EXIT_SUCCESS;
 }

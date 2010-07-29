@@ -313,5 +313,5 @@ msg("=== compiling =============================================================
 SetOption('num_jobs',   int(os.environ.get('NUM_CPU', COMPILECPU)))
 
 # get all cpp-files and compile
-env.Program( getRekusivFiles(os.curdir, ".cpp", ["gui"]), LIBS=alllibs, LIBPATH=library_path )
+env.Program( getRekusivFiles(os.curdir, ".cpp"), LIBS=alllibs, LIBPATH=library_path )
 
