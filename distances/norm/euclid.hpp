@@ -27,9 +27,8 @@
 
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
-#include <boost/numeric/bindings/ublas/matrix.hpp>
-#include <boost/numeric/bindings/ublas/vector.hpp>
 #include <boost/numeric/bindings/blas.hpp>
+
 
 #include "../distance.hpp"
 #include "../../exception/exception.h"

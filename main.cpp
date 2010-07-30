@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
     
     tl::files::hdf f("spectral.hdf5", true);
     f.write<double>( "/data",  sp.getPrototypes(), H5::PredType::NATIVE_DOUBLE );  
-    
+
     
     // ==== LLE ====
     /*

@@ -26,6 +26,7 @@
 
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
+#include <boost/numeric/bindings/blas.hpp>
 
 #include "../clustering.hpp"
 #include "neuralgas.hpp"
@@ -33,16 +34,14 @@
 #include "../../tools/tools.h"
 #include "../../distances/distances.h"
 
-#include <iostream>
-#include <boost/numeric/ublas/io.hpp>
 
 namespace machinelearning { namespace clustering { namespace nonsupervised {
     
     namespace ublas = boost::numeric::ublas;
+    namespace blas  = boost::numeric::bindings::blas;
     
     
-    
-    /** class for (normalized & unnormalized) spectral clustering. This class calculates only the graph laplacian
+    /** class for normalized spectral clustering. This class calculates only the graph laplacian
      * and creates the general eigenvector decomposition. A neuralgas algorithm with euclidian
      * distancesis used for clustering the data
      * @todo set all routines to sparse matrix if arpack can be used with boost
@@ -66,7 +65,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             
             //static std::size_t getEigenGap( const ublas::matrix<T>& ) const;
             //static std::size_t getEigenGap( const ublas::matrix<T>&, const ublas::matrix<T>& ) const;
-            
+
 
         private :
         
@@ -159,7 +158,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * @todo try to do it numerical stable
      * @param p_dissimilarity similarity NxN matrix, needs to be symmetric and non-negative
      * @param p_iterations number of iterations
-     * @todo don't work, eigenvalues are not correct
      **/
     template<typename T> inline void spectralclustering<T>::train( const ublas::matrix<T>& p_dissimilarity, const std::size_t& p_iterations )
     {
@@ -185,15 +183,15 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         // ranking eigenvalues and get the k smallest for the eigenvectors
         const ublas::indirect_array< std::vector<std::size_t> > l_rank = tools::vector::rankIndex<T>(l_eigenvalue);
         
-        std::cout << l_eigenvector << std::endl;
-        std::cout << std::endl;
-        std::cout << l_eigenvalue << std::endl;
-        
-        // extrakt the k eigenvectors
+        // extrakt the k eigenvectors, change the normalized laplacian back and normalize
         ublas::matrix<T> l_eigenmatrix(m_ng.getPrototypeCount(), l_laplacian.size1());
-        for(std::size_t i=0; i < m_ng.getPrototypeCount(); ++i)
-            ublas::row(l_eigenmatrix, i) = ublas::column(l_eigenvector, l_rank(i));
+        const ublas::vector<T> l_sum = tools::matrix::sum(l_similarity);
         
+        for(std::size_t i=0; i < m_ng.getPrototypeCount(); ++i) {
+            ublas::row(l_eigenmatrix, i)  = ublas::element_div( ublas::column(l_eigenvector, l_rank(i)), l_sum );
+            ublas::row(l_eigenmatrix, i) /= blas::nrm2( static_cast< ublas::vector<T> >(ublas::row(l_eigenmatrix, i)) ); 
+        }
+            
         // clustering
         m_ng.train(l_eigenmatrix, p_iterations);
     }
