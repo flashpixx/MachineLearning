@@ -26,8 +26,8 @@
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 
-#include "../tools/tools.h"
 #include "../exception/exception.h"
+#include "../tools/tools.h"
 
 
 namespace machinelearning { namespace distances {

@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
     std::cout << l_eigenvectors << std::endl;
     */
     
-    //tl::files::hdf o("blub.hdf5");
+    tl::files::hdf o("blub.hdf5");
     //std::cout << o.readString("/string") << std::endl;
 	//std::vector<std::string> x = o.readStringVector("/stringarray");
     //ublas::vector<double> x = o.readVector<double>("/vector", H5::PredType::NATIVE_DOUBLE);
@@ -60,14 +60,14 @@ int main(int argc, char *argv[]) {
     
     
     // ==== Spectral Clustering ====
-    /*
+    
     ublas::matrix<double> data = o.readMatrix<double>("/spectral2", H5::PredType::NATIVE_DOUBLE); 
     nsl::spectralclustering<double> sp(3, data.size1());
     sp.train(data, 15);
     
     tl::files::hdf f("spectral.hdf5", true);
     f.write<double>( "/data",  sp.getPrototypes(), H5::PredType::NATIVE_DOUBLE );  
-    */
+    
     
     // ==== LLE ====
     /*
@@ -140,8 +140,8 @@ int main(int argc, char *argv[]) {
         std::vector< ublas::matrix<double> > p = ng.getLoggedPrototypes();
         for(std::size_t i=0; i < p.size(); ++i)
             f.write<double>("/log" + boost::lexical_cast<std::string>( i ), p[i], H5::PredType::NATIVE_DOUBLE );
-    }*/
-    
+    }
+    */
     
     // ===== RLVQ ======
     /*

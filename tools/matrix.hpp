@@ -32,8 +32,8 @@
 #include <boost/numeric/ublas/matrix_proxy.hpp>
 
 #include "../exception/exception.h"
+//#include "../distances/distances.h"
 #include "vector.hpp"
-#include "lapack.hpp"
 #include "function.hpp"
 
 
@@ -54,15 +54,6 @@ namespace machinelearning { namespace tools {
                 column  = 1
             };
         
-            enum definitekind
-            {
-                none         = 0,
-                positive     = 1,
-                negative     = 2,
-                positivesemi = 3,
-                negativesemi = 4
-            };
-        
         
             template<typename T> static ublas::matrix<T> random( const std::size_t&, const std::size_t&, const tools::random::distribution& = tools::random::uniform );
             template<typename T> static ublas::matrix<T> random( const std::size_t&, const tools::random::distribution& = tools::random::uniform );
@@ -78,7 +69,8 @@ namespace machinelearning { namespace tools {
 			template<typename T> static ublas::matrix<T> centering( const ublas::matrix<T>&, const rowtype& = column );
             template<typename T> static ublas::matrix<T> sort( const ublas::matrix<T>&, const ublas::vector<std::size_t>&, const rowtype& p_which = row);
             template<typename T> static ublas::matrix<T> cov( const ublas::matrix<T>& );
-            template<typename T> static bool definite( const ublas::matrix<T>&, const definitekind& );
+            template<typename T> static ublas::matrix<T> similarity( const ublas::matrix<T>&, const distances::distance<T>& );
+            template<typename T> static ublas::matrix<T> dissimilarity( const ublas::matrix<T>&, const distances::distance<T>& );
         
     };
     
@@ -357,36 +349,26 @@ namespace machinelearning { namespace tools {
     }
     
     
-    /** determine the definite of a matrix
-     * @param p_matrix input matrix
-     * @param p_def option which kind of definite will be calculate
-     * @return bool of definite is set
+    /** creates a similarity matrix from a dissimilarity matrix
+     * @param p_dissimilarity input dissimilarity matrix
+     * @param p_distance distance object for converting
+     * @return similarity matrix
      **/
-    template<typename T> inline bool matrix::definite( const ublas::matrix<T>& p_matrix, const definitekind& p_def )
+    template<typename T> inline ublas::matrix<T> matrix::similarity( const ublas::matrix<T>& p_dissimilarity, const distances::distance<T>& p_distance )
     {
-        ublas::vector<T> l_eigval;
-        lapack::eigen(p_matrix, l_eigval);
-        
-        std::size_t l_null = 0;
-        std::size_t l_pos  = 0;
-        std::size_t l_neg  = 0;
-        
-        BOOST_FOREACH( T i, l_eigval) {
-            l_null += (function::isNumericalZero<T>(i)) ? 1 : 0;
-            l_pos  += (i > 0) ? 1 : 0;
-            l_neg  += (i < 0) ? 1 : 0;
-        }
-        
-        switch (p_def)
-        {
-            case none           :     return (l_pos > 0) && (l_pos > 0);
-            case positive       :     return (l_pos > 0) && (l_neg == 0) && (l_null == 0);
-            case negative       :     return (l_neg > 0) && (l_pos == 0) && (l_null == 0);
-            case positivesemi   :     return (l_pos > 0) && (l_neg > 0)  && (l_null == 0);
-            case negativesemi   :     return (l_neg > 0) && (l_pos > 0)  && (l_null == 0);
-        }
-        
-        return false;
+        return p_dissimilarity;
+    }
+    
+    
+    /** creates a dissimilarity matrix from a similarity matrix
+     * @param p_similarity input similarity matrix
+     * @param p_distance distance object for converting
+     * @return dissimilarity matrix
+     **/
+    template<typename T> inline ublas::matrix<T> matrix::dissimilarity( const ublas::matrix<T>& p_similarity, const distances::distance<T>& p_distance )
+    {
+        // as.dist(sqrt(outer(diag(mx), diag(mx), "+") - 2*mx)) 
+        return p_similarity;
     }
        
 };};
