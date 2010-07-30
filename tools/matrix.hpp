@@ -69,6 +69,8 @@ namespace machinelearning { namespace tools {
 			template<typename T> static ublas::matrix<T> centering( const ublas::matrix<T>&, const rowtype& = column );
             template<typename T> static ublas::matrix<T> sort( const ublas::matrix<T>&, const ublas::vector<std::size_t>&, const rowtype& p_which = row);
             template<typename T> static ublas::matrix<T> cov( const ublas::matrix<T>& );
+            template<typename T> static ublas::matrix<T> setNumericalZero( const ublas::matrix<T>&, const T& = 0);
+        
         template<typename T> static ublas::matrix<T> similarity( const ublas::matrix<T>&); //, const distances::distance<T>& );
         template<typename T> static ublas::matrix<T> dissimilarity( const ublas::matrix<T>&); //, const distances::distance<T>& );
         
@@ -346,6 +348,24 @@ namespace machinelearning { namespace tools {
         
         ublas::vector<T> l_sum = sum(p_input, column);
         return (ublas::prod(ublas::trans(p_input),p_input) - ublas::outer_prod(l_sum, l_sum) / p_input.size1()) / (p_input.size1()-1);
+    }
+    
+    
+    /** changes numerical zero / datatype limit to a fixed value
+     * @param p_mat input matrix
+     * @param p_val fixed vakue
+     * @return changed matrix
+     **/
+    template<typename T> inline ublas::matrix<T> matrix::setNumericalZero( const ublas::matrix<T>& p_mat, const T& p_val)
+    {
+        ublas::matrix<T> l_mat( p_mat );
+        
+        for(std::size_t i=0; i < l_mat.size1(); ++i)
+            for(std::size_t j=0; j < l_mat.size2(); ++j)
+                if (tools::function::isNumericalZero(l_mat(i,j)))
+                    l_mat(i,j) = p_val; 
+        
+        return l_mat;
     }
     
     

@@ -87,6 +87,7 @@ namespace machinelearning { namespace tools {
             template<typename T> static ublas::vector<std::size_t> rank( ublas::vector<T>& );
             template<typename T> static ublas::vector<std::size_t> rankIndexVector( ublas::vector<T>& );
             template<typename T> static ublas::indirect_array< std::vector<std::size_t> > rankIndex( ublas::vector<T>& );
+            template<typename T> static ublas::vector<T> setNumericalZero( const ublas::vector<T>&, const T& = 0 );
          
     };
     
@@ -118,7 +119,7 @@ namespace machinelearning { namespace tools {
      **/    
     template<typename T> inline ublas::vector<T> vector::pow( const ublas::vector<T>& p_vec, const T& p_exponent )
     {
-        ublas::vector<T> l_vec = p_vec;
+        ublas::vector<T> l_vec(p_vec);
         BOOST_FOREACH( T& i, l_vec)
             i = std::pow(i, p_exponent);
         
@@ -255,6 +256,25 @@ namespace machinelearning { namespace tools {
         
         return ublas::indirect_array< std::vector<std::size_t> >(p_vec.size(), l_temp);
     }
+    
+    
+    /** changes numerical zero / datatype limit to a fixed value
+     * @param p_vec input vector
+     * @param p_val fixed vakue
+     * @return changed vector
+     **/
+    template<typename T> inline ublas::vector<T> vector::setNumericalZero( const ublas::vector<T>& p_vec, const T& p_val)
+    {
+        ublas::vector<T> l_vec(p_vec);
+        
+        BOOST_FOREACH( T& i, l_vec)
+            if (tools::function::isNumericalZero(i))
+                i = p_val;
+        
+        return l_vec;
+    }    
+    
+    
     
 };};
 
