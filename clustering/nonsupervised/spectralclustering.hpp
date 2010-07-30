@@ -159,6 +159,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * @todo try to do it numerical stable
      * @param p_dissimilarity similarity NxN matrix, needs to be symmetric and non-negative
      * @param p_iterations number of iterations
+     * @todo don't work, eigenvalues are not correct
      **/
     template<typename T> inline void spectralclustering<T>::train( const ublas::matrix<T>& p_dissimilarity, const std::size_t& p_iterations )
     {

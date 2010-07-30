@@ -43,6 +43,10 @@
  * <li><pre>MPI</pre> enable MPI Support for the toolbox (required Boost MPI support)</li>
  * </ul>
  *
+ * @section defs definitions / assumption
+ * <ul>
+ * <li>every similarity / dissimilarity matrix that is a method parameter must be a dissimilarity matrix with diagonal elements zero (otherwise it must be specified)</li>
+ * </ul>
  *
  * @page libaray Library Installation 
  * @section atlaslapack Atlas with LAPACK support

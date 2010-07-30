@@ -28,7 +28,6 @@
 
 #include <boost/numeric/ublas/matrix.hpp>
 
-#include "../distances/distances.h"
 
 
 namespace machinelearning { namespace neighborhood {

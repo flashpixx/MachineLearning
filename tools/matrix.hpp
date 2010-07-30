@@ -69,8 +69,8 @@ namespace machinelearning { namespace tools {
 			template<typename T> static ublas::matrix<T> centering( const ublas::matrix<T>&, const rowtype& = column );
             template<typename T> static ublas::matrix<T> sort( const ublas::matrix<T>&, const ublas::vector<std::size_t>&, const rowtype& p_which = row);
             template<typename T> static ublas::matrix<T> cov( const ublas::matrix<T>& );
-            template<typename T> static ublas::matrix<T> similarity( const ublas::matrix<T>&, const distances::distance<T>& );
-            template<typename T> static ublas::matrix<T> dissimilarity( const ublas::matrix<T>&, const distances::distance<T>& );
+        template<typename T> static ublas::matrix<T> similarity( const ublas::matrix<T>&); //, const distances::distance<T>& );
+        template<typename T> static ublas::matrix<T> dissimilarity( const ublas::matrix<T>&); //, const distances::distance<T>& );
         
     };
     
@@ -354,7 +354,7 @@ namespace machinelearning { namespace tools {
      * @param p_distance distance object for converting
      * @return similarity matrix
      **/
-    template<typename T> inline ublas::matrix<T> matrix::similarity( const ublas::matrix<T>& p_dissimilarity, const distances::distance<T>& p_distance )
+    template<typename T> inline ublas::matrix<T> matrix::similarity( const ublas::matrix<T>& p_dissimilarity) //, const distances::distance<T>& p_distance )
     {
         return p_dissimilarity;
     }
@@ -365,7 +365,7 @@ namespace machinelearning { namespace tools {
      * @param p_distance distance object for converting
      * @return dissimilarity matrix
      **/
-    template<typename T> inline ublas::matrix<T> matrix::dissimilarity( const ublas::matrix<T>& p_similarity, const distances::distance<T>& p_distance )
+    template<typename T> inline ublas::matrix<T> matrix::dissimilarity( const ublas::matrix<T>& p_similarity) //, const distances::distance<T>& p_distance )
     {
         // as.dist(sqrt(outer(diag(mx), diag(mx), "+") - 2*mx)) 
         return p_similarity;

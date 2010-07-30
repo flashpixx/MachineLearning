@@ -99,6 +99,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     
     /** caluate and project the input data
      * @todo project matrix change to a sparse matrix if arpack can used with boost
+     * @todo it is uncomplete
      * @param p_data input datamatrix
      * @return matrix with mapped points
      **/

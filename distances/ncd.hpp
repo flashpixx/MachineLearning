@@ -157,7 +157,7 @@ namespace machinelearning { namespace distances {
      * @overload
      * @param p_strvec string vector
      * @param p_isfile parameter for interpreting the string as a file with path
-     * @return matrix with vector x vector elements
+     * @return dissimilarity matrix with std::vector x std::vector elements
     **/
     template<typename T> inline ublas::matrix<T> ncd::calculate( const std::vector<std::string>& p_strvec, const bool& p_isfile  )
     {
