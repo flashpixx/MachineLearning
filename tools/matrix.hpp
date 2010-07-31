@@ -71,9 +71,6 @@ namespace machinelearning { namespace tools {
             template<typename T> static ublas::matrix<T> cov( const ublas::matrix<T>& );
             template<typename T> static ublas::matrix<T> setNumericalZero( const ublas::matrix<T>&, const T& = 0);
         
-        template<typename T> static ublas::matrix<T> similarity( const ublas::matrix<T>&); //, const distances::distance<T>& );
-        template<typename T> static ublas::matrix<T> dissimilarity( const ublas::matrix<T>&); //, const distances::distance<T>& );
-        
     };
     
     
@@ -373,23 +370,23 @@ namespace machinelearning { namespace tools {
      * @param p_dissimilarity input dissimilarity matrix
      * @param p_distance distance object for converting
      * @return similarity matrix
-     **/
+     **
     template<typename T> inline ublas::matrix<T> matrix::similarity( const ublas::matrix<T>& p_dissimilarity) //, const distances::distance<T>& p_distance )
     {
         return p_dissimilarity;
     }
     
     
-    /** creates a dissimilarity matrix from a similarity matrix
+    ** creates a dissimilarity matrix from a similarity matrix
      * @param p_similarity input similarity matrix
      * @param p_distance distance object for converting
      * @return dissimilarity matrix
-     **/
+     **
     template<typename T> inline ublas::matrix<T> matrix::dissimilarity( const ublas::matrix<T>& p_similarity) //, const distances::distance<T>& p_distance )
     {
         // as.dist(sqrt(outer(diag(mx), diag(mx), "+") - 2*mx)) 
         return p_similarity;
-    }
+    }*/
        
 };};
 

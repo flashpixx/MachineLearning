@@ -155,25 +155,21 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     
     /** cluster the graph with the <strong>normalized</strong> graph laplacian
      * @todo copy function for matrix musst be optimized
-     * @todo try to do it numerical stable
-     * @param p_dissimilarity similarity NxN matrix, needs to be symmetric and non-negative
+     * @param p_similarity similarity NxN matrix, needs to be symmetric and non-negative
      * @param p_iterations number of iterations
      **/
-    template<typename T> inline void spectralclustering<T>::train( const ublas::matrix<T>& p_dissimilarity, const std::size_t& p_iterations )
+    template<typename T> inline void spectralclustering<T>::train( const ublas::matrix<T>& p_similarity, const std::size_t& p_iterations )
     {
-        if (p_dissimilarity.size1() != p_dissimilarity.size1())
+        if (p_similarity.size1() != p_similarity.size1())
             throw exception::matrix("matrix are not symmetric");
-        if (p_dissimilarity.size2() < m_ng.getPrototypeCount())
+        if (p_similarity.size2() < m_ng.getPrototypeCount())
             throw exception::matrix("data and prototype dimension are not equal");
 
         
-        // we must create a similiarty matrix (we have a dissimilarity)
-        const ublas::matrix<T> l_similarity = tools::matrix::similarity(p_dissimilarity);
-        
         // create squared degree and normalized graph laplacian
-        const ublas::matrix<T> l_sqrtdegree = tools::matrix::pow( tools::matrix::diag(tools::matrix::sum(l_similarity)), static_cast<T>(-0.5));
-        const ublas::matrix<T> l_tmp        = ublas::prod(l_sqrtdegree, l_similarity);
-        const ublas::matrix<T> l_laplacian  = tools::matrix::eye<T>(l_similarity.size1()) - ublas::prod(l_tmp, l_sqrtdegree);
+        const ublas::matrix<T> l_sqrtdegree = tools::matrix::pow( tools::matrix::diag(tools::matrix::sum(p_similarity)), static_cast<T>(-0.5));
+        const ublas::matrix<T> l_tmp        = ublas::prod(l_sqrtdegree, p_similarity);
+        const ublas::matrix<T> l_laplacian  = tools::matrix::eye<T>(p_similarity.size1()) - ublas::prod(l_tmp, l_sqrtdegree);
         
         // determine eigenvalues and -vector of the graph laplacian
         ublas::vector<T> l_eigenvalue;
@@ -185,7 +181,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
         // extrakt the k eigenvectors, change the normalized laplacian back and normalize
         ublas::matrix<T> l_eigenmatrix(m_ng.getPrototypeCount(), l_laplacian.size1());
-        const ublas::vector<T> l_sum = tools::matrix::sum(l_similarity);
+        const ublas::vector<T> l_sum = tools::matrix::sum(p_similarity);
         
         for(std::size_t i=0; i < m_ng.getPrototypeCount(); ++i) {
             ublas::row(l_eigenmatrix, i)  = ublas::element_div( ublas::column(l_eigenvector, l_rank(i)), l_sum );
