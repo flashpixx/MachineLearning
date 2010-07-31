@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
     namespace ublas     = boost::numeric::ublas;
     
     
-    tl::files::hdf o("blub.hdf5");
+    //tl::files::hdf o("blub.hdf5");
     //std::cout << o.readString("/string") << std::endl;
 	//std::vector<std::string> x = o.readStringVector("/stringarray");
     //ublas::vector<double> x = o.readVector<double>("/vector", H5::PredType::NATIVE_DOUBLE);
@@ -39,6 +39,7 @@ int main(int argc, char *argv[]) {
     
     
     // ==== Spectral Clustering ====
+    
     ublas::matrix<double> data = o.readMatrix<double>("/spectral2", H5::PredType::NATIVE_DOUBLE); 
     nsl::spectralclustering<double> sp(3, data.size1());
     sp.train(data, 15);
@@ -151,18 +152,18 @@ int main(int argc, char *argv[]) {
      
     //=============== NCD ================
     /*
-    std::vector< std:: string > val(4);
-    val[0] = "main.cpp";
-    val[1] = "tools/files/hdf.hpp";
-    val[2] = "distances/ncd.hpp";
-    val[3] = "clustering/supervised/rlvq.hpp";
+    std::vector< std:: string > val;
+    val.push_back("main.cpp");
+    val.push_back("tools/files/hdf.hpp");
+    val.push_back("distances/ncd.hpp");
+    val.push_back("clustering/supervised/rlvq.hpp");
+    //val.push_back("blub.hdf5");
     
     
     dist::ncd ncd(dist::ncd::bzip2);
     std::cout << "unsymmetric: " << ncd.unsymmetric<double>(val, true) << std::endl;
     std::cout << "symmetric: " << ncd.symmetric<double>(val, true) << std::endl;
     */
-    
     
     
     return EXIT_SUCCESS;

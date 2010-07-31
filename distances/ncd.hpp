@@ -25,13 +25,10 @@
 #ifndef MACHINELEARNING_DISTANCES_NCD_HPP
 #define MACHINELEARNING_DISTANCES_NCD_HPP
 
-#include <map>
 #include <string>
 #include <sstream>
 #include <iostream>
 #include <fstream>
-#include <iterator>
-#include <algorithm>
 
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/symmetric.hpp>
@@ -58,7 +55,6 @@ namespace machinelearning { namespace distances {
 	/**
      * class for calculating the normalized compression distance (NCD)
      * with some different algorithms like gzip and bzip2
-     * @todo implementation the compression level
      * @todo set to unicode
      **/
     class ncd {
@@ -70,6 +66,13 @@ namespace machinelearning { namespace distances {
                 gzip    = 0, 
                 bzip2   = 1
             };
+        
+            enum compresslevel
+            {
+                defaultcompression  = 0,
+                bestspeed           = 1,
+                bestcompression     = 2
+            };
             
             
             ncd ();
@@ -77,14 +80,16 @@ namespace machinelearning { namespace distances {
             template<typename T> ublas::matrix<T> unsymmetric ( const std::vector<std::string>&, const bool& = false );
             template<typename T> ublas::symmetric_matrix<T, ublas::upper> symmetric ( const std::vector<std::string>&, const bool& = false );
             template<typename T> T calculate ( const std::string&, const std::string&, const bool& = false );
-            void setCompressionLevel( const unsigned int& );
+            void setCompressionLevel( const compresslevel& = defaultcompression );
             
         private:
             
             /** type for internal compression state **/
             const compresstype m_compress;
-            /** compression level in [0,9], default 6 **/
-            unsigned int m_compresslevel;
+            /** parameter for gzip **/
+            bio::gzip_params m_gzipparam;
+            /** parameter for bzip2 **/
+            bio::bzip2_params m_bzip2param;
             
             std::size_t deflate ( const bool&, const std::string&, const std::string& = "" );        
     };
@@ -93,23 +98,23 @@ namespace machinelearning { namespace distances {
     
     
     /** default constructor
-	 * @param p_sym optional bool argument for creating symmetric NCD
      * @overload
      **/
     inline ncd::ncd() :
         m_compress ( gzip ),
-        m_compresslevel(6)
+        m_gzipparam( bio::gzip::default_compression ),
+        m_bzip2param( 6 )
     {}
     
     
     /** constructor with the compression parameter
      * @overload
      * @param p_compress enum value that is declared inside the class
-	 * @param p_sym optional bool argument for creating symmetric NCD
      **/
     inline ncd::ncd( const compresstype& p_compress ) :
         m_compress ( p_compress ),
-        m_compresslevel(6)
+        m_gzipparam( bio::gzip::default_compression ),
+        m_bzip2param( 6 )
     {}
 
     
@@ -117,9 +122,25 @@ namespace machinelearning { namespace distances {
 	/** sets the compression level
 	 * @param  p_level compression level
      **/
-	inline void ncd::setCompressionLevel( const unsigned int& p_level )
+	inline void ncd::setCompressionLevel( const compresslevel& p_level )
 	{
-		m_compresslevel = p_level;
+        switch (p_level) 
+        {
+            case defaultcompression :   
+                m_gzipparam     = bio::gzip_params( bio::gzip::default_compression );
+                m_bzip2param    = bio::bzip2_params( 6 );
+                break;
+                
+            case bestspeed          :   
+                m_gzipparam = bio::gzip_params( bio::gzip::best_speed );
+                m_bzip2param    = bio::bzip2_params( 1 );
+                break;
+            
+            case bestcompression    :   
+                m_gzipparam = bio::gzip_params( bio::gzip::best_compression );
+                m_bzip2param    = bio::bzip2_params( 9 );
+                break;
+        }
 	}
     
     
@@ -251,8 +272,8 @@ namespace machinelearning { namespace distances {
         bio::filtering_streambuf< bio::output > l_deflate;
         
         switch (m_compress) {
-            case gzip   : l_deflate.push( bio::gzip_compressor() );     break;
-            case bzip2  : l_deflate.push( bio::bzip2_compressor() );    break;
+            case gzip   : l_deflate.push( bio::gzip_compressor( m_gzipparam ) );     break;
+            case bzip2  : l_deflate.push( bio::bzip2_compressor( m_bzip2param ) );    break;
         }
         l_deflate.push( boost::ref(l_counter) );        
         l_deflate.push( l_null );
