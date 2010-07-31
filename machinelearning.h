@@ -53,10 +53,31 @@
  *
  * @section ex advanced documentation
  * <ul>
+ * <li>@subpage classifier</li>
  * <li>@subpage clustering</li>
  * <li>@subpage distances</li>
  * <li>@subpage dimreduce</li>
  * </ul>
+ *
+ *
+ *
+ * @page classifier classifier
+ * @section lazy lazy learner
+ * @code
+    ublas::matrix<double> data = / fill data (row orientated) /;
+    std::vector<std::string> labels = / fill label for each row /;
+ 
+    // create distance object
+    distances::euclid<double> d;
+    // neighbourhood k-nearest-neighbour object with 4 neighbours
+    neighbourhood::knn<double> k(d, 4);
+    // create lazy learner object with inverse-distance-weightening 
+    classifier::lazylearner<double, std::string> ll(k, classifier::lazylearner<double, std::string>::inversedistance);
+ 
+    // insert data
+    ll.setDatabase( data,  labels );
+ 
+ * @endcode
  *
  *
  *
