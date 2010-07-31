@@ -31,6 +31,10 @@ int main(int argc, char *argv[]) {
     namespace linalg    = boost::numeric::bindings::lapack;
     namespace ublas     = boost::numeric::ublas;
     
+    setlocale(LC_ALL, "");
+    bindtextdomain("machinelearning", ".");
+    textdomain("machinelearning");
+    
     
     tl::files::hdf o("blub.hdf5");
     //std::cout << o.readString("/string") << std::endl;
