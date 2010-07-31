@@ -39,9 +39,9 @@ namespace machinelearning { namespace exception {
     
     
     
-    templatevirtual::templatevirtual( const std::string& p_str ) : std::runtime_error("virtual method ["+p_str+"] must not be called") {}
+    classmethod::classmethod( const std::string& p_str ) : std::runtime_error(p_str) {}
     
-    matrix::matrix( const std::string& p_str ) : std::runtime_error("matrix error"+( (!p_str.empty()) ? " ["+p_str+"]" : "" )) {}  
+    matrix::matrix( const std::string& p_str ) : std::runtime_error(p_str) {}  
     
     
 };};

@@ -16,7 +16,7 @@ def configuration_macosx(config) :
     config["compileflags"]      = "-D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS -O2 -Wall -ftree-vectorize"
     config["include"]           = os.environ["CPPPATH"]
     config["libpath"]           = os.environ["LIBRARY_PATH"]
-    config["libs"]              = ""
+    config["libs"]              = "intl"
     config["libsuffix"]         = [".dylib", ".a"]
     config["libremovestring"]   = "lib"
     config["libremovesuffix"]   = True  
@@ -29,7 +29,7 @@ def configuration_posix(config) :
     config["compileflags"]      = "-D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS -O2 -Wall -ftree-vectorize"
     config["include"]           = os.environ["CPPPATH"]
     config["libpath"]           = os.environ["LIBRARY_PATH"]
-    config["libs"]              = ""
+    config["libs"]              = "intl"
     config["libsuffix"]         = [".so", ".a"]
     config["libremovestring"]   = "lib"
     config["libremovesuffix"]   = True  
@@ -315,3 +315,13 @@ SetOption('num_jobs',   int(os.environ.get('NUM_CPU', COMPILECPU)))
 # get all cpp-files and compile
 env.Program( getRekusivFiles(os.curdir, ".cpp"), LIBS=alllibs, LIBPATH=library_path )
 
+# build languagefiles
+sources = []
+sources.extend( getRekusivFiles(os.curdir, ".h") )
+sources.extend( getRekusivFiles(os.curdir, ".hpp") )
+sources.extend( getRekusivFiles(os.curdir, ".cpp") )
+
+cmd = "xgettext --output=tools/language/language.po --keyword=_ --language=c++ ";
+for i in sources :
+    cmd = cmd + i + " "
+os.system(cmd);

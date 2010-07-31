@@ -161,9 +161,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     template<typename T> inline void spectralclustering<T>::train( const ublas::matrix<T>& p_similarity, const std::size_t& p_iterations )
     {
         if (p_similarity.size1() != p_similarity.size1())
-            throw exception::matrix("matrix are not symmetric");
+            throw exception::matrix(_("matrix are not symmetric"));
         if (p_similarity.size2() < m_ng.getPrototypeCount())
-            throw exception::matrix("data and prototype dimension are not equal");
+            throw exception::matrix(_("data and prototype dimension are not equal"));
 
         
         // create squared degree and normalized graph laplacian

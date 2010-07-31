@@ -33,7 +33,7 @@
 
 
 #include "../exception/exception.h"
-
+#include "language/language.h"
 
 
 namespace machinelearning { namespace tools {
@@ -70,9 +70,9 @@ namespace machinelearning { namespace tools {
     template<typename T> inline void lapack::eigen( const ublas::matrix<T>& p_matrix, const ublas::matrix<T>& p_diag, ublas::vector<T>& p_eigval, ublas::matrix<T>& p_eigvec )
     {
         if (  (p_matrix.size1() != p_matrix.size2()) || (p_diag.size1() != p_diag.size2())  )
-            throw exception::matrix("matrix are not symmetric");
+            throw exception::matrix( _("matrix are not symmetric") );
         if ( (p_matrix.size1() != p_diag.size1()) || (p_matrix.size2() != p_diag.size2()) )
-            throw exception::matrix("both matrices have not the same size");
+            throw exception::matrix( _("both matrices have not the same size") );
         
         // copy matrix for LAPACK
         ublas::matrix<T, ublas::column_major> l_matrix(p_matrix);
@@ -118,7 +118,7 @@ namespace machinelearning { namespace tools {
     template<typename T> inline void lapack::eigen( const ublas::matrix<T>& p_matrix, ublas::vector<T>& p_eigval, ublas::matrix<T>& p_eigvec )
     {
         if (p_matrix.size1() != p_matrix.size2())
-            throw exception::matrix("matrix are not symmetric");
+            throw exception::matrix(_("matrix are not symmetric"));
         
         // copy matrix for LAPACK
         ublas::matrix<T, ublas::column_major> l_matrix(p_matrix);

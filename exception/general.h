@@ -29,6 +29,7 @@
 #include <exception>
 
 
+
 namespace machinelearning { namespace exception {
 
     class greaterthanzero  : public std::invalid_argument   { public : greaterthanzero( const std::string& ); };
@@ -39,7 +40,7 @@ namespace machinelearning { namespace exception {
     
     
     
-    class templatevirtual  : public std::runtime_error      { public : templatevirtual( const std::string& ); };
+    class classmethod      : public std::runtime_error      { public : classmethod( const std::string& ); };
     class matrix           : public std::runtime_error      { public : matrix( const std::string& ); };
     
 };};

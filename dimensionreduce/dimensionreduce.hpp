@@ -28,6 +28,7 @@
 #include <boost/numeric/ublas/matrix.hpp>
 
 #include "../exception/exception.h"
+#include "../tools/tools.h"
 
 
 namespace machinelearning { namespace dimensionreduce {
@@ -42,13 +43,13 @@ namespace machinelearning { namespace dimensionreduce {
         public :
 
             /** maps data to target dimension **/
-            virtual ublas::matrix<T> map( const ublas::matrix<T>& ) { throw exception::templatevirtual("map"); };
+            virtual ublas::matrix<T> map( const ublas::matrix<T>& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
         
             /** returns the direction **/
-            virtual ublas::matrix<T> getMapping( void ) const { throw exception::templatevirtual("getMapping"); };
+            virtual ublas::matrix<T> getMapping( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
       
             /** returns the mapped dimension **/
-            virtual std::size_t getDimension( void ) const { throw exception::templatevirtual("getDimension"); };
+            virtual std::size_t getDimension( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
         
         protected :
         
@@ -65,13 +66,13 @@ namespace machinelearning { namespace dimensionreduce {
         public :
         
             /** maps data to target dimension **/
-            virtual ublas::matrix<T> map( const ublas::matrix<T>&, const std::vector<L>& ) { throw exception::templatevirtual("map"); };
+            virtual ublas::matrix<T> map( const ublas::matrix<T>&, const std::vector<L>& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
         
             /** returns the direction **/
-            virtual ublas::matrix<T> getMapping( void ) const { throw exception::templatevirtual("getMapping"); };
+            virtual ublas::matrix<T> getMapping( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
         
             /** returns the mapped dimension **/
-            virtual std::size_t getDimension( void ) const { throw exception::templatevirtual("getDimension"); };
+            virtual std::size_t getDimension( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
         
         protected :
         

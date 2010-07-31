@@ -45,31 +45,31 @@ namespace machinelearning { namespace classifier {
         public :
             
             /** method for training prototypes **/
-            virtual void setDatabase( const ublas::matrix<T>&, const std::vector<L>& ) { throw exception::templatevirtual("train"); };
+            virtual void setDatabase( const ublas::matrix<T>&, const std::vector<L>& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
             
             /** method which returns prototypes **/
-            virtual ublas::matrix<T> getDatabasePoints( void ) const { throw exception::templatevirtual("getTrainedData"); };
+            virtual ublas::matrix<T> getDatabasePoints( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
             
             /** return lables of prototypes **/
-            virtual std::vector<L> getDatabaseLabel( void ) const { throw exception::templatevirtual("getTrainedLabel"); };
+            virtual std::vector<L> getDatabaseLabel( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
             
             /** disable and enable logging **/
-            virtual void setLogging( const bool& ) { throw exception::templatevirtual("setLogging"); };
+            virtual void setLogging( const bool& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
             
             /** returns dimension of data points **/
-            virtual std::size_t getDatabaseSize( void ) const { throw exception::templatevirtual("getTrainedDataSize"); };
+            virtual std::size_t getDatabaseSize( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
             
             /** returns number of data points **/
-            virtual std::size_t getDatabaseCount( void ) const { throw exception::templatevirtual("getTrainedDataCount"); };
+            virtual std::size_t getDatabaseCount( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
             
             /** shows logging status **/
-            virtual bool getLogging( void ) const { throw exception::templatevirtual("getLogging"); };
+            virtual bool getLogging( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
            
             /** return the quantizationerror **/
-            virtual std::vector<T> getLoggedQuantizationError( void ) const { throw exception::templatevirtual("getQuantizationError"); };
+            virtual std::vector<T> getLoggedQuantizationError( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
             
             /** calculate label for unkown datapoints **/
-            virtual std::vector<L> use( const ublas::matrix<T>& ) const { throw exception::templatevirtual("use"); };
+            virtual std::vector<L> use( const ublas::matrix<T>& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
         
         
         

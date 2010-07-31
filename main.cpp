@@ -137,11 +137,11 @@ int main(int argc, char *argv[]) {
     
    
     // ===== NG ===== 
-    /*
+    
     ublas::matrix<double> data = o.readMatrix<double>("/ngdata", H5::PredType::NATIVE_DOUBLE);
      
     dist::euclid<double> d;
-    nsl::neuralgas<double> ng(d, 11, data.size2());
+    nsl::neuralgas<double> ng(d, 11, data.size2()-1);
     ng.setLogging(true);
     ng.train(data, 15);
     
@@ -154,15 +154,15 @@ int main(int argc, char *argv[]) {
         for(std::size_t i=0; i < p.size(); ++i)
             f.write<double>("/log" + boost::lexical_cast<std::string>( i ), p[i], H5::PredType::NATIVE_DOUBLE );
     }
-    */
+    
     
     // ===== RLVQ ======
     /*
     ublas::matrix<double> data = o.readMatrix<double>("/rlvqdata", H5::PredType::NATIVE_DOUBLE);
 
-    std::vector<unsigned int> lab(10);
+    std::vector<unsigned int> lab;
     for (std::size_t i=0; i < lab.size(); ++i)
-        lab[i] = i;
+        lab.push_back(i);
  
     dist::euclid<double> d;
     sl::rlvq<double, unsigned int> vq(d, lab, data.size2());
