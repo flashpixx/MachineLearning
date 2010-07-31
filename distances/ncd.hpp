@@ -74,9 +74,8 @@ namespace machinelearning { namespace distances {
             
             ncd ();
             ncd ( const compresstype& );
-            template<typename T> ublas::matrix<T> unsymmetricCalculate ( const std::vector<std::string>&, const bool& = false );
-            template<typename T> ublas::symmetric_matrix<T, ublas::upper> symmetricCalculate ( const std::vector<std::string>&, const bool& = false );
-        
+            template<typename T> ublas::matrix<T> unsymmetric ( const std::vector<std::string>&, const bool& = false );
+            template<typename T> ublas::symmetric_matrix<T, ublas::upper> symmetric ( const std::vector<std::string>&, const bool& = false );
             template<typename T> T calculate ( const std::string&, const std::string&, const bool& = false );
             void setCompressionLevel( const unsigned int& );
             
@@ -148,7 +147,7 @@ namespace machinelearning { namespace distances {
      * @param p_isfile parameter for interpreting the string as a file with path
      * @return dissimilarity matrix with std::vector x std::vector elements
     **/
-    template<typename T> inline ublas::matrix<T> ncd::unsymmetricCalculate( const std::vector<std::string>& p_strvec, const bool& p_isfile  )
+    template<typename T> inline ublas::matrix<T> ncd::unsymmetric( const std::vector<std::string>& p_strvec, const bool& p_isfile  )
     {
         if (p_strvec.size() == 0)
             throw exception::initialization("vector");
@@ -195,7 +194,7 @@ namespace machinelearning { namespace distances {
      * @param p_isfile parameter for interpreting the string as a file with path
      * @return dissimilarity matrix with std::vector x std::vector elements
      **/
-    template<typename T> inline ublas::symmetric_matrix<T, ublas::upper> ncd::symmetricCalculate( const std::vector<std::string>& p_strvec, const bool& p_isfile  )
+    template<typename T> inline ublas::symmetric_matrix<T, ublas::upper> ncd::symmetric( const std::vector<std::string>& p_strvec, const bool& p_isfile  )
     {
         if (p_strvec.size() == 0)
             throw exception::initialization("vector");

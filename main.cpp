@@ -30,30 +30,8 @@ int main(int argc, char *argv[]) {
     namespace linalg    = boost::numeric::bindings::lapack;
     namespace ublas     = boost::numeric::ublas;
     
-
     
-    /*
-    ublas::matrix<double> x(3,3);
-    x(0,0)=1;     x(0,1)=12;  x(0,2)=20;
-    x(1,0)=2;     x(1,1)=2;   x(1,2)=9;
-    x(2,0)=3;     x(2,1)=3;   x(2,2)=4;
-    
-    ublas::matrix<double> y(3,3);
-    y(0,0)=6;
-    y(1,1)=17;
-    y(2,2)=33;
-    
-    
-    ublas::vector<double> l_eigenvalues;
-    ublas::matrix<double> l_eigenvectors;
-    tl::lapack::eigen<double>(x, l_eigenvalues, l_eigenvectors);
-    
-    std::cout << l_eigenvalues << std::endl;
-    std::cout << std::endl;
-    std::cout << l_eigenvectors << std::endl;
-    */
-    
-    //tl::files::hdf o("blub.hdf5");
+    tl::files::hdf o("blub.hdf5");
     //std::cout << o.readString("/string") << std::endl;
 	//std::vector<std::string> x = o.readStringVector("/stringarray");
     //ublas::vector<double> x = o.readVector<double>("/vector", H5::PredType::NATIVE_DOUBLE);
@@ -61,14 +39,13 @@ int main(int argc, char *argv[]) {
     
     
     // ==== Spectral Clustering ====
-    /*
     ublas::matrix<double> data = o.readMatrix<double>("/spectral2", H5::PredType::NATIVE_DOUBLE); 
     nsl::spectralclustering<double> sp(3, data.size1());
     sp.train(data, 15);
     
     tl::files::hdf f("spectral.hdf5", true);
     f.write<double>( "/data",  tl::matrix::setNumericalZero(sp.getPrototypes()), H5::PredType::NATIVE_DOUBLE );  
-     */
+    
     
     // ==== LLE ====
     /*
@@ -173,7 +150,7 @@ int main(int argc, char *argv[]) {
     */
      
     //=============== NCD ================
-    
+    /*
     std::vector< std:: string > val(4);
     val[0] = "main.cpp";
     val[1] = "tools/files/hdf.hpp";
@@ -182,9 +159,9 @@ int main(int argc, char *argv[]) {
     
     
     dist::ncd ncd(dist::ncd::bzip2);
-    std::cout << "unsymmetric: " << ncd.unsymmetricCalculate<double>(val, true) << std::endl;
-    std::cout << "symmetric: " << ncd.symmetricCalculate<double>(val, true) << std::endl;
-    
+    std::cout << "unsymmetric: " << ncd.unsymmetric<double>(val, true) << std::endl;
+    std::cout << "symmetric: " << ncd.symmetric<double>(val, true) << std::endl;
+    */
     
     
     

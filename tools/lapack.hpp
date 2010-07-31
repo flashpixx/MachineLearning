@@ -53,59 +53,11 @@ namespace machinelearning { namespace tools {
         public :
         
             template<typename T> static void eigen( const ublas::matrix<T>&, ublas::vector<T>&, ublas::matrix<T>& );
-            template<typename T> static void eigen( const ublas::matrix<T>&, ublas::matrix<T>& );
-            template<typename T> static void eigen( const ublas::matrix<T>&, ublas::vector<T>& );
-
             template<typename T> static void eigen( const ublas::matrix<T>&, const ublas::matrix<T>&, ublas::vector<T>&, ublas::matrix<T>& );
-            template<typename T> static void eigen( const ublas::matrix<T>&, const ublas::matrix<T>&, ublas::matrix<T>& );
-            template<typename T> static void eigen( const ublas::matrix<T>&, const ublas::matrix<T>&, ublas::vector<T>& );   
-        
             template<typename T> static void solve( const ublas::matrix<T>&, const ublas::vector<T>&, ublas::vector<T>& );
-        
-        
-        private :
-        
-            template<typename T> static void symEigenDecomposition(const ublas::matrix<T>&, ublas::vector<T>&, ublas::matrix<T>& );
-            template<typename T> static void symGeneralEigenDecomposition(const ublas::matrix<T>&, const ublas::matrix<T>&, ublas::vector<T>&, ublas::matrix<T>& );
         
     };
 
-    
-    
-    /** calulate from a NxN and a diagonalized matrix the generalized eigenvalues and -vectors
-     * @overload
-     * @param p_matrix input matrix
-     * @param p_diag diagonal matrix
-     * @param p_eigval blas vector for eigenvalues [initialisation is not needed]
-     **/    
-    template<typename T> inline void lapack::eigen( const ublas::matrix<T>& p_matrix, const ublas::matrix<T>& p_diag, ublas::vector<T>& p_eigval )
-    {
-        if (  (p_matrix.size1() != p_matrix.size2()) || (p_diag.size1() != p_diag.size2())  )
-            throw exception::matrix("matrix are not symmetric");
-        if ( (p_matrix.size1() != p_diag.size1()) || (p_matrix.size2() != p_diag.size2()) )
-            throw exception::matrix("both matrices have not the same size");  
-        
-        ublas::matrix<T> l_eigvec;
-        symGeneralEigenDecomposition(p_matrix, p_diag, p_eigval, l_eigvec);
-    }
-    
-    
-    /** calulate from a NxN and a diagonalized matrix the generalized eigenvalues and -vectors
-     * @overload
-     * @param p_matrix input matrix
-     * @param p_diag diagonal matrix
-     * @param p_eigvec blas matrix for (normalized) eigenvectors (every column is a eigenvector) [initialisation is not needed]
-     **/    
-    template<typename T> inline void lapack::eigen( const ublas::matrix<T>& p_matrix, const ublas::matrix<T>& p_diag, ublas::matrix<T>& p_eigvec )
-    {
-        if (  (p_matrix.size1() != p_matrix.size2()) || (p_diag.size1() != p_diag.size2())  )
-            throw exception::matrix("matrix are not symmetric");
-        if ( (p_matrix.size1() != p_diag.size1()) || (p_matrix.size2() != p_diag.size2()) )
-            throw exception::matrix("both matrices have not the same size");  
-        
-        ublas::vector<T> l_eigval;
-        symGeneralEigenDecomposition(p_matrix, p_diag, l_eigval, p_eigvec);
-    }
     
     
     /** calulate from a NxN and a diagonalized matrix the generalized eigenvalues and -vectors
@@ -122,7 +74,38 @@ namespace machinelearning { namespace tools {
         if ( (p_matrix.size1() != p_diag.size1()) || (p_matrix.size2() != p_diag.size2()) )
             throw exception::matrix("both matrices have not the same size");
         
-        symGeneralEigenDecomposition(p_matrix, p_diag, p_eigval, p_eigvec);
+        // copy matrix for LAPACK
+        ublas::matrix<T, ublas::column_major> l_matrix(p_matrix);
+        ublas::matrix<T, ublas::column_major> l_diag(p_diag);
+        
+        // create result structures
+        ublas::matrix<T, ublas::column_major> l_eigvec(l_matrix.size1(), l_matrix.size2());
+        ublas::vector<T> l_eigval(l_matrix.size1());
+        ublas::vector<T> l_div(l_matrix.size1());
+        
+        // need temporary structures
+        ublas::vector<T> l_tmp1(l_eigval.size());
+        ublas::matrix<T, ublas::column_major> l_tmp2(l_matrix.size1(),l_matrix.size2());
+        
+        // determine eigenvector without sorting and calculate eigenvalues
+        linalg::ggev( 'N', 'V', l_matrix, l_diag, l_eigval,  l_tmp1,  l_div,  l_tmp2,  l_eigvec, linalg::optimal_workspace() );
+        
+        // calculate eigenvalues
+        for(std::size_t i=0; i < l_eigval.size(); ++i)
+            if (!function::isNumericalZero<T>(l_div(i)))
+                l_eigval(i) /= l_div(i);
+  		
+		// normalize every eigenvector
+		for(std::size_t i=0; i < l_eigvec.size2(); ++i) {
+			const T l_val = blas::nrm2( static_cast< ublas::vector<T> >(ublas::column(l_eigvec, i)) );
+            if (!function::isNumericalZero<T>(l_val))
+                ublas::column(l_eigvec, i) /= l_val;
+        }
+		
+        
+        // we must copy the reference
+        p_eigvec = l_eigvec;
+        p_eigval = l_eigval;
     }
     
     
@@ -137,41 +120,32 @@ namespace machinelearning { namespace tools {
         if (p_matrix.size1() != p_matrix.size2())
             throw exception::matrix("matrix are not symmetric");
         
-        symEigenDecomposition( p_matrix, p_eigval, p_eigvec );
-    }
-    
-    
-    
-    /** create a matrix with sorted eigenvectors of the NxN matrix
-     * @overload
-     * @param p_matrix symmetric matrix
-     * @param p_eigvec matrix with column orientated (normalized) eigenvectors
-     **/
-    template<typename T> inline void lapack::eigen( const ublas::matrix<T>& p_matrix, ublas::matrix<T>& p_eigvec )
-    {
-        if (p_matrix.size1() != p_matrix.size2())
-            throw exception::matrix("matrix are not symmetric");
+        // copy matrix for LAPACK
+        ublas::matrix<T, ublas::column_major> l_matrix(p_matrix);
         
-        ublas::vector<T> l_eigval;
-        symEigenDecomposition( p_matrix, l_eigval, p_eigvec );
+        // create result structures
+        ublas::matrix<T, ublas::column_major> l_eigvec(l_matrix.size1(), l_matrix.size2());
+        ublas::vector<T> l_eigval(l_matrix.size1());
+        
+        // need temporary structures
+        ublas::vector<T> l_tmp1(l_eigval.size());
+        ublas::matrix<T, ublas::column_major> l_tmp2(l_matrix.size1(),l_matrix.size2());
+        ublas::matrix<T, ublas::column_major> l_tmp3(l_matrix.size1(),l_matrix.size2());
+        
+        // determine eigenvector without sorting
+        linalg::geev( 'N', 'V', l_matrix, l_eigval,  l_tmp1,l_tmp2,  l_eigvec, linalg::optimal_workspace() );
+        
+		// normalize every eigenvector
+		for(std::size_t i=0; i < l_eigvec.size2(); ++i) {
+			const T l_val = blas::nrm2( static_cast< ublas::vector<T> >(ublas::column(l_eigvec, i)) );
+            if (!function::isNumericalZero<T>(l_val))
+                ublas::column(l_eigvec, i) /= l_val;
+		}
+        
+        // we must copy the reference
+        p_eigvec = l_eigvec;
+        p_eigval = l_eigval;
     }
-    
-    
-    
-    /** create a vector with sorted eigenvalues of the NxN matrix
-     * @overload
-     * @param p_matrix symmetric matrix
-     * @param p_eigval vector with sorted eigenvalues
-     **/
-    template<typename T> inline void lapack::eigen( const ublas::matrix<T>& p_matrix, ublas::vector<T>& p_eigval )
-    {
-        if (p_matrix.size1() != p_matrix.size2())
-            throw exception::matrix("matrix are not symmetric");
-    
-        ublas::matrix<T> l_eigvec;
-        symEigenDecomposition( p_matrix, p_eigval, l_eigvec );
-    }
-    
     
     
     /** solve a lineare equation system like Ax=b
@@ -197,83 +171,6 @@ namespace machinelearning { namespace tools {
     }
     
     
-    /** calulates the symmetric eigenvalues and eigenvectors from a matrix
-     * @param p_matrix input matrix
-     * @param p_eigval vector with eigenvalues
-     * @param p_eigvec matrix with column orientated (normalized) eigenvectors
-    **/
-    template<typename T> inline void lapack::symEigenDecomposition(const ublas::matrix<T>& p_matrix, ublas::vector<T>& p_eigval, ublas::matrix<T>& p_eigvec )
-    {
-        // copy matrix for LAPACK
-        ublas::matrix<T, ublas::column_major> l_matrix(p_matrix);
-        
-        // create result structures
-        ublas::matrix<T, ublas::column_major> l_eigvec(l_matrix.size1(), l_matrix.size2());
-        ublas::vector<T> l_eigval(l_matrix.size1());
-        
-        // need temporary structures
-        ublas::vector<T> l_tmp1(l_eigval.size());
-        ublas::matrix<T, ublas::column_major> l_tmp2(l_matrix.size1(),l_matrix.size2());
-        ublas::matrix<T, ublas::column_major> l_tmp3(l_matrix.size1(),l_matrix.size2());
-        
-        // determine eigenvector without sorting
-        linalg::geev( 'N', 'V', l_matrix, l_eigval,  l_tmp1,l_tmp2,  l_eigvec, linalg::optimal_workspace() );
-        
-		// normalize every eigenvector
-		for(std::size_t i=0; i < l_eigvec.size2(); ++i) {
-			const T l_val = blas::nrm2( static_cast< ublas::vector<T> >(ublas::column(l_eigvec, i)) );
-            if (!function::isNumericalZero<T>(l_val))
-                    ublas::column(l_eigvec, i) /= l_val;
-		}
-            
-        // we must copy the reference
-        p_eigvec = l_eigvec;
-        p_eigval = l_eigval;
-    }
-    
-    
-    /** calulate from a NxN and a diagonalized matrix the generalized eigenvalues and -vectors
-     * @param p_matrix input matrix
-     * @param p_diag diagonal matrix
-     * @param p_eigval blas vector for sorted eigenvalues [initialisation is not needed]
-     * @param p_eigvec blas matrix for (normalized) eigenvectors (every column is a eigenvector) [initialisation is not needed]
-     **/   
-    template<typename T> inline void lapack::symGeneralEigenDecomposition(const ublas::matrix<T>& p_matrix, const ublas::matrix<T>& p_diag, ublas::vector<T>& p_eigval, ublas::matrix<T>& p_eigvec )
-    {
-        // copy matrix for LAPACK
-        ublas::matrix<T, ublas::column_major> l_matrix(p_matrix);
-        ublas::matrix<T, ublas::column_major> l_diag(p_diag);
-        
-        // create result structures
-        ublas::matrix<T, ublas::column_major> l_eigvec(l_matrix.size1(), l_matrix.size2());
-        ublas::vector<T> l_eigval(l_matrix.size1());
-        ublas::vector<T> l_div(l_matrix.size1());
-        
-        // need temporary structures
-        ublas::vector<T> l_tmp1(l_eigval.size());
-        ublas::matrix<T, ublas::column_major> l_tmp2(l_matrix.size1(),l_matrix.size2());
-         
-        // determine eigenvector without sorting and calculate eigenvalues
-        linalg::ggev( 'N', 'V', l_matrix, l_diag, l_eigval,  l_tmp1,  l_div,  l_tmp2,  l_eigvec, linalg::optimal_workspace() );
-        
-        // calculate eigenvalues
-        for(std::size_t i=0; i < l_eigval.size(); ++i)
-            if (!function::isNumericalZero<T>(l_div(i)))
-                l_eigval(i) /= l_div(i);
-  		
-		// normalize every eigenvector
-		for(std::size_t i=0; i < l_eigvec.size2(); ++i) {
-			const T l_val = blas::nrm2( static_cast< ublas::vector<T> >(ublas::column(l_eigvec, i)) );
-            if (!function::isNumericalZero<T>(l_val))
-                ublas::column(l_eigvec, i) /= l_val;
-        }
-		
-        
-        // we must copy the reference
-        p_eigvec = l_eigvec;
-        p_eigval = l_eigval;
-    }
-
 
 };};
 #endif
