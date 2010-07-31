@@ -71,8 +71,8 @@ namespace machinelearning { namespace clustering {
             /** return the quantizationerror **/
             virtual std::vector<T> getLoggedQuantizationError( void ) const { throw exception::templatevirtual("getQuantizationError"); };
         
-            /** calculate label for unkown datapoints **/
-            virtual std::vector<L> use( const ublas::matrix<T>& ) const { throw exception::templatevirtual("use"); };
+            /** index position for prototype or label **/
+            virtual ublas::indirect_array< std::vector<std::size_t> > use( const ublas::matrix<T>& ) const { throw exception::templatevirtual("use"); };
 
         
         
@@ -119,7 +119,7 @@ namespace machinelearning { namespace clustering {
             virtual std::vector<T> getLoggedQuantizationError( void ) const { throw exception::templatevirtual("getQuantizationError"); };
         
             /** calculate prototype index for datapoints **/
-            virtual std::vector<T> use( const ublas::matrix<T>& ) const { throw exception::templatevirtual("use"); };
+            virtual ublas::indirect_array< std::vector<std::size_t> > use( const ublas::matrix<T>& ) const { throw exception::templatevirtual("use"); };
 
 
         

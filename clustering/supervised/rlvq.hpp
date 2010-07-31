@@ -61,7 +61,7 @@ namespace machinelearning { namespace clustering { namespace supervised {
             std::size_t getPrototypeSize( void ) const; 
             std::size_t getPrototypeCount( void ) const;
             std::vector<T> getLoggedQuantizationError( void ) const;
-            std::vector<L> use( const ublas::matrix<T>& ) const;
+            ublas::indirect_array< std::vector<std::size_t> > use( const ublas::matrix<T>& ) const;
         
         
         private :
@@ -289,15 +289,15 @@ namespace machinelearning { namespace clustering { namespace supervised {
     
     /** labels unkown data (row orientated)
      * @param p_data unkwon datamatrix
-     * @return labels
+     * @return index position for every datapoint and its prototype / label
     **/
-    template<typename T, typename L> inline std::vector<L> rlvq<T, L>::use( const ublas::matrix<T>& p_data ) const
+    template<typename T, typename L> inline ublas::indirect_array< std::vector<std::size_t> > rlvq<T, L>::use( const ublas::matrix<T>& p_data ) const
     {
         if (p_data.size2() != m_prototypes.size2())
             throw exception::matrix("data and prototype dimension are not equal");
         
         ublas::scalar_vector<T> l_ones(m_prototypes.size1(), 1);
-        std::vector<L> l_labels( p_data.size1() );
+        std::vector<std::size_t> l_vec;
         
         for(std::size_t i=0; i < p_data.size1(); ++i) {
             
@@ -305,11 +305,11 @@ namespace machinelearning { namespace clustering { namespace supervised {
             ublas::vector<T> l_distance                                 = m_distance->calculate( m_prototypes, ublas::outer_prod( l_ones, ublas::row(p_data, i) )  );
             ublas::indirect_array< std::vector<std::size_t> > l_rank    = tools::vector::rankIndex( l_distance );
             
-            // add neuron label
-            l_labels[i] = m_neuronlabels[ l_rank(0) ];
+            // add index
+            l_vec.push_back(l_rank(0) );
         }
         
-        return l_labels;
+        return ublas::indirect_array< std::vector<std::size_t> >(l_vec.size(), l_vec);;
     }
 
 

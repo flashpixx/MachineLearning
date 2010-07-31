@@ -55,7 +55,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             std::size_t getPrototypeSize( void ) const;
             std::size_t getPrototypeCount( void ) const;
             std::vector<T> getLoggedQuantizationError( void ) const;
-            std::vector<T> use( const ublas::matrix<T>& ) const;
+            ublas::indirect_array< std::vector<std::size_t> > use( const ublas::matrix<T>& ) const;
             
             
         private :
@@ -247,22 +247,29 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     /** calulates distance between datapoints and prototypes and returns a std::vector
      * with index of the nearest prototype
      * @param p_data matrix
-     * @return vector with index of prototype
+     * @return index array of prototype indices
      **/
-    template<typename T> inline std::vector<T> kmeans<T>::use( const ublas::matrix<T>& p_data ) const
+    template<typename T> inline ublas::indirect_array< std::vector<std::size_t> > kmeans<T>::use( const ublas::matrix<T>& p_data ) const
     {
         if (p_data.size1() < m_prototypes.size1())
             throw exception::greaterthan("data", "neurons");
         
-        std::vector<T> l_vec(p_data.size1());
+        std::vector<std::size_t> l_vec(p_data.size1());
         ublas::scalar_vector<T> l_ones(p_data.size1(), 1);
         ublas::matrix<T> l_distance(m_prototypes.size1(), p_data.size1());
         
+        // calculate distance for every prototype
         for(std::size_t i=0; i < m_prototypes.size1(); ++i)
             ublas::row(l_distance, i)  = m_distance->calculate( p_data,  ublas::outer_prod(l_ones, ublas::row(m_prototypes, i)) );
         
+        // determine nearest prototype
+        for(std::size_t i=0; i < m_prototypes.size2(); ++i) {
+            ublas::vector<T> l_col                                          = ublas::column(l_distance, i);
+            const ublas::indirect_array< std::vector<std::size_t> > l_rank  = tools::vector::rankIndex( l_col );
+            l_vec.push_back( l_rank(0) );
+        }
         
-        return l_vec;
+        return ublas::indirect_array< std::vector<std::size_t> >(l_vec.size(), l_vec);;
         
     }
 

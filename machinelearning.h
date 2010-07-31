@@ -45,6 +45,7 @@
  *
  * @section defs definitions / assumption
  * <ul>
+ * <li>data points should be matrix data and the matrix is row-orientated, so for K data points with every point dimension P, we have a K x P matrix (prototype matrices are equal)</li>
  * <li>every similarity / dissimilarity matrix that is a method parameter must be a dissimilarity matrix with diagonal elements zero (otherwise it must be specified)</li>
  * </ul>
  *
