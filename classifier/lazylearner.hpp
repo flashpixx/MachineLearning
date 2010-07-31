@@ -41,9 +41,7 @@ namespace machinelearning { namespace classifier {
     namespace ublas   = boost::numeric::ublas;
     
     
-    /** class for create a lazy learner
-     * @todo Logging must be implementated
-     **/
+    /** class for create a lazy learner **/
     template<typename T, typename L> class lazylearner : public classifier<T, L>  {
         
         public :
@@ -211,6 +209,7 @@ namespace machinelearning { namespace classifier {
     
     
     /** label unkown data
+     * @todo logging implementation
      * @param p_data input data matrix (row orientated)
      * @return std::vector with label information
     **/
@@ -218,7 +217,7 @@ namespace machinelearning { namespace classifier {
     {
         // determine nearest neighbour
         const ublas::matrix<std::size_t> l_neighbour = m_neighborhood->get(m_basedata, p_data);
-        std::vector<L> l_label(p_data.size1()); 
+        std::vector<L> l_label; 
         
            
         switch (m_weight) {
@@ -238,7 +237,7 @@ namespace machinelearning { namespace classifier {
                             l_nnlabel[ m_baselabels[l_idx[j]] ]++;
                 
                     // set this label that is the biggest (most counts)
-                    l_label[i] = std::max_element(l_nnlabel.begin(), l_nnlabel.end(), labelMapCompair)->first;
+                    l_label.push_back(  std::max_element(l_nnlabel.begin(), l_nnlabel.end(), labelMapCompair)->first );
                 }
                 break;
                 
@@ -273,7 +272,7 @@ namespace machinelearning { namespace classifier {
                             j *= j;
                         
                         // set this label that is the biggest (most counts)
-                        l_label[i] = std::distance(l_distance.begin(), std::max_element(l_distance.begin(), l_distance.end()));
+                        l_label.push_back(  std::distance(l_distance.begin(), std::max_element(l_distance.begin(), l_distance.end()))  );
                     }
                     
                 }
@@ -312,21 +311,16 @@ namespace machinelearning { namespace classifier {
                             j = static_cast<T>(1.0)/(j*j);
                         
                         // set this label that is the biggest (most counts)
-                        l_label[i] = std::distance(l_distance.begin(), std::max_element(l_distance.begin(), l_distance.end()));
+                        l_label.push_back(  std::distance(l_distance.begin(), std::max_element(l_distance.begin(), l_distance.end()))  );
                     }
                     
                 }
                 
                 break;
-                
-                
-                
-            default :
-                throw exception::initialization("weight");
 
         }
         
-        m_logprototypes.push_back( l_neighbour );
+        //m_logprototypes.push_back( l_neighbour );
         
         return l_label;
     }
