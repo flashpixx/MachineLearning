@@ -34,6 +34,7 @@
 #include <algorithm>
 
 #include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/symmetric.hpp>
 
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/filter/bzip2.hpp>
@@ -71,19 +72,18 @@ namespace machinelearning { namespace distances {
             };
             
             
-            ncd ( const bool& = false );
-            ncd ( const compresstype&, const bool& = false );
-            template<typename T> ublas::matrix<T> calculate ( const std::vector<std::string>&, const bool& = false );
+            ncd ();
+            ncd ( const compresstype& );
+            template<typename T> ublas::matrix<T> unsymmetricCalculate ( const std::vector<std::string>&, const bool& = false );
+            template<typename T> ublas::symmetric_matrix<T, ublas::upper> symmetricCalculate ( const std::vector<std::string>&, const bool& = false );
+        
             template<typename T> T calculate ( const std::string&, const std::string&, const bool& = false );
-            bool is_symmetric( void ) const;
             void setCompressionLevel( const unsigned int& );
             
         private:
             
             /** type for internal compression state **/
             const compresstype m_compress;
-            /** value for creating symmetric NCD **/
-            const bool m_symmetric;
             /** compression level in [0,9], default 6 **/
             unsigned int m_compresslevel;
             
@@ -97,9 +97,8 @@ namespace machinelearning { namespace distances {
 	 * @param p_sym optional bool argument for creating symmetric NCD
      * @overload
      **/
-    inline ncd::ncd( const bool& p_sym ) :
+    inline ncd::ncd() :
         m_compress ( gzip ),
-        m_symmetric( p_sym ),
         m_compresslevel(6)
     {}
     
@@ -109,20 +108,11 @@ namespace machinelearning { namespace distances {
      * @param p_compress enum value that is declared inside the class
 	 * @param p_sym optional bool argument for creating symmetric NCD
      **/
-    inline ncd::ncd( const compresstype& p_compress, const bool& p_sym ) :
+    inline ncd::ncd( const compresstype& p_compress ) :
         m_compress ( p_compress ),
-        m_symmetric( p_sym ),
         m_compresslevel(6)
     {}
-    
-	
-    
-	/** returns that NCD matrix is symmetric
-	 * @return bool
-     **/
-	inline bool ncd::is_symmetric( void ) const {
-		return m_symmetric;
-	}
+
     
     
 	/** sets the compression level
@@ -154,12 +144,11 @@ namespace machinelearning { namespace distances {
 
     /** calculate all distances of the string vector (first item in the vector is
      * first row and colum in the returning matrix
-     * @overload
      * @param p_strvec string vector
      * @param p_isfile parameter for interpreting the string as a file with path
      * @return dissimilarity matrix with std::vector x std::vector elements
     **/
-    template<typename T> inline ublas::matrix<T> ncd::calculate( const std::vector<std::string>& p_strvec, const bool& p_isfile  )
+    template<typename T> inline ublas::matrix<T> ncd::unsymmetricCalculate( const std::vector<std::string>& p_strvec, const bool& p_isfile  )
     {
         if (p_strvec.size() == 0)
             throw exception::initialization("vector");
@@ -191,11 +180,7 @@ namespace machinelearning { namespace distances {
                 				
 				// because of deflate algorithms there can be values greater than 1, so we check and set it to 1
                 l_distances(i, j) = std::min(  ( static_cast<T>(deflate(p_isfile, p_strvec[i], p_strvec[j])) - l_min) / l_max,  static_cast<T>(1)  );    
-           			
-				if (m_symmetric)
-					l_distances(j, i) = l_distances(i, j);
-				else 
-                    l_distances(j, i) = std::min(  ( static_cast<T>(deflate(p_isfile, p_strvec[j], p_strvec[i])) - l_min) / l_max,  static_cast<T>(1)  );  
+                l_distances(j, i) = std::min(  ( static_cast<T>(deflate(p_isfile, p_strvec[j], p_strvec[i])) - l_min) / l_max,  static_cast<T>(1)  );  
             }
 
         }
@@ -203,6 +188,52 @@ namespace machinelearning { namespace distances {
         return l_distances;
     }
        
+    
+    /** calculate all distances of the string vector (first item in the vector is
+     * first row and colum in the returning matrix
+     * @param p_strvec string vector
+     * @param p_isfile parameter for interpreting the string as a file with path
+     * @return dissimilarity matrix with std::vector x std::vector elements
+     **/
+    template<typename T> inline ublas::symmetric_matrix<T, ublas::upper> ncd::symmetricCalculate( const std::vector<std::string>& p_strvec, const bool& p_isfile  )
+    {
+        if (p_strvec.size() == 0)
+            throw exception::initialization("vector");
+        
+        
+        // create matrix, cache and compress
+        ublas::symmetric_matrix<T, ublas::upper> l_distances( p_strvec.size(), p_strvec.size() );
+        ublas::vector<std::size_t> l_cache( p_strvec.size() );
+        
+        // create content
+        for (std::size_t i = 0; i < p_strvec.size(); ++i) {
+            
+            // create deflate to cache
+            if (i==0)
+                l_cache(i) = deflate(p_isfile, p_strvec[i]);
+            
+            // diagonal elements are always zero
+            l_distances(i,i) = 0;
+            
+            for (std::size_t j = i+1; j < p_strvec.size(); ++j) {
+                
+                // create deflate to cache
+                if (i==0)
+                    l_cache(j) = deflate(p_isfile, p_strvec[j]);
+                
+                // determine min and max for NCD
+                const std::size_t l_min    = std::min(l_cache(i), l_cache(j));
+                const std::size_t l_max    = std::max(l_cache(i), l_cache(j));
+                
+				// because of deflate algorithms there can be values greater than 1, so we check and set it to 1
+                l_distances(i, j) = std::min(  ( static_cast<T>(deflate(p_isfile, p_strvec[i], p_strvec[j])) - l_min) / l_max,  static_cast<T>(1)  );    
+            }
+            
+        }
+        
+        return l_distances;
+    }
+    
     
     /** deflate a string or file with the algorithm
      * @param p_isfile parameter for interpreting the string as a file with path

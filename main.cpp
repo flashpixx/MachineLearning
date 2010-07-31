@@ -7,6 +7,7 @@
 
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/matrix_sparse.hpp>
+#include <boost/numeric/ublas/symmetric.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix_proxy.hpp>
 #include <boost/numeric/ublas/vector_proxy.hpp>
@@ -52,7 +53,7 @@ int main(int argc, char *argv[]) {
     std::cout << l_eigenvectors << std::endl;
     */
     
-    tl::files::hdf o("blub.hdf5");
+    //tl::files::hdf o("blub.hdf5");
     //std::cout << o.readString("/string") << std::endl;
 	//std::vector<std::string> x = o.readStringVector("/stringarray");
     //ublas::vector<double> x = o.readVector<double>("/vector", H5::PredType::NATIVE_DOUBLE);
@@ -60,14 +61,14 @@ int main(int argc, char *argv[]) {
     
     
     // ==== Spectral Clustering ====
-    
+    /*
     ublas::matrix<double> data = o.readMatrix<double>("/spectral2", H5::PredType::NATIVE_DOUBLE); 
     nsl::spectralclustering<double> sp(3, data.size1());
     sp.train(data, 15);
     
     tl::files::hdf f("spectral.hdf5", true);
     f.write<double>( "/data",  tl::matrix::setNumericalZero(sp.getPrototypes()), H5::PredType::NATIVE_DOUBLE );  
-
+     */
     
     // ==== LLE ====
     /*
@@ -172,7 +173,7 @@ int main(int argc, char *argv[]) {
     */
      
     //=============== NCD ================
-    /*
+    
     std::vector< std:: string > val(4);
     val[0] = "main.cpp";
     val[1] = "tools/files/hdf.hpp";
@@ -180,12 +181,12 @@ int main(int argc, char *argv[]) {
     val[3] = "clustering/supervised/rlvq.hpp";
     
     
-    dist::ncd n(dist::ncd::gzip);
-    std::cout << "GZip:  " << n.calculate<double>(val, true) << std::endl;
+    dist::ncd ncd(dist::ncd::bzip2);
+    std::cout << "unsymmetric: " << ncd.unsymmetricCalculate<double>(val, true) << std::endl;
+    std::cout << "symmetric: " << ncd.symmetricCalculate<double>(val, true) << std::endl;
     
-    dist::ncd v(dist::ncd::bzip2);
-    std::cout << "BZip2: " << v.calculate<double>(val, true) << std::endl;
-    */
+    
+    
     
     return EXIT_SUCCESS;
 }
