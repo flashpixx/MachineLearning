@@ -32,8 +32,11 @@ int main(int argc, char *argv[]) {
     namespace ublas     = boost::numeric::ublas;
     
     setlocale(LC_ALL, "");
-    bindtextdomain("machinelearning", ".");
+    bindtextdomain("machinelearning", "./tools/language/");
     textdomain("machinelearning");
+    std::cout << "Sprache: " << getenv("LANG") << std::endl;
+    
+
     
     
     tl::files::hdf o("blub.hdf5");
@@ -141,7 +144,7 @@ int main(int argc, char *argv[]) {
     
    
     // ===== NG ===== 
-    
+    /*
     ublas::matrix<double> data = o.readMatrix<double>("/ngdata", H5::PredType::NATIVE_DOUBLE);
      
     dist::euclid<double> d;
@@ -158,7 +161,7 @@ int main(int argc, char *argv[]) {
         for(std::size_t i=0; i < p.size(); ++i)
             f.write<double>("/log" + boost::lexical_cast<std::string>( i ), p[i], H5::PredType::NATIVE_DOUBLE );
     }
-    
+    */
     
     // ===== RLVQ ======
     /*
