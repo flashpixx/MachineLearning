@@ -57,11 +57,13 @@ namespace machinelearning { namespace classifier {
             
         
             lazylearner( const neighborhood::neighborhood<T>&, const weighttype& = 2 );
-            void train( const ublas::matrix<T>&, const std::vector<L>&, const unsigned int& );
+            void train( const ublas::matrix<T>&, const std::vector<L>&, const std::size_t& = 0 );
             ublas::matrix<T> getTrainedData( void ) const;
             std::vector<L> getTrainedLabel( void ) const;
             void setLogging( const bool& );
             bool getLogging( void ) const;
+            std::size_t getTrainedDataSize( void ) const; 
+            std::size_t getTrainedDataCount( void ) const;
             std::vector<T> getLoggedQuantizationError( void ) const;
             std::vector<L> use( const ublas::matrix<T>& ) const;        
             void clearLogging( void );
@@ -121,6 +123,24 @@ namespace machinelearning { namespace classifier {
     }
     
     
+    /** returns the dimension of prototypes
+     * @return dimension of the prototypes
+     **/
+    template<typename T, typename L> inline std::size_t lazylearner<T, L>::getTrainedDataSize( void ) const 
+    {
+        return m_basedata.size2();
+    };
+    
+    
+    /** returns the number of prototypes
+     * @return number of the prototypes / classes
+     **/
+    template<typename T, typename L> inline std::size_t lazylearner<T, L>::getTrainedDataCount( void ) const 
+    {
+        return m_basedata.size1();
+    };
+    
+    
     /** enabled / disable logging
      * @param p bool
      **/
@@ -159,17 +179,22 @@ namespace machinelearning { namespace classifier {
     /** sets the datapoints as the fixed references 
      * @param p_data Matrix with data (rows are the vectors)
      * @param p_labels vector for labels
-     * @param p_number number of rows which are used
+     * @param p_number number of rows which should be used (0 for all)
      **/
-    template<typename T, typename L> inline void lazylearner<T, L>::train( const ublas::matrix<T>& p_data, const std::vector<L>& p_labels, const unsigned int& p_number )
+    template<typename T, typename L> inline void lazylearner<T, L>::train( const ublas::matrix<T>& p_data, const std::vector<L>& p_labels, const std::size_t& p_number )
     {
         clearLogging;
         
-        ublas::matrix_range< ublas::matrix<T> > l_rangedata( p_data, ublas::range(0, p_number), ublas::range(0,p_data.size2()-1)  );
-        m_basedata   = l_rangedata;
-        
-        ublas::vector_range< std::vector<L> > l_rangelabel( p_labels, ublas::range(0, p_number) );
-        m_baselabels = l_rangelabel;
+        if (p_number == 0) {
+            m_basedata      = p_data;
+            m_baselabels    = p_labels;
+        } else {
+            ublas::matrix_range< ublas::matrix<T> > l_rangedata( p_data, ublas::range(0, p_number), ublas::range(0,p_data.size2()-1)  );
+            m_basedata   = l_rangedata;
+            
+            ublas::vector_range< std::vector<L> > l_rangelabel( p_labels, ublas::range(0, p_number) );
+            m_baselabels = l_rangelabel;
+        }
     }
     
     

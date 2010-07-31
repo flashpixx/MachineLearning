@@ -43,34 +43,40 @@ namespace machinelearning { namespace classifier {
     template<typename T, typename L> class classifier {
         
         public :
-        
-        /** method for training prototypes **/
-        virtual void train( const ublas::matrix<T>&, const std::vector<L>&, const unsigned int&  ) { throw exception::templatevirtual("train"); };
-        
-        /** method which returns prototypes **/
-        virtual ublas::matrix<T> getTrainedData( void ) const { throw exception::templatevirtual("getTrainedData"); };
-        
-        /** return lables of prototypes **/
-        virtual std::vector<L> getTrainedLabel( void ) const { throw exception::templatevirtual("getTrainedLabel"); };
-        
-        /** disable and enable logging **/
-        virtual void setLogging( const bool& ) { throw exception::templatevirtual("setLogging"); };
-        
-        /** shows logging status **/
-        virtual bool getLogging( void ) const { throw exception::templatevirtual("getLogging"); };
-       
-        /** return the quantizationerror **/
-        virtual std::vector<T> getLoggedQuantizationError( void ) const { throw exception::templatevirtual("getQuantizationError"); };
-        
-        /** calculate label for unkown datapoints **/
-        virtual std::vector<L> use( const ublas::matrix<T>& ) const { throw exception::templatevirtual("use"); };
+            
+            /** method for training prototypes **/
+            virtual void train( const ublas::matrix<T>&, const std::vector<L>&, const unsigned int&  ) { throw exception::templatevirtual("train"); };
+            
+            /** method which returns prototypes **/
+            virtual ublas::matrix<T> getTrainedData( void ) const { throw exception::templatevirtual("getTrainedData"); };
+            
+            /** return lables of prototypes **/
+            virtual std::vector<L> getTrainedLabel( void ) const { throw exception::templatevirtual("getTrainedLabel"); };
+            
+            /** disable and enable logging **/
+            virtual void setLogging( const bool& ) { throw exception::templatevirtual("setLogging"); };
+            
+            /** returns dimension of data points **/
+            virtual std::size_t getTrainedDataSize( void ) const { throw exception::templatevirtual("getTrainedDataSize"); };
+            
+            /** returns number of data points **/
+            virtual std::size_t getTrainedDataCount( void ) const { throw exception::templatevirtual("getTrainedDataCount"); };
+            
+            /** shows logging status **/
+            virtual bool getLogging( void ) const { throw exception::templatevirtual("getLogging"); };
+           
+            /** return the quantizationerror **/
+            virtual std::vector<T> getLoggedQuantizationError( void ) const { throw exception::templatevirtual("getQuantizationError"); };
+            
+            /** calculate label for unkown datapoints **/
+            virtual std::vector<L> use( const ublas::matrix<T>& ) const { throw exception::templatevirtual("use"); };
         
         
         
         protected :
         
-        /** destructor **/
-        virtual ~classifier( void ) {}
+            /** destructor **/
+            virtual ~classifier( void ) {}
         
     };
 
