@@ -45,22 +45,22 @@ namespace machinelearning { namespace classifier {
         public :
             
             /** method for training prototypes **/
-            virtual void train( const ublas::matrix<T>&, const std::vector<L>&, const unsigned int&  ) { throw exception::templatevirtual("train"); };
+            virtual void setDatabase( const ublas::matrix<T>&, const std::vector<L>& ) { throw exception::templatevirtual("train"); };
             
             /** method which returns prototypes **/
-            virtual ublas::matrix<T> getTrainedData( void ) const { throw exception::templatevirtual("getTrainedData"); };
+            virtual ublas::matrix<T> getDatabasePoints( void ) const { throw exception::templatevirtual("getTrainedData"); };
             
             /** return lables of prototypes **/
-            virtual std::vector<L> getTrainedLabel( void ) const { throw exception::templatevirtual("getTrainedLabel"); };
+            virtual std::vector<L> getDatabaseLabel( void ) const { throw exception::templatevirtual("getTrainedLabel"); };
             
             /** disable and enable logging **/
             virtual void setLogging( const bool& ) { throw exception::templatevirtual("setLogging"); };
             
             /** returns dimension of data points **/
-            virtual std::size_t getTrainedDataSize( void ) const { throw exception::templatevirtual("getTrainedDataSize"); };
+            virtual std::size_t getDatabaseSize( void ) const { throw exception::templatevirtual("getTrainedDataSize"); };
             
             /** returns number of data points **/
-            virtual std::size_t getTrainedDataCount( void ) const { throw exception::templatevirtual("getTrainedDataCount"); };
+            virtual std::size_t getDatabaseCount( void ) const { throw exception::templatevirtual("getTrainedDataCount"); };
             
             /** shows logging status **/
             virtual bool getLogging( void ) const { throw exception::templatevirtual("getLogging"); };

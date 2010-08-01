@@ -25,9 +25,9 @@
 #define MACHINELEARNING_CLASSIFIER_LAZYLEARNER_HPP
 
 #include <algorithm>
+#include <map>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
-#include <boost/foreach.hpp>
 
 #include "classifier.hpp"
 #include "../exception/exception.h"
@@ -54,14 +54,14 @@ namespace machinelearning { namespace classifier {
             };
             
         
-            lazylearner( const neighborhood::neighborhood<T>&, const weighttype& = 2 );
-            void train( const ublas::matrix<T>&, const std::vector<L>&, const std::size_t& = 0 );
-            ublas::matrix<T> getTrainedData( void ) const;
-            std::vector<L> getTrainedLabel( void ) const;
+            lazylearner( const neighborhood::neighborhood<T>&, const weighttype& = inversedistance );
+            void setDatabase( const ublas::matrix<T>&, const std::vector<L>& );
+            ublas::matrix<T> getDatabasePoints( void ) const;
+            std::vector<L> getDatabaseLabel( void ) const;
             void setLogging( const bool& );
             bool getLogging( void ) const;
-            std::size_t getTrainedDataSize( void ) const; 
-            std::size_t getTrainedDataCount( void ) const;
+            std::size_t getDatabaseSize( void ) const; 
+            std::size_t getDatabaseCount( void ) const;
             std::vector<T> getLoggedQuantizationError( void ) const;
             std::vector<L> use( const ublas::matrix<T>& ) const;        
             void clearLogging( void );
@@ -75,14 +75,17 @@ namespace machinelearning { namespace classifier {
             const weighttype m_weight;
             /** data basis **/
             ublas::matrix<T> m_basedata;
-            /** vector with neuron label information **/
-            const std::vector<L> m_baselabels;
-            /** bool for logging prototypes **/
+            /** vector with data label information **/
+            std::vector<L> m_baselabels;
+            /** bool for logging **/
             bool m_logging;
             /** std::vector with index of the nearest datapoints for each datapoint  **/
             std::vector< ublas::matrix<T> > m_logprototypes;
             /** std::vector with quantisation error for each datapoint **/
             std::vector<T> m_quantizationerror;
+        
+            std::vector<L> getLabelsWithoutWeight( const ublas::matrix<std::size_t>& ) const;
+            std::vector<L> getLabelsWithWeight( const ublas::matrix<std::size_t>&, const ublas::matrix<T>& ) const;
         
             static bool labelMapCompair( std::pair<L, std::size_t> left, std::pair<L, std::size_t> right);
         
@@ -106,7 +109,7 @@ namespace machinelearning { namespace classifier {
     /** returns the prototype / data matrix
      * @return matrix (rows = prototypes)
      **/
-    template<typename T, typename L> inline ublas::matrix<T> lazylearner<T, L>::getTrainedData( void ) const
+    template<typename T, typename L> inline ublas::matrix<T> lazylearner<T, L>::getDatabasePoints( void ) const
     {
         return m_basedata;
     }
@@ -115,7 +118,7 @@ namespace machinelearning { namespace classifier {
     /** returns the prototypes / data labels
      * @return vector with label information
      **/
-    template<typename T, typename L> inline std::vector<L> lazylearner<T, L>::getTrainedLabel( void ) const
+    template<typename T, typename L> inline std::vector<L> lazylearner<T, L>::getDatabaseLabel( void ) const
     {
         return m_baselabels;
     }
@@ -124,7 +127,7 @@ namespace machinelearning { namespace classifier {
     /** returns the dimension of prototypes
      * @return dimension of the prototypes
      **/
-    template<typename T, typename L> inline std::size_t lazylearner<T, L>::getTrainedDataSize( void ) const 
+    template<typename T, typename L> inline std::size_t lazylearner<T, L>::getDatabaseSize( void ) const 
     {
         return m_basedata.size2();
     };
@@ -133,7 +136,7 @@ namespace machinelearning { namespace classifier {
     /** returns the number of prototypes
      * @return number of the prototypes / classes
      **/
-    template<typename T, typename L> inline std::size_t lazylearner<T, L>::getTrainedDataCount( void ) const 
+    template<typename T, typename L> inline std::size_t lazylearner<T, L>::getDatabaseCount( void ) const 
     {
         return m_basedata.size1();
     };
@@ -177,22 +180,15 @@ namespace machinelearning { namespace classifier {
     /** sets the datapoints as the fixed references 
      * @param p_data Matrix with data (rows are the vectors)
      * @param p_labels vector for labels
-     * @param p_number number of rows which should be used (0 for all)
      **/
-    template<typename T, typename L> inline void lazylearner<T, L>::train( const ublas::matrix<T>& p_data, const std::vector<L>& p_labels, const std::size_t& p_number )
+    template<typename T, typename L> inline void lazylearner<T, L>::setDatabase( const ublas::matrix<T>& p_data, const std::vector<L>& p_labels )
     {
-        clearLogging;
+        if (p_labels.size() != p_data.size1())
+            throw exception::matrix("matrix rows and label size are not equal");
         
-        if (p_number == 0) {
-            m_basedata      = p_data;
-            m_baselabels    = p_labels;
-        } else {
-            ublas::matrix_range< ublas::matrix<T> > l_rangedata( p_data, ublas::range(0, p_number), ublas::range(0,p_data.size2()-1)  );
-            m_basedata   = l_rangedata;
-            
-            ublas::vector_range< std::vector<L> > l_rangelabel( p_labels, ublas::range(0, p_number) );
-            m_baselabels = l_rangelabel;
-        }
+        clearLogging();
+        m_basedata      = p_data;
+        m_baselabels    = p_labels;
     }
     
     
@@ -207,6 +203,81 @@ namespace machinelearning { namespace classifier {
         return p_left.second < p_right.second;
     }
     
+    
+    /** create labels for every data point (data point label with maximum label counts)
+     * @param p_neighbour neighbourhood matrix
+     * @return vector with labels
+    **/
+    template<typename T, typename L> inline std::vector<L> lazylearner<T, L>::getLabelsWithoutWeight( const ublas::matrix<std::size_t>& p_neighbour ) const
+    {
+        std::vector<L> l_label; 
+        std::map<L, std::size_t> l_nnlabel;
+        
+        for(std::size_t i=0; i < p_neighbour.size1(); ++i) {            
+
+            // get label count
+            l_nnlabel.clear();
+            for(std::size_t j=0; j < p_neighbour.size2(); ++j)
+                
+                if ( l_nnlabel.find(m_baselabels[p_neighbour(i,j)]) == l_nnlabel.end())
+                    l_nnlabel.insert( std::pair<L, std::size_t>(m_baselabels[p_neighbour(i,j)], 1) );
+                else
+                    l_nnlabel[ m_baselabels[p_neighbour(i,j)] ]++;
+            
+            // set this label that is the biggest (most counts)
+            l_label.push_back(  std::max_element(l_nnlabel.begin(), l_nnlabel.end(), labelMapCompair)->first );
+        }
+        return l_label;
+    }
+    
+    
+    /** create weighted labels for every data point (data point label with maximum weight)
+     * @param p_neighbour neighbourhood matrix
+     * @param p_data data values for calculate distance
+     * @return vector with labels
+     **/
+    template<typename T, typename L> inline std::vector<L> lazylearner<T, L>::getLabelsWithWeight( const ublas::matrix<std::size_t>& p_neighbour, const ublas::matrix<T>& p_data ) const
+    {
+        std::vector<L> l_label; 
+        std::map<L,T> l_nnlabel;
+        
+        for(std::size_t i=0; i < p_neighbour.size1(); ++i) {
+            //ublas::vector<std::size_t> l_idx = ublas::row(p_neighbour,i);
+            
+            // calculate the distance values of the neighbourhood points
+            // if data point exact over a prototype (distance == 0) set lable direct
+            l_nnlabel.clear();
+            for(std::size_t j=0; j < p_neighbour.size2(); ++j) {
+                T l_distance = m_neighborhood->calculateDistance( static_cast< ublas::vector<T> >(ublas::row(p_data,i)), 
+                                                                  static_cast< ublas::vector<T> >(ublas::row(m_basedata, p_neighbour(i,j)))
+                                                                );
+                
+                if (tools::function::isNumericalZero<T>(l_distance)) {
+                    l_label.push_back( m_baselabels[p_neighbour(i,j)] );
+                    break;
+                }
+                
+                
+                if (m_weight == inversedistance)
+                    l_distance = static_cast<T>(1) / l_distance;
+                
+                // add distance to bucket
+                if ( l_nnlabel.find(m_baselabels[p_neighbour(i,j)]) == l_nnlabel.end())
+                    l_nnlabel.insert( std::pair<L,T>(m_baselabels[p_neighbour(i,j) ], l_distance) );
+                else
+                    l_nnlabel[ m_baselabels[p_neighbour(i,j)] ] += l_distance;
+            }
+            
+            // data point is not over a prototype (normalize buckets and get max element label)
+            if ( i == l_label.size())
+                l_label.push_back(  std::max_element(l_nnlabel.begin(), l_nnlabel.end(), labelMapCompair)->first );
+        
+        }
+        
+        return l_label;
+    }
+        
+        
     
     /** label unkown data
      * @todo logging implementation
@@ -223,100 +294,16 @@ namespace machinelearning { namespace classifier {
         switch (m_weight) {
         
             // use only neighbourhood for determine label
-            case none :
-
-                for(std::size_t i=0; i < l_neighbour.size1(); ++i) {
-                    ublas::vector<std::size_t> l_idx = ublas::row(l_neighbour,i);
-                
-                    // get label count
-                    std::map<L, std::size_t> l_nnlabel;
-                    for(std::size_t j=0; j < l_idx.size(); ++j)
-                        if ( l_nnlabel.find(m_baselabels[l_idx[j]]) == l_nnlabel.end())
-                            l_nnlabel.insert( std::pair<L, std::size_t>(m_baselabels[l_idx[j]], 1) );
-                        else
-                            l_nnlabel[ m_baselabels[l_idx[j]] ]++;
-                
-                    // set this label that is the biggest (most counts)
-                    l_label.push_back(  std::max_element(l_nnlabel.begin(), l_nnlabel.end(), labelMapCompair)->first );
-                }
-                break;
-                
-                
+            case none :     
+                l_label = getLabelsWithoutWeight( l_neighbour );            break;
                 
             // get label from their distances
-            case distance :
-                
-                for(std::size_t i=0; i < l_neighbour.size1(); ++i) {
-                    ublas::vector<std::size_t> l_idx = ublas::row(l_neighbour,i);
-                                        
-                    // calculate the distance values of the neighbourhood points
-                    // if data point exact over a prototype (distance == 0) set lable direct
-                    ublas::vector<T> l_distance(l_idx.size());
-                    bool l_exact = false;
-                    for(std::size_t j=0; j < l_idx.size(); ++j) {
-                        l_distance(j) = m_neighborhood->calculateDistance( static_cast< ublas::vector<T> >(ublas::row(p_data,i)), 
-                                                                           static_cast< ublas::vector<T> >(ublas::row(m_basedata, l_idx(j)))
-                                                                         );
-                        
-                        if (tools::function::isNumericalZero<T>(l_distance(j))) {
-                            l_label[i] = m_baselabels[l_idx[j]];
-                            l_exact    = true;
-                            break;
-                        }
-                    }
-                    
-                    // data point is not over a prototype
-                    if (!l_exact) {
-                        // quadratic distance
-                        BOOST_FOREACH( T& j, l_distance)
-                            j *= j;
-                        
-                        // set this label that is the biggest (most counts)
-                        l_label.push_back(  std::distance(l_distance.begin(), std::max_element(l_distance.begin(), l_distance.end()))  );
-                    }
-                    
-                }
-                break;
-                
-                
-                
-                
+            case distance : 
+                l_label = getLabelsWithWeight( l_neighbour, p_data );       break;
                 
             // get label from their inverse distances    
-            case inversedistance :
-                
-                for(std::size_t i=0; i < l_neighbour.size1(); ++i) {
-                    ublas::vector<std::size_t> l_idx = ublas::row(l_neighbour,i);
-                    
-                    // calculate the distance values of the neighbourhood points
-                    // if data point exact over a prototype (distance == 0) set lable direct
-                    ublas::vector<T> l_distance(l_idx.size());
-                    bool l_exact = false;
-                    for(std::size_t j=0; j < l_idx.size(); ++j) {
-                        l_distance(j) = m_neighborhood->calculateDistance( static_cast< ublas::vector<T> >(ublas::row(p_data,i)), 
-                                                                           static_cast< ublas::vector<T> >(ublas::row(m_basedata, l_idx(j)))
-                                                                         );
-                        
-                        if (tools::function::isNumericalZero<T>(l_distance(j))) {
-                            l_label[i] = m_baselabels[l_idx[j]];
-                            l_exact    = true;
-                            break;
-                        }
-                    }
-                    
-                    // data point is not over a prototype
-                    if (!l_exact) {
-                        // quadratic inverse distance
-                        BOOST_FOREACH( T& j, l_distance)
-                            j = static_cast<T>(1.0)/(j*j);
-                        
-                        // set this label that is the biggest (most counts)
-                        l_label.push_back(  std::distance(l_distance.begin(), std::max_element(l_distance.begin(), l_distance.end()))  );
-                    }
-                    
-                }
-                
-                break;
+            case inversedistance : 
+                l_label = getLabelsWithWeight( l_neighbour, p_data );       break;
 
         }
         

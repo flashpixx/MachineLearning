@@ -26,6 +26,7 @@ int main(int argc, char *argv[]) {
     namespace sl        = machinelearning::clustering::supervised;
     namespace nsl       = machinelearning::clustering::nonsupervised;
     namespace nd        = machinelearning::neighborhood;
+    namespace cl        = machinelearning::classifier;
         
     namespace linalg    = boost::numeric::bindings::lapack;
     namespace ublas     = boost::numeric::ublas;
@@ -38,15 +39,46 @@ int main(int argc, char *argv[]) {
     //std::cout << x << std::endl;
     
     
-    // ==== Spectral Clustering ====
+    // ===== Lazy Learner ======
+    ublas::matrix<double> data       = o.readMatrix<double>("/iris/data", H5::PredType::NATIVE_DOUBLE); 
+    ublas::vector<std::size_t> label = o.readVector<std::size_t>("/iris/label", H5::PredType::NATIVE_ULONG); 
+
     
+    ublas::indirect_array<> x(10);
+    for(std::size_t i=0; i < x.size(); ++i)
+        x(i) = static_cast<std::size_t>(tl::random::get<double>( tl::random::uniform, 0, data.size1()));
+
+    ublas::indirect_array<> y(data.size2());
+    for(std::size_t i=0; i < y.size(); ++i)
+        y(i) = i;
+    
+
+    ublas::matrix<double>      blub1 = ublas::project(data, x, y);
+    ublas::vector<std::size_t> blub2 = ublas::project(label, x);
+    
+    dist::euclid<double> d;
+    nd::knn<double> k(d, 4);
+    cl::lazylearner<double, std::size_t> ll(k, cl::lazylearner<double, std::size_t>::inversedistance);
+    
+    ll.setDatabase( blub1,  tl::vector::copy(blub2) );
+    
+    
+    tl::files::hdf f("lazy.hdf5", true);
+    f.write<double>( "/data",  data, H5::PredType::NATIVE_DOUBLE );
+    f.write<double>( "/label",  tl::vector::copy( ll.use(data) ), H5::PredType::NATIVE_DOUBLE ); 
+    f.write<double>( "/basedata",  blub1, H5::PredType::NATIVE_DOUBLE );
+    f.write<double>( "/baselabel",  blub2, H5::PredType::NATIVE_DOUBLE );
+
+    
+    // ==== Spectral Clustering ====
+    /*
     ublas::matrix<double> data = o.readMatrix<double>("/spectral2", H5::PredType::NATIVE_DOUBLE); 
     nsl::spectralclustering<double> sp(3, data.size1());
     sp.train(data, 15);
     
     tl::files::hdf f("spectral.hdf5", true);
     f.write<double>( "/data",  tl::matrix::setNumericalZero(sp.getPrototypes()), H5::PredType::NATIVE_DOUBLE );  
-    
+    */
     
     // ==== LLE ====
     /*
@@ -87,7 +119,7 @@ int main(int argc, char *argv[]) {
     ublas::matrix<double> data = o.readMatrix<double>("/ngdata", H5::PredType::NATIVE_DOUBLE);
     
     dist::euclid<double> d;
-    nsl::kmeans<double> kmeans(d, 11, 2);
+    nsl::kmeans<double> kmeans(d, 11, data.size2());
     kmeans.setLogging(true);
     kmeans.train(data, 15);
     
@@ -107,7 +139,7 @@ int main(int argc, char *argv[]) {
     ublas::matrix<double> data = o.readMatrix<double>("/ngdata", H5::PredType::NATIVE_DOUBLE);
      
     dist::euclid<double> d;
-    nsl::neuralgas<double> ng(d, 11, 2);
+    nsl::neuralgas<double> ng(d, 11, data.size2());
     ng.setLogging(true);
     ng.train(data, 15);
     
@@ -131,7 +163,7 @@ int main(int argc, char *argv[]) {
         lab[i] = i;
  
     dist::euclid<double> d;
-    sl::rlvq<double, unsigned int> vq(d, lab, 64);
+    sl::rlvq<double, unsigned int> vq(d, lab, data.size2());
     vq.setLogging(true);
     
     

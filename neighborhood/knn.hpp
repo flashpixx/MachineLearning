@@ -107,6 +107,9 @@ namespace machinelearning { namespace neighborhood {
             ublas::vector<T> l_vec = static_cast< ublas::vector<T> >(ublas::row(l_distance,i));
             
             ublas::vector<std::size_t> l_rank = tools::vector::rankIndexVector(l_vec);
+            
+            // index position in [1,knn+1] because we would like to have the neighbours of a data point
+            // and rank[0] is index of the data point self (distance is 0) 
             const ublas::vector_range< ublas::vector<std::size_t> > l_range( l_rank, ublas::range(1, m_knn+1)  );
             
             ublas::row(l_index, i) = l_range;
@@ -137,7 +140,7 @@ namespace machinelearning { namespace neighborhood {
                 l_distance(j) = calculateDistance( l_vec, static_cast< ublas::vector<T> >(ublas::row(p_fix, j)) );
             
             ublas::vector<std::size_t> l_rank = tools::vector::rankIndexVector(l_distance);
-            const ublas::vector_range< ublas::vector<std::size_t> > l_range( l_rank, ublas::range(1, m_knn+1)  );
+            const ublas::vector_range< ublas::vector<std::size_t> > l_range( l_rank, ublas::range(0, m_knn)  );
 
             ublas::row(l_index, i) = l_range;
         }
