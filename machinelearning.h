@@ -1,5 +1,5 @@
 /** 
- \verbatim
+ @cond
  #########################################################################
  # GPL License                                                           #
  #                                                                       #
@@ -17,7 +17,7 @@
  # You should have received a copy of the GNU General Public License     #
  # along with this program.  If not, see <http://www.gnu.org/licenses/>. #
  #########################################################################
- \endverbatim
+ @endcond
  **/
 
 /**
@@ -51,23 +51,27 @@
  * <li>data points should be matrix data and the matrix is row-orientated, so for K data points with every point dimension P, we have a K x P matrix (prototype matrices are equal)</li>
  * </ul>
  *
- * @section ex examples
+ * @section ex advanced documentation
  * <ul>
  * <li>@subpage clustering</li>
  * <li>@subpage distances</li>
+ * <li>@subpage dimreduce</li>
  * </ul>
  *
  *
- * @page clustering clustering examples
+ * @page clustering clustering
+ * The clustering classes are templates classes, there are two main structures <i>supervised</i> and <i>nonsupervised</i>. The namespaces are named in the same way machinelearning::clustering::nonsupervised or 
+ * machinelearning::clustering::supervised. All classes are subclasses of their supervised / unsupervised base class. Especially the supervised classes have two template parameters, first for the data and second
+ * for their labels, the nonsupervised uses only one template parameter. The examples show the different using.
+ *
  * @section kmeans k-Means
  * @code
     ublas::matrix<double> data = / fill data (row orientated) /;
 
     // create euclidian distance object
-    tools::distances::euclid<double> d;
-
+    distances::euclid<double> d;
     // create kmeans with 11 prototypes and column dimension of data
-    kmeans<double> kmeans(d, 11, data.size2());
+    clustering::nonsupervised::kmeans<double> kmeans(d, 11, data.size2());
     // enabled logging
     kmeans.setLogging(true);
     // clustering with 15 iterations
@@ -88,23 +92,85 @@
     ublas::indirect_array< std::vector<std::size_t> > protoidx = kmeans.use(unkown);
  * @endcode
  *
+ * @section ng neural gas
+ * @code
+    ublas::matrix<double> data = / fill data (row orientated) /;
+ 
+    // create distance object
+    distances::euclid<double> d;
+    // create neural gas object with 11 prototypes
+    clustering::nonsupervised::neuralgas<double> ng(d, 11, data.size2());
+    // enabled logging
+    ng.setLogging(true);
+    // clustering with 15 iterations
+    ng.train(data, 15);
+ 
+    // if logging is enabled
+    if (ng.getLogging()) {
+ 
+        // get prototypes after every iteration 
+        std::vector< ublas::matrix<double> > p = ng.getLoggedPrototypes();
+ 
+        for(std::size_t i=0; i < p.size(); ++i)
+            std::cout << p[i] << std::endl;
+    }
+ 
+    // get row index for the prototype of every data point
+    ublas::matrix<double> unkown = / create matrix with unkown data /;
+    ublas::indirect_array< std::vector<std::size_t> > protoidx = ng.use(unkown);
+ * @endcode
  *
- * @page distances distance examples 
- * @section ncd normalize compression distance (NCD)
+ *
+ * @page dimreduce dimension reducing
+ * The dimension reducing classes are in the namespace machinelearning::dimensionreduce and can be used for dimension reduction. The are two subnamespaces machinelearning::dimensionreduce::nonsupervised and 
+ * machinelearning::dimensionreduce::supervised. Supervised uses two template parameter first one for datatype, second one for labeling. The nonsupervised is used only one parameter (for datatype). The examples
+ * show the different option
+ *
+ * @section pca principle component analysis (PCA)
+ * @code
+    ublas::matrix<double> data = / fill data (row orientated) /;
+ 
+    // create a pca object for reduce data to 2 dimensions
+    dimensionreduce::nonsupervised::pca<double> p(2);
+    
+    // create reduce data matrix
+    ublas::matrix<double> reduce = pca.map(data);
+ * @endcode
+ *
+ * @section lda linear discriminant analysis (LDA)
+ * @code
+    ublas::matrix<double> data      = / fill data (row orientated) /;
+    std::vector<std::string> labels = / fill label for each row /;
+ 
+    // create lda object for reduce data to 2 dimensions
+    dimensionreduce::supervised::lda<double, std::string> lda(2);
+ 
+    // create reduce data
+    ublas::matrix<double> reduce = lda.map(data, labels);
+ * @endcode
+ *
+ * @section lle local linear embedding (LLE)
+ * @code
+ * @endcode
+ *
+ *
+ * @page distances distance
  * The namespace machinelearning::distances holds all types of distances. Every distance function is a subclass of <i>distance</i> and calculates distances values for vector- and matrixdata. The class must be implementated
  * as a template class and must hold some special functions for using the distance operation. In the namespace is also the ncd-class that creates a symmetric/asymmetric dissimilarity matrix of string- or filedata with the
- * <i>normalized compression distance</i>, that based on an approximation of the the Kolmogorov complexity. The example show how to use this class:
+ * <i>normalized compression distance</i>, that based on an approximation of the the Kolmogorov complexity. The example show how to use these classes.
+ *
+ * @section ncd normalize compression distance (NCD)
  * @code
     std::vector< std:: string > val;
     val.push_back( / add file path or string data / );
      
-    ncd ncd1(ncd::gzip);
+    distances::ncd ncd1( distances::ncd::gzip );
     ncd1.setCompressionLevel( ncd::bestspeed );
     std::cout << "read data as file and use gzip" << std::endl; 
     std::cout << "unsymmetric: " << ncd1.unsymmetric<double>(val, true) << std::endl;
     std::cout << "symmetric: " << ncd1.symmetric<double>(val, true) << std::endl;
  
-    ncd ncd2(ncd::bzip2);
+    distances::ncd ncd2( distances::ncd::bzip2 );
     ncd2.setCompressionLevel( ncd::bestcompression );
     std::cout << "read data as string and use bzip2" << std::endl; 
     std::cout << "unsymmetric: " << ncd1.unsymmetric<double>(val) << std::endl;

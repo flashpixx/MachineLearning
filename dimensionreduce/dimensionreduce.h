@@ -1,5 +1,5 @@
 /** 
- \verbatim
+ @cond
  #########################################################################
  # GPL License                                                           #
  #                                                                       #
@@ -17,7 +17,7 @@
  # You should have received a copy of the GNU General Public License     #
  # along with this program.  If not, see <http://www.gnu.org/licenses/>. #
  #########################################################################
- \endverbatim
+ @endcond
  **/
 
 /** header file to connect all dimensional reducing algorithm for one include **/
