@@ -52,6 +52,9 @@ namespace machinelearning { namespace neighborhood {
             /** calculates the distance between two vectors **/
             virtual T calculateDistance( const ublas::vector<T>&, const ublas::vector<T>& ) const { throw exception::templatevirtual("calculate"); }
         
+            /** invert a value **/
+            virtual T invert( const T& ) const { throw exception::templatevirtual("invert"); };
+        
             /** returns the number of neighbors **/
             virtual std::size_t getNeighborCount( void ) const { throw exception::templatevirtual("getNeighborCount"); }
         

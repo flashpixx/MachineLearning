@@ -69,6 +69,9 @@ namespace machinelearning { namespace distances {
             /** return the length of the vector **/
             virtual T length( const ublas::vector<T>& ) const { throw exception::templatevirtual("length"); };
         
+            /** invert a value **/
+            virtual T invert( const T& ) const { throw exception::templatevirtual("invert"); };
+        
         
         protected :
         

@@ -53,6 +53,8 @@ namespace machinelearning { namespace neighborhood {
             ublas::matrix<std::size_t> get( const ublas::matrix<T>& ) const;
             ublas::matrix<std::size_t> get( const ublas::matrix<T>&, const ublas::matrix<T>& ) const;
             T calculateDistance( const ublas::vector<T>&, const ublas::vector<T>& ) const;
+            T invert( const T& p_val ) const;
+
         
         private :
         
@@ -157,6 +159,16 @@ namespace machinelearning { namespace neighborhood {
     template<typename T> inline T knn<T>::calculateDistance( const ublas::vector<T>& p_first, const ublas::vector<T>& p_second ) const
     {
         return m_distance->calculate( p_first, p_second );
+    }
+    
+    
+    /** invert a value with using the distance object
+     * @param p_val value
+     * @return inverted value
+     **/
+    template<typename T> inline T knn<T>::invert( const T& p_val ) const
+    {
+        return m_distance->invert( p_val );
     }
     
     

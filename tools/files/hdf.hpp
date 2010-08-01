@@ -42,7 +42,7 @@ namespace machinelearning { namespace tools { namespace files {
     
     /** class for reading and writing the HDF data
      * @see http://www.hdfgroup.org
-     * @todo add inline
+     * @note hdf uses their own datatypes http://www.hdfgroup.org/HDF5/doc/cpplus_RM/classH5_1_1PredType.html 
      * @todo implement array functions
      **/
     class hdf {
@@ -344,7 +344,7 @@ namespace machinelearning { namespace tools { namespace files {
     
     /** reads a vector with convert to blas matrix
      * @param p_path dataset path & name
-     * @param p_datatype datatype for reading data (see http://www.hdfgroup.org/HDF5/doc/cpplus_RM/classH5_1_1PredType.html )
+     * @param p_datatype datatype for reading data
      * @return ublas matrix
     **/ 
     template<typename T> inline ublas::vector<T> hdf::readVector( const std::string& p_path, const H5::PredType& p_datatype ) const

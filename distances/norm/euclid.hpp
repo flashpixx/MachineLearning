@@ -55,6 +55,7 @@ namespace machinelearning { namespace distances {
             void norm( ublas::vector<T>& ) const ;
             void norm( ublas::matrix<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const; 
             T length( const ublas::vector<T>& p_vec ) const;
+            T invert( const T& p_val ) const;
         
     };
 
@@ -194,6 +195,17 @@ namespace machinelearning { namespace distances {
     {
         return blas::nrm2( p_vec );
     }
+    
+    
+    /** returns a invertet value
+     * @param p_val value
+     * @return inverted value
+     **/
+    template<typename T> inline T euclid<T>::invert( const T& p_val ) const
+    {
+        return std::pow( p_val, static_cast<T>(-2) );
+    }
+
 
 };};
 

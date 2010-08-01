@@ -242,7 +242,6 @@ namespace machinelearning { namespace classifier {
         std::map<L,T> l_nnlabel;
         
         for(std::size_t i=0; i < p_neighbour.size1(); ++i) {
-            //ublas::vector<std::size_t> l_idx = ublas::row(p_neighbour,i);
             
             // calculate the distance values of the neighbourhood points
             // if data point exact over a prototype (distance == 0) set lable direct
@@ -259,7 +258,7 @@ namespace machinelearning { namespace classifier {
                 
                 
                 if (m_weight == inversedistance)
-                    l_distance = static_cast<T>(1) / l_distance;
+                    l_distance = m_neighborhood->invert(l_distance);
                 
                 // add distance to bucket
                 if ( l_nnlabel.find(m_baselabels[p_neighbour(i,j)]) == l_nnlabel.end())
@@ -307,7 +306,8 @@ namespace machinelearning { namespace classifier {
 
         }
         
-        //m_logprototypes.push_back( l_neighbour );
+        //if (m_logging)
+        //    m_logprototypes.push_back( l_neighbour );
         
         return l_label;
     }
