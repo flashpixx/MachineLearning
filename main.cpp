@@ -40,6 +40,7 @@ int main(int argc, char *argv[]) {
     
     
     // ===== Lazy Learner ======
+    /*
     ublas::matrix<double> data       = o.readMatrix<double>("/iris/data", H5::PredType::NATIVE_DOUBLE); 
     ublas::vector<std::size_t> label = o.readVector<std::size_t>("/iris/label", H5::PredType::NATIVE_ULONG); 
 
@@ -68,7 +69,7 @@ int main(int argc, char *argv[]) {
     f.write<double>( "/label",  tl::vector::copy( ll.use(data) ), H5::PredType::NATIVE_DOUBLE ); 
     f.write<double>( "/basedata",  blub1, H5::PredType::NATIVE_DOUBLE );
     f.write<double>( "/baselabel",  blub2, H5::PredType::NATIVE_DOUBLE );
-
+    */
     
     // ==== Spectral Clustering ====
     /*
@@ -131,7 +132,8 @@ int main(int argc, char *argv[]) {
         std::vector< ublas::matrix<double> > p = kmeans.getLoggedPrototypes();
         for(std::size_t i=0; i < p.size(); ++i)
             f.write<double>("/log" + boost::lexical_cast<std::string>( i ), p[i], H5::PredType::NATIVE_DOUBLE );
-    }*/
+    }
+    */
     
    
     // ===== NG ===== 
@@ -193,6 +195,7 @@ int main(int argc, char *argv[]) {
     
     
     dist::ncd ncd(dist::ncd::bzip2);
+    //ncd.setCompressionLevel( dist::ncd::bestspeed );
     std::cout << "unsymmetric: " << ncd.unsymmetric<double>(val, true) << std::endl;
     std::cout << "symmetric: " << ncd.symmetric<double>(val, true) << std::endl;
     */

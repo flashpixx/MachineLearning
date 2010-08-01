@@ -51,33 +51,66 @@
  * <li>data points should be matrix data and the matrix is row-orientated, so for K data points with every point dimension P, we have a K x P matrix (prototype matrices are equal)</li>
  * </ul>
  *
+ * @section ex examples
+ * <ul>
+ * <li>@subpage clustering</li>
+ * <li>@subpage distances</li>
+ * </ul>
  *
  *
- * @page examples Code Examples
- * @section k-Means
- * <pre>
-        ublas::matrix<double> data = / fill data (row orientated) /;
+ * @page clustering clustering examples
+ * @section kmeans k-Means
+ * @code
+    ublas::matrix<double> data = / fill data (row orientated) /;
+
+    // create euclidian distance object
+    tools::distances::euclid<double> d;
+
+    // create kmeans with 11 prototypes and column dimension of data
+    kmeans<double> kmeans(d, 11, data.size2());
+    // enabled logging
+    kmeans.setLogging(true);
+    // clustering with 15 iterations
+    kmeans.train(data, 15);
+
+    // if logging is enabled
+    if (kmeans.getLogging()) {
+        
+        // get prototypes after every iteration 
+        std::vector< ublas::matrix<double> > p = kmeans.getLoggedPrototypes();
+
+        for(std::size_t i=0; i < p.size(); ++i)
+            std::cout << p[i] << std::endl;
+    }
  
-        // create euclidian distance object
-        tools::distances::euclid<double> d;
+    // get row index for the prototype of every data point
+    ublas::matrix<double> unkown = / create matrix with unkown data /;
+    ublas::indirect_array< std::vector<std::size_t> > protoidx = kmeans.use(unkown);
+ * @endcode
+ *
+ *
+ * @page distances distance examples 
+ * @section ncd normalize compression distance (NCD)
+ * The namespace machinelearning::distances holds all types of distances. Every distance function is a subclass of <i>distance</i> and calculates distances values for vector- and matrixdata. The class must be implementated
+ * as a template class and must hold some special functions for using the distance operation. In the namespace is also the ncd-class that creates a symmetric/asymmetric dissimilarity matrix of string- or filedata with the
+ * <i>normalized compression distance</i>, that based on an approximation of the the Kolmogorov complexity. The example show how to use this class:
+ * @code
+    std::vector< std:: string > val;
+    val.push_back( / add file path or string data / );
+     
+    ncd ncd1(ncd::gzip);
+    ncd1.setCompressionLevel( ncd::bestspeed );
+    std::cout << "read data as file and use gzip" << std::endl; 
+    std::cout << "unsymmetric: " << ncd1.unsymmetric<double>(val, true) << std::endl;
+    std::cout << "symmetric: " << ncd1.symmetric<double>(val, true) << std::endl;
  
-        // create kmeans with 11 prototypes and dimension 2
-        kmeans<double> kmeans(d, 11, 2);
-        // enabled logging
-        kmeans.setLogging(true);
-        // clustering with 15 iterations
-        kmeans.train(data, 15);
+    ncd ncd2(ncd::bzip2);
+    ncd2.setCompressionLevel( ncd::bestcompression );
+    std::cout << "read data as string and use bzip2" << std::endl; 
+    std::cout << "unsymmetric: " << ncd1.unsymmetric<double>(val) << std::endl;
+    std::cout << "symmetric: " << ncd1.symmetric<double>(val) << std::endl;
+ * @endcode
  
-        // if logging is enabled
-        if (kmeans.getLogging()) {
-            
-            // get prototypes after every iteration 
-            std::vector< ublas::matrix<double> > p = kmeans.getLoggedPrototypes();
- 
-            for(std::size_t i=0; i < p.size(); ++i)
-                std::cout << p[i] << std::endl;
-        }
- * </pre>
 **/
 
 #ifndef MACHINELEARNING_H
