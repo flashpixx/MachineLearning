@@ -59,6 +59,7 @@
  * </ul>
  *
  *
+ *
  * @page clustering clustering
  * The clustering classes are templates classes, there are two main structures <i>supervised</i> and <i>nonsupervised</i>. The namespaces are named in the same way machinelearning::clustering::nonsupervised or 
  * machinelearning::clustering::supervised. All classes are subclasses of their supervised / unsupervised base class. Especially the supervised classes have two template parameters, first for the data and second
@@ -120,6 +121,24 @@
     ublas::indirect_array< std::vector<std::size_t> > protoidx = ng.use(unkown);
  * @endcode
  *
+ * @section rlvq relevance vector quantization (RLVQ)
+ * @code
+    ublas::matrix<double> data = / fill data (row orientated) /;
+    std::vector<std::string> labels = / fill label for each row /;
+    std::vector<std::string> prototypelabel = / fill label for each prototype /;
+ 
+    // create distance object
+    distances::euclid<double> d;
+    // create rlvq object (the size of label vector is the number of prototypes)
+    clustering::supervised::rlvq<double, std::string> rlvq(d, prototypelabel, data.size2())
+    // enabled logging
+    rlvq.setLogging(true);
+ 
+    // train prototypes in 15 iterations
+    rlvq.train(data, labels, 15);
+ 
+ * @endcode
+ *
  *
  * @page dimreduce dimension reducing
  * The dimension reducing classes are in the namespace machinelearning::dimensionreduce and can be used for dimension reduction. The are two subnamespaces machinelearning::dimensionreduce::nonsupervised and 
@@ -152,6 +171,7 @@
  * @section lle local linear embedding (LLE)
  * @code
  * @endcode
+ *
  *
  *
  * @page distances distance
