@@ -164,9 +164,9 @@ namespace machinelearning { namespace tools { namespace files {
         
         // check datasetdimension
         if (l_dataspace.getSimpleExtentNdims() != 1)
-            throw exception::hdf::sizecorrect();
+            throw exception::parameter(_("dataset must be one-dimensional"));
         if (!l_dataspace.isSimple())
-            throw exception::hdf::simpletype();
+            throw exception::parameter(_("dataset must be a simple datatype"));
 		
  		// get array size
 		hsize_t l_size[1];
@@ -205,9 +205,9 @@ namespace machinelearning { namespace tools { namespace files {
         
         // check datasetdimension
         if (l_dataspace.getSimpleExtentNdims() != 1)
-            throw exception::hdf::sizecorrect();
+            throw exception::parameter(_("dataset must be one-dimensional"));
         if (!l_dataspace.isSimple())
-            throw exception::hdf::simpletype();       
+            throw exception::parameter(_("dataset must be a simple datatype"));       
         
         // read size of chars
         hsize_t l_strlength = l_dataset.getStorageSize(); 
@@ -317,9 +317,9 @@ namespace machinelearning { namespace tools { namespace files {
 
         // check datasetdimension
         if (l_dataspace.getSimpleExtentNdims() != 2)
-            throw exception::hdf::sizecorrect();
+            throw exception::parameter(_("dataset must be two-dimensional"));
         if (!l_dataspace.isSimple())
-            throw exception::hdf::simpletype();
+            throw exception::parameter(_("dataset must be a simple datatype"));
         
         // read matrix size and create matrix
         // (first element is column size, second row size)
@@ -355,9 +355,9 @@ namespace machinelearning { namespace tools { namespace files {
         
         // check datasetdimension
         if (l_dataspace.getSimpleExtentNdims() != 1)
-            throw exception::hdf::sizecorrect();
+            throw exception::parameter(_("dataset must be one-dimensional"));
         if (!l_dataspace.isSimple())
-            throw exception::hdf::simpletype();
+            throw exception::parameter(_("dataset must be a simple datatype"));
         
         // read matrix size and create vector
         hsize_t l_size[1];
