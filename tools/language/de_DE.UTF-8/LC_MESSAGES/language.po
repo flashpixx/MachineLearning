@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-08-03 21:36+0200\n"
-"PO-Revision-Date: 2010-08-03 21:37+0100\n"
+"POT-Creation-Date: 2010-08-03 22:08+0200\n"
+"PO-Revision-Date: 2010-08-03 22:10+0100\n"
 "Last-Translator: Philipp Kraus <philipp.kraus@flashpixx.de>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -194,7 +194,24 @@ msgstr "Größe konnte nicht ermittelt werden"
 msgid "vector reserve must be greater than zero"
 msgstr "Vektor Puffer muss größer Null sein"
 
+#: tools/files/hdf.hpp:167
+#: tools/files/hdf.hpp:208
+#: tools/files/hdf.hpp:358
+msgid "dataset must be one-dimensional"
+msgstr "Datensatz muss ein-dimensional sein"
+
+#: tools/files/hdf.hpp:169
+#: tools/files/hdf.hpp:210
+#: tools/files/hdf.hpp:322
+#: tools/files/hdf.hpp:360
+msgid "dataset must be a simple datatype"
+msgstr "Datensatz muss ein Simpledatentyp sein"
+
 #: tools/files/hdf.hpp:277
 msgid "empty path is forbidden"
 msgstr "Eine leere Pfadangabe ist verboten"
+
+#: tools/files/hdf.hpp:320
+msgid "dataset must be two-dimensional"
+msgstr "Datensatz muss zwei-dimensional sein"
 

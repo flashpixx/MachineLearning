@@ -27,6 +27,5 @@
 #define MACHINELEARNING_EXCEPTION_H
 
 #include "general.h"
-#include "hdf.h"
 
 #endif
