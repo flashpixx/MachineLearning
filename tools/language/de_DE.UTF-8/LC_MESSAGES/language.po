@@ -7,173 +7,189 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-08-03 14:41+0200\n"
-"PO-Revision-Date: 2010-08-03 15:40+0100\n"
+"POT-Creation-Date: 2010-08-03 21:25+0200\n"
+"PO-Revision-Date: 2010-08-03 21:29+0100\n"
 "Last-Translator: Philipp Kraus <philipp.kraus@flashpixx.de>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: classifier/classifier.hpp:48
-#: classifier/classifier.hpp:51
-#: classifier/classifier.hpp:54
-#: classifier/classifier.hpp:57
-#: classifier/classifier.hpp:60
-#: classifier/classifier.hpp:63
-#: classifier/classifier.hpp:66
-#: classifier/classifier.hpp:69
-#: classifier/classifier.hpp:72
-#: clustering/clustering.hpp:49
-#: clustering/clustering.hpp:52
-#: clustering/clustering.hpp:55
-#: clustering/clustering.hpp:58
-#: clustering/clustering.hpp:61
-#: clustering/clustering.hpp:64
-#: clustering/clustering.hpp:67
-#: clustering/clustering.hpp:70
-#: clustering/clustering.hpp:73
-#: clustering/clustering.hpp:76
-#: clustering/clustering.hpp:99
-#: clustering/clustering.hpp:102
-#: clustering/clustering.hpp:105
-#: clustering/clustering.hpp:108
-#: clustering/clustering.hpp:111
-#: clustering/clustering.hpp:114
-#: clustering/clustering.hpp:117
-#: clustering/clustering.hpp:120
-#: clustering/clustering.hpp:123
-#: dimensionreduce/dimensionreduce.hpp:46
-#: dimensionreduce/dimensionreduce.hpp:49
-#: dimensionreduce/dimensionreduce.hpp:52
-#: dimensionreduce/dimensionreduce.hpp:69
-#: dimensionreduce/dimensionreduce.hpp:72
-#: dimensionreduce/dimensionreduce.hpp:75
-#: distances/distance.hpp:50
-#: distances/distance.hpp:53
-#: distances/distance.hpp:56
-#: distances/distance.hpp:59
-#: distances/distance.hpp:62
-#: distances/distance.hpp:65
-#: distances/distance.hpp:68
-#: distances/distance.hpp:71
-#: distances/distance.hpp:74
-#: neighborhood/neighborhood.hpp:48
-#: neighborhood/neighborhood.hpp:51
-#: neighborhood/neighborhood.hpp:54
-#: neighborhood/neighborhood.hpp:57
-#: neighborhood/neighborhood.hpp:60
+#: classifier/classifier.hpp:49
+#: classifier/classifier.hpp:52
+#: classifier/classifier.hpp:55
+#: classifier/classifier.hpp:58
+#: classifier/classifier.hpp:61
+#: classifier/classifier.hpp:64
+#: classifier/classifier.hpp:67
+#: classifier/classifier.hpp:70
+#: classifier/classifier.hpp:73
+#: clustering/clustering.hpp:50
+#: clustering/clustering.hpp:53
+#: clustering/clustering.hpp:56
+#: clustering/clustering.hpp:59
+#: clustering/clustering.hpp:62
+#: clustering/clustering.hpp:65
+#: clustering/clustering.hpp:68
+#: clustering/clustering.hpp:71
+#: clustering/clustering.hpp:74
+#: clustering/clustering.hpp:77
+#: clustering/clustering.hpp:100
+#: clustering/clustering.hpp:103
+#: clustering/clustering.hpp:106
+#: clustering/clustering.hpp:109
+#: clustering/clustering.hpp:112
+#: clustering/clustering.hpp:115
+#: clustering/clustering.hpp:118
+#: clustering/clustering.hpp:121
+#: clustering/clustering.hpp:124
+#: dimensionreduce/dimensionreduce.hpp:47
+#: dimensionreduce/dimensionreduce.hpp:50
+#: dimensionreduce/dimensionreduce.hpp:53
+#: dimensionreduce/dimensionreduce.hpp:70
+#: dimensionreduce/dimensionreduce.hpp:73
+#: dimensionreduce/dimensionreduce.hpp:76
+#: distances/distance.hpp:51
+#: distances/distance.hpp:54
+#: distances/distance.hpp:57
+#: distances/distance.hpp:60
+#: distances/distance.hpp:63
+#: distances/distance.hpp:66
+#: distances/distance.hpp:69
+#: distances/distance.hpp:72
+#: distances/distance.hpp:75
+#: neighborhood/neighborhood.hpp:49
+#: neighborhood/neighborhood.hpp:52
+#: neighborhood/neighborhood.hpp:55
+#: neighborhood/neighborhood.hpp:58
+#: neighborhood/neighborhood.hpp:61
 msgid "method is not implementated in the base class"
 msgstr "Methode ist nicht implementiert, da sie Teil einer Basisklasse ist"
 
-#: classifier/lazylearner.hpp:187
-#: clustering/supervised/rlvq.hpp:215
-#: dimensionreduce/supervised/lda.hpp:101
+#: classifier/lazylearner.hpp:188
+#: clustering/supervised/rlvq.hpp:216
+#: dimensionreduce/supervised/lda.hpp:102
 msgid "matrix rows and label size are not equal"
 msgstr "Matrixzeilen und Labelanzahl sind nicht identisch"
 
-#: clustering/nonsupervised/kmeans.hpp:93
-#: clustering/nonsupervised/neuralgas.hpp:94
-#: clustering/supervised/rlvq.hpp:100
+#: clustering/nonsupervised/kmeans.hpp:94
+#: clustering/nonsupervised/neuralgas.hpp:95
+#: clustering/supervised/rlvq.hpp:101
 msgid "prototype size must be greater than zero"
 msgstr "Prototypdimension musst größer Null sein"
 
-#: clustering/nonsupervised/kmeans.hpp:95
-#: clustering/nonsupervised/neuralgas.hpp:96
+#: clustering/nonsupervised/kmeans.hpp:96
+#: clustering/nonsupervised/neuralgas.hpp:97
 msgid "number of prototypes must be greater than zero"
 msgstr "Anzahl der Prototypen muss größer Null sein"
 
-#: clustering/nonsupervised/kmeans.hpp:154
-#: clustering/nonsupervised/neuralgas.hpp:188
-#: clustering/supervised/rlvq.hpp:213
+#: clustering/nonsupervised/kmeans.hpp:155
+#: clustering/nonsupervised/neuralgas.hpp:189
+#: clustering/supervised/rlvq.hpp:214
 msgid "iterations must be greater than zero"
 msgstr "Iterationen müssen größer Null sein"
 
-#: clustering/nonsupervised/kmeans.hpp:156
-#: clustering/nonsupervised/neuralgas.hpp:190
-#: clustering/nonsupervised/spectralclustering.hpp:166
-#: clustering/supervised/rlvq.hpp:217
-#: clustering/supervised/rlvq.hpp:297
+#: clustering/nonsupervised/kmeans.hpp:157
+#: clustering/nonsupervised/neuralgas.hpp:191
+#: clustering/nonsupervised/spectralclustering.hpp:167
+#: clustering/supervised/rlvq.hpp:218
+#: clustering/supervised/rlvq.hpp:298
 msgid "data and prototype dimension are not equal"
 msgstr "Daten- und Prototypdimension sind nicht identisch"
 
-#: clustering/nonsupervised/kmeans.hpp:158
-#: clustering/nonsupervised/kmeans.hpp:255
-#: clustering/nonsupervised/neuralgas.hpp:186
-#: clustering/nonsupervised/neuralgas.hpp:279
-#: clustering/supervised/rlvq.hpp:211
+#: clustering/nonsupervised/kmeans.hpp:159
+#: clustering/nonsupervised/kmeans.hpp:256
+#: clustering/nonsupervised/neuralgas.hpp:187
+#: clustering/nonsupervised/neuralgas.hpp:280
+#: clustering/supervised/rlvq.hpp:212
 msgid "number of datapoints are less than prototypes"
 msgstr "Anzahl der Datenpunkte ist weniger als Anzahl der Prototypen"
 
-#: clustering/nonsupervised/neuralgas.hpp:192
-#: clustering/supervised/rlvq.hpp:219
+#: clustering/nonsupervised/neuralgas.hpp:193
+#: clustering/supervised/rlvq.hpp:220
 msgid "lambda must be greater than zero"
 msgstr "Lambda muss größer Null sein"
 
-#: clustering/nonsupervised/spectralclustering.hpp:164
-#: tools/lapack.hpp:73
-#: tools/lapack.hpp:121
+#: clustering/nonsupervised/spectralclustering.hpp:165
+#: tools/lapack.hpp:74
+#: tools/lapack.hpp:122
 msgid "matrix are not symmetric"
 msgstr "Matrix ist nicht symmetrisch"
 
-#: clustering/supervised/rlvq.hpp:221
+#: clustering/supervised/rlvq.hpp:222
 msgid "eta must be greater than zero"
 msgstr "Eta muss größer Null sein"
 
-#: dimensionreduce/nonsupervised/lle.hpp:78
-#: dimensionreduce/nonsupervised/pca.hpp:69
-#: dimensionreduce/supervised/lda.hpp:71
+#: dimensionreduce/nonsupervised/lle.hpp:79
+#: dimensionreduce/nonsupervised/pca.hpp:70
+#: dimensionreduce/supervised/lda.hpp:72
 msgid "dimension must be greater than zero"
 msgstr "Dimension muss größer Null sein"
 
-#: dimensionreduce/nonsupervised/lle.hpp:109
-#: dimensionreduce/nonsupervised/pca.hpp:97
+#: dimensionreduce/nonsupervised/lle.hpp:110
+msgid "data points are less than target dimension"
+msgstr "Datenpunktdimension ist kleiner als Dimension der Zielprojektion"
+
+#: dimensionreduce/nonsupervised/pca.hpp:98
 msgid "datapoint dimension are less than target dimension"
 msgstr "Datenpunktdimension ist kleiner als Dimension der Zielprojektion"
 
-#: dimensionreduce/supervised/lda.hpp:109
+#: dimensionreduce/supervised/lda.hpp:110
 msgid "target dimension must be less than unique data classes"
 msgstr "Zieldimension musst kleiner sein als Anzahl der eindeutigen Klassen"
 
-#: neighborhood/knn.hpp:81
+#: distances/ncd.hpp:175
+#: distances/ncd.hpp:222
+msgid "vector size must be greater than zero"
+msgstr "Vektor Puffer muss größer Null sein"
+
+#: distances/ncd.hpp:267
+msgid "string size must be greater than zero"
+msgstr "Zeilenanzahl muss größer Null sein"
+
+#: neighborhood/knn.hpp:82
 msgid "knn must be greater than zero"
 msgstr "KNN muss größer Null sein"
 
-#: neighborhood/knn.hpp:101
-#: neighborhood/knn.hpp:132
+#: neighborhood/knn.hpp:102
+#: neighborhood/knn.hpp:133
 msgid "knn is greater than datapoints"
 msgstr "KNN ist größer als Anzahl der Datenpunkte"
 
-#: tools/lapack.hpp:75
+#: tools/lapack.hpp:76
 msgid "both matrices have not the same size"
 msgstr "beide Matrizen haben nicht die gleiche Größe"
 
-#: tools/matrix.hpp:90
-#: tools/matrix.hpp:125
-#: tools/matrix.hpp:345
-#: tools/files/csv.hpp:124
+#: tools/matrix.hpp:91
+#: tools/matrix.hpp:126
+#: tools/matrix.hpp:346
+#: tools/files/csv.hpp:125
 msgid "row size must be greater than zero"
 msgstr "Zeilenanzahl muss größer Null sein"
 
-#: tools/matrix.hpp:92
-#: tools/matrix.hpp:127
-#: tools/files/csv.hpp:122
+#: tools/matrix.hpp:93
+#: tools/matrix.hpp:128
+#: tools/files/csv.hpp:123
 msgid "column size must be greater than zero"
 msgstr "Spaltenanzahl muss größer Null sein"
 
-#: tools/vector.hpp:105
+#: tools/vector.hpp:106
 msgid "length must be greater than zero"
 msgstr "Länge muss größer Null sein"
 
-#: tools/files/csv.hpp:79
+#: tools/files/csv.hpp:80
 msgid "vector dimension must be greater than zero"
 msgstr "Vektordimension muss größer Null sein"
 
-#: tools/files/csv.hpp:152
+#: tools/files/csv.hpp:112
+msgid "can not separate size"
+msgstr "Größe konnte nicht ermittelt werden"
+
+#: tools/files/csv.hpp:153
 msgid "vector reserve must be greater than zero"
 msgstr "Vektor Puffer muss größer Null sein"
 
-#: tools/files/hdf.hpp:276
+#: tools/files/hdf.hpp:277
 msgid "empty path is forbidden"
 msgstr "Eine leere Pfadangabe ist verboten"
 
