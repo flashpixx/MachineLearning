@@ -155,7 +155,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         if (p_data.size2() != m_prototypes.size2())
             throw exception::matrix(_("data and prototype dimension are not equal"));
         if (p_data.size1() < m_prototypes.size1())
-            throw exception::greaterthan("data", "neurons");
+            throw exception::parameter(_("number of datapoints are less than prototypes"));
         
         
         // creates logging
@@ -252,7 +252,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     template<typename T> inline ublas::indirect_array< std::vector<std::size_t> > kmeans<T>::use( const ublas::matrix<T>& p_data ) const
     {
         if (p_data.size1() < m_prototypes.size1())
-            throw exception::greaterthan("data", "neurons");
+            throw exception::parameter(_("number of datapoints are less than prototypes"));        
         
         std::vector<std::size_t> l_vec(p_data.size1());
         ublas::scalar_vector<T> l_ones(p_data.size1(), 1);

@@ -106,7 +106,7 @@ namespace machinelearning { namespace dimensionreduce { namespace supervised {
         
         // we can only reduce to length(classes)-1
         if (m_dim >= l_uniquelabel.size())
-            throw exception::greaterthan("data classes", "reduce dimension");
+            throw exception::parameter(_("target dimension must be less than unique data classes"));
         
 		
         // centering the data

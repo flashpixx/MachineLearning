@@ -183,7 +183,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     template<typename T> inline void neuralgas<T>::train( const ublas::matrix<T>& p_data, const std::size_t& p_iterations, const T& p_lambda )
     {
         if (p_data.size1() < m_prototypes.size1())
-            throw exception::greaterthan("data", "neurons");
+            throw exception::parameter(_("number of datapoints are less than prototypes"));
         if (p_iterations == 0)
             throw exception::parameter(_("iterations must be greater than zero"));
         if (p_data.size2() != m_prototypes.size2())
@@ -276,7 +276,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     template<typename T> inline ublas::indirect_array< std::vector<std::size_t> > neuralgas<T>::use( const ublas::matrix<T>& p_data ) const
     {
         if (p_data.size1() < m_prototypes.size1())
-            throw exception::greaterthan("data", "neurons");
+            throw exception::parameter(_("number of datapoints are less than prototypes"));
         
         std::vector<std::size_t> l_vec(p_data.size1());
         ublas::scalar_vector<T> l_ones(p_data.size1(), 1);

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-08-03 01:43+0200\n"
-"PO-Revision-Date: 2010-08-03 13:32+0100\n"
+"POT-Creation-Date: 2010-08-03 14:41+0200\n"
+"PO-Revision-Date: 2010-08-03 15:40+0100\n"
 "Last-Translator: Philipp Kraus <philipp.kraus@flashpixx.de>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -97,6 +97,14 @@ msgstr "Iterationen müssen größer Null sein"
 msgid "data and prototype dimension are not equal"
 msgstr "Daten- und Prototypdimension sind nicht identisch"
 
+#: clustering/nonsupervised/kmeans.hpp:158
+#: clustering/nonsupervised/kmeans.hpp:255
+#: clustering/nonsupervised/neuralgas.hpp:186
+#: clustering/nonsupervised/neuralgas.hpp:279
+#: clustering/supervised/rlvq.hpp:211
+msgid "number of datapoints are less than prototypes"
+msgstr "Anzahl der Datenpunkte ist weniger als Anzahl der Prototypen"
+
 #: clustering/nonsupervised/neuralgas.hpp:192
 #: clustering/supervised/rlvq.hpp:219
 msgid "lambda must be greater than zero"
@@ -118,9 +126,23 @@ msgstr "Eta muss größer Null sein"
 msgid "dimension must be greater than zero"
 msgstr "Dimension muss größer Null sein"
 
+#: dimensionreduce/nonsupervised/lle.hpp:109
+#: dimensionreduce/nonsupervised/pca.hpp:97
+msgid "datapoint dimension are less than target dimension"
+msgstr "Datenpunktdimension ist kleiner als Dimension der Zielprojektion"
+
+#: dimensionreduce/supervised/lda.hpp:109
+msgid "target dimension must be less than unique data classes"
+msgstr "Zieldimension musst kleiner sein als Anzahl der eindeutigen Klassen"
+
 #: neighborhood/knn.hpp:81
 msgid "knn must be greater than zero"
 msgstr "KNN muss größer Null sein"
+
+#: neighborhood/knn.hpp:101
+#: neighborhood/knn.hpp:132
+msgid "knn is greater than datapoints"
+msgstr "KNN ist größer als Anzahl der Datenpunkte"
 
 #: tools/lapack.hpp:75
 msgid "both matrices have not the same size"

@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
     namespace ublas     = boost::numeric::ublas;
     
     
-    tl::language::bind("", "machinelearning", "./tools/language/");
+    tl::language::bind("", "ml", "./tools/language/");
 
     
     

@@ -208,7 +208,7 @@ namespace machinelearning { namespace clustering { namespace supervised {
     template<typename T, typename L> inline void rlvq<T, L>::train( const ublas::matrix<T>& p_data, const std::vector<L>& p_labels, const std::size_t& p_iterations, const T& p_lambda, const T& p_eta )
     {
         if (p_data.size1() < m_prototypes.size1())
-            throw exception::greaterthan("data", "neurons");
+            throw exception::parameter(_("number of datapoints are less than prototypes"));
         if (p_iterations == 0)
             throw exception::parameter(_("iterations must be greater than zero"));
         if (p_labels.size() != p_data.size1())

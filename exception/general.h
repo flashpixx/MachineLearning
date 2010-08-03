@@ -32,7 +32,6 @@
 
 namespace machinelearning { namespace exception {
 
-    class greaterthan      : public std::invalid_argument   { public : greaterthan( const std::string&, const std::string& ); };
     class initialization   : public std::range_error        { public : initialization( const std::string& ); };
     class iostreamopen     : public std::ios_base::failure  { public : iostreamopen( const std::string& ); };
     class iostreamempty    : public std::ios_base::failure  { public : iostreamempty( const std::string& ); };
@@ -42,6 +41,7 @@ namespace machinelearning { namespace exception {
     class classmethod      : public std::runtime_error      { public : classmethod( const std::string& ); };
     class matrix           : public std::runtime_error      { public : matrix( const std::string& ); };
     class parameter        : public std::runtime_error      { public : parameter( const std::string& ); };
+    
 };};
 
 #endif

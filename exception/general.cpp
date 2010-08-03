@@ -25,8 +25,6 @@
 
 namespace machinelearning { namespace exception {
    
-    greaterthan::greaterthan( const std::string& p_str1, const std::string& p_str2 ) : std::invalid_argument("argument ["+p_str1+"] must be greater than ["+p_str2+"]") {}
-
     initialization::initialization( const std::string& p_str ) : std::range_error("value ["+p_str+"] is not initialisized") {}
     
     iostreamopen::iostreamopen( const std::string& p_str ) : std::ios_base::failure("fail to open stream ["+p_str+"]") {}  
