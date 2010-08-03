@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-08-03 21:25+0200\n"
-"PO-Revision-Date: 2010-08-03 21:29+0100\n"
+"POT-Creation-Date: 2010-08-03 21:36+0200\n"
+"PO-Revision-Date: 2010-08-03 21:37+0100\n"
 "Last-Translator: Philipp Kraus <philipp.kraus@flashpixx.de>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -146,6 +146,11 @@ msgstr "Vektor Puffer muss größer Null sein"
 #: distances/ncd.hpp:267
 msgid "string size must be greater than zero"
 msgstr "Zeilenanzahl muss größer Null sein"
+
+#: distances/ncd.hpp:291
+#: distances/ncd.hpp:300
+msgid "file can not be opened"
+msgstr "Datei konnte nicht geöffnet werden"
 
 #: neighborhood/knn.hpp:82
 msgid "knn must be greater than zero"

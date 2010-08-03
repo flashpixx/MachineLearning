@@ -26,10 +26,13 @@
 
 namespace machinelearning { namespace exception {
     
+    /** exception class for throwing on not implementated method **/
     classmethod::classmethod( const std::string& p_str ) : std::runtime_error(p_str) {}
     
+    /** exception class for throwing on matrix errors **/
     matrix::matrix( const std::string& p_str ) : std::runtime_error(p_str) {}  
     
+    /** exception class for throwing on parameter errors **/
     parameter::parameter( const std::string& p_str ) : std::runtime_error(p_str) {}
     
 };};
