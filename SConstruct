@@ -318,7 +318,7 @@ env.Program( getRekusivFiles(os.curdir, ".cpp"), LIBS=alllibs, LIBPATH=library_p
 
 # build languagefiles
 # compiling with: msgfmt -v -o target.mo source.po
-# add new data: msgmerge --no-wrap --update old.po new.po
+# add new data: msgmerge --no-wrap --update old_file.po newer_file.po
 sources = []
 sources.extend( getRekusivFiles(os.curdir, ".h") )
 sources.extend( getRekusivFiles(os.curdir, ".hpp") )
