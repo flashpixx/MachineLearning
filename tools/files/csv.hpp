@@ -109,7 +109,7 @@ namespace machinelearning { namespace tools { namespace files {
         boost::split( l_data, l_line, boost::is_any_of(p_separator) );
         
         if (l_data.size() == 0)
-            throw exception::initialization("first line");
+            throw exception::parameter(_("can not separate size"));
 
         unsigned int l_row = 0;
         if (l_data.size() > 0)

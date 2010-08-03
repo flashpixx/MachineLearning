@@ -26,8 +26,6 @@
 
 namespace machinelearning { namespace exception {
    
-    initialization::initialization( const std::string& p_str ) : std::range_error("value ["+p_str+"] is not initialisized") {}
-    
     iostreamopen::iostreamopen( const std::string& p_str ) : std::ios_base::failure("fail to open stream ["+p_str+"]") {}  
     
     iostreamempty::iostreamempty( const std::string& p_str ) : std::ios_base::failure("["+p_str+"] stream is empty") {} 

@@ -33,7 +33,6 @@
 
 namespace machinelearning { namespace exception {
 
-    class initialization   : public std::range_error        { public : initialization( const std::string& ); };
     class iostreamopen     : public std::ios_base::failure  { public : iostreamopen( const std::string& ); };
     class iostreamempty    : public std::ios_base::failure  { public : iostreamempty( const std::string& ); };
     

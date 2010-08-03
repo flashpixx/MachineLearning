@@ -130,8 +130,6 @@ namespace machinelearning { namespace tools {
             case pareto      :       return getPareto(     (function::isNumericalZero<T>(p_first) ? 0 : p_first),   (function::isNumericalZero<T>(p_second) ? 1 : p_second)  );
             case triangular  :       return getTriangular( (function::isNumericalZero<T>(p_first) ? 0 : p_first),   (function::isNumericalZero<T>(p_second) ? static_cast<T>(0.5) : p_second),  (function::isNumericalZero<T>(p_third) ? 1 : p_third) );
         }
-        
-        throw exception::initialization("distribution");
     }
     
    

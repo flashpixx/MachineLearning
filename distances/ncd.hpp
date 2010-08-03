@@ -172,7 +172,7 @@ namespace machinelearning { namespace distances {
     template<typename T> inline ublas::matrix<T> ncd::unsymmetric( const std::vector<std::string>& p_strvec, const bool& p_isfile  )
     {
         if (p_strvec.size() == 0)
-            throw exception::initialization("vector");
+            throw exception::parameter(_("vector size must be greater than zero"));
         
         
         // create matrix, cache and compress
@@ -219,7 +219,7 @@ namespace machinelearning { namespace distances {
     template<typename T> inline ublas::symmetric_matrix<T, ublas::upper> ncd::symmetric( const std::vector<std::string>& p_strvec, const bool& p_isfile  )
     {
         if (p_strvec.size() == 0)
-            throw exception::initialization("vector");
+            throw exception::parameter(_("vector size must be greater than zero"));
         
         
         // create matrix, cache and compress
@@ -264,7 +264,7 @@ namespace machinelearning { namespace distances {
     inline std::size_t ncd::deflate( const bool& p_isfile, const std::string& p_str1, const std::string& p_str2 )
     {
         if (p_str1.empty())
-            throw exception::initialization("string 1");
+            throw exception::parameter(_("string size must be greater than zero"));
         
         
         // create output null stream, compressor and counter structure
