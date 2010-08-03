@@ -52,7 +52,7 @@
  * @section License
  * The framework is supported under the @subpage license
  *
- * @section defs definitions / assumption
+ * @section defs definitions / specifications
  * <ul>
  * <li>data points should be matrix data and the matrix is row-orientated, so for K data points with every point dimension P, we have a K x P matrix (prototype matrices are equal)</li>
  * </ul>
@@ -216,7 +216,7 @@
  *
  *
  *
- * @page distances distance
+ * @page distances distances
  * The namespace machinelearning::distances holds all types of distances. Every distance function is a subclass of <i>distance</i> and calculates distances values for vector- and matrixdata. The class must be implementated
  * as a template class and must hold some special functions for using the distance operation. In the namespace is also the ncd-class that creates a symmetric/asymmetric dissimilarity matrix of string- or filedata with the
  * <i>normalized compression distance</i>, that based on an approximation of the the Kolmogorov complexity. The example show how to use these classes.
