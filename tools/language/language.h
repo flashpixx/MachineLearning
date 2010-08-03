@@ -17,7 +17,7 @@
  # You should have received a copy of the GNU General Public License     #
  # along with this program.  If not, see <http://www.gnu.org/licenses/>. #
  #########################################################################
- @endcond
+@endcond
  **/
 
 #ifndef MULTILANGUAGE
@@ -34,7 +34,6 @@
 #define _(string) gettext(string)
 
 
-
 namespace machinelearning { namespace tools {
     
     
@@ -44,7 +43,7 @@ namespace machinelearning { namespace tools {
         public :
             
             static std::string getLanguage( void );
-            static void bind( const std::string&, const std::string&, const std::string& );
+            static void bind( const std::string&, const std::string&, const std::string& = "" );
 
         
     };
@@ -60,11 +59,11 @@ namespace machinelearning { namespace tools {
     
     
     /** bind the textdomain for different language
-     * @param p_lang language (empty for system value)
      * @param p_name name of language file
-     * @param p_path path to language file (eg: ./language files locate under ./language/<p_lang>/p_name.mo)
+     * @param p_path path to language file (eg: ./language files locate under <p_path>/<p_lang>/<p_name>.mo)
+     * @param p_lang language (empty for system value)
      **/
-    inline void language::bind( const std::string& p_lang, const std::string& p_name, const std::string& p_path )
+    inline void language::bind( const std::string& p_name, const std::string& p_path, const std::string& p_lang )
     {
         setlocale(LC_ALL, p_lang.c_str());
         bindtextdomain(p_name.c_str(), p_path.c_str());
