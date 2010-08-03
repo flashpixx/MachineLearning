@@ -46,6 +46,7 @@
 #include <boost/accumulators/statistics/variance.hpp>
 
 #include "../exception/exception.h"
+#include "language/language.h"
 
 
 
@@ -100,8 +101,8 @@ namespace machinelearning { namespace tools {
      **/
     template<typename T> inline ublas::vector<T> vector::random( const std::size_t& p_length, const tools::random::distribution& p_distribution )
     {
-        if (tools::function::isNumericalZero(p_length))
-            throw exception::greaterthanzero("length");
+        if (p_length == 0)
+            throw exception::parameter(_("length must be greater than zero"));
         
         // initialisation of prototypes
         ublas::vector<T> l_vec(p_length);

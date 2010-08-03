@@ -31,11 +31,8 @@ int main(int argc, char *argv[]) {
     namespace linalg    = boost::numeric::bindings::lapack;
     namespace ublas     = boost::numeric::ublas;
     
-    setlocale(LC_ALL, "");
-    bindtextdomain("machinelearning", "./tools/language/");
-    textdomain("machinelearning");
-    std::cout << "Sprache: " << getenv("LANG") << std::endl;
     
+    tl::language::bind("", "machinelearning", "./tools/language/");
 
     
     
@@ -148,7 +145,7 @@ int main(int argc, char *argv[]) {
     ublas::matrix<double> data = o.readMatrix<double>("/ngdata", H5::PredType::NATIVE_DOUBLE);
      
     dist::euclid<double> d;
-    nsl::neuralgas<double> ng(d, 11, data.size2()-1);
+    nsl::neuralgas<double> ng(d, 11, data.size2());
     ng.setLogging(true);
     ng.train(data, 15);
     

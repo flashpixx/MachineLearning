@@ -76,7 +76,7 @@ namespace machinelearning { namespace tools { namespace files {
         std::getline(l_stream, l_line);
         unsigned int l_vecsize = boost::lexical_cast<unsigned int>(l_line);
         if (l_vecsize == 0)
-            throw exception::greaterthanzero("vector size");
+            throw exception::parameter(_("vector dimension must be greater than zero"));
         ublas::vector<T> l_vec( l_vecsize );        
         
         // read other lines
@@ -119,9 +119,9 @@ namespace machinelearning { namespace tools { namespace files {
             l_col = boost::lexical_cast<unsigned int>( l_data[1] );  
         
         if (l_col > 0)
-            throw exception::greaterthanzero("column size");
+            throw exception::parameter(_("column size must be greater than zero"));
         if (l_row > 0)
-            throw exception::greaterthanzero("row size");
+            throw exception::parameter(_("row size must be greater than zero"));
         
         ublas::matrix<T> l_mat( l_row, l_col ); 
         
@@ -149,7 +149,7 @@ namespace machinelearning { namespace tools { namespace files {
     template<typename T> inline std::vector<T> csv::readVector( const std::string& p_file, const std::size_t& p_vecreserve=100 ) const
     {
         if (p_vecreserve == 0)
-            throw exception::greaterthanzero("vector reserve");
+            throw exception::parameter(_("vector reserve must be greater than zero"));
         
         std::vector<std::string> l_vec();
         l_vec.reserve(p_vecreserve);

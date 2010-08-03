@@ -77,8 +77,8 @@ namespace machinelearning { namespace neighborhood {
         m_knn(p_knn),    
         m_distance( &p_distance )
     {
-        if (tools::function::isNumericalZero(p_knn))
-            throw exception::greaterthanzero("knn");
+        if (p_knn == 0)
+            throw exception::parameter(_("knn must be greater than zero"));
     }
     
     

@@ -90,10 +90,10 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         m_logprototypes( std::vector< ublas::matrix<T> >() ),
         m_quantizationerror( std::vector<T>() )
     {
-        if (tools::function::isNumericalZero(p_prototypesize))
-            throw exception::greaterthanzero("prototype size");
-        if (tools::function::isNumericalZero(p_prototypes))
-            throw exception::greaterthanzero("prototype number");
+        if (p_prototypesize == 0)
+            throw exception::parameter(_("prototype size must be greater than zero"));
+        if (p_prototypes == 0)
+            throw exception::parameter(_("number of prototypes must be greater than zero"));
     }
     
      
@@ -185,11 +185,11 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         if (p_data.size1() < m_prototypes.size1())
             throw exception::greaterthan("data", "neurons");
         if (p_iterations == 0)
-            throw exception::greaterthanzero("iterations");
+            throw exception::parameter(_("iterations must be greater than zero"));
         if (p_data.size2() != m_prototypes.size2())
             throw exception::matrix(_("data and prototype dimension are not equal"));
         if (p_lambda <= 0)
-            throw exception::greaterthanzero("lambda");
+            throw exception::parameter(_("lambda must be greater than zero"));
         
             
         // creates logging

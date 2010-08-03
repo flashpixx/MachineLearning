@@ -273,7 +273,7 @@ namespace machinelearning { namespace tools { namespace files {
         
         // path must have more than zero elements
         if (l_path.size() == 0)
-            throw exception::greaterthanzero("path");
+            throw exception::parameter(_("empty path is forbidden"));
         
         // if only one element then create dataset directly
         if (l_path.size() == 1) {

@@ -20,13 +20,59 @@
  @endcond
  **/
 
+#ifndef MULTILANGUAGE
+    #define _(string) string
+#else
 
 #ifndef MACHINELEARNING_TOOLS_LANGUAGE_H
 #define MACHINELEARNING_TOOLS_LANGUAGE_H
 
 #include <libintl.h>
 #include <locale.h>
+#include <string>
 
 #define _(string) gettext(string)
 
+
+
+namespace machinelearning { namespace tools {
+    
+    
+    /** class for create langugage bindings **/
+    class language {
+      
+        public :
+            
+            static std::string getLanguage( void );
+            static void bind( const std::string&, const std::string&, const std::string& );
+
+        
+    };
+    
+    
+    /** returns the environmental language
+     * @return string with language
+     **/
+    std::string language::getLanguage( void )
+    {
+         return getenv("LANG");
+    }
+    
+    
+    /** bind the textdomain for different language
+     * @param p_lang language (empty for system value)
+     * @param p_name name of language file
+     * @param p_path path to language file (eg: ./language files locate under ./language/<p_lang>/p_name.mo)
+     **/
+    void language::bind( const std::string& p_lang, const std::string& p_name, const std::string& p_path )
+    {
+        setlocale(LC_ALL, p_lang.c_str());
+        bindtextdomain(p_name.c_str(), p_path.c_str());
+        textdomain(p_name.c_str());
+    }
+    
+    
+};};
+
+#endif
 #endif

@@ -24,9 +24,7 @@
 #include "general.h"
 
 namespace machinelearning { namespace exception {
-
-    greaterthanzero::greaterthanzero( const std::string& p_str ) : std::invalid_argument("argument ["+p_str+"] must be greater than zero") {}
-    
+   
     greaterthan::greaterthan( const std::string& p_str1, const std::string& p_str2 ) : std::invalid_argument("argument ["+p_str1+"] must be greater than ["+p_str2+"]") {}
 
     initialization::initialization( const std::string& p_str ) : std::range_error("value ["+p_str+"] is not initialisized") {}
@@ -43,5 +41,6 @@ namespace machinelearning { namespace exception {
     
     matrix::matrix( const std::string& p_str ) : std::runtime_error(p_str) {}  
     
+    parameter::parameter( const std::string& p_str ) : std::runtime_error(p_str) {}
     
 };};

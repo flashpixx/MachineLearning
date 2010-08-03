@@ -65,8 +65,8 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         m_dim( p_dim ),
         m_project()
     {
-        if (tools::function::isNumericalZero(p_dim))
-            throw exception::greaterthanzero("dimension");
+        if (p_dim == 0)
+            throw exception::parameter(_("dimension must be greater than zero"));
     }
     
     

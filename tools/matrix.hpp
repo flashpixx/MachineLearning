@@ -35,6 +35,7 @@
 //#include "../distances/distances.h"
 #include "vector.hpp"
 #include "function.hpp"
+#include "language/language.h"
 
 
 
@@ -85,10 +86,10 @@ namespace machinelearning { namespace tools {
      **/
     template<typename T> inline ublas::matrix<T> matrix::random( const std::size_t& p_row, const std::size_t& p_col, const tools::random::distribution& p_distribution )
     {
-        if (tools::function::isNumericalZero(p_row))
-            throw exception::greaterthanzero("row size");
-        if (tools::function::isNumericalZero(p_col))
-            throw exception::greaterthanzero("column size");
+        if (p_row == 0)
+            throw exception::parameter(_("row size must be greater than zero"));
+        if (p_col == 0)
+            throw exception::parameter(_("column size must be greater than zero"));
                 
         // initialisation of prototypes
         ublas::matrix<T> l_matrix(p_row, p_col);
@@ -120,10 +121,10 @@ namespace machinelearning { namespace tools {
      **/      
     template<typename T> inline ublas::matrix<T> matrix::eye( const std::size_t& p_row, const std::size_t& p_col )
     {
-        if (tools::function::isNumericalZero(p_row))
-            throw exception::greaterthanzero("row size");
-        if (tools::function::isNumericalZero(p_col))
-            throw exception::greaterthanzero("column size");
+        if (p_row == 0)
+            throw exception::parameter(_("row size must be greater than zero"));
+        if (p_col == 0)
+            throw exception::parameter(_("column size must be greater than zero"));
         
         const std::size_t l_diag = (p_row < p_col) ? p_row : p_col;
         
@@ -340,8 +341,8 @@ namespace machinelearning { namespace tools {
     **/
     template<typename T> inline ublas::matrix<T> matrix::cov( const ublas::matrix<T>& p_input )
     {
-        if (tools::function::isNumericalZero(p_input.size1()))
-            throw exception::greaterthanzero("row size");
+        if (p_input.size1() == 0)
+            throw exception::parameter(_("row size must be greater than zero"));
         
         ublas::vector<T> l_sum = sum(p_input, column);
         return (ublas::prod(ublas::trans(p_input),p_input) - ublas::outer_prod(l_sum, l_sum) / p_input.size1()) / (p_input.size1()-1);

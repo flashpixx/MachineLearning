@@ -36,7 +36,8 @@
  * @section compileroptions Compiler Option
  * global toolbox compilerflags
  * <ul>
- * <li><pre>RANDOMDEVICE</pre> for using the Boost Device Random support (required Boost Random Device Support), otherwise a Mersenne Twister is used
+ * <li><pre>RANDOMDEVICE</pre> for using the Boost Device Random support (required Boost Random Device Support), otherwise a Mersenne Twister is used</li>
+ * <li><pre>MULTILANGUAGE</pre> option for compiling the framework with multilanguage support (uses gettext)</li>
  * <li><pre>MPI</pre> enable MPI Support for the toolbox (required Boost MPI support)</li>
  * </ul>
  * The following global compiler commands should be set

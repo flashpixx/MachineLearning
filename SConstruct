@@ -13,7 +13,7 @@ COMPILECPU = 6
 def configuration_macosx(config) :
     config["seperator"]         = ":"
     config["compiler"]          = "g++"
-    config["compileflags"]      = "-D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS -O2 -Wall -ftree-vectorize"
+    config["compileflags"]      = "-D MULTILANGUAGE -D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS -O2 -Wall -ftree-vectorize"
     config["include"]           = os.environ["CPPPATH"]
     config["libpath"]           = os.environ["LIBRARY_PATH"]
     config["libs"]              = "intl"
@@ -26,7 +26,7 @@ def configuration_macosx(config) :
 def configuration_posix(config) :
     config["seperator"]         = ":"
     config["compiler"]          = "g++"
-    config["compileflags"]      = "-D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS -O2 -Wall -ftree-vectorize"
+    config["compileflags"]      = "-D MULTILANGUAGE -D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS -O2 -Wall -ftree-vectorize"
     config["include"]           = os.environ["CPPPATH"]
     config["libpath"]           = os.environ["LIBRARY_PATH"]
     config["libs"]              = "intl"
@@ -326,3 +326,6 @@ cmd = "xgettext --output=tools/language/language.po --keyword=_ --language=c++ "
 for i in sources :
     cmd = cmd + i + " "
 os.system(cmd);
+
+#trans = sources.extend( getRekusivFiles(os.curdir, ".po") )
+#print trans
