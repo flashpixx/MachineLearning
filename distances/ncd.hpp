@@ -288,7 +288,7 @@ namespace machinelearning { namespace distances {
             
             std::ifstream l_file( p_str1.c_str(), std::ifstream::in | std::ifstream::binary );       
             if (!l_file.is_open())
-                throw exception::iostreamopen(p_str1);
+                throw exception::parameter(_("file can not be opened"));
             
             std::copy( std::istream_iterator<char>(l_file), std::istream_iterator<char>(), std::ostreambuf_iterator<char>(&l_deflate) );
             l_file.close();
@@ -297,7 +297,7 @@ namespace machinelearning { namespace distances {
                 
                 l_file.open( p_str2.c_str(), std::ifstream::in | std::ifstream::binary );
                 if (!l_file.is_open())
-                    throw exception::iostreamopen(p_str2);
+                    throw exception::parameter(_("file can not be opened"));
                 
                 std::copy( std::istream_iterator<char>(l_file), std::istream_iterator<char>(), std::ostreambuf_iterator<char>(&l_deflate) );
                 l_file.close();

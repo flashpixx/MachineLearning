@@ -32,11 +32,6 @@
 
 
 namespace machinelearning { namespace exception {
-
-    class iostreamopen     : public std::ios_base::failure  { public : iostreamopen( const std::string& ); };
-    class iostreamempty    : public std::ios_base::failure  { public : iostreamempty( const std::string& ); };
-    
-    
     
     class classmethod      : public std::runtime_error      { public : classmethod( const std::string& ); };
     class matrix           : public std::runtime_error      { public : matrix( const std::string& ); };
