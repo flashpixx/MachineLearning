@@ -31,7 +31,8 @@
  * <li>Boost Bindings (SVN http://svn.boost.org/svn/boost/sandbox/numeric_bindings / ZIP http://mathema.tician.de/software/boost-numeric-bindings)</li>
  * <li>LAPACK (http://www.netlib.org/lapack/)</li>
  * <li>HDF (http://www.hdfgroup.org/)</li>
- * <li><i>optional MPI-Support:</i> Open MPI (http://www.open-mpi.org/) for unix systems / MS MPI (Microsoft Cluster Pack) for Windows system</li>
+ * <li><i>optional Message-Passing-Interface-Support:</i> Open MPI (http://www.open-mpi.org/) for unix systems / MS MPI (Microsoft Cluster Pack) for Windows system</li>
+ * <li><i>optional GetText:</i> (http://www.gnu.org/software/gettext) for including multilanguage support</li>
  * </ul>
  *
  * @section compileroptions Compiler Option
@@ -48,6 +49,9 @@
  * <li><pre>BOOST_NUMERIC_BINDINGS_BLAS_CBLAS</pre> add LAPACK support for the Boost Bindings</li>
  * </ul>
  *
+ * @section License
+ * The framework is supported under the @subpage license
+ *
  * @section defs definitions / assumption
  * <ul>
  * <li>data points should be matrix data and the matrix is row-orientated, so for K data points with every point dimension P, we have a K x P matrix (prototype matrices are equal)</li>
@@ -60,6 +64,11 @@
  * <li>@subpage distances</li>
  * <li>@subpage dimreduce</li>
  * </ul>
+ *
+ *
+ *
+ * @page license GNU General Public License
+ * @verbinclude license.txt
  *
  *
  *
