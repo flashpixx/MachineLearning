@@ -60,7 +60,7 @@ namespace machinelearning { namespace tools {
     
     /** bind the textdomain for different language
      * @param p_name name of language file
-     * @param p_path path to language file (eg: ./language files locate under <p_path>/<p_lang>/<p_name>.mo)
+     * @param p_path path to language file (eg: ./language files locate under p_path / p_lang / p_name.mo)
      * @param p_lang language (empty for system value)
      **/
     inline void language::bind( const std::string& p_name, const std::string& p_path, const std::string& p_lang )
