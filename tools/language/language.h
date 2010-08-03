@@ -53,7 +53,7 @@ namespace machinelearning { namespace tools {
     /** returns the environmental language
      * @return string with language
      **/
-    std::string language::getLanguage( void )
+    inline std::string language::getLanguage( void )
     {
          return getenv("LANG");
     }
@@ -64,7 +64,7 @@ namespace machinelearning { namespace tools {
      * @param p_name name of language file
      * @param p_path path to language file (eg: ./language files locate under ./language/<p_lang>/p_name.mo)
      **/
-    void language::bind( const std::string& p_lang, const std::string& p_name, const std::string& p_path )
+    inline void language::bind( const std::string& p_lang, const std::string& p_name, const std::string& p_path )
     {
         setlocale(LC_ALL, p_lang.c_str());
         bindtextdomain(p_name.c_str(), p_path.c_str());
