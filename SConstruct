@@ -20,7 +20,7 @@ def configuration_macosx(config) :
     config["libsuffix"]         = [".dylib", ".a"]
     config["libremovestring"]   = "lib"
     config["libremovesuffix"]   = True  
-    config["ldremove"]          = ["boost_python", "hdf5.6", "hdf5_cpp.6", "hdf5_hl.6", "hdf5_hl_cpp.6", "ptcblas", "ptf77blas", "f77blas"]
+    config["ldremove"]          = ["boost_python", "hdf5.6", "hdf5_cpp.6", "hdf5_hl.6", "hdf5_hl_cpp.6", "ptcblas", "ptf77blas", "f77blas", "ginac"]
     
     
 def configuration_posix(config) :
@@ -33,7 +33,7 @@ def configuration_posix(config) :
     config["libsuffix"]         = [".so", ".a"]
     config["libremovestring"]   = "lib"
     config["libremovesuffix"]   = True  
-    config["ldremove"]          = ["boost_python", "hdf5.6", "hdf5_cpp.6", "hdf5_hl.6", "hdf5_hl_cpp.6", "ptcblas", "ptf77blas", "f77blas"]
+    config["ldremove"]          = ["boost_python", "hdf5.6", "hdf5_cpp.6", "hdf5_hl.6", "hdf5_hl_cpp.6", "ptcblas", "ptf77blas", "f77blas", "ginac"]
 
     
 def configuration_win32(config) :
@@ -291,6 +291,18 @@ else :
 msg()
 
 
+ginaclibs = []
+ginacpath = getListPattern("ginac", library_path, True)
+if ginacpath :
+    ginaclibs = readLibs(env, ginacpath)
+    msg("ginac is located in ["+ginacpath+"]\n")
+    showList("ginac libs", ginaclibs)
+else :
+    msg("ginac library path is not found\n")
+
+msg()
+
+
 
 #get defaultlibs
 general_libs = splitter(env, env["libs"])
@@ -302,6 +314,7 @@ alllibs.extend(general_libs)
 alllibs.extend(boostlibs)
 alllibs.extend(atlaslibs)
 alllibs.extend(hdflibs)
+alllibs.extend(ginaclibs)
 
 alllibs = rmListItem(alllibs, env["ldremove"])
 

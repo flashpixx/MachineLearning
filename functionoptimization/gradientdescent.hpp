@@ -24,9 +24,12 @@
 #ifndef MACHINELEARNING_FUNCTIONALOPTIMIZATION_GRADIENTDESCENT_HPP
 #define MACHINELEARNING_FUNCTIONALOPTIMIZATION_GRADIENTDESCENT_HPP
 
+#include <string>
 
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
+#include <ginac/ginac.h>
+
 
 #include "../exception/exception.h"
 #include "../tools/tools.h"
@@ -38,12 +41,31 @@ namespace machinelearning { namespace functionaloptimization {
     namespace ublas = boost::numeric::ublas;
     
     
+    /** class for using a (stochastic) gradient descent **/
     template<typename T> class gradientdescent {
         
+        public :
+        
+            gradientdescent( const std::string& );
+        
+        
+        
     };
+
+    
+    
+    template<typename T> inline gradientdescent<T>::gradientdescent( const std::string& p_func )
+    {
+        
+        /*
+         symbol x;
+         const ex generator = pow(cosh(x),-1);
+         return generator.diff(x,n).subs(x==0);
+
+         */
+    }
     
     
 };};
-
 
 #endif
