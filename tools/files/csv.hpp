@@ -50,10 +50,10 @@ namespace machinelearning { namespace tools { namespace files {
         public :
             
             template<typename T> ublas::vector<T> readBlasVector( const std::string& ) const;
-            template<typename T> ublas::matrix<T> readBlasMatrix( const std::string&, const std::string& ) const;
-            template<typename T> std::vector<T> readVector( const std::string&, const std::size_t& ) const;
+            template<typename T> ublas::matrix<T> readBlasMatrix( const std::string&, const std::string& = ",; " ) const;
+            template<typename T> std::vector<T> readVector( const std::string&, const std::size_t& = 100 ) const;
             template<typename T> void write( const std::string&, const ublas::vector<T>& ) const;
-            template<typename T> void write( const std::string&, const ublas::matrix<T>&, const std::string& ) const;
+            template<typename T> void write( const std::string&, const ublas::matrix<T>&, const std::string& =" " ) const;
             template<typename T> void write( const std::string&, const std::vector<T>& ) const;
         
     };
@@ -95,7 +95,7 @@ namespace machinelearning { namespace tools { namespace files {
      * @param p_separator characters for sperator (default , ; blank)
      * @return ublas vector with data
      **/
-    template<typename T> inline ublas::matrix<T> csv::readBlasMatrix( const std::string& p_file, const std::string& p_separator=",; " ) const
+    template<typename T> inline ublas::matrix<T> csv::readBlasMatrix( const std::string& p_file, const std::string& p_separator ) const
     {
         // open stream and read first line with matrix dimensions (rows cols)
         std::string l_line;
@@ -147,7 +147,7 @@ namespace machinelearning { namespace tools { namespace files {
      * @param p_vecreserve reserve capacity for std::vector (default 100)
      * @return std::vector
      **/    
-    template<typename T> inline std::vector<T> csv::readVector( const std::string& p_file, const std::size_t& p_vecreserve=100 ) const
+    template<typename T> inline std::vector<T> csv::readVector( const std::string& p_file, const std::size_t& p_vecreserve ) const
     {
         if (p_vecreserve == 0)
             throw exception::parameter(_("vector reserve must be greater than zero"));
@@ -192,7 +192,7 @@ namespace machinelearning { namespace tools { namespace files {
      * @param p_mat blas matrix
      * @param p_separator separator 
      **/    
-    template<typename T> inline void csv::write( const std::string& p_file, const ublas::matrix<T>& p_mat, const std::string& p_separator=" " ) const
+    template<typename T> inline void csv::write( const std::string& p_file, const ublas::matrix<T>& p_mat, const std::string& p_separator ) const
     {
         if ( (p_mat.size1() == 0) || (p_mat.size2() == 0) )
             return;

@@ -63,7 +63,6 @@ namespace machinelearning { namespace tools {
 		return std::fabs(p) <= std::numeric_limits<T>::epsilon();
 	}
     
-       
     
 };};
 
