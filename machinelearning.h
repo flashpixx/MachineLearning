@@ -252,6 +252,6 @@
 #include "neighborhood/neighborhood.h"
 #include "distances/distances.h"
 #include "tools/tools.h"
-#include "functionaloptimization/functionaloptimization.h"
+#include "functionoptimization/functionoptimization.h"
 
 #endif

@@ -21,29 +21,10 @@
  @endcond
  **/
 
-#ifndef MACHINELEARNING_FUNCTIONALOPTIMIZATION_GRADIENTDESCENT_HPP
-#define MACHINELEARNING_FUNCTIONALOPTIMIZATION_GRADIENTDESCENT_HPP
+#ifndef MACHINELEARNING_FUNCTIONALOPTIMIZATION_H
+#define MACHINELEARNING_FUNCTIONALOPTIMIZATION_H
 
-
-#include <boost/numeric/ublas/vector.hpp>
-#include <boost/numeric/ublas/matrix.hpp>
-
-#include "../exception/exception.h"
-#include "../tools/tools.h"
-
-
-
-namespace machinelearning { namespace functionaloptimization {
-    
-    namespace ublas = boost::numeric::ublas;
-    
-    
-    template<typename T> class gradientdescent {
-        
-    };
-    
-    
-};};
+#include "gradientdescent.hpp"
 
 
 #endif
