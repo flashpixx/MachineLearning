@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
     tl::language::bind("ml", "./tools/language/");
 
     
-    func::gradientdescent x("x^2 + y^2");
+    func::gradientdescent x("4*x^2 + 3*y^3");
     x.create("x y");
     
     //tl::files::hdf o("blub.hdf5");
