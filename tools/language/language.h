@@ -29,7 +29,6 @@
 #define MACHINELEARNING_TOOLS_LANGUAGE_H
 
 #include <libintl.h>
-#include <locale.h>
 #include <string>
 
 #define _(string) gettext(string)
