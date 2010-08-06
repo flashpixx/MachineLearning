@@ -2,6 +2,10 @@
 
 #include <iostream>
 #include <algorithm>
+#include <fstream>
+
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
 
 #include <boost/numeric/ublas/io.hpp>
 
@@ -37,7 +41,7 @@ int main(int argc, char *argv[]) {
 
     
     func::gradientdescent x("a*x^3 + b*y^4");
-    x.set("a , b");
+    x.set("a , b, m");
     
     //tl::files::hdf o("blub.hdf5");
     //std::cout << o.readString("/string") << std::endl;
@@ -160,8 +164,16 @@ int main(int argc, char *argv[]) {
         std::vector< ublas::matrix<double> > p = ng.getLoggedPrototypes();
         for(std::size_t i=0; i < p.size(); ++i)
             f.write<double>("/log" + boost::lexical_cast<std::string>( i ), p[i], H5::PredType::NATIVE_DOUBLE );
-    }
-    */
+    }*/
+    
+    /*
+    std::ofstream ofs("filename");
+    boost::archive::text_oarchive oa(ofs);
+    oa << ng;*/
+    
+    
+
+    
     
     // ===== RLVQ ======
     /*

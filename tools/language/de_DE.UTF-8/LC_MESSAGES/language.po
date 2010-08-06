@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-08-03 22:08+0200\n"
-"PO-Revision-Date: 2010-08-03 22:10+0100\n"
+"POT-Creation-Date: 2010-08-06 21:06+0200\n"
+"PO-Revision-Date: 2010-08-06 21:08+0100\n"
 "Last-Translator: Philipp Kraus <philipp.kraus@flashpixx.de>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -49,15 +49,15 @@ msgstr ""
 #: dimensionreduce/dimensionreduce.hpp:70
 #: dimensionreduce/dimensionreduce.hpp:73
 #: dimensionreduce/dimensionreduce.hpp:76
-#: distances/distance.hpp:51
-#: distances/distance.hpp:54
-#: distances/distance.hpp:57
-#: distances/distance.hpp:60
-#: distances/distance.hpp:63
-#: distances/distance.hpp:66
-#: distances/distance.hpp:69
-#: distances/distance.hpp:72
-#: distances/distance.hpp:75
+#: distances/distance.hpp:50
+#: distances/distance.hpp:53
+#: distances/distance.hpp:56
+#: distances/distance.hpp:59
+#: distances/distance.hpp:62
+#: distances/distance.hpp:65
+#: distances/distance.hpp:68
+#: distances/distance.hpp:71
+#: distances/distance.hpp:74
 #: neighborhood/neighborhood.hpp:49
 #: neighborhood/neighborhood.hpp:52
 #: neighborhood/neighborhood.hpp:55
@@ -152,6 +152,31 @@ msgstr "Zeilenanzahl muss größer Null sein"
 msgid "file can not be opened"
 msgstr "Datei konnte nicht geöffnet werden"
 
+#: functionoptimization/gradientdescent.hpp:82
+msgid "function need not be empty"
+msgstr "Funktion darf nicht leer sein"
+
+#: functionoptimization/gradientdescent.hpp:92
+#: functionoptimization/gradientdescent.hpp:145
+msgid "arithmetic expression could not be parsed"
+msgstr "Arithmetischer Ausdruckt konnte nicht geparst werden"
+
+#: functionoptimization/gradientdescent.hpp:108
+msgid "error function need not be empty"
+msgstr "Fehlerfunktion darf nicht leer sein"
+
+#: functionoptimization/gradientdescent.hpp:110
+msgid "variable name for the function need not be empty"
+msgstr "Variablenname für die Funktion darf nicht leer sein"
+
+#: functionoptimization/gradientdescent.hpp:112
+msgid "separators need not be empty"
+msgstr "Separator darf nicht leer sein"
+
+#: functionoptimization/gradientdescent.hpp:125
+msgid "variable for optimization is not found in the expression symbol table"
+msgstr "Variable zur Optimierung ist nicht im symbolischen Ausdruck enthalten"
+
 #: neighborhood/knn.hpp:82
 msgid "knn must be greater than zero"
 msgstr "KNN muss größer Null sein"
@@ -177,6 +202,10 @@ msgstr "Zeilenanzahl muss größer Null sein"
 #: tools/files/csv.hpp:123
 msgid "column size must be greater than zero"
 msgstr "Spaltenanzahl muss größer Null sein"
+
+#: tools/random.hpp:135
+msgid "distribution is not kwon"
+msgstr "Verteilung ist nicht bekannt"
 
 #: tools/vector.hpp:106
 msgid "length must be greater than zero"

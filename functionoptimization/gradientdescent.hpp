@@ -50,9 +50,7 @@ namespace machinelearning { namespace functionaloptimization {
         public :
 
             gradientdescent( const std::string& );
-        void set( const std::string&, const std::string& = "0.5 * (target+function)^2", const std::string& = "function", const std::string& = " ,;" );
-        
-        template<typename T> void blub();
+            void set( const std::string&, const std::string& = "0.5 * (target-(function))^2", const std::string& = "function", const std::string& = " ,;" );
         
         
         private :
