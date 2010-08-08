@@ -38,11 +38,12 @@ int main(int argc, char *argv[]) {
     
     
     tl::language::bind("ml", "./tools/language/");
-
     
-    func::gradientdescent x("a*x^3 + b*y^4");
-    x.set("a , b, m");
+    func::gradientdescent<double, 3> x("a*x^3 + b*y^4");
+    x.set("a, b");
     
+    
+        
     //tl::files::hdf o("blub.hdf5");
     //std::cout << o.readString("/string") << std::endl;
 	//std::vector<std::string> x = o.readStringVector("/stringarray");

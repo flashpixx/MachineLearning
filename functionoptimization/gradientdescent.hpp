@@ -25,11 +25,15 @@
 #define MACHINELEARNING_FUNCTIONALOPTIMIZATION_GRADIENTDESCENT_HPP
 
 #include <string>
+#include <map>
+#include <algorithm>
+#include <ginac/ginac.h>
 #include <boost/algorithm/string.hpp> 
 #include <boost/lexical_cast.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
-#include <ginac/ginac.h>
+#include <boost/multi_array.hpp>
+
 
 
 #include "../exception/exception.h"
@@ -45,12 +49,14 @@ namespace machinelearning { namespace functionaloptimization {
     /** class for using a (stochastic) gradient descent
      * symbolic numerical algorithms @see http://www.ginac.de
      **/
-    class gradientdescent {
+    template<typename T, std::size_t D> class gradientdescent {
     
         public :
 
             gradientdescent( const std::string& );
             void set( const std::string&, const std::string& = "0.5 * (target-(function))^2", const std::string& = "function", const std::string& = " ,;" );
+            void setOptimizeVar( const std::string&, const T&, const T& );
+            void setStaticVar( const std::string&, const boost::multi_array<T,D>& );
         
         
         private :
@@ -59,11 +65,14 @@ namespace machinelearning { namespace functionaloptimization {
             GiNaC::ex m_expression;
             /** symbols table for the function **/
             GiNaC::symtab m_exprtable;
-            /** symbols table for gradient function **/
-            GiNaC::symtab m_difftable;
+            /** symbols table for all variables **/
+            GiNaC::symtab m_fulltable;
             /** derivations **/
-            std::vector<GiNaC::ex> m_derivation;
-
+            std::map<std::string, GiNaC::ex> m_derivation;
+            /** map with upper and lower value for parameter **/
+            std::map<std::string, std::pair<T,T> > m_optimize;
+            /** map for static parameter **/
+            std::map<std::string, boost::multi_array<T,D> > m_static;
         
     };
 
@@ -72,11 +81,13 @@ namespace machinelearning { namespace functionaloptimization {
     /** constructor
      * @param p_func arithmetic expression
      **/
-    inline gradientdescent::gradientdescent( const std::string& p_func ) :
+    template<typename T, std::size_t D> inline gradientdescent<T,D>::gradientdescent( const std::string& p_func ) :
         m_expression(),
         m_exprtable(),
-        m_difftable(),
-        m_derivation()
+        m_fulltable(),
+        m_derivation(),
+        m_optimize(),
+        m_static()
     {
         if (p_func.empty())
             throw exception::parameter(_("function need not be empty"));
@@ -102,7 +113,7 @@ namespace machinelearning { namespace functionaloptimization {
      * @param p_funcname string name in which will be set the function
      * @param p_separator separator charaters (default space, comma and semicolon)
      **/
-    inline void gradientdescent::set( const std::string& p_optimizevars, const std::string& p_errfunc, const std::string& p_funcname, const std::string& p_separator )
+    template<typename T, std::size_t D> inline void gradientdescent<T,D>::set( const std::string& p_optimizevars, const std::string& p_errfunc, const std::string& p_funcname, const std::string& p_separator )
     {
         if (p_errfunc.empty())
             throw exception::parameter(_("error function need not be empty"));
@@ -110,6 +121,10 @@ namespace machinelearning { namespace functionaloptimization {
             throw exception::parameter(_("variable name for the function need not be empty"));
         if (p_separator.empty())
             throw exception::parameter(_("separators need not be empty"));
+        
+        // clear properties
+        m_optimize.clear();
+        m_static.clear();
         
         // check if symbols for optimization are in the table
         std::vector<std::string> l_sep;
@@ -140,33 +155,51 @@ namespace machinelearning { namespace functionaloptimization {
 
         try {
             l_full      = l_parser( p_errfunc );
-            m_difftable = l_parser.get_syms();
+            
+            // symbolic table for concat function
+            m_fulltable = l_parser.get_syms();
         } catch (...) {
             throw exception::parameter(_("arithmetic expression could not be parsed"));
         }
-
         
         // checks number of variables (target and function are symbolic vars, so increment +2)
-        //if (m_exprtable.size()+2 != m_difftable.size())
-        //    throw exception::parameter(_("only one variable for the data must be added"));
+        if (m_exprtable.size()+2 != m_fulltable.size())
+            throw exception::parameter(_("only one variable for the data must be added"));
         
         
         // create first derivation for each variable, which should be fitted
-        m_derivation.clear();
         for(std::size_t i=0; i < l_vars.size(); ++i)
-            m_derivation.push_back(  l_full.diff( GiNaC::ex_to<GiNaC::symbol>(m_difftable[l_vars[i]]), 1)  );
-            
-
-        
-        
-        std::cout << l_full << std::endl << std::endl;
-        for(std::size_t i=0; i < m_derivation.size(); ++i)
-            std::cout << m_derivation[i]  << std::endl;
-                
+            m_derivation[ l_vars[i] ] = l_full.diff( GiNaC::ex_to<GiNaC::symbol>(m_fulltable[ l_vars[i] ]), 1);
     }
     
     
+    
+    /** sets init values for optimizing values. Real start value will be taken with random between [lower, upper]
+     * @param p_name variable name
+     * @param p_lower lower value
+     * @param p_upper upper vlaue
+     **/
+    template<typename T, std::size_t D> inline void gradientdescent<T,D>::setOptimizeVar( const std::string& p_name, const T& p_lower, const T& p_upper )
+    {
+        if (m_derivation.find(p_name) == m_derivation.end())
+            throw exception::parameter(_("variable for optimization is not found in the expression symbol table"));
 
+        m_optimize[p_name] = std::pair<T,T>(p_lower, p_upper);
+    }
+    
+    
+    
+    /** sets the static variables that are constant during optimization
+     * @param p_name variable name
+     * @param p_data data array (multidimensional)
+     **/
+    template<typename T, std::size_t D> inline void gradientdescent<T,D>::setStaticVar( const std::string& p_name, const boost::multi_array<T,D>& p_data )
+    {
+        if ( (m_derivation.find(p_name)) || (m_fulltable.find(p_name) == m_fulltable.end()) )
+            throw exception::parameter(_("static variable is not in the symbol table or is an optimazation variable"));
+        
+        m_static[p_name] = p_data;
+    }
     
     
 };};
