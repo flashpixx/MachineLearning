@@ -33,6 +33,8 @@
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/multi_array.hpp>
+#include <boost/static_assert.hpp>
+
 
 
 
@@ -49,7 +51,9 @@ namespace machinelearning { namespace functionaloptimization {
     /** class for using a (stochastic) gradient descent
      * symbolic numerical algorithms @see http://www.ginac.de
      **/
-    template<typename T, std::size_t D> class gradientdescent {
+    template<typename T, std::size_t D=1> class gradientdescent {
+        BOOST_STATIC_ASSERT(D > 0);         // array dimension must be greater than 0
+        
     
         public :
 
