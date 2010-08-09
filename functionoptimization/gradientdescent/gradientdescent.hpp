@@ -37,7 +37,7 @@
 
 
 
-#include "gradientthread.hpp"
+#include "thread.hpp"
 #include "../../exception/exception.h"
 #include "../../tools/tools.h"
 
