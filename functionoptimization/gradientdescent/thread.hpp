@@ -25,8 +25,6 @@
 #define MACHINELEARNING_FUNCTIONALOPTIMIZATION_GRADIENTDESCENT_THREAD_HPP
 
 #include <map>
-#include <string>
-#include <algorithm>
 #include <ginac/ginac.h>
 #include <boost/algorithm/string.hpp> 
 #include <boost/lexical_cast.hpp>
@@ -47,7 +45,49 @@ namespace machinelearning { namespace functionaloptimization { namespace thread 
             BOOST_STATIC_ASSERT(D > 0);         // array dimension must be greater than 0
         
         
+        public :
+        
+            gradientdescent(    const std::map<std::string, GiNaC::ex>&, 
+                                const std::map<std::string, std::pair<T,T> >&, 
+                                const std::map<std::string, boost::multi_array<T,D> >&,
+                                const std::vector<std::string>&
+                           );
+        
+            std::map<std::string, T> getResult( void ) const;
+        
+        
+        private :
+        
+            /** map with derivation **/
+            const std::map<std::string, GiNaC::ex> m_derivation;
+            /** map with initialisation values **/
+            const std::map<std::string, std::pair<T,T> > m_initvalues;
+            /** map with static values **/
+            const std::map<std::string, boost::multi_array<T,D> > m_staticvalues;
+            /** vector with variables for batch optimize **/
+            const std::vector<std::string> m_batch;
+            /** map with optimized values **/
+            std::map<std::string, T> m_result;
+        
+        
     };
+    
+    
+    
+    template<typename T, std::size_t D> inline gradientdescent<T,D>::gradientdescent(  const std::map<std::string, GiNaC::ex>& p_derivation, const std::map<std::string, std::pair<T,T> >& p_initvalues, const std::map<std::string, boost::multi_array<T,D> >& p_staticvalues, const std::vector<std::string>& p_batch  ) :
+        m_derivation( p_derivation ),
+        m_initvalues( p_initvalues ),
+        m_staticvalues( p_staticvalues ),
+        m_batch( p_batch )
+    {}
+    
+    
+    
+    
+    template<typename T, std::size_t D> inline std::map<std::string, T> gradientdescent<T,D>::getResult( void ) const
+    {
+        return m_result;
+    }
 
 
 
