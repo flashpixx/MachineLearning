@@ -24,20 +24,20 @@
 #ifndef MACHINELEARNING_FUNCTIONALOPTIMIZATION_GRADIENTDESCENT_HPP
 #define MACHINELEARNING_FUNCTIONALOPTIMIZATION_GRADIENTDESCENT_HPP
 
-#include <string>
+
 #include <map>
+#include <string>
 #include <algorithm>
 #include <ginac/ginac.h>
 #include <boost/algorithm/string.hpp> 
 #include <boost/lexical_cast.hpp>
-#include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/multi_array.hpp>
 #include <boost/static_assert.hpp>
 
 
 
-
+#include "gradientthread.hpp"
 #include "../../exception/exception.h"
 #include "../../tools/tools.h"
 
