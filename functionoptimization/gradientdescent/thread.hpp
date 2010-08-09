@@ -37,13 +37,13 @@
 
 
 
-namespace machinelearning { namespace functionaloptimization { namespace gradient {
+namespace machinelearning { namespace functionaloptimization { namespace thread {
     
     namespace ublas = boost::numeric::ublas;
     
     
     /** class for worker thread for calulating gradient values **/
-    template<typename T, std::size_t D> class thread {
+    template<typename T, std::size_t D> class gradientdescent {
             BOOST_STATIC_ASSERT(D > 0);         // array dimension must be greater than 0
         
         
