@@ -29,6 +29,7 @@
 #include <string>
 #include <algorithm>
 #include <ginac/ginac.h>
+#include <boost/bind.hpp>
 #include <boost/algorithm/string.hpp> 
 #include <boost/lexical_cast.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
@@ -217,7 +218,25 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
     
     template<typename T, std::size_t D> inline std::map<std::string, T> descent<T,D>::optimize( const std::size_t& p_iteration, const std::vector<std::string>& p_batch, const T& p_stepsize, const bool& p_random ) const
     {
-        boost::thread_group l_worker;
+        // creating worker objects
+        
+        std::vector< thread<T,D> > l_worker;
+        for(std::size_t i=0; i < m_threads; ++i)
+            l_worker.push_back(  thread<T,D>(m_derivation, m_optimize, m_static, p_batch)  );
+        
+        // create thread objects
+        boost::thread_group l_threads;
+        
+        for(std::size_t i=0; i < m_threads; ++i)
+            l_threads.create_thread(  boost::bind( &thread<T,D>::optimize ), l_worker[i]  );
+        
+        
+        // run threads and wait during all finished
+        l_threads.join_all();
+        
+        // get Data
+        
+        
     }
     
     
