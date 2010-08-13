@@ -122,6 +122,12 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
     /** optimize value with gradient descent **/
     template<typename T, std::size_t D> inline void worker<T,D>::optimize( void ) 
     {
+        // initialize values
+        /*std::map<std::string, T > l_init;
+        for(std::map<std::string, std::pair<T,T> >::iterator it = m_initvalues.begin(); it != m_initvalues.end(); ++it) {
+        }*/
+        
+        
         
         for(std::size_t i=0; i < m_iteration; ++i) {
         }

@@ -62,8 +62,7 @@ namespace machinelearning { namespace functionaloptimization {
             void set( const std::string&, const std::string& = "0.5 * (target-(function))^2", const std::string& = "function", const std::string& = " ,;" );
             void setOptimizeVar( const std::string&, const T&, const T& );
             void setStaticVar( const std::string&, const boost::multi_array<T,D>& );
-            std::map<std::string, T> optimize( const std::size_t&, const std::size_t&, const T&, const std::vector<std::string>& ) const;
-            std::map<std::string, T> optimize( const std::size_t&, const std::size_t&, const T& ) const;
+            std::map<std::string, T> optimize( const std::size_t&, const std::size_t&, const T&, const std::vector<std::string>& = std::vector<std::string>() ) const;
         
         
         private :
@@ -207,13 +206,7 @@ namespace machinelearning { namespace functionaloptimization {
         
         m_static[p_name] = p_data;
     }
-    
-    
-    
-    template<typename T, std::size_t D> inline std::map<std::string, T> gradientdescent<T,D>::optimize( const std::size_t& p_threads, const std::size_t& p_iteration, const T& p_stepsize ) const
-    {
-        return optimize( p_threads, p_iteration, p_stepsize, std::vector<std::string>() );
-    }
+
     
     
     
