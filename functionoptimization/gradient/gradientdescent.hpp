@@ -226,7 +226,7 @@ namespace machinelearning { namespace functionaloptimization {
         
         std::vector< gradient::worker<T,D> > l_worker;
         for(std::size_t i=0; i < m_threads; ++i)
-            l_worker.push_back(  gradient::worker<T,D>(p_iteration, m_derivation, m_optimize, m_static, p_batch)  );
+            l_worker.push_back(  gradient::worker<T,D>(p_iteration, p_stepsize, m_derivation, m_optimize, m_static, p_batch)  );
         
         // create thread objects
         boost::thread_group l_threads;
