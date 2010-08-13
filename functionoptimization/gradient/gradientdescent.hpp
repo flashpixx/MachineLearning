@@ -21,8 +21,8 @@
  @endcond
  **/
 
-#ifndef MACHINELEARNING_FUNCTIONALOPTIMIZATION_GRADIENT_DESCENT_HPP
-#define MACHINELEARNING_FUNCTIONALOPTIMIZATION_GRADIENT_DESCENT_HPP
+#ifndef MACHINELEARNING_FUNCTIONALOPTIMIZATION_GRADIENTDESCENT_HPP
+#define MACHINELEARNING_FUNCTIONALOPTIMIZATION_GRADIENTDESCENT_HPP
 
 
 #include <map>
@@ -35,7 +35,7 @@
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/multi_array.hpp>
 #include <boost/static_assert.hpp>
-
+#include <boost/thread.hpp>
 
 
 #include "worker.hpp"
