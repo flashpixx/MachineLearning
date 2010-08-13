@@ -218,6 +218,10 @@ namespace machinelearning { namespace functionaloptimization {
     
     template<typename T, std::size_t D> inline std::map<std::string, T> gradientdescent<T,D>::optimize( const std::size_t& p_iteration, const std::vector<std::string>& p_batch, const T& p_stepsize, const bool& p_random ) const
     {
+        if (p_iteration == 0)
+            throw exception::parameter(_("iterations must be greater than zero"));
+        
+        
         // creating worker objects
         
         std::vector< gradient::worker<T,D> > l_worker;

@@ -31,8 +31,8 @@
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/multi_array.hpp>
 #include <boost/static_assert.hpp>
-#include <boost/thread.hpp>
 
+#include "../../exception/exception.h"
 
 
 namespace machinelearning { namespace functionaloptimization { namespace gradient {
@@ -90,7 +90,12 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
         m_initvalues( p_initvalues ),
         m_staticvalues( p_staticvalues ),
         m_batch( p_batch )
-    {}
+    {
+        if (m_iteration == 0)
+            throw exception::parameter(_("iterations must be greater than zero"));
+        if (p_derivation.size() != p_initvalues.size()) 
+            throw exception::parameter(_("derivations and initialisation have not the same size"));
+    }
     
     
     
