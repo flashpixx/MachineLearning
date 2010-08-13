@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-08-06 21:06+0200\n"
-"PO-Revision-Date: 2010-08-06 21:08+0100\n"
+"POT-Creation-Date: 2010-08-13 19:42+0200\n"
+"PO-Revision-Date: 2010-08-13 19:45+0100\n"
 "Last-Translator: Philipp Kraus <philipp.kraus@flashpixx.de>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -86,6 +86,8 @@ msgstr "Anzahl der Prototypen muss größer Null sein"
 #: clustering/nonsupervised/kmeans.hpp:155
 #: clustering/nonsupervised/neuralgas.hpp:189
 #: clustering/supervised/rlvq.hpp:214
+#: functionoptimization/gradient/gradientdescent.hpp:222
+#: functionoptimization/gradient/worker.hpp:95
 msgid "iterations must be greater than zero"
 msgstr "Iterationen müssen größer Null sein"
 
@@ -152,30 +154,47 @@ msgstr "Zeilenanzahl muss größer Null sein"
 msgid "file can not be opened"
 msgstr "Datei konnte nicht geöffnet werden"
 
-#: functionoptimization/gradientdescent.hpp:82
+#: functionoptimization/gradient/gradientdescent.hpp:103
+msgid "number of threads must be greater than zero"
+msgstr "Anzahl der Prototypen muss größer Null sein"
+
+#: functionoptimization/gradient/gradientdescent.hpp:106
 msgid "function need not be empty"
 msgstr "Funktion darf nicht leer sein"
 
-#: functionoptimization/gradientdescent.hpp:92
-#: functionoptimization/gradientdescent.hpp:145
+#: functionoptimization/gradient/gradientdescent.hpp:116
+#: functionoptimization/gradient/gradientdescent.hpp:175
 msgid "arithmetic expression could not be parsed"
 msgstr "Arithmetischer Ausdruckt konnte nicht geparst werden"
 
-#: functionoptimization/gradientdescent.hpp:108
+#: functionoptimization/gradient/gradientdescent.hpp:132
 msgid "error function need not be empty"
 msgstr "Fehlerfunktion darf nicht leer sein"
 
-#: functionoptimization/gradientdescent.hpp:110
+#: functionoptimization/gradient/gradientdescent.hpp:134
 msgid "variable name for the function need not be empty"
 msgstr "Variablenname für die Funktion darf nicht leer sein"
 
-#: functionoptimization/gradientdescent.hpp:112
+#: functionoptimization/gradient/gradientdescent.hpp:136
 msgid "separators need not be empty"
 msgstr "Separator darf nicht leer sein"
 
-#: functionoptimization/gradientdescent.hpp:125
+#: functionoptimization/gradient/gradientdescent.hpp:153
+#: functionoptimization/gradient/gradientdescent.hpp:198
 msgid "variable for optimization is not found in the expression symbol table"
 msgstr "Variable zur Optimierung ist nicht im symbolischen Ausdruck enthalten"
+
+#: functionoptimization/gradient/gradientdescent.hpp:180
+msgid "only one variable for the data must be added"
+msgstr "nur eine Variable darf dem Ausdruck hinzugefügt werden"
+
+#: functionoptimization/gradient/gradientdescent.hpp:212
+msgid "static variable is not in the symbol table or is an optimazation variable"
+msgstr "statische Variable ist nicht in der Symboltabelle oder es ist eine zu optimierende Variable"
+
+#: functionoptimization/gradient/worker.hpp:97
+msgid "derivations and initialisation have not the same size"
+msgstr "beide Matrizen haben nicht die gleiche Größe"
 
 #: neighborhood/knn.hpp:82
 msgid "knn must be greater than zero"
