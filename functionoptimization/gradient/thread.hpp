@@ -21,8 +21,8 @@
  @endcond
  **/
 
-#ifndef MACHINELEARNING_FUNCTIONALOPTIMIZATION_GRADIENTDESCENT_THREAD_HPP
-#define MACHINELEARNING_FUNCTIONALOPTIMIZATION_GRADIENTDESCENT_THREAD_HPP
+#ifndef MACHINELEARNING_FUNCTIONALOPTIMIZATION_GRADIENT_THREAD_HPP
+#define MACHINELEARNING_FUNCTIONALOPTIMIZATION_GRADIENT_THREAD_HPP
 
 #include <map>
 #include <ginac/ginac.h>
@@ -47,14 +47,14 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
         
         public :
         
-            gradientdescent(    const std::map<std::string, GiNaC::ex>&, 
+            thread(    const std::map<std::string, GiNaC::ex>&, 
                                 const std::map<std::string, std::pair<T,T> >&, 
                                 const std::map<std::string, boost::multi_array<T,D> >&,
                                 const std::vector<std::string>&
                            );
         
             std::map<std::string, T> getResult( void ) const;
-            void optimze( void );
+            void optimize( void );
         
         
         
@@ -76,7 +76,7 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
     
     
     
-    template<typename T, std::size_t D> inline gradientdescent<T,D>::gradientdescent(  const std::map<std::string, GiNaC::ex>& p_derivation, const std::map<std::string, std::pair<T,T> >& p_initvalues, const std::map<std::string, boost::multi_array<T,D> >& p_staticvalues, const std::vector<std::string>& p_batch  ) :
+    template<typename T, std::size_t D> inline thread<T,D>::thread(  const std::map<std::string, GiNaC::ex>& p_derivation, const std::map<std::string, std::pair<T,T> >& p_initvalues, const std::map<std::string, boost::multi_array<T,D> >& p_staticvalues, const std::vector<std::string>& p_batch  ) :
         m_derivation( p_derivation ),
         m_initvalues( p_initvalues ),
         m_staticvalues( p_staticvalues ),
@@ -86,13 +86,13 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
     
     
     
-    template<typename T, std::size_t D> inline std::map<std::string, T> gradientdescent<T,D>::getResult( void ) const
+    template<typename T, std::size_t D> inline std::map<std::string, T> thread<T,D>::getResult( void ) const
     {
         return m_result;
     }
 
     
-    template<typename T, std::size_t D> inline void optimize( void ) 
+    template<typename T, std::size_t D> inline void thread<T,D>::optimize( void ) 
     {
     }
 

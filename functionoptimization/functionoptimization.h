@@ -24,7 +24,7 @@
 #ifndef MACHINELEARNING_FUNCTIONALOPTIMIZATION_H
 #define MACHINELEARNING_FUNCTIONALOPTIMIZATION_H
 
-#include "gradientdescent/gradientdescent.hpp"
+#include "gradient/descent.hpp"
 
 
 #endif

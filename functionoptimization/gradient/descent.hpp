@@ -89,14 +89,14 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
      * @param p_func arithmetic expression
      * @param p_threads number of threads
      **/
-    template<typename T, std::size_t D> inline gradientdescent<T,D>::descent( const std::string& p_func, const std::size_t p_threads ) :
+    template<typename T, std::size_t D> inline descent<T,D>::descent( const std::string& p_func, const std::size_t& p_threads ) :
+        m_threads( p_threads ),
         m_expression(),
         m_exprtable(),
         m_fulltable(),
         m_derivation(),
         m_optimize(),
-        m_static(),
-        m_threads( p_threads )
+        m_static()
     {
         if (p_threads == 0)
             throw exception::parameter(_("number of threads must be greater than zero"));

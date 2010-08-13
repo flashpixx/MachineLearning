@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
     
     tl::language::bind("ml", "./tools/language/");
     
-    func::gradient::descent<double> x("a*x^3 + b*y^4");
+    func::gradient::descent<double> x("a*x^3 + b*y^4", 5);
     x.set("a, b");
     
     
