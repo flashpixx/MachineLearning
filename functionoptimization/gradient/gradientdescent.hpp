@@ -38,13 +38,13 @@
 
 
 
-#include "thread.hpp"
+#include "worker.hpp"
 #include "../../exception/exception.h"
 #include "../../tools/tools.h"
 
 
 
-namespace machinelearning { namespace functionaloptimization { namespace gradient {
+namespace machinelearning { namespace functionaloptimization { 
     
     namespace ublas = boost::numeric::ublas;
     
@@ -52,13 +52,13 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
     /** class for using a (stochastic) gradient descent
      * symbolic numerical algorithms @see http://www.ginac.de
      **/
-    template<typename T, std::size_t D=1> class descent {
+    template<typename T, std::size_t D=1> class gradientdescent {
         BOOST_STATIC_ASSERT(D > 0);         // array dimension must be greater than 0
         
     
         public :
 
-            descent( const std::string&, const std::size_t& );
+            gradientdescent( const std::string&, const std::size_t& );
             void set( const std::string&, const std::string& = "0.5 * (target-(function))^2", const std::string& = "function", const std::string& = " ,;" );
             void setOptimizeVar( const std::string&, const T&, const T& );
             void setStaticVar( const std::string&, const boost::multi_array<T,D>& );
@@ -90,7 +90,7 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
      * @param p_func arithmetic expression
      * @param p_threads number of threads
      **/
-    template<typename T, std::size_t D> inline descent<T,D>::descent( const std::string& p_func, const std::size_t& p_threads ) :
+    template<typename T, std::size_t D> inline gradientdescent<T,D>::gradientdescent( const std::string& p_func, const std::size_t& p_threads ) :
         m_threads( p_threads ),
         m_expression(),
         m_exprtable(),
@@ -126,7 +126,7 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
      * @param p_funcname string name in which will be set the function
      * @param p_separator separator charaters (default space, comma and semicolon)
      **/
-    template<typename T, std::size_t D> inline void descent<T,D>::set( const std::string& p_optimizevars, const std::string& p_errfunc, const std::string& p_funcname, const std::string& p_separator )
+    template<typename T, std::size_t D> inline void gradientdescent<T,D>::set( const std::string& p_optimizevars, const std::string& p_errfunc, const std::string& p_funcname, const std::string& p_separator )
     {
         if (p_errfunc.empty())
             throw exception::parameter(_("error function need not be empty"));
@@ -192,7 +192,7 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
      * @param p_lower lower value
      * @param p_upper upper vlaue
      **/
-    template<typename T, std::size_t D> inline void descent<T,D>::setOptimizeVar( const std::string& p_name, const T& p_lower, const T& p_upper )
+    template<typename T, std::size_t D> inline void gradientdescent<T,D>::setOptimizeVar( const std::string& p_name, const T& p_lower, const T& p_upper )
     {
         if (m_derivation.find(p_name) == m_derivation.end())
             throw exception::parameter(_("variable for optimization is not found in the expression symbol table"));
@@ -206,7 +206,7 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
      * @param p_name variable name
      * @param p_data data array (multidimensional)
      **/
-    template<typename T, std::size_t D> inline void descent<T,D>::setStaticVar( const std::string& p_name, const boost::multi_array<T,D>& p_data )
+    template<typename T, std::size_t D> inline void gradientdescent<T,D>::setStaticVar( const std::string& p_name, const boost::multi_array<T,D>& p_data )
     {
         if ( (m_derivation.find(p_name)) || (m_fulltable.find(p_name) == m_fulltable.end()) )
             throw exception::parameter(_("static variable is not in the symbol table or is an optimazation variable"));
@@ -216,30 +216,30 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
     
     
     
-    template<typename T, std::size_t D> inline std::map<std::string, T> descent<T,D>::optimize( const std::size_t& p_iteration, const std::vector<std::string>& p_batch, const T& p_stepsize, const bool& p_random ) const
+    template<typename T, std::size_t D> inline std::map<std::string, T> gradientdescent<T,D>::optimize( const std::size_t& p_iteration, const std::vector<std::string>& p_batch, const T& p_stepsize, const bool& p_random ) const
     {
         // creating worker objects
         
-        std::vector< thread<T,D> > l_worker;
+        std::vector< gradient::worker<T,D> > l_worker;
         for(std::size_t i=0; i < m_threads; ++i)
-            l_worker.push_back(  thread<T,D>(m_derivation, m_optimize, m_static, p_batch)  );
+            l_worker.push_back(  gradient::worker<T,D>(p_iteration, m_derivation, m_optimize, m_static, p_batch)  );
         
         // create thread objects
         boost::thread_group l_threads;
         
         for(std::size_t i=0; i < m_threads; ++i)
-            l_threads.create_thread(  boost::bind( &thread<T,D>::optimize ), l_worker[i]  );
+            l_threads.create_thread(  boost::bind( &gradient::worker<T,D>::optimize ), l_worker[i]  );
         
         
         // run threads and wait during all finished
         l_threads.join_all();
         
-        // get Data
+        // get data and creates best values
         
         
     }
     
     
-};};};
+};};
 
 #endif
