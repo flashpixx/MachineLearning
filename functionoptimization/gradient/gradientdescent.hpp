@@ -58,17 +58,16 @@ namespace machinelearning { namespace functionaloptimization {
     
         public :
 
-            gradientdescent( const std::string&, const std::size_t& );
+            gradientdescent( const std::string& );
             void set( const std::string&, const std::string& = "0.5 * (target-(function))^2", const std::string& = "function", const std::string& = " ,;" );
             void setOptimizeVar( const std::string&, const T&, const T& );
             void setStaticVar( const std::string&, const boost::multi_array<T,D>& );
-            std::map<std::string, T> optimize( const std::size_t&, const std::vector<std::string>&, const T&, const bool& = false ) const;
+            std::map<std::string, T> optimize( const std::size_t&, const std::size_t&, const T&, const std::vector<std::string>& ) const;
+            std::map<std::string, T> optimize( const std::size_t&, const std::size_t&, const T& ) const;
         
         
         private :
-            
-            /** number of thread objects **/
-            const std::size_t m_threads;    
+             
             /** expression for the function **/
             GiNaC::ex m_expression;
             /** symbols table for the function **/
@@ -88,10 +87,8 @@ namespace machinelearning { namespace functionaloptimization {
     
     /** constructor
      * @param p_func arithmetic expression
-     * @param p_threads number of threads
      **/
-    template<typename T, std::size_t D> inline gradientdescent<T,D>::gradientdescent( const std::string& p_func, const std::size_t& p_threads ) :
-        m_threads( p_threads ),
+    template<typename T, std::size_t D> inline gradientdescent<T,D>::gradientdescent( const std::string& p_func ) :
         m_expression(),
         m_exprtable(),
         m_fulltable(),
@@ -99,9 +96,6 @@ namespace machinelearning { namespace functionaloptimization {
         m_optimize(),
         m_static()
     {
-        if (p_threads == 0)
-            throw exception::parameter(_("number of threads must be greater than zero"));
-        
         if (p_func.empty())
             throw exception::parameter(_("function need not be empty"));
         
@@ -216,24 +210,29 @@ namespace machinelearning { namespace functionaloptimization {
     
     
     
-    template<typename T, std::size_t D> inline std::map<std::string, T> gradientdescent<T,D>::optimize( const std::size_t& p_iteration, const std::vector<std::string>& p_batch, const T& p_stepsize, const bool& p_random ) const
+    template<typename T, std::size_t D> inline std::map<std::string, T> gradientdescent<T,D>::optimize( const std::size_t& p_threads, const std::size_t& p_iteration, const T& p_stepsize ) const
+    {
+        return optimize( p_threads, p_iteration, p_stepsize, std::vector<std::string>() );
+    }
+    
+    
+    
+    template<typename T, std::size_t D> inline std::map<std::string, T> gradientdescent<T,D>::optimize( const std::size_t& p_threads, const std::size_t& p_iteration, const T& p_stepsize, const std::vector<std::string>& p_batch ) const
     {
         if (p_iteration == 0)
             throw exception::parameter(_("iterations must be greater than zero"));
+        if ( (p_stepsize < 0 ) || (tools::function::isNumericalZero(p_stepsize)) )
+            throw exception::parameter(_("stepsize must be greater than zero"));
+        if (p_threads == 0)
+            throw exception::parameter(_("number of threads must be greater than zero"));
         
-        
-        // creating worker objects
-        
+        // creating worker and thread objects
         std::vector< gradient::worker<T,D> > l_worker;
-        for(std::size_t i=0; i < m_threads; ++i)
-            l_worker.push_back(  gradient::worker<T,D>(p_iteration, p_stepsize, m_derivation, m_optimize, m_static, p_batch)  );
-        
-        // create thread objects
         boost::thread_group l_threads;
-        
-        for(std::size_t i=0; i < m_threads; ++i)
+        for(std::size_t i=0; i < p_threads; ++i) {
+            l_worker.push_back(  gradient::worker<T,D>(p_iteration, p_stepsize, m_derivation, m_optimize, m_static, p_batch)  );
             l_threads.create_thread(  boost::bind( &gradient::worker<T,D>::optimize ), l_worker[i]  );
-        
+        }
         
         // run threads and wait during all finished
         l_threads.join_all();
