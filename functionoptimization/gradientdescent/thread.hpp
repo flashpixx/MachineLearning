@@ -35,13 +35,13 @@
 
 
 
-namespace machinelearning { namespace functionaloptimization { namespace thread {
+namespace machinelearning { namespace functionaloptimization { namespace gradient {
     
     namespace ublas = boost::numeric::ublas;
     
     
     /** class for worker thread for calulating gradient values **/
-    template<typename T, std::size_t D> class gradientdescent {
+    template<typename T, std::size_t D> class thread {
             BOOST_STATIC_ASSERT(D > 0);         // array dimension must be greater than 0
         
         
@@ -54,6 +54,8 @@ namespace machinelearning { namespace functionaloptimization { namespace thread 
                            );
         
             std::map<std::string, T> getResult( void ) const;
+            void optimze( void );
+        
         
         
         private :
@@ -89,6 +91,10 @@ namespace machinelearning { namespace functionaloptimization { namespace thread 
         return m_result;
     }
 
+    
+    template<typename T, std::size_t D> inline void optimize( void ) 
+    {
+    }
 
 
 };};};
