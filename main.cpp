@@ -9,6 +9,7 @@
 
 #include <boost/numeric/ublas/io.hpp>
 
+#include "boost/multi_array.hpp"
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/matrix_sparse.hpp>
 #include <boost/numeric/ublas/symmetric.hpp>
@@ -39,8 +40,21 @@ int main(int argc, char *argv[]) {
     
     tl::language::bind("ml", "./tools/language/");
     
-    func::gradientdescent<double> x("a*x^3 + b*y^4");
-    x.set("a, b");
+    
+    
+    boost::multi_array<double, 2> x;
+    boost::multi_array<double, 2> y;
+    boost::multi_array<double, 2> target;
+    
+    func::gradientdescent<double, 2> gd("a*x^3 + b*y^4");
+    
+    gd.setErrorFunction("a, b");
+    gd.setOptimizeVar("a", 0, 1);
+    gd.setOptimizeVar("b", 0, 1);
+    gd.setStaticVar("x", x);
+    gd.setStaticVar("y", y);
+    gd.setStaticVar("target", target);
+    gd.optimize(1, 1, 0.1);
     
     
         

@@ -64,17 +64,17 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
         private :
             
             /** maximum iterations **/
-            const std::size_t m_iteration;
+            std::size_t m_iteration;
             /** init stepsize **/
-            const T m_stepsize;
+            T m_stepsize;
             /** map with derivation **/
-            const std::map<std::string, GiNaC::ex> m_derivation;
+            std::map<std::string, GiNaC::ex> m_derivation;
             /** map with initialisation values **/
-            const std::map<std::string, std::pair<T,T> > m_initvalues;
+            std::map<std::string, std::pair<T,T> > m_initvalues;
             /** map with static values **/
-            const std::map<std::string, boost::multi_array<T,D> > m_staticvalues;
+            std::map<std::string, boost::multi_array<T,D> > m_staticvalues;
             /** vector with variables for batch optimize **/
-            const std::vector<std::string> m_batch;
+            std::vector<std::string> m_batch;
             /** map with optimized values **/
             std::map<std::string, T> m_result;
         
@@ -123,13 +123,16 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
     template<typename T, std::size_t D> inline void worker<T,D>::optimize( void ) 
     {
         // initialize values
-        /*std::map<std::string, T > l_init;
-        for(std::map<std::string, std::pair<T,T> >::iterator it = m_initvalues.begin(); it != m_initvalues.end(); ++it) {
-        }*/
-        
-        
-        
+
+
+        // run
         for(std::size_t i=0; i < m_iteration; ++i) {
+            
+            
+            // iterate over every derivation
+            
+            
+            
         }
     }
 

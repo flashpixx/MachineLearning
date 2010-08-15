@@ -59,7 +59,7 @@ namespace machinelearning { namespace functionaloptimization {
         public :
 
             gradientdescent( const std::string& );
-            void set( const std::string&, const std::string& = "0.5 * (target-(function))^2", const std::string& = "function", const std::string& = " ,;" );
+            void setErrorFunction( const std::string&, const std::string& = "0.5 * (target-(function))^2", const std::string& = "function", const std::string& = " ,;" );
             void setOptimizeVar( const std::string&, const T&, const T& );
             void setStaticVar( const std::string&, const boost::multi_array<T,D>& );
             std::map<std::string, T> optimize( const std::size_t&, const std::size_t&, const T&, const std::vector<std::string>& = std::vector<std::string>() ) const;
@@ -119,7 +119,7 @@ namespace machinelearning { namespace functionaloptimization {
      * @param p_funcname string name in which will be set the function
      * @param p_separator separator charaters (default space, comma and semicolon)
      **/
-    template<typename T, std::size_t D> inline void gradientdescent<T,D>::set( const std::string& p_optimizevars, const std::string& p_errfunc, const std::string& p_funcname, const std::string& p_separator )
+    template<typename T, std::size_t D> inline void gradientdescent<T,D>::setErrorFunction( const std::string& p_optimizevars, const std::string& p_errfunc, const std::string& p_funcname, const std::string& p_separator )
     {
         if (p_errfunc.empty())
             throw exception::parameter(_("error function need not be empty"));
@@ -158,11 +158,12 @@ namespace machinelearning { namespace functionaloptimization {
         // into the error function
         l_table[p_funcname] = m_expression;
         GiNaC::parser l_parser(l_table);
+        
 
         try {
             l_full      = l_parser( p_errfunc );
             
-            // symbolic table for concat function
+            // symbolic table for concat function and remove "functionname"
             m_fulltable = l_parser.get_syms();
         } catch (...) {
             throw exception::parameter(_("arithmetic expression could not be parsed"));
@@ -201,12 +202,12 @@ namespace machinelearning { namespace functionaloptimization {
      **/
     template<typename T, std::size_t D> inline void gradientdescent<T,D>::setStaticVar( const std::string& p_name, const boost::multi_array<T,D>& p_data )
     {
-        if ( (m_derivation.find(p_name)) || (m_fulltable.find(p_name) == m_fulltable.end()) )
+        if ( (m_derivation.find(p_name) != m_derivation.end()) || (m_fulltable.find(p_name) == m_fulltable.end()) )
             throw exception::parameter(_("static variable is not in the symbol table or is an optimazation variable"));
         
         m_static[p_name] = p_data;
     }
-
+    
     
     
     
@@ -219,22 +220,28 @@ namespace machinelearning { namespace functionaloptimization {
         if (p_threads == 0)
             throw exception::parameter(_("number of threads must be greater than zero"));
         
+        // set -1 because we have in m_fulltable the "target" variable
+        if (m_static.size() + m_optimize.size() != m_fulltable.size()-1)
+            throw exception::parameter(_("there are used variables"));
+
+        
         // creating worker and thread objects
         std::vector< gradient::worker<T,D> > l_worker;
         boost::thread_group l_threads;
         for(std::size_t i=0; i < p_threads; ++i) {
             l_worker.push_back(  gradient::worker<T,D>(p_iteration, p_stepsize, m_derivation, m_optimize, m_static, p_batch)  );
-            l_threads.create_thread(  boost::bind( &gradient::worker<T,D>::optimize ), l_worker[i]  );
+            //l_threads.create_thread(  boost::bind( &gradient::worker<T,D>::optimize ), l_worker[i]  );
         }
         
         // run threads and wait during all finished
         l_threads.join_all();
         
         // get data and creates best values
-        
+        std::map<std::string, T> x;
+        return x;
         
     }
-    
+     
     
 };};
 
