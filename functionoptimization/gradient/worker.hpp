@@ -50,7 +50,7 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
         
             worker( const std::size_t&, 
                     const T&,
-                    const std::map<std::string, GiNaC::ex>&, 
+                    const std::vector<GiNaC::ex>&, 
                     const std::map<std::string, std::pair<T,T> >&, 
                     const std::map<std::string, boost::multi_array<T,D> >&,
                     const std::vector<std::string>&
@@ -68,7 +68,7 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
             /** init stepsize **/
             T m_stepsize;
             /** map with derivation **/
-            std::map<std::string, GiNaC::ex> m_derivation;
+            std::vector<GiNaC::ex> m_derivation;
             /** map with initialisation values **/
             std::map<std::string, std::pair<T,T> > m_initvalues;
             /** map with static values **/
@@ -90,7 +90,7 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
      * @param p_static map with multidimensional array for static variables
      *
      **/
-    template<typename T, std::size_t D> inline worker<T,D>::worker(  const std::size_t& p_iteration, const T& p_stepsize, const std::map<std::string, GiNaC::ex>& p_derivation, const std::map<std::string, std::pair<T,T> >& p_initvalues, const std::map<std::string, boost::multi_array<T,D> >& p_staticvalues, const std::vector<std::string>& p_batch  ) :
+    template<typename T, std::size_t D> inline worker<T,D>::worker(  const std::size_t& p_iteration, const T& p_stepsize, const std::vector<GiNaC::ex>& p_derivation, const std::map<std::string, std::pair<T,T> >& p_initvalues, const std::map<std::string, boost::multi_array<T,D> >& p_staticvalues, const std::vector<std::string>& p_batch  ) :
         m_iteration( p_iteration ),
         m_stepsize( p_stepsize ),
         m_derivation( p_derivation ),
@@ -122,18 +122,20 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
     /** optimize value with gradient descent **/
     template<typename T, std::size_t D> inline void worker<T,D>::optimize( void ) 
     {
-        // initialize values
-        std::cout << "blub" << std::endl;
+        // init dynamic values
+        std::map<GiNaC::symbol, T> l_dynamic;
+        //for(std::map<std::string, std::pair<T,T> >::iterator it = m_derivation.begin(); it != m_derivation.end(); ++it) {
+        //}
+
 
         // run
-        //for(std::size_t i=0; i < m_iteration; ++i) {
+        for(std::size_t i=0; i < m_iteration; ++i) {
             
             
             // iterate over every derivation
-            
-            
-            
-        //}
+            for(std::vector<GiNaC::ex>::iterator it = m_derivation.begin(); it != m_derivation.end(); ++it) {
+            }
+        }
     }
 
 

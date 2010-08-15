@@ -74,7 +74,7 @@ namespace machinelearning { namespace functionaloptimization {
             /** symbols table for all variables **/
             GiNaC::symtab m_fulltable;
             /** derivations **/
-            std::map<std::string, GiNaC::ex> m_derivation;
+            std::vector<GiNaC::ex> m_derivation;
             /** map with upper and lower value for parameter **/
             std::map<std::string, std::pair<T,T> > m_optimize;
             /** map for static parameter **/
@@ -132,6 +132,7 @@ namespace machinelearning { namespace functionaloptimization {
         // clear properties
         m_optimize.clear();
         m_static.clear();
+        m_derivation.clear();
         
         // check if symbols for optimization are in the table
         std::vector<std::string> l_sep;
@@ -177,7 +178,7 @@ namespace machinelearning { namespace functionaloptimization {
         
         // create first derivation for each variable, which should be fitted
         for(std::size_t i=0; i < l_vars.size(); ++i)
-            m_derivation[ l_vars[i] ] = l_full.diff( GiNaC::ex_to<GiNaC::symbol>(m_fulltable[ l_vars[i] ]), 1);
+            m_derivation.push_back(  l_full.diff( GiNaC::ex_to<GiNaC::symbol>(m_fulltable[ l_vars[i] ]), 1)  );
     }
     
     
