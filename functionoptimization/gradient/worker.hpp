@@ -123,17 +123,17 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
     template<typename T, std::size_t D> inline void worker<T,D>::optimize( void ) 
     {
         // initialize values
-
+        std::cout << "blub" << std::endl;
 
         // run
-        for(std::size_t i=0; i < m_iteration; ++i) {
+        //for(std::size_t i=0; i < m_iteration; ++i) {
             
             
             // iterate over every derivation
             
             
             
-        }
+        //}
     }
 
 

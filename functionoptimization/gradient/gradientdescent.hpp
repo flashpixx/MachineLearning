@@ -118,6 +118,7 @@ namespace machinelearning { namespace functionaloptimization {
      * @param p_errfunc error function in wich must be set the name from p_funcname
      * @param p_funcname string name in which will be set the function
      * @param p_separator separator charaters (default space, comma and semicolon)
+     * @todo check errorfunction if convex (2nd derivation must be >= 0 for all values)
      **/
     template<typename T, std::size_t D> inline void gradientdescent<T,D>::setErrorFunction( const std::string& p_optimizevars, const std::string& p_errfunc, const std::string& p_funcname, const std::string& p_separator )
     {
@@ -230,7 +231,7 @@ namespace machinelearning { namespace functionaloptimization {
         boost::thread_group l_threads;
         for(std::size_t i=0; i < p_threads; ++i) {
             l_worker.push_back(  gradient::worker<T,D>(p_iteration, p_stepsize, m_derivation, m_optimize, m_static, p_batch)  );
-            //l_threads.create_thread(  boost::bind( &gradient::worker<T,D>::optimize ), l_worker[i]  );
+            l_threads.create_thread(  boost::bind( &gradient::worker<T,D>::optimize, l_worker[i] )  );
         }
         
         // run threads and wait during all finished
