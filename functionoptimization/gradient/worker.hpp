@@ -141,16 +141,15 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
                 l_dynamic[ m_symbols[(*it).first] ] = (*it).second.first;
             else
                 l_dynamic[ m_symbols[(*it).first] ] = tools::random::get<T>( tools::random::uniform, (*it).second.first, (*it).second.second );
-            
         
         // run
         //for(std::size_t i=0; i < m_iteration; ++i) {
             
             
             // iterate over every derivation
-            for(std::map<std::string, GiNaC::ex>::iterator it = m_derivation.begin(); it != m_derivation.end(); ++it) {
-                std::cout << it->second << "\t\t" << it->second.subs(l_dynamic) << std::endl;
-            }
+            //for(std::map<std::string, GiNaC::ex>::iterator it = m_derivation.begin(); it != m_derivation.end(); ++it) {
+            //    std::cout << it->second << "\t\t" << it->second.subs(l_dynamic) << std::endl;
+            //}
         //}
     }
 
