@@ -231,14 +231,16 @@ namespace machinelearning { namespace functionaloptimization {
         
         // creating worker and thread objects
         std::vector< gradient::worker<T,D> > l_worker;
-        boost::thread_group l_threads;
+        boost::thread_group l_threadgroup;
         for(std::size_t i=0; i < p_threads; ++i) {
-            l_worker.push_back(  gradient::worker<T,D>(p_iteration, p_stepsize, m_fulltable, m_derivation, m_optimize, m_static, p_batch)  );
-            l_threads.create_thread(  boost::bind( &gradient::worker<T,D>::optimize, l_worker[i] )  );
+           l_worker.push_back(  gradient::worker<T,D>(p_iteration, p_stepsize, m_fulltable, m_derivation, m_optimize, m_static, p_batch)  );
+            l_threadgroup.create_thread(  boost::bind( &gradient::worker<T,D>::optimize, l_worker[i] )  );
         }
         
         // run threads and wait during all finished
-        l_threads.join_all();
+        // remove all threads bindings
+        l_threadgroup.join_all();
+
         
         // get data and creates best values
         std::map<std::string, T> x;
