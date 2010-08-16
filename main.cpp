@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
     
     gd.setErrorFunction("a, b");
     gd.setOptimizeVar("a", 0, 1);
-    gd.setOptimizeVar("b", 0, 1);
+    gd.setOptimizeVar("b", 1, 5);
     gd.setStaticVar("x", x);
     gd.setStaticVar("y", y);
     gd.setStaticVar("target", target);

@@ -140,7 +140,7 @@ namespace machinelearning { namespace functionaloptimization {
         std::vector<std::string> l_vars;
         boost::split( l_sep, p_optimizevars, boost::is_any_of(p_separator) );
                
-        // during spearation empty vector entries can be created, so we check if is not empty and in the symbolic table, than we copy
+        // during separation empty vector entries can be created, so we check if is not empty and in the symbolic table, than we copy
         for(std::size_t i=0; i < l_sep.size(); ++i) {
             if (l_sep[i].empty())
                 continue;
@@ -227,13 +227,13 @@ namespace machinelearning { namespace functionaloptimization {
         // all variables must be set to a numerical value, so we check it
         if (m_static.size() + m_optimize.size() != m_fulltable.size())
             throw exception::parameter(_("there are unsed variables"));
-
+                
         
         // creating worker and thread objects
         std::vector< gradient::worker<T,D> > l_worker;
         boost::thread_group l_threads;
         for(std::size_t i=0; i < p_threads; ++i) {
-            l_worker.push_back(  gradient::worker<T,D>(p_iteration, p_stepsize, m_derivation, m_optimize, m_static, p_batch)  );
+            l_worker.push_back(  gradient::worker<T,D>(p_iteration, p_stepsize, m_fulltable, m_derivation, m_optimize, m_static, p_batch)  );
             l_threads.create_thread(  boost::bind( &gradient::worker<T,D>::optimize, l_worker[i] )  );
         }
         

@@ -50,6 +50,7 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
         
             worker( const std::size_t&, 
                     const T&,
+                    const GiNaC::symtab&,
                     const std::map<std::string, GiNaC::ex>&, 
                     const std::map<std::string, std::pair<T,T> >&,  
                     const std::map<std::string, boost::multi_array<T,D> >&,
@@ -67,6 +68,8 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
             std::size_t m_iteration;
             /** init stepsize **/
             T m_stepsize;
+            /** symbols table for all variables **/
+            GiNaC::symtab m_symbols;
             /** map with derivation **/
             std::map<std::string, GiNaC::ex> m_derivation;
             /** map with lower & upper initialisation values **/
@@ -93,6 +96,7 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
     template<typename T, std::size_t D> inline worker<T,D>::worker(  
                         const std::size_t& p_iteration, 
                         const T& p_stepsize, 
+                        const GiNaC::symtab& p_syms,
                         const std::map<std::string, GiNaC::ex>& p_derivation, 
                         const std::map<std::string, std::pair<T,T> >& p_initvalues, 
                         const std::map<std::string, boost::multi_array<T,D> >& p_staticvalues, 
@@ -100,6 +104,7 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
     ) :
         m_iteration( p_iteration ),
         m_stepsize( p_stepsize ),
+        m_symbols( p_syms ),
         m_derivation( p_derivation ),
         m_initvalues( p_initvalues ),
         m_staticvalues( p_staticvalues ),
@@ -130,20 +135,20 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
     template<typename T, std::size_t D> inline void worker<T,D>::optimize( void ) 
     {
         // init dynamic values
-        std::map<GiNaC::symbol, T> l_dynamic;
-        for(typename std::map<std::string, std::pair<T,T> >::iterator it = m_initvalues.begin(); it != m_initvalues.end(); ++it) {
-            std::cout << it.first << std::endl;
-        }
+        GiNaC::exmap l_dynamic;
+        for(typename std::map<std::string, std::pair<T,T> >::iterator it = m_initvalues.begin(); it != m_initvalues.end(); ++it)
+            l_dynamic[ GiNaC::ex_to<GiNaC::symbol>(m_symbols[ it->first ]) ] = tools::random::get<T>( tools::random::uniform, it->second.first, it->second.second );
 
-
+        
         // run
-        for(std::size_t i=0; i < m_iteration; ++i) {
+        //for(std::size_t i=0; i < m_iteration; ++i) {
             
             
             // iterate over every derivation
             for(std::map<std::string, GiNaC::ex>::iterator it = m_derivation.begin(); it != m_derivation.end(); ++it) {
+                std::cout << it->second.subs(l_dynamic) << std::endl;
             }
-        }
+        //}
     }
 
 
