@@ -21,8 +21,8 @@
  @endcond
  **/
 
-#ifndef MACHINELEARNING_FUNCTIONALOPTIMIZATION_GRADIENTDESCENT_HPP
-#define MACHINELEARNING_FUNCTIONALOPTIMIZATION_GRADIENTDESCENT_HPP
+#ifndef MACHINELEARNING_FUNCTIONALOPTIMIZATION_GRADIENT_GRADIENTDESCENT_HPP
+#define MACHINELEARNING_FUNCTIONALOPTIMIZATION_GRADIENT_GRADIENTDESCENT_HPP
 
 
 #include <map>
@@ -67,6 +67,7 @@ namespace machinelearning { namespace functionaloptimization {
         
         private :
              
+        
             /** expression for the function **/
             GiNaC::ex m_expression;
             /** symbols table for the function **/
@@ -74,8 +75,8 @@ namespace machinelearning { namespace functionaloptimization {
             /** symbols table for all variables **/
             GiNaC::symtab m_fulltable;
             /** derivations **/
-            std::vector<GiNaC::ex> m_derivation;
-            /** map with upper and lower value for parameter **/
+            std::map<std::string, GiNaC::ex> m_derivation;
+            /** map with lower & upper value for parameter **/
             std::map<std::string, std::pair<T,T> > m_optimize;
             /** map for static parameter **/
             std::map<std::string, boost::multi_array<T,D> > m_static;
@@ -167,18 +168,19 @@ namespace machinelearning { namespace functionaloptimization {
             
             // symbolic table for concat function and remove "functionname"
             m_fulltable = l_parser.get_syms();
+            m_fulltable.erase(p_funcname);
         } catch (...) {
             throw exception::parameter(_("arithmetic expression could not be parsed"));
         }
         
-        // checks number of variables (target and function are symbolic vars, so increment +2)
-        if (m_exprtable.size()+2 != m_fulltable.size())
+        // checks number of variables (target symbolic var, so increment +1)
+        if (m_exprtable.size()+1 != m_fulltable.size())
             throw exception::parameter(_("only one variable for the data must be added"));
         
         
         // create first derivation for each variable, which should be fitted
         for(std::size_t i=0; i < l_vars.size(); ++i)
-            m_derivation.push_back(  l_full.diff( GiNaC::ex_to<GiNaC::symbol>(m_fulltable[ l_vars[i] ]), 1)  );
+            m_derivation[l_vars[i]] =  l_full.diff( GiNaC::ex_to<GiNaC::symbol>(m_fulltable[ l_vars[i] ]), 1);
     }
     
     
@@ -193,7 +195,7 @@ namespace machinelearning { namespace functionaloptimization {
         if (m_derivation.find(p_name) == m_derivation.end())
             throw exception::parameter(_("variable for optimization is not found in the expression symbol table"));
         
-            m_optimize[p_name] = std::pair<T,T>(p_lower, p_upper);
+        m_optimize[p_name] = std::pair<T,T>(p_lower, p_upper);
     }
     
     
@@ -222,9 +224,9 @@ namespace machinelearning { namespace functionaloptimization {
         if (p_threads == 0)
             throw exception::parameter(_("number of threads must be greater than zero"));
         
-        // set -1 because we have in m_fulltable the "target" variable
-        if (m_static.size() + m_optimize.size() != m_fulltable.size()-1)
-            throw exception::parameter(_("there are used variables"));
+        // all variables must be set to a numerical value, so we check it
+        if (m_static.size() + m_optimize.size() != m_fulltable.size())
+            throw exception::parameter(_("there are unsed variables"));
 
         
         // creating worker and thread objects

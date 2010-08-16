@@ -27,7 +27,7 @@
  * @section requirements Requirements
  * <ul>
  * <li>ATLAS (http://math-atlas.sourceforge.net/)</li>
- * <li>Boost (http://www.boost.org/) (support for iostreams with gzip and bzip2 support musst be compiled, random and MPI support are optional)</li>
+ * <li>Boost (http://www.boost.org/) (support for iostreams with gzip and bzip2 support and thread support musst be compiled, random and MPI support are optional)</li>
  * <li>Boost Bindings (SVN http://svn.boost.org/svn/boost/sandbox/numeric_bindings / ZIP http://mathema.tician.de/software/boost-numeric-bindings)</li>
  * <li>LAPACK (http://www.netlib.org/lapack/)</li>
  * <li>HDF (http://www.hdfgroup.org/)</li>
