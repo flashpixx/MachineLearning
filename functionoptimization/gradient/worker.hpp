@@ -80,7 +80,7 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
             std::vector<std::string> m_batch;
             /** map with optimized values **/
             std::map<std::string, T> m_result;
-        
+            
         
     };
     
@@ -136,19 +136,22 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
     {
         // init dynamic values
         GiNaC::exmap l_dynamic;
-        for(typename std::map<std::string, std::pair<T,T> >::iterator it = m_initvalues.begin(); it != m_initvalues.end(); ++it);
-            //l_dynamic[ GiNaC::ex_to<GiNaC::symbol>(m_symbols[ it->first ]) ] = tools::random::get<T>( tools::random::uniform, it->second.first, it->second.second );
-
-     /*   
+        for(typename std::map<std::string, std::pair<T,T> >::iterator it = m_initvalues.begin(); it != m_initvalues.end(); ++it)
+            if (tools::function::isNumericalEqual((*it).second.first, (*it).second.second))
+                l_dynamic[ m_symbols[(*it).first] ] = (*it).second.first;
+            else
+                l_dynamic[ m_symbols[(*it).first] ] = tools::random::get<T>( tools::random::uniform, (*it).second.first, (*it).second.second );
+            
+        
         // run
         //for(std::size_t i=0; i < m_iteration; ++i) {
             
             
             // iterate over every derivation
             for(std::map<std::string, GiNaC::ex>::iterator it = m_derivation.begin(); it != m_derivation.end(); ++it) {
-                //std::cout << it->second << "\t\t" << it->second.subs(l_dynamic) << std::endl;
+                std::cout << it->second << "\t\t" << it->second.subs(l_dynamic) << std::endl;
             }
-        //}*/
+        //}
     }
 
 

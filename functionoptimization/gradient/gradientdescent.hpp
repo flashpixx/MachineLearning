@@ -61,6 +61,7 @@ namespace machinelearning { namespace functionaloptimization {
             gradientdescent( const std::string& );
             void setErrorFunction( const std::string&, const std::string& = "0.5 * (target-(function))^2", const std::string& = "function", const std::string& = " ,;" );
             void setOptimizeVar( const std::string&, const T&, const T& );
+            void setOptimizeVar( const std::string&, const T& );
             void setStaticVar( const std::string&, const boost::multi_array<T,D>& );
             std::map<std::string, T> optimize( const std::size_t&, const std::size_t&, const T&, const std::vector<std::string>& = std::vector<std::string>() ) const;
         
@@ -196,6 +197,16 @@ namespace machinelearning { namespace functionaloptimization {
             throw exception::parameter(_("variable for optimization is not found in the expression symbol table"));
         
         m_optimize[p_name] = std::pair<T,T>(p_lower, p_upper);
+    }
+    
+    
+    /** sets init values for optimizing values. The value will be used exactly
+     * @param p_name variable name
+     * @param p_value lower value
+     **/
+    template<typename T, std::size_t D> inline void gradientdescent<T,D>::setOptimizeVar( const std::string& p_name, const T& p_value )
+    {
+        setOptimizeVar(p_name, p_value, p_value);
     }
     
     

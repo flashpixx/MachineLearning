@@ -49,12 +49,12 @@ int main(int argc, char *argv[]) {
     func::gradientdescent<double, 2> gd("a*x^3 + b*y^4");
     
     gd.setErrorFunction("a, b");
-    gd.setOptimizeVar("a", 0, 1);
-    gd.setOptimizeVar("b", 1, 5);
+    gd.setOptimizeVar("a", 9);
+    gd.setOptimizeVar("b", 2, 5);
     gd.setStaticVar("x", x);
     gd.setStaticVar("y", y);
     gd.setStaticVar("target", target);
-    gd.optimize(250, 1, 0.1);
+    gd.optimize(5, 1, 0.1);
     
     
         
