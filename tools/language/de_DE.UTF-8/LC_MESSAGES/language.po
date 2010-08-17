@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-08-13 19:42+0200\n"
-"PO-Revision-Date: 2010-08-13 19:45+0100\n"
+"POT-Creation-Date: 2010-08-17 00:11+0200\n"
+"PO-Revision-Date: 2010-08-17 00:14+0100\n"
 "Last-Translator: Philipp Kraus <philipp.kraus@flashpixx.de>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -86,8 +86,8 @@ msgstr "Anzahl der Prototypen muss größer Null sein"
 #: clustering/nonsupervised/kmeans.hpp:155
 #: clustering/nonsupervised/neuralgas.hpp:189
 #: clustering/supervised/rlvq.hpp:214
-#: functionoptimization/gradient/gradientdescent.hpp:222
-#: functionoptimization/gradient/worker.hpp:95
+#: functionoptimization/gradient/gradientdescent.hpp:232
+#: functionoptimization/gradient/worker.hpp:114
 msgid "iterations must be greater than zero"
 msgstr "Iterationen müssen größer Null sein"
 
@@ -154,45 +154,58 @@ msgstr "Zeilenanzahl muss größer Null sein"
 msgid "file can not be opened"
 msgstr "Datei konnte nicht geöffnet werden"
 
-#: functionoptimization/gradient/gradientdescent.hpp:103
-msgid "number of threads must be greater than zero"
-msgstr "Anzahl der Prototypen muss größer Null sein"
-
-#: functionoptimization/gradient/gradientdescent.hpp:106
+#: functionoptimization/gradient/gradientdescent.hpp:101
 msgid "function need not be empty"
 msgstr "Funktion darf nicht leer sein"
 
-#: functionoptimization/gradient/gradientdescent.hpp:116
-#: functionoptimization/gradient/gradientdescent.hpp:175
+#: functionoptimization/gradient/gradientdescent.hpp:111
+#: functionoptimization/gradient/gradientdescent.hpp:174
 msgid "arithmetic expression could not be parsed"
 msgstr "Arithmetischer Ausdruckt konnte nicht geparst werden"
 
-#: functionoptimization/gradient/gradientdescent.hpp:132
+#: functionoptimization/gradient/gradientdescent.hpp:128
 msgid "error function need not be empty"
 msgstr "Fehlerfunktion darf nicht leer sein"
 
-#: functionoptimization/gradient/gradientdescent.hpp:134
+#: functionoptimization/gradient/gradientdescent.hpp:130
 msgid "variable name for the function need not be empty"
 msgstr "Variablenname für die Funktion darf nicht leer sein"
 
-#: functionoptimization/gradient/gradientdescent.hpp:136
+#: functionoptimization/gradient/gradientdescent.hpp:132
 msgid "separators need not be empty"
 msgstr "Separator darf nicht leer sein"
 
-#: functionoptimization/gradient/gradientdescent.hpp:153
-#: functionoptimization/gradient/gradientdescent.hpp:198
+#: functionoptimization/gradient/gradientdescent.hpp:150
+#: functionoptimization/gradient/gradientdescent.hpp:197
 msgid "variable for optimization is not found in the expression symbol table"
 msgstr "Variable zur Optimierung ist nicht im symbolischen Ausdruck enthalten"
 
-#: functionoptimization/gradient/gradientdescent.hpp:180
+#: functionoptimization/gradient/gradientdescent.hpp:179
 msgid "only one variable for the data must be added"
 msgstr "nur eine Variable darf dem Ausdruck hinzugefügt werden"
 
-#: functionoptimization/gradient/gradientdescent.hpp:212
+#: functionoptimization/gradient/gradientdescent.hpp:221
 msgid "static variable is not in the symbol table or is an optimazation variable"
 msgstr "statische Variable ist nicht in der Symboltabelle oder es ist eine zu optimierende Variable"
 
-#: functionoptimization/gradient/worker.hpp:97
+#: functionoptimization/gradient/gradientdescent.hpp:234
+#: functionoptimization/gradient/worker.hpp:120
+msgid "stepsize must be greater than zero"
+msgstr "Zeilenanzahl muss größer Null sein"
+
+#: functionoptimization/gradient/gradientdescent.hpp:236
+msgid "number of threads must be greater than zero"
+msgstr "Anzahl der Prototypen muss größer Null sein"
+
+#: functionoptimization/gradient/gradientdescent.hpp:240
+msgid "there are unsed variables"
+msgstr "es existieren unbenutze Variablen (Variablen ohne Wertzuweisung)"
+
+#: functionoptimization/gradient/worker.hpp:116
+msgid "there are no variables for optimization"
+msgstr "es existieren keine Variablen zur Optimierung"
+
+#: functionoptimization/gradient/worker.hpp:118
 msgid "derivations and initialisation have not the same size"
 msgstr "beide Matrizen haben nicht die gleiche Größe"
 
