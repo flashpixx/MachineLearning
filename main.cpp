@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
     gd.setStaticVar("y", y);
     gd.setStaticVar("target", target);
     
-    gd.optimize(50, 1, 0.1);
+    gd.optimize(2, 1, 0.1);
     
     
         

@@ -240,18 +240,28 @@ namespace machinelearning { namespace functionaloptimization {
             throw exception::parameter(_("there are unsed variables"));
                 
         
-        // creating worker and thread objects
+        
+        // creating worker
         std::vector< gradient::worker<T,D> > l_worker;
-        boost::thread_group l_threadgroup;
-        for(std::size_t i=0; i < p_threads; ++i) {
-           l_worker.push_back(  gradient::worker<T,D>(p_iteration, p_stepsize, m_fulltable, m_derivation, m_optimize, m_static, p_batch)  );
-            l_threadgroup.create_thread(  boost::bind( &gradient::worker<T,D>::optimize, l_worker[i] )  );
+        
+        // if only one thread is used, we create the worker object directly and run it
+        if (p_threads == 1) {
+            l_worker.push_back(  gradient::worker<T,D>(p_iteration, p_stepsize, m_fulltable, m_derivation, m_optimize, m_static, p_batch)  );
+            l_worker[0].optimize();
+        } else {
+            
+            // we create threads - 1 because one thread is called above 
+            boost::thread_group l_threadgroup;
+            for(std::size_t i=0; i < p_threads-1; ++i) {
+                l_worker.push_back(  gradient::worker<T,D>(p_iteration, p_stepsize, m_fulltable, m_derivation, m_optimize, m_static, p_batch)  );
+                l_threadgroup.create_thread(  boost::bind( &gradient::worker<T,D>::optimize, l_worker[i] )  );
+            }
+        
+            // run threads and wait during all finished
+            l_threadgroup.join_all();
         }
         
-        // run threads and wait during all finished
-        // remove all threads bindings
-        l_threadgroup.join_all();
-
+        std::cout << "Worker Count: " << l_worker.size() << std::endl;
         
         // get data and creates best values
         std::map<std::string, T> x;

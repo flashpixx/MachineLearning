@@ -20,7 +20,7 @@ def configuration_macosx(config) :
     config["libsuffix"]         = [".dylib", ".a"]
     config["libremovestring"]   = "lib"
     config["libremovesuffix"]   = True  
-    config["ldremove"]          = ["boost_python", "hdf5.6", "hdf5_cpp.6", "hdf5_hl.6", "hdf5_hl_cpp.6", "ptcblas", "ptf77blas", "f77blas", "ginac"]
+    config["ldremove"]          = ["boost_python", "hdf5.6", "hdf5_cpp.6", "hdf5_hl.6", "hdf5_hl_cpp.6", "ptcblas", "ptf77blas", "f77blas", "ginac", "boost_wave", "boost_signals", "boost_regex", "boost_date_time", "boost_graph", "boost_mpi", "boost_graph", "boost_graph_parallel", "boost_serialization", "boost_system", "boost_filesystem"]
     
     
 def configuration_posix(config) :
