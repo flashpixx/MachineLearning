@@ -13,14 +13,14 @@ COMPILECPU = 6
 def configuration_macosx(config) :
     config["seperator"]         = ":"
     config["compiler"]          = "g++"
-    config["compileflags"]      = "-D MULTILANGUAGE -D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS -O2 -Wall -ftree-vectorize"
+    config["compileflags"]      = "-D MULTILANGUAGE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS -O2 -Wall -ftree-vectorize"
     config["include"]           = os.environ["CPPPATH"]
     config["libpath"]           = os.environ["LIBRARY_PATH"]
     config["libs"]              = "intl"
     config["libsuffix"]         = [".dylib", ".a"]
     config["libremovestring"]   = "lib"
     config["libremovesuffix"]   = True  
-    config["ldremove"]          = ["boost_python", "hdf5.6", "hdf5_cpp.6", "hdf5_hl.6", "hdf5_hl_cpp.6", "ptcblas", "ptf77blas", "f77blas", "ginac", "boost_wave", "boost_signals", "boost_regex", "boost_date_time", "boost_graph", "boost_mpi", "boost_graph", "boost_graph_parallel", "boost_serialization", "boost_system", "boost_filesystem"]
+    config["ldremove"]          = ["boost_python", "hdf5.6", "hdf5_cpp.6", "hdf5_hl.6", "hdf5_hl_cpp.6", "ptcblas", "ptf77blas", "f77blas", "ginac", "boost_wave", "boost_signals", "boost_regex", "boost_date_time", "boost_graph", "boost_mpi", "boost_graph", "boost_graph_parallel", "boost_serialization", "boost_system", "boost_filesystem", "boost_math_c99", "boost_math_tr1", "boost_math_tr1l", "boost_math_tr1f",  "boost_math_c99f", "boost_math_c99l"]
     
     
 def configuration_posix(config) :
