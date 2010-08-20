@@ -118,12 +118,6 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
             throw exception::parameter(_("derivations and initialisation have not the same size"));
         if ( (m_stepsize < 0 ) || (tools::function::isNumericalZero(m_stepsize)) )
             throw exception::parameter(_("stepsize must be greater than zero"));
-    
-        /*
-        std::copy( p_derivation.begin(), p_derivation.end(), std::inserter(m_derivation, m_derivation.begin()));
-        std::copy( p_initvalues.begin(), p_initvalues.end(), std::inserter(m_initvalues, m_initvalues.begin()));
-        std::copy( p_syms.begin(),       p_syms.end(),       std::inserter(m_symbols, m_symbols.begin()));
-        */
     }
     
     
@@ -140,23 +134,23 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
     /** optimize value with gradient descent **/
     template<typename T, std::size_t D> inline void worker<T,D>::optimize( void ) 
     {
-        
         // init dynamic values
+        
         GiNaC::exmap l_dynamic;
         for(typename std::map<std::string, std::pair<T,T> >::iterator it = m_initvalues.begin(); it != m_initvalues.end(); ++it)
-            if (tools::function::isNumericalEqual(it->second.first, it->second.second))
+            //if (tools::function::isNumericalEqual(it->second.first, it->second.second))
                 l_dynamic[ m_symbols[it->first] ] = it->second.first;
-            else
-                l_dynamic[ m_symbols[it->first] ] = tools::random::get<T>( tools::random::uniform, it->second.first, it->second.second );
+            //else
+                //l_dynamic[ m_symbols[it->first] ] = tools::random::get<T>( tools::random::uniform, it->second.first, it->second.second );
         
         // run
         //for(std::size_t i=0; i < m_iteration; ++i) {
             
             
             // iterate over every derivation
-            for(std::map<std::string, GiNaC::ex>::iterator it = m_derivation.begin(); it != m_derivation.end(); ++it) {
+            //for(std::map<std::string, GiNaC::ex>::iterator it = m_derivation.begin(); it != m_derivation.end(); ++it) {
                 //std::cout << it->second << "\t\t" << it->second.subs(l_dynamic) << std::endl;
-            }
+            //}
         //}
     }
 
