@@ -136,12 +136,14 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
     {
         // init dynamic values
         
-        GiNaC::exmap l_dynamic;
-        for(typename std::map<std::string, std::pair<T,T> >::iterator it = m_initvalues.begin(); it != m_initvalues.end(); ++it)
+        //GiNaC::exmap l_dynamic;
+        //for(typename std::map<std::string, std::pair<T,T> >::iterator it = m_initvalues.begin(); it != m_initvalues.end(); ++it)
             //if (tools::function::isNumericalEqual(it->second.first, it->second.second))
-                l_dynamic[ m_symbols[it->first] ] = it->second.first;
+            //    l_dynamic[ m_symbols[it->first] ] = it->second.first;
             //else
                 //l_dynamic[ m_symbols[it->first] ] = tools::random::get<T>( tools::random::uniform, it->second.first, it->second.second );
+        
+        std::cout << tools::random::get<T>( tools::random::uniform, 1, 5) << std::endl;
         
         // run
         //for(std::size_t i=0; i < m_iteration; ++i) {

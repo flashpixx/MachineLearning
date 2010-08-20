@@ -84,6 +84,14 @@ namespace machinelearning { namespace tools {
         
         private :
         
+            #ifdef RANDOMDEVICE
+                /** static random device **/
+                static boost::random_device m_random;
+            #else
+                /** static mersenne twister object **/
+                static boost::mt19937 m_random;
+            #endif
+        
             template<typename T> static T getUniform( const T&, const T& );
             template<typename T> static T getBinomial( const T&, const T& );
             template<typename T> static T getBernoulli( const T& );
@@ -101,6 +109,7 @@ namespace machinelearning { namespace tools {
             template<typename T> static T getTriangular( const T&, const T&, const T& );
         
     };
+    
     
     
     
@@ -146,11 +155,9 @@ namespace machinelearning { namespace tools {
         boost::uniform_real<T> l_range(p_min, p_max);
         
         #ifdef RANDOMDEVICE
-            static boost::random_device l_random;
-            boost::variate_generator<boost::random_device&, boost::uniform_real<T> > l_noise( l_random, l_range );
+            boost::variate_generator<boost::random_device&, boost::uniform_real<T> > l_noise( m_random, l_range );
         #else
-            static boost::mt19937 l_random(static_cast<std::time_t>(time(0)));
-            boost::variate_generator<boost::mt19937&, boost::uniform_real<T> > l_noise(  l_random, l_range );
+            boost::variate_generator<boost::mt19937&, boost::uniform_real<T> > l_noise(  m_random, l_range );
         #endif
         
         return l_noise();
@@ -166,11 +173,9 @@ namespace machinelearning { namespace tools {
         boost::bernoulli_distribution<T> l_range(p_prop);
 
         #ifdef RANDOMDEVICE
-            static boost::random_device l_random;
-            boost::variate_generator<boost::random_device&, boost::bernoulli_distribution<T> > l_noise( l_random, l_range );
+            boost::variate_generator<boost::random_device&, boost::bernoulli_distribution<T> > l_noise( m_random, l_range );
         #else
-            static boost::mt19937 l_random(static_cast<std::time_t>(time(0)));
-            boost::variate_generator<boost::mt19937&, boost::bernoulli_distribution<T> > l_noise(  l_random, l_range );
+            boost::variate_generator<boost::mt19937&, boost::bernoulli_distribution<T> > l_noise(  m_random, l_range );
         #endif
         
         return l_noise();
@@ -187,11 +192,9 @@ namespace machinelearning { namespace tools {
         boost::binomial_distribution<T> l_range(p_n, p_p);
 
         #ifdef RANDOMDEVICE
-            static boost::random_device l_random;
-            boost::variate_generator<boost::random_device&, boost::binomial_distribution<T> > l_noise( l_random, l_range );
+            boost::variate_generator<boost::random_device&, boost::binomial_distribution<T> > l_noise( m_random, l_range );
         #else
-            static boost::mt19937 l_random(static_cast<std::time_t>(time(0)));
-            boost::variate_generator<boost::mt19937&, boost::binomial_distribution<T> > l_noise(  l_random, l_range );
+            boost::variate_generator<boost::mt19937&, boost::binomial_distribution<T> > l_noise(  m_random, l_range );
         #endif
         
         return l_noise();
@@ -208,11 +211,9 @@ namespace machinelearning { namespace tools {
         boost::cauchy_distribution<T> l_range(p_loc, p_scale);
         
         #ifdef RANDOMDEVICE
-            static boost::random_device l_random;
-            boost::variate_generator<boost::random_device&, boost::cauchy_distribution<T> > l_noise( l_random, l_range );
+            boost::variate_generator<boost::random_device&, boost::cauchy_distribution<T> > l_noise( m_random, l_range );
         #else
-            static boost::mt19937 l_random(static_cast<std::time_t>(time(0)));
-            boost::variate_generator<boost::mt19937&, boost::cauchy_distribution<T> > l_noise(  l_random, l_range );
+            boost::variate_generator<boost::mt19937&, boost::cauchy_distribution<T> > l_noise(  m_random, l_range );
         #endif
         
         return l_noise();
@@ -228,11 +229,9 @@ namespace machinelearning { namespace tools {
         boost::gamma_distribution<T> l_range(p_shape);
         
         #ifdef RANDOMDEVICE
-            static boost::random_device l_random;
-            boost::variate_generator<boost::random_device&, boost::gamma_distribution<T> > l_noise( l_random, l_range );
+            boost::variate_generator<boost::random_device&, boost::gamma_distribution<T> > l_noise( m_random, l_range );
         #else
-            static boost::mt19937 l_random(static_cast<std::time_t>(time(0)));
-            boost::variate_generator<boost::mt19937&, boost::gamma_distribution<T> > l_noise(  l_random, l_range );
+            boost::variate_generator<boost::mt19937&, boost::gamma_distribution<T> > l_noise(  m_random, l_range );
         #endif
         
         return l_noise();
@@ -248,11 +247,9 @@ namespace machinelearning { namespace tools {
         boost::poisson_distribution<std::size_t> l_range(p_lambda);
         
         #ifdef RANDOMDEVICE
-            static boost::random_device l_random;
-            boost::variate_generator<boost::random_device&, boost::poisson_distribution<std::size_t> > l_noise( l_random, l_range );
+            boost::variate_generator<boost::random_device&, boost::poisson_distribution<std::size_t> > l_noise( m_random, l_range );
         #else
-            static boost::mt19937 l_random(static_cast<std::time_t>(time(0)));
-            boost::variate_generator<boost::mt19937&, boost::poisson_distribution<std::size_t> > l_noise(  l_random, l_range );
+            boost::variate_generator<boost::mt19937&, boost::poisson_distribution<std::size_t> > l_noise(  m_random, l_range );
         #endif
         
         return l_noise();
@@ -268,11 +265,9 @@ namespace machinelearning { namespace tools {
         boost::exponential_distribution<T> l_range(p_lambda);
         
         #ifdef RANDOMDEVICE
-            static boost::random_device l_random;
-            boost::variate_generator<boost::random_device&, boost::exponential_distribution<T> > l_noise( l_random, l_range );
+            boost::variate_generator<boost::random_device&, boost::exponential_distribution<T> > l_noise( m_random, l_range );
         #else
-            static boost::mt19937 l_random(static_cast<std::time_t>(time(0)));
-            boost::variate_generator<boost::mt19937&, boost::exponential_distribution<T> > l_noise(  l_random, l_range );
+            boost::variate_generator<boost::mt19937&, boost::exponential_distribution<T> > l_noise(  m_random, l_range );
         #endif
         
         return l_noise();
@@ -289,11 +284,9 @@ namespace machinelearning { namespace tools {
         boost::normal_distribution<T> l_range(p_mean, p_sd);
 
         #ifdef RANDOMDEVICE
-            static boost::random_device l_random;
-            boost::variate_generator<boost::random_device&, boost::normal_distribution<T> > l_noise( l_random, l_range );
+            boost::variate_generator<boost::random_device&, boost::normal_distribution<T> > l_noise( m_random, l_range );
         #else
-            static boost::mt19937 l_random(static_cast<std::time_t>(time(0)));
-            boost::variate_generator<boost::mt19937&, boost::normal_distribution<T> > l_noise(  l_random, l_range );
+            boost::variate_generator<boost::mt19937&, boost::normal_distribution<T> > l_noise(  m_random, l_range );
         #endif
         
         return l_noise();
@@ -309,11 +302,9 @@ namespace machinelearning { namespace tools {
         boost::math::students_t_distribution<T> l_range(p_v);
         
         #ifdef RANDOMDEVICE
-            static boost::random_device l_random;
-            boost::variate_generator<boost::random_device&, boost::uniform_01<T> > l_uniform(  l_random, boost::uniform_01<T>() );
+            boost::variate_generator<boost::random_device&, boost::uniform_01<T> > l_uniform(  m_random, boost::uniform_01<T>() );
         #else
-            static boost::mt19937 l_random(static_cast<std::time_t>(time(0)));
-            boost::variate_generator<boost::mt19937&, boost::uniform_01<T> > l_uniform(  l_random, boost::uniform_01<T>() );
+            boost::variate_generator<boost::mt19937&, boost::uniform_01<T> > l_uniform(  m_random, boost::uniform_01<T>() );
         #endif
         
         return quantile(l_range, l_uniform());
@@ -330,11 +321,9 @@ namespace machinelearning { namespace tools {
         boost::math::weibull_distribution<T> l_range(p_shape, p_scale);
         
         #ifdef RANDOMDEVICE
-            static boost::random_device l_random;
-            boost::variate_generator<boost::random_device&, boost::uniform_01<T> > l_uniform(  l_random, boost::uniform_01<T>() );
+            boost::variate_generator<boost::random_device&, boost::uniform_01<T> > l_uniform(  m_random, boost::uniform_01<T>() );
         #else
-            static boost::mt19937 l_random(static_cast<std::time_t>(time(0)));
-            boost::variate_generator<boost::mt19937&, boost::uniform_01<T> > l_uniform(  l_random, boost::uniform_01<T>() );
+            boost::variate_generator<boost::mt19937&, boost::uniform_01<T> > l_uniform(  m_random, boost::uniform_01<T>() );
         #endif
         
         return quantile(l_range, l_uniform());
@@ -350,11 +339,9 @@ namespace machinelearning { namespace tools {
         boost::math::rayleigh_distribution<T> l_range(p_sigma);
        
         #ifdef RANDOMDEVICE
-            static boost::random_device l_random;
-            boost::variate_generator<boost::random_device&, boost::uniform_01<T> > l_uniform(  l_random, boost::uniform_01<T>() );
+            boost::variate_generator<boost::random_device&, boost::uniform_01<T> > l_uniform(  m_random, boost::uniform_01<T>() );
         #else
-            static boost::mt19937 l_random(static_cast<std::time_t>(time(0)));
-            boost::variate_generator<boost::mt19937&, boost::uniform_01<T> > l_uniform(  l_random, boost::uniform_01<T>() );
+            boost::variate_generator<boost::mt19937&, boost::uniform_01<T> > l_uniform(  m_random, boost::uniform_01<T>() );
         #endif
         
         return quantile(l_range, l_uniform());
@@ -371,11 +358,9 @@ namespace machinelearning { namespace tools {
         boost::math::beta_distribution<T> l_range(p_alpha, p_beta);
         
         #ifdef RANDOMDEVICE
-            static boost::random_device l_random;
-            boost::variate_generator<boost::random_device&, boost::uniform_01<T> > l_uniform(  l_random, boost::uniform_01<T>() );
+            boost::variate_generator<boost::random_device&, boost::uniform_01<T> > l_uniform(  m_random, boost::uniform_01<T>() );
         #else
-            static boost::mt19937 l_random(static_cast<std::time_t>(time(0)));
-            boost::variate_generator<boost::mt19937&, boost::uniform_01<T> > l_uniform(  l_random, boost::uniform_01<T>() );
+            boost::variate_generator<boost::mt19937&, boost::uniform_01<T> > l_uniform(  m_random, boost::uniform_01<T>() );
         #endif
         
         return quantile(l_range, l_uniform());
@@ -392,11 +377,9 @@ namespace machinelearning { namespace tools {
         boost::math::pareto_distribution<T> l_range(p_loc, p_scale);
         
         #ifdef RANDOMDEVICE
-            static boost::random_device l_random;
-            boost::variate_generator<boost::random_device&, boost::uniform_01<T> > l_uniform(  l_random, boost::uniform_01<T>() );
+            boost::variate_generator<boost::random_device&, boost::uniform_01<T> > l_uniform(  m_random, boost::uniform_01<T>() );
         #else
-            static boost::mt19937 l_random(static_cast<std::time_t>(time(0)));
-            boost::variate_generator<boost::mt19937&, boost::uniform_01<T> > l_uniform(  l_random, boost::uniform_01<T>() );
+            boost::variate_generator<boost::mt19937&, boost::uniform_01<T> > l_uniform(  m_random, boost::uniform_01<T>() );
         #endif
         
         return quantile(l_range, l_uniform());
@@ -412,11 +395,9 @@ namespace machinelearning { namespace tools {
         boost::math::chi_squared_distribution<T> l_range(p_v);
         
         #ifdef RANDOMDEVICE
-            static boost::random_device l_random;
-            boost::variate_generator<boost::random_device&, boost::uniform_01<T> > l_uniform(  l_random, boost::uniform_01<T>() );
+            boost::variate_generator<boost::random_device&, boost::uniform_01<T> > l_uniform(  m_random, boost::uniform_01<T>() );
         #else
-            static boost::mt19937 l_random(static_cast<std::time_t>(time(0)));
-            boost::variate_generator<boost::mt19937&, boost::uniform_01<T> > l_uniform(  l_random, boost::uniform_01<T>() );
+            boost::variate_generator<boost::mt19937&, boost::uniform_01<T> > l_uniform(  m_random, boost::uniform_01<T>() );
         #endif
         
         return quantile(l_range, l_uniform());
@@ -434,11 +415,9 @@ namespace machinelearning { namespace tools {
         boost::math::triangular_distribution<T> l_range(p_min, p_center, p_max);
         
         #ifdef RANDOMDEVICE
-            static boost::random_device l_random;
-            boost::variate_generator<boost::random_device&, boost::uniform_01<T> > l_uniform(  l_random, boost::uniform_01<T>() );
+            boost::variate_generator<boost::random_device&, boost::uniform_01<T> > l_uniform(  m_random, boost::uniform_01<T>() );
         #else
-            static boost::mt19937 l_random(static_cast<std::time_t>(time(0)));
-            boost::variate_generator<boost::mt19937&, boost::uniform_01<T> > l_uniform(  l_random, boost::uniform_01<T>() );
+            boost::variate_generator<boost::mt19937&, boost::uniform_01<T> > l_uniform(  m_random, boost::uniform_01<T>() );
         #endif
         
         return quantile(l_range, l_uniform());
