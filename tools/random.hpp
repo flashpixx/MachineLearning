@@ -28,6 +28,7 @@
 
 #include <ctime>
 #include <limits>
+#include <sstream>
 #include <boost/thread/thread.hpp>
 #include <boost/random.hpp>
 
@@ -115,10 +116,25 @@ namespace machinelearning { namespace tools {
     };
     
     
+    /** constructor with creating a own number generator
+     * for multithrading. Read thread-id and create xor
+     * with time
+     **/
     #ifndef RANDOMDEVICE
     inline random::random( void ) :
-        m_random( boost::mt19937(time(NULL)) )
-    {}
+        m_random()
+    {
+        std::size_t l_val = 1;
+     
+        // convert thread id into numeric value
+        try {
+            std::stringstream l_sstream;
+            l_sstream << std::hex << boost::this_thread::get_id();
+            l_sstream >> l_val;
+        } catch (...) {}
+
+        m_random = boost::mt19937(time(NULL) ^ l_val);
+    }
     #endif
     
     
