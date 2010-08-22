@@ -50,8 +50,9 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
         
             worker( const std::size_t&, 
                     const T&,
-                    const GiNaC::symtab&,
-                    const std::map<std::string, GiNaC::ex>&, 
+                    const std::string&,
+                    const std::string&,
+                    const std::vector<std::string>&, 
                     const std::map<std::string, std::pair<T,T> >&,  
                     const std::map<std::string, boost::multi_array<T,D> >&,
                     const std::vector<std::string>&
@@ -68,10 +69,12 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
             std::size_t m_iteration;
             /** init stepsize **/
             T m_stepsize;
-            /** symbols table for all variables **/
-            GiNaC::symtab m_symbols;
+            /** full function (function and errorfunction) **/
+            std::string m_errorfunction;
+            /** function **/
+            std::string m_function;
             /** map with derivation **/
-            std::map<std::string, GiNaC::ex> m_derivation;
+            std::vector<std::string> m_derivationvars;
             /** map with lower & upper initialisation values **/
             std::map<std::string, std::pair<T,T> > m_initvalues;
             /** map with static values **/
@@ -85,7 +88,8 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
     };
     
     
-    /** constructor
+    /** The constructor is only called by the gradient class, so we must not check
+     * the parameter
      * @param p_iteration maximum iterations
      * @param p_stepsize initializsation stepsize
      * @param p_syms symbolic value map
@@ -97,29 +101,22 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
     template<typename T, std::size_t D> inline worker<T,D>::worker(  
                         const std::size_t& p_iteration, 
                         const T& p_stepsize, 
-                        const GiNaC::symtab& p_syms,
-                        const std::map<std::string, GiNaC::ex>& p_derivation, 
+                        const std::string& p_function,
+                        const std::string& p_errorfunction,
+                        const std::vector<std::string>& p_derivationvars, 
                         const std::map<std::string, std::pair<T,T> >& p_initvalues, 
                         const std::map<std::string, boost::multi_array<T,D> >& p_staticvalues, 
                         const std::vector<std::string>& p_batch  
     ) :
         m_iteration( p_iteration ),
         m_stepsize( p_stepsize ),
-        m_symbols( p_syms ),
-        m_derivation( p_derivation ),
+        m_errorfunction( p_errorfunction ),
+        m_function( p_function ),
+        m_derivationvars( p_derivationvars ),
         m_initvalues( p_initvalues ),
         m_staticvalues( p_staticvalues ),
         m_batch( p_batch )
-    {
-        if (m_iteration == 0)
-            throw exception::parameter(_("iterations must be greater than zero"));
-        if (p_derivation.size() == 0)
-            throw exception::parameter(_("there are no variables for optimization"));
-        if (p_derivation.size() != p_initvalues.size())
-            throw exception::parameter(_("derivations and initialisation have not the same size"));
-        if ( (m_stepsize < 0 ) || (tools::function::isNumericalZero(m_stepsize)) )
-            throw exception::parameter(_("stepsize must be greater than zero"));
-    }
+    {}
     
     
     
@@ -135,22 +132,35 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
     /** optimize value with gradient descent **/
     template<typename T, std::size_t D> inline void worker<T,D>::optimize( void ) 
     {
-        // init dynamic values
+        GiNaC::symtab   l_symbols;
+        GiNaC::ex       l_function;
+        GiNaC::ex       l_errorfunction;
         
-        //GiNaC::exmap l_dynamic;
-        //for(typename std::map<std::string, std::pair<T,T> >::iterator it = m_initvalues.begin(); it != m_initvalues.end(); ++it)
-            //if (tools::function::isNumericalEqual(it->second.first, it->second.second))
-            //    l_dynamic[ m_symbols[it->first] ] = it->second.first;
-            //else
-                //l_dynamic[ m_symbols[it->first] ] = tools::random::get<T>( tools::random::uniform, it->second.first, it->second.second );
+        GiNaC::parser l_parser;
+        
+        try {
+            l_function      = l_parser("2x");
+            //l_errorfunction = l_parser( m_errorfunction );
+            //l_symbols       = l_parser.get_syms();
+        } catch (...) {
+            return;
+        }
+        
+        
+        
+        //create derivations
 
+        
+        // init dynamic values
+        /*GiNaC::exmap l_dynamic;
         tools::random l_rand;
-        
-        for(std::size_t i=0; i < 50; ++i)
-        //std::cout << 
-            l_rand.get<T>( tools::random::uniform, 1, 50);
-        //<< std::endl;
-        
+        for(typename std::map<std::string, std::pair<T,T> >::iterator it = m_initvalues.begin(); it != m_initvalues.end(); ++it)
+            if (tools::function::isNumericalEqual(it->second.first, it->second.second))
+                l_dynamic[ m_symbols[it->first] ] = it->second.first;
+            else
+                l_dynamic[ m_symbols[it->first] ] = l_rand.get<T>( tools::random::uniform, it->second.first, it->second.second );
+
+          */
         // run
         //for(std::size_t i=0; i < m_iteration; ++i) {
             

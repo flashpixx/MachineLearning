@@ -27,6 +27,7 @@
 
 #include <map>
 #include <string>
+#include <sstream>
 #include <algorithm>
 #include <ginac/ginac.h>
 #include <boost/bind.hpp>
@@ -49,8 +50,9 @@ namespace machinelearning { namespace functionaloptimization {
     namespace ublas = boost::numeric::ublas;
     
     
-    /** class for using a (stochastic) gradient descent
-     * symbolic numerical algorithms @see http://www.ginac.de
+    /** class for using a (stochastic) gradient descent.
+     * For symbolic numerical algorithms @see http://www.ginac.de .
+     * GiNaC is not thread-safe, so for the thread we create only std::string vars
      **/
     template<typename T, std::size_t D=1> class gradientdescent {
         BOOST_STATIC_ASSERT(D > 0);         // array dimension must be greater than 0
@@ -73,17 +75,38 @@ namespace machinelearning { namespace functionaloptimization {
             GiNaC::ex m_expression;
             /** symbols table for the function **/
             GiNaC::symtab m_exprtable;
-            /** symbols table for all variables **/
+            /** full error expression **/
+            GiNaC::ex m_full;
+            /** table with all symbols **/
             GiNaC::symtab m_fulltable;
             /** derivations **/
-            std::map<std::string, GiNaC::ex> m_derivation;
+            std::vector<std::string> m_derivationvars;
             /** map with lower & upper value for parameter **/
             std::map<std::string, std::pair<T,T> > m_optimize;
             /** map for static parameter **/
             std::map<std::string, boost::multi_array<T,D> > m_static;
         
+            static std::string expression2string( const GiNaC::ex& );
+        
     };
 
+    
+    
+    /** converts a GiNaC expression to a string
+     * @param p_ex expression
+     * @return string with expression
+     **/
+    template<typename T, std::size_t D> inline std::string gradientdescent<T,D>::expression2string( const GiNaC::ex& p_ex )
+    {
+        std::string l_str;
+        std::stringstream l_sstream;
+        
+        l_sstream << p_ex;
+        l_sstream >> l_str;
+        
+        return l_str;
+    }
+    
     
     
     /** constructor
@@ -92,8 +115,7 @@ namespace machinelearning { namespace functionaloptimization {
     template<typename T, std::size_t D> inline gradientdescent<T,D>::gradientdescent( const std::string& p_func ) :
         m_expression(),
         m_exprtable(),
-        m_fulltable(),
-        m_derivation(),
+        m_derivationvars(),
         m_optimize(),
         m_static()
     {
@@ -134,11 +156,11 @@ namespace machinelearning { namespace functionaloptimization {
         // clear properties
         m_optimize.clear();
         m_static.clear();
-        m_derivation.clear();
+        m_derivationvars.clear();
+        m_fulltable.clear();
         
         // check if symbols for optimization are in the table
         std::vector<std::string> l_sep;
-        std::vector<std::string> l_vars;
         boost::split( l_sep, p_optimizevars, boost::is_any_of(p_separator) );
                
         // during separation empty vector entries can be created, so we check if is not empty and in the symbolic table, than we copy
@@ -149,12 +171,11 @@ namespace machinelearning { namespace functionaloptimization {
              if (m_exprtable.find(l_sep[i]) == m_exprtable.end())
                  throw exception::parameter(_("variable for optimization is not found in the expression symbol table"));
              
-             l_vars.push_back( l_sep[i] );
+             m_derivationvars.push_back( l_sep[i] );
         }
         
         
         // create full expression, symboltable and parse the function
-        GiNaC::ex l_full;
         GiNaC::symtab l_table(m_exprtable);
         
         // we copy the main expression into the definition variable name
@@ -162,10 +183,9 @@ namespace machinelearning { namespace functionaloptimization {
         // into the error function
         l_table[p_funcname] = m_expression;
         GiNaC::parser l_parser(l_table);
-        
 
         try {
-            l_full      = l_parser( p_errfunc );
+            m_full      = l_parser( p_errfunc );
             
             // symbolic table for concat function and remove "functionname"
             m_fulltable = l_parser.get_syms();
@@ -176,12 +196,7 @@ namespace machinelearning { namespace functionaloptimization {
         
         // checks number of variables (target symbolic var, so increment +1)
         if (m_exprtable.size()+1 != m_fulltable.size())
-            throw exception::parameter(_("only one variable for the data must be added"));
-        
-        
-        // create first derivation for each variable, which should be fitted
-        for(std::size_t i=0; i < l_vars.size(); ++i)
-            m_derivation[l_vars[i]] =  l_full.diff( GiNaC::ex_to<GiNaC::symbol>(m_fulltable[ l_vars[i] ]), 1);
+            throw exception::parameter(_("only one variable for the data must be added"));        
     }
     
     
@@ -193,7 +208,7 @@ namespace machinelearning { namespace functionaloptimization {
      **/
     template<typename T, std::size_t D> inline void gradientdescent<T,D>::setOptimizeVar( const std::string& p_name, const T& p_lower, const T& p_upper )
     {
-        if (m_derivation.find(p_name) == m_derivation.end())
+        if (std::find(m_derivationvars.begin(), m_derivationvars.end(), p_name) == m_derivationvars.end())
             throw exception::parameter(_("variable for optimization is not found in the expression symbol table"));
         
         m_optimize[p_name] = std::pair<T,T>(p_lower, p_upper);
@@ -217,7 +232,7 @@ namespace machinelearning { namespace functionaloptimization {
      **/
     template<typename T, std::size_t D> inline void gradientdescent<T,D>::setStaticVar( const std::string& p_name, const boost::multi_array<T,D>& p_data )
     {
-        if ( (m_derivation.find(p_name) != m_derivation.end()) || (m_fulltable.find(p_name) == m_fulltable.end()) )
+        if ( (std::find(m_derivationvars.begin(), m_derivationvars.end(), p_name) != m_derivationvars.end()) || (m_fulltable.find(p_name) == m_fulltable.end()) )
             throw exception::parameter(_("static variable is not in the symbol table or is an optimazation variable"));
         
         m_static[p_name] = p_data;
@@ -240,23 +255,22 @@ namespace machinelearning { namespace functionaloptimization {
             throw exception::parameter(_("there are unsed variables"));
                 
         
-        
         // creating worker
         std::vector< gradient::worker<T,D> > l_worker;
         
         // if only one thread is used, we create the worker object directly and run it
         if (p_threads == 1) {
-            l_worker.push_back(  gradient::worker<T,D>(p_iteration, p_stepsize, m_fulltable, m_derivation, m_optimize, m_static, p_batch)  );
+            l_worker.push_back(  gradient::worker<T,D>(p_iteration, p_stepsize, expression2string(m_expression), expression2string(m_full), m_derivationvars, m_optimize, m_static, p_batch)  );
             l_worker[0].optimize();
         } else { 
             boost::thread_group l_threadgroup;
             for(std::size_t i=0; i < p_threads; ++i) {
-                l_worker.push_back(  gradient::worker<T,D>(p_iteration, p_stepsize, m_fulltable, m_derivation, m_optimize, m_static, p_batch)  );
+                l_worker.push_back(  gradient::worker<T,D>(p_iteration, p_stepsize, expression2string(m_expression), expression2string(m_full), m_derivationvars, m_optimize, m_static, p_batch)  );
                 l_threadgroup.create_thread(  boost::bind( &gradient::worker<T,D>::optimize, &l_worker[i] )  );
             }
         
             // run threads and wait during all finished
-            l_threadgroup.join_all();
+            //l_threadgroup.join_all();
         }
         
         // get data and creates best values
