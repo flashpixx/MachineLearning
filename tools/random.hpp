@@ -61,68 +61,56 @@ namespace machinelearning { namespace tools {
         
         public :
         
-        enum distribution
-        {
-            uniform     = 0,
-            binomial    = 1,
-            bernoulli   = 2,
-            cauchy      = 3,
-            gamma       = 4,
-            poisson     = 5,
-            exponential = 6,
-            normal      = 7,
-            student     = 9,
-            weibull     = 10,
-            rayleigh    = 11,
-            chisquared  = 12,
-            pareto      = 13,
-            triangular  = 14
-        };
-        
-        
-        #ifndef RANDOMDEVICE
-        random( void );
-        #endif
-        template<typename T> T get( const distribution&, const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon() );
-        
+            enum distribution
+            {
+                uniform     = 0,
+                binomial    = 1,
+                bernoulli   = 2,
+                cauchy      = 3,
+                gamma       = 4,
+                poisson     = 5,
+                exponential = 6,
+                normal      = 7,
+                student     = 9,
+                weibull     = 10,
+                rayleigh    = 11,
+                chisquared  = 12,
+                pareto      = 13,
+                triangular  = 14
+            };
+            
+            
+     
+            template<typename T> static T get( const distribution&, const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon() );
+            
         
         private :
         
-        #ifdef RANDOMDEVICE
-        /** static random device pbject **/
-        static boost::random_device m_random;
-        #else
-        /** mersenne twister object **/
-        boost::mt19937 m_random;
-        #endif
-        
-        template<typename T> T getUniform( const T&, const T& );
-        template<typename T> T getBinomial( const T&, const T& );
-        template<typename T> T getBernoulli( const T& );
-        template<typename T> T getCauchy( const T&, const T& );
-        template<typename T> T getGamma( const T& );
-        template<typename T> T getPoisson( const std::size_t& );
-        template<typename T> T getExponential( const T& );
-        template<typename T> T getNormal( const T&, const T& );
-        template<typename T> T getStudent( const T& );
-        template<typename T> T getWeibull( const T&, const T& );
-        template<typename T> T getRayleigh( const T& );
-        template<typename T> T getBeta( const T&, const T& );
-        template<typename T> T getPareto( const T&, const T& );
-        template<typename T> T getChiSquared( const T& );
-        template<typename T> T getTriangular( const T&, const T&, const T& );
+            #ifdef RANDOMDEVICE
+            /** static random device pbject **/
+            static boost::random_device m_random;
+            #else
+            /** mersenne twister object **/
+            static boost::mt19937 m_random;
+            #endif
+            
+            template<typename T> static T getUniform( const T&, const T& );
+            template<typename T> static T getBinomial( const T&, const T& );
+            template<typename T> static T getBernoulli( const T& );
+            template<typename T> static T getCauchy( const T&, const T& );
+            template<typename T> static T getGamma( const T& );
+            template<typename T> static T getPoisson( const std::size_t& );
+            template<typename T> static T getExponential( const T& );
+            template<typename T> static T getNormal( const T&, const T& );
+            template<typename T> static T getStudent( const T& );
+            template<typename T> static T getWeibull( const T&, const T& );
+            template<typename T> static T getRayleigh( const T& );
+            template<typename T> static T getBeta( const T&, const T& );
+            template<typename T> static T getPareto( const T&, const T& );
+            template<typename T> static T getChiSquared( const T& );
+            template<typename T> static T getTriangular( const T&, const T&, const T& );
         
     };
-    
-    
-    /** constructor for creating the mersenne twister object with thread-id initvalue**/
-    #ifndef RANDOMDEVICE
-    inline random::random( void ) :
-        m_random( boost::mt19937( static_cast<std::time_t>(time(0))) )
-    {
-        std::cout << "Thread " << boost::this_thread::get_id() << std::endl;
-    }
-    #endif
     
     
     
