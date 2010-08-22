@@ -145,7 +145,11 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
                 //l_dynamic[ m_symbols[it->first] ] = tools::random::get<T>( tools::random::uniform, it->second.first, it->second.second );
 
         tools::random l_rand;
-        l_rand.get<T>( tools::random::uniform, 1, 5);
+        
+        for(std::size_t i=0; i < 50; ++i)
+        //std::cout << 
+            l_rand.get<T>( tools::random::uniform, 1, 50);
+        //<< std::endl;
         
         // run
         //for(std::size_t i=0; i < m_iteration; ++i) {

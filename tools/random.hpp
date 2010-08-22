@@ -113,7 +113,12 @@ namespace machinelearning { namespace tools {
             template<typename T> T getChiSquared( const T& );
             template<typename T> T getTriangular( const T&, const T&, const T& );
         
+            #ifndef RANDOMDEVICE
+            static std::time_t getThreadID( void );
+            #endif
+        
     };
+    
     
     
     /** constructor with creating a own number generator
@@ -122,21 +127,26 @@ namespace machinelearning { namespace tools {
      **/
     #ifndef RANDOMDEVICE
     inline random::random( void ) :
-        m_random()
-    {
-        std::size_t l_val = 1;
-     
-        // convert thread id into numeric value
-        try {
-            std::stringstream l_sstream;
-            l_sstream << std::hex << boost::this_thread::get_id();
-            l_sstream >> l_val;
-        } catch (...) {}
-
-        m_random = boost::mt19937(time(NULL) ^ l_val);
-    }
+        m_random(  boost::mt19937(getThreadID() ^ time(NULL))  )
+    {}
     #endif
     
+    
+    
+    /** reads the thread object id and converts it to numeric value **/
+    #ifndef RANDOMDEVICE
+    inline std::time_t random::getThreadID( void )
+    {
+        std::size_t l_val = 1;
+         
+        std::stringstream l_sstream;
+        l_sstream << std::hex << boost::this_thread::get_id();
+        l_sstream >> l_val;
+
+        return l_val;
+    }
+    #endif
+        
     
     
     /** returns a number from a pseudo random generator. Default values are set with the numerical limits for checking
