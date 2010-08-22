@@ -106,9 +106,10 @@ namespace machinelearning { namespace tools {
             throw exception::parameter(_("length must be greater than zero"));
         
         // initialisation of prototypes
+        tools::random l_rand;
         ublas::vector<T> l_vec(p_length);
         BOOST_FOREACH( T& i, l_vec)
-            i = tools::random::get<T>( p_distribution );
+            i = l_rand.get<T>( p_distribution );
         
         return l_vec;
     }

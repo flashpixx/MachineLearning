@@ -93,10 +93,11 @@ namespace machinelearning { namespace tools {
             throw exception::parameter(_("column size must be greater than zero"));
                 
         // initialisation of prototypes
+        tools::random l_rand;
         ublas::matrix<T> l_matrix(p_row, p_col);
         for (std::size_t i=0; i < p_row; ++i)
             for (std::size_t j=0; j < p_col; ++j)
-                l_matrix(i,j) = tools::random::get<T>( p_distribution );
+                l_matrix(i,j) = l_rand.get<T>( p_distribution );
         
         return l_matrix;
     }
