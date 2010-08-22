@@ -88,10 +88,11 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
     /** constructor
      * @param p_iteration maximum iterations
      * @param p_stepsize initializsation stepsize
+     * @param p_syms symbolic value map
      * @param p_derivation map with all derivations
      * @param p_initvalues map with values and optimize range
-     * @param p_static map with multidimensional array for static variables
-     *
+     * @param p_staticvalues map with multidimensional array for static variables
+     * @param p_batch vector with information wich variable can be optimize together
      **/
     template<typename T, std::size_t D> inline worker<T,D>::worker(  
                         const std::size_t& p_iteration, 
@@ -144,8 +145,7 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
                 //l_dynamic[ m_symbols[it->first] ] = tools::random::get<T>( tools::random::uniform, it->second.first, it->second.second );
 
         tools::random l_rand;
-        //l_rand.get<T>( tools::random::uniform, 1, 5);
-        std::cout << l_rand.get<T>( tools::random::uniform, 1, 5) << std::endl;
+        l_rand.get<T>( tools::random::uniform, 1, 5);
         
         // run
         //for(std::size_t i=0; i < m_iteration; ++i) {
