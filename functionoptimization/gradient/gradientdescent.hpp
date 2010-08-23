@@ -270,7 +270,7 @@ namespace machinelearning { namespace functionaloptimization {
             }
         
             // run threads and wait during all finished
-            //l_threadgroup.join_all();
+            l_threadgroup.join_all();
         }
         
         // get data and creates best values
