@@ -13,20 +13,22 @@ COMPILECPU = 6
 def configuration_macosx(config) :
     config["seperator"]         = ":"
     config["compiler"]          = "g++"
-    config["compileflags"]      = "-D MULTILANGUAGE -D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS -O2 -Wall -ftree-vectorize"
+    config["compileflags"]      = "-D MULTILANGUAGE -D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS -O2"
+    config["linkerflags"]       = ""
     config["include"]           = os.environ["CPPPATH"]
     config["libpath"]           = os.environ["LIBRARY_PATH"]
     config["libs"]              = "intl"
     config["libsuffix"]         = [".dylib", ".a"]
     config["libremovestring"]   = "lib"
     config["libremovesuffix"]   = True  
-    config["ldremove"]          = ["boost_python", "hdf5.6", "hdf5_cpp.6", "hdf5_hl.6", "hdf5_hl_cpp.6", "ptcblas", "ptf77blas", "f77blas", "ginac", "boost_wave", "boost_signals", "boost_regex", "boost_date_time", "boost_graph", "boost_mpi", "boost_graph", "boost_graph_parallel", "boost_serialization", "boost_system", "boost_filesystem", "boost_math_c99", "boost_math_tr1", "boost_math_tr1l", "boost_math_tr1f",  "boost_math_c99f", "boost_math_c99l"]
+    config["ldremove"]          = ["boost_python", "hdf5.6", "hdf5_cpp.6", "hdf5_hl.6", "hdf5_hl_cpp.6", "cblas", "ptf77blas", "f77blas", "ginac", "boost_wave", "boost_signals", "boost_regex", "boost_date_time", "boost_graph", "boost_mpi", "boost_graph", "boost_graph_parallel", "boost_serialization", "boost_system", "boost_filesystem", "boost_math_c99", "boost_math_tr1", "boost_math_tr1l", "boost_math_tr1f",  "boost_math_c99f", "boost_math_c99l"]
     
     
 def configuration_posix(config) :
     config["seperator"]         = ":"
     config["compiler"]          = "g++"
-    config["compileflags"]      = "-D MULTILANGUAGE -D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS -O2 -Wall -ftree-vectorize"
+    config["compileflags"]      = "-D MULTILANGUAGE -D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS -O2 -Wall"
+    config["linkerflags"]       = ""
     config["include"]           = os.environ["CPPPATH"]
     config["libpath"]           = os.environ["LIBRARY_PATH"]
     config["libs"]              = "intl"
@@ -40,6 +42,7 @@ def configuration_win32(config) :
     config["seperator"]         = ";"
     config["compiler"]          = ""
     config["compileflags"]      = ""
+    config["linkerflags"]       = ""
     config["include"]           = os.environ["INCLUDE"]
     config["libpath"]           = os.environ["LIBS"]
     config["libs"]              = ""
@@ -86,12 +89,12 @@ def checkSysConfig():
         config["libsuffix"] = config["seperator"].join(config["libsuffix"])
 
 
-    for i in ["compiler", "compileflags", "include", "libpath", "libs", "seperator", "libsuffix", "libremovestring", "libremovesuffix" ] :
+    for i in ["compiler", "compileflags", "include", "libpath", "libs", "seperator", "libsuffix", "libremovestring", "libremovesuffix", "linkerflags" ] :
         if not(config.has_key(i)) :
             msg("field ["+i+"] is not set in the configuration")
             exit(1)
 
-    for i in ["compiler", "compileflags", "include", "libpath", "libs", "seperator", "libremovestring" ] :
+    for i in ["compiler", "compileflags", "include", "libpath", "libs", "seperator", "libremovestring", "linkerflags" ] :
         if type(config[i]) <> type("str") :
             msg("field ["+i+"] must be a string type")
             exit(1)
@@ -104,17 +107,18 @@ def checkSysConfig():
         msg("field [libremovesuffix] must be a boolean type")
         exit(1)
 
-    if not(env["CXX"]) :
-        msg("no compiler set")
-        exit(1)
-
     if not(config["compiler"]) :
-        msg("no compiler is set, using default ["+env["CXX"]+"]")
+        msg("no compiler is set, using default")
+        if not(env["CXX"]) :
+            msg("no compiler set")
+            exit(1)
+    else :
+        env.Replace(CXX         = config["compiler"])
     
-    env.Replace(CXX         = config["compiler"])
     env.Replace(CXXFLAGS    = config["compileflags"])
     env.Replace(CCFLAGS     = config["compileflags"])
     env.Replace(CPPPATH     = config["include"])
+    env.Replace(LINKFLAGS   = config["linkerflags"])
     env["seperator"]        = config["seperator"]
     env["libs"]             = config["libs"]
     env["libpath"]          = config["libpath"]
@@ -122,7 +126,7 @@ def checkSysConfig():
     env["libremovesuffix"]  = config["libremovesuffix"]
     env["libremovestring"]  = config["libremovestring"]
     env["ldremove"]         = config["ldremove"]
-
+    
     # only *.o files will be clean ??
     #env.NoClean( getRekusivFiles(os.curdir, ".o") )
 

@@ -69,12 +69,6 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
             std::size_t m_iteration;
             /** init stepsize **/
             T m_stepsize;
-            /** full function (function and errorfunction) **/
-            std::string m_errorfunction;
-            /** function **/
-            std::string m_function;
-            /** map with derivation **/
-            std::vector<std::string> m_derivationvars;
             /** map with lower & upper initialisation values **/
             std::map<std::string, std::pair<T,T> > m_initvalues;
             /** map with static values **/
@@ -83,7 +77,12 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
             std::vector<std::string> m_batch;
             /** map with optimized values **/
             std::map<std::string, T> m_result;
-            
+        
+            GiNaC::ex m_function;
+            GiNaC::symtab m_functionsymbols;
+            GiNaC::ex m_errorfunction;
+            GiNaC::symtab m_errorfunctionsymbols;
+        std::vector<std::string> m_derivationvars;
         
     };
     
@@ -110,13 +109,28 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
     ) :
         m_iteration( p_iteration ),
         m_stepsize( p_stepsize ),
-        m_errorfunction( p_errorfunction ),
-        m_function( p_function ),
-        m_derivationvars( p_derivationvars ),
         m_initvalues( p_initvalues ),
         m_staticvalues( p_staticvalues ),
-        m_batch( p_batch )
-    {}
+        m_batch( p_batch ),
+        m_result(),
+        m_function(),
+        m_functionsymbols(),
+        m_errorfunction(),
+        m_derivationvars(p_derivationvars)
+    {
+        // parsing the expression are not thread-safe, so we do this here
+        GiNaC::parser l_parser;
+        
+        try {
+            m_function              = l_parser( p_function );
+            m_functionsymbols       = l_parser.get_syms();
+            
+            m_errorfunction         = l_parser( p_errorfunction );
+            m_errorfunctionsymbols  = l_parser.get_syms();
+        } catch (...) {
+            throw exception::parameter(_("arithmetic expression could not be parsed"));
+        }
+    }
     
     
     
@@ -132,23 +146,13 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
     /** optimize value with gradient descent **/
     template<typename T, std::size_t D> inline void worker<T,D>::optimize( void ) 
     {
-        GiNaC::symtab   l_symbols;
-        GiNaC::ex       l_function;
-        GiNaC::ex       l_errorfunction;
         
-        GiNaC::parser l_parser;
+        //create derivations of the errorfunction
+        std::vector<GiNaC::ex> l_derivation;
         
-        try {
-            l_function      = l_parser("2x");
-            //l_errorfunction = l_parser( m_errorfunction );
-            //l_symbols       = l_parser.get_syms();
-        } catch (...) {
-            return;
-        }
-        
-        
-        
-        //create derivations
+        for(std::size_t i=0; i < m_derivationvars.size(); ++i)
+            m_errorfunction.diff( GiNaC::ex_to<GiNaC::symbol>(m_errorfunctionsymbols[ m_derivationvars[i] ]), 1);
+  
 
         
         // init dynamic values

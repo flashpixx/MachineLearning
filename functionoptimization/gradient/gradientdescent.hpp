@@ -65,7 +65,7 @@ namespace machinelearning { namespace functionaloptimization {
             void setOptimizeVar( const std::string&, const T&, const T& );
             void setOptimizeVar( const std::string&, const T& );
             void setStaticVar( const std::string&, const boost::multi_array<T,D>& );
-            std::map<std::string, T> optimize( const std::size_t&, const std::size_t&, const T&, const std::vector<std::string>& = std::vector<std::string>() ) const;
+            std::map<std::string, T> optimize( const std::size_t&, const T&, const std::vector<std::string>& = std::vector<std::string>() ) const;
         
         
         private :
@@ -241,30 +241,28 @@ namespace machinelearning { namespace functionaloptimization {
     
     
     
-    template<typename T, std::size_t D> inline std::map<std::string, T> gradientdescent<T,D>::optimize( const std::size_t& p_threads, const std::size_t& p_iteration, const T& p_stepsize, const std::vector<std::string>& p_batch ) const
+    template<typename T, std::size_t D> inline std::map<std::string, T> gradientdescent<T,D>::optimize( const std::size_t& p_iteration, const T& p_stepsize, const std::vector<std::string>& p_batch ) const
     {
         if (p_iteration == 0)
             throw exception::parameter(_("iterations must be greater than zero"));
         if ( (p_stepsize < 0 ) || (tools::function::isNumericalZero(p_stepsize)) )
             throw exception::parameter(_("stepsize must be greater than zero"));
-        if (p_threads == 0)
-            throw exception::parameter(_("number of threads must be greater than zero"));
         
         // all variables must be set to a numerical value, so we check it
         if (m_static.size() + m_optimize.size() != m_fulltable.size())
             throw exception::parameter(_("there are unsed variables"));
                 
-        
+           
         // creating worker
         std::vector< gradient::worker<T,D> > l_worker;
         
         // if only one thread is used, we create the worker object directly and run it
-        if (p_threads == 1) {
+        if (boost::thread::hardware_concurrency() == 1) {
             l_worker.push_back(  gradient::worker<T,D>(p_iteration, p_stepsize, expression2string(m_expression), expression2string(m_full), m_derivationvars, m_optimize, m_static, p_batch)  );
             l_worker[0].optimize();
         } else { 
             boost::thread_group l_threadgroup;
-            for(std::size_t i=0; i < p_threads; ++i) {
+            for(std::size_t i=0; i < boost::thread::hardware_concurrency(); ++i) {
                 l_worker.push_back(  gradient::worker<T,D>(p_iteration, p_stepsize, expression2string(m_expression), expression2string(m_full), m_derivationvars, m_optimize, m_static, p_batch)  );
                 l_threadgroup.create_thread(  boost::bind( &gradient::worker<T,D>::optimize, &l_worker[i] )  );
             }
