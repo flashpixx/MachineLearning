@@ -46,7 +46,7 @@
 #include "../exception/exception.h"
 
 
-
+#include <boost/numeric/ublas/io.hpp>
 namespace machinelearning { namespace distances {   
     
     namespace ublas = boost::numeric::ublas;
@@ -94,6 +94,7 @@ namespace machinelearning { namespace distances {
             bio::bzip2_params m_bzip2param;
             
             std::size_t deflate ( const bool&, const std::string&, const std::string& = "" );        
+            static std::multimap<std::size_t, std::pair<std::size_t,std::size_t> > getWavefrontIndex( const std::size_t&, const std::size_t& );
     };
     
 
@@ -119,6 +120,37 @@ namespace machinelearning { namespace distances {
         m_bzip2param( 6 )
     {}
 
+    
+    
+    inline std::multimap<std::size_t, std::pair<std::size_t,std::size_t> > ncd::getWavefrontIndex( const std::size_t& p_size, const std::size_t& p_threads )
+    {
+        //ublas::symmetric_matrix<std::size_t, ublas::upper> l_wave(p_size, p_size);
+        std::multimap<std::size_t, std::pair<std::size_t,std::size_t> > l_idxmap; 
+        
+        
+        // create wavefront in this case: (0,n) = 0, (0,n-1) = 1, (1,n) = 2 ...
+        // we must create only the upper or lower index position, the other one can be created of swapping the index position
+        std::size_t n=0;
+        for(std::size_t i=p_size-1; i > 0; --i)
+            for(std::size_t j=0; (i+j) < p_size; ++j)
+                l_idxmap.insert(  std::pair<std::size_t, std::pair<std::size_t,std::size_t> >(n++ % p_threads, std::pair<std::size_t,std::size_t>(j, i+j))  );
+        
+        /*
+        for(std::size_t i=0; i < p_threads; ++i) {
+            std::cout << "Thread No " << i << std::endl;
+            
+            for(std::multimap<std::size_t, std::pair<std::size_t,std::size_t> >::iterator it=l_idxmap.lower_bound(i); it != l_idxmap.upper_bound(i); ++it)
+                std::cout << "(" << it->second.first << "," << it->second.second << ")  ";
+            
+            std::cout << std::endl << std::endl;
+        }
+        */
+        
+               
+        return l_idxmap;
+        
+    }
+    
     
     
 	/** sets the compression level
@@ -222,6 +254,7 @@ namespace machinelearning { namespace distances {
         if (p_strvec.size() == 0)
             throw exception::parameter(_("vector size must be greater than zero"));
         
+        getWavefrontIndex(6, 3);
         
         // create matrix, cache and compress
         ublas::symmetric_matrix<T, ublas::upper> l_distances( p_strvec.size(), p_strvec.size() );

@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
     tl::language::bind("ml", "./tools/language/");
     
     
-    
+    /*
     boost::multi_array<double, 2> x;
     boost::multi_array<double, 2> y;
     boost::multi_array<double, 2> target;
@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
     gd.setStaticVar("target", target);
     
     gd.optimize(1, 0.1);
-    
+    */
     
         
     //tl::files::hdf o("blub.hdf5");
@@ -223,7 +223,7 @@ int main(int argc, char *argv[]) {
     */
      
     //=============== NCD ================
-    /*
+    
     std::vector< std:: string > val;
     val.push_back("main.cpp");
     val.push_back("tools/files/hdf.hpp");
@@ -234,9 +234,9 @@ int main(int argc, char *argv[]) {
     
     dist::ncd ncd(dist::ncd::bzip2);
     //ncd.setCompressionLevel( dist::ncd::bestspeed );
-    std::cout << "unsymmetric: " << ncd.unsymmetric<double>(val, true) << std::endl;
+    //std::cout << "unsymmetric: " << ncd.unsymmetric<double>(val, true) << std::endl;
     std::cout << "symmetric: " << ncd.symmetric<double>(val, true) << std::endl;
-    */
+    
     
     
     return EXIT_SUCCESS;
