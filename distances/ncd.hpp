@@ -43,10 +43,13 @@
 #include <boost/iostreams/copy.hpp>
 #include <boost/ref.hpp>
 
+#include <boost/thread.hpp>
+
+
 #include "../exception/exception.h"
 
 
-#include <boost/numeric/ublas/io.hpp>
+
 namespace machinelearning { namespace distances {   
     
     namespace ublas = boost::numeric::ublas;
@@ -59,7 +62,7 @@ namespace machinelearning { namespace distances {
      * @todo set to unicode
      * @todo multithread, wavefront begin by (1,n), (1,n-1), (2,n) ...
      **/
-    class ncd {
+    template<typename T> class ncd {
         
         public:
             
@@ -79,9 +82,9 @@ namespace machinelearning { namespace distances {
             
             ncd ();
             ncd ( const compresstype& );
-            template<typename T> ublas::matrix<T> unsymmetric ( const std::vector<std::string>&, const bool& = false );
-            template<typename T> ublas::symmetric_matrix<T, ublas::upper> symmetric ( const std::vector<std::string>&, const bool& = false );
-            template<typename T> T calculate ( const std::string&, const std::string&, const bool& = false );
+            ublas::matrix<T> unsymmetric ( const std::vector<std::string>&, const bool& = false );
+            ublas::symmetric_matrix<T, ublas::upper> symmetric ( const std::vector<std::string>&, const bool& = false );
+            T calculate ( const std::string&, const std::string&, const bool& = false );
             void setCompressionLevel( const compresslevel& = defaultcompression );
             
         private:
@@ -92,9 +95,17 @@ namespace machinelearning { namespace distances {
             bio::gzip_params m_gzipparam;
             /** parameter for bzip2 **/
             bio::bzip2_params m_bzip2param;
-            
-            std::size_t deflate ( const bool&, const std::string&, const std::string& = "" );        
-            static std::multimap<std::size_t, std::pair<std::size_t,std::size_t> > getWavefrontIndex( const std::size_t&, const std::size_t& );
+        
+        ublas::symmetric_matrix<T, ublas::upper> m_symmetric;
+        std::multimap<std::size_t, std::pair<std::size_t,std::size_t> > m_wavefront;    
+        ublas::vector<std::size_t> m_cache;
+        std::vector<std::string> m_sources;
+        bool m_isfile;
+        
+            std::size_t deflate ( const bool&, const std::string&, const std::string& = "" ) const;        
+            void getWavefrontIndex( const std::size_t&, const std::size_t& );
+            void multithread_symmatric( const std::size_t& );
+        
     };
     
 
@@ -103,10 +114,15 @@ namespace machinelearning { namespace distances {
     /** default constructor
      * @overload
      **/
-    inline ncd::ncd() :
+    template<typename T> inline ncd<T>::ncd() :
         m_compress ( gzip ),
         m_gzipparam( bio::gzip::default_compression ),
-        m_bzip2param( 6 )
+        m_bzip2param( 6 ),
+        m_symmetric(),
+        m_wavefront(),
+        m_cache(),
+        m_sources(),
+        m_isfile( false )
     {}
     
     
@@ -114,26 +130,31 @@ namespace machinelearning { namespace distances {
      * @overload
      * @param p_compress enum value that is declared inside the class
      **/
-    inline ncd::ncd( const compresstype& p_compress ) :
+    template<typename T> inline ncd<T>::ncd( const compresstype& p_compress ) :
         m_compress ( p_compress ),
         m_gzipparam( bio::gzip::default_compression ),
-        m_bzip2param( 6 )
+        m_bzip2param( 6 ),
+        m_symmetric(),
+        m_wavefront(),
+        m_cache(),
+        m_sources(),
+        m_isfile( false )
     {}
 
     
     
-    inline std::multimap<std::size_t, std::pair<std::size_t,std::size_t> > ncd::getWavefrontIndex( const std::size_t& p_size, const std::size_t& p_threads )
+    template<typename T> inline void ncd<T>::getWavefrontIndex( const std::size_t& p_size, const std::size_t& p_threads )
     {
         //ublas::symmetric_matrix<std::size_t, ublas::upper> l_wave(p_size, p_size);
-        std::multimap<std::size_t, std::pair<std::size_t,std::size_t> > l_idxmap; 
-        
+        //std::multimap<std::size_t, std::pair<std::size_t,std::size_t> > m_front; 
+        m_wavefront.clear();
         
         // create wavefront in this case: (0,n) = 0, (0,n-1) = 1, (1,n) = 2 ...
         // we must create only the upper or lower index position, the other one can be created of swapping the index position
         std::size_t n=0;
         for(std::size_t i=p_size-1; i > 0; --i)
             for(std::size_t j=0; (i+j) < p_size; ++j)
-                l_idxmap.insert(  std::pair<std::size_t, std::pair<std::size_t,std::size_t> >(n++ % p_threads, std::pair<std::size_t,std::size_t>(j, i+j))  );
+                m_wavefront.insert(  std::pair<std::size_t, std::pair<std::size_t,std::size_t> >(n++ % p_threads, std::pair<std::size_t,std::size_t>(j, i+j))  );
         
         /*
         for(std::size_t i=0; i < p_threads; ++i) {
@@ -147,8 +168,16 @@ namespace machinelearning { namespace distances {
         */
         
                
-        return l_idxmap;
+        //return l_idxmap;
         
+    }
+    
+    
+    template<typename T> inline void ncd<T>::multithread_symmatric( const std::size_t& p_id )
+    {
+        for(std::multimap<std::size_t, std::pair<std::size_t,std::size_t> >::iterator it=m_wavefront.lower_bound(p_id); it != m_wavefront.upper_bound(p_id); ++it) {
+            deflate(m_isfile, m_sources[it->second.first], m_sources[it->second.second]);
+        }
     }
     
     
@@ -156,7 +185,7 @@ namespace machinelearning { namespace distances {
 	/** sets the compression level
 	 * @param  p_level compression level
      **/
-	inline void ncd::setCompressionLevel( const compresslevel& p_level )
+	template<typename T> inline void ncd<T>::setCompressionLevel( const compresslevel& p_level )
 	{
         switch (p_level) 
         {
@@ -186,7 +215,7 @@ namespace machinelearning { namespace distances {
      * @param p_isfile parameter for interpreting the string as a file with path
      * @return distance value
      **/   
-    template<typename T> inline T ncd::calculate( const std::string& p_str1, const std::string& p_str2, const bool& p_isfile )
+    template<typename T> inline T ncd<T>::calculate( const std::string& p_str1, const std::string& p_str2, const bool& p_isfile )
     {
         const std::size_t l_first  = deflate(p_isfile, p_str1);
         const std::size_t l_second = deflate(p_isfile, p_str2);
@@ -202,7 +231,7 @@ namespace machinelearning { namespace distances {
      * @param p_isfile parameter for interpreting the string as a file with path
      * @return dissimilarity matrix with std::vector x std::vector elements
     **/
-    template<typename T> inline ublas::matrix<T> ncd::unsymmetric( const std::vector<std::string>& p_strvec, const bool& p_isfile  )
+    template<typename T> inline ublas::matrix<T> ncd<T>::unsymmetric( const std::vector<std::string>& p_strvec, const bool& p_isfile  )
     {
         if (p_strvec.size() == 0)
             throw exception::parameter(_("vector size must be greater than zero"));
@@ -249,13 +278,34 @@ namespace machinelearning { namespace distances {
      * @param p_isfile parameter for interpreting the string as a file with path
      * @return dissimilarity matrix with std::vector x std::vector elements
      **/
-    template<typename T> inline ublas::symmetric_matrix<T, ublas::upper> ncd::symmetric( const std::vector<std::string>& p_strvec, const bool& p_isfile  )
+    template<typename T> inline ublas::symmetric_matrix<T, ublas::upper> ncd<T>::symmetric( const std::vector<std::string>& p_strvec, const bool& p_isfile  )
     {
         if (p_strvec.size() == 0)
             throw exception::parameter(_("vector size must be greater than zero"));
         
-        getWavefrontIndex(6, 3);
+        // create cache and set sources global
+        m_sources = p_strvec;
+        m_isfile  = p_isfile;
+        m_cache   = ublas::vector<std::size_t>(p_strvec.size());
         
+        
+        // if we can multithreads 
+        if (boost::thread::hardware_concurrency() > 1) {
+            
+            // create wavefront index position
+            getWavefrontIndex(p_strvec.size(), boost::thread::hardware_concurrency());
+            
+            // create threads
+            boost::thread_group l_threadgroup;
+            for(std::size_t i=0; i < boost::thread::hardware_concurrency(); ++i)
+                l_threadgroup.create_thread(  boost::bind( &ncd<T>::multithread_symmatric, this, i )  );
+            
+            // run threads and wait during all finished
+            l_threadgroup.join_all();
+        }
+            
+            
+        /*
         // create matrix, cache and compress
         ublas::symmetric_matrix<T, ublas::upper> l_distances( p_strvec.size(), p_strvec.size() );
         ublas::vector<std::size_t> l_cache( p_strvec.size() );
@@ -285,8 +335,8 @@ namespace machinelearning { namespace distances {
             }
             
         }
-        
-        return l_distances;
+        */
+        return m_symmetric;
     }
     
     
@@ -295,7 +345,7 @@ namespace machinelearning { namespace distances {
      * @param p_str1 first string to compress
      * @param p_str2 optional second string to compress
      **/    
-    inline std::size_t ncd::deflate( const bool& p_isfile, const std::string& p_str1, const std::string& p_str2 )
+    template<typename T> inline std::size_t ncd<T>::deflate( const bool& p_isfile, const std::string& p_str1, const std::string& p_str2 ) const
     {
         if (p_str1.empty())
             throw exception::parameter(_("string size must be greater than zero"));

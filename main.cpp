@@ -232,10 +232,10 @@ int main(int argc, char *argv[]) {
     //val.push_back("blub.hdf5");
     
     
-    dist::ncd ncd(dist::ncd::bzip2);
+    dist::ncd<double> ncd(dist::ncd<double>::bzip2);
     //ncd.setCompressionLevel( dist::ncd::bestspeed );
     //std::cout << "unsymmetric: " << ncd.unsymmetric<double>(val, true) << std::endl;
-    std::cout << "symmetric: " << ncd.symmetric<double>(val, true) << std::endl;
+    std::cout << "symmetric: " << ncd.symmetric(val, true) << std::endl;
     
     
     

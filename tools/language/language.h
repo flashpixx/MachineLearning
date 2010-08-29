@@ -37,7 +37,9 @@
 namespace machinelearning { namespace tools {
     
     
-    /** class for create langugage bindings **/
+    /** class for create langugage bindings
+     * @todo thread safe
+     **/
     class language {
       
         public :
