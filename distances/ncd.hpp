@@ -57,6 +57,7 @@ namespace machinelearning { namespace distances {
      * class for calculating the normalized compression distance (NCD)
      * with some different algorithms like gzip and bzip2
      * @todo set to unicode
+     * @todo multithread, wavefront begin by (1,n), (1,n-1), (2,n) ...
      **/
     class ncd {
         
