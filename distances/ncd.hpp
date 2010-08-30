@@ -97,14 +97,15 @@ namespace machinelearning { namespace distances {
             bio::bzip2_params m_bzip2param;
         
         ublas::symmetric_matrix<T, ublas::upper> m_symmetric;
+        ublas::matrix<T> m_unsymmetric;
         std::multimap<std::size_t, std::pair<std::size_t,std::size_t> > m_wavefront;    
         ublas::vector<std::size_t> m_cache;
         std::vector<std::string> m_sources;
         bool m_isfile;
         
-            std::size_t deflate ( const bool&, const std::string&, const std::string& = "" ) const;        
+            std::size_t deflate ( const std::string&, const std::string& = "" ) const;        
             void getWavefrontIndex( const std::size_t&, const std::size_t& );
-            void multithread_symmatric( const std::size_t& );
+            void multithread_deflate( const std::size_t&, const bool& );
         
     };
     
@@ -119,6 +120,7 @@ namespace machinelearning { namespace distances {
         m_gzipparam( bio::gzip::default_compression ),
         m_bzip2param( 6 ),
         m_symmetric(),
+        m_unsymmetric(),
         m_wavefront(),
         m_cache(),
         m_sources(),
@@ -135,6 +137,7 @@ namespace machinelearning { namespace distances {
         m_gzipparam( bio::gzip::default_compression ),
         m_bzip2param( 6 ),
         m_symmetric(),
+        m_unsymmetric(),
         m_wavefront(),
         m_cache(),
         m_sources(),
@@ -142,11 +145,12 @@ namespace machinelearning { namespace distances {
     {}
 
     
-    
+    /** creates wavefront index pairs for using on multithreaded systems
+     * @param p_size number of rows or columns
+     * @param p_threads number of threads
+     **/
     template<typename T> inline void ncd<T>::getWavefrontIndex( const std::size_t& p_size, const std::size_t& p_threads )
     {
-        //ublas::symmetric_matrix<std::size_t, ublas::upper> l_wave(p_size, p_size);
-        //std::multimap<std::size_t, std::pair<std::size_t,std::size_t> > m_front; 
         m_wavefront.clear();
         
         // create wavefront in this case: (0,n) = 0, (0,n-1) = 1, (1,n) = 2 ...
@@ -155,29 +159,58 @@ namespace machinelearning { namespace distances {
         for(std::size_t i=p_size-1; i > 0; --i)
             for(std::size_t j=0; (i+j) < p_size; ++j)
                 m_wavefront.insert(  std::pair<std::size_t, std::pair<std::size_t,std::size_t> >(n++ % p_threads, std::pair<std::size_t,std::size_t>(j, i+j))  );
-        
-        /*
-        for(std::size_t i=0; i < p_threads; ++i) {
-            std::cout << "Thread No " << i << std::endl;
-            
-            for(std::multimap<std::size_t, std::pair<std::size_t,std::size_t> >::iterator it=l_idxmap.lower_bound(i); it != l_idxmap.upper_bound(i); ++it)
-                std::cout << "(" << it->second.first << "," << it->second.second << ")  ";
-            
-            std::cout << std::endl << std::endl;
-        }
-        */
-        
-               
-        //return l_idxmap;
-        
     }
     
     
-    template<typename T> inline void ncd<T>::multithread_symmatric( const std::size_t& p_id )
+    
+    /** creates the thread and calculates the NCD symmetric or unsymmetric 
+     * @param p_id thread id for reading pairs in wavefront
+     * @param p_symmetric bool for creating the symmetric or unsymmetric data
+     **/
+    template<typename T> inline void ncd<T>::multithread_deflate( const std::size_t& p_id, const bool& p_symmetric )
     {
-        for(std::multimap<std::size_t, std::pair<std::size_t,std::size_t> >::iterator it=m_wavefront.lower_bound(p_id); it != m_wavefront.upper_bound(p_id); ++it) {
-            deflate(m_isfile, m_sources[it->second.first], m_sources[it->second.second]);
-        }
+                
+        if (p_symmetric)
+            for(std::multimap<std::size_t, std::pair<std::size_t,std::size_t> >::iterator it=m_wavefront.lower_bound(p_id); it != m_wavefront.upper_bound(p_id); ++it) {
+            
+                // check for both index positions the cache and adds the data
+                if (m_cache[it->second.first] == 0)
+                    m_cache[it->second.first] = deflate(m_sources[it->second.first]);
+            
+                if (m_cache[it->second.second] == 0)
+                    m_cache[it->second.second] = deflate(m_sources[it->second.second]);
+            
+                // calculate NCD and set max. to 1, because the defalter can create data greater than 1
+                m_symmetric(it->second.first, it->second.second) = 
+                    std::min( static_cast<T>(1),
+                    static_cast<T>(deflate(m_sources[it->second.first], m_sources[it->second.second]) - std::min(m_cache[it->second.first], m_cache[it->second.second])) / std::max(m_cache[it->second.first], m_cache[it->second.second])
+                ); 
+            }
+        
+        else
+            for(std::multimap<std::size_t, std::pair<std::size_t,std::size_t> >::iterator it=m_wavefront.lower_bound(p_id); it != m_wavefront.upper_bound(p_id); ++it) {
+                
+                // check for both index positions the cache and adds the data
+                if (m_cache[it->second.first] == 0)
+                    m_cache[it->second.first] = deflate(m_sources[it->second.first]);
+                
+                if (m_cache[it->second.second] == 0)
+                    m_cache[it->second.second] = deflate(m_sources[it->second.second]);
+                
+                const std::size_t l_min = std::min(m_cache[it->second.first], m_cache[it->second.second]);
+                const std::size_t l_max = std::max(m_cache[it->second.first], m_cache[it->second.second]);
+                
+                // calculate NCD and set max. to 1, because the defalter can create data greater than 1
+                m_unsymmetric(it->second.first, it->second.second) = 
+                    std::min( static_cast<T>(1),
+                    static_cast<T>(deflate(m_sources[it->second.first], m_sources[it->second.second]) - l_min) / l_max
+                ); 
+
+                m_unsymmetric(it->second.second, it->second.first) = 
+                    std::min( static_cast<T>(1),
+                    static_cast<T>(deflate(m_sources[it->second.second], m_sources[it->second.first]) - l_min) / l_max
+                ); 
+            }
     }
     
     
@@ -209,7 +242,6 @@ namespace machinelearning { namespace distances {
     
     
     /** calculate distances between two strings
-     * @overload
      * @param p_str1 first string
      * @param p_str2 second string
      * @param p_isfile parameter for interpreting the string as a file with path
@@ -217,10 +249,12 @@ namespace machinelearning { namespace distances {
      **/   
     template<typename T> inline T ncd<T>::calculate( const std::string& p_str1, const std::string& p_str2, const bool& p_isfile )
     {
-        const std::size_t l_first  = deflate(p_isfile, p_str1);
-        const std::size_t l_second = deflate(p_isfile, p_str2);
+        m_isfile                   = p_isfile;
         
-        return ( static_cast<T>(deflate(p_isfile, p_str1, p_str2)) - std::min(l_first, l_second)) / std::max(l_first, l_second);
+        const std::size_t l_first  = deflate(p_str1);
+        const std::size_t l_second = deflate(p_str2);
+        
+        return ( static_cast<T>(deflate(p_str1, p_str2)) - std::min(l_first, l_second)) / std::max(l_first, l_second);
     }
     
     
@@ -238,6 +272,8 @@ namespace machinelearning { namespace distances {
         
         
         // create matrix, cache and compress
+        m_isfile = p_isfile;
+        
         ublas::matrix<T> l_distances( p_strvec.size(), p_strvec.size() );
         ublas::vector<std::size_t> l_cache( p_strvec.size() );
         
@@ -246,7 +282,7 @@ namespace machinelearning { namespace distances {
             
             // create deflate to cache
             if (i==0)
-                l_cache(i) = deflate(p_isfile, p_strvec[i]);
+                l_cache(i) = deflate(p_strvec[i]);
             
             // diagonal elements are always zero
             l_distances(i,i) = 0;
@@ -255,15 +291,15 @@ namespace machinelearning { namespace distances {
                 
                 // create deflate to cache
                 if (i==0)
-                    l_cache(j) = deflate(p_isfile, p_strvec[j]);
+                    l_cache(j) = deflate(p_strvec[j]);
                 
                 // determine min and max for NCD
                 const std::size_t l_min    = std::min(l_cache(i), l_cache(j));
                 const std::size_t l_max    = std::max(l_cache(i), l_cache(j));
                 				
 				// because of deflate algorithms there can be values greater than 1, so we check and set it to 1
-                l_distances(i, j) = std::min(  ( static_cast<T>(deflate(p_isfile, p_strvec[i], p_strvec[j])) - l_min) / l_max,  static_cast<T>(1)  );    
-                l_distances(j, i) = std::min(  ( static_cast<T>(deflate(p_isfile, p_strvec[j], p_strvec[i])) - l_min) / l_max,  static_cast<T>(1)  );  
+                l_distances(i, j) = std::min(  ( static_cast<T>(deflate(p_strvec[i], p_strvec[j])) - l_min) / l_max,  static_cast<T>(1)  );    
+                l_distances(j, i) = std::min(  ( static_cast<T>(deflate(p_strvec[j], p_strvec[i])) - l_min) / l_max,  static_cast<T>(1)  );  
             }
 
         }
@@ -283,14 +319,21 @@ namespace machinelearning { namespace distances {
         if (p_strvec.size() == 0)
             throw exception::parameter(_("vector size must be greater than zero"));
         
-        // create cache and set sources global
-        m_sources = p_strvec;
-        m_isfile  = p_isfile;
-        m_cache   = ublas::vector<std::size_t>(p_strvec.size());
+        // init data
+        m_sources       = p_strvec;
+        m_isfile        = p_isfile;
+        m_cache         = ublas::vector<std::size_t>(p_strvec.size());
+        m_symmetric     = ublas::symmetric_matrix<T, ublas::upper>( p_strvec.size(), p_strvec.size() );
+        m_unsymmetric   = ublas::matrix<T>();
         
         
-        // if we can multithreads 
+        // if we can use multithreads 
         if (boost::thread::hardware_concurrency() > 1) {
+            
+            // the first and last element are calculated in a single run, because
+            // the first two thread are used the data directly
+            m_cache(0) = deflate(p_strvec[0]);
+            m_cache(p_strvec.size()-1) = deflate(p_strvec[p_strvec.size()-1]);
             
             // create wavefront index position
             getWavefrontIndex(p_strvec.size(), boost::thread::hardware_concurrency());
@@ -298,44 +341,31 @@ namespace machinelearning { namespace distances {
             // create threads
             boost::thread_group l_threadgroup;
             for(std::size_t i=0; i < boost::thread::hardware_concurrency(); ++i)
-                l_threadgroup.create_thread(  boost::bind( &ncd<T>::multithread_symmatric, this, i )  );
+                l_threadgroup.create_thread(  boost::bind( &ncd<T>::multithread_deflate, this, i, true )  );
             
             // run threads and wait during all finished
             l_threadgroup.join_all();
-        }
-            
-            
-        /*
-        // create matrix, cache and compress
-        ublas::symmetric_matrix<T, ublas::upper> l_distances( p_strvec.size(), p_strvec.size() );
-        ublas::vector<std::size_t> l_cache( p_strvec.size() );
         
-        // create content
-        for (std::size_t i = 0; i < p_strvec.size(); ++i) {
             
-            // create deflate to cache
-            if (i==0)
-                l_cache(i) = deflate(p_isfile, p_strvec[i]);
-            
-            // diagonal elements are always zero
-            l_distances(i,i) = 0;
-            
-            for (std::size_t j = i+1; j < p_strvec.size(); ++j) {
+        } else // otherwise (we can't use threads)
+            for (std::size_t i = 0; i < m_sources.size(); ++i) {
                 
                 // create deflate to cache
                 if (i==0)
-                    l_cache(j) = deflate(p_isfile, p_strvec[j]);
+                    m_cache(i) = deflate(m_sources[i]);
                 
-                // determine min and max for NCD
-                const std::size_t l_min    = std::min(l_cache(i), l_cache(j));
-                const std::size_t l_max    = std::max(l_cache(i), l_cache(j));
+                m_symmetric(i,i) = 0;
+                for (std::size_t j = i+1; j < m_sources.size(); ++j) {
+                    if (i==0)
+                        m_cache(j) = deflate(m_sources[j]);
+                    
+                    // because of deflate algorithms there can be values greater than 1, so we check and set it to 1
+                    m_symmetric(i, j) = std::min(  static_cast<T>(1),
+                                                   static_cast<T>(deflate(m_sources[i], m_sources[j]) - std::min(m_cache(i), m_cache(j))) / std::max(m_cache(i), m_cache(j))  );    
+                }
                 
-				// because of deflate algorithms there can be values greater than 1, so we check and set it to 1
-                l_distances(i, j) = std::min(  ( static_cast<T>(deflate(p_isfile, p_strvec[i], p_strvec[j])) - l_min) / l_max,  static_cast<T>(1)  );    
             }
-            
-        }
-        */
+        
         return m_symmetric;
     }
     
@@ -345,7 +375,7 @@ namespace machinelearning { namespace distances {
      * @param p_str1 first string to compress
      * @param p_str2 optional second string to compress
      **/    
-    template<typename T> inline std::size_t ncd<T>::deflate( const bool& p_isfile, const std::string& p_str1, const std::string& p_str2 ) const
+    template<typename T> inline std::size_t ncd<T>::deflate( const std::string& p_str1, const std::string& p_str2 ) const
     {
         if (p_str1.empty())
             throw exception::parameter(_("string size must be greater than zero"));
@@ -365,7 +395,7 @@ namespace machinelearning { namespace distances {
         
         
         // create stream for data and copy streamdata to output
-        if (p_isfile) {
+        if (m_isfile) {
             // for filestreams copy data manually to deflate stream, cause boost::iostreams::copy close
             // source and destination stream after copy is finished, so we copy only data from first
             // stream into deflate and than from second stream
