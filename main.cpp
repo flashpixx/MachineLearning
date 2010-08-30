@@ -224,10 +224,11 @@ int main(int argc, char *argv[]) {
      
     //=============== NCD ================
     std::vector< std:: string > val;
-    val.push_back("main.cpp");
+    /*val.push_back("main.cpp");
     val.push_back("tools/files/hdf.hpp");
     val.push_back("distances/ncd.hpp");
     val.push_back("clustering/supervised/rlvq.hpp");
+    */
     val.push_back("tools/lapack.hpp");
     val.push_back("tools/random.hpp");
     val.push_back("tools/matrix.hpp");
@@ -236,8 +237,8 @@ int main(int argc, char *argv[]) {
     
     dist::ncd<double> ncd(dist::ncd<double>::bzip2);
     //ncd.setCompressionLevel( dist::ncd::bestspeed );
-    //std::cout << "unsymmetric: " << ncd.unsymmetric<double>(val, true) << std::endl;
-    std::cout << "symmetric: " << ncd.symmetric(val, true) << std::endl;
+    std::cout << "unsymmetric: " << ncd.unsymmetric(val, true) << std::endl;
+    //std::cout << "\nsymmetric: " << ncd.symmetric(val, true) << std::endl;
     
     
     return EXIT_SUCCESS;
