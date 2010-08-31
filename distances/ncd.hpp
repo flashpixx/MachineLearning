@@ -60,7 +60,6 @@ namespace machinelearning { namespace distances {
      * class for calculating the normalized compression distance (NCD)
      * with some different algorithms like gzip and bzip2
      * @todo set to unicode
-     * @todo multithread, wavefront begin by (1,n), (1,n-1), (2,n) ...
      **/
     template<typename T> class ncd {
         
@@ -107,11 +106,17 @@ namespace machinelearning { namespace distances {
             std::vector<std::string> m_sources;
             /** boolean if vector data are files **/
             bool m_isfile;
+            /** boost mutex for determine read/write access of the cache **/
+            boost::shared_mutex m_cachelock;
         
             std::size_t deflate ( const std::string&, const std::string& = "" ) const;        
             void getWavefrontIndex( const std::size_t&, const std::size_t& );
             void multithread_deflate_symmetric( const std::size_t& );
             void multithread_deflate_unsymmetric( const std::size_t& );
+            
+            void setCache( const std::size_t&, const std::size_t& );
+            void getCache( const std::size_t&, const std::size_t&, std::size_t&, std::size_t& );
+            
         
     };
     
@@ -168,6 +173,36 @@ namespace machinelearning { namespace distances {
     }
     
     
+    /** writing cache data must be implementated thread-safe so we do writing-option in a own method
+     * @param p_id index position in the cache vector
+     * @param p_data data which should be write
+     **/
+    template<typename T> inline void ncd<T>::setCache( const std::size_t& p_id, const std::size_t& p_data )
+    {
+        // upgrade lock for writing
+        boost::unique_lock<boost::shared_mutex> lock( m_cachelock ); 
+        
+        m_cache(p_id) = p_data;
+    }
+    
+    
+    /** reading cache data must be implementated thread-safe so we had created a own method for reading on one
+     * access two data, because on the NCD calulation we need everytime two entries
+     * @param p_idfirst index position of the first element
+     * @param p_idsecond index position of the second element
+     * @param p_first reference for writing the first element
+     * @param p_second reference for writing the second element
+     **/
+    template<typename T> inline void ncd<T>::getCache( const std::size_t& p_idfirst, const std::size_t& p_idsecond, std::size_t& p_first, std::size_t& p_second )
+    {
+        // shared access for reading
+        boost::shared_lock<boost::shared_mutex> lock( m_cachelock );
+        
+        p_first  = m_cache(p_idfirst);
+        p_second = m_cache(p_idsecond);
+    }
+    
+    
     
     /** creates the thread and calculates the NCD symmetric 
      * @param p_id thread id for reading pairs in wavefront
@@ -175,18 +210,27 @@ namespace machinelearning { namespace distances {
     template<typename T> inline void ncd<T>::multithread_deflate_symmetric( const std::size_t& p_id )
     {
         for(std::multimap<std::size_t, std::pair<std::size_t,std::size_t> >::iterator it=m_wavefront.lower_bound(p_id); it != m_wavefront.upper_bound(p_id); ++it) {
-        
+            // read cache data
+            std::size_t l_first;
+            std::size_t l_second;
+            getCache(it->second.first, it->second.second, l_first, l_second);
+            
+            
             // check for both index positions the cache and adds the data
-            if (m_cache[it->second.first] == 0)
-                m_cache[it->second.first] = deflate(m_sources[it->second.first]);
-        
-            if (m_cache[it->second.second] == 0)
-                m_cache[it->second.second] = deflate(m_sources[it->second.second]);
-        
+            if (l_first == 0) {
+                l_first = deflate(m_sources[it->second.first]);
+                setCache(it->second.first, l_first);
+            }
+                
+            if (l_second == 0) {
+                l_second = deflate(m_sources[it->second.second]);
+                setCache(it->second.second, l_second);
+            }
+                
             // calculate NCD and set max. to 1, because the defalter can create data greater than 1
             m_symmetric(it->second.first, it->second.second) = std::min( 
                 static_cast<T>(1),
-                static_cast<T>(deflate(m_sources[it->second.first], m_sources[it->second.second]) - std::min(m_cache[it->second.first], m_cache[it->second.second])) / std::max(m_cache[it->second.first], m_cache[it->second.second])
+                static_cast<T>(deflate(m_sources[it->second.first], m_sources[it->second.second]) - std::min(l_first, l_second)) / std::max(l_first, l_second)
             ); 
         }
     }
@@ -199,19 +243,26 @@ namespace machinelearning { namespace distances {
     template<typename T> inline void ncd<T>::multithread_deflate_unsymmetric( const std::size_t& p_id )
     {
         for(std::multimap<std::size_t, std::pair<std::size_t,std::size_t> >::iterator it=m_wavefront.lower_bound(p_id); it != m_wavefront.upper_bound(p_id); ++it) {
+            // read cache data
+            std::size_t l_first;
+            std::size_t l_second;
+            getCache(it->second.first, it->second.second, l_first, l_second);
+            
             
             // check for both index positions the cache and adds the data
-            if (m_cache[it->second.first] == 0)
-                m_cache[it->second.first] = deflate(m_sources[it->second.first]);
+            if (l_first == 0) {
+                l_first = deflate(m_sources[it->second.first]);
+                setCache(it->second.first, l_first);
+            }
             
-            if (m_cache[it->second.second] == 0)
-                m_cache[it->second.second] = deflate(m_sources[it->second.second]);
+            if (l_second == 0) {
+                l_second = deflate(m_sources[it->second.second]);
+                setCache(it->second.second, l_second);
+            }
             
-            //std::cout << p_id << ": " << m_sources[it->second.first] << " " << m_sources[it->second.second] << std::endl;
-            //std::cout << p_id << ": " << it->second.first << " " << it->second.second << std::endl;
-            
-            const std::size_t l_min = std::min(m_cache[it->second.first], m_cache[it->second.second]);
-            const std::size_t l_max = std::max(m_cache[it->second.first], m_cache[it->second.second]);
+            // determin min and max
+            const std::size_t l_min = std::min(l_first, l_second);
+            const std::size_t l_max = std::max(l_first, l_second);
             
             // calculate NCD and set max. to 1, because the defalter can create data greater than 1
             m_unsymmetric(it->second.first, it->second.second) = std::min( 
