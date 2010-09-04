@@ -31,10 +31,14 @@
 #include <boost/numeric/ublas/vector.hpp>
 
 #include "neuron.hpp"
-#include "../../neighborhood/neighborhood.h"
+#include "../neighborhood/neighborhood.h"
 
 
 namespace machinelearning { namespace neuralnetwork {
+    
+    namespace ublas   = boost::numeric::ublas;
+    
+    
 
     template<typename T> class nnet {
         
@@ -52,7 +56,7 @@ namespace machinelearning { namespace neuralnetwork {
         
         private :
         
-            std::map< neuron<T> > m_neurons;
+            std::map<std::size_t, neuron<T> > m_neurons;
             ublas::matrix<T> m_weights;
         
         
