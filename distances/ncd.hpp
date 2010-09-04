@@ -108,6 +108,7 @@ namespace machinelearning { namespace distances {
             bool m_isfile;
             /** boost mutex for determine read/write access of the cache **/
             boost::shared_mutex m_cachelock;
+            boost::shared_mutex m_matrixlock;
         
             std::size_t deflate ( const std::string&, const std::string& = "" ) const;        
             void getWavefrontIndex( const std::size_t&, const std::size_t& );
@@ -116,8 +117,10 @@ namespace machinelearning { namespace distances {
             
             void setCache( const std::size_t&, const std::size_t& );
             void getCache( const std::size_t&, const std::size_t&, std::size_t&, std::size_t& );
+            void setUnsymmetric( const std::size_t&, const std::size_t&, const T&, const T& );
+            void setSymmetric( const std::size_t&, const std::size_t&, const T& );
             
-        
+            //volatile 
     };
     
 
@@ -135,7 +138,9 @@ namespace machinelearning { namespace distances {
         m_wavefront(),
         m_cache(),
         m_sources(),
-        m_isfile( false )
+        m_isfile( false ),
+        m_cachelock(),
+        m_matrixlock()
     {}
     
     
@@ -204,6 +209,37 @@ namespace machinelearning { namespace distances {
     
     
     
+    /** write method for unsymmetric matrix data, which sets two values into the positions 
+     * @param p_row row index
+     * @param p_col col index
+     * @param p_val1 value for (p_row/p_col)
+     * @param p_val2 value for (p_col/p_row)
+     **/
+    template<typename T> inline void ncd<T>::setUnsymmetric( const std::size_t& p_row, const std::size_t& p_col, const T& p_val1, const T& p_val2 )
+    {
+        // upgrade lock for writing
+        boost::unique_lock<boost::shared_mutex> lock( m_matrixlock ); 
+         
+        m_unsymmetric(p_row, p_col) = p_val1;
+        m_unsymmetric(p_col, p_row) = p_val2;
+    }
+    
+    
+    /** write method for symmetric matrix data, which sets the values into the position
+     * @param p_row row index
+     * @param p_col col index
+     * @param p_val value for (p_row/p_col)
+     **/
+    template<typename T> inline void ncd<T>::setSymmetric( const std::size_t& p_row, const std::size_t& p_col, const T& p_val )
+    {
+        // upgrade lock for writing
+        boost::unique_lock<boost::shared_mutex> lock( m_matrixlock ); 
+        
+        m_symmetric(p_row, p_col) = p_val;
+    }
+    
+    
+    
     /** creates the thread and calculates the NCD symmetric 
      * @param p_id thread id for reading pairs in wavefront
      **/
@@ -228,10 +264,12 @@ namespace machinelearning { namespace distances {
             }
                 
             // calculate NCD and set max. to 1, because the defalter can create data greater than 1
-            m_symmetric(it->second.first, it->second.second) = std::min( 
-                static_cast<T>(1),
-                static_cast<T>(deflate(m_sources[it->second.first], m_sources[it->second.second]) - std::min(l_first, l_second)) / std::max(l_first, l_second)
-            ); 
+            setSymmetric(it->second.first, it->second.second, 
+                         std::min(
+                                  static_cast<T>(1),
+                                  static_cast<T>(deflate(m_sources[it->second.first], m_sources[it->second.second]) - std::min(l_first, l_second)) / std::max(l_first, l_second)
+                                 )
+                         );
         }
     }
     
@@ -265,15 +303,16 @@ namespace machinelearning { namespace distances {
             const std::size_t l_max = std::max(l_first, l_second);
             
             // calculate NCD and set max. to 1, because the defalter can create data greater than 1
-            m_unsymmetric(it->second.first, it->second.second) = std::min( 
-                static_cast<T>(1),
-                static_cast<T>(deflate(m_sources[it->second.first], m_sources[it->second.second]) - l_min) / l_max
-            ); 
-
-            m_unsymmetric(it->second.second, it->second.first) = std::min( 
-                static_cast<T>(1),
-                static_cast<T>(deflate(m_sources[it->second.second], m_sources[it->second.first]) - l_min) / l_max
-            ); 
+            setUnsymmetric(it->second.first, it->second.second, 
+                           std::min(
+                                    static_cast<T>(1),
+                                    static_cast<T>(deflate(m_sources[it->second.first], m_sources[it->second.second]) - l_min) / l_max
+                                   ),
+                           std::min(
+                                    static_cast<T>(1),
+                                    static_cast<T>(deflate(m_sources[it->second.second], m_sources[it->second.first]) - l_min) / l_max
+                                   )
+                           );
         }
     }
     
@@ -363,7 +402,7 @@ namespace machinelearning { namespace distances {
             
             
         } else // otherwise (we can't use threads)
-            for (std::size_t i = 0; i < m_sources.size(); ++i) {
+           for (std::size_t i = 0; i < m_sources.size(); ++i) {
                 // create deflate to cache
                 if (i==0)
                     m_cache(i) = deflate(m_sources[i]);
@@ -432,7 +471,7 @@ namespace machinelearning { namespace distances {
             l_threadgroup.join_all();
         
             
-        } else // otherwise (we can't use threads)
+        } /* else // otherwise (we can't use threads)
             for (std::size_t i = 0; i < m_sources.size(); ++i) {
                 
                 // create deflate to cache
@@ -449,7 +488,7 @@ namespace machinelearning { namespace distances {
                                                    static_cast<T>(deflate(m_sources[i], m_sources[j]) - std::min(m_cache(i), m_cache(j))) / std::max(m_cache(i), m_cache(j))  );    
                 }
                 
-            }
+            }*/
         
         return m_symmetric;
     }
