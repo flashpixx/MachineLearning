@@ -33,12 +33,18 @@ int main(int argc, char *argv[]) {
     namespace nd        = machinelearning::neighborhood;
     namespace cl        = machinelearning::classifier;
     namespace func      = machinelearning::functionaloptimization;
-        
+    namespace nn        = machinelearning::neuronalnetwork;
+    
+    
     namespace linalg    = boost::numeric::bindings::lapack;
     namespace ublas     = boost::numeric::ublas;
     
     
-    //tl::language::bind("ml", "./tools/language/");
+    tl::language::bind("ml", "./tools/language/");
+    
+    nn::nnet<double> net(3);
+    
+    
     
     
     /*

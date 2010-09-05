@@ -27,14 +27,16 @@
 #define MACHINELEARNING_NEURONALNETWORK_NNET_HPP
 
 #include <map>
-#include <boost/numeric/ublas/matrix.hpp>
-#include <boost/numeric/ublas/vector.hpp>
+#include <algorithm>
+#include <boost/graph/graph_traits.hpp>
+#include <boost/graph/adjacency_matrix.hpp>
+
 
 #include "neuron.hpp"
-#include "../neighborhood/neighborhood.h"
+#include "../exception/exception.h"
 
 
-namespace machinelearning { namespace neuralnetwork {
+namespace machinelearning { namespace neuronalnetwork {
     
     namespace ublas   = boost::numeric::ublas;
     
@@ -46,22 +48,28 @@ namespace machinelearning { namespace neuralnetwork {
         
             nnet( const std::size_t& );
         
-            void setConnectionWeight( const std::size_t&, const std::size_t&, const T& );
-            T getConnectionWeight( const std::size_t&, const std::size_t& ) const;
-            void setConnectionWeight( const ublas::matrix<T>& );
-            ublas::matrix<T> getConnectionWeight( void ) const;
             neuron<T> getNeuron( const std::size_t&, const std::size_t& ) const;
             void setNeuron( const std::size_t&, const std::size_t&, const neuron<T>& );
             
         
         private :
         
-            std::map<std::size_t, neuron<T> > m_neurons;
-            ublas::matrix<T> m_weights;
-        
+            boost::adjacency_matrix<boost::undirectedS> m_net;
+            std::multimap<std::size_t, std::size_t > m_layer;
         
         
     };
+    
+    
+    
+    template<typename T> inline nnet<T>::nnet( const std::size_t& p_vertex ) :
+        m_net( p_vertex ),
+        m_layer()
+    {
+        if (p_vertex == 0)
+            throw exception::parameter(_("number of vertices must be greater than zero"));
+    }
+
     
     
     

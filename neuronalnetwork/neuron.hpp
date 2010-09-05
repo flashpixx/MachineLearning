@@ -26,14 +26,39 @@
 #ifndef MACHINELEARNING_NEURONALNETWORK_NEURON_HPP
 #define MACHINELEARNING_NEURONALNETWORK_NEURON_HPP
 
+#include <string>
 #include <ginac/ginac.h>
 
+#include "../distances/distances.h"
+#include "../exception/exception.h"
 
 
-namespace machinelearning { namespace neuralnetwork {
+
+namespace machinelearning { namespace neuronalnetwork {
+    
+    namespace ublas   = boost::numeric::ublas;
+    
+    
+    
 
     template<typename T> class neuron {
         
+        public :
+        
+            neuron( const std::string&, const std::size_t& );
+            neuron( const distances::distance<T>&, const std::string&, const std::size_t& );
+            ublas::vector<T> getWeights( void ) const;
+            T evaluate( const ublas::vector<T>& );
+        
+        //operator() 
+        //operator= 
+        
+        private :
+        
+            const GiNaC::ex m_function;
+            const distances::distance<T> m_distance;
+            ublas::vector<T> m_weights;
+
         
     };
     
