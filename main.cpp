@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
     
     tl::language::bind("ml", "./tools/language/");
     
-    nn::nnet<double> net(3);
+    //nn::nnet<double> net(3);
     
     
     
@@ -243,7 +243,7 @@ int main(int argc, char *argv[]) {
     
     dist::ncd<double> ncd(dist::ncd<double>::bzip2);
     //ncd.setCompressionLevel( dist::ncd::bestspeed );
-    std::cout << "unsymmetric: " << ncd.unsymmetric(val, true) << std::endl;
+    //std::cout << "unsymmetric: " << ncd.unsymmetric(val, true) << std::endl;
     std::cout << "\nsymmetric: " << ncd.symmetric(val, true) << std::endl;
     
     

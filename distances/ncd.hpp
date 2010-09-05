@@ -119,8 +119,6 @@ namespace machinelearning { namespace distances {
             void getCache( const std::size_t&, const std::size_t&, std::size_t&, std::size_t& );
             void setUnsymmetric( const std::size_t&, const std::size_t&, const T&, const T& );
             void setSymmetric( const std::size_t&, const std::size_t&, const T& );
-            
-            //volatile 
     };
     
 
@@ -159,7 +157,12 @@ namespace machinelearning { namespace distances {
         m_sources(),
         m_isfile( false )
     {}
-
+    
+    
+    
+    
+    //--- multithread methods ---------------------------------------------------------------------------------------------------------------------------------
+    
     
     /** creates wavefront index pairs for using on multithreaded systems
      * @param p_size number of rows or columns
@@ -176,7 +179,7 @@ namespace machinelearning { namespace distances {
             for(std::size_t j=0; (i+j) < p_size; ++j)
                 m_wavefront.insert(  std::pair<std::size_t, std::pair<std::size_t,std::size_t> >(n++ % p_threads, std::pair<std::size_t,std::size_t>(j, i+j))  );
     }
-    
+
     
     /** writing cache data must be implementated thread-safe so we do writing-option in a own method
      * @param p_id index position in the cache vector
@@ -316,6 +319,7 @@ namespace machinelearning { namespace distances {
         }
     }
     
+    //---------------------------------------------------------------------------------------------------------------------------------------------------------
     
     
 	/** sets the compression level
@@ -471,7 +475,7 @@ namespace machinelearning { namespace distances {
             l_threadgroup.join_all();
         
             
-        } /* else // otherwise (we can't use threads)
+        } else // otherwise (we can't use threads)
             for (std::size_t i = 0; i < m_sources.size(); ++i) {
                 
                 // create deflate to cache
@@ -488,7 +492,7 @@ namespace machinelearning { namespace distances {
                                                    static_cast<T>(deflate(m_sources[i], m_sources[j]) - std::min(m_cache(i), m_cache(j))) / std::max(m_cache(i), m_cache(j))  );    
                 }
                 
-            }*/
+            }
         
         return m_symmetric;
     }
