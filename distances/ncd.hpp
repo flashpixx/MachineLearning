@@ -290,18 +290,18 @@ namespace machinelearning { namespace distances {
         for(std::multimap<std::size_t, std::pair<std::size_t,std::size_t> >::iterator it=m_wavefront.lower_bound(p_id); it != m_wavefront.upper_bound(p_id); ++it) {
             // read cache data
             std::size_t l_first=0, l_second=0;
-            //getCache(it->second.first, it->second.second, l_first, l_second);
+            getCache(it->second.first, it->second.second, l_first, l_second);
             
             
             // check for both index positions the cache and adds the data
             if (l_first == 0) {
                 l_first = deflate(m_sources[it->second.first]);
-                //setCache(it->second.first, l_first);
+                setCache(it->second.first, l_first);
             }
             
             if (l_second == 0) {
                 l_second = deflate(m_sources[it->second.second]);
-                //setCache(it->second.second, l_second);
+                setCache(it->second.second, l_second);
             }
             
             // determin min and max
