@@ -243,8 +243,7 @@ namespace machinelearning { namespace distances {
         // upgrade lock for writing
         boost::unique_lock<boost::shared_mutex> l_lock( m_matrixlock ); 
 
-        m_symmetric(p_row, p_col) = p_val; 
-
+        m_symmetric(p_row, p_col) = p_val;
     }
     
     
@@ -257,7 +256,7 @@ namespace machinelearning { namespace distances {
         for(std::multimap<std::size_t, std::pair<std::size_t,std::size_t> >::iterator it=m_wavefront.lower_bound(p_id); it != m_wavefront.upper_bound(p_id); ++it) {
             // read cache data
             std::size_t l_first=0, l_second=0;
-            //getCache(it->second.first, it->second.second, l_first, l_second);
+            getCache(it->second.first, it->second.second, l_first, l_second);
             
             
             // check for both index positions the cache and adds the data
@@ -271,7 +270,7 @@ namespace machinelearning { namespace distances {
                 setCache(it->second.second, l_second);
             }
                 
-            // calculate NCD and set max. to 1, because the defalter can create data greater than 1
+            // calculate NCD and set max. to 1, because the deflater can create data greater than 1
             setSymmetric(it->second.first, it->second.second, 
                          std::min(
                                   static_cast<T>(1),
@@ -309,7 +308,7 @@ namespace machinelearning { namespace distances {
             const std::size_t l_min = std::min(l_first, l_second);
             const std::size_t l_max = std::max(l_first, l_second);
             
-            // calculate NCD and set max. to 1, because the defalter can create data greater than 1
+            // calculate NCD and set max. to 1, because the deflater can create data greater than 1
             setUnsymmetric(it->second.first, it->second.second, 
                            std::min(
                                     static_cast<T>(1),
