@@ -44,7 +44,8 @@
 #include <boost/ref.hpp>
 
 #include <boost/thread.hpp>
-
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/condition.hpp>
 
 #include "../exception/exception.h"
 
@@ -108,7 +109,9 @@ namespace machinelearning { namespace distances {
             bool m_isfile;
             /** boost mutex for determine read/write access of the cache **/
             boost::shared_mutex m_cachelock;
+            /** boost mutex for determine read/write access of the matrix **/
             boost::shared_mutex m_matrixlock;
+        
         
             std::size_t deflate ( const std::string&, const std::string& = "" ) const;        
             void getWavefrontIndex( const std::size_t&, const std::size_t& );
@@ -155,7 +158,9 @@ namespace machinelearning { namespace distances {
         m_wavefront(),
         m_cache(),
         m_sources(),
-        m_isfile( false )
+        m_isfile( false ),
+        m_cachelock(),
+        m_matrixlock()
     {}
     
     
@@ -188,7 +193,7 @@ namespace machinelearning { namespace distances {
     template<typename T> inline void ncd<T>::setCache( const std::size_t& p_id, const std::size_t& p_data )
     {
         // upgrade lock for writing
-        boost::unique_lock<boost::shared_mutex> lock( m_cachelock ); 
+        boost::unique_lock<boost::shared_mutex> l_lock( m_cachelock ); 
         
         m_cache(p_id) = p_data;
     }
@@ -204,7 +209,7 @@ namespace machinelearning { namespace distances {
     template<typename T> inline void ncd<T>::getCache( const std::size_t& p_idfirst, const std::size_t& p_idsecond, std::size_t& p_first, std::size_t& p_second )
     {
         // shared access for reading
-        boost::shared_lock<boost::shared_mutex> lock( m_cachelock );
+        boost::shared_lock<boost::shared_mutex> l_lock( m_cachelock );
         
         p_first  = m_cache(p_idfirst);
         p_second = m_cache(p_idsecond);
@@ -221,8 +226,8 @@ namespace machinelearning { namespace distances {
     template<typename T> inline void ncd<T>::setUnsymmetric( const std::size_t& p_row, const std::size_t& p_col, const T& p_val1, const T& p_val2 )
     {
         // upgrade lock for writing
-        boost::unique_lock<boost::shared_mutex> lock( m_matrixlock ); 
-         
+        boost::unique_lock<boost::shared_mutex> l_lock( m_matrixlock ); 
+          
         m_unsymmetric(p_row, p_col) = p_val1;
         m_unsymmetric(p_col, p_row) = p_val2;
     }
@@ -236,9 +241,10 @@ namespace machinelearning { namespace distances {
     template<typename T> inline void ncd<T>::setSymmetric( const std::size_t& p_row, const std::size_t& p_col, const T& p_val )
     {
         // upgrade lock for writing
-        boost::unique_lock<boost::shared_mutex> lock( m_matrixlock ); 
-        
-        m_symmetric(p_row, p_col) = p_val;
+        boost::unique_lock<boost::shared_mutex> l_lock( m_matrixlock ); 
+
+        m_symmetric(p_row, p_col) = p_val; 
+
     }
     
     
@@ -250,9 +256,8 @@ namespace machinelearning { namespace distances {
     {
         for(std::multimap<std::size_t, std::pair<std::size_t,std::size_t> >::iterator it=m_wavefront.lower_bound(p_id); it != m_wavefront.upper_bound(p_id); ++it) {
             // read cache data
-            std::size_t l_first;
-            std::size_t l_second;
-            getCache(it->second.first, it->second.second, l_first, l_second);
+            std::size_t l_first=0, l_second=0;
+            //getCache(it->second.first, it->second.second, l_first, l_second);
             
             
             // check for both index positions the cache and adds the data
@@ -285,20 +290,19 @@ namespace machinelearning { namespace distances {
     {
         for(std::multimap<std::size_t, std::pair<std::size_t,std::size_t> >::iterator it=m_wavefront.lower_bound(p_id); it != m_wavefront.upper_bound(p_id); ++it) {
             // read cache data
-            std::size_t l_first;
-            std::size_t l_second;
-            getCache(it->second.first, it->second.second, l_first, l_second);
+            std::size_t l_first=0, l_second=0;
+            //getCache(it->second.first, it->second.second, l_first, l_second);
             
             
             // check for both index positions the cache and adds the data
             if (l_first == 0) {
                 l_first = deflate(m_sources[it->second.first]);
-                setCache(it->second.first, l_first);
+                //setCache(it->second.first, l_first);
             }
             
             if (l_second == 0) {
                 l_second = deflate(m_sources[it->second.second]);
-                setCache(it->second.second, l_second);
+                //setCache(it->second.second, l_second);
             }
             
             // determin min and max
@@ -335,12 +339,12 @@ namespace machinelearning { namespace distances {
                 break;
                 
             case bestspeed          :   
-                m_gzipparam = bio::gzip_params( bio::gzip::best_speed );
+                m_gzipparam     = bio::gzip_params( bio::gzip::best_speed );
                 m_bzip2param    = bio::bzip2_params( 1 );
                 break;
             
             case bestcompression    :   
-                m_gzipparam = bio::gzip_params( bio::gzip::best_compression );
+                m_gzipparam     = bio::gzip_params( bio::gzip::best_compression );
                 m_bzip2param    = bio::bzip2_params( 9 );
                 break;
         }
@@ -380,7 +384,7 @@ namespace machinelearning { namespace distances {
         // init data
         m_sources       = p_strvec;
         m_isfile        = p_isfile;
-        m_cache         = ublas::vector<std::size_t>(p_strvec.size());
+        m_cache         = ublas::vector<std::size_t>(p_strvec.size(), 0);
         m_symmetric     = ublas::symmetric_matrix<T, ublas::upper>();
         m_unsymmetric   = ublas::matrix<T>(p_strvec.size(), p_strvec.size(), 0);
         
@@ -403,7 +407,6 @@ namespace machinelearning { namespace distances {
             
             // run threads and wait during all finished
             l_threadgroup.join_all();
-            
             
         } else // otherwise (we can't use threads)
            for (std::size_t i = 0; i < m_sources.size(); ++i) {
@@ -447,12 +450,12 @@ namespace machinelearning { namespace distances {
         // init data
         m_sources       = p_strvec;
         m_isfile        = p_isfile;
-        m_cache         = ublas::vector<std::size_t>(p_strvec.size());
+        m_cache         = ublas::vector<std::size_t>(p_strvec.size(), 0);
         m_symmetric     = ublas::symmetric_matrix<T, ublas::upper>( p_strvec.size(), p_strvec.size() );
         m_unsymmetric   = ublas::matrix<T>();
         
         // if we can use multithreads 
-        if (boost::thread::hardware_concurrency() > 5) {
+        if (boost::thread::hardware_concurrency() > 1) {
             
             // set main diagonal elements to zero
             for(std::size_t i=0; i < p_strvec.size(); ++i)
@@ -473,7 +476,6 @@ namespace machinelearning { namespace distances {
             
             // run threads and wait during all finished
             l_threadgroup.join_all();
-        
             
         } else // otherwise (we can't use threads)
             for (std::size_t i = 0; i < m_sources.size(); ++i) {
