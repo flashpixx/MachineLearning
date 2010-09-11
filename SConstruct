@@ -13,7 +13,7 @@ COMPILECPU = 6
 def configuration_macosx(config) :
     config["seperator"]         = ":"
     config["compiler"]          = "g++"
-    config["compileflags"]      = "-O2 -Wall -D THREAD_SAFE -D MULTILANGUAGE -D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
+    config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -D MULTILANGUAGE -D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
     config["linkerflags"]       = ""
     config["include"]           = os.environ["CPPPATH"]
     config["libpath"]           = os.environ["LIBRARY_PATH"]

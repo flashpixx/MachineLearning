@@ -28,8 +28,6 @@
 
 #include <string>
 #include <sstream>
-#include <iostream>
-#include <fstream>
 
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/symmetric.hpp>
@@ -37,15 +35,15 @@
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/filter/bzip2.hpp>
 
+#include <boost/iostreams/stream.hpp>
 #include <boost/iostreams/device/null.hpp>
+#include <boost/iostreams/device/file.hpp>
 #include <boost/iostreams/filtering_streambuf.hpp>
 #include <boost/iostreams/filter/counter.hpp>
 #include <boost/iostreams/copy.hpp>
-#include <boost/ref.hpp>
 
 #include <boost/thread.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/condition.hpp>
+#include <boost/ref.hpp>
 
 #include "../exception/exception.h"
 
@@ -528,24 +526,26 @@ namespace machinelearning { namespace distances {
             // for filestreams copy data manually to deflate stream, cause boost::iostreams::copy close
             // source and destination stream after copy is finished, so we copy only data from first
             // stream into deflate and than from second stream
-            
-            std::ifstream l_file( p_str1.c_str(), std::ifstream::in | std::ifstream::binary );       
+           
+            // At next, we use the boost::iostreams methods, because std::streams creates thread mutex errors 
+            // under pthread
+            bio::stream< bio::basic_file_source<char> > l_file(p_str1);
             if (!l_file.is_open())
                 throw exception::parameter(_("file can not be opened"));
             
             std::copy( std::istream_iterator<char>(l_file), std::istream_iterator<char>(), std::ostreambuf_iterator<char>(&l_deflate) );
             l_file.close();
             
+            /*
             if (!p_str2.empty()) {
                 
-                l_file.open( p_str2.c_str(), std::ifstream::in | std::ifstream::binary );
+                l_file.open( p_str2 );
                 if (!l_file.is_open())
                     throw exception::parameter(_("file can not be opened"));
-                
                 std::copy( std::istream_iterator<char>(l_file), std::istream_iterator<char>(), std::ostreambuf_iterator<char>(&l_deflate) );
                 l_file.close();
                 
-            }
+            }*/
             
             // close deflate stream, cause only than counter returns correct value
             bio::close(l_deflate);
