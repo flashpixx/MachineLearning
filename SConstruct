@@ -27,15 +27,15 @@ def configuration_macosx(config) :
 def configuration_posix(config) :
     config["seperator"]         = ":"
     config["compiler"]          = "g++"
-    config["compileflags"]      = "-D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS -O2 -Wall"
+    config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -D MULTILANGUAGE -D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
     config["linkerflags"]       = ""
     config["include"]           = os.environ["CPPPATH"]
-    config["libpath"]           = os.environ["LIBRARY_PATH"]
+    config["libpath"]           = os.environ["LD_LIBRARY_PATH"]
     config["libs"]              = ""
     config["libsuffix"]         = [".so", ".a"]
     config["libremovestring"]   = "lib"
     config["libremovesuffix"]   = True  
-    config["ldremove"]          = ["boost_python", "hdf5.6", "hdf5_cpp.6", "hdf5_hl.6", "hdf5_hl_cpp.6", "cblas", "ptf77blas", "f77blas", "ginac", "boost_wave", "boost_signals", "boost_regex", "boost_date_time", "boost_graph", "boost_mpi", "boost_graph", "boost_graph_parallel", "boost_serialization", "boost_system", "boost_filesystem", "boost_math_c99", "boost_math_tr1", "boost_math_tr1l", "boost_math_tr1f",  "boost_math_c99f", "boost_math_c99l"]
+    config["ldremove"]          = ["boost_python", "hdf5.6", "hdf5_cpp.6", "hdf5_hl.6", "hdf5_hl_cpp.6", "cblas", "ptf77blas", "f77blas", "boost_wave", "boost_signals", "boost_regex", "boost_date_time", "boost_graph", "boost_mpi", "boost_graph", "boost_graph_parallel", "boost_system", "boost_filesystem", "boost_math_c99", "boost_math_tr1", "boost_math_tr1l", "boost_math_tr1f",  "boost_math_c99f", "boost_math_c99l"]
 
     
 def configuration_win32(config) :
