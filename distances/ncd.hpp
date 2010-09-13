@@ -528,29 +528,29 @@ namespace machinelearning { namespace distances {
             // stream into deflate and than from second stream
            
             // At next, we use the boost::iostreams methods, because std::streams creates thread mutex errors 
-            // under pthread
+            // under pthread.
             bio::stream< bio::basic_file_source<char> > l_file(p_str1);
             if (!l_file.is_open())
                 throw exception::parameter(_("file can not be opened"));
-            
             std::copy( std::istream_iterator<char>(l_file), std::istream_iterator<char>(), std::ostreambuf_iterator<char>(&l_deflate) );
             l_file.close();
             
-            /*
+            
             if (!p_str2.empty()) {
                 
-                l_file.open( p_str2 );
+                l_file.open(p_str2);
                 if (!l_file.is_open())
                     throw exception::parameter(_("file can not be opened"));
                 std::copy( std::istream_iterator<char>(l_file), std::istream_iterator<char>(), std::ostreambuf_iterator<char>(&l_deflate) );
                 l_file.close();
                 
-            }*/
+            }
             
             // close deflate stream, cause only than counter returns correct value
             bio::close(l_deflate);
             
         } else {
+            // boost iostream copy closes input and output stream after copy
             std::stringstream l_sstream( p_str1+p_str2 );
             bio::copy( l_sstream, l_deflate );
         }
