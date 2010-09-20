@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
     */
     
         
-    //tl::files::hdf o("blub.hdf5");
+    tl::files::hdf o("blub.hdf5");
     //std::cout << o.readString("/string") << std::endl;
 	//std::vector<std::string> x = o.readStringVector("/stringarray");
     //ublas::vector<double> x = o.readVector<double>("/vector", H5::PredType::NATIVE_DOUBLE);
@@ -152,7 +152,7 @@ int main(int argc, char *argv[]) {
     
     
     // ===== kmeans ===== 
-    /*
+    
     ublas::matrix<double> data = o.readMatrix<double>("/ngdata", H5::PredType::NATIVE_DOUBLE);
     
     dist::euclid<double> d;
@@ -169,7 +169,7 @@ int main(int argc, char *argv[]) {
         for(std::size_t i=0; i < p.size(); ++i)
             f.write<double>("/log" + boost::lexical_cast<std::string>( i ), p[i], H5::PredType::NATIVE_DOUBLE );
     }
-    */
+    
     
    
     // ===== NG ===== 
@@ -189,33 +189,25 @@ int main(int argc, char *argv[]) {
         std::vector< ublas::matrix<double> > p = ng.getLoggedPrototypes();
         for(std::size_t i=0; i < p.size(); ++i)
             f.write<double>("/log" + boost::lexical_cast<std::string>( i ), p[i], H5::PredType::NATIVE_DOUBLE );
-    }*/
-    
-    /*
-    std::ofstream ofs("filename");
-    boost::archive::text_oarchive oa(ofs);
-    oa << ng;*/
-    
-    
-
+    }
+    */
     
     
     // ===== RLVQ ======
     /*
-    ublas::matrix<double> data = o.readMatrix<double>("/rlvqdata", H5::PredType::NATIVE_DOUBLE);
-
-    std::vector<unsigned int> lab;
-    for (std::size_t i=0; i < lab.size(); ++i)
-        lab.push_back(i);
- 
+    ublas::matrix<double> data          = o.readMatrix<double>("/rlvqdata", H5::PredType::NATIVE_DOUBLE);
+    ublas::vector<unsigned int> label   = o.readVector<unsigned int>("/rlvqlabel", H5::PredType::NATIVE_UINT);
+    std::vector<unsigned int> datalabel = tl::vector::copy<unsigned int>( label );   
+    
+    std::vector<unsigned int> protolabel;
+    for (std::size_t i=1; i <= 10; ++i)
+        protolabel.push_back(i);
+   
+    
     dist::euclid<double> d;
-    sl::rlvq<double, unsigned int> vq(d, lab, data.size2());
+    sl::rlvq<double, unsigned int> vq(d, protolabel, data.size2());
     vq.setLogging(true);
-    
-    
-    std::vector<unsigned int> label = tl::vector::copy<unsigned int>( o.readVector<unsigned int>("rlvqlabel", H5::PredType::NATIVE_UINT) );
-
-    vq.train(data, label, 10, 0.001, 0.0001);
+    vq.train(data, datalabel, 10, 0.001, 0.0001);
     
     tl::files::hdf f("rlvq.hdf5", true);
     f.write<double>( "/protos",  vq.getPrototypes(), H5::PredType::NATIVE_DOUBLE );
@@ -225,16 +217,17 @@ int main(int argc, char *argv[]) {
         std::vector< ublas::matrix<double> > p = vq.getLoggedPrototypes();
         for(std::size_t i=0; i < p.size(); ++i)
             f.write<double>("/log" + boost::lexical_cast<std::string>( i ), p[i], H5::PredType::NATIVE_DOUBLE );
-    }
-    */
+    }*/
+    
      
     //=============== NCD ================
+    /*
     std::vector< std:: string > val;
-    /*val.push_back("main.cpp");
+    val.push_back("main.cpp");
     val.push_back("tools/files/hdf.hpp");
     val.push_back("distances/ncd.hpp");
     val.push_back("clustering/supervised/rlvq.hpp");
-    */
+    
     val.push_back("tools/lapack.hpp");
     val.push_back("tools/random.hpp");
     val.push_back("tools/matrix.hpp");
@@ -245,7 +238,7 @@ int main(int argc, char *argv[]) {
     //ncd.setCompressionLevel( dist::ncd::bestspeed );
     //std::cout << "unsymmetric: " << ncd.unsymmetric(val, true) << std::endl;
     std::cout << "\nsymmetric: " << ncd.symmetric(val, true) << std::endl;
-    
+    */
     
     return EXIT_SUCCESS;
 }

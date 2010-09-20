@@ -42,7 +42,14 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     
     
     
-    /** class for calculate (batch) neural gas **/
+    /** class for calculate (batch) neural gas
+     * @todo parallelism with threading and MPI in this case: every CPU gets some prototypes (randomly).
+     * Every CPU holds his own dataset and calculates the distance between prototype and datapoints.
+     * After calculating the prototypes on the k-th CPU will send to the (k+1)-th CPU (the n-th send to the first CPU, building a circle)
+     * and calculates the distance again. Finish is than, if the prototypes from the first CPU are back on them (on full circle run).
+     * Every CPU hold now the distances for every prototype and can calculate their rankings. After we summarize the adaption for every
+     * prototype and send the information to the CPU on which the prototype is saved and do the adaption.
+     **/
     template<typename T> class neuralgas : public nonsupervisedclustering<T> {
         
         public:

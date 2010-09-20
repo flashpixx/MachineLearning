@@ -335,13 +335,13 @@ env.Program( getRekusivFiles(os.curdir, ".cpp"), LIBS=alllibs, LIBPATH=library_p
 
 # build languagefiles
 # compiling with: msgfmt -v -o target.mo source.po
-# add new data: msgmerge --no-wrap --update old_file.po newer_file.po
+# add new data: msgmerge --no-wrap --update old_file.po newer_file.pot
 sources = []
 sources.extend( getRekusivFiles(os.curdir, ".h") )
 sources.extend( getRekusivFiles(os.curdir, ".hpp") )
 sources.extend( getRekusivFiles(os.curdir, ".cpp") )
 
-cmd = "xgettext --output=tools/language/language.po --keyword=_ --language=c++ ";
+cmd = "xgettext --output=tools/language/language.pot --keyword=_ --language=c++ ";
 for i in sources :
     cmd = cmd + i + " "
 os.system(cmd);
