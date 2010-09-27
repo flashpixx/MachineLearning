@@ -9,11 +9,13 @@ import glob
 SHOWCONFIG = False
 # using CPUs for compiling
 COMPILECPU = 6
+# constante for creating language files
+CREATELANGUAGE = False
 
 def configuration_macosx(config) :
     config["seperator"]         = ":"
-    config["compiler"]          = "g++"
-    config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -D MULTILANGUAGE -D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
+    config["compiler"]          = "mpic++"
+    config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -D MPI -D MULTILANGUAGE -D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
     config["linkerflags"]       = ""
     config["include"]           = os.environ["CPPPATH"]
     config["libpath"]           = os.environ["LIBRARY_PATH"]
@@ -21,7 +23,7 @@ def configuration_macosx(config) :
     config["libsuffix"]         = [".dylib", ".a"]
     config["libremovestring"]   = "lib"
     config["libremovesuffix"]   = True  
-    config["ldremove"]          = ["boost_python", "hdf5.6", "hdf5_cpp.6", "hdf5_hl.6", "hdf5_hl_cpp.6", "cblas", "ptf77blas", "f77blas", "ginac", "boost_wave", "boost_signals", "boost_regex", "boost_date_time", "boost_graph", "boost_mpi", "boost_graph", "boost_graph_parallel", "boost_serialization", "boost_system", "boost_filesystem", "boost_math_c99", "boost_math_tr1", "boost_math_tr1l", "boost_math_tr1f",  "boost_math_c99f", "boost_math_c99l"]
+    config["ldremove"]          = ["boost_python", "hdf5.6", "hdf5_cpp.6", "hdf5_hl.6", "hdf5_hl_cpp.6", "cblas", "ptf77blas", "f77blas", "ginac", "boost_wave", "boost_signals", "boost_regex", "boost_date_time", "boost_graph",  "boost_graph", "boost_graph_parallel", "boost_system", "boost_filesystem", "boost_math_c99", "boost_math_tr1", "boost_math_tr1l", "boost_math_tr1f",  "boost_math_c99f", "boost_math_c99l"]
     
     
 def configuration_posix(config) :
@@ -126,15 +128,10 @@ def checkSysConfig():
     env["libremovesuffix"]  = config["libremovesuffix"]
     env["libremovestring"]  = config["libremovestring"]
     env["ldremove"]         = config["ldremove"]
-    
+ 
     # only *.o files will be clean ??
     #env.NoClean( getRekusivFiles(os.curdir, ".o") )
-
-    # add the doxyfile
-    # doxyfile = glob.glob("*.doxyfile")
-    # if doxyfile :
-    #    env.Doxygen( doxyfile )
-    
+   
     msg("\n")
     msg("------->>> compiling now with these properties:\n")
     msg("plattform            : " + env['PLATFORM'] + "\n")
@@ -245,6 +242,25 @@ def getRekusivFiles(startdir, ending, pdontuse=[], pShowPath=True) :
 def msg(pStr="") :
     if SHOWCONFIG :
         print pStr
+        
+        
+# build languagefiles
+def createLanguage() :
+    if not(CREATELANGUAGE) :
+        return
+
+    # compiling with: msgfmt -v -o target.mo source.po
+    # add new data: msgmerge --no-wrap --update old_file.po newer_file.pot
+    sources = []
+    sources.extend( getRekusivFiles(os.curdir, ".h") )
+    sources.extend( getRekusivFiles(os.curdir, ".hpp") )
+    sources.extend( getRekusivFiles(os.curdir, ".cpp") )
+
+    cmd = "xgettext --output=tools/language/language.pot --keyword=_ --language=c++ ";
+    for i in sources :
+        cmd = cmd + i + " "
+    os.system(cmd);
+
 #=======================================================================================================================================
 
 
@@ -332,16 +348,4 @@ SetOption('num_jobs',   int(os.environ.get('NUM_CPU', COMPILECPU)))
 # get all cpp-files and compile
 env.Program( getRekusivFiles(os.curdir, ".cpp"), LIBS=alllibs, LIBPATH=library_path )
 
-
-# build languagefiles
-# compiling with: msgfmt -v -o target.mo source.po
-# add new data: msgmerge --no-wrap --update old_file.po newer_file.pot
-sources = []
-sources.extend( getRekusivFiles(os.curdir, ".h") )
-sources.extend( getRekusivFiles(os.curdir, ".hpp") )
-sources.extend( getRekusivFiles(os.curdir, ".cpp") )
-
-cmd = "xgettext --output=tools/language/language.pot --keyword=_ --language=c++ ";
-for i in sources :
-    cmd = cmd + i + " "
-os.system(cmd);
+createLanguage()

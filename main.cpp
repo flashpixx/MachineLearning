@@ -152,7 +152,7 @@ int main(int argc, char *argv[]) {
     
     
     // ===== kmeans ===== 
-    
+    /*
     ublas::matrix<double> data = o.readMatrix<double>("/ngdata", H5::PredType::NATIVE_DOUBLE);
     
     dist::euclid<double> d;
@@ -169,11 +169,11 @@ int main(int argc, char *argv[]) {
         for(std::size_t i=0; i < p.size(); ++i)
             f.write<double>("/log" + boost::lexical_cast<std::string>( i ), p[i], H5::PredType::NATIVE_DOUBLE );
     }
-    
+    */
     
    
     // ===== NG ===== 
-    /*
+    
     ublas::matrix<double> data = o.readMatrix<double>("/ngdata", H5::PredType::NATIVE_DOUBLE);
      
     dist::euclid<double> d;
@@ -190,7 +190,7 @@ int main(int argc, char *argv[]) {
         for(std::size_t i=0; i < p.size(); ++i)
             f.write<double>("/log" + boost::lexical_cast<std::string>( i ), p[i], H5::PredType::NATIVE_DOUBLE );
     }
-    */
+    
     
     
     // ===== RLVQ ======

@@ -29,6 +29,10 @@
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 
+#ifdef MPI
+#include <boost/mpi.hpp>
+#endif
+
 #include "../clustering.hpp"
 #include "../../exception/exception.h"
 #include "../../tools/tools.h"
@@ -39,8 +43,9 @@
 namespace machinelearning { namespace clustering { namespace nonsupervised {
     
     namespace ublas = boost::numeric::ublas;
-    
-    
+    #ifdef MPI
+    namespace mpi	= boost::mpi;
+    #endif
     
     /** class for calculate (batch) neural gas
      * @todo parallelism with threading and MPI in this case: every CPU gets some prototypes (randomly).
@@ -65,6 +70,12 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             std::size_t getPrototypeCount( void ) const;
             std::vector<T> getLoggedQuantizationError( void ) const;
             ublas::indirect_array< std::vector<std::size_t> > use( const ublas::matrix<T>& ) const;
+        
+            #ifdef MPI
+            void train( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t& );
+            void train( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t&, const T& );
+            #endif
+        
         
         
         private :
@@ -304,6 +315,19 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         return ublas::indirect_array< std::vector<std::size_t> >(l_vec.size(), l_vec);
                 
     }
+    
+    
+    #ifdef MPI
+    template<typename T> inline void neuralgas<T>::train( const mpi::communicator& poMPI, const ublas::matrix<T>& p_data, const std::size_t& p_iterations )
+    {
+    }
+    #endif
+    
+    #ifdef MPI
+    template<typename T> inline void neuralgas<T>::train( const mpi::communicator& poMPI, const ublas::matrix<T>& p_data, const std::size_t& p_iterations, const T& p_lambda )
+    {
+    }
+    #endif
     
 };};};
 
