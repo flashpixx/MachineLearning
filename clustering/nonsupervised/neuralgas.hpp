@@ -29,7 +29,7 @@
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 
-#ifdef MPI
+#ifdef CLUSTER
 #include <boost/mpi.hpp>
 #endif
 
@@ -43,7 +43,7 @@
 namespace machinelearning { namespace clustering { namespace nonsupervised {
     
     namespace ublas = boost::numeric::ublas;
-    #ifdef MPI
+    #ifdef CLUSTER
     namespace mpi	= boost::mpi;
     #endif
     
@@ -71,7 +71,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             std::vector<T> getLoggedQuantizationError( void ) const;
             ublas::indirect_array< std::vector<std::size_t> > use( const ublas::matrix<T>& ) const;
         
-            #ifdef MPI
+            #ifdef CLUSTER
             void train( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t& );
             void train( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t&, const T& );
             #endif
@@ -317,13 +317,14 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     }
     
     
-    #ifdef MPI
+    #ifdef CLUSTER
     template<typename T> inline void neuralgas<T>::train( const mpi::communicator& poMPI, const ublas::matrix<T>& p_data, const std::size_t& p_iterations )
     {
+        train(poMPI, p_data, p_iterations, m_prototypes.size1() * 0.5);
     }
     #endif
     
-    #ifdef MPI
+    #ifdef CLUSTER
     template<typename T> inline void neuralgas<T>::train( const mpi::communicator& poMPI, const ublas::matrix<T>& p_data, const std::size_t& p_iterations, const T& p_lambda )
     {
     }

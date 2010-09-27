@@ -39,8 +39,9 @@ int main(int argc, char *argv[]) {
     namespace linalg    = boost::numeric::bindings::lapack;
     namespace ublas     = boost::numeric::ublas;
     
-    
     tl::language::bind("ml", "./tools/language/");
+    mpi::environment loMPIenv(argc, argv);
+  	mpi::communicator loMPICom;
     
     //nn::nnet<double> net(3);
     

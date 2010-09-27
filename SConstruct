@@ -4,9 +4,7 @@ import os
 import glob
 
 #=== function for os configuration ===================================================================================================
-
-# constante for showing messages during compiling
-SHOWCONFIG = True
+print "==>> real <<==\n\n"
 # using CPUs for compiling
 COMPILECPU = 6
 # constante for creating language files
@@ -14,17 +12,17 @@ CREATELANGUAGE = False
 
 def configuration_macosx(config) :
     config["compiler"]          = "mpic++"
-    config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -D MPI -D MULTILANGUAGE -D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
+    config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -D CLUSTER -D MULTILANGUAGE -D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
     config["linkerflags"]       = ""
     config["include"]           = os.environ["CPPPATH"]
-    config["librarypath"]       = os.environ["DYLD_LIBRARY_PATH"]
+    config["librarypath"]       = os.environ["LIBRARY_PATH"]
     config["linkto"]            = ["intl", "boost_mpi", "boost_serialization", "boost_random", "boost_thread", "hdf5_cpp", "hdf5", "ginac", "atlas", "lapack", "ptcblas"]
 
     
     
 def configuration_posix(config) :
     config["compiler"]          = "mpic++"
-    config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -D MPI -D MULTILANGUAGE -D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
+    config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -D CLUSTER -D MULTILANGUAGE -D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
     config["linkerflags"]       = ""
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["LIBRARY_PATH"]
@@ -52,32 +50,32 @@ def getConfig():
     elif env['PLATFORM'].lower() == "posix" :
         configuration_posix(config)
     else :
-        msg("configuration for ["+env['PLATFORM']+"] not exists")
+        print "configuration for ["+env['PLATFORM']+"] not exists"
         exit(1) 
     
     if not(config) :
-        msg("Configuration is empty")
+        print "Configuration is empty"
         exit(1)
 
     for i in [ "compiler", "compileflags", "linkerflags", "include", "librarypath", "linkto" ] :
         if not(config.has_key(i)) :
-            msg("field ["+i+"] is not set in the configuration")
+            print "field ["+i+"] is not set in the configuration"
             exit(1)
 
     for i in [ "compiler", "compileflags", "linkerflags", "include", "librarypath" ] :
         if type(config[i]) <> type("str") :
-            msg("field ["+i+"] must be a string type")
+            print "field ["+i+"] must be a string type"
             exit(1)
 
     for i in [ "linkto" ] :
         if type(config[i]) <> type([]) :
-            msg("field ["+i+"] must be a list type")
+            print "field ["+i+"] must be a list type"
             exit(1)
 
     if not(config["compiler"]) :
-        msg("no compiler is set, using default")
+        print "no compiler is set, using default"
         if not(env["CXX"]) :
-            msg("no compiler set")
+            print "no compiler set"
             exit(1)
     else :
         env.Replace(CXX         = config["compiler"])
@@ -87,6 +85,10 @@ def getConfig():
     env.Replace(LINKFLAGS   = config["linkerflags"])
     env.Replace(LIBS        = config["linkto"])
     env.Replace(LIBPATH     = config["librarypath"])
+    
+    #dict = env.Dictionary()
+    #for i,j in dict.iteritems():
+    #    print i, j		   
     
     return env
     
@@ -107,12 +109,7 @@ def getRekusivFiles(startdir, ending, pdontuse=[], pShowPath=True) :
                         lst.append(filename)
     return lst
         
-# print messages
-def msg(pStr="") :
-    if SHOWCONFIG :
-        print pStr
-        
-        
+       
 # build languagefiles
 def createLanguage() :
     if not(CREATELANGUAGE) :
@@ -135,6 +132,7 @@ def createLanguage() :
 
 #=== create environment and compiling ==================================================================================================
 env = getConfig()
+
 SetOption('num_jobs',   int(os.environ.get('NUM_CPU', COMPILECPU)))
 
 # get all cpp-files and compile
