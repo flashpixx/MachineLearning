@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-08-17 00:11+0200\n"
-"PO-Revision-Date: 2010-08-17 00:14+0100\n"
+"PO-Revision-Date: 2010-09-27 20:52+0100\n"
 "Last-Translator: Philipp Kraus <philipp.kraus@flashpixx.de>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -147,7 +147,7 @@ msgstr "Vektor Puffer muss größer Null sein"
 
 #: distances/ncd.hpp:267
 msgid "string size must be greater than zero"
-msgstr "Zeilenanzahl muss größer Null sein"
+msgstr "Zeichenanzahl muss größer Null sein"
 
 #: distances/ncd.hpp:291
 #: distances/ncd.hpp:300
@@ -191,7 +191,7 @@ msgstr "statische Variable ist nicht in der Symboltabelle oder es ist eine zu op
 #: functionoptimization/gradient/gradientdescent.hpp:234
 #: functionoptimization/gradient/worker.hpp:120
 msgid "stepsize must be greater than zero"
-msgstr "Zeilenanzahl muss größer Null sein"
+msgstr "Schrittweite muss größer Null sein"
 
 #: functionoptimization/gradient/gradientdescent.hpp:236
 msgid "number of threads must be greater than zero"
