@@ -2,25 +2,24 @@
 
 import os
 import glob
+import platform
 
 #=== function for os configuration ===================================================================================================
-print "==>> real <<==\n\n"
 # using CPUs for compiling
 COMPILECPU = 6
 # constante for creating language files
 CREATELANGUAGE = False
 
-def configuration_macosx(config) :
+def configuration_macosx(config, version, architecture) :
     config["compiler"]          = "mpic++"
-    config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -D CLUSTER -D MULTILANGUAGE -D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
+    config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -arch "+architecture+" -D CLUSTER -D MULTILANGUAGE -D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
     config["linkerflags"]       = ""
     config["include"]           = os.environ["CPPPATH"]
-    config["librarypath"]       = os.environ["LIBRARY_PATH"]
+    config["librarypath"]       = os.environ["DYLD_LIBRARY_PATH"]
     config["linkto"]            = ["intl", "boost_mpi", "boost_serialization", "boost_random", "boost_thread", "hdf5_cpp", "hdf5", "ginac", "atlas", "lapack", "ptcblas"]
 
     
-    
-def configuration_posix(config) :
+def configuration_posix(config, version, architecture) :
     config["compiler"]          = "mpic++"
     config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -D CLUSTER -D MULTILANGUAGE -D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
     config["linkerflags"]       = ""
@@ -29,7 +28,7 @@ def configuration_posix(config) :
     config["linkto"]            = ["boost_mpi", "boost_serialization", "boost_random", "boost_thread", "hdf5_cpp", "hdf5", "ginac", "atlas", "lapack", "ptcblas"]
 
     
-def configuration_win32(config) :
+def configuration_win32(config, version, architecture) :
     config = []
 #=======================================================================================================================================
 
@@ -44,11 +43,11 @@ def getConfig():
     config = {}
     
     if env['PLATFORM'].lower() == "darwin" :
-        configuration_macosx(config)
+        configuration_macosx(config, platform.mac_ver()[0], platform.machine())
     elif env['PLATFORM'].lower() == "win32" :
-        configuration_win32(config)
+        configuration_win32(config, "", platform.machine())
     elif env['PLATFORM'].lower() == "posix" :
-        configuration_posix(config)
+        configuration_posix(config, "", platform.machine())
     else :
         print "configuration for ["+env['PLATFORM']+"] not exists"
         exit(1) 
@@ -85,6 +84,7 @@ def getConfig():
     env.Replace(LINKFLAGS   = config["linkerflags"])
     env.Replace(LIBS        = config["linkto"])
     env.Replace(LIBPATH     = config["librarypath"])
+    env.Replace(CPPSUFFIXES = [".hpp", ".h", ".cpp"])
     
     #dict = env.Dictionary()
     #for i,j in dict.iteritems():
@@ -111,16 +111,16 @@ def getRekusivFiles(startdir, ending, pdontuse=[], pShowPath=True) :
         
        
 # build languagefiles
-def createLanguage() :
+def createLanguage(env) :
     if not(CREATELANGUAGE) :
         return
 
     # compiling with: msgfmt -v -o target.mo source.po
     # add new data: msgmerge --no-wrap --update old_file.po newer_file.pot
+    
     sources = []
-    sources.extend( getRekusivFiles(os.curdir, ".h") )
-    sources.extend( getRekusivFiles(os.curdir, ".hpp") )
-    sources.extend( getRekusivFiles(os.curdir, ".cpp") )
+    for i in env["CPPSUFFIXES"] :
+        sources.extend( getRekusivFiles(os.curdir, i) )
 
     cmd = "xgettext --output=tools/language/language.pot --keyword=_ --language=c++ ";
     for i in sources :
@@ -135,7 +135,6 @@ env = getConfig()
 
 SetOption('num_jobs',   int(os.environ.get('NUM_CPU', COMPILECPU)))
 
-# get all cpp-files and compile
+# get all cpp-files and compile and create language file
+createLanguage(env)
 env.Program( getRekusivFiles(os.curdir, ".cpp") )
-
-createLanguage()

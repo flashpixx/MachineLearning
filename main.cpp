@@ -23,7 +23,13 @@
 
 
 int main(int argc, char *argv[]) {
-
+    #ifdef CLUSTER
+    namespace mpi	= boost::mpi;
+    mpi::environment loMPIenv(argc, argv);
+    mpi::communicator loMPICom;
+    #endif
+    
+    
     namespace tl        = machinelearning::tools;
     namespace dist      = machinelearning::distances;
     namespace ndim      = machinelearning::dimensionreduce::nonsupervised;
@@ -34,14 +40,14 @@ int main(int argc, char *argv[]) {
     namespace cl        = machinelearning::classifier;
     namespace func      = machinelearning::functionaloptimization;
     namespace nn        = machinelearning::neuronalnetwork;
-    
+
     
     namespace linalg    = boost::numeric::bindings::lapack;
     namespace ublas     = boost::numeric::ublas;
     
+    #ifdef MULTILANGUAGE
     tl::language::bind("ml", "./tools/language/");
-    mpi::environment loMPIenv(argc, argv);
-  	mpi::communicator loMPICom;
+    #endif
     
     //nn::nnet<double> net(3);
     
@@ -180,7 +186,7 @@ int main(int argc, char *argv[]) {
     dist::euclid<double> d;
     nsl::neuralgas<double> ng(d, 11, data.size2());
     ng.setLogging(true);
-    ng.train(data, 15);
+    ng.train(loMPICom, data, 15);
     
     tl::files::hdf f("ng.hdf5", true);
     f.write<double>( "/protos",  ng.getPrototypes(), H5::PredType::NATIVE_DOUBLE );
