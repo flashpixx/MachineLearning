@@ -461,6 +461,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> inline ublas::matrix<T> neuralgas<T>::getPrototypes( const mpi::communicator& poMPI ) const
     {
+        std::cout << "I am process " << poMPI.rank() << " and my protos: " << std::endl;
+        std::cout << m_prototypes << std::endl;
+        
         return ublas::matrix<T>(0,0);
     }
     
