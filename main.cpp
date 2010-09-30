@@ -180,14 +180,28 @@ int main(int argc, char *argv[]) {
     
    
     // ===== NG ===== 
-    
     ublas::matrix<double> data = o.readMatrix<double>("/ngdata", H5::PredType::NATIVE_DOUBLE);
      
     dist::euclid<double> d;
-    nsl::neuralgas<double> ng(d, 11, data.size2());
-    ng.setLogging(true);
-    ng.train(loMPICom, data, 15);
+    #ifdef CLUSTER
+    nsl::neuralgas<double> ng(d, 3, data.size2());
+    //seperates the data for every process (disjoint sets)
+    std::size_t numpoints = data.size1() / loMPICom.size();
+    //for(std::size_t i=loMPICom.rank()*numpoints; (i <  (loMPICom.rank()+1)*numpoints) && (i < data.size1()); ++i)
     
+    
+    std::cout << numpoints << std::endl;
+    std::cout << data.size1() << std::endl;
+    ng.train(loMPICom, data, 15);
+    #else    
+    nsl::neuralgas<double> ng(d, 11, data.size2());
+    ng.train(data, 15);
+    #endif
+    
+    ng.setLogging(true);
+    
+    
+    #ifndef CLUSTER
     tl::files::hdf f("ng.hdf5", true);
     f.write<double>( "/protos",  ng.getPrototypes(), H5::PredType::NATIVE_DOUBLE );
     
@@ -197,7 +211,9 @@ int main(int argc, char *argv[]) {
         for(std::size_t i=0; i < p.size(); ++i)
             f.write<double>("/log" + boost::lexical_cast<std::string>( i ), p[i], H5::PredType::NATIVE_DOUBLE );
     }
-    
+    #else
+    std::cout << ng.getPrototypes(loMPICom) << std::endl;
+    #endif
     
     
     // ===== RLVQ ======

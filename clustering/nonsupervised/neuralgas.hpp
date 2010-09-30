@@ -74,6 +74,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             #ifdef CLUSTER
             void train( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t& );
             void train( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t&, const T& );
+            ublas::matrix<T> getPrototypes( const mpi::communicator& ) const;
             #endif
         
         
@@ -318,16 +319,154 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     
     
     #ifdef CLUSTER
+    
+    /** train the data on the cluster
+     * @overload
+     * @param poMPI MPI object for communication
+     * @param p_data datapoints
+     * @param p_iterations iterations
+     **/
     template<typename T> inline void neuralgas<T>::train( const mpi::communicator& poMPI, const ublas::matrix<T>& p_data, const std::size_t& p_iterations )
     {
         train(poMPI, p_data, p_iterations, m_prototypes.size1() * 0.5);
     }
-    #endif
+
     
-    #ifdef CLUSTER
+    /** train the data on the cluster
+     * @overload
+     * @param poMPI MPI object for communication
+     * @param p_data datapoints
+     * @param p_iterations iterations
+     * @param p_lambda max adapet size
+     **/
     template<typename T> inline void neuralgas<T>::train( const mpi::communicator& poMPI, const ublas::matrix<T>& p_data, const std::size_t& p_iterations, const T& p_lambda )
     {
+        if (p_data.size1() < m_prototypes.size1())
+            throw exception::parameter(_("number of datapoints are less than prototypes"));
+        if (p_iterations == 0)
+            throw exception::parameter(_("iterations must be greater than zero"));
+        if (p_data.size2() != m_prototypes.size2())
+            throw exception::matrix(_("data and prototype dimension are not equal"));
+        if (p_lambda <= 0)
+            throw exception::parameter(_("lambda must be greater than zero"));
+        
+        
+        // process 0 sets the iteration and the lambda
+        std::size_t l_iterations = p_iterations;
+        T l_lambda               = p_lambda;
+        
+        mpi::broadcast(poMPI, l_iterations, 0);
+        mpi::broadcast(poMPI, l_lambda, 0);
+        
+        // create matrix for adaption (we need the number of prototype of every process)
+        std::size_t l_protonum =  0;
+        std::map<int, std::size_t> l_processprototypes;
+        for(int l=0; l < poMPI.size(); ++l) {
+            std::size_t l_num = m_prototypes.size1();
+            mpi::broadcast(poMPI, l_num, l);
+            
+            l_processprototypes.insert( std::pair<int, std::size_t>(l, l_protonum) );
+            l_protonum += l_num;
+        }
+        ublas::matrix<T> l_adaptmatrix( l_protonum, p_data.size1() );
+        
+         
+        
+        // run neural gas       
+        const T l_multi = 0.01/p_lambda;
+        ublas::scalar_vector<T> l_ones(p_data.size1(), 1);
+        
+        for(std::size_t i=0; (i < p_iterations); ++i) {
+            
+            // create adapt values
+            const T l_lambda = p_lambda * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(p_iterations));
+            
+            // first we need the local prototypes
+            ublas::matrix<T> l_prototypes;
+                        
+            // we iterate over every process
+            for(int l=0; l < poMPI.size(); ++l) {
+            
+                // we get the prototypes of every process
+                mpi::broadcast(poMPI, l_prototypes, l);
+                                
+                // calculate for every prototype the distance (of the actually prototypes).
+                // within the adapt matrix, we must specify the position of the prototypes 
+                for(std::size_t n=0; n < l_prototypes.size1(); ++n)
+                    ublas::row(l_adaptmatrix, l_processprototypes[l]+n)  = m_distance->calculate( p_data,  ublas::outer_prod(l_ones, ublas::row(l_prototypes, n)) );
+
+            }
+
+            std::cout << l_adaptmatrix << std::endl;
+            return;
+            
+            // at this point, every process holds the adaptmatrix
+            // for every prototype and their local datapoints
+            
+            // for every column ranks values and create adapts
+            // we need rank and not randIndex, because we 
+            // use the value of the ranking for calculate the 
+            // adapt value
+            for(std::size_t n=0; n < l_adaptmatrix.size2(); ++n) {
+                ublas::vector<T> l_col = ublas::column(l_adaptmatrix, n);
+                l_col                  = tools::vector::rank( l_col );
+                    
+                // calculate adapt value
+                BOOST_FOREACH( T& p, l_col)
+                        p = std::exp( -p / l_lambda );
+                    
+                // return value to matrix
+                ublas::column(l_adaptmatrix, n) = l_col;
+            }
+                
+            // now every process need the adaption for their prototypes, so we send them... back
+            
+            /*
+            
+                
+                // adapt to the adapt prototypes and normalize (row orientated) 
+                l_updateprototypes += ublas::prod( l_adaptmatrix, p_data );
+                
+                // now we send the prototypes and the adapt prototypes to the next process
+                poMPI.send( (poMPI.rank()+1) % poMPI.size(), 0, l_prototypes );
+                poMPI.send( (poMPI.rank()+1) % poMPI.size(), 0, l_updateprototypes );
+                
+                // and receives the data from the previous process
+                poMPI.recv( (poMPI.rank()+poMPI.size()-1) % poMPI.size(), 0, l_prototypes);
+                poMPI.recv( (poMPI.rank()+poMPI.size()-1) % poMPI.size(), 0, l_updateprototypes);                
+            }
+            
+            // now we do the normalization for the the data and set it to the prototypes
+            for(std::size_t n=0; n < l_updateprototypes.size1(); ++n) {
+
+            }
+            
+        
+        
+  -----      m_prototypes = ublas::prod( l_adaptmatrix, p_data );
+        
+   -----     for(std::size_t n=0; n < m_prototypes.size1(); ++n) {
+        ------    const T l_norm = ublas::sum( ublas::row(l_adaptmatrix, n) );
+            
+        ----    if (!tools::function::isNumericalZero(l_norm))
+         -----       ublas::row(m_prototypes, n) /= l_norm;
+      ----  }*/
+            
+            
+        }
     }
+    
+    
+    /** return all prototypes of the cluster
+     * @overload
+     * @param poMPI MPI object for communication
+     * @return matrix (rows = number of prototypes)
+     **/
+    template<typename T> inline ublas::matrix<T> neuralgas<T>::getPrototypes( const mpi::communicator& poMPI ) const
+    {
+        return ublas::matrix<T>(0,0);
+    }
+    
     #endif
     
 };};};
