@@ -352,20 +352,19 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
         
         // process 0 sets the iteration and the lambda
-        std::size_t l_iterations = p_iterations;
-        T l_lambda               = p_lambda;
+        std::size_t l_iterationsBrd = p_iterations;
+        T l_lambdaBrd               = p_lambda;
         
-        mpi::broadcast(poMPI, l_iterations, 0);
-        mpi::broadcast(poMPI, l_lambda, 0);
+        mpi::broadcast(poMPI, l_iterationsBrd, 0);
+        mpi::broadcast(poMPI, l_lambdaBrd, 0);
         
         // create matrix for adaption (we need the number of prototype of every process)
         std::size_t l_protonum =  0;
-        std::map<int, std::size_t> l_processprototypes;
+        std::map<int, std::pair<std::size_t,std::size_t> > l_processinfo;
         for(int l=0; l < poMPI.size(); ++l) {
             std::size_t l_num = m_prototypes.size1();
             mpi::broadcast(poMPI, l_num, l);
-            
-            l_processprototypes.insert( std::pair<int, std::size_t>(l, l_protonum) );
+            l_processinfo.insert( std::pair<int, std::pair<std::size_t, std::size_t> >( l, std::pair<std::size_t, std::size_t>(l_num, l_protonum) ) );
             l_protonum += l_num;
         }
         ublas::matrix<T> l_adaptmatrix( l_protonum, p_data.size1() );
@@ -373,13 +372,13 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
          
         
         // run neural gas       
-        const T l_multi = 0.01/p_lambda;
+        const T l_multi = 0.01/l_lambdaBrd;
         ublas::scalar_vector<T> l_ones(p_data.size1(), 1);
         
-        for(std::size_t i=0; (i < p_iterations); ++i) {
+        for(std::size_t i=0; (i < l_iterationsBrd); ++i) {
             
             // create adapt values
-            const T l_lambda = p_lambda * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(p_iterations));
+            const T l_lambda = l_lambdaBrd * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(l_iterationsBrd));
             
             // first we need the local prototypes
             ublas::matrix<T> l_prototypes;
@@ -393,12 +392,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
                 // calculate for every prototype the distance (of the actually prototypes).
                 // within the adapt matrix, we must specify the position of the prototypes 
                 for(std::size_t n=0; n < l_prototypes.size1(); ++n)
-                    ublas::row(l_adaptmatrix, l_processprototypes[l]+n)  = m_distance->calculate( p_data,  ublas::outer_prod(l_ones, ublas::row(l_prototypes, n)) );
+                    ublas::row(l_adaptmatrix, l_processinfo[l].second+n)  = m_distance->calculate( p_data,  ublas::outer_prod(l_ones, ublas::row(l_prototypes, n)) );
 
             }
-
-            std::cout << l_adaptmatrix << std::endl;
-            return;
             
             // at this point, every process holds the adaptmatrix
             // for every prototype and their local datapoints
@@ -413,46 +409,47 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
                     
                 // calculate adapt value
                 BOOST_FOREACH( T& p, l_col)
-                        p = std::exp( -p / l_lambda );
+                    p = std::exp( -p / l_lambda );
                     
                 // return value to matrix
                 ublas::column(l_adaptmatrix, n) = l_col;
             }
                 
-            // now every process need the adaption for their prototypes, so we send them... back
+            // calculate the "prototype" for the local points
+            ublas::matrix<T> l_localprototype = ublas::prod( l_adaptmatrix, p_data );
             
-            /*
-            
+            // now we send every local prototypes with their adaption to the process back 
+            // we do this a gather for prototypes and adaption
+            std::vector< ublas::matrix<T> > l_prototypesGather;
+            std::vector< ublas::vector<T> > l_normadaptGather;
+            for(int l=0; l < poMPI.size(); ++l) {
                 
-                // adapt to the adapt prototypes and normalize (row orientated) 
-                l_updateprototypes += ublas::prod( l_adaptmatrix, p_data );
+                // extract the prototypes for the process and create a copy for sending
+                ublas::matrix_range< ublas::matrix<T> > l_range(l_localprototype, ublas::range(l_processinfo[l].second, l_processinfo[l].first+l_processinfo[l].second), ublas::range(0, l_localprototype.size2()));
+                ublas::matrix<T> l_prototypesend      = l_range;
                 
-                // now we send the prototypes and the adapt prototypes to the next process
-                poMPI.send( (poMPI.rank()+1) % poMPI.size(), 0, l_prototypes );
-                poMPI.send( (poMPI.rank()+1) % poMPI.size(), 0, l_updateprototypes );
+                // creates the normalize values for the prototypes
+                ublas::vector<T> l_adeptsend(l_range.size1(), 0);
+                for(std::size_t m=0; m < l_range.size1(); ++m)
+                    l_adeptsend(m) = ublas::sum( ublas::row(l_adaptmatrix, l_processinfo[l].second+m) );
                 
-                // and receives the data from the previous process
-                poMPI.recv( (poMPI.rank()+poMPI.size()-1) % poMPI.size(), 0, l_prototypes);
-                poMPI.recv( (poMPI.rank()+poMPI.size()-1) % poMPI.size(), 0, l_updateprototypes);                
+                // do the gathering
+                mpi::gather(poMPI, l_prototypesend, l_prototypesGather, l);
+                mpi::gather(poMPI, l_adeptsend, l_normadaptGather, l);
             }
             
-            // now we do the normalization for the the data and set it to the prototypes
-            for(std::size_t n=0; n < l_updateprototypes.size1(); ++n) {
+            // create the prototypes of the gathering data as sum
+                             m_prototypes = l_prototypesGather[0];
+            ublas::vector<T> l_norm       = l_normadaptGather[0];
+            for(std::size_t l=1; l < l_prototypesGather.size(); ++l) {
+                m_prototypes += l_prototypesGather[l];
+                l_norm       += l_normadaptGather[l];
+            }
 
-            }
-            
-        
-        
-  -----      m_prototypes = ublas::prod( l_adaptmatrix, p_data );
-        
-   -----     for(std::size_t n=0; n < m_prototypes.size1(); ++n) {
-        ------    const T l_norm = ublas::sum( ublas::row(l_adaptmatrix, n) );
-            
-        ----    if (!tools::function::isNumericalZero(l_norm))
-         -----       ublas::row(m_prototypes, n) /= l_norm;
-      ----  }*/
-            
-            
+            // now we do the normalization 
+            for(std::size_t n=0; n < m_prototypes.size1(); ++n)
+                if (!tools::function::isNumericalZero(l_norm(n)))
+                    ublas::row(m_prototypes, n) /= l_norm(n);
         }
     }
     

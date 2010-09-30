@@ -184,14 +184,10 @@ int main(int argc, char *argv[]) {
      
     dist::euclid<double> d;
     #ifdef CLUSTER
-    nsl::neuralgas<double> ng(d, 3, data.size2());
+    nsl::neuralgas<double> ng(d, loMPICom.rank()+1, data.size2());
     //seperates the data for every process (disjoint sets)
-    std::size_t numpoints = data.size1() / loMPICom.size();
+    //std::size_t numpoints = data.size1() / loMPICom.size();
     //for(std::size_t i=loMPICom.rank()*numpoints; (i <  (loMPICom.rank()+1)*numpoints) && (i < data.size1()); ++i)
-    
-    
-    std::cout << numpoints << std::endl;
-    std::cout << data.size1() << std::endl;
     ng.train(loMPICom, data, 15);
     #else    
     nsl::neuralgas<double> ng(d, 11, data.size2());

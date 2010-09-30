@@ -21,7 +21,7 @@ def configuration_macosx(config, version, architecture) :
     
 def configuration_posix(config, version, architecture) :
     config["compiler"]          = "mpic++"
-    config["compileflags"]      = " -O2 -pipe -Wall -pthread -finline-functions -D CLUSTER -D MULTILANGUAGE -D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
+    config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -D CLUSTER -D MULTILANGUAGE -D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
     config["linkerflags"]       = ""
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["LIBRARY_PATH"]
