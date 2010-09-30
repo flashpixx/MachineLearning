@@ -359,11 +359,16 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         mpi::broadcast(poMPI, l_lambdaBrd, 0);
         
         // create matrix for adaption (we need the number of prototype of every process)
+        // we collcting the number of prototypes of every process into a std::map
         std::size_t l_protonum =  0;
         std::map<int, std::pair<std::size_t,std::size_t> > l_processinfo;
         for(int l=0; l < poMPI.size(); ++l) {
             std::size_t l_num = m_prototypes.size1();
             mpi::broadcast(poMPI, l_num, l);
+            
+            // process rank and in the first element of the pair is set the number of prototypes and
+            // the second is the start value in the full prototype matrix
+            // [0, number of first process prototypes-1], [number of first process prototypes, number of second process prototypes-1]
             l_processinfo.insert( std::pair<int, std::pair<std::size_t, std::size_t> >( l, std::pair<std::size_t, std::size_t>(l_num, l_protonum) ) );
             l_protonum += l_num;
         }
@@ -461,7 +466,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> inline ublas::matrix<T> neuralgas<T>::getPrototypes( const mpi::communicator& poMPI ) const
     {
-        std::cout << "I am process " << poMPI.rank() << " and my protos: " << std::endl;
+        std::cout << "I am process " << poMPI.rank() << " and my protos are: " << std::endl;
         std::cout << m_prototypes << std::endl;
         
         return ublas::matrix<T>(0,0);
