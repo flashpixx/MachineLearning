@@ -203,19 +203,11 @@ int main(int argc, char *argv[]) {
         protonum += 11 % loMPICom.size();
         add       = data.size1() % loMPICom.size();
     }
-    
-    
     ublas::matrix_range< ublas::matrix<double> > datarange(data, ublas::range(loMPICom.rank()*nums, (loMPICom.rank()+1)*nums + add), ublas::range(0, data.size2()));
-    std::cout << loMPICom.rank() << " " << datarange.size1() << " " << datarange.size2() << std::endl;
-    std::cout << loMPICom.rank() << " " << protonum << std::endl;
-                                                                                     
-    return 0;
+
     
     nsl::neuralgas<double> ng(d, protonum, data.size2());
-    //seperates the data for every process (disjoint sets)
-    //std::size_t numpoints = data.size1() / loMPICom.size();
-    //for(std::size_t i=loMPICom.rank()*numpoints; (i <  (loMPICom.rank()+1)*numpoints) && (i < data.size1()); ++i)
-    //ng.train(loMPICom, datarange, 15);
+    ng.train(loMPICom, datarange, 15);
     #else    
     nsl::neuralgas<double> ng(d, 11, data.size2());
     ng.train(data, 15);
