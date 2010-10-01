@@ -386,7 +386,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             const T l_lambda = l_lambdaBrd * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(l_iterationsBrd));
             
             // first we need the local prototypes
-            ublas::matrix<T> l_prototypes;
+			ublas::matrix<T> l_prototypes = m_prototypes;
                         
             // we iterate over every process
             for(int l=0; l < poMPI.size(); ++l) {
@@ -422,7 +422,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
                 
             // calculate the "prototype" for the local points
             ublas::matrix<T> l_localprototype = ublas::prod( l_adaptmatrix, p_data );
-            
+
+			std::cout << l_localprototype << std::endl;
+
             // now we send every local prototypes with their adaption to the process back 
             // we do this a gather for prototypes and adaption
             std::vector< ublas::matrix<T> > l_prototypesGather;
@@ -466,10 +468,30 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> inline ublas::matrix<T> neuralgas<T>::getPrototypes( const mpi::communicator& poMPI ) const
     {
-        std::cout << "I am process " << poMPI.rank() << " and my protos are: " << std::endl;
-        std::cout << m_prototypes << std::endl;
-        
-        return ublas::matrix<T>(0,0);
+        // we catch all prototypes on every process
+		std::vector< ublas::matrix<T> > l_prototypesGather;
+		
+		std::size_t l_numprotos = 0;
+		for(int l=0; l < poMPI.size(); ++l) {
+			std::size_t l_num = m_prototypes.size1();
+            
+			mpi::broadcast(poMPI, l_num, l);
+			mpi::gather(poMPI, m_prototypes, l_prototypesGather, l);
+			
+			l_numprotos += l_num;
+		}
+
+		// conect the full row matrix of prototypes
+		std::size_t l_idx = 0;
+		ublas::matrix<T> l_prototypes(l_numprotos, m_prototypes.size2());
+		for(std::size_t i=0; i < l_prototypesGather.size(); ++i) {
+			ublas::matrix<T> l_processproto = l_prototypesGather[i];
+			
+			for(std::size_t n=0; n < l_processproto.size1(); ++n)
+				ublas::row(l_prototypes, l_idx++) = ublas::row(l_processproto, n);
+		}
+
+        return l_prototypes;
     }
     
     #endif
