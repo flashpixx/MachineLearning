@@ -189,7 +189,7 @@ int main(int argc, char *argv[]) {
     ublas::vector<std::size_t> disjoint = static_cast< ublas::vector<std::size_t> >( tl::vector::random<double>(data.size1(), tl::random::uniform, 0, data.size1()) );
     mpi::broadcast(loMPICom, disjoint, 0);
     for(std::size_t i=0; i < disjoint.size(); ++i) {
-        ublas::vector<double> x              = ublas::row(data, i);
+        ublas::vector<double> x         = ublas::row(data, i);
         ublas::row(data, i)             = ublas::row(data, disjoint(i));
         ublas::row(data, disjoint(i))   = x;
     }
@@ -213,12 +213,18 @@ int main(int argc, char *argv[]) {
     ng.train(data, 15);
     #endif
     
-    ng.setLogging(true);
+    ng.setLogging(false);
     
     
-    #ifndef CLUSTER
+    #ifdef CLUSTER
+    if (loMPICom.rank() == 0) {
+        ublas::matrix<double> proto = ng.getPrototypes(loMPICom);
+    #else
+        ublas::matrix<double> proto = ng.getPrototypes();
+    #endif
+        
     tl::files::hdf f("ng.hdf5", true);
-    f.write<double>( "/protos",  ng.getPrototypes(), H5::PredType::NATIVE_DOUBLE );
+    f.write<double>( "/protos",  proto, H5::PredType::NATIVE_DOUBLE );
     
     if (ng.getLogging()) {
         f.write<double>( "/error",  tl::vector::copy(ng.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
@@ -226,8 +232,9 @@ int main(int argc, char *argv[]) {
         for(std::size_t i=0; i < p.size(); ++i)
             f.write<double>("/log" + boost::lexical_cast<std::string>( i ), p[i], H5::PredType::NATIVE_DOUBLE );
     }
-    #else
-    std::cout << ng.getPrototypes(loMPICom) << std::endl;
+        
+    #ifdef CLUSTER
+    }
     #endif
     
     
