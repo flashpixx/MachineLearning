@@ -201,7 +201,7 @@ int main(int argc, char *argv[]) {
     
     if (loMPICom.rank() == loMPICom.size()-1) {
         protonum += 11 % loMPICom.size();
-        add       = data.size2() % loMPICom.size();
+        add       = data.size1() % loMPICom.size();
     }
     
     
