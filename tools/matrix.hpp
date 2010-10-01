@@ -57,8 +57,8 @@ namespace machinelearning { namespace tools {
             };
         
         
-            template<typename T> static ublas::matrix<T> random( const std::size_t&, const std::size_t&, const tools::random::distribution& = tools::random::uniform );
-            template<typename T> static ublas::matrix<T> random( const std::size_t&, const tools::random::distribution& = tools::random::uniform );
+            template<typename T> static ublas::matrix<T> random( const std::size_t&, const std::size_t&, const tools::random::distribution& = tools::random::uniform, const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon() );
+            template<typename T> static ublas::matrix<T> random( const std::size_t&, const tools::random::distribution& = tools::random::uniform, const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon() );
             template<typename T> static ublas::matrix<T> eye( const std::size_t&, const std::size_t& );
             template<typename T> static ublas::matrix<T> eye( const std::size_t& );
             template<typename T> static ublas::matrix<T> pow( const ublas::matrix<T>&, const T& );
@@ -83,9 +83,12 @@ namespace machinelearning { namespace tools {
      * @param p_row rows
      * @param p_col columns
      * @param p_distribution name of the distribution
+     * @param p_a first value for distribution
+     * @param p_b first value for distribution
+     * @param p_c first value for distribution
      * @return matrix of type T
      **/
-    template<typename T> inline ublas::matrix<T> matrix::random( const std::size_t& p_row, const std::size_t& p_col, const tools::random::distribution& p_distribution )
+    template<typename T> inline ublas::matrix<T> matrix::random( const std::size_t& p_row, const std::size_t& p_col, const tools::random::distribution& p_distribution, const T& p_a, const T& p_b, const T& p_c )
     {
         if (p_row == 0)
             throw exception::parameter(_("row size must be greater than zero"));
@@ -97,7 +100,7 @@ namespace machinelearning { namespace tools {
         ublas::matrix<T> l_matrix(p_row, p_col);
         for (std::size_t i=0; i < p_row; ++i)
             for (std::size_t j=0; j < p_col; ++j)
-                l_matrix(i,j) = l_rand.get<T>( p_distribution );
+                l_matrix(i,j) = l_rand.get<T>( p_distribution, p_a, p_b, p_c );
         
         return l_matrix;
     }
@@ -107,11 +110,14 @@ namespace machinelearning { namespace tools {
      * @overload
      * @param p_size element size
      * @param p_distribution name of the distribution
+     * @param p_a first value for distribution
+     * @param p_b first value for distribution
+     * @param p_c first value for distribution
      * @return matrix of type T
      **/
-    template<typename T> inline ublas::matrix<T> matrix::random( const std::size_t& p_size, const tools::random::distribution& p_distribution )
+    template<typename T> inline ublas::matrix<T> matrix::random( const std::size_t& p_size, const tools::random::distribution& p_distribution, const T& p_a, const T& p_b, const T& p_c )
     {
-        return random<T>(p_size, p_size, p_distribution);
+        return random<T>(p_size, p_size, p_distribution, p_a, p_b, p_c);
     }
     
     

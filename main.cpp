@@ -179,16 +179,39 @@ int main(int argc, char *argv[]) {
     */
     
    
-    // ===== NG ===== 
+    // ===== NG =====     
     ublas::matrix<double> data = o.readMatrix<double>("/ngdata", H5::PredType::NATIVE_DOUBLE);
      
     dist::euclid<double> d;
     #ifdef CLUSTER
-    nsl::neuralgas<double> ng(d, loMPICom.rank()+1, data.size2());
+    
+    // we must create a shuffle vector for disjoint datasets and shuffle the matrix - it's not nice, but it works
+    ublas::vector<std::size_t> disjoint = static_cast< ublas::vector<std::size_t> >( tl::vector::random<double>(data.size1(), tl::random::uniform, 0, data.size1()) );
+    mpi::broadcast(loMPICom, disjoint, 0);
+    for(std::size_t i=0; i < disjoint.size(); ++i) {
+        ublas::vector<double> x              = ublas::row(data, i);
+        ublas::row(data, i)             = ublas::row(data, disjoint(i));
+        ublas::row(data, disjoint(i))   = x;
+    }
+    
+    // extract the data for the process (every process has load the whole data and shuffel them with the broadcasted shuffle vector)
+    std::size_t nums     = data.size1() / loMPICom.size();
+    std::size_t protonum = 11 / loMPICom.size();
+    
+    if (loMPICom.rank() == loMPICom.size()-1)
+        protonum += 11 % loMPICom.size();
+    
+    
+    ublas::matrix_range< ublas::matrix<double> > datarange(data, ublas::range(loMPICom.rank()*nums, (loMPICom.rank()+1)*nums), ublas::range(0, data.size2()));
+    std::cout << datarange.size1() << " " << datarange.size2() << std::endl;
+                                                                                     
+    return 0;
+    
+    nsl::neuralgas<double> ng(d, protonum, data.size2());
     //seperates the data for every process (disjoint sets)
     //std::size_t numpoints = data.size1() / loMPICom.size();
     //for(std::size_t i=loMPICom.rank()*numpoints; (i <  (loMPICom.rank()+1)*numpoints) && (i < data.size1()); ++i)
-    ng.train(loMPICom, data, 15);
+    //ng.train(loMPICom, datarange, 15);
     #else    
     nsl::neuralgas<double> ng(d, 11, data.size2());
     ng.train(data, 15);

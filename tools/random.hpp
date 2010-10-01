@@ -129,12 +129,9 @@ namespace machinelearning { namespace tools {
     inline random::random( void ) :
         m_random(  boost::mt19937(getThreadID() ^ time(NULL))  )
     {}
-    #endif
-    
-    
+   
     
     /** reads the thread object id and converts it to numeric value **/
-    #ifndef RANDOMDEVICE
     inline std::time_t random::getThreadID( void )
     {
         std::size_t l_val = 1;

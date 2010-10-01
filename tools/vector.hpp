@@ -29,6 +29,7 @@
 #ifndef MACHINELEARNING_TOOLS_VECTOR_HPP
 #define MACHINELEARNING_TOOLS_VECTOR_HPP
 
+#include <limits>
 #include <algorithm>
 #include <boost/foreach.hpp>
 #include <boost/bind.hpp>
@@ -78,7 +79,7 @@ namespace machinelearning { namespace tools {
         
         public :
         
-            template<typename T> static ublas::vector<T> random( const std::size_t&, const tools::random::distribution& = tools::random::uniform );
+            template<typename T> static ublas::vector<T> random( const std::size_t&, const tools::random::distribution& = tools::random::uniform, const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon() );
             template<typename T> static ublas::vector<T> pow( const ublas::vector<T>&, const T& );
             template<typename T> static std::vector<T> copy( const ublas::vector<T>& );
             template<typename T> static ublas::vector<T> copy( const std::vector<T>& );
@@ -98,9 +99,12 @@ namespace machinelearning { namespace tools {
     /** creates a random vector of type T
      * @param p_length vector size
      * @param p_distribution name of the distribution
+     * @param p_a first value for distribution
+     * @param p_b first value for distribution
+     * @param p_c first value for distribution
      * @return vector of type T
      **/
-    template<typename T> inline ublas::vector<T> vector::random( const std::size_t& p_length, const tools::random::distribution& p_distribution )
+    template<typename T> inline ublas::vector<T> vector::random( const std::size_t& p_length, const tools::random::distribution& p_distribution, const T& p_a, const T& p_b, const T& p_c )
     {
         if (p_length == 0)
             throw exception::parameter(_("length must be greater than zero"));
@@ -109,7 +113,7 @@ namespace machinelearning { namespace tools {
         tools::random l_rand;
         ublas::vector<T> l_vec(p_length);
         BOOST_FOREACH( T& i, l_vec)
-            i = l_rand.get<T>( p_distribution );
+            i = l_rand.get<T>( p_distribution, p_a, p_b, p_c );
         
         return l_vec;
     }
