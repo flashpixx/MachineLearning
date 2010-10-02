@@ -40,7 +40,7 @@
 namespace machinelearning { namespace tools {
     
     namespace ublas     = boost::numeric::ublas;
-	namespace blas      = boost::numeric::bindings::blas;
+    namespace blas      = boost::numeric::bindings::blas;
     namespace bindings  = boost::numeric::bindings;
     namespace linalg    = boost::numeric::bindings::lapack;
     
@@ -95,14 +95,14 @@ namespace machinelearning { namespace tools {
         for(std::size_t i=0; i < l_eigval.size(); ++i)
             if (!function::isNumericalZero<T>(l_div(i)))
                 l_eigval(i) /= l_div(i);
-  		
-		// normalize every eigenvector
-		for(std::size_t i=0; i < l_eigvec.size2(); ++i) {
-			const T l_val = blas::nrm2( static_cast< ublas::vector<T> >(ublas::column(l_eigvec, i)) );
+        
+        // normalize every eigenvector
+        for(std::size_t i=0; i < l_eigvec.size2(); ++i) {
+            const T l_val = blas::nrm2( static_cast< ublas::vector<T> >(ublas::column(l_eigvec, i)) );
             if (!function::isNumericalZero<T>(l_val))
                 ublas::column(l_eigvec, i) /= l_val;
         }
-		
+        
         
         // we must copy the reference
         p_eigvec = l_eigvec;
@@ -136,12 +136,12 @@ namespace machinelearning { namespace tools {
         // determine eigenvector without sorting
         linalg::geev( 'N', 'V', l_matrix, l_eigval,  l_tmp1,l_tmp2,  l_eigvec, linalg::optimal_workspace() );
         
-		// normalize every eigenvector
-		for(std::size_t i=0; i < l_eigvec.size2(); ++i) {
-			const T l_val = blas::nrm2( static_cast< ublas::vector<T> >(ublas::column(l_eigvec, i)) );
+        // normalize every eigenvector
+        for(std::size_t i=0; i < l_eigvec.size2(); ++i) {
+            const T l_val = blas::nrm2( static_cast< ublas::vector<T> >(ublas::column(l_eigvec, i)) );
             if (!function::isNumericalZero<T>(l_val))
                 ublas::column(l_eigvec, i) /= l_val;
-		}
+        }
         
         // we must copy the reference
         p_eigvec = l_eigvec;

@@ -68,7 +68,7 @@ namespace machinelearning { namespace tools {
             template<typename T> static ublas::matrix<T> diag( const ublas::vector<T>& );
             template<typename T> static ublas::vector<T> diag( const ublas::matrix<T>& );
             template<typename T> static T trace( const ublas::matrix<T>& );
-			template<typename T> static ublas::matrix<T> centering( const ublas::matrix<T>&, const rowtype& = column );
+            template<typename T> static ublas::matrix<T> centering( const ublas::matrix<T>&, const rowtype& = column );
             template<typename T> static ublas::matrix<T> sort( const ublas::matrix<T>&, const ublas::vector<std::size_t>&, const rowtype& p_which = row);
             template<typename T> static ublas::matrix<T> cov( const ublas::matrix<T>& );
             template<typename T> static ublas::matrix<T> setNumericalZero( const ublas::matrix<T>&, const T& = 0);
@@ -206,36 +206,36 @@ namespace machinelearning { namespace tools {
         return l_min;
     }
     
-	
-	/** centering the matrix data (row or column orientated)
-	 * @param p_data input matrix
-	 * @param p_which row / column option (default column)
-	 * @return centered matrix
-	**/
+    
+    /** centering the matrix data (row or column orientated)
+     * @param p_data input matrix
+     * @param p_which row / column option (default column)
+     * @return centered matrix
+    **/
     template<typename T> inline ublas::matrix<T> matrix::centering( const ublas::matrix<T>& p_data, const rowtype& p_which )
-	{
-		ublas::matrix<T> l_center(p_data);
-		
-		switch (p_which) { 
-				case row :
-					for(std::size_t i=0; i < l_center.size1(); ++i) {
-						T l_mean = tools::vector::mean( static_cast< ublas::vector<T> >(ublas::row(p_data,i)) );
-						for(std::size_t j=0; j < l_center.size2(); ++j)
-							l_center(i,j) -= l_mean;
-					}
-					break;
-				
-			case column :
-				for(std::size_t i=0; i < l_center.size2(); ++i) {
-					T l_mean = tools::vector::mean( static_cast< ublas::vector<T> >(ublas::column(p_data,i)) );
-					for(std::size_t j=0; j < l_center.size1(); ++j)
-						l_center(j,i) -= l_mean;
-				}
-				break;
-		}
-		
-		return l_center;
-	}
+    {
+        ublas::matrix<T> l_center(p_data);
+        
+        switch (p_which) { 
+                case row :
+                    for(std::size_t i=0; i < l_center.size1(); ++i) {
+                        T l_mean = tools::vector::mean( static_cast< ublas::vector<T> >(ublas::row(p_data,i)) );
+                        for(std::size_t j=0; j < l_center.size2(); ++j)
+                            l_center(i,j) -= l_mean;
+                    }
+                    break;
+                
+            case column :
+                for(std::size_t i=0; i < l_center.size2(); ++i) {
+                    T l_mean = tools::vector::mean( static_cast< ublas::vector<T> >(ublas::column(p_data,i)) );
+                    for(std::size_t j=0; j < l_center.size1(); ++j)
+                        l_center(j,i) -= l_mean;
+                }
+                break;
+        }
+        
+        return l_center;
+    }
     
     
     /** sorts the rows or columns with the index elements of the vector 

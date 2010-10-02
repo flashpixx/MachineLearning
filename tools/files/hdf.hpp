@@ -60,18 +60,18 @@ namespace machinelearning { namespace tools { namespace files {
             void remove( const std::string& ) const;
             bool pathexists( const std::string& ) const;
 
-		
-			template<typename T> ublas::matrix<T> readMatrix( const std::string&, const H5::PredType& ) const;
-			template<typename T> ublas::vector<T> readVector( const std::string&, const H5::PredType& ) const;
-		
+        
+            template<typename T> ublas::matrix<T> readMatrix( const std::string&, const H5::PredType& ) const;
+            template<typename T> ublas::vector<T> readVector( const std::string&, const H5::PredType& ) const;
+        
             std::string readString( const std::string& ) const;
-			std::vector<std::string> readStringVector( const std::string& ) const;
+            std::vector<std::string> readStringVector( const std::string& ) const;
 
             
             template<typename T> void write( const std::string&, ublas::matrix<T>, const H5::PredType& ) const;
             template<typename T> void write( const std::string&, ublas::vector<T>, const H5::PredType& ) const;
-			
-			void write( const std::string&, const std::string&, const H5::PredType& ) const;
+            
+            void write( const std::string&, const std::string&, const H5::PredType& ) const;
 
         
         private :
@@ -153,13 +153,13 @@ namespace machinelearning { namespace tools { namespace files {
     }
     
     
-	/** reads a string array from HDF file into a std::vector
-	 * @param p_path path to element
-	 * @return std::vector with std::string elements
+    /** reads a string array from HDF file into a std::vector
+     * @param p_path path to element
+     * @return std::vector with std::string elements
      **/
-	inline std::vector<std::string> hdf::readStringVector( const std::string& p_path ) const
+    inline std::vector<std::string> hdf::readStringVector( const std::string& p_path ) const
     {
-		H5::DataSet   l_dataset   = m_file.openDataSet( p_path.c_str() );
+        H5::DataSet   l_dataset   = m_file.openDataSet( p_path.c_str() );
         H5::DataSpace l_dataspace = l_dataset.getSpace();
         
         // check datasetdimension
@@ -167,13 +167,13 @@ namespace machinelearning { namespace tools { namespace files {
             throw exception::parameter(_("dataset must be one-dimensional"));
         if (!l_dataspace.isSimple())
             throw exception::parameter(_("dataset must be a simple datatype"));
-		
- 		// get array size
-		hsize_t l_size[1];
-        l_dataspace.getSimpleExtentDims( l_size );		
         
-		// get data
-		std::vector<std::string> l_vec( l_size[0] );
+        // get array size
+        hsize_t l_size[1];
+        l_dataspace.getSimpleExtentDims( l_size );      
+        
+        // get data
+        std::vector<std::string> l_vec( l_size[0] );
         //l_dataset.read(
         
         l_dataspace.close();
@@ -229,7 +229,7 @@ namespace machinelearning { namespace tools { namespace files {
      * @param p_path path to dataset
      * @param p_value string value
      * @param p_datatype HDF% datatype
-	 * @warning incomplete
+     * @warning incomplete
      **/
     inline void hdf::write( const std::string& p_path, const std::string& p_value, const H5::PredType& p_datatype ) const
     {

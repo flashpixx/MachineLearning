@@ -109,24 +109,24 @@ namespace machinelearning { namespace dimensionreduce { namespace supervised {
         if (m_dim >= l_uniquelabel.size())
             throw exception::parameter(_("target dimension must be less than unique data classes"));
         
-		
+        
         // centering the data
-        ublas::matrix<T> l_center = tools::matrix::centering<T>(p_data);		
-		
-		// we create a map for indexing the rows of the matrix with their labels
-		std::multimap<L, std::size_t> l_index;
-		for(std::size_t i=0; i < p_label.size(); ++i)
-			l_index.insert( std::make_pair(p_label[i], i) );
+        ublas::matrix<T> l_center = tools::matrix::centering<T>(p_data);        
+        
+        // we create a map for indexing the rows of the matrix with their labels
+        std::multimap<L, std::size_t> l_index;
+        for(std::size_t i=0; i < p_label.size(); ++i)
+            l_index.insert( std::make_pair(p_label[i], i) );
 
         // calculate covarianz for every class and all data
         ublas::matrix<T> l_st = tools::matrix::cov(l_center);
         ublas::matrix<T> l_sw(l_st.size1(), l_st.size2());
-		const T l_classes = static_cast<T>(l_uniquelabel.size()-1);
-	
+        const T l_classes = static_cast<T>(l_uniquelabel.size()-1);
+    
         for(std::size_t i=0; i < l_uniquelabel.size(); ++i) {
             
             
-			// extract index from map | typename must be first, because is a exotic structure from C++ :-)
+            // extract index from map | typename must be first, because is a exotic structure from C++ :-)
             // create a matrix whitch holds the rows for every class. Create a matrix with index elements for the rows
             std::size_t n=0;
             ublas::matrix<T> l_cluster(  std::distance(l_index.lower_bound(l_uniquelabel[i]), l_index.upper_bound(l_uniquelabel[i])),  l_center.size2()  );

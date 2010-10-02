@@ -55,7 +55,7 @@ namespace machinelearning { namespace distances {
     namespace bio   = boost::iostreams;
     
     
-	/**
+    /**
      * class for calculating the normalized compression distance (NCD)
      * with some different algorithms like gzip and bzip2
      * @todo set to unicode
@@ -323,11 +323,11 @@ namespace machinelearning { namespace distances {
     //---------------------------------------------------------------------------------------------------------------------------------------------------------
     
     
-	/** sets the compression level
-	 * @param  p_level compression level
+    /** sets the compression level
+     * @param  p_level compression level
      **/
-	template<typename T> inline void ncd<T>::setCompressionLevel( const compresslevel& p_level )
-	{
+    template<typename T> inline void ncd<T>::setCompressionLevel( const compresslevel& p_level )
+    {
         switch (p_level) 
         {
             case defaultcompression :   
@@ -345,7 +345,7 @@ namespace machinelearning { namespace distances {
                 m_bzip2param    = bio::bzip2_params( 9 );
                 break;
         }
-	}
+    }
     
     
     

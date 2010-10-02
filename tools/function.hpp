@@ -44,24 +44,24 @@ namespace machinelearning { namespace tools {
 
     
     
-	/** check equality of floating point values 
+    /** check equality of floating point values 
      * @param p1 first value
      * @param p2 second value
      * @return equality
     **/
     template<typename T> inline bool function::isNumericalEqual( const T& p1, const T& p2 )
     {
-		return !( std::fabs(p1-p2) > std::numeric_limits<T>::epsilon() );
-	}
-	
-	/** check zero of floating point values
+        return !( std::fabs(p1-p2) > std::numeric_limits<T>::epsilon() );
+    }
+    
+    /** check zero of floating point values
      * @param p value
      * @return equality to zero
     **/
     template<typename T> inline bool function::isNumericalZero( const T& p )
     {
-		return std::fabs(p) <= std::numeric_limits<T>::epsilon();
-	}
+        return std::fabs(p) <= std::numeric_limits<T>::epsilon();
+    }
     
     
 };};
