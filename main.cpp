@@ -179,51 +179,53 @@ int main(int argc, char *argv[]) {
    
     // ===== NG =====     
     ublas::matrix<double> data = o.readMatrix<double>("/ngdata", H5::PredType::NATIVE_DOUBLE);
-     
-    dist::euclid<double> d;
+	dist::euclid<double> d;
+	
     #ifdef CLUSTER
     
     // we must create a shuffle vector for disjoint datasets and shuffle the matrix - it's not nice, but it works
-    ublas::vector<std::size_t> disjoint = static_cast< ublas::vector<std::size_t> >( tl::vector::random<double>(data.size1(), tl::random::uniform, 0, data.size1()) );
+/*    ublas::vector<std::size_t> disjoint = static_cast< ublas::vector<std::size_t> >( tl::vector::random<double>(data.size1(), tl::random::uniform, 0, data.size1()) );
     mpi::broadcast(loMPICom, disjoint, 0);
     for(std::size_t i=0; i < disjoint.size(); ++i) {
         ublas::vector<double> x         = ublas::row(data, i);
         ublas::row(data, i)             = ublas::row(data, disjoint(i));
         ublas::row(data, disjoint(i))   = x;
-    }
+    }*/
     
     // extract the data for the process (every process has load the whole data and shuffel them with the broadcasted shuffle vector)
-    std::size_t nums     = data.size1() / loMPICom.size();
-    std::size_t protonum = 11 / loMPICom.size();
-    std::size_t add      = 0;
+    std::size_t nums     		= data.size1() / loMPICom.size();
+    std::size_t protonum 		= 11 / loMPICom.size();
+    std::size_t add      		= 0;
     
     if (loMPICom.rank() == loMPICom.size()-1) {
         protonum += 11 % loMPICom.size();
         add       = data.size1() % loMPICom.size();
     }
-    ublas::matrix_range< ublas::matrix<double> > datarange(data, ublas::range(loMPICom.rank()*nums, (loMPICom.rank()+1)*nums + add), ublas::range(0, data.size2()));
 
-    
+    ublas::matrix_range< ublas::matrix<double> > datarange(data, ublas::range(loMPICom.rank()*nums, (loMPICom.rank()+1)*nums + add), ublas::range(0, data.size2()));
+	    
     nsl::neuralgas<double> ng(d, protonum, data.size2());
-    ng.train(loMPICom, datarange, 15);
+    ng.train(loMPICom, datarange, 200);
     #else    
     nsl::neuralgas<double> ng(d, 11, data.size2());
-    ng.train(data, 15);
+    ng.train(data, 25);
     #endif
     
     ng.setLogging(false);
     
     
     #ifdef CLUSTER
+	ublas::matrix<double> proto = ng.getPrototypes(loMPICom);
     if (loMPICom.rank() == 0) {
-        ublas::matrix<double> proto = ng.getPrototypes(loMPICom);
     #else
         ublas::matrix<double> proto = ng.getPrototypes();
     #endif
         
     tl::files::hdf f("ng.hdf5", true);
     f.write<double>( "/protos",  proto, H5::PredType::NATIVE_DOUBLE );
-    
+	std::cout << "all Prototypes:" << std::endl;
+	std::cout << proto << std::endl;
+
     if (ng.getLogging()) {
         f.write<double>( "/error",  tl::vector::copy(ng.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
         std::vector< ublas::matrix<double> > p = ng.getLoggedPrototypes();

@@ -25,7 +25,8 @@
 #ifndef MACHINELEARNING_CLUSTERING_NONSUPERVISED_NG_HPP
 #define MACHINELEARNING_CLUSTERING_NONSUPERVISED_NG_HPP
 
-
+#include <algorithm>
+#include <numeric>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 
@@ -75,6 +76,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             void train( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t& );
             void train( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t&, const T& );
             ublas::matrix<T> getPrototypes( const mpi::communicator& ) const;
+			std::map<int, std::size_t> getProcessPrototypePosition( const mpi::communicator& ) const;
             #endif
         
         
@@ -340,52 +342,74 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         ublas::matrix<T> l_prototypes = l_processdata[0];
         for(std::size_t i=1; i < l_processdata.size(); ++i) {
             l_prototypes.resize( l_prototypes.size1()+l_processdata[i].size1(), l_prototypes.size2());
-            l_prototypes.project().assign( l_processdata[i] );
+            //l_prototypes.project().assign( l_processdata[i] );
         }
         
         return l_prototypes;
-        
     }
+
+
+	/** returns a std::map with the begin position of the prototypes matrix. Is needed for extracting the prototypes
+	 * of the full matrix for every process
+	 * @param p_mpi MPI object for communication
+	 * @return std::map with process rank and position in the full matrix of the first prototype of the process
+	**/
+	template<typename T> inline std::map<int, std::size_t> neuralgas<T>::getProcessPrototypePosition( const mpi::communicator& p_mpi ) const
+	{
+		// gathering the number of prototypes
+		std::vector< std::size_t > l_processdata;
+        for(int i=0; i < p_mpi.size(); ++i)
+			mpi::gather(p_mpi, m_prototypes.size1(), l_processdata, i);
+		
+		// create map
+		std::map<int, std::size_t> l_map;
+		std::size_t l_sum = 0;
+		for(int i=0; i < l_processdata.size(); ++i) {
+			l_map.insert( std::pair<int, std::size_t>( i, l_sum) );
+			l_sum += l_processdata[i];
+		}
+			
+		return l_map;
+	}
     
     
     /** returns the number of all prototypes
-     * @param p_MPI MPI object for communication
+     * @param p_mpi MPI object for communication
      * @return number of prototypes
      **/
-    template<typename T> inline std::size_t neuralgas<T>::gatherNumberPrototypes( const mpi::communicator& ) const
+    template<typename T> inline std::size_t neuralgas<T>::gatherNumberPrototypes( const mpi::communicator& p_mpi ) const
     {
         // gathering number of prototypes
-        ublas::vector<std::size_t> l_numbers;
-        for(int i=0; i < p_MPI.size(); ++i)
-            mpi::gather(p_MPI, m_prototypes.size1(), l_numbers, i);
+        std::vector<std::size_t> l_numbers;
+        for(int i=0; i < p_mpi.size(); ++i)
+            mpi::gather(p_mpi, m_prototypes.size1(), l_numbers, i);
         
-        return ublas::sum( l_numbers );
+		// calculate the sum and return
+        return std::accumulate( l_numbers.begin(), l_numbers.end(), 0 );;
     }
     
     
     /** train the data on the cluster
      * @overload
-     * @param p_MPI MPI object for communication
+     * @param p_mpi MPI object for communication
      * @param p_data datapoints
      * @param p_iterations iterations
      **/
-    template<typename T> inline void neuralgas<T>::train( const mpi::communicator& p_MPI, const ublas::matrix<T>& p_data, const std::size_t& p_iterations )
+    template<typename T> inline void neuralgas<T>::train( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data, const std::size_t& p_iterations )
     {
-        train(p_MPI, p_data, p_iterations, m_prototypes.size1() * 0.5);
+        train(p_mpi, p_data, p_iterations, m_prototypes.size1() * 0.5);
     }
 
     
     /** train the data on the cluster
      * @overload
-     * @param p_MPI MPI object for communication
+     * @param p_mpi MPI object for communication
      * @param p_data datapoints
      * @param p_iterations iterations
      * @param p_lambda max adapet size
      **/
-    template<typename T> inline void neuralgas<T>::train( const mpi::communicator& p_MPI, const ublas::matrix<T>& p_data, const std::size_t& p_iterations, const T& p_lambda )
+    template<typename T> inline void neuralgas<T>::train( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data, const std::size_t& p_iterations, const T& p_lambda )
     {
-        std::cout << gatherNumberPrototypes(p_MPI) << std::endl;
-        
         if (p_data.size1() < m_prototypes.size1())
             throw exception::parameter(_("number of datapoints are less than prototypes"));
         if (p_iterations == 0)
@@ -396,29 +420,16 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             throw exception::parameter(_("lambda must be greater than zero"));
         
         
-        // process 0 sets the iteration and the lambda
+        // process 0 sets the iteration and the lambda and we collect all needed data
         std::size_t l_iterationsBrd = p_iterations;
         T l_lambdaBrd               = p_lambda;
         
-        mpi::broadcast(p_MPI, l_iterationsBrd, 0);
-        mpi::broadcast(p_MPI, l_lambdaBrd, 0);
+        mpi::broadcast(p_mpi, l_iterationsBrd, 0);
+        mpi::broadcast(p_mpi, l_lambdaBrd, 0);
         
-        // create matrix for adaption (we need the number of prototype of every process)
-        // we collcting the number of prototypes of every process into a std::map
-        std::size_t l_protonum =  0;
-        std::map<int, std::pair<std::size_t,std::size_t> > l_processinfo;
-        for(int l=0; l < p_MPI.size(); ++l) {
-            std::size_t l_num = m_prototypes.size1();
-            mpi::broadcast(p_MPI, l_num, l);
-            
-            // process rank and in the first element of the pair is set the number of prototypes and
-            // the second is the start value in the full prototype matrix
-            // [0, number of first process prototypes-1], [number of first process prototypes, number of second process prototypes-1]
-            l_processinfo.insert( std::pair<int, std::pair<std::size_t, std::size_t> >( l, std::pair<std::size_t, std::size_t>(l_num, l_protonum) ) );
-            l_protonum += l_num;
-        }
-        ublas::matrix<T> l_adaptmatrix( l_protonum, p_data.size1() );
-        
+		
+        ublas::matrix<T> l_adaptmatrix( gatherNumberPrototypes(p_mpi), p_data.size1() );
+		std::map<int, std::size_t> l_prototypeposition = getProcessPrototypePosition(p_mpi);
          
         
         // run neural gas       
@@ -430,26 +441,16 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             // create adapt values
             const T l_lambda = l_lambdaBrd * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(l_iterationsBrd));
             
-            // first we need the local prototypes
-			ublas::matrix<T> l_prototypes = m_prototypes;
-                        
-            // we iterate over every process
-            for(int l=0; l < p_MPI.size(); ++l) {
-            
-                // we get the prototypes of every process
-                mpi::broadcast(p_MPI, l_prototypes, l);
-                                
-                // calculate for every prototype the distance (of the actually prototypes).
-                // within the adapt matrix, we must specify the position of the prototypes 
-                for(std::size_t n=0; n < l_prototypes.size1(); ++n)
-                    ublas::row(l_adaptmatrix, l_processinfo[l].second+n)  = m_distance->calculate( p_data,  ublas::outer_prod(l_ones, ublas::row(l_prototypes, n)) );
+            // we get all prototypes of every process
+			ublas::matrix<T> l_prototypes = gatherPrototypes(p_mpi, m_prototypes);
+			
+            // calculate for every prototype the distance (of the actually prototypes).
+            // within the adapt matrix, we must specify the position of the prototypes 
+            for(std::size_t n=0; n < l_prototypes.size1(); ++n)
+            	ublas::row(l_adaptmatrix, n)  = m_distance->calculate( p_data,  ublas::outer_prod(l_ones, ublas::row(l_prototypes, n)) );
 
-            }
-            
-            // at this point, every process holds the adaptmatrix
-            // for every prototype and their local datapoints
-            
-            // for every column ranks values and create adapts
+           
+             // for every column ranks values and create adapts
             // we need rank and not randIndex, because we 
             // use the value of the ranking for calculate the 
             // adapt value
@@ -465,19 +466,20 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
                 ublas::column(l_adaptmatrix, n) = l_col;
             }
                 
-            // calculate the "prototype" for the local points
-            ublas::matrix<T> l_localprototype = ublas::prod( l_adaptmatrix, p_data );
+            // calculate all prototype for the local data points
+            l_prototypes = ublas::prod( l_adaptmatrix, p_data );
 
-			std::cout << l_localprototype << std::endl;
+			//std::cout << l_localprototype << std::endl;
 
             // now we send every local prototypes with their adaption to the process back 
             // we do this a gather for prototypes and adaption
-            std::vector< ublas::matrix<T> > l_prototypesGather;
+        	/*
+    		std::vector< ublas::matrix<T> > l_prototypesGather;
             std::vector< ublas::vector<T> > l_normadaptGather;
             for(int l=0; l < p_MPI.size(); ++l) {
                 
                 // extract the prototypes for the process and create a copy for sending
-                ublas::matrix_range< ublas::matrix<T> > l_range(l_localprototype, ublas::range(l_processinfo[l].second, l_processinfo[l].first+l_processinfo[l].second), ublas::range(0, l_localprototype.size2()));
+                ublas::matrix_range< ublas::matrix<T> > l_range(l_locaprototype, ublas::range(l_processinfo[l].second, l_processinfo[l].first+l_processinfo[l].second), ublas::range(0, l_localprototype.size2()));
                 ublas::matrix<T> l_prototypesend      = l_range;
                 
                 // creates the normalize values for the prototypes
@@ -502,6 +504,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             for(std::size_t n=0; n < m_prototypes.size1(); ++n)
                 if (!tools::function::isNumericalZero(l_norm(n)))
                     ublas::row(m_prototypes, n) /= l_norm(n);
+			*/
         }
     }
     
