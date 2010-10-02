@@ -52,8 +52,6 @@ int main(int argc, char *argv[]) {
     //nn::nnet<double> net(3);
     
     
-    
-    
     /*
     boost::multi_array<double, 2> x;
     boost::multi_array<double, 2> y;
