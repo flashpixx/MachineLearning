@@ -94,7 +94,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             std::map<int, std::pair<std::size_t,std::size_t> > m_processprototypinfo;
 
             ublas::matrix<T> gatherPrototypes( const mpi::communicator& ) const;
-            void gatherLocalPrototypes( const mpi::communicator&, const ublas::matrix<T>&, const ublas::vector<T>& );
+            void gatherLocalPrototypes( const mpi::communicator&, ublas::matrix<T>&, ublas::vector<T>& );
             std::size_t gatherNumberPrototypes( const mpi::communicator& ) const;
             void setProcessPrototypeInfo( const mpi::communicator& );
             #endif
@@ -328,22 +328,22 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     #ifdef CLUSTER
     
     /** gathering prototypes of every process and return the full prototypes matrix (row oriantated)
-     * @param p_MPI MPI object for communication
+     * @param p_mpi MPI object for communication
      * @return full prototypes matrix
      **/
-    template<typename T> inline ublas::matrix<T> neuralgas<T>::gatherPrototypes( const mpi::communicator& p_MPI ) const
+    template<typename T> inline ublas::matrix<T> neuralgas<T>::gatherPrototypes( const mpi::communicator& p_mpi ) const
     {
         // gathering in this way, that every process get all prototypes
         std::vector< ublas::matrix<T> > l_processdata;
-        for(int i=0; i < p_MPI.size(); ++i)
-            mpi::gather(p_MPI, m_prototypes, l_processdata, i);
+        for(int i=0; i < p_mpi.size(); ++i)
+            mpi::gather(p_mpi, m_prototypes, l_processdata, i);
         
         // create full prototype matrix with processprotos
         ublas::matrix<T> l_prototypes = l_processdata[0];
         for(std::size_t i=1; i < l_processdata.size(); ++i) {
             l_prototypes.resize( l_prototypes.size1()+l_processdata[i].size1(), l_prototypes.size2());
 
-            ublas::matrix_range< ublas::matrix<double> > l_range(l_prototypes, 
+            ublas::matrix_range< ublas::matrix<T> > l_range(l_prototypes, 
                     ublas::range( l_prototypes.size1()-l_processdata[i].size1(), l_prototypes.size1() ), 
                     ublas::range( 0, l_prototypes.size2() )
             );
@@ -354,15 +354,44 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     }
 
 
-    /** gathering prototypes of every process and set with them the local prototypematrix
+    /** gathering prototypes of every process and set with them the local prototypematrix.
+     * We can not use const references because of the range
      * @param p_MPI MPI object for communication
      * @param p_localprototypes local prototype matrix
      * @param p_localnorm normalize vector
      **/
-    template<typename T> inline void neuralgas<T>::gatherLocalPrototypes( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_localprototypes, const ublas::vector<T>& p_localnorm )
+    template<typename T> inline void neuralgas<T>::gatherLocalPrototypes( const mpi::communicator& p_mpi, ublas::matrix<T>& p_localprototypes, ublas::vector<T>& p_localnorm )
     {
-        //for(int i=0; i < p_MPI.size(); ++i)
+        std::vector< ublas::matrix<T> > l_localprototypes;
+		std::vector< ublas::vector<T> > l_localnorm;
+        for(int i=0; i < p_mpi.size(); ++i) {
 
+            // gather prototypes
+            ublas::matrix_range< ublas::matrix<T> > l_protorange(p_localprototypes, 
+                    ublas::range( m_processprototypinfo[i].first, m_processprototypinfo[i].first + m_processprototypinfo[i].second ), 
+                    ublas::range( 0, p_localprototypes.size2() )
+            );
+            ublas::matrix<T> l_protomatrix = l_protorange;
+            mpi::gather(p_mpi, l_protomatrix, l_localprototypes, i);
+
+            // gather norm
+            ublas::vector_range< ublas::vector<T> > l_normrange(p_localnorm,
+                    ublas::range( m_processprototypinfo[i].first, m_processprototypinfo[i].first + m_processprototypinfo[i].second )
+            );
+            ublas::vector<T> l_normvec = l_normrange;
+            mpi::gather(p_mpi, l_normvec, l_localnorm, i);
+        }
+
+        // create local prototypes and normalize
+        m_prototypes             = l_localprototypes[0];
+        ublas::vector<T> l_norm  = l_localnorm[0];
+        for(std::size_t i=1; i < l_localprototypes.size(); ++i) {
+            m_prototypes += l_localprototypes[i];
+            l_norm       += l_localnorm[i];
+        }
+
+        for(std::size_t i=0; i < m_prototypes.size1(); ++i)
+            ublas::row(m_prototypes, i) /= l_norm(i);
     }
 
 
