@@ -93,7 +93,7 @@ namespace machinelearning { namespace tools { namespace files {
         m_file( p_file.c_str(), H5F_ACC_RDWR )
     {
         #ifdef NDEBUG
-            H5::Exception::dontPrint();
+        H5::Exception::dontPrint();
         #endif
     }
     
@@ -107,7 +107,7 @@ namespace machinelearning { namespace tools { namespace files {
         m_file( p_file.c_str(), (p_write ? H5F_ACC_TRUNC : H5F_ACC_RDWR) )
     {
         #ifdef NDEBUG
-            H5::Exception::dontPrint();
+        H5::Exception::dontPrint();
         #endif
     }
     

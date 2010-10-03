@@ -205,35 +205,43 @@ int main(int argc, char *argv[]) {
     ublas::matrix_range< ublas::matrix<double> > datarange(data, ublas::range(loMPICom.rank()*nums, (loMPICom.rank()+1)*nums + add), ublas::range(0, data.size2()));
 	    
     nsl::neuralgas<double> ng(d, protonum, data.size2());
-    ng.train(loMPICom, datarange, 200);
+    ng.setLogging(true);
+    ng.train(loMPICom, datarange, 20);
+    
     #else    
     nsl::neuralgas<double> ng(d, 11, data.size2());
-    ng.train(data, 25);
+    ng.setLogging(true);
+    ng.train(data, 20);
     #endif
     
-    ng.setLogging(true);
     
     
     #ifdef CLUSTER
-	ublas::matrix<double> proto = ng.getPrototypes(loMPICom);
+	ublas::matrix<double> proto                   = ng.getPrototypes(loMPICom);
+    ublas::vector<double> qerror                  = tl::vector::copy(ng.getLoggedQuantizationError(loMPICom));
+    std::vector< ublas::matrix<double> > logproto = ng.getLoggedPrototypes(loMPICom);
+    
     if (loMPICom.rank() == 0) {
+        tl::files::hdf f("ng.hdf5", true);
+        f.write<double>( "/protos",  proto, H5::PredType::NATIVE_DOUBLE );
+    
+        if (ng.getLogging()) {
+            f.write<double>( "/error",  qerror, H5::PredType::NATIVE_DOUBLE );
+            
+            for(std::size_t i=0; i < logproto.size(); ++i)
+                f.write<double>("/log" + boost::lexical_cast<std::string>( i ), logproto[i], H5::PredType::NATIVE_DOUBLE );
+        }
+    }
+    
     #else
-        ublas::matrix<double> proto = ng.getPrototypes();
-    #endif
-        
     tl::files::hdf f("ng.hdf5", true);
-    f.write<double>( "/protos",  proto, H5::PredType::NATIVE_DOUBLE );
-	std::cout << "all Prototypes:" << std::endl;
-	std::cout << proto << std::endl;
-
+    f.write<double>( "/protos",  ng.getPrototypes(), H5::PredType::NATIVE_DOUBLE );        
     if (ng.getLogging()) {
         f.write<double>( "/error",  tl::vector::copy(ng.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
-        std::vector< ublas::matrix<double> > p = ng.getLoggedPrototypes();
-        for(std::size_t i=0; i < p.size(); ++i)
-            f.write<double>("/log" + boost::lexical_cast<std::string>( i ), p[i], H5::PredType::NATIVE_DOUBLE );
-    }
-        
-    #ifdef CLUSTER
+ 
+        std::vector< ublas::matrix<double> > logproto = ng.getLoggedPrototypes();
+        for(std::size_t i=0; i < logproto.size(); ++i)
+            f.write<double>("/log" + boost::lexical_cast<std::string>( i ), logproto[i], H5::PredType::NATIVE_DOUBLE );
     }
     #endif
     
