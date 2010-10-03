@@ -211,7 +211,7 @@ int main(int argc, char *argv[]) {
     ng.train(data, 25);
     #endif
     
-    ng.setLogging(false);
+    ng.setLogging(true);
     
     
     #ifdef CLUSTER
