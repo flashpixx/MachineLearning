@@ -70,6 +70,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             void train( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t& );
             void train( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t&, const T& );
             ublas::matrix<T> getPrototypes( const mpi::communicator& ) const;
+            std::vector< ublas::matrix<T> > getLoggedPrototypes( const mpi::communicator& ) const;
+            std::vector<T> getLoggedQuantizationError( const mpi::communicator& ) const;
             #endif
         
         
@@ -87,7 +89,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             /** std::vector for quantisation error in each iteration **/
             std::vector<T> m_quantizationerror;
         
-            T calculateQuantizationError( const ublas::matrix<T>& ) const;
+            T calculateQuantizationError( const ublas::matrix<T>&, const ublas::matrix<T>& ) const;
         
             #ifdef CLUSTER
             /** map with information **/
@@ -273,7 +275,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             // determine quantization error for logging
             if (m_logging) {
                 m_logprototypes.push_back( m_prototypes );
-                m_quantizationerror.push_back( calculateQuantizationError(p_data) );
+                m_quantizationerror.push_back( calculateQuantizationError(p_data, m_prototypes) );
             }
         }
     }
@@ -281,15 +283,16 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     
     /** calculate the quantization error
      * @param p_data matrix with data points
+     * @param p_prototypes prototype matrix
      * @return quantization error
      **/    
-    template<typename T> inline T neuralgas<T>::calculateQuantizationError( const ublas::matrix<T>& p_data ) const
+    template<typename T> inline T neuralgas<T>::calculateQuantizationError( const ublas::matrix<T>& p_data, const ublas::matrix<T>& p_prototypes ) const
     {
         ublas::scalar_vector<T> l_ones(p_data.size1(), 1);
-        ublas::matrix<T> l_distances( m_prototypes.size1(), p_data.size2() );
+        ublas::matrix<T> l_distances( p_prototypes.size1(), p_data.size2() );
         
-        for(std::size_t i=0; i < m_prototypes.size1(); ++i)
-            ublas::row(l_distances, i) = m_distance->calculate( p_data, ublas::outer_prod( l_ones, ublas::row(m_prototypes, i) ));
+        for(std::size_t i=0; i < p_prototypes.size1(); ++i)
+            ublas::row(l_distances, i) = m_distance->calculate( p_data, ublas::outer_prod( l_ones, ublas::row(p_prototypes, i) ));
         
         return ublas::sum(  m_distance->abs( tools::matrix::min(l_distances) )  );  
     }
@@ -391,7 +394,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         }
 
         for(std::size_t i=0; i < m_prototypes.size1(); ++i)
-            ublas::row(m_prototypes, i) /= l_norm(i);
+            if (!tools::function::isNumericalZero(l_norm(i)))
+                ublas::row(m_prototypes, i) /= l_norm(i);
     }
 
 
@@ -469,11 +473,20 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
         mpi::broadcast(p_mpi, l_iterationsBrd, 0);
         mpi::broadcast(p_mpi, l_lambdaBrd, 0);
-        
+        mpi::broadcast(p_mpi, m_logging, 0);
         
         ublas::matrix<T> l_adaptmatrix( gatherNumberPrototypes(p_mpi), p_data.size1() );
         setProcessPrototypeInfo(p_mpi);
          
+        
+        // creates logging
+        if (m_logging) {
+            m_logprototypes     = std::vector< ublas::matrix<T> >();
+            m_quantizationerror = std::vector< T >();
+            m_logprototypes.reserve(p_iterations);
+            m_quantizationerror.reserve(p_iterations);
+        }
+        
         
         // run neural gas       
         const T l_multi = 0.01/l_lambdaBrd;
@@ -513,14 +526,23 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
 
             // calculating local norm for the prototypes
             ublas::vector<T> l_normvec(l_prototypes.size1(),0);
-            for(std::size_t n=0; n < l_prototypes.size1(); ++n) {
-                const T l_norm = ublas::sum( ublas::row(l_adaptmatrix, n) );
-
-                if (!tools::function::isNumericalZero(l_norm))
-                    l_normvec(n) = l_norm;
-            }
+            for(std::size_t n=0; n < l_prototypes.size1(); ++n)
+                l_normvec(n) = ublas::sum( ublas::row(l_adaptmatrix, n) );
 
             gatherLocalPrototypes(p_mpi, l_prototypes, l_normvec);
+            
+            
+            // determine quantization error for logging
+            if (m_logging) {
+                
+                // we must normalize the local prototypes (only on logging, in other cases gatherLocalPrototypes do this)
+                for(std::size_t n=0; n < l_prototypes.size1(); ++n)
+                    if (!tools::function::isNumericalZero(l_normvec(n)))
+                        ublas::row(l_prototypes, n) /= l_normvec(n);
+                
+                m_logprototypes.push_back( m_prototypes );
+                m_quantizationerror.push_back( calculateQuantizationError(p_data, l_prototypes) );
+            }
         }
     }
     
@@ -533,6 +555,59 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     template<typename T> inline ublas::matrix<T> neuralgas<T>::getPrototypes( const mpi::communicator& p_mpi ) const
     {
         return gatherPrototypes( p_mpi );
+    }
+    
+    
+    /** returns all logged prototypes in all processes
+     * @overload
+     * @param p_mpi MPI object for communication
+     * @retun std::vector with all logged prototypes
+     **/
+    template<typename T> inline std::vector< ublas::matrix<T> > neuralgas<T>::getLoggedPrototypes( const mpi::communicator& p_mpi ) const
+    {
+        // we must gather every logged prototype and create the full prototype matrix
+        std::vector< std::vector< ublas::matrix<T> > > l_gatherProto;
+        for(int i=0; i < p_mpi.size(); ++i)
+            mpi::gather(p_mpi, m_logprototypes, l_gatherProto, i);
+        
+        // now we create the full prototype matrix for every log
+        std::vector< ublas::matrix<T> > l_logProto = l_gatherProto[0];
+        for(std::size_t i=1; i < l_gatherProto.size(); ++i)
+            for(std::size_t n=0; n < l_logProto.size(); ++n) {
+            
+                l_logProto[n].resize( l_logProto[n].size1()+l_gatherProto[i][n].size1(), l_logProto[n].size2());
+        
+                ublas::matrix_range< ublas::matrix<T> > l_range(l_logProto[n], 
+                                                                ublas::range( l_logProto[n].size1()-l_gatherProto[i][n].size1(), l_logProto[n].size1() ), 
+                                                                ublas::range( 0, l_logProto[n].size2() )
+                                                                );
+                l_range.assign(l_gatherProto[i][n]);
+            }
+        
+        
+        return l_logProto;
+    }
+    
+    
+    /** returns the logged quantisation error
+     * @overload
+     * @param p_mpi MPI object for communication
+     * @return std::vector with quantization error
+     **/
+    template<typename T> inline std::vector<T> neuralgas<T>::getLoggedQuantizationError( const mpi::communicator& p_mpi ) const
+    {
+        // we must call the quantization error of every process and sum all values for the main error
+        std::vector< std::vector<T> > l_gatherError;
+        for(int i=0; i < p_mpi.size(); ++i)
+            mpi::gather(p_mpi, m_quantizationerror, l_gatherError, i);
+        
+        std::vector<T> l_error = l_gatherError[0];
+        for(std::size_t i=1; i < l_gatherError.size(); ++i)
+            for(std::size_t n=0; n < l_error.size(); ++n)
+                l_error[n] += l_gatherError[i][n];
+            
+        return l_error;
+            
     }
     
     #endif
