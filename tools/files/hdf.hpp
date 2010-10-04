@@ -31,6 +31,9 @@
 #include <boost/algorithm/string.hpp> 
 #include <H5Cpp.h>
 
+#include <iostream>
+#include <boost/numeric/ublas/io.hpp>
+
 #include "../../exception/exception.h"
 
 //http://www.hdfgroup.uiuc.edu/UserSupport/code-examples/stratt.cpp
@@ -68,17 +71,21 @@ namespace machinelearning { namespace tools { namespace files {
             std::vector<std::string> readStringVector( const std::string& ) const;
 
             
-            template<typename T> void write( const std::string&, ublas::matrix<T>, const H5::PredType& ) const;
-            template<typename T> void write( const std::string&, ublas::vector<T>, const H5::PredType& ) const;
+            template<typename T> void write( const std::string&, const ublas::matrix<T>&, const H5::PredType& ) const;
+            template<typename T> void write( const std::string&, const ublas::vector<T>&, const H5::PredType& ) const;
+            template<typename T> void write( const std::string&, const T&, const H5::PredType& ) const;
             
             void write( const std::string&, const std::string&, const H5::PredType& ) const;
 
         
         private :
-            void createPathWithDataset( const std::string&, const H5::PredType&, const H5::DataSpace&, std::vector<H5::Group>&, H5::DataSet& ) const;
 
             /** file handler **/
             H5::H5File m_file;
+            
+            void createPathWithDataset( const std::string&, const H5::PredType&, const H5::DataSpace&, std::vector<H5::Group>&, H5::DataSet& ) const;
+            void createDataSpace( const std::string&, const H5::PredType&, const ublas::vector<std::size_t>&, H5::DataSpace&, H5::DataSet&, std::vector<H5::Group>& ) const;
+            void closeDataSpace( std::vector<H5::Group>&, H5::DataSpace& ) const;
         
     };
     
@@ -384,20 +391,17 @@ namespace machinelearning { namespace tools { namespace files {
      * @param p_dataset matrixdata
      * @param p_datatype datatype for writing data (see http://www.hdfgroup.org/HDF5/doc/cpplus_RM/classH5_1_1PredType.html )
     **/
-    template<typename T> inline void hdf::write( const std::string& p_path, ublas::matrix<T> p_dataset, const H5::PredType& p_datatype ) const
+    template<typename T> inline void hdf::write( const std::string& p_path, const ublas::matrix<T>& p_dataset, const H5::PredType& p_datatype ) const
     {        
-        // define Structurs
-        H5::DSetCreatPropList l_defaultvalue;
-        l_defaultvalue.setFillValue( p_datatype, 0 );     
-        hsize_t l_size[2];
-        l_size[0] = p_dataset.size2();
-        l_size[1] = p_dataset.size1();
-        H5::DataSpace l_dataspace( 2, l_size );
-        std::vector<H5::Group> l_groups;
-
-        // create Dataspace in path        
         H5::DataSet l_dataset;
-        createPathWithDataset( p_path,  p_datatype, l_dataspace, l_groups, l_dataset ); 
+        H5::DataSpace l_dataspace;
+        std::vector<H5::Group> l_groups;
+        
+        ublas::vector<std::size_t> l_dim(2);
+        l_dim(0) = p_dataset.size2();
+        l_dim(1) = p_dataset.size1();
+        
+        createDataSpace(p_path,  p_datatype, l_dim, l_dataspace, l_dataset, l_groups);
         
         // copy matrix to dataset
         T l_data[p_dataset.size2()][p_dataset.size1()];
@@ -405,11 +409,8 @@ namespace machinelearning { namespace tools { namespace files {
             for(std::size_t j=0; j < p_dataset.size2(); ++j)
                 l_data[j][i] = p_dataset(i,j);
         l_dataset.write( l_data, p_datatype, l_dataspace  );
-        l_dataspace.close();
         
-        // close groups
-        for(std::vector<H5::Group>::reverse_iterator it = l_groups.rbegin(); it != l_groups.rend(); ++it)
-            (*it).close();
+        closeDataSpace(l_groups, l_dataspace);
     }
     
     
@@ -418,33 +419,86 @@ namespace machinelearning { namespace tools { namespace files {
      * @param p_dataset vectordata
      * @param p_datatype datatype for writing data (see http://www.hdfgroup.org/HDF5/doc/cpplus_RM/classH5_1_1PredType.html )
     **/
-    template<typename T> inline void hdf::write( const std::string& p_path, ublas::vector<T> p_dataset, const H5::PredType& p_datatype ) const
-    {        
-        // define Structurs
-        H5::DSetCreatPropList l_defaultvalue;
-        l_defaultvalue.setFillValue( p_datatype, 0 );        
-        hsize_t l_size[1];
-        l_size[0] = p_dataset.size();       
-        H5::DataSpace l_dataspace( 1, l_size );
+    template<typename T> inline void hdf::write( const std::string& p_path, const ublas::vector<T>& p_dataset, const H5::PredType& p_datatype ) const
+    {     
+        H5::DataSet l_dataset;
+        H5::DataSpace l_dataspace;
         std::vector<H5::Group> l_groups;
         
-        // create Dataspace in path
-        H5::DataSet l_dataset;
-        createPathWithDataset( p_path,  p_datatype, l_dataspace, l_groups, l_dataset );
+        createDataSpace(p_path,  p_datatype, ublas::vector<std::size_t>(1,p_dataset.size()), l_dataspace, l_dataset, l_groups);
         
-        // copy matrix to dataset
+        // copy vector to dataset
         T l_data[p_dataset.size()];
         for(std::size_t i=0; i < p_dataset.size(); ++i)
             l_data[i] = p_dataset(i);
         l_dataset.write( l_data, p_datatype, l_dataspace  );
-        l_dataspace.close();
         
-        // close groups
-        for(std::vector<H5::Group>::reverse_iterator it = l_groups.rbegin(); it != l_groups.rend(); ++it)
-            (*it).close();
+        closeDataSpace(l_groups, l_dataspace);
     }
     
     
+    /** write a value to hdf file
+     * @param p_path dataset path & name
+     * @param p_dataset value
+     * @param p_datatype datatype for writing data (see http://www.hdfgroup.org/HDF5/doc/cpplus_RM/classH5_1_1PredType.html )
+     **/
+    template<typename T> inline void hdf::write( const std::string& p_path, const T& p_dataset, const H5::PredType& p_datatype ) const
+    {        
+        H5::DataSet l_dataset;
+        H5::DataSpace l_dataspace;
+        std::vector<H5::Group> l_groups;
+        
+        createDataSpace(p_path,  p_datatype, ublas::vector<std::size_t>(1,1), l_dataspace, l_dataset, l_groups);
+        
+        // copy value to dataset
+        T l_data[1];
+        l_data[0] = p_dataset;
+        l_dataset.write( l_data, p_datatype, l_dataspace  );
+
+        closeDataSpace(l_groups, l_dataspace);
+     }
+    
+    
+    /** close the dataspace and the groups in the right order
+     * @param p_group vector with group information
+     * @param p_dataset dataset
+     **/
+    inline void hdf::closeDataSpace( std::vector<H5::Group>& p_groups, H5::DataSpace& p_dataset ) const
+    {
+        p_dataset.close();
+        
+        // close groups
+        for(std::vector<H5::Group>::reverse_iterator it = p_groups.rbegin(); it != p_groups.rend(); ++it)
+            (*it).close();
+        
+        p_groups.clear();
+    }
+    
+    
+    /** create a dataspace in the file content
+     * @param p_path path for dataspace
+     * @param p_datatype datatype for writing data (see http://www.hdfgroup.org/HDF5/doc/cpplus_RM/classH5_1_1PredType.html )
+     * @param p_dim dimension for dataspace and every dimension
+     * @param p_dataspace refernce of the dataspace
+     * @param p_dataset refernce for the dataset
+     * @param p_groups groups for closing
+     **/
+    inline void hdf::createDataSpace( const std::string& p_path, const H5::PredType& p_datatype, const ublas::vector<std::size_t>& p_dim, H5::DataSpace& p_dataspace, H5::DataSet& p_dataset, std::vector<H5::Group>& p_groups ) const
+    {
+        // define Structurs
+        H5::DSetCreatPropList l_defaultvalue;
+        l_defaultvalue.setFillValue( p_datatype, 0 );        
+        hsize_t l_size[p_dim.size()];
+        for(std::size_t i=0; i < p_dim.size(); ++i)
+            l_size[i] = p_dim(i);
+        
+        p_dataspace = H5::DataSpace( p_dim.size(), l_size );
+        p_groups    = std::vector<H5::Group>();
+        
+        // create Dataspace in path
+        p_dataset   = H5::DataSet();
+        createPathWithDataset( p_path,  p_datatype, p_dataspace, p_groups, p_dataset );
+    }
     
     
 };};};

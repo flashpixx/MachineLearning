@@ -288,12 +288,12 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     template<typename T> inline T neuralgas<T>::calculateQuantizationError( const ublas::matrix<T>& p_data, const ublas::matrix<T>& p_prototypes ) const
     {
         ublas::scalar_vector<T> l_ones(p_data.size1(), 1);
-        ublas::matrix<T> l_distances( p_prototypes.size1(), p_data.size2() );
+        ublas::matrix<T> l_distances( p_prototypes.size1(), p_data.size1() );
         
         for(std::size_t i=0; i < p_prototypes.size1(); ++i)
             ublas::row(l_distances, i) = m_distance->calculate( p_data, ublas::outer_prod( l_ones, ublas::row(p_prototypes, i) ));
         
-        return ublas::sum(  m_distance->abs( tools::matrix::min(l_distances) )  );  
+        return 0.5 * ublas::sum(  m_distance->abs(tools::matrix::min(l_distances, tools::matrix::column))  );  
     }
     
     

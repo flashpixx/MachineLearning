@@ -180,7 +180,8 @@ int main(int argc, char *argv[]) {
     // ===== NG =====     
     ublas::matrix<double> data = o.readMatrix<double>("/ngdata", H5::PredType::NATIVE_DOUBLE);
 	dist::euclid<double> d;
-	
+	const std::size_t ngit = 25;
+    
     #ifdef CLUSTER
     
     // we must create a shuffle vector for disjoint datasets and shuffle the matrix - it's not nice, but it works
@@ -206,12 +207,16 @@ int main(int argc, char *argv[]) {
 	    
     nsl::neuralgas<double> ng(d, protonum, data.size2());
     ng.setLogging(true);
-    ng.train(loMPICom, datarange, 20);
+    mpi::timer t;
+    ng.train(loMPICom, datarange, ngit);
+    if (loMPICom.rank() == 0)
+        std::cout << "number of process: " << loMPICom.size() << " Time: " << t.elapsed() << std::endl;
+    
     
     #else    
     nsl::neuralgas<double> ng(d, 11, data.size2());
     ng.setLogging(true);
-    ng.train(data, 20);
+    ng.train(data, ngit);
     #endif
     
     
@@ -224,6 +229,7 @@ int main(int argc, char *argv[]) {
     if (loMPICom.rank() == 0) {
         tl::files::hdf f("ng.hdf5", true);
         f.write<double>( "/protos",  proto, H5::PredType::NATIVE_DOUBLE );
+        f.write<std::size_t>( "/iteration",  ngit, H5::PredType::NATIVE_ULONG );
     
         if (ng.getLogging()) {
             f.write<double>( "/error",  qerror, H5::PredType::NATIVE_DOUBLE );
@@ -235,10 +241,13 @@ int main(int argc, char *argv[]) {
     
     #else
     tl::files::hdf f("ng.hdf5", true);
-    f.write<double>( "/protos",  ng.getPrototypes(), H5::PredType::NATIVE_DOUBLE );        
+    f.write<double>( "/protos",  ng.getPrototypes(), H5::PredType::NATIVE_DOUBLE );    
+    f.write<std::size_t>( "/iteration",  ngit, H5::PredType::NATIVE_ULONG );
+    
     if (ng.getLogging()) {
         f.write<double>( "/error",  tl::vector::copy(ng.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
- 
+        
+        
         std::vector< ublas::matrix<double> > logproto = ng.getLoggedPrototypes();
         for(std::size_t i=0; i < logproto.size(); ++i)
             f.write<double>("/log" + boost::lexical_cast<std::string>( i ), logproto[i], H5::PredType::NATIVE_DOUBLE );
