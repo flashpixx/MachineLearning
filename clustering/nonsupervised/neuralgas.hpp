@@ -603,6 +603,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         // we get every quantization error in 0.5 * sum-over-local-datapoints,
         // so we must for full sum multiplicate with 2
         std::vector<T> l_error = l_gatherError[0];
+        for(std::size_t i=0; i < l_error.size(); ++i)
+            l_error[i] *= 2.0;
+        
         for(std::size_t i=1; i < l_gatherError.size(); ++i)
             for(std::size_t n=0; n < l_error.size(); ++n)
                 l_error[n] += 2.0*l_gatherError[i][n];
