@@ -185,13 +185,13 @@ int main(int argc, char *argv[]) {
     #ifdef CLUSTER
     
     // we must create a shuffle vector for disjoint datasets and shuffle the matrix - it's not nice, but it works
-/*    ublas::vector<std::size_t> disjoint = static_cast< ublas::vector<std::size_t> >( tl::vector::random<double>(data.size1(), tl::random::uniform, 0, data.size1()) );
+    ublas::vector<std::size_t> disjoint = static_cast< ublas::vector<std::size_t> >( tl::vector::random<double>(data.size1(), tl::random::uniform, 0, data.size1()) );
     mpi::broadcast(loMPICom, disjoint, 0);
     for(std::size_t i=0; i < disjoint.size(); ++i) {
         ublas::vector<double> x         = ublas::row(data, i);
         ublas::row(data, i)             = ublas::row(data, disjoint(i));
         ublas::row(data, disjoint(i))   = x;
-    }*/
+    }
     
     // extract the data for the process (every process has load the whole data and shuffel them with the broadcasted shuffle vector)
     std::size_t nums     		= data.size1() / loMPICom.size();

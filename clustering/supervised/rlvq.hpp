@@ -278,12 +278,12 @@ namespace machinelearning { namespace clustering { namespace supervised {
     template<typename T, typename L> inline T rlvq<T, L>::calculateQuantizationError( const ublas::matrix<T>& p_data ) const
     {
         ublas::scalar_vector<T> l_ones(p_data.size1(), 1);
-        ublas::matrix<T> l_distances( m_prototypes.size1(), p_data.size2() );
+        ublas::matrix<T> l_distances( m_prototypes.size1(), p_data.size1() );
         
         for(std::size_t i=0; i < m_prototypes.size1(); ++i)
             ublas::row(l_distances, i) = m_distance->calculate( p_data, ublas::outer_prod( l_ones, ublas::row(m_prototypes, i) ));
         
-        return ublas::sum(  m_distance->abs( tools::matrix::min(l_distances) )  );
+        return 0.5 * ublas::sum(  m_distance->abs(tools::matrix::min(l_distances, tools::matrix::column))  );  
     }
     
     
