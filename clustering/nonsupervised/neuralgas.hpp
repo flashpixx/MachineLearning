@@ -600,20 +600,12 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         for(int i=0; i < p_mpi.size(); ++i)
             mpi::gather(p_mpi, m_quantizationerror, l_gatherError, i);
         
-        // we get every quantization error in 0.5 * sum-over-local-datapoints,
-        // so we must for full sum multiplicate with 2
+        // we get every quantization error
         std::vector<T> l_error = l_gatherError[0];
-        for(std::size_t i=0; i < l_error.size(); ++i)
-            l_error[i] *= 2.0;
-        
         for(std::size_t i=1; i < l_gatherError.size(); ++i)
             for(std::size_t n=0; n < l_error.size(); ++n)
-                l_error[n] += 2.0*l_gatherError[i][n];
-            
-        // now we can create the correct error
-        for(std::size_t i=0; i < l_error.size(); ++i)
-            l_error[i] *= 0.5;
-        
+                l_error[n] += l_gatherError[i][n];
+  
         return l_error;
             
     }

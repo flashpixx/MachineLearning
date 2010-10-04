@@ -11,14 +11,14 @@ COMPILECPU = 6
 CREATELANGUAGE = False
 
 def configuration_macosx(config, version, architecture) :
-    config["compiler"]          = "g++"
-    #config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -arch "+architecture+" -D CLUSTER -D MULTILANGUAGE -D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
-    config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -arch "+architecture+" -D MULTILANGUAGE -D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
+    config["compiler"]          = "mpic++"
+    config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -arch "+architecture+" -D CLUSTER -D MULTILANGUAGE -D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
+    #config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -arch "+architecture+" -D MULTILANGUAGE -D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
     config["linkerflags"]       = ""
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["LIBRARY_PATH"]
-    #config["linkto"]            = ["intl", "boost_mpi", "boost_serialization", "boost_random", "boost_thread", "hdf5_cpp", "hdf5", "ginac", "atlas", "lapack", "ptcblas"]
-    config["linkto"]            = ["intl", "boost_random", "boost_thread", "hdf5_cpp", "hdf5", "ginac", "atlas", "lapack", "ptcblas"]
+    config["linkto"]            = ["intl", "boost_mpi", "boost_serialization", "boost_random", "boost_thread", "hdf5_cpp", "hdf5", "ginac", "atlas", "lapack", "ptcblas"]
+    #config["linkto"]            = ["intl", "boost_random", "boost_thread", "hdf5_cpp", "hdf5", "ginac", "atlas", "lapack", "ptcblas"]
 
     
 def configuration_posix(config, version, architecture) :
