@@ -385,7 +385,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             mpi::gather(p_mpi, l_normvec, l_localnorm, i);
         }
 
-        // create local prototypes and normalize
+        // create local prototypes (sum) and normalize (sum)
         m_prototypes             = l_localprototypes[0];
         ublas::vector<T> l_norm  = l_localnorm[0];
         for(std::size_t i=1; i < l_localprototypes.size(); ++i) {
