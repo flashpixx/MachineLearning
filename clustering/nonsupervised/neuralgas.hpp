@@ -72,6 +72,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             ublas::matrix<T> getPrototypes( const mpi::communicator& ) const;
             std::vector< ublas::matrix<T> > getLoggedPrototypes( const mpi::communicator& ) const;
             std::vector<T> getLoggedQuantizationError( const mpi::communicator& ) const;
+            ublas::indirect_array< std::vector<std::size_t> > use( const mpi::communicator&, const ublas::matrix<T>& ) const;
             #endif
         
         
@@ -609,6 +610,41 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         return l_error;
             
     }
+    
+    
+    /** calulates distance between datapoints and prototypes and returns a std::vector
+     * with index of the nearest prototype
+     * @overload
+     * @param p_mpi MPI object for communication     
+     * @param p_data matrix
+     * @return index array of prototype indices
+     **/
+    template<typename T> inline ublas::indirect_array< std::vector<std::size_t> > neuralgas<T>::use( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data ) const
+    {
+        if (p_data.size1() < m_prototypes.size1())
+            throw exception::parameter(_("number of datapoints are less than prototypes"));
+        
+        //first we gathering all other prototypes
+        const ublas::matrix<T> l_prototypes = gatherPrototypes( p_mpi );
+        
+        std::vector<std::size_t> l_vec(p_data.size1());
+        ublas::scalar_vector<T> l_ones(p_data.size1(), 1);
+        ublas::matrix<T> l_distance(l_prototypes.size1(), p_data.size1());
+        
+        // calculate distance for every prototype
+        for(std::size_t i=0; i < l_prototypes.size1(); ++i)
+            ublas::row(l_distance, i)  = m_distance->calculate( p_data,  ublas::outer_prod(l_ones, ublas::row(l_prototypes, i)) );
+        
+        // determine nearest prototype
+        for(std::size_t i=0; i < l_prototypes.size2(); ++i) {
+            ublas::vector<T> l_col                                          = ublas::column(l_distance, i);
+            const ublas::indirect_array< std::vector<std::size_t> > l_rank  = tools::vector::rankIndex( l_col );
+            l_vec.push_back( l_rank(0) );
+        }
+        
+        return ublas::indirect_array< std::vector<std::size_t> >(l_vec.size(), l_vec);
+    }
+    
     
     #endif
     
