@@ -327,7 +327,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
                 
     }
     
-    
+    //======= MPI ==================================================================================================================================
     #ifdef CLUSTER
     
     /** gathering prototypes of every process and return the full prototypes matrix (row oriantated)
