@@ -63,29 +63,44 @@ namespace machinelearning { namespace distances { namespace relational {
     
     
     /** calculate distance between matrix, wherever rows or columns
-     * are read like vectors (sqrt( sum ( (vec1[i] - vec2[i]).^2 ) )
+     * are read like pairs of distances ( (D*alpha_i)_i - 0.5 * alpha_i^t * D * alpha_i) )
      * @overload
-     * @param p_first first matrix
-     * @param p_second second matrix
+     * @param p_first first matrix (data matrix)
+     * @param p_second second matrix (prototype matrix)
      * @param p_row enum for creating matrix sum over rows or columns
      * @return vector with distances
      **/
     template<typename T> inline ublas::vector<T> euclid<T>::calculate( const ublas::matrix<T>& p_first, const ublas::matrix<T>& p_second, const tools::matrix::rowtype& p_row ) const
     {
-      /*  ublas::vector<T> l_vec( (p_row==tools::matrix::row) ? p_first.size1() : p_first.size2()  );
-        ublas::matrix<T> l_matrix = p_first-p_second;
+        ublas::vector<T> l_vec( (p_row==tools::matrix::row) ? p_first.size1() : p_first.size2()  );
+        
+        /*
+        [lnDimy lnDimx] = size( paNeurons );
+        
+        Werte zwischen Distanzen und Neuronen berechnen
+        la1 = paNeurons * paDistances;
+        la2 = zeros(lnDimy,1);
+        
+        für jedes Neuron den quadratischen ABstand bilden
+        for i = 1:lnDimy
+            la2(i,1) = 0.5 * (la1(i,:) * paNeurons(i,:)');
+            end
+            
+            raDistances = la1 - la2*ones(1,lnDimx);
+        */
         
         switch (p_row) {                
-            case tools::matrix::row :     for(std::size_t i=0; i < l_vec.size(); ++i)
-                    l_vec(i) = blas::nrm2( static_cast< ublas::vector<T> >(ublas::row(l_matrix, i)) );
-                break;
+            case tools::matrix::row :   ublas::matrix<T> l_matrix = ublas::outer_prod(p_second, p_first);
+                                        for(std::size_t i=0; i < l_vec.size(); ++i)
+                                            l_vec(i) = 0.5 * ublas::row(l_matrix, i);
+                                        break;
                 
-                case tools::matrix::column :  for(std::size_t i=0; i < l_vec.size(); ++i)
-                    l_vec(i) = blas::nrm2( static_cast< ublas::vector<T> >(ublas::column(l_matrix, i)) );
-                break;
+                //case tools::matrix::column :  for(std::size_t i=0; i < l_vec.size(); ++i)
+                //    l_vec(i) = blas::nrm2( static_cast< ublas::vector<T> >(ublas::column(l_matrix, i)) );
+                //break;
         }
         
-        return l_vec;*/
+        return l_vec;
     }
     
     

@@ -95,6 +95,7 @@ namespace machinelearning { namespace dimensionreduce { namespace supervised {
      * @param p_data input datamatrix
      * @param p_label labeling for matrix rows
      * @return matrix with mapped points
+     * @todo change matrix copy with ublas ranges
      **/
     template<typename T, typename L> inline ublas::matrix<T> lda<T, L>::map( const ublas::matrix<T>& p_data, const std::vector<L>& p_label )
     {
@@ -126,11 +127,12 @@ namespace machinelearning { namespace dimensionreduce { namespace supervised {
         for(std::size_t i=0; i < l_uniquelabel.size(); ++i) {
             
             
-            // extract index from map | typename must be first, because is a exotic structure from C++ :-)
+            // extract index from map | typename must be first, because is a exotic structure of C++ :-)
             // create a matrix whitch holds the rows for every class. Create a matrix with index elements for the rows
             std::size_t n=0;
             ublas::matrix<T> l_cluster(  std::distance(l_index.lower_bound(l_uniquelabel[i]), l_index.upper_bound(l_uniquelabel[i])),  l_center.size2()  );
             for( typename std::multimap<L, std::size_t>::iterator it = l_index.lower_bound(l_uniquelabel[i]); it != l_index.upper_bound(l_uniquelabel[i]); ++it )
+                // -> do this with range
                 ublas::row(l_cluster, n++) = ublas::row(l_center, it->second);
             
             // calculate covarianz for the cluster

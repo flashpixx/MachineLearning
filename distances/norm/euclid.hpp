@@ -65,8 +65,8 @@ namespace machinelearning { namespace distances {
     /** calculate distance between matrix, wherever rows or columns
      * are read like vectors (sqrt( sum ( (vec1[i] - vec2[i]).^2 ) )
      * @overload
-     * @param p_first first matrix
-     * @param p_second second matrix
+     * @param p_first first matrix (data matrix)
+     * @param p_second second matrix (prototype matrix)
      * @param p_row enum for creating matrix sum over rows or columns
      * @return vector with distances
     **/
@@ -93,8 +93,8 @@ namespace machinelearning { namespace distances {
     /** calculate weight distance between matrix, wherever rows or columns
      * are read like vectors (sqrt( sum ( weights.^2 .* (vec1[i] - vec2[i]).^2 ) )
      * @overload
-     * @param p_first first matrix
-     * @param p_second second matrix
+     * @param p_first first matrix (data matrix)
+     * @param p_second second matrix (prototype matrix)
      * @param p_weights weights 
      * @param p_row enum for creating matrix sum over rows or columns
      * @return vector with distances
