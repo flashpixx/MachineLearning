@@ -87,7 +87,7 @@ namespace machinelearning { namespace distances { namespace relational {
             end
             
             raDistances = la1 - la2*ones(1,lnDimx);
-        */
+        
         
         switch (p_row) {                
             case tools::matrix::row :   ublas::matrix<T> l_matrix = ublas::outer_prod(p_second, p_first);
@@ -100,7 +100,7 @@ namespace machinelearning { namespace distances { namespace relational {
                 //break;
         }
         
-        return l_vec;
+        return l_vec;*/
     }
     
     
