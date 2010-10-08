@@ -18,15 +18,15 @@ def configuration_macosx(config, version, architecture) :
     if ver[0] == "10" and ver[1] == "6" :
         arch = "x86_64"
     
-    #config["compiler"]          = "mpic++"
-    config["compiler"]          = "g++"
-    #config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -arch "+arch" -D CLUSTER -D MULTILANGUAGE -D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
-    config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -arch "+arch+" -D MULTILANGUAGE -D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
+    config["compiler"]          = "mpic++"
+    #config["compiler"]          = "g++"
+    config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -arch "+arch+" -D CLUSTER -D MULTILANGUAGE -D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
+    #config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -arch "+arch+" -D MULTILANGUAGE -D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
     config["linkerflags"]       = ""
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["LIBRARY_PATH"]
-    #config["linkto"]            = ["intl", "boost_mpi", "boost_serialization", "boost_random", "boost_thread", "hdf5_cpp", "hdf5", "ginac", "atlas", "lapack", "ptcblas"]
-    config["linkto"]            = ["intl", "boost_random", "boost_thread", "hdf5_cpp", "hdf5", "ginac", "atlas", "lapack", "ptcblas"]
+    config["linkto"]            = ["intl", "boost_mpi", "boost_serialization", "boost_random", "boost_thread", "hdf5_cpp", "hdf5", "ginac", "atlas", "lapack", "ptcblas"]
+    #config["linkto"]            = ["intl", "boost_random", "boost_thread", "hdf5_cpp", "hdf5", "ginac", "atlas", "lapack", "ptcblas"]
 
     
 def configuration_posix(config, version, architecture) :

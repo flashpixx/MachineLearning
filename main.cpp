@@ -182,8 +182,8 @@ int main(int argc, char *argv[]) {
     ublas::matrix<double> data = o.readMatrix<double>("/ngbigdata", H5::PredType::NATIVE_DOUBLE);
    
     
-	//dist::euclid<double> d;
-    dist::relational::euclid<double> d;
+	dist::euclid<double> d;
+    //dist::relational::euclid<double> d;
     
 	const std::size_t ngit = 25;
     
