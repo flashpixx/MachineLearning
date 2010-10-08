@@ -11,10 +11,17 @@ COMPILECPU = 6
 CREATELANGUAGE = False
 
 def configuration_macosx(config, version, architecture) :
+    # check the OSX build for set the correct architecture
+    arch = architecture
+    ver  = version.split(".")
+    
+    if ver[0] == "10" and ver[1] == "6" :
+        arch = "x86_64"
+    
     #config["compiler"]          = "mpic++"
     config["compiler"]          = "g++"
-    #config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -arch "+architecture+" -D CLUSTER -D MULTILANGUAGE -D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
-    config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -arch "+architecture+" -D MULTILANGUAGE -D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
+    #config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -arch "+arch" -D CLUSTER -D MULTILANGUAGE -D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
+    config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -arch "+arch+" -D MULTILANGUAGE -D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
     config["linkerflags"]       = ""
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["LIBRARY_PATH"]
