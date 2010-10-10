@@ -54,7 +54,7 @@ def configuration_posix(config, version, architecture) :
     config["linkerflags"]       = ""
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["LIBRARY_PATH"]
-    config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -arch "+arch+" -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
+    config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -arch "+architecture+" -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
     config["linkto"]            = ["boost_thread", "hdf5_cpp", "hdf5", "ginac", "atlas", "lapack", "ptcblas", "ptf77blas"]
     
     
