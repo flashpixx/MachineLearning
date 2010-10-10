@@ -460,7 +460,7 @@ namespace machinelearning { namespace tools { namespace files {
     
     
     /** close the dataspace and the groups in the right order
-     * @param p_group vector with group information
+     * @param p_groups vector with group information
      * @param p_dataset dataset
      **/
     inline void hdf::closeDataSpace( std::vector<H5::Group>& p_groups, H5::DataSpace& p_dataset ) const

@@ -8,7 +8,8 @@ import platform
 AddOption("--with-randomdevice", dest="withrandom", type="string", nargs=0, action="store", help="installation with random device support")
 AddOption("--with-mpi", dest="withmpi", type="string", nargs=0, action="store", help="installation with MPI support")
 AddOption("--with-multilanguage", dest="withmultilanguage", type="string", nargs=0, action="store", help="installation with multilanguage support")
-AddOption("--createlang", dest="createlang", type="string", nargs=0, action="store", help="creates the file tools/language/language.pot for translation")
+AddOption("--create-language", dest="createlang", type="string", nargs=0, action="store", help="creates the file tools/language/language.pot for translation")
+AddOption("--create-documentation", dest="createdocu", type="string", nargs=0, action="store", help="creates the doxygen documentation (doxygen must be within the path)")
 
 
 
@@ -184,5 +185,7 @@ SetOption('num_jobs',   int(os.environ.get('NUM_CPU', COMPILECPU)))
 # get all cpp-files and compile and create language file
 if GetOption("createlang") != None :
     createLanguage(env)
+elif GetOption("createdocu") != None :
+    os.system("doxygen documentation.doxyfile")
 else :
     env.Program( getRekusivFiles(os.curdir, ".cpp") )

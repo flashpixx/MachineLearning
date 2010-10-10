@@ -91,8 +91,9 @@ namespace machinelearning { namespace functionaloptimization { namespace gradien
      * the parameter
      * @param p_iteration maximum iterations
      * @param p_stepsize initializsation stepsize
-     * @param p_syms symbolic value map
-     * @param p_derivation map with all derivations
+     * @param p_function function string
+     * @param p_errorfunction error function
+     * @param p_derivationvars map with all derivations
      * @param p_initvalues map with values and optimize range
      * @param p_staticvalues map with multidimensional array for static variables
      * @param p_batch vector with information wich variable can be optimize together

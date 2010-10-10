@@ -498,7 +498,6 @@ namespace machinelearning { namespace distances {
     
     
     /** deflate a string or file with the algorithm
-     * @param p_isfile parameter for interpreting the string as a file with path
      * @param p_str1 first string to compress
      * @param p_str2 optional second string to compress
      **/    

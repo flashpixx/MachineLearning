@@ -359,7 +359,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
 
     /** gathering prototypes of every process and set with them the local prototypematrix.
      * We can not use const references because of the range
-     * @param p_MPI MPI object for communication
+     * @param p_mpi MPI object for communication
      * @param p_localprototypes local prototype matrix
      * @param p_localnorm normalize vector
      **/
@@ -562,7 +562,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     /** returns all logged prototypes in all processes
      * @overload
      * @param p_mpi MPI object for communication
-     * @retun std::vector with all logged prototypes
+     * @return std::vector with all logged prototypes
      **/
     template<typename T> inline std::vector< ublas::matrix<T> > neuralgas<T>::getLoggedPrototypes( const mpi::communicator& p_mpi ) const
     {
