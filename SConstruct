@@ -8,15 +8,16 @@ import platform
 AddOption("--with-randomdevice", dest="withrandom", type="string", nargs=0, action="store", help="installation with random device support")
 AddOption("--with-mpi", dest="withmpi", type="string", nargs=0, action="store", help="installation with MPI support")
 AddOption("--with-multilanguage", dest="withmultilanguage", type="string", nargs=0, action="store", help="installation with multilanguage support")
+AddOption("--createlang", dest="createlang", type="string", nargs=0, action="store", help="creates the file tools/language/language.pot for translation")
+
 
 
 #=== function for os configuration ===================================================================================================
-# using CPUs for compiling
-COMPILECPU = 6
-# constante for creating language files
-CREATELANGUAGE = False
+# using CPUs for compiling (default)
+COMPILECPU = 2
 
 
+# configuration for OSX build
 def configuration_macosx(config, version, architecture) :
     # check the OSX build for set the correct architecture
     arch = architecture
@@ -49,7 +50,8 @@ def configuration_macosx(config, version, architecture) :
         config["linkto"].append("intl");
 
     
-    
+
+# configuration for Posix (Linux) build
 def configuration_posix(config, version, architecture) :
     config["linkerflags"]       = ""
     config["include"]           = os.environ["CPPPATH"]
@@ -74,7 +76,7 @@ def configuration_posix(config, version, architecture) :
 
 
 
-    
+# configuration for Windows build
 def configuration_win32(config, version, architecture) :
     config = []
 #=======================================================================================================================================
@@ -159,9 +161,6 @@ def getRekusivFiles(startdir, ending, pdontuse=[], pShowPath=True) :
        
 # build languagefiles
 def createLanguage(env) :
-    if not(CREATELANGUAGE) :
-        return
-
     # compiling with: msgfmt -v -o target.mo source.po
     # add new data: msgmerge --no-wrap --update old_file.po newer_file.pot
     
@@ -183,5 +182,7 @@ env = getConfig()
 SetOption('num_jobs',   int(os.environ.get('NUM_CPU', COMPILECPU)))
 
 # get all cpp-files and compile and create language file
-createLanguage(env)
-env.Program( getRekusivFiles(os.curdir, ".cpp") )
+if GetOption("createlang") != None :
+    createLanguage(env)
+else :
+    env.Program( getRekusivFiles(os.curdir, ".cpp") )
