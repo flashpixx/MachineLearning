@@ -4,11 +4,18 @@ import os
 import glob
 import platform
 
+
+AddOption("--with-randomdevice", dest="withrandom", type="string", nargs=0, action="store", help="installation with random device support")
+AddOption("--with-mpi", dest="withmpi", type="string", nargs=0, action="store", help="installation with MPI support")
+AddOption("--with-multilanguage", dest="withmultilanguage", type="string", nargs=0, action="store", help="installation with multilanguage support")
+
+
 #=== function for os configuration ===================================================================================================
 # using CPUs for compiling
 COMPILECPU = 6
 # constante for creating language files
 CREATELANGUAGE = False
+
 
 def configuration_macosx(config, version, architecture) :
     # check the OSX build for set the correct architecture
@@ -18,24 +25,54 @@ def configuration_macosx(config, version, architecture) :
     if ver[0] == "10" and ver[1] == "6" :
         arch = "x86_64"
     
-    config["compiler"]          = "mpic++"
-    #config["compiler"]          = "g++"
-    config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -arch "+arch+" -D CLUSTER -D MULTILANGUAGE -D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
-    #config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -arch "+arch+" -D MULTILANGUAGE -D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
+    
     config["linkerflags"]       = ""
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["LIBRARY_PATH"]
-    config["linkto"]            = ["intl", "boost_mpi", "boost_serialization", "boost_random", "boost_thread", "hdf5_cpp", "hdf5", "ginac", "atlas", "lapack", "ptcblas"]
-    #config["linkto"]            = ["intl", "boost_random", "boost_thread", "hdf5_cpp", "hdf5", "ginac", "atlas", "lapack", "ptcblas"]
+    config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -arch "+arch+" -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
+    config["linkto"]            = ["boost_thread", "hdf5_cpp", "hdf5", "ginac", "atlas", "lapack", "ptcblas"]
+    
+    
+    if GetOption("withmpi") == None :
+        config["compiler"]          =  "g++"
+    else :
+        config["compiler"]          = "mpic++"
+        config["compileflags"]      += " -D CLUSTER"
+        config["linkto"].extend( ["boost_mpi", "boost_serialization"] )
+                
+    if GetOption("withrandom") != None :   
+        config["compileflags"]      += " -D RANDOMDEVICE"
+        config["linkto"].append("boost_random");
+            
+    if GetOption("withmultilanguage") != None :
+        config["compileflags"]      += " -D MULTILANGUAGE"
+        config["linkto"].append("intl");
 
     
+    
 def configuration_posix(config, version, architecture) :
-    config["compiler"]          = "mpic++"
-    config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -D CLUSTER -D MULTILANGUAGE -D RANDOMDEVICE -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
     config["linkerflags"]       = ""
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["LIBRARY_PATH"]
-    config["linkto"]            = ["boost_mpi", "boost_serialization", "boost_random", "boost_thread", "hdf5_cpp", "hdf5", "ginac", "atlas", "lapack", "ptcblas", "ptf77blas"]
+    config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -arch "+arch+" -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
+    config["linkto"]            = ["boost_thread", "hdf5_cpp", "hdf5", "ginac", "atlas", "lapack", "ptcblas", "ptf77blas"]
+    
+    
+    if GetOption("withmpi") == None :
+        config["compiler"]          =  "g++"
+    else :
+        config["compiler"]          = "mpic++"
+        config["compileflags"]      += " -D CLUSTER"
+        config["linkto"].extend( ["boost_mpi", "boost_serialization"] )
+                
+    if GetOption("withrandom") != None :   
+        config["compileflags"]      += " -D RANDOMDEVICE"
+        config["linkto"].append("boost_random");
+            
+    if GetOption("withmultilanguage") != None :
+        config["compileflags"]      += " -D MULTILANGUAGE"
+
+
 
     
 def configuration_win32(config, version, architecture) :
