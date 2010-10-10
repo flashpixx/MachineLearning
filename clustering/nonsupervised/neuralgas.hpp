@@ -374,18 +374,19 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
                     ublas::range( m_processprototypinfo[i].first, m_processprototypinfo[i].first + m_processprototypinfo[i].second ), 
                     ublas::range( 0, p_localprototypes.size2() )
             );
-            ublas::matrix<T> l_protomatrix = l_protorange;
-            mpi::gather(p_mpi, l_protomatrix, l_localprototypes, i);
+            mpi::gather(p_mpi, static_cast< ublas::matrix<T> >(l_protorange), l_localprototypes, i);
 
             // gather norm
             ublas::vector_range< ublas::vector<T> > l_normrange(p_localnorm,
                     ublas::range( m_processprototypinfo[i].first, m_processprototypinfo[i].first + m_processprototypinfo[i].second )
             );
-            ublas::vector<T> l_normvec = l_normrange;
-            mpi::gather(p_mpi, l_normvec, l_localnorm, i);
+            mpi::gather(p_mpi, static_cast< ublas::vector<T> >(l_normrange), l_localnorm, i);
         }
 
         // create local prototypes (sum) and normalize (sum)
+        // because every dimension of the prototype can be written as a dot product
+        // and the datasets are disjoint sets, so we can create the dot product as disjount sum functions
+        // (normalization in the same way)
         m_prototypes             = l_localprototypes[0];
         ublas::vector<T> l_norm  = l_localnorm[0];
         for(std::size_t i=1; i < l_localprototypes.size(); ++i) {
