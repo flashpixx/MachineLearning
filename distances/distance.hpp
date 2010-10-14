@@ -46,6 +46,9 @@ namespace machinelearning { namespace distances {
         
         public :
         
+            /** returns true if class is relational **/
+            virtual bool isRelational( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+        
             /** normalize a vector */
             virtual void normalize( ublas::vector<T>& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
 

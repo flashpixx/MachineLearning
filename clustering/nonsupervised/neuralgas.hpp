@@ -270,16 +270,19 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             }
             
             
-            // adapt to prototypes and normalize (row orientated)
-            m_prototypes = ublas::prod( l_adaptmatrix, p_data );
-            
+            // create prototypes
+            if (m_distance->isRelational())
+                m_prototypes = l_adaptmatrix;
+            else
+                m_prototypes = ublas::prod( l_adaptmatrix, p_data );
+
+            // normalize prototypes
             for(std::size_t n=0; n < m_prototypes.size1(); ++n) {
                 l_norm = ublas::sum( ublas::row(l_adaptmatrix, n) );
                 
                 if (!tools::function::isNumericalZero(l_norm))
                     ublas::row(m_prototypes, n) /= l_norm;
             }
-
             
             // determine quantization error for logging
             if (m_logging) {
@@ -537,10 +540,14 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             }
                 
             
-            // calculate all local prototype for the local data points
-            l_prototypes = ublas::prod( l_adaptmatrix, p_data );
+            // create local prototypes
+            if (m_distance->isRelational())
+                l_prototypes = l_adaptmatrix;
+            else
+                l_prototypes = ublas::prod( l_adaptmatrix, p_data );
+            
 
-            // calculating local norm for the prototypes
+            // normalize prototypes
             for(std::size_t n=0; n < l_prototypes.size1(); ++n)
                 l_normvec(n) = ublas::sum( ublas::row(l_adaptmatrix, n) );
 

@@ -45,6 +45,8 @@ namespace machinelearning { namespace distances { namespace relational {
         
     public:
         
+        bool isRelational( void ) const;
+        
         void normalize( ublas::vector<T>& ) const;
         void normalize( ublas::matrix<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const;        
         ublas::vector<T> getNormalize( const ublas::vector<T>& ) const;
@@ -54,6 +56,16 @@ namespace machinelearning { namespace distances { namespace relational {
         ublas::vector<T> getAbs( const ublas::vector<T>& ) const;
         
     };
+    
+    
+    
+    /** marker method for relational
+     * @return bool for relational
+     **/
+    template<typename T> inline bool euclid<T>::isRelational( void ) const
+    {
+        return true;
+    }
     
     
     
