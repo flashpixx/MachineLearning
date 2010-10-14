@@ -179,24 +179,75 @@ int main(int argc, char *argv[]) {
     }
     */
     
+    
+    
+    // ===== RNG =====
+    /*
+    ublas::matrix<double> data = o.readMatrix<double>("/relational/cortex/data2", H5::PredType::NATIVE_DOUBLE);
+    
+    dist::relational::euclid<double> d;
+    
+    const std::size_t ngit      = 25;
+    const std::size_t numproto  = 3;
+    
+    #ifdef CLUSTER
+    #else    
+    nsl::relationalneuralgas<double> ng(d, numproto, data.size2());
+    ng.setLogging(true);
+    ng.train(data, ngit);
+    #endif
+    
+    
+    
+    #ifdef CLUSTER
+	ublas::matrix<double> proto                   = tl::matrix::setNumericalZero(ng.getPrototypes(loMPICom));
+    ublas::vector<double> qerror                  = tl::vector::copy(ng.getLoggedQuantizationError(loMPICom));
+    std::vector< ublas::matrix<double> > logproto = ng.getLoggedPrototypes(loMPICom);
+    
+    if (loMPICom.rank() == 0) {
+        tl::files::hdf f("rng.hdf5", true);
+        f.write<double>( "/protos",  proto, H5::PredType::NATIVE_DOUBLE );
+        f.write<std::size_t>( "/iteration",  ngit, H5::PredType::NATIVE_ULONG );
+        
+        if (ng.getLogging()) {
+            f.write<double>( "/error",  qerror, H5::PredType::NATIVE_DOUBLE );
+            
+            for(std::size_t i=0; i < logproto.size(); ++i)
+                f.write<double>("/log" + boost::lexical_cast<std::string>( i ), tl::matrix::setNumericalZero(logproto[i]), H5::PredType::NATIVE_DOUBLE );
+        }
+    }
+    
+    #else
+    tl::files::hdf f("rng.hdf5", true);
+    f.write<double>( "/protos",  tl::matrix::setNumericalZero(ng.getPrototypes()), H5::PredType::NATIVE_DOUBLE );    
+    f.write<std::size_t>( "/iteration",  ngit, H5::PredType::NATIVE_ULONG );
+    
+    if (ng.getLogging()) {
+        f.write<double>( "/error",  tl::vector::copy(ng.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
+        
+        
+        std::vector< ublas::matrix<double> > logproto = ng.getLoggedPrototypes();
+        for(std::size_t i=0; i < logproto.size(); ++i)
+            f.write<double>("/log" + boost::lexical_cast<std::string>( i ), tl::matrix::setNumericalZero(logproto[i]), H5::PredType::NATIVE_DOUBLE );
+    }
+    #endif    
+    */
+    
    
     // ===== NG =====    
     
     ublas::matrix<double> data = o.readMatrix<double>("/ngdata", H5::PredType::NATIVE_DOUBLE);
     //ublas::matrix<double> data = o.readMatrix<double>("/ngmini", H5::PredType::NATIVE_DOUBLE);
     //ublas::matrix<double> data = o.readMatrix<double>("/ngbigdata", H5::PredType::NATIVE_DOUBLE);
-    //ublas::matrix<double> data = o.readMatrix<double>("/relational/cortex/data2", H5::PredType::NATIVE_DOUBLE);
-	
+    	
     
     dist::euclid<double> d;
-    //dist::relational::euclid<double> d;
     
-	const std::size_t ngit      = 25;
-    const std::size_t numproto  = 11; //3 relational & 11 real
+    const std::size_t ngit      = 25;
+    const std::size_t numproto  = 11;
 
     
     #ifdef CLUSTER
-    
     // we must create a shuffle vector for disjoint datasets and shuffle the matrix - it's not nice, but it works
     ublas::vector<std::size_t> disjoint = static_cast< ublas::vector<std::size_t> >( tl::vector::random<double>(data.size1(), tl::random::uniform, 0, data.size1()) );
     mpi::broadcast(loMPICom, disjoint, 0);
@@ -266,6 +317,7 @@ int main(int argc, char *argv[]) {
             f.write<double>("/log" + boost::lexical_cast<std::string>( i ), tl::matrix::setNumericalZero(logproto[i]), H5::PredType::NATIVE_DOUBLE );
     }
     #endif
+    
     
     
     // ===== RLVQ ======

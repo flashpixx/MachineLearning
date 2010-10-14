@@ -22,8 +22,8 @@
  **/
 
 
-#ifndef MACHINELEARNING_CLUSTERING_NONSUPERVISED_NG_HPP
-#define MACHINELEARNING_CLUSTERING_NONSUPERVISED_NG_HPP
+#ifndef MACHINELEARNING_CLUSTERING_NONSUPERVISED_RNG_HPP
+#define MACHINELEARNING_CLUSTERING_NONSUPERVISED_RNG_HPP
 
 #include <algorithm>
 #include <numeric>
@@ -48,13 +48,13 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     namespace mpi   = boost::mpi;
     #endif
     
-    /** class for calculate (batch) neural gas
+    /** class for calculate (batch) relational neural gas
      **/
-    template<typename T> class neuralgas : public nonsupervisedclustering<T> {
+    template<typename T> class relationalneuralgas : public nonsupervisedclustering<T> {
         
         public:
-        
-            neuralgas( const distances::distance<T>&, const std::size_t&, const std::size_t& );
+            
+            relationalneuralgas( const distances::distance<T>&, const std::size_t&, const std::size_t& );
             void train( const ublas::matrix<T>&, const std::size_t& );
             void train( const ublas::matrix<T>&, const std::size_t&, const T& );
             ublas::matrix<T> getPrototypes( void ) const;
@@ -65,7 +65,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             std::size_t getPrototypeCount( void ) const;
             std::vector<T> getLoggedQuantizationError( void ) const;
             ublas::indirect_array< std::vector<std::size_t> > use( const ublas::matrix<T>& ) const;
-        
+            
             #ifdef CLUSTER
             void train( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t& );
             void train( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t&, const T& );
@@ -78,7 +78,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
         
         private :
-        
+            
             /** distance object **/
             const distances::distance<T>* m_distance;        
             /** prototypes **/
@@ -89,15 +89,16 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             std::vector< ublas::matrix<T> > m_logprototypes;
             /** std::vector for quantisation error in each iteration **/
             std::vector<T> m_quantizationerror;
-        
+            
             T calculateQuantizationError( const ublas::matrix<T>&, const ublas::matrix<T>& ) const;
-        
+            
             #ifdef CLUSTER
             /** map with information **/
             std::map<int, std::pair<std::size_t,std::size_t> > m_processprototypinfo;
-
+            
             ublas::matrix<T> gatherPrototypes( const mpi::communicator& ) const;
-            void gatherLocalPrototypes( const mpi::communicator&, ublas::matrix<T>&, ublas::vector<T>& );
+            void gatherNonRelationalLocalPrototypes( const mpi::communicator&, ublas::matrix<T>&, ublas::vector<T>& );
+            void gatherRelationalLocalPrototypes( const mpi::communicator&, ublas::matrix<T>&, ublas::vector<T>& );
             std::size_t gatherNumberPrototypes( const mpi::communicator& ) const;
             void setProcessPrototypeInfo( const mpi::communicator& );
             #endif
@@ -109,8 +110,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * @param p_distance distance object
      * @param p_prototypes number of prototypes
      * @param p_prototypesize size of each prototype (data dimension)
-    **/
-    template<typename T> inline neuralgas<T>::neuralgas( const distances::distance<T>& p_distance, const std::size_t& p_prototypes, const std::size_t& p_prototypesize ) :
+     **/
+    template<typename T> inline relationalneuralgas<T>::relationalneuralgas( const distances::distance<T>& p_distance, const std::size_t& p_prototypes, const std::size_t& p_prototypesize ) :
         m_distance( &p_distance ),
         m_prototypes( tools::matrix::random<T>(p_prototypes, p_prototypesize) ),
         m_logging( false ),
@@ -124,36 +125,36 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             throw exception::parameter(_("prototype size must be greater than zero"));
         if (p_prototypes == 0)
             throw exception::parameter(_("number of prototypes must be greater than zero"));
-    
+        
         // normalize the prototypes
         m_distance->normalize( m_prototypes );
     }
     
-     
+    
     /** returns the prototype matrix
      * @return matrix (rows = number of prototypes)
      **/
-    template<typename T> inline ublas::matrix<T> neuralgas<T>::getPrototypes( void ) const
+    template<typename T> inline ublas::matrix<T> relationalneuralgas<T>::getPrototypes( void ) const
     {
         return m_prototypes;
     }
     
-
+    
     
     /** enabled logging for training
      * @param p bool
      **/
-    template<typename T> inline void neuralgas<T>::setLogging( const bool& p )
+    template<typename T> inline void relationalneuralgas<T>::setLogging( const bool& p )
     {
         m_logging = p;
     }
     
     
-
+    
     /** shows the logging status
      * @return bool
      **/
-    template<typename T> inline bool neuralgas<T>::getLogging( void ) const
+    template<typename T> inline bool relationalneuralgas<T>::getLogging( void ) const
     {
         return m_logging;
     }
@@ -163,7 +164,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     /** returns every prototype step during training
      * @return std::vector with prototype matrix
      **/
-    template<typename T> inline std::vector< ublas::matrix<T> > neuralgas<T>::getLoggedPrototypes( void ) const
+    template<typename T> inline std::vector< ublas::matrix<T> > relationalneuralgas<T>::getLoggedPrototypes( void ) const
     {
         return m_logprototypes;
     }
@@ -172,16 +173,16 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     /** returns the dimension of prototypes
      * @return dimension of the prototypes
      **/
-    template<typename T> inline std::size_t neuralgas<T>::getPrototypeSize( void ) const 
+    template<typename T> inline std::size_t relationalneuralgas<T>::getPrototypeSize( void ) const 
     {
         return m_prototypes.size2();
     };
     
-
+    
     /** returns the number of prototypes
      * @return number of the prototypes / classes
      **/
-    template<typename T> inline std::size_t neuralgas<T>::getPrototypeCount( void ) const 
+    template<typename T> inline std::size_t relationalneuralgas<T>::getPrototypeCount( void ) const 
     {
         return m_prototypes.size1();
     };
@@ -190,7 +191,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     /** returns the quantisation error 
      * @return error for each iteration
      **/
-    template<typename T> inline std::vector<T> neuralgas<T>::getLoggedQuantizationError( void ) const
+    template<typename T> inline std::vector<T> relationalneuralgas<T>::getLoggedQuantizationError( void ) const
     {
         return m_quantizationerror;
     }    
@@ -200,20 +201,20 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * @overload
      * @param p_data data matrix
      * @param p_iterations number of iterations
-    **/
-    template<typename T> inline void neuralgas<T>::train( const ublas::matrix<T>& p_data, const std::size_t& p_iterations )
+     **/
+    template<typename T> inline void relationalneuralgas<T>::train( const ublas::matrix<T>& p_data, const std::size_t& p_iterations )
     {
         train(p_data, p_iterations, m_prototypes.size1() * 0.5);
     }
-
+    
     
     /** training the prototypes
      * @overload
      * @param p_data datapoints
      * @param p_iterations iterations
      * @param p_lambda max adapet size
-    **/
-    template<typename T> inline void neuralgas<T>::train( const ublas::matrix<T>& p_data, const std::size_t& p_iterations, const T& p_lambda )
+     **/
+    template<typename T> inline void relationalneuralgas<T>::train( const ublas::matrix<T>& p_data, const std::size_t& p_iterations, const T& p_lambda )
     {
         if (p_data.size1() < m_prototypes.size1())
             throw exception::parameter(_("number of datapoints are less than prototypes"));
@@ -241,7 +242,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         ublas::vector<T> l_rank;
         
         for(std::size_t i=0; (i < p_iterations); ++i) {
-          
+            
             // create adapt values
             l_lambda = p_lambda * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(p_iterations));
             
@@ -249,7 +250,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             // calculate for every prototype the distance
             for(std::size_t n=0; n < m_prototypes.size1(); ++n)
                 ublas::row(l_adaptmatrix, n)  = m_distance->getDistance( p_data, ublas::row(m_prototypes, n) ) ;
-
+            
             //std::cout << l_adaptmatrix << std::endl;
             //throw exception::parameter("xxx");
             
@@ -271,8 +272,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             
             
             // create prototypes
-            m_prototypes = ublas::prod( l_adaptmatrix, p_data );
-
+            m_prototypes = l_adaptmatrix;
+            
             // normalize prototypes
             for(std::size_t n=0; n < m_prototypes.size1(); ++n) {
                 l_norm = ublas::sum( ublas::row(l_adaptmatrix, n) );
@@ -295,7 +296,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * @param p_prototypes prototype matrix
      * @return quantization error
      **/    
-    template<typename T> inline T neuralgas<T>::calculateQuantizationError( const ublas::matrix<T>& p_data, const ublas::matrix<T>& p_prototypes ) const
+    template<typename T> inline T relationalneuralgas<T>::calculateQuantizationError( const ublas::matrix<T>& p_data, const ublas::matrix<T>& p_prototypes ) const
     {
         ublas::matrix<T> l_distances( p_prototypes.size1(), p_data.size1() );
         
@@ -310,8 +311,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * with index of the nearest prototype
      * @param p_data matrix
      * @return index array of prototype indices
-    **/
-    template<typename T> inline ublas::indirect_array< std::vector<std::size_t> > neuralgas<T>::use( const ublas::matrix<T>& p_data ) const
+     **/
+    template<typename T> inline ublas::indirect_array< std::vector<std::size_t> > relationalneuralgas<T>::use( const ublas::matrix<T>& p_data ) const
     {
         if (p_data.size1() < m_prototypes.size1())
             throw exception::parameter(_("number of datapoints are less than prototypes"));
@@ -329,9 +330,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             const ublas::indirect_array< std::vector<std::size_t> > l_rank  = tools::vector::rankIndex( l_col );
             l_vec.push_back( l_rank(0) );
         }
-            
+        
         return ublas::indirect_array< std::vector<std::size_t> >(l_vec.size(), l_vec);
-                
+        
     }
     
     //======= MPI ==================================================================================================================================
@@ -341,7 +342,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * @param p_mpi MPI object for communication
      * @return full prototypes matrix
      **/
-    template<typename T> inline ublas::matrix<T> neuralgas<T>::gatherPrototypes( const mpi::communicator& p_mpi ) const
+    template<typename T> inline ublas::matrix<T> relationalneuralgas<T>::gatherPrototypes( const mpi::communicator& p_mpi ) const
     {
         // gathering in this way, that every process get all prototypes
         std::vector< ublas::matrix<T> > l_processdata;
@@ -352,48 +353,45 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         ublas::matrix<T> l_prototypes = l_processdata[0];
         for(std::size_t i=1; i < l_processdata.size(); ++i) {
             l_prototypes.resize( l_prototypes.size1()+l_processdata[i].size1(), l_prototypes.size2());
-
+            
             ublas::matrix_range< ublas::matrix<T> > l_range(l_prototypes, 
-                    ublas::range( l_prototypes.size1()-l_processdata[i].size1(), l_prototypes.size1() ), 
-                    ublas::range( 0, l_prototypes.size2() )
-            );
+                                                            ublas::range( l_prototypes.size1()-l_processdata[i].size1(), l_prototypes.size1() ), 
+                                                            ublas::range( 0, l_prototypes.size2() )
+                                                            );
             l_range.assign(l_processdata[i]);
         }
         
         return l_prototypes;
     }
-
     
-
+    
+    
     /** gathering prototypes of every process and set with them the local prototypematrix.
-     * We can not use const references because of the range. The idea is the commutativity
-     * of the dot product of every prototype dimension. The prototypes are a matrix-matrix-product of the
-     * adaption value and the data values. The matrix-matrix-product is a dot product of rows and columns so
-     * the commutativity is used for parallelism / the gathering uses the commutativity for create the correct prototype values
+     * @warning don't work with relational data
      * @param p_mpi MPI object for communication
      * @param p_localprototypes local prototype matrix
      * @param p_localnorm normalize vector
      **/
-    template<typename T> inline void neuralgas<T>::gatherLocalPrototypes( const mpi::communicator& p_mpi, ublas::matrix<T>& p_localprototypes, ublas::vector<T>& p_localnorm )
+    template<typename T> inline void relationalneuralgas<T>::gatherNonRelationalLocalPrototypes( const mpi::communicator& p_mpi, ublas::matrix<T>& p_localprototypes, ublas::vector<T>& p_localnorm )
     {
         std::vector< ublas::matrix<T> > l_localprototypes;
 		std::vector< ublas::vector<T> > l_localnorm;
         for(int i=0; i < p_mpi.size(); ++i) {
-
+            
             // gather prototypes
             ublas::matrix_range< ublas::matrix<T> > l_protorange(p_localprototypes, 
-                    ublas::range( m_processprototypinfo[i].first, m_processprototypinfo[i].first + m_processprototypinfo[i].second ), 
-                    ublas::range( 0, p_localprototypes.size2() )
-            );
+                                                                 ublas::range( m_processprototypinfo[i].first, m_processprototypinfo[i].first + m_processprototypinfo[i].second ), 
+                                                                 ublas::range( 0, p_localprototypes.size2() )
+                                                                 );
             mpi::gather(p_mpi, static_cast< ublas::matrix<T> >(l_protorange), l_localprototypes, i);
-
+            
             // gather norm
             ublas::vector_range< ublas::vector<T> > l_normrange(p_localnorm,
-                    ublas::range( m_processprototypinfo[i].first, m_processprototypinfo[i].first + m_processprototypinfo[i].second )
-            );
+                                                                ublas::range( m_processprototypinfo[i].first, m_processprototypinfo[i].first + m_processprototypinfo[i].second )
+                                                                );
             mpi::gather(p_mpi, static_cast< ublas::vector<T> >(l_normrange), l_localnorm, i);
         }
-
+        
         // create local prototypes (sum) and normalize (sum)
         // because every dimension of the prototype can be written as a dot product
         // and the datasets are disjoint sets, so we can create the dot product as disjount sum functions
@@ -404,19 +402,19 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             m_prototypes += l_localprototypes[i];
             l_norm       += l_localnorm[i];
         }
-
+        
         for(std::size_t i=0; i < m_prototypes.size1(); ++i)
             if (!tools::function::isNumericalZero(l_norm(i)))
                 ublas::row(m_prototypes, i) /= l_norm(i);
     }
-
+    
     
     
     /** set the std::map with the begin position and size of the prototypes matrix. Is needed for extracting the prototypes
      * of the full matrix for every process
      * @param p_mpi MPI object for communication
-    **/
-    template<typename T> inline void neuralgas<T>::setProcessPrototypeInfo( const mpi::communicator& p_mpi )
+     **/
+    template<typename T> inline void relationalneuralgas<T>::setProcessPrototypeInfo( const mpi::communicator& p_mpi )
     {
         // gathering the number of prototypes
         std::vector< std::size_t > l_processdata;
@@ -437,7 +435,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * @param p_mpi MPI object for communication
      * @return number of prototypes
      **/
-    template<typename T> inline std::size_t neuralgas<T>::gatherNumberPrototypes( const mpi::communicator& p_mpi ) const
+    template<typename T> inline std::size_t relationalneuralgas<T>::gatherNumberPrototypes( const mpi::communicator& p_mpi ) const
     {
         // gathering number of prototypes
         std::vector<std::size_t> l_numbers;
@@ -455,11 +453,11 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * @param p_data datapoints
      * @param p_iterations iterations
      **/
-    template<typename T> inline void neuralgas<T>::train( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data, const std::size_t& p_iterations )
+    template<typename T> inline void relationalneuralgas<T>::train( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data, const std::size_t& p_iterations )
     {
         train(p_mpi, p_data, p_iterations, m_prototypes.size1() * 0.5);
     }
-
+    
     
     /** train the data on the cluster
      * @overload
@@ -468,7 +466,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * @param p_iterations iterations
      * @param p_lambda max adapet size
      **/
-    template<typename T> inline void neuralgas<T>::train( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data, const std::size_t& p_iterations, const T& p_lambda )
+    template<typename T> inline void relationalneuralgas<T>::train( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data, const std::size_t& p_iterations, const T& p_lambda )
     {
         if (p_data.size1() < m_prototypes.size1())
             throw exception::parameter(_("number of datapoints are less than prototypes"));
@@ -489,7 +487,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         mpi::broadcast(p_mpi, m_logging, 0);
         
         setProcessPrototypeInfo(p_mpi);
-         
+        
         
         // creates logging
         if (m_logging) {
@@ -521,7 +519,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             // within the adapt matrix, we must specify the position of the prototypes 
             for(std::size_t n=0; n < l_prototypes.size1(); ++n)
                 ublas::row(l_adaptmatrix, n)  = m_distance->getDistance( p_data, ublas::row(l_prototypes, n) ) ;
-                
+            
             // for every column ranks values and create adapts
             // we need rank and not randIndex, because we 
             // use the value of the ranking for calculate the 
@@ -537,17 +535,19 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
                 // return value to matrix
                 ublas::column(l_adaptmatrix, n) = l_rank;
             }
-                
+            
             
             // create local prototypes
-            l_prototypes = ublas::prod( l_adaptmatrix, p_data );
+            l_prototypes = l_adaptmatrix;
             
-
             // normalize prototypes
             for(std::size_t n=0; n < l_prototypes.size1(); ++n)
                 l_normvec(n) = ublas::sum( ublas::row(l_adaptmatrix, n) );
-
-            gatherLocalPrototypes(p_mpi, l_prototypes, l_normvec);
+            
+            if (m_distance->isRelational())
+                gatherRelationalLocalPrototypes(p_mpi, l_prototypes, l_normvec);
+            else
+                gatherNonRelationalLocalPrototypes(p_mpi, l_prototypes, l_normvec);
             
             
             // determine quantization error for logging
@@ -570,7 +570,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * @param p_mpi MPI object for communication
      * @return matrix (rows = prototypes)
      **/
-    template<typename T> inline ublas::matrix<T> neuralgas<T>::getPrototypes( const mpi::communicator& p_mpi ) const
+    template<typename T> inline ublas::matrix<T> relationalneuralgas<T>::getPrototypes( const mpi::communicator& p_mpi ) const
     {
         return gatherPrototypes( p_mpi );
     }
@@ -581,7 +581,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * @param p_mpi MPI object for communication
      * @return std::vector with all logged prototypes
      **/
-    template<typename T> inline std::vector< ublas::matrix<T> > neuralgas<T>::getLoggedPrototypes( const mpi::communicator& p_mpi ) const
+    template<typename T> inline std::vector< ublas::matrix<T> > relationalneuralgas<T>::getLoggedPrototypes( const mpi::communicator& p_mpi ) const
     {
         // we must gather every logged prototype and create the full prototype matrix
         std::vector< std::vector< ublas::matrix<T> > > l_gatherProto;
@@ -592,9 +592,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         std::vector< ublas::matrix<T> > l_logProto = l_gatherProto[0];
         for(std::size_t i=1; i < l_gatherProto.size(); ++i)
             for(std::size_t n=0; n < l_logProto.size(); ++n) {
-            
+                
                 l_logProto[n].resize( l_logProto[n].size1()+l_gatherProto[i][n].size1(), l_logProto[n].size2());
-        
+                
                 ublas::matrix_range< ublas::matrix<T> > l_range(l_logProto[n], 
                                                                 ublas::range( l_logProto[n].size1()-l_gatherProto[i][n].size1(), l_logProto[n].size1() ), 
                                                                 ublas::range( 0, l_logProto[n].size2() )
@@ -612,7 +612,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * @param p_mpi MPI object for communication
      * @return std::vector with quantization error
      **/
-    template<typename T> inline std::vector<T> neuralgas<T>::getLoggedQuantizationError( const mpi::communicator& p_mpi ) const
+    template<typename T> inline std::vector<T> relationalneuralgas<T>::getLoggedQuantizationError( const mpi::communicator& p_mpi ) const
     {
         // we must call the quantization error of every process and sum all values for the main error
         std::vector< std::vector<T> > l_gatherError;
@@ -624,9 +624,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         for(std::size_t i=1; i < l_gatherError.size(); ++i)
             for(std::size_t n=0; n < l_error.size(); ++n)
                 l_error[n] += l_gatherError[i][n];
-  
+        
         return l_error;
-            
+        
     }
     
     
@@ -637,7 +637,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * @param p_data matrix
      * @return index array of prototype indices
      **/
-    template<typename T> inline ublas::indirect_array< std::vector<std::size_t> > neuralgas<T>::use( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data ) const
+    template<typename T> inline ublas::indirect_array< std::vector<std::size_t> > relationalneuralgas<T>::use( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data ) const
     {
         if (p_data.size1() < m_prototypes.size1())
             throw exception::parameter(_("number of datapoints are less than prototypes"));
@@ -664,7 +664,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     }
     
     
-    #endif
+#endif
     
 };};};
 
