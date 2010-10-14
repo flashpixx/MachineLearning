@@ -48,6 +48,7 @@ int main(int argc, char *argv[]) {
     #ifdef MULTILANGUAGE
     tl::language::bind("ml", "./tools/language/");
     #endif
+
     
     //nn::nnet<double> net(3);
     
@@ -181,17 +182,17 @@ int main(int argc, char *argv[]) {
    
     // ===== NG =====    
     
-    //ublas::matrix<double> data = o.readMatrix<double>("/ngdata", H5::PredType::NATIVE_DOUBLE);
+    ublas::matrix<double> data = o.readMatrix<double>("/ngdata", H5::PredType::NATIVE_DOUBLE);
     //ublas::matrix<double> data = o.readMatrix<double>("/ngmini", H5::PredType::NATIVE_DOUBLE);
     //ublas::matrix<double> data = o.readMatrix<double>("/ngbigdata", H5::PredType::NATIVE_DOUBLE);
-    ublas::matrix<double> data = o.readMatrix<double>("/relational/cortex/data2", H5::PredType::NATIVE_DOUBLE);
+    //ublas::matrix<double> data = o.readMatrix<double>("/relational/cortex/data2", H5::PredType::NATIVE_DOUBLE);
 	
     
-    //dist::euclid<double> d;
-    dist::relational::euclid<double> d;
+    dist::euclid<double> d;
+    //dist::relational::euclid<double> d;
     
 	const std::size_t ngit      = 25;
-    const std::size_t numproto  = 3; //3 relational & 11 real
+    const std::size_t numproto  = 11; //3 relational & 11 real
 
     
     #ifdef CLUSTER
@@ -234,7 +235,7 @@ int main(int argc, char *argv[]) {
     
     
     #ifdef CLUSTER
-	ublas::matrix<double> proto                   = ng.getPrototypes(loMPICom);
+	ublas::matrix<double> proto                   = tl::matrix::setNumericalZero(ng.getPrototypes(loMPICom));
     ublas::vector<double> qerror                  = tl::vector::copy(ng.getLoggedQuantizationError(loMPICom));
     std::vector< ublas::matrix<double> > logproto = ng.getLoggedPrototypes(loMPICom);
     
@@ -247,13 +248,13 @@ int main(int argc, char *argv[]) {
             f.write<double>( "/error",  qerror, H5::PredType::NATIVE_DOUBLE );
             
             for(std::size_t i=0; i < logproto.size(); ++i)
-                f.write<double>("/log" + boost::lexical_cast<std::string>( i ), logproto[i], H5::PredType::NATIVE_DOUBLE );
+                f.write<double>("/log" + boost::lexical_cast<std::string>( i ), tl::matrix::setNumericalZero(logproto[i]), H5::PredType::NATIVE_DOUBLE );
         }
     }
     
     #else
     tl::files::hdf f("ng.hdf5", true);
-    f.write<double>( "/protos",  ng.getPrototypes(), H5::PredType::NATIVE_DOUBLE );    
+    f.write<double>( "/protos",  tl::matrix::setNumericalZero(ng.getPrototypes()), H5::PredType::NATIVE_DOUBLE );    
     f.write<std::size_t>( "/iteration",  ngit, H5::PredType::NATIVE_ULONG );
     
     if (ng.getLogging()) {
@@ -262,7 +263,7 @@ int main(int argc, char *argv[]) {
         
         std::vector< ublas::matrix<double> > logproto = ng.getLoggedPrototypes();
         for(std::size_t i=0; i < logproto.size(); ++i)
-            f.write<double>("/log" + boost::lexical_cast<std::string>( i ), logproto[i], H5::PredType::NATIVE_DOUBLE );
+            f.write<double>("/log" + boost::lexical_cast<std::string>( i ), tl::matrix::setNumericalZero(logproto[i]), H5::PredType::NATIVE_DOUBLE );
     }
     #endif
     

@@ -45,7 +45,7 @@ namespace machinelearning { namespace distances {
         
         
         public :
-
+        
             /** normalize a vector */
             virtual void normalize( ublas::vector<T>& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
 

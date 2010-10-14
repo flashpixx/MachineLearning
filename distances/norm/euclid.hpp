@@ -83,7 +83,7 @@ namespace machinelearning { namespace distances {
     
    
     /** normalize a matrix on their rows or columns vectors
-     * @param p_matrix matrix for noamlization
+     * @param p_matrix matrix for normalization
      * @param p_row option for row or column iteration (default row)
      **/
     template<typename T> inline void euclid<T>::normalize( ublas::matrix<T>& p_matrix, const tools::matrix::rowtype& p_row ) const

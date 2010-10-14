@@ -124,6 +124,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             throw exception::parameter(_("prototype size must be greater than zero"));
         if (p_prototypes == 0)
             throw exception::parameter(_("number of prototypes must be greater than zero"));
+    
+        // normalize the prototypes
+        m_distance->normalize( m_prototypes );
     }
     
      
@@ -247,6 +250,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             for(std::size_t n=0; n < m_prototypes.size1(); ++n)
                 ublas::row(l_adaptmatrix, n)  = m_distance->getDistance( p_data, ublas::row(m_prototypes, n) ) ;
 
+            //std::cout << l_adaptmatrix << std::endl;
+            //throw exception::parameter("xxx");
             
             // for every column ranks values and create adapts
             // we need rank and not randIndex, because we 
