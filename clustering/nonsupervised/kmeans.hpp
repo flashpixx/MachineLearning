@@ -169,7 +169,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
         
         // run kmeans       
-        ublas::scalar_vector<T> l_ones(p_data.size1(), 1);
         ublas::matrix<T> l_distances( m_prototypes.size1(), p_data.size1() );
         // the matrix for adaption is a sparse matrix, because there are only 0 or 1 values
         ublas::mapped_matrix<T> l_adaptmatrix( m_prototypes.size1(), p_data.size1(), m_prototypes.size1()*p_data.size1() );
@@ -178,7 +177,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             
             // calculate for every prototype the distance
             for(std::size_t n=0; n < m_prototypes.size1(); ++n)
-                ublas::row(l_distances, n)  = m_distance->calculate( p_data,  ublas::outer_prod(l_ones, ublas::row(m_prototypes, n)) );
+                ublas::row(l_distances, n)  = m_distance->getDistance( p_data,  ublas::row(m_prototypes, n) );
             
             // determine winner and set the winner to 1
             // iterate over the columns and ranks every column
@@ -235,13 +234,12 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/    
     template<typename T> inline T kmeans<T>::calculateQuantizationError( const ublas::matrix<T>& p_data ) const
     {
-        ublas::scalar_vector<T> l_ones(p_data.size1(), 1);
         ublas::matrix<T> l_distances( m_prototypes.size1(), p_data.size1() );
         
         for(std::size_t i=0; i < m_prototypes.size1(); ++i)
-            ublas::row(l_distances, i) = m_distance->calculate( p_data, ublas::outer_prod( l_ones, ublas::row(m_prototypes, i) ));
+            ublas::row(l_distances, i) = m_distance->getDistance( p_data, ublas::row(m_prototypes, i) );
         
-        return 0.5 * ublas::sum(  m_distance->abs(tools::matrix::min(l_distances, tools::matrix::column))  );  
+        return 0.5 * ublas::sum(  m_distance->getAbs(tools::matrix::min(l_distances, tools::matrix::column))  );  
     }
     
     
@@ -256,12 +254,11 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             throw exception::parameter(_("number of datapoints are less than prototypes"));        
         
         std::vector<std::size_t> l_vec(p_data.size1());
-        ublas::scalar_vector<T> l_ones(p_data.size1(), 1);
         ublas::matrix<T> l_distance(m_prototypes.size1(), p_data.size1());
         
         // calculate distance for every prototype
         for(std::size_t i=0; i < m_prototypes.size1(); ++i)
-            ublas::row(l_distance, i)  = m_distance->calculate( p_data,  ublas::outer_prod(l_ones, ublas::row(m_prototypes, i)) );
+            ublas::row(l_distance, i)  = m_distance->getDistance( p_data, ublas::row(m_prototypes, i) );
         
         // determine nearest prototype
         for(std::size_t i=0; i < m_prototypes.size2(); ++i) {

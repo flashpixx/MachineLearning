@@ -52,6 +52,7 @@ int main(int argc, char *argv[]) {
     //nn::nnet<double> net(3);
     
     
+    
     /*
     boost::multi_array<double, 2> x;
     boost::multi_array<double, 2> y;
@@ -87,8 +88,9 @@ int main(int argc, char *argv[]) {
 
     
     ublas::indirect_array<> x(10);
+    tl::random l_rand;
     for(std::size_t i=0; i < x.size(); ++i)
-        x(i) = static_cast<std::size_t>(tl::random::get<double>( tl::random::uniform, 0, data.size1()));
+        x(i) = static_cast<std::size_t>(l_rand.get<double>( tl::random::uniform, 0, data.size1()));
 
     ublas::indirect_array<> y(data.size2());
     for(std::size_t i=0; i < y.size(); ++i)
@@ -177,15 +179,20 @@ int main(int argc, char *argv[]) {
     */
     
    
-    // ===== NG =====     
-    //ublas::matrix<double> data = o.readMatrix<double>("/ngdata", H5::PredType::NATIVE_DOUBLE);
-    ublas::matrix<double> data = o.readMatrix<double>("/ngbigdata", H5::PredType::NATIVE_DOUBLE);
-   
+    // ===== NG =====    
+    /*
+    ublas::matrix<double> data = o.readMatrix<double>("/ngdata", H5::PredType::NATIVE_DOUBLE);
+    //ublas::matrix<double> data = o.readMatrix<double>("/ngmini", H5::PredType::NATIVE_DOUBLE);
+    //ublas::matrix<double> data = o.readMatrix<double>("/ngbigdata", H5::PredType::NATIVE_DOUBLE);
+    //ublas::matrix<double> data = o.readMatrix<double>("/relational/cortex/data2", H5::PredType::NATIVE_DOUBLE);
+	
     
-	dist::euclid<double> d;
+    dist::euclid<double> d;
     //dist::relational::euclid<double> d;
     
-	const std::size_t ngit = 25;
+	const std::size_t ngit      = 25;
+    const std::size_t numproto  = 11; //3 relational & 11 real
+
     
     #ifdef CLUSTER
     
@@ -200,11 +207,11 @@ int main(int argc, char *argv[]) {
     
     // extract the data for the process (every process has load the whole data and shuffel them with the broadcasted shuffle vector)
     std::size_t nums     		= data.size1() / loMPICom.size();
-    std::size_t protonum 		= 11 / loMPICom.size();
+    std::size_t protonum 		= numproto / loMPICom.size();
     std::size_t add      		= 0;
     
     if (loMPICom.rank() == loMPICom.size()-1) {
-        protonum += 11 % loMPICom.size();
+        protonum += numproto % loMPICom.size();
         add       = data.size1() % loMPICom.size();
     }
 
@@ -219,7 +226,7 @@ int main(int argc, char *argv[]) {
     
     
     #else    
-    nsl::neuralgas<double> ng(d, 11, data.size2());
+    nsl::neuralgas<double> ng(d, numproto, data.size2());
     ng.setLogging(true);
     ng.train(data, ngit);
     #endif
@@ -258,7 +265,7 @@ int main(int argc, char *argv[]) {
             f.write<double>("/log" + boost::lexical_cast<std::string>( i ), logproto[i], H5::PredType::NATIVE_DOUBLE );
     }
     #endif
-    
+    */
     
     // ===== RLVQ ======
     /*
@@ -284,8 +291,8 @@ int main(int argc, char *argv[]) {
         std::vector< ublas::matrix<double> > p = vq.getLoggedPrototypes();
         for(std::size_t i=0; i < p.size(); ++i)
             f.write<double>("/log" + boost::lexical_cast<std::string>( i ), p[i], H5::PredType::NATIVE_DOUBLE );
-    }*/
-    
+    }
+    */
      
     //=============== NCD ================
     /*

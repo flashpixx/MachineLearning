@@ -232,40 +232,44 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
         // run neural gas       
         const T l_multi = 0.01/p_lambda;
-        ublas::scalar_vector<T> l_ones(p_data.size1(), 1);
+        T l_lambda      = 0;
+        T l_norm        = 0;
         ublas::matrix<T> l_adaptmatrix( m_prototypes.size1(), p_data.size1() );
-
+        ublas::vector<T> l_rank;
+        
         for(std::size_t i=0; (i < p_iterations); ++i) {
           
             // create adapt values
-            const T l_lambda = p_lambda * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(p_iterations));
+            l_lambda = p_lambda * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(p_iterations));
+            
             
             // calculate for every prototype the distance
             for(std::size_t n=0; n < m_prototypes.size1(); ++n)
-                ublas::row(l_adaptmatrix, n)  = m_distance->calculate( p_data,  ublas::outer_prod(l_ones, ublas::row(m_prototypes, n)) );
+                ublas::row(l_adaptmatrix, n)  = m_distance->getDistance( p_data, ublas::row(m_prototypes, n) ) ;
 
+            
             // for every column ranks values and create adapts
             // we need rank and not randIndex, because we 
             // use the value of the ranking for calculate the 
             // adapt value
             for(std::size_t n=0; n < l_adaptmatrix.size2(); ++n) {
-                ublas::vector<T> l_col = ublas::column(l_adaptmatrix, n);
-                l_col                  = tools::vector::rank( l_col );
+                l_rank = ublas::column(l_adaptmatrix, n);
+                l_rank  = tools::vector::rank( l_rank );
                 
                 // calculate adapt value
-                BOOST_FOREACH( T& p, l_col)
+                BOOST_FOREACH( T& p, l_rank)
                     p = std::exp( -p / l_lambda );
                 
                 // return value to matrix
-                ublas::column(l_adaptmatrix, n) = l_col;
+                ublas::column(l_adaptmatrix, n) = l_rank;
             }
-           
+            
             
             // adapt to prototypes and normalize (row orientated)
             m_prototypes = ublas::prod( l_adaptmatrix, p_data );
             
             for(std::size_t n=0; n < m_prototypes.size1(); ++n) {
-                const T l_norm = ublas::sum( ublas::row(l_adaptmatrix, n) );
+                l_norm = ublas::sum( ublas::row(l_adaptmatrix, n) );
                 
                 if (!tools::function::isNumericalZero(l_norm))
                     ublas::row(m_prototypes, n) /= l_norm;
@@ -288,13 +292,12 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/    
     template<typename T> inline T neuralgas<T>::calculateQuantizationError( const ublas::matrix<T>& p_data, const ublas::matrix<T>& p_prototypes ) const
     {
-        ublas::scalar_vector<T> l_ones(p_data.size1(), 1);
         ublas::matrix<T> l_distances( p_prototypes.size1(), p_data.size1() );
         
         for(std::size_t i=0; i < p_prototypes.size1(); ++i)
-            ublas::row(l_distances, i) = m_distance->calculate( p_data, ublas::outer_prod( l_ones, ublas::row(p_prototypes, i) ));
+            ublas::row(l_distances, i) = m_distance->getDistance( p_data, ublas::row(p_prototypes, i) );
         
-        return 0.5 * ublas::sum(  m_distance->abs(tools::matrix::min(l_distances, tools::matrix::column))  );  
+        return 0.5 * ublas::sum(  m_distance->getAbs(tools::matrix::min(l_distances, tools::matrix::column))  );  
     }
     
     
@@ -309,12 +312,11 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             throw exception::parameter(_("number of datapoints are less than prototypes"));
         
         std::vector<std::size_t> l_vec(p_data.size1());
-        ublas::scalar_vector<T> l_ones(p_data.size1(), 1);
         ublas::matrix<T> l_distance(m_prototypes.size1(), p_data.size1());
         
         // calculate distance for every prototype
         for(std::size_t i=0; i < m_prototypes.size1(); ++i)
-            ublas::row(l_distance, i)  = m_distance->calculate( p_data,  ublas::outer_prod(l_ones, ublas::row(m_prototypes, i)) );
+            ublas::row(l_distance, i)  = m_distance->getDistance( p_data,  ublas::row(m_prototypes, i) );
         
         // determine nearest prototype
         for(std::size_t i=0; i < m_prototypes.size2(); ++i) {
@@ -358,7 +360,10 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
 
 
     /** gathering prototypes of every process and set with them the local prototypematrix.
-     * We can not use const references because of the range
+     * We can not use const references because of the range. The idea is the commutativity
+     * of the dot product of every prototype dimension. The prototypes are a matrix-matrix-product of the
+     * adaption value and the data values. The matrix-matrix-product is a dot product of rows and columns so
+     * the commutativity is used for parallelism / the gathering uses the commutativity for create the correct prototype values
      * @param p_mpi MPI object for communication
      * @param p_localprototypes local prototype matrix
      * @param p_localnorm normalize vector
@@ -476,7 +481,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         mpi::broadcast(p_mpi, l_lambdaBrd, 0);
         mpi::broadcast(p_mpi, m_logging, 0);
         
-        ublas::matrix<T> l_adaptmatrix( gatherNumberPrototypes(p_mpi), p_data.size1() );
         setProcessPrototypeInfo(p_mpi);
          
         
@@ -490,43 +494,50 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
         
         // run neural gas       
-        const T l_multi = 0.01/l_lambdaBrd;
-        ublas::scalar_vector<T> l_ones(p_data.size1(), 1);
+        const T l_multi = 0.01/p_lambda;
+        T l_lambda      = 0;
+        T l_norm        = 0;
+        ublas::vector<T> l_normvec(gatherNumberPrototypes(p_mpi),0);
+        ublas::matrix<T> l_adaptmatrix(l_normvec.size(), p_data.size1() );
+        ublas::vector<T> l_rank;
+        
         
         for(std::size_t i=0; (i < l_iterationsBrd); ++i) {
             
             // create adapt values
-            const T l_lambda = l_lambdaBrd * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(l_iterationsBrd));
+            l_lambda = l_lambdaBrd * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(l_iterationsBrd));
             
             // we get all prototypes of every process
             ublas::matrix<T> l_prototypes = gatherPrototypes( p_mpi );
             
+            
             // calculate for every prototype the distance (of the actually prototypes).
             // within the adapt matrix, we must specify the position of the prototypes 
             for(std::size_t n=0; n < l_prototypes.size1(); ++n)
-                ublas::row(l_adaptmatrix, n)  = m_distance->calculate( p_data,  ublas::outer_prod(l_ones, ublas::row(l_prototypes, n)) );
+                ublas::row(l_adaptmatrix, n)  = m_distance->calculate( p_data,  ublas::row(l_prototypes, n) );
 
+            
             // for every column ranks values and create adapts
             // we need rank and not randIndex, because we 
             // use the value of the ranking for calculate the 
             // adapt value
             for(std::size_t n=0; n < l_adaptmatrix.size2(); ++n) {
-                ublas::vector<T> l_col = ublas::column(l_adaptmatrix, n);
-                l_col                  = tools::vector::rank( l_col );
-                    
+                l_rank = ublas::column(l_adaptmatrix, n);
+                l_rank  = tools::vector::rank( l_rank );
+                
                 // calculate adapt value
-                BOOST_FOREACH( T& p, l_col)
-                    p = std::exp( -p / l_lambda );
-                    
+                BOOST_FOREACH( T& p, l_rank)
+                p = std::exp( -p / l_lambda );
+                
                 // return value to matrix
-                ublas::column(l_adaptmatrix, n) = l_col;
+                ublas::column(l_adaptmatrix, n) = l_rank;
             }
                 
+            
             // calculate all local prototype for the local data points
             l_prototypes = ublas::prod( l_adaptmatrix, p_data );
 
             // calculating local norm for the prototypes
-            ublas::vector<T> l_normvec(l_prototypes.size1(),0);
             for(std::size_t n=0; n < l_prototypes.size1(); ++n)
                 l_normvec(n) = ublas::sum( ublas::row(l_adaptmatrix, n) );
 

@@ -39,7 +39,7 @@
 namespace machinelearning { namespace distances { namespace relational {
     
     namespace ublas  = boost::numeric::ublas;
-    namespace blas   = boost::numeric::bindings::blas;
+    //namespace blas   = boost::numeric::bindings::blas;
     
     
     /** class for calculating relational euclid distance beween datapoints **/
@@ -49,21 +49,16 @@ namespace machinelearning { namespace distances { namespace relational {
     public:
         
         ublas::vector<T> calculate( const ublas::matrix<T>&, const ublas::matrix<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const;
-        ublas::vector<T> calculate( const ublas::matrix<T>&, const ublas::matrix<T>&, const ublas::matrix<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const;
         ublas::vector<T> abs( const ublas::vector<T>&  ) const;
-        T calculate( const ublas::vector<T>&, const ublas::vector<T>& ) const;
-        T calculate( const ublas::vector<T>&, const ublas::vector<T>&, const ublas::vector<T>& ) const;
         void norm( ublas::vector<T>& ) const ;
         void norm( ublas::matrix<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const; 
         T length( const ublas::vector<T>& p_vec ) const;
-        T invert( const T& p_val ) const;
-        
     };
     
     
     
     /** calculate distance between matrix, wherever rows or columns
-     * are read like pairs of distances ( (D*alpha_i)_i - 0.5 * alpha_i^t * D * alpha_i) )
+     * are read like pairs of distances ( (D*alpha_i)_j - 0.5 * alpha_i^t * D * alpha_i) )
      * @overload
      * @param p_first first matrix (data matrix)
      * @param p_second second matrix (prototype matrix)
@@ -73,73 +68,36 @@ namespace machinelearning { namespace distances { namespace relational {
     template<typename T> inline ublas::vector<T> euclid<T>::calculate( const ublas::matrix<T>& p_first, const ublas::matrix<T>& p_second, const tools::matrix::rowtype& p_row ) const
     {
         ublas::vector<T> l_vec( (p_row==tools::matrix::row) ? p_first.size1() : p_first.size2()  );
-        
-        /*
-        [lnDimy lnDimx] = size( paNeurons );
-        
-        Werte zwischen Distanzen und Neuronen berechnen
-        la1 = paNeurons * paDistances;
-        la2 = zeros(lnDimy,1);
-        
-        für jedes Neuron den quadratischen ABstand bilden
-        for i = 1:lnDimy
-            la2(i,1) = 0.5 * (la1(i,:) * paNeurons(i,:)');
-            end
-            
-            raDistances = la1 - la2*ones(1,lnDimx);
-        
+        ublas::matrix<T> l_matrix;
         
         switch (p_row) {                
-            case tools::matrix::row :   ublas::matrix<T> l_matrix = ublas::outer_prod(p_second, p_first);
-                                        for(std::size_t i=0; i < l_vec.size(); ++i)
-                                            l_vec(i) = 0.5 * ublas::row(l_matrix, i);
-                                        break;
+            case tools::matrix::row :       l_matrix = ublas::prod(p_second, p_first);
+                std::cout << l_matrix << "\n\n" << std::endl;
+                                            for(std::size_t i=0; i < l_vec.size(); ++i)
+                                                l_vec(i) = 0.5 * ublas::inner_prod( ublas::row(l_matrix, i), ublas::row(p_second, i));
+                                            break;
+
+            case tools::matrix::column :    l_matrix = ublas::prod(p_second, p_first);
+                                            for(std::size_t i=0; i < l_vec.size(); ++i)
+                                                l_vec(i) = 0.5 * ublas::inner_prod( ublas::column(l_matrix, i), ublas::column(p_second, i));
+                                            break;
                 
-                //case tools::matrix::column :  for(std::size_t i=0; i < l_vec.size(); ++i)
-                //    l_vec(i) = blas::nrm2( static_cast< ublas::vector<T> >(ublas::column(l_matrix, i)) );
-                //break;
         }
         
-        return l_vec;*/
+        return l_vec;
     }
     
     
-    
-    /** calculate weight distance between matrix, wherever rows or columns
-     * are read like vectors (sqrt( sum ( weights.^2 .* (vec1[i] - vec2[i]).^2 ) )
-     * @overload
-     * @param p_first first matrix
-     * @param p_second second matrix
-     * @param p_weights weights 
-     * @param p_row enum for creating matrix sum over rows or columns
-     * @return vector with distances
-     **/
-    template<typename T> inline ublas::vector<T> euclid<T>::calculate( const ublas::matrix<T>& p_first, const ublas::matrix<T>& p_second, const ublas::matrix<T>& p_weights, const tools::matrix::rowtype& p_row ) const
-    {
-       /* ublas::vector<T> l_vec( (p_row==tools::matrix::row) ? p_first.size1() : p_first.size2()  );
-        ublas::matrix<T> l_matrix = ublas::element_prod( p_weights, p_first-p_second );      
         
-        switch (p_row) {                
-            case tools::matrix::row :     for(std::size_t i=0; i < l_vec.size(); ++i)
-                    l_vec(i) = blas::nrm2( static_cast< ublas::vector<T> >(ublas::row(l_matrix, i)) );
-                break;
-                
-                case tools::matrix::column :  for(std::size_t i=0; i < l_vec.size(); ++i)
-                    l_vec(i) = blas::nrm2( static_cast< ublas::vector<T> >(ublas::column(l_matrix, i)) );
-                break;
-        }
-        
-        return l_vec;*/
-    }
-    
     
     /** normalize a vector with euclidian norm
      * @param p_vec vector which should be normalized
      **/
     template<typename T> inline void euclid<T>::norm( ublas::vector<T>& p_vec ) const 
     {
-        //p_vec /= blas::nrm2( p_vec );
+        p_vec /= blas::nrm2( p_vec );
     };
+    
     
     
     /** normalize a matrix on their row or column vectors
@@ -161,44 +119,14 @@ namespace machinelearning { namespace distances { namespace relational {
     };
     
     
-    /** calculate absolut values for a vector like vec.^2
+    
+    /** the abs vector is on a relational vector the same
      * @param p_vec vector
      * @return absolut value
      **/
     template<typename T> inline ublas::vector<T> euclid<T>::abs( const ublas::vector<T>& p_vec ) const
     {
-        //return tools::vector::pow<T>(p_vec, 2);
-    }    
-    
-    
-    
-    /** calculate distance between two vectors like
-     * sqrt( (vec1 - vec2).^2 )
-     * @overload
-     * @param p_first first vector
-     * @param p_second second vector
-     * return distance value
-     **/
-    template<typename T> inline T euclid<T>::calculate( const ublas::vector<T>& p_first, const ublas::vector<T>& p_second ) const
-    {
-       /* ublas::vector<T> l_vec = p_first-p_second;
-        return blas::nrm2( l_vec ); */
-    }
-    
-    
-    
-    /** calculate distance between two vectors like
-     * sqrt( weights.^2 .* (vec1 - vec2).^2 )
-     * @overload
-     * @param p_first first vector
-     * @param p_second second vector
-     * @param p_weights weights
-     * return distance value
-     **/
-    template<typename T> inline T euclid<T>::calculate( const ublas::vector<T>& p_first, const ublas::vector<T>& p_second, const ublas::vector<T>& p_weights ) const
-    {
-      /*  ublas::vector<T> l_vec = ublas::element_prod( p_weights, p_first-p_second );
-        return blas::nrm2( l_vec ); */
+        return p_vec;
     }    
     
     
@@ -209,17 +137,7 @@ namespace machinelearning { namespace distances { namespace relational {
      **/
     template<typename T> inline T euclid<T>::length( const ublas::vector<T>& p_vec ) const
     {
-      //  return blas::nrm2( p_vec );
-    }
-    
-    
-    /** returns a invertet value
-     * @param p_val value
-     * @return inverted value
-     **/
-    template<typename T> inline T euclid<T>::invert( const T& p_val ) const
-    {
-      //  return std::pow( p_val, static_cast<T>(-2) );
+        return ublas::sum( p_vec );
     }
     
     

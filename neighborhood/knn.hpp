@@ -159,7 +159,7 @@ namespace machinelearning { namespace neighborhood {
      **/
     template<typename T> inline T knn<T>::calculateDistance( const ublas::vector<T>& p_first, const ublas::vector<T>& p_second ) const
     {
-        return m_distance->calculate( p_first, p_second );
+        return m_distance->getDistance( p_first, p_second );
     }
     
     
@@ -169,7 +169,7 @@ namespace machinelearning { namespace neighborhood {
      **/
     template<typename T> inline T knn<T>::invert( const T& p_val ) const
     {
-        return m_distance->invert( p_val );
+        return m_distance->getInvert( p_val );
     }
     
     
