@@ -259,7 +259,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             // adapt value
             for(std::size_t n=0; n < l_adaptmatrix.size2(); ++n) {
                 l_rank = ublas::column(l_adaptmatrix, n);
-                l_rank  = tools::vector::rank( l_rank );
+                l_rank = tools::vector::rank( l_rank );
                 
                 // calculate adapt value
                 BOOST_FOREACH( T& p, l_rank)
@@ -501,7 +501,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         // run neural gas       
         const T l_multi = 0.01/p_lambda;
         T l_lambda      = 0;
-        T l_norm        = 0;
         ublas::vector<T> l_normvec(gatherNumberPrototypes(p_mpi),0);
         ublas::matrix<T> l_adaptmatrix(l_normvec.size(), p_data.size1() );
         ublas::vector<T> l_rank;
@@ -519,20 +518,19 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             // calculate for every prototype the distance (of the actually prototypes).
             // within the adapt matrix, we must specify the position of the prototypes 
             for(std::size_t n=0; n < l_prototypes.size1(); ++n)
-                ublas::row(l_adaptmatrix, n)  = m_distance->calculate( p_data,  ublas::row(l_prototypes, n) );
-
-            
+                ublas::row(l_adaptmatrix, n)  = m_distance->getDistance( p_data, ublas::row(l_prototypes, n) ) ;
+                
             // for every column ranks values and create adapts
             // we need rank and not randIndex, because we 
             // use the value of the ranking for calculate the 
             // adapt value
             for(std::size_t n=0; n < l_adaptmatrix.size2(); ++n) {
                 l_rank = ublas::column(l_adaptmatrix, n);
-                l_rank  = tools::vector::rank( l_rank );
+                l_rank = tools::vector::rank( l_rank );
                 
                 // calculate adapt value
                 BOOST_FOREACH( T& p, l_rank)
-                p = std::exp( -p / l_lambda );
+                    p = std::exp( -p / l_lambda );
                 
                 // return value to matrix
                 ublas::column(l_adaptmatrix, n) = l_rank;
