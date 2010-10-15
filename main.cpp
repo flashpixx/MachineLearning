@@ -236,9 +236,9 @@ int main(int argc, char *argv[]) {
    
     // ===== NG =====    
     
-    ublas::matrix<double> data = o.readMatrix<double>("/ngdata", H5::PredType::NATIVE_DOUBLE);
+    //ublas::matrix<double> data = o.readMatrix<double>("/ngdata", H5::PredType::NATIVE_DOUBLE);
     //ublas::matrix<double> data = o.readMatrix<double>("/ngmini", H5::PredType::NATIVE_DOUBLE);
-    //ublas::matrix<double> data = o.readMatrix<double>("/ngbigdata", H5::PredType::NATIVE_DOUBLE);
+    ublas::matrix<double> data = o.readMatrix<double>("/ngbigdata", H5::PredType::NATIVE_DOUBLE);
     	
     
     dist::euclid<double> d;
