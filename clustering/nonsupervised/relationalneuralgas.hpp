@@ -93,14 +93,15 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             T calculateQuantizationError( const ublas::matrix<T>&, const ublas::matrix<T>& ) const;
             
             #ifdef CLUSTER
-            /** map with information **/
+            /** map with information to every process and prototype **/
             std::map<int, std::pair<std::size_t,std::size_t> > m_processprototypinfo;
+            /** map with information to every process and size of data matrix rows **/
+            std::map<int, std::pair<std::size_t,std::size_t> > m_processdatasize;
             
             ublas::matrix<T> gatherPrototypes( const mpi::communicator& ) const;
-            void gatherNonRelationalLocalPrototypes( const mpi::communicator&, ublas::matrix<T>&, ublas::vector<T>& );
-            void gatherRelationalLocalPrototypes( const mpi::communicator&, ublas::matrix<T>&, ublas::vector<T>& );
+            void gatherLocalPrototypes( const mpi::communicator&, ublas::matrix<T>&, ublas::vector<T>& );
             std::size_t gatherNumberPrototypes( const mpi::communicator& ) const;
-            void setProcessPrototypeInfo( const mpi::communicator& );
+            void setProcessPrototypeInfo( const mpi::communicator&, const std::size_t& );
             #endif
     };
     
@@ -118,7 +119,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         m_logprototypes( std::vector< ublas::matrix<T> >() ),
         m_quantizationerror( std::vector<T>() )
         #ifdef CLUSTER
-        , m_processprototypinfo()
+        , m_processprototypinfo(),
+        m_processdatasize()
         #endif
     {
         if (p_prototypesize == 0)
@@ -372,13 +374,17 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * @param p_localprototypes local prototype matrix
      * @param p_localnorm normalize vector
      **/
-    template<typename T> inline void relationalneuralgas<T>::gatherNonRelationalLocalPrototypes( const mpi::communicator& p_mpi, ublas::matrix<T>& p_localprototypes, ublas::vector<T>& p_localnorm )
+    template<typename T> inline void relationalneuralgas<T>::gatherLocalPrototypes( const mpi::communicator& p_mpi, ublas::matrix<T>& p_localadepts, ublas::vector<T>& p_localnorm )
     {
-        std::vector< ublas::matrix<T> > l_localprototypes;
+        std::vector< ublas::matrix<T> > l_localadaption;
 		std::vector< ublas::vector<T> > l_localnorm;
+        
+        // we must cut the parts of the adaption matrix which are relevant for the cpu
+        // that are the cpu specified prototypes and the parts of the dataset
+        
         for(int i=0; i < p_mpi.size(); ++i) {
             
-            // gather prototypes
+            // gather parts of prototypes
             ublas::matrix_range< ublas::matrix<T> > l_protorange(p_localprototypes, 
                                                                  ublas::range( m_processprototypinfo[i].first, m_processprototypinfo[i].first + m_processprototypinfo[i].second ), 
                                                                  ublas::range( 0, p_localprototypes.size2() )
@@ -410,24 +416,44 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     
     
     
-    /** set the std::map with the begin position and size of the prototypes matrix. Is needed for extracting the prototypes
+    /** set the std::map with the begin position and size of the prototypes matrix and position within the prototypes. Is needed for extracting the prototypes
      * of the full matrix for every process
      * @param p_mpi MPI object for communication
      **/
-    template<typename T> inline void relationalneuralgas<T>::setProcessPrototypeInfo( const mpi::communicator& p_mpi )
+    template<typename T> inline void relationalneuralgas<T>::setProcessPrototypeInfo( const mpi::communicator& p_mpi, const std::size_t& p_datasize )
     {
+        m_processprototypinfo.clear();
+        m_processdatasize.clear();
+        
         // gathering the number of prototypes
         std::vector< std::size_t > l_processdata;
         for(int i=0; i < p_mpi.size(); ++i)
             mpi::gather(p_mpi, m_prototypes.size1(), l_processdata, i);
         
-        // create map
+        // create map with information which prototype is on which cpu
         std::size_t l_sum = 0;
         for(std::size_t i=0; i < l_processdata.size(); ++i) {
             m_processprototypinfo[static_cast<int>(i)]  = std::pair<std::size_t,std::size_t>(l_sum, l_processdata[i]);
             
             l_sum += l_processdata[i];
         }
+        
+        
+        
+        
+        // gathering data sizes of every process
+        std::vector< std::size_t > l_datasize;
+        for(int i=0; i < p_mpi.size(); ++i)
+            mpi::gather(p_mpi, p_datasize, l_datasize, i);        
+        
+        // create map with information which prototype dimension (position) is calculated on which cpu
+        l_sum = 0;
+        for(std::size_t i=0; i < l_datasize.size(); ++i) {
+            m_processdatasize[static_cast<int>(i)]  = std::pair<std::size_t,std::size_t>(l_sum, l_datasize[i]);
+            
+            l_sum += l_datasize[i];
+        }        
+        
     }
     
     
@@ -486,7 +512,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         mpi::broadcast(p_mpi, l_lambdaBrd, 0);
         mpi::broadcast(p_mpi, m_logging, 0);
         
-        setProcessPrototypeInfo(p_mpi);
+        setProcessPrototypeInfo(p_mpi, p_data.size1());
         
         
         // creates logging
@@ -502,7 +528,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         const T l_multi = 0.01/p_lambda;
         T l_lambda      = 0;
         ublas::vector<T> l_normvec(gatherNumberPrototypes(p_mpi),0);
+        // i think it p_data.size1() as l_adapt matrix size
         ublas::matrix<T> l_adaptmatrix(l_normvec.size(), p_data.size1() );
+        ublas::matrix<T> l_prototypes;
         ublas::vector<T> l_rank;
         
         
@@ -512,7 +540,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             l_lambda = l_lambdaBrd * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(l_iterationsBrd));
             
             // we get all prototypes of every process
-            ublas::matrix<T> l_prototypes = gatherPrototypes( p_mpi );
+            l_prototypes = gatherPrototypes( p_mpi );
             
             
             // calculate for every prototype the distance (of the actually prototypes).
@@ -537,29 +565,25 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             }
             
             
-            // create local prototypes
-            l_prototypes = l_adaptmatrix;
-            
-            // normalize prototypes
+            // the adept matrix holds the parts of the prototypes
+            // so we need only to create the parts of the normalization
             for(std::size_t n=0; n < l_prototypes.size1(); ++n)
                 l_normvec(n) = ublas::sum( ublas::row(l_adaptmatrix, n) );
             
-            if (m_distance->isRelational())
-                gatherRelationalLocalPrototypes(p_mpi, l_prototypes, l_normvec);
-            else
-                gatherNonRelationalLocalPrototypes(p_mpi, l_prototypes, l_normvec);
-            
+            gatherLocalPrototypes(p_mpi, l_adaptmatrix, l_normvec);
+
             
             // determine quantization error for logging
             if (m_logging) {
                 
+                // dont work in this version
                 // we must normalize the local prototypes (only on logging, in other cases gatherLocalPrototypes do this)
-                for(std::size_t n=0; n < l_prototypes.size1(); ++n)
+                /*for(std::size_t n=0; n < l_prototypes.size1(); ++n)
                     if (!tools::function::isNumericalZero(l_normvec(n)))
                         ublas::row(l_prototypes, n) /= l_normvec(n);
                 
                 m_logprototypes.push_back( m_prototypes );
-                m_quantizationerror.push_back( calculateQuantizationError(p_data, l_prototypes) );
+                m_quantizationerror.push_back( calculateQuantizationError(p_data, l_prototypes) );*/
             }
         }
     }

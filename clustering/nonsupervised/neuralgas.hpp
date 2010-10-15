@@ -93,7 +93,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             T calculateQuantizationError( const ublas::matrix<T>&, const ublas::matrix<T>& ) const;
         
             #ifdef CLUSTER
-            /** map with information **/
+            /** map with information to every process and prototype**/
             std::map<int, std::pair<std::size_t,std::size_t> > m_processprototypinfo;
 
             ublas::matrix<T> gatherPrototypes( const mpi::communicator& ) const;
@@ -345,6 +345,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> inline ublas::matrix<T> neuralgas<T>::gatherPrototypes( const mpi::communicator& p_mpi ) const
     {
+        m_processprototypinfo.clear();
+        
         // gathering in this way, that every process get all prototypes
         std::vector< ublas::matrix<T> > l_processdata;
         for(int i=0; i < p_mpi.size(); ++i)
