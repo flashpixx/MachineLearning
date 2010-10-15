@@ -125,7 +125,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         if (p_prototypes == 0)
             throw exception::parameter(_("number of prototypes must be greater than zero"));
     
-        #ifdef CLUSTER
+        #ifndef CLUSTER
         // normalize the prototypes
         m_distance->normalize( m_prototypes );
         #endif
