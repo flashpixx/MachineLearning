@@ -345,8 +345,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> inline ublas::matrix<T> neuralgas<T>::gatherPrototypes( const mpi::communicator& p_mpi ) const
     {
-        m_processprototypinfo.clear();
-        
         // gathering in this way, that every process get all prototypes
         std::vector< ublas::matrix<T> > l_processdata;
         for(int i=0; i < p_mpi.size(); ++i)
@@ -485,6 +483,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
         
         // process 0 sets the iteration and the lambda and we collect all needed data
+        m_processprototypinfo.clear();
         std::size_t l_iterationsBrd = p_iterations;
         T l_lambdaBrd               = p_lambda;
         

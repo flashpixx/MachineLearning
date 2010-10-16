@@ -378,7 +378,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     {
         std::vector< ublas::matrix<T> > l_localadaption;
 		std::vector< ublas::vector<T> > l_localnorm;
-        
+        /*
         // we must cut the parts of the adaption matrix which are relevant for the cpu
         // that are the cpu specified prototypes and the parts of the dataset
         
@@ -411,7 +411,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
         for(std::size_t i=0; i < m_prototypes.size1(); ++i)
             if (!tools::function::isNumericalZero(l_norm(i)))
-                ublas::row(m_prototypes, i) /= l_norm(i);
+                ublas::row(m_prototypes, i) /= l_norm(i);*/
     }
     
     
