@@ -225,6 +225,7 @@ int main(int argc, char *argv[]) {
     
     if (loMPICom.rank() == 0) {
         tl::files::hdf f("rng.hdf5", true);
+        f.write<double>( "/numprotos",  numproto, H5::PredType::NATIVE_DOUBLE );
         f.write<double>( "/protos",  proto, H5::PredType::NATIVE_DOUBLE );
         f.write<std::size_t>( "/iteration",  ngit, H5::PredType::NATIVE_ULONG );
         
@@ -238,6 +239,7 @@ int main(int argc, char *argv[]) {
     
     #else
     tl::files::hdf f("rng.hdf5", true);
+    f.write<double>( "/numprotos",  numproto, H5::PredType::NATIVE_DOUBLE );
     f.write<double>( "/protos",  tl::matrix::setNumericalZero(ng.getPrototypes()), H5::PredType::NATIVE_DOUBLE );    
     f.write<std::size_t>( "/iteration",  ngit, H5::PredType::NATIVE_ULONG );
     
@@ -311,6 +313,7 @@ int main(int argc, char *argv[]) {
     
     if (loMPICom.rank() == 0) {
         tl::files::hdf f("ng.hdf5", true);
+        f.write<double>( "/numprotos",  numproto, H5::PredType::NATIVE_DOUBLE );
         f.write<double>( "/protos",  proto, H5::PredType::NATIVE_DOUBLE );
         f.write<std::size_t>( "/iteration",  ngit, H5::PredType::NATIVE_ULONG );
     
@@ -324,6 +327,7 @@ int main(int argc, char *argv[]) {
     
     #else
     tl::files::hdf f("ng.hdf5", true);
+    f.write<double>( "/numprotos",  numproto, H5::PredType::NATIVE_DOUBLE );
     f.write<double>( "/protos",  tl::matrix::setNumericalZero(ng.getPrototypes()), H5::PredType::NATIVE_DOUBLE );    
     f.write<std::size_t>( "/iteration",  ngit, H5::PredType::NATIVE_ULONG );
     
