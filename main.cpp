@@ -182,7 +182,7 @@ int main(int argc, char *argv[]) {
     
     
     // ===== RNG =====
-    
+    /*
     ublas::matrix<double> data = o.readMatrix<double>("/relational/cortex/data2", H5::PredType::NATIVE_DOUBLE);
     
     dist::relational::euclid<double> d;
@@ -250,11 +250,11 @@ int main(int argc, char *argv[]) {
             f.write<double>("/log" + boost::lexical_cast<std::string>( i ), tl::matrix::setNumericalZero(logproto[i]), H5::PredType::NATIVE_DOUBLE );
     }
     #endif    
-    
+    */
     
    
     // ===== NG =====    
-    /*
+    
     //ublas::matrix<double> data = o.readMatrix<double>("/ngdata", H5::PredType::NATIVE_DOUBLE);
     //ublas::matrix<double> data = o.readMatrix<double>("/ngmini", H5::PredType::NATIVE_DOUBLE);
     ublas::matrix<double> data = o.readMatrix<double>("/ngbigdata", H5::PredType::NATIVE_DOUBLE);
@@ -263,7 +263,7 @@ int main(int argc, char *argv[]) {
     dist::euclid<double> d;
     
     const std::size_t ngit      = 25;
-    const std::size_t numproto  = 11;
+    const std::size_t numproto  = 22;
 
     
     #ifdef CLUSTER
@@ -336,7 +336,7 @@ int main(int argc, char *argv[]) {
             f.write<double>("/log" + boost::lexical_cast<std::string>( i ), tl::matrix::setNumericalZero(logproto[i]), H5::PredType::NATIVE_DOUBLE );
     }
     #endif
-    */
+    
     
     
     // ===== RLVQ ======
