@@ -173,6 +173,19 @@ def createLanguage(env) :
     for i in sources :
         cmd = cmd + i + " "
     os.system(cmd);
+    
+    
+    # get all language files in the subdirs and add the new texts
+    po = getRekusivFiles(os.curdir, ".po")
+    for i in po :
+        os.system( "msgmerge --no-wrap --update " + i + " tools/language/language.pot" )
+        
+    os.remove("tools/language/language.pot")
+    
+    # compiling all files
+    for i in po :
+        os.system( "msgfmt -v -o " + os.path.join(os.path.dirname(i),"ml.mo") +" "+ i )
+    
 
 #=======================================================================================================================================
 
