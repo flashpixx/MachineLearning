@@ -31,6 +31,7 @@
 #include <boost/numeric/bindings/lapack/driver/geev.hpp>
 #include <boost/numeric/bindings/lapack/driver/ggev.hpp>
 #include <boost/numeric/bindings/lapack/driver/gesv.hpp> 
+#include <boost/numeric/bindings/lapack/computational/hseqr.hpp>
 
 
 #include "../exception/exception.h"
@@ -56,6 +57,8 @@ namespace machinelearning { namespace tools {
             template<typename T> static void eigen( const ublas::matrix<T>&, ublas::vector<T>&, ublas::matrix<T>& );
             template<typename T> static void eigen( const ublas::matrix<T>&, const ublas::matrix<T>&, ublas::vector<T>&, ublas::matrix<T>& );
             template<typename T> static void solve( const ublas::matrix<T>&, const ublas::vector<T>&, ublas::vector<T>& );
+            template<typename T> static void schur( const ublas::matrix<T>&, ublas::matrix<T>& );
+            template<typename T> static ublas::matrix<T> perronfrobenius( const ublas::matrix<T>&, const std::size_t& );
         
     };
 
@@ -71,7 +74,7 @@ namespace machinelearning { namespace tools {
     template<typename T> inline void lapack::eigen( const ublas::matrix<T>& p_matrix, const ublas::matrix<T>& p_diag, ublas::vector<T>& p_eigval, ublas::matrix<T>& p_eigvec )
     {
         if (  (p_matrix.size1() != p_matrix.size2()) || (p_diag.size1() != p_diag.size2())  )
-            throw exception::matrix( _("matrix are not symmetric") );
+            throw exception::matrix( _("matrix must be square") );
         if ( (p_matrix.size1() != p_diag.size1()) || (p_matrix.size2() != p_diag.size2()) )
             throw exception::matrix( _("both matrices have not the same size") );
         
@@ -119,7 +122,7 @@ namespace machinelearning { namespace tools {
     template<typename T> inline void lapack::eigen( const ublas::matrix<T>& p_matrix, ublas::vector<T>& p_eigval, ublas::matrix<T>& p_eigvec )
     {
         if (p_matrix.size1() != p_matrix.size2())
-            throw exception::matrix(_("matrix are not symmetric"));
+            throw exception::matrix(_("matrix must be square"));
         
         // copy matrix for LAPACK
         ublas::matrix<T, ublas::column_major> l_matrix(p_matrix);
@@ -172,6 +175,23 @@ namespace machinelearning { namespace tools {
     }
     
     
+    template<typename T> inline void lapack::schur( const ublas::matrix<T>& p_matrix, ublas::matrix<T>& p_solve )
+    {
+        if (p_matrix.size1() != p_matrix.size2())
+            throw exception::matrix(_("matrix must be square"));
+    }
+    
+    
+    
+    /** generates the matrix exponential with Schur decomposition
+     * @param p_matrix input matrix
+     * @return exponential matrix
+     **/
+    template<typename T> inline ublas::matrix<T> perronfrobenius( const ublas::matrix<T>& p_matrix, const std::size_t& p_iteration )
+    {
+        if (p_matrix.size1() != p_matrix.size2())
+            throw exception::matrix(_("matrix must be square"));
+    }
 
 };};
 #endif

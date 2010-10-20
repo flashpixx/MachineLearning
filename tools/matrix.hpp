@@ -72,7 +72,6 @@ namespace machinelearning { namespace tools {
             template<typename T> static ublas::matrix<T> sort( const ublas::matrix<T>&, const ublas::vector<std::size_t>&, const rowtype& p_which = row);
             template<typename T> static ublas::matrix<T> cov( const ublas::matrix<T>& );
             template<typename T> static ublas::matrix<T> setNumericalZero( const ublas::matrix<T>&, const T& = 0);
-        
     };
     
     
@@ -374,6 +373,7 @@ namespace machinelearning { namespace tools {
         return l_mat;
     }
     
+
     
     /** creates a similarity matrix from a dissimilarity matrix
      * @param p_dissimilarity input dissimilarity matrix
