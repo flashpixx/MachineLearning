@@ -7,116 +7,111 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-08-17 00:11+0200\n"
-"PO-Revision-Date: 2010-09-27 20:52+0100\n"
+"POT-Creation-Date: 2010-10-21 00:01+0200\n"
+"PO-Revision-Date: 2010-10-20 23:47+0100\n"
 "Last-Translator: Philipp Kraus <philipp.kraus@flashpixx.de>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: classifier/classifier.hpp:49
-#: classifier/classifier.hpp:52
-#: classifier/classifier.hpp:55
-#: classifier/classifier.hpp:58
-#: classifier/classifier.hpp:61
-#: classifier/classifier.hpp:64
-#: classifier/classifier.hpp:67
-#: classifier/classifier.hpp:70
-#: classifier/classifier.hpp:73
-#: clustering/clustering.hpp:50
-#: clustering/clustering.hpp:53
-#: clustering/clustering.hpp:56
-#: clustering/clustering.hpp:59
-#: clustering/clustering.hpp:62
-#: clustering/clustering.hpp:65
-#: clustering/clustering.hpp:68
-#: clustering/clustering.hpp:71
-#: clustering/clustering.hpp:74
-#: clustering/clustering.hpp:77
-#: clustering/clustering.hpp:100
-#: clustering/clustering.hpp:103
-#: clustering/clustering.hpp:106
-#: clustering/clustering.hpp:109
-#: clustering/clustering.hpp:112
-#: clustering/clustering.hpp:115
-#: clustering/clustering.hpp:118
-#: clustering/clustering.hpp:121
-#: clustering/clustering.hpp:124
+#: classifier/classifier.hpp:49 classifier/classifier.hpp:52
+#: classifier/classifier.hpp:55 classifier/classifier.hpp:58
+#: classifier/classifier.hpp:61 classifier/classifier.hpp:64
+#: classifier/classifier.hpp:67 classifier/classifier.hpp:70
+#: classifier/classifier.hpp:73 clustering/clustering.hpp:50
+#: clustering/clustering.hpp:53 clustering/clustering.hpp:56
+#: clustering/clustering.hpp:59 clustering/clustering.hpp:62
+#: clustering/clustering.hpp:65 clustering/clustering.hpp:68
+#: clustering/clustering.hpp:71 clustering/clustering.hpp:74
+#: clustering/clustering.hpp:77 clustering/clustering.hpp:100
+#: clustering/clustering.hpp:103 clustering/clustering.hpp:106
+#: clustering/clustering.hpp:109 clustering/clustering.hpp:112
+#: clustering/clustering.hpp:115 clustering/clustering.hpp:118
+#: clustering/clustering.hpp:121 clustering/clustering.hpp:124
 #: dimensionreduce/dimensionreduce.hpp:47
 #: dimensionreduce/dimensionreduce.hpp:50
 #: dimensionreduce/dimensionreduce.hpp:53
 #: dimensionreduce/dimensionreduce.hpp:70
 #: dimensionreduce/dimensionreduce.hpp:73
-#: dimensionreduce/dimensionreduce.hpp:76
-#: distances/distance.hpp:50
-#: distances/distance.hpp:53
-#: distances/distance.hpp:56
-#: distances/distance.hpp:59
-#: distances/distance.hpp:62
-#: distances/distance.hpp:65
-#: distances/distance.hpp:68
-#: distances/distance.hpp:71
-#: distances/distance.hpp:74
-#: neighborhood/neighborhood.hpp:49
-#: neighborhood/neighborhood.hpp:52
-#: neighborhood/neighborhood.hpp:55
-#: neighborhood/neighborhood.hpp:58
-#: neighborhood/neighborhood.hpp:61
+#: dimensionreduce/dimensionreduce.hpp:76 distances/distance.hpp:50
+#: distances/distance.hpp:53 distances/distance.hpp:56
+#: distances/distance.hpp:59 distances/distance.hpp:64
+#: distances/distance.hpp:67 distances/distance.hpp:70
+#: distances/distance.hpp:73 distances/distance.hpp:76
+#: distances/distance.hpp:81 distances/distance.hpp:84
+#: distances/distance.hpp:87 distances/distance.hpp:92
+#: distances/distance.hpp:95 distances/distance.hpp:98
+#: distances/distance.hpp:101 neighborhood/neighborhood.hpp:49
+#: neighborhood/neighborhood.hpp:52 neighborhood/neighborhood.hpp:55
+#: neighborhood/neighborhood.hpp:58 neighborhood/neighborhood.hpp:61
 msgid "method is not implementated in the base class"
 msgstr "Methode ist nicht implementiert, da sie Teil einer Basisklasse ist"
 
-#: classifier/lazylearner.hpp:188
-#: clustering/supervised/rlvq.hpp:216
-#: dimensionreduce/supervised/lda.hpp:102
+#: classifier/lazylearner.hpp:188 clustering/supervised/rlvq.hpp:216
+#: dimensionreduce/supervised/lda.hpp:103
 msgid "matrix rows and label size are not equal"
 msgstr "Matrixzeilen und Labelanzahl sind nicht identisch"
 
 #: clustering/nonsupervised/kmeans.hpp:94
-#: clustering/nonsupervised/neuralgas.hpp:95
+#: clustering/nonsupervised/neuralgas.hpp:124
+#: clustering/nonsupervised/relationalneuralgas.hpp:127
 #: clustering/supervised/rlvq.hpp:101
 msgid "prototype size must be greater than zero"
 msgstr "Prototypdimension musst größer Null sein"
 
 #: clustering/nonsupervised/kmeans.hpp:96
-#: clustering/nonsupervised/neuralgas.hpp:97
+#: clustering/nonsupervised/neuralgas.hpp:126
+#: clustering/nonsupervised/relationalneuralgas.hpp:129
 msgid "number of prototypes must be greater than zero"
 msgstr "Anzahl der Prototypen muss größer Null sein"
 
 #: clustering/nonsupervised/kmeans.hpp:155
-#: clustering/nonsupervised/neuralgas.hpp:189
+#: clustering/nonsupervised/neuralgas.hpp:221
+#: clustering/nonsupervised/neuralgas.hpp:476
+#: clustering/nonsupervised/relationalneuralgas.hpp:224
+#: clustering/nonsupervised/relationalneuralgas.hpp:500
 #: clustering/supervised/rlvq.hpp:214
-#: functionoptimization/gradient/gradientdescent.hpp:232
-#: functionoptimization/gradient/worker.hpp:114
+#: functionoptimization/gradient/gradientdescent.hpp:247
 msgid "iterations must be greater than zero"
 msgstr "Iterationen müssen größer Null sein"
 
 #: clustering/nonsupervised/kmeans.hpp:157
-#: clustering/nonsupervised/neuralgas.hpp:191
+#: clustering/nonsupervised/neuralgas.hpp:223
+#: clustering/nonsupervised/neuralgas.hpp:478
+#: clustering/nonsupervised/relationalneuralgas.hpp:226
+#: clustering/nonsupervised/relationalneuralgas.hpp:502
 #: clustering/nonsupervised/spectralclustering.hpp:167
-#: clustering/supervised/rlvq.hpp:218
-#: clustering/supervised/rlvq.hpp:298
+#: clustering/supervised/rlvq.hpp:218 clustering/supervised/rlvq.hpp:294
 msgid "data and prototype dimension are not equal"
 msgstr "Daten- und Prototypdimension sind nicht identisch"
 
 #: clustering/nonsupervised/kmeans.hpp:159
-#: clustering/nonsupervised/kmeans.hpp:256
-#: clustering/nonsupervised/neuralgas.hpp:187
-#: clustering/nonsupervised/neuralgas.hpp:280
+#: clustering/nonsupervised/kmeans.hpp:254
+#: clustering/nonsupervised/neuralgas.hpp:219
+#: clustering/nonsupervised/neuralgas.hpp:317
+#: clustering/nonsupervised/neuralgas.hpp:474
+#: clustering/nonsupervised/neuralgas.hpp:644
+#: clustering/nonsupervised/relationalneuralgas.hpp:222
+#: clustering/nonsupervised/relationalneuralgas.hpp:320
+#: clustering/nonsupervised/relationalneuralgas.hpp:498
+#: clustering/nonsupervised/relationalneuralgas.hpp:667
 #: clustering/supervised/rlvq.hpp:212
 msgid "number of datapoints are less than prototypes"
 msgstr "Anzahl der Datenpunkte ist weniger als Anzahl der Prototypen"
 
-#: clustering/nonsupervised/neuralgas.hpp:193
+#: clustering/nonsupervised/neuralgas.hpp:225
+#: clustering/nonsupervised/neuralgas.hpp:480
+#: clustering/nonsupervised/relationalneuralgas.hpp:228
+#: clustering/nonsupervised/relationalneuralgas.hpp:504
 #: clustering/supervised/rlvq.hpp:220
 msgid "lambda must be greater than zero"
 msgstr "Lambda muss größer Null sein"
 
-#: clustering/nonsupervised/spectralclustering.hpp:165
-#: tools/lapack.hpp:74
-#: tools/lapack.hpp:122
-msgid "matrix are not symmetric"
-msgstr "Matrix ist nicht symmetrisch"
+#: clustering/nonsupervised/spectralclustering.hpp:165 tools/lapack.hpp:77
+#: tools/lapack.hpp:125 tools/lapack.hpp:181 tools/lapack.hpp:193
+msgid "matrix must be square"
+msgstr "Matrix muss quadratisch sein"
 
 #: clustering/supervised/rlvq.hpp:222
 msgid "eta must be greater than zero"
@@ -136,110 +131,96 @@ msgstr "Datenpunktdimension ist kleiner als Dimension der Zielprojektion"
 msgid "datapoint dimension are less than target dimension"
 msgstr "Datenpunktdimension ist kleiner als Dimension der Zielprojektion"
 
-#: dimensionreduce/supervised/lda.hpp:110
+#: dimensionreduce/supervised/lda.hpp:111
 msgid "target dimension must be less than unique data classes"
 msgstr "Zieldimension musst kleiner sein als Anzahl der eindeutigen Klassen"
 
-#: distances/ncd.hpp:175
-#: distances/ncd.hpp:222
+#: distances/ncd.hpp:379 distances/ncd.hpp:445
 msgid "vector size must be greater than zero"
 msgstr "Vektor Puffer muss größer Null sein"
 
-#: distances/ncd.hpp:267
+#: distances/ncd.hpp:507
 msgid "string size must be greater than zero"
 msgstr "Zeichenanzahl muss größer Null sein"
 
-#: distances/ncd.hpp:291
-#: distances/ncd.hpp:300
+#: distances/ncd.hpp:533 distances/ncd.hpp:542
 msgid "file can not be opened"
 msgstr "Datei konnte nicht geöffnet werden"
 
-#: functionoptimization/gradient/gradientdescent.hpp:101
+#: functionoptimization/gradient/gradientdescent.hpp:123
 msgid "function need not be empty"
 msgstr "Funktion darf nicht leer sein"
 
-#: functionoptimization/gradient/gradientdescent.hpp:111
-#: functionoptimization/gradient/gradientdescent.hpp:174
+#: functionoptimization/gradient/gradientdescent.hpp:133
+#: functionoptimization/gradient/gradientdescent.hpp:194
+#: functionoptimization/gradient/worker.hpp:132
 msgid "arithmetic expression could not be parsed"
 msgstr "Arithmetischer Ausdruckt konnte nicht geparst werden"
 
-#: functionoptimization/gradient/gradientdescent.hpp:128
+#: functionoptimization/gradient/gradientdescent.hpp:150
 msgid "error function need not be empty"
 msgstr "Fehlerfunktion darf nicht leer sein"
 
-#: functionoptimization/gradient/gradientdescent.hpp:130
+#: functionoptimization/gradient/gradientdescent.hpp:152
 msgid "variable name for the function need not be empty"
 msgstr "Variablenname für die Funktion darf nicht leer sein"
 
-#: functionoptimization/gradient/gradientdescent.hpp:132
+#: functionoptimization/gradient/gradientdescent.hpp:154
 msgid "separators need not be empty"
 msgstr "Separator darf nicht leer sein"
 
-#: functionoptimization/gradient/gradientdescent.hpp:150
-#: functionoptimization/gradient/gradientdescent.hpp:197
+#: functionoptimization/gradient/gradientdescent.hpp:172
+#: functionoptimization/gradient/gradientdescent.hpp:212
 msgid "variable for optimization is not found in the expression symbol table"
 msgstr "Variable zur Optimierung ist nicht im symbolischen Ausdruck enthalten"
 
-#: functionoptimization/gradient/gradientdescent.hpp:179
+#: functionoptimization/gradient/gradientdescent.hpp:199
 msgid "only one variable for the data must be added"
 msgstr "nur eine Variable darf dem Ausdruck hinzugefügt werden"
 
-#: functionoptimization/gradient/gradientdescent.hpp:221
+#: functionoptimization/gradient/gradientdescent.hpp:236
 msgid "static variable is not in the symbol table or is an optimazation variable"
 msgstr "statische Variable ist nicht in der Symboltabelle oder es ist eine zu optimierende Variable"
 
-#: functionoptimization/gradient/gradientdescent.hpp:234
-#: functionoptimization/gradient/worker.hpp:120
+#: functionoptimization/gradient/gradientdescent.hpp:249
 msgid "stepsize must be greater than zero"
 msgstr "Schrittweite muss größer Null sein"
 
-#: functionoptimization/gradient/gradientdescent.hpp:236
-msgid "number of threads must be greater than zero"
-msgstr "Anzahl der Prototypen muss größer Null sein"
-
-#: functionoptimization/gradient/gradientdescent.hpp:240
+#: functionoptimization/gradient/gradientdescent.hpp:253
 msgid "there are unsed variables"
 msgstr "es existieren unbenutze Variablen (Variablen ohne Wertzuweisung)"
 
-#: functionoptimization/gradient/worker.hpp:116
-msgid "there are no variables for optimization"
-msgstr "es existieren keine Variablen zur Optimierung"
-
-#: functionoptimization/gradient/worker.hpp:118
-msgid "derivations and initialisation have not the same size"
-msgstr "beide Matrizen haben nicht die gleiche Größe"
-
 #: neighborhood/knn.hpp:82
+#, fuzzy
 msgid "knn must be greater than zero"
-msgstr "KNN muss größer Null sein"
+msgstr "Eta muss größer Null sein"
 
-#: neighborhood/knn.hpp:102
-#: neighborhood/knn.hpp:133
+#: neighborhood/knn.hpp:102 neighborhood/knn.hpp:133
 msgid "knn is greater than datapoints"
 msgstr "KNN ist größer als Anzahl der Datenpunkte"
 
-#: tools/lapack.hpp:76
+#: neuronalnetwork/nnet.hpp:70
+msgid "number of vertices must be greater than zero"
+msgstr "Anzahl der Prototypen muss größer Null sein"
+
+#: tools/lapack.hpp:79
 msgid "both matrices have not the same size"
 msgstr "beide Matrizen haben nicht die gleiche Größe"
 
-#: tools/matrix.hpp:91
-#: tools/matrix.hpp:126
-#: tools/matrix.hpp:346
+#: tools/matrix.hpp:93 tools/matrix.hpp:132 tools/matrix.hpp:352
 #: tools/files/csv.hpp:125
 msgid "row size must be greater than zero"
 msgstr "Zeilenanzahl muss größer Null sein"
 
-#: tools/matrix.hpp:93
-#: tools/matrix.hpp:128
-#: tools/files/csv.hpp:123
+#: tools/matrix.hpp:95 tools/matrix.hpp:134 tools/files/csv.hpp:123
 msgid "column size must be greater than zero"
 msgstr "Spaltenanzahl muss größer Null sein"
 
-#: tools/random.hpp:135
+#: tools/random.hpp:177
 msgid "distribution is not kwon"
 msgstr "Verteilung ist nicht bekannt"
 
-#: tools/vector.hpp:106
+#: tools/vector.hpp:110
 msgid "length must be greater than zero"
 msgstr "Länge muss größer Null sein"
 
@@ -255,24 +236,28 @@ msgstr "Größe konnte nicht ermittelt werden"
 msgid "vector reserve must be greater than zero"
 msgstr "Vektor Puffer muss größer Null sein"
 
-#: tools/files/hdf.hpp:167
-#: tools/files/hdf.hpp:208
-#: tools/files/hdf.hpp:358
+#: tools/files/hdf.hpp:174 tools/files/hdf.hpp:215 tools/files/hdf.hpp:365
 msgid "dataset must be one-dimensional"
 msgstr "Datensatz muss ein-dimensional sein"
 
-#: tools/files/hdf.hpp:169
-#: tools/files/hdf.hpp:210
-#: tools/files/hdf.hpp:322
-#: tools/files/hdf.hpp:360
+#: tools/files/hdf.hpp:176 tools/files/hdf.hpp:217 tools/files/hdf.hpp:329
+#: tools/files/hdf.hpp:367
 msgid "dataset must be a simple datatype"
 msgstr "Datensatz muss ein Simpledatentyp sein"
 
-#: tools/files/hdf.hpp:277
+#: tools/files/hdf.hpp:284
 msgid "empty path is forbidden"
 msgstr "Eine leere Pfadangabe ist verboten"
 
-#: tools/files/hdf.hpp:320
+#: tools/files/hdf.hpp:327
 msgid "dataset must be two-dimensional"
 msgstr "Datensatz muss zwei-dimensional sein"
 
+#~ msgid "matrix are not symmetric"
+#~ msgstr "Matrix ist nicht symmetrisch"
+
+#~ msgid "there are no variables for optimization"
+#~ msgstr "es existieren keine Variablen zur Optimierung"
+
+#~ msgid "derivations and initialisation have not the same size"
+#~ msgstr "beide Matrizen haben nicht die gleiche Größe"

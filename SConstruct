@@ -9,8 +9,8 @@ AddOption("--with-randomdevice", dest="withrandom", type="string", nargs=0, acti
 AddOption("--with-mpi", dest="withmpi", type="string", nargs=0, action="store", help="installation with MPI support")
 AddOption("--with-multilanguage", dest="withmultilanguage", type="string", nargs=0, action="store", help="installation with multilanguage support")
 AddOption("--create-language", dest="createlang", type="string", nargs=0, action="store", help="creates the file tools/language/language.pot for translation")
+AddOption("--compile-language", dest="compilelang", type="string", nargs=0, action="store", help="compiles the language files")
 AddOption("--create-documentation", dest="createdocu", type="string", nargs=0, action="store", help="creates the doxygen documentation (doxygen must be within the path)")
-
 
 
 #=== function for os configuration ===================================================================================================
@@ -161,30 +161,38 @@ def getRekusivFiles(startdir, ending, pdontuse=[], pShowPath=True) :
         
        
 # build languagefiles
-def createLanguage(env) :
+def createLanguage(env, onlycompile=False) :
     # compiling with: msgfmt -v -o target.mo source.po
     # add new data: msgmerge --no-wrap --update old_file.po newer_file.pot
-    
-    sources = []
-    for i in env["CPPSUFFIXES"] :
-        sources.extend( getRekusivFiles(os.curdir, i) )
 
-    cmd = "xgettext --output=tools/language/language.pot --keyword=_ --language=c++ ";
-    for i in sources :
-        cmd = cmd + i + " "
-    os.system(cmd);
+    po = getRekusivFiles(os.curdir, ".pot")
+    print po
     
-    
-    # get all language files in the subdirs and add the new texts
-    po = getRekusivFiles(os.curdir, ".po")
-    for i in po :
-        os.system( "msgmerge --no-wrap --update " + i + " tools/language/language.pot" )
+    if onlycompile :
+        # compiling all files
+        for i in po :
+            os.system( "msgfmt -v -o " + os.path.join(os.path.dirname(i),"ml.mo") +" "+ i )
         
-    os.remove("tools/language/language.pot")
-    
-    # compiling all files
-    for i in po :
-        os.system( "msgfmt -v -o " + os.path.join(os.path.dirname(i),"ml.mo") +" "+ i )
+    else :
+        sources = []
+        for i in env["CPPSUFFIXES"] :
+            sources.extend( getRekusivFiles(os.curdir, i) )
+
+        cmd = "xgettext --output=tools/language/language.pot --keyword=_ --language=c++ ";
+        for i in sources :
+            cmd = cmd + i + " "
+        os.system(cmd);
+        
+        
+        # get all language files in the subdirs and add the new texts
+        for i in po :
+            os.system( "msgmerge --no-wrap --update " + i + " tools/language/language.pot" )
+            
+        os.remove("tools/language/language.pot")
+        
+        # compiling all files
+        for i in po :
+            os.system( "msgfmt -v -o " + os.path.join(os.path.dirname(i),"ml.mo") +" "+ i )
     
 
 #=======================================================================================================================================
