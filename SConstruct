@@ -166,7 +166,6 @@ def createLanguage(env, onlycompile=False) :
     # add new data: msgmerge --no-wrap --update old_file.po newer_file.pot
 
     po = getRekusivFiles(os.curdir, ".pot")
-    print po
     
     if onlycompile :
         # compiling all files
@@ -206,6 +205,8 @@ SetOption('num_jobs',   int(os.environ.get('NUM_CPU', COMPILECPU)))
 # get all cpp-files and compile and create language file
 if GetOption("createlang") != None :
     createLanguage(env)
+elif GetOption("compilelang") != None :
+        createLanguage(env, True)
 elif GetOption("createdocu") != None :
     os.system("doxygen documentation.doxyfile")
 else :
