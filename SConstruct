@@ -8,7 +8,7 @@ import platform
 AddOption("--with-randomdevice", dest="withrandom", type="string", nargs=0, action="store", help="installation with random device support")
 AddOption("--with-mpi", dest="withmpi", type="string", nargs=0, action="store", help="installation with MPI support")
 AddOption("--with-multilanguage", dest="withmultilanguage", type="string", nargs=0, action="store", help="installation with multilanguage support")
-AddOption("--create-language", dest="createlang", type="string", nargs=0, action="store", help="creates the file tools/language/language.pot for translation")
+AddOption("--create-language", dest="createlang", type="string", nargs=0, action="store", help="reads the data for translation and add them to the different language files")
 AddOption("--compile-language", dest="compilelang", type="string", nargs=0, action="store", help="compiles the language files")
 AddOption("--create-documentation", dest="createdocu", type="string", nargs=0, action="store", help="creates the doxygen documentation (doxygen must be within the path)")
 
@@ -165,7 +165,7 @@ def createLanguage(env, onlycompile=False) :
     # compiling with: msgfmt -v -o target.mo source.po
     # add new data: msgmerge --no-wrap --update old_file.po newer_file.pot
 
-    po = getRekusivFiles(os.curdir, ".pot")
+    po = getRekusivFiles(os.curdir, ".po")
     
     if onlycompile :
         # compiling all files
@@ -177,7 +177,7 @@ def createLanguage(env, onlycompile=False) :
         for i in env["CPPSUFFIXES"] :
             sources.extend( getRekusivFiles(os.curdir, i) )
 
-        cmd = "xgettext --output=tools/language/language.pot --keyword=_ --language=c++ ";
+        cmd = "xgettext --output=tools/language/language.po --keyword=_ --language=c++ ";
         for i in sources :
             cmd = cmd + i + " "
         os.system(cmd);
@@ -185,9 +185,9 @@ def createLanguage(env, onlycompile=False) :
         
         # get all language files in the subdirs and add the new texts
         for i in po :
-            os.system( "msgmerge --no-wrap --update " + i + " tools/language/language.pot" )
+            os.system( "msgmerge --no-wrap --update " + i + " tools/language/language.po" )
             
-        os.remove("tools/language/language.pot")
+        os.remove("tools/language/language.po")
         
         # compiling all files
         for i in po :
