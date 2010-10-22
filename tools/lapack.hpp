@@ -58,7 +58,8 @@ namespace machinelearning { namespace tools {
             template<typename T> static void eigen( const ublas::matrix<T>&, const ublas::matrix<T>&, ublas::vector<T>&, ublas::matrix<T>& );
             template<typename T> static void solve( const ublas::matrix<T>&, const ublas::vector<T>&, ublas::vector<T>& );
             template<typename T> static ublas::matrix<T> expm( const ublas::matrix<T>& );
-            template<typename T> static ublas::matrix<T> perronfrobenius( const ublas::matrix<T>&, const std::size_t& );
+            template<typename T> static ublas::vector<T> perronfrobenius( const ublas::matrix<T>&, const std::size_t& );
+            template<typename T> static ublas::vector<T> perronfrobenius( const ublas::matrix<T>&, const std::size_t&, const ublas::vector<T>& );
         
     };
 
@@ -184,6 +185,11 @@ namespace machinelearning { namespace tools {
         if (p_matrix.size1() != p_matrix.size2())
             throw exception::matrix(_("matrix must be square"));
         
+        const ublas::matrix<T> l_eye = matrix::eye<T>(p_matrix.size1());
+        
+        
+        return p_matrix;
+        
         /*
         edit expmdemo1
 
@@ -201,16 +207,16 @@ namespace machinelearning { namespace tools {
          q = 6;
          p = 1;
          for k = 2:q
-         c = c * (q-k+1) / (k*(2*q-k+1));
-         X = A*X;
-         cX = c*X;
-         E = E + cX;
-         if p
-         D = D + cX;
-         else
-         D = D - cX;
-         end
-         p = ~p;
+            c = c * (q-k+1) / (k*(2*q-k+1));
+            X = A*X;
+            cX = c*X;
+            E = E + cX;
+            if p
+                D = D + cX;
+            else
+                D = D - cX;
+            end
+            p = ~p;
          end
          E = D\E;
          
@@ -220,14 +226,41 @@ namespace machinelearning { namespace tools {
         */
     }
     
-    /** generates the matrix exponential with Schur decomposition
+    /** generates the eigenvalue / -vector with the perronforbenius theorem
      * @param p_matrix input matrix
-     * @return exponential matrix
+     * @param p_iteration number of iterations
+     * @return eigenvector
      **/
-    template<typename T> inline ublas::matrix<T> perronfrobenius( const ublas::matrix<T>& p_matrix, const std::size_t& p_iteration )
+    template<typename T> inline ublas::vector<T> lapack::perronfrobenius( const ublas::matrix<T>& p_matrix, const std::size_t& p_iteration )
     {
         if (p_matrix.size1() != p_matrix.size2())
             throw exception::matrix(_("matrix must be square"));
+        
+        return perronfrobenius( p_matrix, p_iteration, vector::random<T>(p_matrix.size1()) );
+    }
+    
+    
+    /** generates the eigenvalue / -vector with the perronforbenius theorem
+     * @param p_matrix input matrix
+     * @param p_iteration number of iterations
+     * @param p_init initialization vector
+     * @return eigenvector
+     **/
+    template<typename T> inline ublas::vector<T> lapack::perronfrobenius( const ublas::matrix<T>& p_matrix, const std::size_t& p_iteration, const ublas::vector<T>& p_init )
+    {
+        if (p_matrix.size1() != p_matrix.size2())
+            throw exception::matrix(_("matrix must be square"));
+        if (p_matrix.size1() != p_init.size())
+            throw exception::matrix(_("number of rows / columns of the matrix must have the same dimension like the initialisation vector"));
+        
+        ublas::vector<T> l_vec = p_init;
+        for(std::size_t i=0; i < p_iteration; ++i) {
+            l_vec  = ublas::prod(p_matrix, l_vec);
+            l_vec /= blas::nrm2( l_vec );
+        }
+        
+        return l_vec;
+        
     }
 
 };};

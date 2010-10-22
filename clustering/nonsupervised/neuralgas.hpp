@@ -249,9 +249,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             // calculate for every prototype the distance
             for(std::size_t n=0; n < m_prototypes.size1(); ++n)
                 ublas::row(l_adaptmatrix, n)  = m_distance->getDistance( p_data, ublas::row(m_prototypes, n) ) ;
-
-            //std::cout << l_adaptmatrix << std::endl;
-            //throw exception::parameter("xxx");
             
             // for every column ranks values and create adapts
             // we need rank and not randIndex, because we 

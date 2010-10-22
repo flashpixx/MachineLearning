@@ -91,7 +91,6 @@ namespace machinelearning { namespace tools {
             template<typename T> static ublas::vector<std::size_t> rankIndexVector( ublas::vector<T>& );
             template<typename T> static ublas::indirect_array< std::vector<std::size_t> > rankIndex( ublas::vector<T>& );
             template<typename T> static ublas::vector<T> setNumericalZero( const ublas::vector<T>&, const T& = 0 );
-         
     };
     
     

@@ -134,7 +134,7 @@ namespace machinelearning { namespace distances { namespace relational {
     
     
     /** returns a vector with absolut elements
-     * @pram p_vec relational vector
+     * @param p_vec relational vector
      * @return the input vector, because a relational vector is positiv (>= 0)
      **/
     template<typename T> inline ublas::vector<T> euclid<T>::getAbs( const ublas::vector<T>& p_vec ) const
