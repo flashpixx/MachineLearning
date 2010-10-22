@@ -57,7 +57,7 @@ namespace machinelearning { namespace tools {
             template<typename T> static void eigen( const ublas::matrix<T>&, ublas::vector<T>&, ublas::matrix<T>& );
             template<typename T> static void eigen( const ublas::matrix<T>&, const ublas::matrix<T>&, ublas::vector<T>&, ublas::matrix<T>& );
             template<typename T> static void solve( const ublas::matrix<T>&, const ublas::vector<T>&, ublas::vector<T>& );
-            template<typename T> static void schur( const ublas::matrix<T>&, ublas::matrix<T>& );
+            template<typename T> static ublas::matrix<T> expm( const ublas::matrix<T>& );
             template<typename T> static ublas::matrix<T> perronfrobenius( const ublas::matrix<T>&, const std::size_t& );
         
     };
@@ -173,15 +173,52 @@ namespace machinelearning { namespace tools {
         // we must copy the reference
         p_solve = static_cast< ublas::vector<T> >(ublas::column(l_right,0));
     }
-    
-    
-    template<typename T> inline void lapack::schur( const ublas::matrix<T>& p_matrix, ublas::matrix<T>& p_solve )
+   
+  
+    /** matrix exponential via Pade approximation
+     * @param p_matrix input m atrix
+     * @return exponential matrix
+     **/
+    template<typename T> inline ublas::matrix<T> lapack::expm( const ublas::matrix<T>& p_matrix )
     {
         if (p_matrix.size1() != p_matrix.size2())
             throw exception::matrix(_("matrix must be square"));
+        
+        /*
+        edit expmdemo1
+
+         
+         % Scale A by power of 2 so that its norm is < 1/2 .
+         [f,e] = log2(norm(A,'inf'));
+         s = max(0,e+1);
+         A = A/2^s;
+         
+         % Pade approximation for exp(A)
+         X = A; 
+         c = 1/2;
+         E = eye(size(A)) + c*A;
+         D = eye(size(A)) - c*A;
+         q = 6;
+         p = 1;
+         for k = 2:q
+         c = c * (q-k+1) / (k*(2*q-k+1));
+         X = A*X;
+         cX = c*X;
+         E = E + cX;
+         if p
+         D = D + cX;
+         else
+         D = D - cX;
+         end
+         p = ~p;
+         end
+         E = D\E;
+         
+         % Undo scaling by repeated squaring
+         for k=1:s, E = E*E; end
+         
+        */
     }
-    
-    
     
     /** generates the matrix exponential with Schur decomposition
      * @param p_matrix input matrix
