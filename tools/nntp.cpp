@@ -21,23 +21,8 @@
  @endcond
  **/
 
-
-
-/** header file to connect all tools library for one include **/
-
-#ifndef MACHINELEARNING_TOOLS_H
-#define MACHINELEARNING_TOOLS_H
-
-#include "random.hpp"
-#include "function.hpp"
-#include "matrix.hpp"
-#include "vector.hpp"
-#include "lapack.hpp"
 #include "nntp.h"
 
-#include "files/csv.hpp"
-#include "files/hdf.hpp"
+namespace machinelearning { namespace tools {
 
-#include "language/language.h"
-
-#endif
+};};

@@ -22,22 +22,19 @@
  **/
 
 
+#ifndef MACHINELEARNING_TOOLS_NNTP_H
+#define MACHINELEARNING_TOOLS_NNTP_H
 
-/** header file to connect all tools library for one include **/
 
-#ifndef MACHINELEARNING_TOOLS_H
-#define MACHINELEARNING_TOOLS_H
+namespace machinelearning { namespace tools {
+    
+    /** class for creating nntp connection (exspecially for creating distance matrix)
+     * @todo ssl connection
+     **/
+    class nntp {
+        
+    };
 
-#include "random.hpp"
-#include "function.hpp"
-#include "matrix.hpp"
-#include "vector.hpp"
-#include "lapack.hpp"
-#include "nntp.h"
 
-#include "files/csv.hpp"
-#include "files/hdf.hpp"
-
-#include "language/language.h"
-
+};};
 #endif

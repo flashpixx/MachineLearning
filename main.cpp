@@ -76,7 +76,7 @@ int main(int argc, char *argv[]) {
     */
     
         
-    tl::files::hdf o("blub.hdf5");
+    //tl::files::hdf o("blub.hdf5");
     //std::cout << o.readString("/string") << std::endl;
 	//std::vector<std::string> x = o.readStringVector("/stringarray");
     //ublas::vector<double> x = o.readVector<double>("/vector", H5::PredType::NATIVE_DOUBLE);
@@ -185,8 +185,6 @@ int main(int argc, char *argv[]) {
     // ===== RNG =====
     /*
     ublas::matrix<double> data = o.readMatrix<double>("/relational/cortex/data2", H5::PredType::NATIVE_DOUBLE);
-    
-    dist::relational::euclid<double> d;
     
     const std::size_t ngit      = 25;
     const std::size_t numproto  = 3;
