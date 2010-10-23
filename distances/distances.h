@@ -32,6 +32,5 @@
 
 #include "ncd.hpp"
 #include "norm/euclid.hpp"
-#include "norm/relational/euclid.hpp"
 
 #endif

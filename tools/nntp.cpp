@@ -24,5 +24,17 @@
 #include "nntp.h"
 
 namespace machinelearning { namespace tools {
+    
+    
+    nntp::nntp( const std::string& p_server ) :
+        m_server( p_server )
+    {}
+    
+    
+    std::string nntp::getServer( void ) const
+    {
+        return m_server;
+    }
+    
 
 };};

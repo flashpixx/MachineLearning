@@ -50,6 +50,9 @@ int main(int argc, char *argv[]) {
     #endif
 
     
+    
+    tl::nntp x("news.online.de");
+    
    
     //nn::nnet<double> net(3);
     

@@ -25,6 +25,8 @@
 #ifndef MACHINELEARNING_TOOLS_NNTP_H
 #define MACHINELEARNING_TOOLS_NNTP_H
 
+#include <string>
+
 
 namespace machinelearning { namespace tools {
     
@@ -32,6 +34,17 @@ namespace machinelearning { namespace tools {
      * @todo ssl connection
      **/
     class nntp {
+        
+        
+        public :
+        
+            nntp( const std::string& );
+            std::string getServer( void ) const;
+        
+        
+        private :
+        
+            const std::string m_server;
         
     };
 
