@@ -75,7 +75,7 @@ namespace machinelearning { namespace tools { namespace files {
         
         //first line => length of vector
         std::getline(l_stream, l_line);
-        unsigned int l_vecsize = boost::lexical_cast<unsigned int>(l_line);
+        std::size_t l_vecsize = boost::lexical_cast<std::size_t>(l_line);
         if (l_vecsize == 0)
             throw exception::parameter(_("vector dimension must be greater than zero"));
         ublas::vector<T> l_vec( l_vecsize );        
@@ -111,13 +111,13 @@ namespace machinelearning { namespace tools { namespace files {
         if (l_data.size() == 0)
             throw exception::parameter(_("can not separate size"));
 
-        unsigned int l_row = 0;
+        std::size_t l_row = 0;
         if (l_data.size() > 0)
-            l_row = boost::lexical_cast<unsigned int>( l_data[0] );
+            l_row = boost::lexical_cast<std::size_t>( l_data[0] );
         
-        unsigned int l_col = l_row;
+        std::size_t l_col = l_row;
         if (l_data.size() > 1)
-            l_col = boost::lexical_cast<unsigned int>( l_data[1] );  
+            l_col = boost::lexical_cast<std::size_t>( l_data[1] );  
         
         if (l_col > 0)
             throw exception::parameter(_("column size must be greater than zero"));

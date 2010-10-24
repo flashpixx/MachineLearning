@@ -30,6 +30,12 @@
 #include <istream>
 #include <ostream>
 #include <boost/asio.hpp>
+#include <boost/iostreams/copy.hpp>
+#include <boost/algorithm/string.hpp> 
+#include <boost/iostreams/concepts.hpp>
+#include <boost/iostreams/operations.hpp> 
+#include <boost/iostreams/filtering_stream.hpp>
+
 
 #include "../exception/exception.h"
 #include "language/language.h"
@@ -38,8 +44,8 @@
 namespace machinelearning { namespace tools {
     
     namespace bip  = boost::asio::ip;
-    
-    
+    namespace bio  = boost::iostreams;
+
     
     /** class for creating nntp connection (exspecially for creating distance matrix).
      * The class is a nntp client class without any post functionality
@@ -70,6 +76,54 @@ namespace machinelearning { namespace tools {
             bip::tcp::socket m_socket;    
         
             void send( const std::string&, const std::string& = "\r\n" );
+        
+        
+        
+        
+            /** private class for filtering nntp data (filtering newsgroup list) **/
+            class groupfilter : public bio::output_filter {
+                
+                public:
+                
+                    /** constructor for initialisation skip variable **/
+                    groupfilter( void ) : m_skip( false ) {}
+                
+                    /** put method
+                     * @overload
+                     * @param p_dest destination stream
+                     * @param p_char char for writing
+                     * @return bool for writing
+                     **/
+                    template<typename Sink> bool put(Sink& p_dest, int p_char)
+                    {
+                        if (m_skip) {
+                            if (p_char == '\n') {
+                                m_skip = false;
+                                return bio::put( p_dest, p_char );
+                            }
+                            return true;
+                            
+                        } else
+                            if ( (p_char == ' ') || (p_char == '\t') ) {
+                                m_skip = true;
+                                return true;
+                            }
+ 
+                        return bio::put( p_dest, p_char );
+                    }
+                
+                    /** close filter
+                     * @param Source close stream
+                     **/
+                    template<typename Source> void close(Source&) { m_skip = false; }
+            
+                
+                private:
+                    
+                    /** bool for skipping characters **/
+                    bool m_skip;
+            };
+        
     };
 
 
@@ -133,7 +187,7 @@ namespace machinelearning { namespace tools {
     
     /** sends a command to the nntp server and checks the returing status code
      * @param p_cmd nntp command
-     * @param p_end ending seperator often \r\n
+     * @param p_end ending seperator often CR/LR
      **/
     inline void nntp::send( const std::string& p_cmd, const std::string& p_end )
     {
@@ -157,7 +211,7 @@ namespace machinelearning { namespace tools {
         
         switch (l_status) {
                 
-            // snntp errors
+            // nntp errors
             case 411 : throw exception::parameter(_("no such group")); break;
             case 412 : throw exception::parameter(_("no newsgroup has been selected")); break;
             case 420 : throw exception::parameter(_("no article has been selected")); break;
@@ -185,20 +239,32 @@ namespace machinelearning { namespace tools {
      **/
     inline std::vector<std::string> nntp::getGroupList( void )
     {
-        send("list newsgroups");
+        send("list active");
 
         
         // read data into response after the last entry is a "CR/LR dot CR/LR"
         boost::asio::streambuf l_response;
         std::istream l_response_stream( &l_response );
-
+        
         boost::asio::read_until(m_socket, l_response, "\r\n.\r\n");
 
         
-        // response hold the data, cut the first and last line and seperates the every line on the space
+        // response hold the data, we filter the data stream, so that only group names are hold in
+        std::string l_filtergroup;
+        bio::filtering_ostream  l_out( std::back_inserter(l_filtergroup) );
+        bio::filtering_streambuf< bio::output > l_filter;
+        l_filter.push( groupfilter() );
+        l_filter.push( l_out );
+        
+        bio::copy( l_response, l_filter );
         
         
+        // seperates the string data (remove fist and last element)
         std::vector<std::string> l_groups;
+        boost::split( l_groups, l_filtergroup, boost::is_any_of("\n") );
+        l_groups.erase( l_groups.begin(), l_groups.begin()+1 );
+        l_groups.erase( l_groups.end()-2, l_groups.end() );
+        
         return l_groups;
     }
     
