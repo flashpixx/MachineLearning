@@ -60,6 +60,7 @@ namespace machinelearning { namespace tools {
             std::string getServer( void ) const;
             std::string getPortProtocoll( void ) const;
             std::vector<std::string> getGroupList( void );
+            std::size_t getArticleNumber( const std::string& );
 
             ~nntp( void );
         
@@ -269,6 +270,24 @@ namespace machinelearning { namespace tools {
     }
     
     
+    /** return the number of articles within a group
+     * @param p_group group name
+     * @return number of articles
+     **/
+    inline std::size_t nntp::getArticleNumber( const std::string& p_group )
+    {
+        send("listgroup "+p_group);
+        /*
+        // read data into response after the last entry is a "CR/LR dot CR/LR"
+        boost::asio::streambuf l_response;
+        std::istream l_response_stream( &l_response );
+        
+        boost::asio::read_until(m_socket, l_response, "\r\n.\r\n");
+        
+        std::cout << l_response_stream << std::endl;
+        */
+        return 0;
+    }
 
     
 
