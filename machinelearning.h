@@ -249,7 +249,6 @@
 #include "dimensionreduce/dimensionreduce.h"
 #include "classifier/classifier.h"
 #include "clustering/clustering.h"
-#include "neuronalnetwork/neuronalnetwork.h"
 #include "neighborhood/neighborhood.h"
 #include "distances/distances.h"
 #include "tools/tools.h"

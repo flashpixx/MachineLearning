@@ -70,7 +70,6 @@ namespace machinelearning { namespace tools {
             bip::tcp::socket m_socket;    
         
             void send( const std::string&, const std::string& = "\r\n" );
-            void throwNNTPErrors( const unsigned int& ) const;
     };
 
 
@@ -132,37 +131,6 @@ namespace machinelearning { namespace tools {
     }
     
     
-    /** method for throwing exception if a status code shows an error
-     * @param p_status integer
-     **/
-    void nntp::throwNNTPErrors( const unsigned int& p_status ) const
-    {
-        switch (p_status) {
-                
-            // snntp errors
-            case 411 : throw exception::parameter(_("no such group")); break;
-            case 412 : throw exception::parameter(_("no newsgroup has been selected")); break;
-            case 420 : throw exception::parameter(_("no article has been selected")); break;
-            case 421 : throw exception::parameter(_("no next article found")); break;
-            case 422 : throw exception::parameter(_("no previous article found")); break;
-            case 423 : throw exception::parameter(_("no such article number in this group")); break;
-            case 430 : throw exception::parameter(_("no such article found")); break;
-            case 435 : throw exception::parameter(_("article not wanted - do not send")); break;
-            case 436 : throw exception::parameter(_("transfer failed - try again later")); break;
-            case 437 : throw exception::parameter(_("article rejected - do not try again")); break;
-            case 440 : throw exception::parameter(_("posting not allowed")); break;
-            case 441 : throw exception::parameter(_("posting failed")); break;
-            
-            // default errors
-            case 500 : throw exception::parameter(_("command not recognized")); break;
-            case 501 : throw exception::parameter(_("command syntax error")); break;
-            case 502 : throw exception::parameter(_("access restriction or permission denied")); break;
-            case 503 : throw exception::parameter(_("program fault")); break;
-        }
-        
-    }
-    
-    
     /** sends a command to the nntp server and checks the returing status code
      * @param p_cmd nntp command
      * @param p_end ending seperator often \r\n
@@ -178,27 +146,57 @@ namespace machinelearning { namespace tools {
         boost::asio::write(m_socket, l_request);
         
         
-        // check if we get a status code 200 or 205
+        // check check the returning status code
         boost::asio::streambuf l_response;
         boost::asio::read_until(m_socket, l_response, p_end );
         
-        std::istream response_stream( &l_response );
+        std::istream l_response_stream( &l_response );
         
         unsigned int l_status;
-        response_stream >> l_status;
+        l_response_stream >> l_status;
         
-        throwNNTPErrors( l_status );
+        switch (l_status) {
+                
+            // snntp errors
+            case 411 : throw exception::parameter(_("no such group")); break;
+            case 412 : throw exception::parameter(_("no newsgroup has been selected")); break;
+            case 420 : throw exception::parameter(_("no article has been selected")); break;
+            case 421 : throw exception::parameter(_("no next article found")); break;
+            case 422 : throw exception::parameter(_("no previous article found")); break;
+            case 423 : throw exception::parameter(_("no such article number in this group")); break;
+            case 430 : throw exception::parameter(_("no such article found")); break;
+            case 435 : throw exception::parameter(_("article not wanted - do not send")); break;
+            case 436 : throw exception::parameter(_("transfer failed - try again later")); break;
+            case 437 : throw exception::parameter(_("article rejected - do not try again")); break;
+            case 440 : throw exception::parameter(_("posting not allowed")); break;
+            case 441 : throw exception::parameter(_("posting failed")); break;
+                
+            // default errors
+            case 500 : throw exception::parameter(_("command not recognized")); break;
+            case 501 : throw exception::parameter(_("command syntax error")); break;
+            case 502 : throw exception::parameter(_("access restriction or permission denied")); break;
+            case 503 : throw exception::parameter(_("program fault")); break;
+        }
     }
     
     
-    /** fetchs the group list
+    /** fetchs the active group list
      * @return vector with group names
      **/
     inline std::vector<std::string> nntp::getGroupList( void )
     {
-        send("list active");
+        send("list newsgroups");
 
-        // read list data
+        
+        // read data into response after the last entry is a "CR/LR dot CR/LR"
+        boost::asio::streambuf l_response;
+        std::istream l_response_stream( &l_response );
+
+        boost::asio::read_until(m_socket, l_response, "\r\n.\r\n");
+
+        
+        // response hold the data, cut the first and last line and seperates the every line on the space
+        
         
         std::vector<std::string> l_groups;
         return l_groups;
