@@ -53,6 +53,10 @@ int main(int argc, char *argv[]) {
     
     tl::nntp x("news.online.de");
     
+    std::vector<std::string> y = x.getGroupList();
+    
+    for(std::size_t i=0; i < y.size(); ++i)
+        std::cout << y[i] << std::endl;
    
     //nn::nnet<double> net(3);
     
