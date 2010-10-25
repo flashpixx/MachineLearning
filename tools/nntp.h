@@ -30,6 +30,7 @@
 #include <istream>
 #include <ostream>
 #include <boost/asio.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/iostreams/copy.hpp>
 #include <boost/algorithm/string.hpp> 
 #include <boost/iostreams/concepts.hpp>
@@ -85,7 +86,7 @@ namespace machinelearning { namespace tools {
             /** socket objekt for send / receive the data **/
             bip::tcp::socket m_socket;    
         
-            void send( const std::string&, const std::string& = "\r\n" );
+            void send( const std::string& );
         
         
         
@@ -197,49 +198,57 @@ namespace machinelearning { namespace tools {
     
     /** sends a command to the nntp server and checks the returing status code
      * @param p_cmd nntp command
-     * @param p_end ending seperator often CR/LR
      **/
-    inline void nntp::send( const std::string& p_cmd, const std::string& p_end )
+    inline void nntp::send( const std::string& p_cmd )
     {
         // send the command
         boost::asio::streambuf l_request;
         std::ostream l_send( &l_request );
         
-        l_send << p_cmd << p_end;
+        l_send << p_cmd << "\r\n" ;
         
         boost::asio::write(m_socket, l_request);
+ 
         
-        
-        // check check the returning status code
+        // read the first line
         boost::asio::streambuf l_response;
-        boost::asio::read_until(m_socket, l_response, p_end );
-        
         std::istream l_response_stream( &l_response );
+
+        boost::asio::read_until(m_socket, l_response, "\r\n" );
         
-        unsigned int l_status;
-        l_response_stream >> l_status;
+        // copy the return value into a string and seperates the status code
+        unsigned int l_status = 0;
+        std::string l_returnline;
+        bio::filtering_ostream  l_out( std::back_inserter(l_returnline) );
+        bio::copy( l_response, l_out );
+  
+        try {
+            l_status = boost::lexical_cast<unsigned int>( l_returnline.substr(0,3) );
+        } catch (...) {}
+ 
         
         switch (l_status) {
+            case 0   : throw exception::parameter(_("error while reading socket data"));            break;
                 
             // nntp errors
-            case 411 : throw exception::parameter(_("no such group")); break;
-            case 412 : throw exception::parameter(_("no newsgroup has been selected")); break;
-            case 420 : throw exception::parameter(_("no article has been selected")); break;
-            case 421 : throw exception::parameter(_("no next article found")); break;
-            case 422 : throw exception::parameter(_("no previous article found")); break;
-            case 423 : throw exception::parameter(_("no such article number in this group")); break;
-            case 430 : throw exception::parameter(_("no such article found")); break;
-            case 435 : throw exception::parameter(_("article not wanted - do not send")); break;
-            case 436 : throw exception::parameter(_("transfer failed - try again later")); break;
-            case 437 : throw exception::parameter(_("article rejected - do not try again")); break;
-            case 440 : throw exception::parameter(_("posting not allowed")); break;
-            case 441 : throw exception::parameter(_("posting failed")); break;
+            case 411 : throw exception::parameter(_("no such group"));                              break;
+            case 412 : throw exception::parameter(_("no newsgroup has been selected"));             break;
+            case 420 : throw exception::parameter(_("no article has been selected"));               break;
+            case 421 : throw exception::parameter(_("no next article found"));                      break;
+            case 422 : throw exception::parameter(_("no previous article found"));                  break;
+            case 423 : throw exception::parameter(_("no such article number in this group"));       break;
+            case 430 : throw exception::parameter(_("no such article found"));                      break;
+            case 435 : throw exception::parameter(_("article not wanted - do not send"));           break;
+            case 436 : throw exception::parameter(_("transfer failed - try again later"));          break;
+            case 437 : throw exception::parameter(_("article rejected - do not try again"));        break;
+            case 440 : throw exception::parameter(_("posting not allowed"));                        break;
+            case 441 : throw exception::parameter(_("posting failed"));                             break;
                 
             // default errors
-            case 500 : throw exception::parameter(_("command not recognized")); break;
-            case 501 : throw exception::parameter(_("command syntax error")); break;
-            case 502 : throw exception::parameter(_("access restriction or permission denied")); break;
-            case 503 : throw exception::parameter(_("program fault")); break;
+            case 500 : throw exception::parameter(_("command not recognized"));                     break;
+            case 501 : throw exception::parameter(_("command syntax error"));                       break;
+            case 502 : throw exception::parameter(_("access restriction or permission denied"));    break;
+            case 503 : throw exception::parameter(_("program fault"));                              break;
         }
     }
     
@@ -319,7 +328,7 @@ namespace machinelearning { namespace tools {
     inline std::string nntp::getArticle( const std::string& p_group, const std::string& p_articleid, const article& p_article )
     {
         send("group "+p_group);
-     
+        
         switch (p_article) {
             case full   :   send("article "+p_articleid);   break;
             case body   :   send("body "+p_articleid);      break;
@@ -331,16 +340,18 @@ namespace machinelearning { namespace tools {
         std::istream l_response_stream( &l_response );
         
         boost::asio::read_until(m_socket, l_response, ".\r\n");
+
         
-        
-        // convert stream data into string and remove the end seperator
+        // convert stream data into string and remove the end seperator and the first line
         std::string l_article;
         bio::filtering_ostream  l_out( std::back_inserter(l_article) );
         bio::copy( l_response, l_out );
         
+        switch (p_article) {
+            case full   :   l_article.erase();  break;
+        }
         l_article.erase( l_article.end()-5, l_article.end() );
-        
-        
+                
         return l_article;
         
     }
