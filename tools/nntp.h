@@ -56,11 +56,20 @@ namespace machinelearning { namespace tools {
         
         public :
         
+            enum article
+            {
+                full    = 0,
+                body    = 1,
+                header  = 2
+            };
+                
             nntp( const std::string&, const std::string& = "nntp" );
             std::string getServer( void ) const;
             std::string getPortProtocoll( void ) const;
             std::vector<std::string> getGroupList( void );
-            std::size_t getArticleNumber( const std::string& );
+            std::vector<std::string> getArticleIDs( const std::string& );
+            std::string getArticle( const std::string&, const std::string&, const article& = body );
+            std::vector<std::string> getArticle( const std::string&, const std::vector<std::string>&, const article& = body );
 
             ~nntp( void );
         
@@ -272,23 +281,103 @@ namespace machinelearning { namespace tools {
     
     /** return the number of articles within a group
      * @param p_group group name
-     * @return number of articles
+     * @return vector with IDs of the articles
      **/
-    inline std::size_t nntp::getArticleNumber( const std::string& p_group )
+    inline std::vector<std::string> nntp::getArticleIDs( const std::string& p_group )
     {
         send("listgroup "+p_group);
-        /*
-        // read data into response after the last entry is a "CR/LR dot CR/LR"
+        
+        // read data into response after the last entry is a "dot CR/LR"
         boost::asio::streambuf l_response;
         std::istream l_response_stream( &l_response );
         
-        boost::asio::read_until(m_socket, l_response, "\r\n.\r\n");
+        boost::asio::read_until(m_socket, l_response, ".\r\n");
         
-        std::cout << l_response_stream << std::endl;
-        */
-        return 0;
+        
+        // seperates the IDs
+        std::string l_string;
+        bio::filtering_ostream  l_out( std::back_inserter(l_string) );
+        bio::copy( l_response, l_out );
+
+        
+        // seperates the string data (remove fist and last element)
+        std::vector<std::string> l_id;
+        boost::split( l_id, l_string, boost::is_any_of("\n") );
+        l_id.erase( l_id.begin(), l_id.begin()+1 );
+        l_id.erase( l_id.end()-2, l_id.end() );
+        
+        return l_id;
     }
 
+    
+    /** returns an article
+     * @param p_group newsgroup
+     * @param p_articleid article ID (not message id)
+     * @param p_article enum with part of an article should be received
+     * @return message
+     **/
+    inline std::string nntp::getArticle( const std::string& p_group, const std::string& p_articleid, const article& p_article )
+    {
+        send("group "+p_group);
+     
+        switch (p_article) {
+            case full   :   send("article "+p_articleid);   break;
+            case body   :   send("body "+p_articleid);      break;
+            case header :   send("head "+p_articleid);      break;
+        }
+        
+        // read data into response after the last entry is a "dot CR/LR"
+        boost::asio::streambuf l_response;
+        std::istream l_response_stream( &l_response );
+        
+        boost::asio::read_until(m_socket, l_response, ".\r\n");
+        
+        
+        // convert stream data into string and remove the end seperator
+        std::string l_article;
+        bio::filtering_ostream  l_out( std::back_inserter(l_article) );
+        bio::copy( l_response, l_out );
+        
+        l_article.erase( l_article.end()-5, l_article.end() );
+        
+        
+        return l_article;
+        
+    }
+    
+    
+    std::vector<std::string> nntp::getArticle( const std::string& p_group, const std::vector<std::string>& p_articleid, const article& p_article )
+    {
+        send("group "+p_group);
+        
+        std::string l_cmd;
+        switch (p_article) {
+            case full   :   l_cmd = "article";   break;
+            case body   :   l_cmd = "body";      break;
+            case header :   l_cmd = "head";      break;
+        }
+        
+        std::vector<std::string> l_data;
+        for(std::size_t i=0; i < p_articleid.size(); ++i) {
+            send(l_cmd + " " + p_articleid[i]);
+            
+            // read data into response after the last entry is a "dot CR/LR"
+            boost::asio::streambuf l_response;
+            std::istream l_response_stream( &l_response );
+            
+            boost::asio::read_until(m_socket, l_response, ".\r\n");
+            
+            
+            // convert stream data into string
+            std::string l_article;
+            bio::filtering_ostream  l_out( std::back_inserter(l_article) );
+            bio::copy( l_response, l_out );
+        
+            l_data.push_back( l_article );
+        }
+        
+        return l_data;
+    }
     
 
 };};
