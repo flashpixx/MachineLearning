@@ -92,7 +92,7 @@ namespace machinelearning { namespace tools { namespace sources {
         
         
         
-            /** private class for filtering nntp data (filtering newsgroup list) **/
+            /** private class for filtering nntp data filtering newsgroup list) **/
             class groupfilter : public bio::output_filter {
                 
                 public:
