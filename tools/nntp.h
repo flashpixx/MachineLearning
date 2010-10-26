@@ -69,6 +69,7 @@ namespace machinelearning { namespace tools {
             std::string getPortProtocoll( void ) const;
             std::vector<std::string> getGroupList( void );
             std::vector<std::string> getArticleIDs( const std::string& );
+            std::string getArticle( const std::string&, const article& = body );
             std::string getArticle( const std::string&, const std::string&, const article& = body );
             std::vector<std::string> getArticle( const std::string&, const std::vector<std::string>&, const article& = body );
 
@@ -223,7 +224,7 @@ namespace machinelearning { namespace tools {
         bio::copy( l_response, l_out );
   
         
-        std::cout << p_cmd << " => " << l_returnline << std::endl;
+        std::cout << p_cmd << " => " << l_returnline << "\n==============\n" << std::endl;
         try {
             l_status = boost::lexical_cast<unsigned int>( l_returnline.substr(0,3) );
         } catch (...) {}
@@ -378,16 +379,17 @@ namespace machinelearning { namespace tools {
             
             boost::asio::read_until(m_socket, l_response, ".\r\n");
             
+            std::cout << &l_response << "\n--------------------------------------------\n\n" << std::endl;
             
             // convert stream data into string and remove the end seperator and the first line
-            std::string l_article;
+            /*std::string l_article;
             bio::filtering_ostream  l_out( std::back_inserter(l_article) );
             bio::copy( l_response, l_out );
             
             l_article.erase( 0, l_article.find("\r\n")+2 );
             l_article.erase( l_article.end()-5, l_article.end() );
         
-            l_data.push_back( l_article );
+            l_data.push_back( l_article );*/
         }
         
         return l_data;
