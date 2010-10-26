@@ -50,14 +50,14 @@ namespace machinelearning { namespace tools {
     
     /** class for creating nntp connection (exspecially for creating distance matrix).
      * The class is a nntp client class without any post functionality
+     * @see http://tools.ietf.org/html/rfc3977 [old RFC http://www.w3.org/Protocols/rfc977/rfc977]
      * @todo ssl connection
      **/
     class nntp {
-        // http://www.boost.org/doc/libs/1_44_0/doc/html/boost_asio/example/http/client/sync_client.cpp
         
         public :
         
-            enum article
+            enum content
             {
                 full    = 0,
                 body    = 1,
@@ -69,10 +69,11 @@ namespace machinelearning { namespace tools {
             std::string getPortProtocoll( void ) const;
             std::vector<std::string> getGroupList( void );
             std::vector<std::string> getArticleIDs( const std::string& );
-            std::string getArticle( const std::string&, const article& = body );
-            std::string getArticle( const std::string&, const std::string&, const article& = body );
-            std::vector<std::string> getArticle( const std::string&, const std::vector<std::string>&, const article& = body );
-
+            std::string getArticle( const std::string&, const content& = body );
+            std::string getArticle( const std::string&, const std::string&, const content& = body );
+            std::vector<std::string> getArticle( const std::string&, const std::vector<std::string>&, const content& = body );
+            std::vector<std::string> getArticle( const std::vector<std::string>&, const content& = body );
+        
             ~nntp( void );
         
         
@@ -88,7 +89,6 @@ namespace machinelearning { namespace tools {
             bip::tcp::socket m_socket;    
         
             void send( const std::string& );
-        
         
         
         
@@ -124,9 +124,7 @@ namespace machinelearning { namespace tools {
                         return bio::put( p_dest, p_char );
                     }
                 
-                    /** close filter
-                     * @param Source close stream
-                     **/
+                    /** close filter **/
                     template<typename Source> void close(Source&) { m_skip = false; }
             
                 
@@ -224,7 +222,6 @@ namespace machinelearning { namespace tools {
         bio::copy( l_response, l_out );
   
         
-        std::cout << p_cmd << " => " << l_returnline << "\n==============\n" << std::endl;
         try {
             l_status = boost::lexical_cast<unsigned int>( l_returnline.substr(0,3) );
         } catch (...) {}
@@ -254,6 +251,7 @@ namespace machinelearning { namespace tools {
             case 503 : throw exception::parameter(_("program fault"));                              break;
         }
     }
+
     
     
     /** fetchs the active group list
@@ -303,7 +301,7 @@ namespace machinelearning { namespace tools {
         boost::asio::streambuf l_response;
         std::istream l_response_stream( &l_response );
         
-        boost::asio::read_until(m_socket, l_response, ".\r\n");
+        boost::asio::read_until(m_socket, l_response, "\r\n.\r\n");
         
         
         // seperates the IDs
@@ -325,14 +323,14 @@ namespace machinelearning { namespace tools {
     /** returns an article
      * @param p_group newsgroup
      * @param p_articleid article ID (not message id)
-     * @param p_article enum with part of an article should be received
+     * @param p_content switch for reading full article, head or body only (default body only)
      * @return message
      **/
-    inline std::string nntp::getArticle( const std::string& p_group, const std::string& p_articleid, const article& p_article )
+    inline std::string nntp::getArticle( const std::string& p_group, const std::string& p_articleid, const content& p_content )
     {
         send("group "+p_group);
         
-        switch (p_article) {
+        switch (p_content) {
             case full   :   send("article "+p_articleid);   break;
             case body   :   send("body "+p_articleid);      break;
             case header :   send("head "+p_articleid);      break;
@@ -342,7 +340,7 @@ namespace machinelearning { namespace tools {
         boost::asio::streambuf l_response;
         std::istream l_response_stream( &l_response );
         
-        boost::asio::read_until(m_socket, l_response, ".\r\n");
+        boost::asio::read_until(m_socket, l_response, "\r\n.\r\n");
 
         
         // convert stream data into string and remove the end seperator and the first line
@@ -358,12 +356,18 @@ namespace machinelearning { namespace tools {
     }
     
     
-    std::vector<std::string> nntp::getArticle( const std::string& p_group, const std::vector<std::string>& p_articleid, const article& p_article )
+    /** reads grouparticles
+     * @param p_group string with group name
+     * @param p_articleid std::vector with article IDs within the group (not message id)
+     * @param p_content switch for reading full article, head or body only (default body only)
+     * @return std::vector with string content
+     **/
+    std::vector<std::string> nntp::getArticle( const std::string& p_group, const std::vector<std::string>& p_articleid, const content& p_content )
     {
         send("group "+p_group);
         
         std::string l_cmd;
-        switch (p_article) {
+        switch (p_content) {
             case full   :   l_cmd = "article";   break;
             case body   :   l_cmd = "body";      break;
             case header :   l_cmd = "head";      break;
@@ -377,24 +381,71 @@ namespace machinelearning { namespace tools {
             boost::asio::streambuf l_response;
             std::istream l_response_stream( &l_response );
             
-            boost::asio::read_until(m_socket, l_response, ".\r\n");
-            
-            std::cout << &l_response << "\n--------------------------------------------\n\n" << std::endl;
+            boost::asio::read_until(m_socket, l_response, "\r\n.\r\n");
+
             
             // convert stream data into string and remove the end seperator and the first line
-            /*std::string l_article;
+            std::string l_article;
             bio::filtering_ostream  l_out( std::back_inserter(l_article) );
             bio::copy( l_response, l_out );
             
             l_article.erase( 0, l_article.find("\r\n")+2 );
             l_article.erase( l_article.end()-5, l_article.end() );
         
-            l_data.push_back( l_article );*/
+            l_data.push_back( l_article );
         }
         
         return l_data;
     }
     
+    
+    /** reads a news article
+     * @param p_messageid message ID
+     * @param p_content switch for reading full article, head or body only (default body only)
+     * @return string with article
+     **/
+    inline std::string nntp::getArticle( const std::string& p_messageid, const content& p_content )
+    {
+        switch (p_content) {
+            case full   :   send("article "+ p_messageid);   break;
+            case body   :   send("body "+ p_messageid);      break;
+            case header :   send("head "+ p_messageid);      break;
+        }
+        
+        // read data into response after the last entry is a "dot CR/LR"
+        boost::asio::streambuf l_response;
+        std::istream l_response_stream( &l_response );
+        
+        boost::asio::read_until(m_socket, l_response, "\r\n.\r\n");
+        
+        
+        // convert stream data into string and remove the end seperator and the first line
+        std::string l_article;
+        bio::filtering_ostream  l_out( std::back_inserter(l_article) );
+        bio::copy( l_response, l_out );
+        
+        l_article.erase( 0, l_article.find("\r\n")+2 );
+        l_article.erase( l_article.end()-5, l_article.end() );
+        
+        return l_article;        
+    }    
+    
+    
+    /** reads an article list witn their messages IDs
+     * @param p_messageid std::vector with a list of message IDs
+     * @param p_content switch for reading full article, head or body only (default body only)
+     * @return std::vector with messages
+     **/
+    inline std::vector<std::string> nntp::getArticle( const std::vector<std::string>& p_messageid, const content& p_content )
+    {
+        std::vector<std::string> l_data;
+        
+        for (std::size_t i=0; i < p_messageid.size(); ++i)
+            l_data.push_back( getArticle(p_messageid[i], p_content) );
+        
+        
+        return l_data;
+    }
 
 };};
 #endif

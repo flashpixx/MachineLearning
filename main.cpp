@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
     vec.push_back("128666");
     vec.push_back("128667");*/
                   
-    
+    /*
     vec.push_back("260379");
     vec.push_back("260380");
     vec.push_back("260381");
@@ -72,22 +72,28 @@ int main(int argc, char *argv[]) {
     vec.push_back("260389");
     vec.push_back("260390");
     vec.push_back("260391");
-
+    */
     
+    vec.push_back("<8im681F7kiU1@mid.individual.net>");
+    vec.push_back("<715c9d59-62ae-40e9-8a77-236e99df0304@26g2000yqv.googlegroups.com>");
+    vec.push_back("<8ilscaF6gcU1@mid.individual.net>");
     
     
     tl::nntp x("news.online.de");
     //tl::nntp x("news.tu-clausthal.de");
     
     //std::vector<std::string> y = x.getArticleIDs("de.comp.text.tex");
-    std::vector<std::string> y = x.getArticle("de.comp.text.tex", vec);
+    //std::vector<std::string> y = x.getArticle("de.comp.text.tex", vec );
+    std::vector<std::string> y = x.getArticle( vec );
     for(std::size_t i=0; i < y.size(); ++i)
         std::cout << y[i] << "\n>=================================================================================<" << std::endl;
         //std::cout << y[i] << std::endl;
     
-    //std::cout << x.getArticle( "de.comp.text.tex", "260365" ) << std::endl;
+    //std::cout << x.getArticle( "de.comp.text.tex", "260365", tl::nntp::full ) << std::endl;
     //std::cout << x.getArticle( "de.comp.text.tex", "128660" ) << std::endl;
     //std::cout << x.getArticle( "de.comp.text.tex", "128663" ) << std::endl;
+    //std::cout << x.getArticle( "<8im681F7kiU1@mid.individual.net>", tl::nntp::header ) << std::endl;
+    
     
     /*
     boost::multi_array<double, 2> x;
