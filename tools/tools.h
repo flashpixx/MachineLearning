@@ -33,7 +33,7 @@
 #include "matrix.hpp"
 #include "vector.hpp"
 #include "lapack.hpp"
-#include "nntp.h"
+#include "sources/nntp.h"
 
 #include "files/csv.hpp"
 #include "files/hdf.hpp"

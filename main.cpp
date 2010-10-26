@@ -79,8 +79,8 @@ int main(int argc, char *argv[]) {
     vec.push_back("<8ilscaF6gcU1@mid.individual.net>");
     
     
-    tl::nntp x("news.online.de");
-    //tl::nntp x("news.tu-clausthal.de");
+    tl::sources::nntp x("news.online.de");
+    //tl::sources::nntp x("news.tu-clausthal.de");
     
     //std::vector<std::string> y = x.getArticleIDs("de.comp.text.tex");
     //std::vector<std::string> y = x.getArticle("de.comp.text.tex", vec );
