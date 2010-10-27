@@ -19,6 +19,8 @@
 
 #include <boost/numeric/bindings/ublas/matrix.hpp>
 #include <boost/numeric/bindings/ublas/vector.hpp>
+//#include <boost/xml/dom.hpp>
+//#include <boost/xml/reader.hpp>
 
 
 
@@ -45,8 +47,11 @@ int main(int argc, char *argv[]) {
     #ifdef MULTILANGUAGE
     tl::language::bind("ml", "./tools/language/");
     #endif
-
-    std::vector<std::string> vec;
+    
+   
+    
+    
+    //std::vector<std::string> vec;
     /*vec.push_back("128658");
     vec.push_back("128659");
     vec.push_back("128660");
@@ -74,9 +79,9 @@ int main(int argc, char *argv[]) {
     vec.push_back("260391");
     */
     
-    vec.push_back("<8im681F7kiU1@mid.individual.net>");
-    vec.push_back("<715c9d59-62ae-40e9-8a77-236e99df0304@26g2000yqv.googlegroups.com>");
-    vec.push_back("<8ilscaF6gcU1@mid.individual.net>");
+    //vec.push_back("<8im681F7kiU1@mid.individual.net>");
+    //vec.push_back("<715c9d59-62ae-40e9-8a77-236e99df0304@26g2000yqv.googlegroups.com>");
+    //vec.push_back("<8ilscaF6gcU1@mid.individual.net>");
     
     
     tl::sources::nntp x("news.online.de");
@@ -84,9 +89,9 @@ int main(int argc, char *argv[]) {
     
     //std::vector<std::string> y = x.getArticleIDs("de.comp.text.tex");
     //std::vector<std::string> y = x.getArticle("de.comp.text.tex", vec );
-    std::vector<std::string> y = x.getArticle( vec );
-    for(std::size_t i=0; i < y.size(); ++i)
-        std::cout << y[i] << "\n>=================================================================================<" << std::endl;
+    //std::vector<std::string> y = x.getArticle( vec );
+    //for(std::size_t i=0; i < y.size(); ++i)
+        //std::cout << y[i] << "\n>=================================================================================<" << std::endl;
         //std::cout << y[i] << std::endl;
     
     //std::cout << x.getArticle( "de.comp.text.tex", "260365", tl::nntp::full ) << std::endl;

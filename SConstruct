@@ -8,6 +8,7 @@ import platform
 AddOption("--with-randomdevice", dest="withrandom", type="string", nargs=0, action="store", help="installation with random device support")
 AddOption("--with-mpi", dest="withmpi", type="string", nargs=0, action="store", help="installation with MPI support")
 AddOption("--with-multilanguage", dest="withmultilanguage", type="string", nargs=0, action="store", help="installation with multilanguage support")
+AddOption("--with-sources", dest="withsources", type="string", nargs=0, action="store", help="installation with source like nntp or something else")
 AddOption("--create-language", dest="createlang", type="string", nargs=0, action="store", help="reads the data for translation and add them to the different language files")
 AddOption("--compile-language", dest="compilelang", type="string", nargs=0, action="store", help="compiles the language files")
 AddOption("--create-documentation", dest="createdocu", type="string", nargs=0, action="store", help="creates the doxygen documentation (doxygen must be within the path)")
@@ -49,7 +50,10 @@ def configuration_macosx(config, version, architecture) :
     if GetOption("withmultilanguage") != None :
         config["compileflags"]      += " -D MULTILANGUAGE"
         config["linkto"].append("intl");
-
+        
+    if GetOption("withsources") != None :
+        config["compileflags"]      += " -D SOURCES"
+    
     
 
 # configuration for Posix (Linux) build
@@ -74,6 +78,9 @@ def configuration_posix(config, version, architecture) :
             
     if GetOption("withmultilanguage") != None :
         config["compileflags"]      += " -D MULTILANGUAGE"
+
+    if GetOption("withsources") != None :
+        config["compileflags"]      += " -D SOURCES"
 
 
 

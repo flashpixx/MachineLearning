@@ -21,23 +21,15 @@
  @endcond
  **/
 
+#ifdef SOURCES
+
+/** headerfile for include all sources **/
+
+#ifndef MACHINELEARNING_TOOLS_SOURCES_H
+#define MACHINELEARNING_TOOLS_SOURCES_H
+
+#include "nntp.h"
 
 
-/** header file to connect all tools library for one include **/
-
-#ifndef MACHINELEARNING_TOOLS_H
-#define MACHINELEARNING_TOOLS_H
-
-#include "random.hpp"
-#include "function.hpp"
-#include "matrix.hpp"
-#include "vector.hpp"
-#include "lapack.hpp"
-#include "sources/sources.h"
-
-#include "files/csv.hpp"
-#include "files/hdf.hpp"
-
-#include "language/language.h"
-
+#endif
 #endif

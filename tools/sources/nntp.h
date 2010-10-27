@@ -21,9 +21,10 @@
  @endcond
  **/
 
+#ifdef SOURCES
 
-#ifndef MACHINELEARNING_TOOLS_NNTP_H
-#define MACHINELEARNING_TOOLS_NNTP_H
+#ifndef MACHINELEARNING_TOOLS_SOURCES_NNTP_H
+#define MACHINELEARNING_TOOLS_SOURCES_NNTP_H
 
 #include <string>
 #include <iostream>
@@ -67,6 +68,7 @@ namespace machinelearning { namespace tools { namespace sources {
             nntp( const std::string&, const std::string& = "nntp" );
             std::string getServer( void ) const;
             std::string getPortProtocoll( void ) const;
+            void browsingGroup( const std::string&, const content& = body );
             std::vector<std::string> getGroupList( void );
             std::vector<std::string> getArticleIDs( const std::string& );
             std::string getArticle( const std::string&, const content& = body );
@@ -79,6 +81,8 @@ namespace machinelearning { namespace tools { namespace sources {
         
         private :
         
+            /** property for browsing the newsgroup **/
+            content m_browsecontent;
             /** string with server name **/
             const std::string m_server;
             /** port or protocoll - should be "nntp" **/
@@ -144,6 +148,7 @@ namespace machinelearning { namespace tools { namespace sources {
      * @param p_portprotocoll port or protocoll name - shoudl be "nntp"
      **/
     inline nntp::nntp( const std::string& p_server, const std::string& p_portprotocoll ) :
+        m_browsecontent( body ),
         m_server( p_server ),
         m_portprotocoll( p_portprotocoll ),
         m_io(),
@@ -446,6 +451,20 @@ namespace machinelearning { namespace tools { namespace sources {
         
         return l_data;
     }
+    
+    
+    /** set group for iterator browsing 
+     * @param p_group group name
+     * @param p_content switch for reading full article, head or body only (default body only)
+     **/
+    inline void nntp::browsingGroup( const std::string& p_group, const content& p_content )
+    {
+        m_browsecontent = p_content;
+        send("group "+p_group);
+    }
+    
 
 };};};
+
+#endif
 #endif
