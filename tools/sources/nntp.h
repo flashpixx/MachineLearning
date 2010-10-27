@@ -49,7 +49,7 @@ namespace machinelearning { namespace tools { namespace sources {
 
     
     /** class for creating nntp connection (exspecially for creating distance matrix).
-     * The class is a nntp client class without any post functionality
+     * The class is a nntp client class without any post functionality (implements the RFC 3977)
      * @see http://tools.ietf.org/html/rfc3977 [old RFC http://www.w3.org/Protocols/rfc977/rfc977]
      * @todo ssl connection
      **/
