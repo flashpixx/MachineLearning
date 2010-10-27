@@ -436,7 +436,7 @@ namespace machinelearning { namespace tools { namespace sources {
     }    
     
     
-    /** reads an article list witn their messages IDs
+    /** reads an article list witin their messages IDs
      * @param p_messageid std::vector with a list of message IDs
      * @param p_content switch for reading full article, head or body only (default body only)
      * @return std::vector with messages
