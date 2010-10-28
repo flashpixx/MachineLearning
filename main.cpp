@@ -87,6 +87,12 @@ int main(int argc, char *argv[]) {
     tl::sources::nntp x("news.online.de");
     //tl::sources::nntp x("news.tu-clausthal.de");
     
+    std::map<std::string, std::size_t> y = x.getGroupList();
+    for (std::map<std::string, std::size_t>::iterator it = y.begin(); it != y.end(); ++it)
+        std::cout << it->first << "\t\t\t" << it->second << std::endl;
+
+    
+    
     //std::vector<std::string> y = x.getArticleIDs("de.comp.text.tex");
     //std::vector<std::string> y = x.getArticle("de.comp.text.tex", vec );
     //std::vector<std::string> y = x.getArticle( vec );

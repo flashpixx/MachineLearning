@@ -68,8 +68,7 @@ namespace machinelearning { namespace tools { namespace sources {
             nntp( const std::string&, const std::string& = "nntp" );
             std::string getServer( void ) const;
             std::string getPortProtocoll( void ) const;
-            void browsingGroup( const std::string&, const content& = body );
-            std::vector<std::string> getGroupList( void );
+            std::map<std::string, std::size_t> getGroupList( void );
             std::vector<std::string> getArticleIDs( const std::string& );
             std::string getArticle( const std::string&, const content& = body );
             std::string getArticle( const std::string&, const std::string&, const content& = body );
@@ -77,8 +76,15 @@ namespace machinelearning { namespace tools { namespace sources {
             std::vector<std::string> getArticle( const std::vector<std::string>&, const content& = body );
             bool existArticle( const std::string& );
             bool existArticle( const std::string&, const std::string& );
-        
+        void browseGroup( const std::string& p_group, const content& p_content );
             ~nntp( void );
+        
+        
+        /*
+        class iterator {
+            
+        };
+        */
         
         
         private :
@@ -96,50 +102,6 @@ namespace machinelearning { namespace tools { namespace sources {
         
             unsigned int send( const std::string&, const bool& = true );
             void throwNNTPError( const unsigned int& ) const;
-        
-        
-        
-            /** private class for filtering nntp data filtering newsgroup list) **/
-            class groupfilter : public bio::output_filter {
-                
-                public:
-                
-                    /** constructor for initialisation skip variable **/
-                    groupfilter( void ) : m_skip( false ) {}
-                
-                    /** put method
-                     * @overload
-                     * @param p_dest destination stream
-                     * @param p_char char for writing
-                     * @return bool for writing
-                     **/
-                    template<typename Sink> bool put(Sink& p_dest, int p_char)
-                    {
-                        if (m_skip) {
-                            if (p_char == '\n') {
-                                m_skip = false;
-                                return bio::put( p_dest, p_char );
-                            }
-                            return true;
-                            
-                        } else
-                            if ( (p_char == ' ') || (p_char == '\t') ) {
-                                m_skip = true;
-                                return true;
-                            }
- 
-                        return bio::put( p_dest, p_char );
-                    }
-                
-                    /** close filter **/
-                    template<typename Source> void close(Source&) { m_skip = false; }
-            
-                
-                private:
-                    
-                    /** bool for skipping characters **/
-                    bool m_skip;
-            };
         
     };
 
@@ -280,9 +242,9 @@ namespace machinelearning { namespace tools { namespace sources {
     
     
     /** fetchs the active group list
-     * @return vector with group names
+     * @return map with group names and article count
      **/
-    inline std::vector<std::string> nntp::getGroupList( void )
+    inline std::map<std::string, std::size_t> nntp::getGroupList( void )
     {
         send("list active");
 
@@ -294,21 +256,34 @@ namespace machinelearning { namespace tools { namespace sources {
         boost::asio::read_until(m_socket, l_response, "\r\n.\r\n");
 
         
-        // response hold the data, we filter the data stream, so that only group names are hold in
+        // response hold the data
         std::string l_filtergroup;
         bio::filtering_ostream  l_out( std::back_inserter(l_filtergroup) );
-        bio::filtering_streambuf< bio::output > l_filter;
-        l_filter.push( groupfilter() );
-        l_filter.push( l_out );
-        
-        bio::copy( l_response, l_filter );
+        bio::copy( l_response, l_out );
         
         
         // seperates the string data (remove fist and last element)
-        std::vector<std::string> l_groups;
-        boost::split( l_groups, l_filtergroup, boost::is_any_of("\n") );
-        l_groups.erase( l_groups.begin(), l_groups.begin()+1 );
-        l_groups.erase( l_groups.end()-2, l_groups.end() );
+        std::vector<std::string> l_list;
+        boost::split( l_list, l_filtergroup, boost::is_any_of("\n") );
+        l_list.erase( l_list.begin(), l_list.begin()+1 );
+        l_list.erase( l_list.end()-2, l_list.end() );
+        
+        // create group list with number of articles
+        std::map<std::string, std::size_t> l_groups;
+        for(std::size_t i=0; i < l_list.size(); ++i) {
+            std::vector<std::string> l_data;
+            boost::split( l_data, l_list[i], boost::is_any_of(" ") );
+            
+            
+            if (l_data.size() > 1) {
+                std::size_t l_num = 0;
+                try {
+                    l_num = boost::lexical_cast<unsigned int>( l_data[1] );
+                } catch (...) {}
+                
+                l_groups[l_data[0]] = l_num;
+            }
+        }
         
         return l_groups;
     }
@@ -467,8 +442,7 @@ namespace machinelearning { namespace tools { namespace sources {
         
         for (std::size_t i=0; i < p_messageid.size(); ++i)
             l_data.push_back( getArticle(p_messageid[i], p_content) );
-        
-        
+
         return l_data;
     }
     
@@ -513,7 +487,7 @@ namespace machinelearning { namespace tools { namespace sources {
      * @param p_group group name
      * @param p_content switch for reading full article, head or body only (default body only)
      **/
-    inline void nntp::browsingGroup( const std::string& p_group, const content& p_content )
+    inline void nntp::browseGroup( const std::string& p_group, const content& p_content )
     {
         m_browsecontent = p_content;
         send("group "+p_group);
