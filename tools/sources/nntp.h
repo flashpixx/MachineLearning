@@ -70,27 +70,20 @@ namespace machinelearning { namespace tools { namespace sources {
             std::string getPortProtocoll( void ) const;
             std::map<std::string, std::size_t> getGroupList( void );
             std::vector<std::string> getArticleIDs( const std::string& );
+            void setGroup( const std::string& );
+            std::string getArticle( const content& = body );
             std::string getArticle( const std::string&, const content& = body );
             std::string getArticle( const std::string&, const std::string&, const content& = body );
             std::vector<std::string> getArticle( const std::string&, const std::vector<std::string>&, const content& = body );
             std::vector<std::string> getArticle( const std::vector<std::string>&, const content& = body );
             bool existArticle( const std::string& );
             bool existArticle( const std::string&, const std::string& );
-        void browseGroup( const std::string& p_group, const content& p_content );
+            bool nextArticle( void );
             ~nntp( void );
-        
-        
-        /*
-        class iterator {
-            
-        };
-        */
         
         
         private :
         
-            /** property for browsing the newsgroup **/
-            content m_browsecontent;
             /** string with server name **/
             const std::string m_server;
             /** port or protocoll - should be "nntp" **/
@@ -113,7 +106,6 @@ namespace machinelearning { namespace tools { namespace sources {
      * @param p_portprotocoll port or protocoll name - shoudl be "nntp"
      **/
     inline nntp::nntp( const std::string& p_server, const std::string& p_portprotocoll ) :
-        m_browsecontent( body ),
         m_server( p_server ),
         m_portprotocoll( p_portprotocoll ),
         m_io(),
@@ -356,6 +348,38 @@ namespace machinelearning { namespace tools { namespace sources {
     }
     
     
+    /** returns an article data
+     * @param p_content switch for reading full article, head or body only (default body only)
+     * @return message
+     **/
+    inline std::string nntp::getArticle( const content& p_content )
+    {
+        switch (p_content) {
+            case full   :   send("article");   break;
+            case body   :   send("body");      break;
+            case header :   send("head");      break;
+        }
+        
+        // read data into response after the last entry is a "dot CR/LR"
+        boost::asio::streambuf l_response;
+        std::istream l_response_stream( &l_response );
+        
+        boost::asio::read_until(m_socket, l_response, "\r\n.\r\n");
+        
+        
+        // convert stream data into string and remove the end seperator and the first line
+        std::string l_article;
+        bio::filtering_ostream  l_out( std::back_inserter(l_article) );
+        bio::copy( l_response, l_out );
+        
+        l_article.erase( 0, l_article.find("\r\n")+2 );
+        l_article.erase( l_article.end()-5, l_article.end() );
+        
+        return l_article;
+        
+    }
+    
+    
     /** reads grouparticles
      * @param p_group string with group name
      * @param p_articleid std::vector with article IDs within the group (not message id)
@@ -483,14 +507,27 @@ namespace machinelearning { namespace tools { namespace sources {
     }
     
     
-    /** set group for iterator browsing 
+    /** sets the group 
      * @param p_group group name
-     * @param p_content switch for reading full article, head or body only (default body only)
      **/
-    inline void nntp::browseGroup( const std::string& p_group, const content& p_content )
+    inline void nntp::setGroup( const std::string& p_group )
     {
-        m_browsecontent = p_content;
         send("group "+p_group);
+    }
+    
+    /** try to set the next article
+     * @return bool, if it set is correct
+     **/
+    inline bool nntp::nextArticle( void )
+    {
+        const unsigned int l_stat = send("next", false);
+        
+        if (l_stat == 421)
+            return false;
+        else
+            throwNNTPError(l_stat);
+    
+        return true;
     }
     
 
