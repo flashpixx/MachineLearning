@@ -94,10 +94,11 @@ int main(int argc, char *argv[]) {
         //std::cout << y[i] << "\n>=================================================================================<" << std::endl;
         //std::cout << y[i] << std::endl;
     
-    //std::cout << x.getArticle( "de.comp.text.tex", "260365", tl::nntp::full ) << std::endl;
+    //std::cout << x.getArticle( "de.comp.text.tex", "260365" ) << std::endl;
     //std::cout << x.getArticle( "de.comp.text.tex", "128660" ) << std::endl;
     //std::cout << x.getArticle( "de.comp.text.tex", "128663" ) << std::endl;
-    //std::cout << x.getArticle( "<8im681F7kiU1@mid.individual.net>", tl::nntp::header ) << std::endl;
+    //std::cout << x.getArticle( "<8im681F7kiU1@mid.individual.net>" ) << std::endl;
+ 
     
     
     /*

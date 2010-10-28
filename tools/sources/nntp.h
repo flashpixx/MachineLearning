@@ -75,6 +75,8 @@ namespace machinelearning { namespace tools { namespace sources {
             std::string getArticle( const std::string&, const std::string&, const content& = body );
             std::vector<std::string> getArticle( const std::string&, const std::vector<std::string>&, const content& = body );
             std::vector<std::string> getArticle( const std::vector<std::string>&, const content& = body );
+            bool existArticle( const std::string& );
+            bool existArticle( const std::string&, const std::string& );
         
             ~nntp( void );
         
@@ -92,7 +94,8 @@ namespace machinelearning { namespace tools { namespace sources {
             /** socket objekt for send / receive the data **/
             bip::tcp::socket m_socket;    
         
-            void send( const std::string& );
+            unsigned int send( const std::string&, const bool& = true );
+            void throwNNTPError( const unsigned int& ) const;
         
         
         
@@ -170,6 +173,11 @@ namespace machinelearning { namespace tools { namespace sources {
         
         if (l_error)
             throw exception::parameter(_("cannot connect to news server"));
+        
+        // read welcome line
+        boost::asio::streambuf l_response;
+        std::istream l_response_stream( &l_response );
+        boost::asio::read_until(m_socket, l_response, "\r\n" );
     }
     
     
@@ -200,10 +208,43 @@ namespace machinelearning { namespace tools { namespace sources {
     }
     
     
+    /** create an exception on the status code
+     * @param p_status status code
+     **/
+    inline void nntp::throwNNTPError( const unsigned int& p_status ) const
+    {
+        switch (p_status) {
+            case 0   : throw exception::parameter(_("error while reading socket data"));     
+                
+                // nntp errors
+            case 411 : throw exception::parameter(_("no such group"));                       
+            case 412 : throw exception::parameter(_("no newsgroup has been selected"));      
+            case 420 : throw exception::parameter(_("no article has been selected"));          
+            case 421 : throw exception::parameter(_("no next article found"));               
+            case 422 : throw exception::parameter(_("no previous article found"));           
+            case 423 : throw exception::parameter(_("no such article number in this group")); 
+            case 430 : throw exception::parameter(_("no such article found"));                
+            case 435 : throw exception::parameter(_("article not wanted - do not send"));     
+            case 436 : throw exception::parameter(_("transfer failed - try again later"));    
+            case 437 : throw exception::parameter(_("article rejected - do not try again"));  
+            case 440 : throw exception::parameter(_("posting not allowed"));                  
+            case 441 : throw exception::parameter(_("posting failed"));                       
+                
+                // default errors
+            case 500 : throw exception::parameter(_("command not recognized"));               
+            case 501 : throw exception::parameter(_("command syntax error"));                 
+            case 502 : throw exception::parameter(_("access restriction or permission denied")); 
+            case 503 : throw exception::parameter(_("program fault"));                           
+        }
+    }
+    
+    
     /** sends a command to the nntp server and checks the returing status code
      * @param p_cmd nntp command
+     * @param p_throw bool for throwing error
+     * @return status code
      **/
-    inline void nntp::send( const std::string& p_cmd )
+    inline unsigned int nntp::send( const std::string& p_cmd, const bool& p_throw )
     {
         // send the command
         boost::asio::streambuf l_request;
@@ -219,42 +260,21 @@ namespace machinelearning { namespace tools { namespace sources {
         std::istream l_response_stream( &l_response );
 
         boost::asio::read_until(m_socket, l_response, "\r\n" );
-        
+
         // copy the return value into a string and seperates the status code
         unsigned int l_status = 0;
         std::string l_returnline;
         bio::filtering_ostream  l_out( std::back_inserter(l_returnline) );
         bio::copy( l_response, l_out );
-  
         
         try {
             l_status = boost::lexical_cast<unsigned int>( l_returnline.substr(0,3) );
         } catch (...) {}
  
+        if ( p_throw )
+            throwNNTPError( l_status );
         
-        switch (l_status) {
-            case 0   : throw exception::parameter(_("error while reading socket data"));            break;
-                
-            // nntp errors
-            case 411 : throw exception::parameter(_("no such group"));                              break;
-            case 412 : throw exception::parameter(_("no newsgroup has been selected"));             break;
-            case 420 : throw exception::parameter(_("no article has been selected"));               break;
-            case 421 : throw exception::parameter(_("no next article found"));                      break;
-            case 422 : throw exception::parameter(_("no previous article found"));                  break;
-            case 423 : throw exception::parameter(_("no such article number in this group"));       break;
-            case 430 : throw exception::parameter(_("no such article found"));                      break;
-            case 435 : throw exception::parameter(_("article not wanted - do not send"));           break;
-            case 436 : throw exception::parameter(_("transfer failed - try again later"));          break;
-            case 437 : throw exception::parameter(_("article rejected - do not try again"));        break;
-            case 440 : throw exception::parameter(_("posting not allowed"));                        break;
-            case 441 : throw exception::parameter(_("posting failed"));                             break;
-                
-            // default errors
-            case 500 : throw exception::parameter(_("command not recognized"));                     break;
-            case 501 : throw exception::parameter(_("command syntax error"));                       break;
-            case 502 : throw exception::parameter(_("access restriction or permission denied"));    break;
-            case 503 : throw exception::parameter(_("program fault"));                              break;
-        }
+        return l_status;
     }
 
     
@@ -450,6 +470,42 @@ namespace machinelearning { namespace tools { namespace sources {
         
         
         return l_data;
+    }
+    
+    
+    /** check if article exists
+     * @param p_messageid message ID
+     * @return bool if exists
+     **/
+    bool nntp::existArticle( const std::string& p_messageid )
+    {
+        const unsigned int l_stat = send("stat "+p_messageid, false);
+        switch (l_stat) {
+            case 223 :  return true;
+            case 430 :  return false;
+            default  :  throwNNTPError(l_stat);
+        }
+        
+        return false;
+    }
+    
+    /** check if article exists within a group
+     * @param p_group group
+     * @param p_articleid article ID
+     * @return bool if exists
+     **/
+    bool nntp::existArticle( const std::string& p_group, const std::string& p_articleid )
+    {
+        send("group "+p_group);
+        
+        const unsigned int l_stat = send("stat "+p_articleid, false);
+        switch (l_stat) {
+            case 223 :  return true;
+            case 423 :  return false;
+            default  :  throwNNTPError(l_stat);
+        }
+        
+        return false;
     }
     
     
