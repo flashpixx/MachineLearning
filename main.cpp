@@ -59,10 +59,10 @@ int main(int argc, char *argv[]) {
     
 
     /*
-    x.setGroup("de.comp.text.tex");
+    x.setGroup("1und1.announce");
     for(bool b=true; b; b=x.nextArticle())
         std::cout << x.getArticle() << "\n>=================================================================================<" << std::endl;
-     */
+    */
     
     
     /*
