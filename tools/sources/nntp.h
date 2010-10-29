@@ -95,6 +95,7 @@ namespace machinelearning { namespace tools { namespace sources {
         
             unsigned int send( const std::string&, const bool& = true );
             void throwNNTPError( const unsigned int& ) const;
+            std::string getResponseData( void );
         
     };
 
@@ -232,6 +233,24 @@ namespace machinelearning { namespace tools { namespace sources {
     }
 
     
+    /** reads the response of the socket
+     * @return response via string
+     **/
+    inline std::string nntp::getResponseData( void )
+    {
+        // read data into response after the last entry is a "dot CR/LR"
+        boost::asio::streambuf l_response;
+        boost::asio::read_until(m_socket, l_response, "\r\n.\r\n");
+        
+        
+        // convert stream data into string and remove the end seperator
+        std::istream l_response_stream( &l_response );
+        std::string l_data( (std::istreambuf_iterator<char>(l_response_stream)), std::istreambuf_iterator<char>());
+        l_data.erase( l_data.end()-5, l_data.end() );
+        
+        return l_data;
+    }
+    
     
     /** fetchs the active group list
      * @return map with group names and article count
@@ -239,24 +258,11 @@ namespace machinelearning { namespace tools { namespace sources {
     inline std::map<std::string, std::size_t> nntp::getGroupList( void )
     {
         send("list active");
-
-        
-        // read data into response after the last entry is a "CR/LR dot CR/LR"
-        boost::asio::streambuf l_response;
-        std::istream l_response_stream( &l_response );
-        
-        boost::asio::read_until(m_socket, l_response, "\r\n.\r\n");
-
-        
-        // response hold the data
-        std::string l_filtergroup;
-        bio::filtering_ostream  l_out( std::back_inserter(l_filtergroup) );
-        bio::copy( l_response, l_out );
-        
+        const std::string l_data = getResponseData();
         
         // seperates the string data (remove fist and last element)
         std::vector<std::string> l_list;
-        boost::split( l_list, l_filtergroup, boost::is_any_of("\n") );
+        boost::split( l_list, l_data, boost::is_any_of("\n") );
         l_list.erase( l_list.begin(), l_list.begin()+1 );
         l_list.erase( l_list.end()-2, l_list.end() );
         
@@ -288,23 +294,11 @@ namespace machinelearning { namespace tools { namespace sources {
     inline std::vector<std::string> nntp::getArticleIDs( const std::string& p_group )
     {
         send("listgroup "+p_group);
-        
-        // read data into response after the last entry is a "dot CR/LR"
-        boost::asio::streambuf l_response;
-        std::istream l_response_stream( &l_response );
-        
-        boost::asio::read_until(m_socket, l_response, "\r\n.\r\n");
-        
-        
-        // seperates the IDs
-        std::string l_string;
-        bio::filtering_ostream  l_out( std::back_inserter(l_string) );
-        bio::copy( l_response, l_out );
-
+        const std::string l_data = getResponseData();
         
         // seperates the string data (remove fist and last element)
         std::vector<std::string> l_id;
-        boost::split( l_id, l_string, boost::is_any_of("\n") );
+        boost::split( l_id, l_data, boost::is_any_of("\n") );
         l_id.erase( l_id.begin(), l_id.begin()+1 );
         l_id.erase( l_id.end()-2, l_id.end() );
         
@@ -328,23 +322,7 @@ namespace machinelearning { namespace tools { namespace sources {
             case header :   send("head "+p_articleid);      break;
         }
         
-        // read data into response after the last entry is a "dot CR/LR"
-        boost::asio::streambuf l_response;
-        std::istream l_response_stream( &l_response );
-        
-        boost::asio::read_until(m_socket, l_response, "\r\n.\r\n");
-
-        
-        // convert stream data into string and remove the end seperator and the first line
-        std::string l_article;
-        bio::filtering_ostream  l_out( std::back_inserter(l_article) );
-        bio::copy( l_response, l_out );
-
-        l_article.erase( 0, l_article.find("\r\n")+2 );
-        l_article.erase( l_article.end()-5, l_article.end() );
-                
-        return l_article;
-        
+        return getResponseData();
     }
     
     
@@ -360,23 +338,7 @@ namespace machinelearning { namespace tools { namespace sources {
             case header :   send("head");      break;
         }
         
-        // read data into response after the last entry is a "dot CR/LR"
-        boost::asio::streambuf l_response;
-        std::istream l_response_stream( &l_response );
-        
-        boost::asio::read_until(m_socket, l_response, "\r\n.\r\n");
-        
-        
-        // convert stream data into string and remove the end seperator and the first line
-        std::string l_article;
-        bio::filtering_ostream  l_out( std::back_inserter(l_article) );
-        bio::copy( l_response, l_out );
-        
-        l_article.erase( 0, l_article.find("\r\n")+2 );
-        l_article.erase( l_article.end()-5, l_article.end() );
-        
-        return l_article;
-        
+        return getResponseData();
     }
     
     
@@ -400,23 +362,7 @@ namespace machinelearning { namespace tools { namespace sources {
         std::vector<std::string> l_data;
         for(std::size_t i=0; i < p_articleid.size(); ++i) {
             send(l_cmd + " " + p_articleid[i]);
-            
-            // read data into response after the last entry is a "dot CR/LR"
-            boost::asio::streambuf l_response;
-            std::istream l_response_stream( &l_response );
-            
-            boost::asio::read_until(m_socket, l_response, "\r\n.\r\n");
-
-            
-            // convert stream data into string and remove the end seperator and the first line
-            std::string l_article;
-            bio::filtering_ostream  l_out( std::back_inserter(l_article) );
-            bio::copy( l_response, l_out );
-            
-            l_article.erase( 0, l_article.find("\r\n")+2 );
-            l_article.erase( l_article.end()-5, l_article.end() );
-        
-            l_data.push_back( l_article );
+            l_data.push_back( getResponseData() );
         }
         
         return l_data;
@@ -435,23 +381,8 @@ namespace machinelearning { namespace tools { namespace sources {
             case body   :   send("body "+ p_messageid);      break;
             case header :   send("head "+ p_messageid);      break;
         }
-        
-        // read data into response after the last entry is a "dot CR/LR"
-        boost::asio::streambuf l_response;
-        std::istream l_response_stream( &l_response );
-        
-        boost::asio::read_until(m_socket, l_response, "\r\n.\r\n");
-        
-        
-        // convert stream data into string and remove the end seperator and the first line
-        std::string l_article;
-        bio::filtering_ostream  l_out( std::back_inserter(l_article) );
-        bio::copy( l_response, l_out );
-        
-        l_article.erase( 0, l_article.find("\r\n")+2 );
-        l_article.erase( l_article.end()-5, l_article.end() );
-        
-        return l_article;        
+
+        return getResponseData();
     }    
     
     
