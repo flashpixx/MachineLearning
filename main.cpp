@@ -48,24 +48,31 @@ int main(int argc, char *argv[]) {
     tl::language::bind("ml", "./tools/language/");
     #endif
     
-   
-    tl::sources::nntp x("news.online.de");
+    
+    //tl::files::hdf o("blub.hdf5");
+    
+    
+    
+    // ===== Newsgroup ======
+   /*
+    //tl::sources::nntp x("news.online.de");
     //tl::sources::nntp x("news.tu-clausthal.de");
     
-    /*
+    
     std::map<std::string, std::size_t> y = x.getGroupList();
     for (std::map<std::string, std::size_t>::iterator it = y.begin(); it != y.end(); ++it)
         std::cout << it->first << "\t\t\t" << it->second << std::endl;
-    */
+    
 
     
     x.setGroup("1und1.announce");
     for(bool b=true; b; b=x.nextArticle())
         std::cout << x.getArticle() << "\n>=================================================================================<" << std::endl;
+    */
     
     
+    // ===== Gradient ======
     
-    /*
     boost::multi_array<double, 2> x;
     boost::multi_array<double, 2> y;
     boost::multi_array<double, 2> target;
@@ -83,14 +90,7 @@ int main(int argc, char *argv[]) {
     gd.setStaticVar("target", target);
     
     gd.optimize(1, 0.1);
-    */
     
-        
-    //tl::files::hdf o("blub.hdf5");
-    //std::cout << o.readString("/string") << std::endl;
-	//std::vector<std::string> x = o.readStringVector("/stringarray");
-    //ublas::vector<double> x = o.readVector<double>("/vector", H5::PredType::NATIVE_DOUBLE);
-    //std::cout << x << std::endl;
     
     
     // ===== Lazy Learner ======
