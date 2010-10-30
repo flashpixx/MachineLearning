@@ -23,13 +23,26 @@
 
 #ifdef SOURCES
 
-/** headerfile for include all sources **/
+#ifndef MACHINELEARNING_TOOLS_SOURCES_WIKIPEDIA_H
+#define MACHINELEARNING_TOOLS_SOURCES_WIKIPEDIA_H
 
-#ifndef MACHINELEARNING_TOOLS_SOURCES_H
-#define MACHINELEARNING_TOOLS_SOURCES_H
+#include <boost/asio.hpp>
 
-#include "nntp.h"
-#include "wikipedia.h"
+#include "../../exception/exception.h"
+#include "../language/language.h"
+
+
+namespace machinelearning { namespace tools { namespace sources {
+
+    
+    /** class for reading Wikipedia article **/
+    class wikipedia {
+        
+    };
+    
+    
+};};};
+
 
 #endif
 #endif

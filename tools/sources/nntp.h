@@ -32,11 +32,7 @@
 #include <ostream>
 #include <boost/asio.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/iostreams/copy.hpp>
 #include <boost/algorithm/string.hpp> 
-#include <boost/iostreams/concepts.hpp>
-#include <boost/iostreams/operations.hpp> 
-#include <boost/iostreams/filtering_stream.hpp>
 
 
 #include "../../exception/exception.h"
@@ -46,13 +42,13 @@
 namespace machinelearning { namespace tools { namespace sources {
     
     namespace bip  = boost::asio::ip;
-    namespace bio  = boost::iostreams;
 
     
     /** class for creating nntp connection (exspecially for creating distance matrix).
      * The class is a nntp client class without any post functionality (implements the RFC 3977)
      * @see http://tools.ietf.org/html/rfc3977 [old RFC http://www.w3.org/Protocols/rfc977/rfc977]
      * @todo ssl connection
+     * @todo try to implementate a iterator over articles
      **/
     class nntp {
         
@@ -95,7 +91,7 @@ namespace machinelearning { namespace tools { namespace sources {
         
             unsigned int send( const std::string&, const bool& = true );
             void throwNNTPError( const unsigned int& ) const;
-            std::string getResponseData( void );
+            std::string getResponseData( const std::string& = "\r\n.\r\n" );
         
     };
 
@@ -206,22 +202,14 @@ namespace machinelearning { namespace tools { namespace sources {
         std::ostream l_send( &l_request );
         
         l_send << p_cmd << "\r\n" ;
-        
         boost::asio::write(m_socket, l_request);
  
         
         // read the first line
-        boost::asio::streambuf l_response;
-        std::istream l_response_stream( &l_response );
-
-        boost::asio::read_until(m_socket, l_response, "\r\n" );
+        const std::string l_returnline = getResponseData("\r\n");
 
         // copy the return value into a string and seperates the status code
         unsigned int l_status = 0;
-        std::string l_returnline;
-        bio::filtering_ostream  l_out( std::back_inserter(l_returnline) );
-        bio::copy( l_response, l_out );
-        
         try {
             l_status = boost::lexical_cast<unsigned int>( l_returnline.substr(0,3) );
         } catch (...) {}
@@ -234,19 +222,20 @@ namespace machinelearning { namespace tools { namespace sources {
 
     
     /** reads the response of the socket
+     * @param p_separator seperator for detecting the end (default CRLF DOT CRLF)
      * @return response via string
      **/
-    inline std::string nntp::getResponseData( void )
+    inline std::string nntp::getResponseData( const std::string& p_separator )
     {
         // read data into response after the last entry is a "dot CR/LR"
         boost::asio::streambuf l_response;
-        boost::asio::read_until(m_socket, l_response, "\r\n.\r\n");
+        boost::asio::read_until(m_socket, l_response, p_separator);
         
         
         // convert stream data into string and remove the end seperator
         std::istream l_response_stream( &l_response );
         std::string l_data( (std::istreambuf_iterator<char>(l_response_stream)), std::istreambuf_iterator<char>());
-        l_data.erase( l_data.end()-5, l_data.end() );
+        l_data.erase( l_data.end()-p_separator.size(), l_data.end() );
         
         return l_data;
     }
