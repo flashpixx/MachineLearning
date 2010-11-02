@@ -49,12 +49,13 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     #endif
     
     /** class for calculate (batch) relational neural gas
+     * @todo MPI code change. Prototypes can be 0 (rows) so not every CPU needn't have a prototypes
      **/
     template<typename T> class relationalneuralgas : public nonsupervisedclustering<T> {
         
         public:
             
-            relationalneuralgas( const distances::distance<T>&, const std::size_t&, const std::size_t& );
+            relationalneuralgas( const std::size_t&, const std::size_t& );
             void train( const ublas::matrix<T>&, const std::size_t& );
             void train( const ublas::matrix<T>&, const std::size_t&, const T& );
             ublas::matrix<T> getPrototypes( void ) const;
@@ -79,7 +80,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
         private :
             
-            /** distance object **/
+            /** distance object (euclidian) **/
             const distances::distance<T>* m_distance;        
             /** prototypes **/
             ublas::matrix<T> m_prototypes;                
@@ -108,12 +109,11 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     
     
     /** contructor for initialization the neural gas
-     * @param p_distance distance object
      * @param p_prototypes number of prototypes
      * @param p_prototypesize size of each prototype (data dimension)
      **/
-    template<typename T> inline relationalneuralgas<T>::relationalneuralgas( const distances::distance<T>& p_distance, const std::size_t& p_prototypes, const std::size_t& p_prototypesize ) :
-        m_distance( &p_distance ),
+    template<typename T> inline relationalneuralgas<T>::relationalneuralgas( const std::size_t& p_prototypes, const std::size_t& p_prototypesize ) :
+        m_distance( distances::euclid<T>() ),
         m_prototypes( tools::matrix::random<T>(p_prototypes, p_prototypesize) ),
         m_logging( false ),
         m_logprototypes( std::vector< ublas::matrix<T> >() ),

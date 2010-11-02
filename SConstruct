@@ -9,6 +9,7 @@ AddOption("--with-randomdevice", dest="withrandom", type="string", nargs=0, acti
 AddOption("--with-mpi", dest="withmpi", type="string", nargs=0, action="store", help="installation with MPI support")
 AddOption("--with-multilanguage", dest="withmultilanguage", type="string", nargs=0, action="store", help="installation with multilanguage support")
 AddOption("--with-sources", dest="withsources", type="string", nargs=0, action="store", help="installation with source like nntp or something else")
+AddOption("--with-files", dest="withfiles", type="string", nargs=0, action="store", help="installation with file reading support for CSV & HDF")
 AddOption("--create-language", dest="createlang", type="string", nargs=0, action="store", help="reads the data for translation and add them to the different language files")
 AddOption("--compile-language", dest="compilelang", type="string", nargs=0, action="store", help="compiles the language files")
 AddOption("--create-documentation", dest="createdocu", type="string", nargs=0, action="store", help="creates the doxygen documentation (doxygen must be within the path)")
@@ -33,7 +34,7 @@ def configuration_macosx(config, version, architecture) :
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["LIBRARY_PATH"]
     config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -arch "+arch+" -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
-    config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "hdf5_cpp", "hdf5", "ginac", "atlas", "lapack", "ptcblas"]
+    config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "ginac", "atlas", "lapack", "ptcblas"]
     
     
     if GetOption("withmpi") == None :
@@ -53,6 +54,10 @@ def configuration_macosx(config, version, architecture) :
         
     if GetOption("withsources") != None :
         config["compileflags"]      += " -D SOURCES"
+        
+    if GetOption("withfiles") != None :
+        config["compileflags"]      += " -D FILES"
+        config["linkto"].extend( ["hdf5_cpp", "hdf5"] )
     
     
 
@@ -62,7 +67,7 @@ def configuration_posix(config, version, architecture) :
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["LIBRARY_PATH"]
     config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
-    config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "hdf5_cpp", "hdf5", "ginac", "atlas", "lapack", "ptcblas", "ptf77blas"]
+    config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "ginac", "atlas", "lapack", "ptcblas", "ptf77blas"]
     
     
     if GetOption("withmpi") == None :
@@ -82,7 +87,11 @@ def configuration_posix(config, version, architecture) :
     if GetOption("withsources") != None :
         config["compileflags"]      += " -D SOURCES"
 
-
+    if GetOption("withfiles") != None :
+        config["compileflags"]      += " -D FILES"
+        config["linkto"].extend( ["hdf5_cpp", "hdf5"] )
+        
+        
 
 # configuration for Windows build
 def configuration_win32(config, version, architecture) :

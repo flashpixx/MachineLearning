@@ -78,6 +78,19 @@ namespace machinelearning { namespace tools { namespace sources {
             ~nntp( void );
         
         
+            /** iterator class for iterating over articles **/
+            class iterator {
+                
+                //public :
+                
+                    
+                
+            };
+        
+            iterator begin( void );
+        
+        
+        
         private :
         
             /** string with server name **/
@@ -449,6 +462,14 @@ namespace machinelearning { namespace tools { namespace sources {
     
         return true;
     }
+    
+    
+    
+    inline nntp::iterator nntp::begin( void )
+    {
+        send("stat");
+    }
+    
     
 
 };};};

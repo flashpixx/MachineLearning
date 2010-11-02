@@ -21,6 +21,7 @@
  @endcond
  **/
 
+#ifdef FILES
 
 #ifndef MACHINELEARNING_TOOLS_FILES_HDF_HPP
 #define MACHINELEARNING_TOOLS_FILES_HDF_HPP
@@ -503,4 +504,5 @@ namespace machinelearning { namespace tools { namespace files {
     
 };};};
 
+#endif
 #endif

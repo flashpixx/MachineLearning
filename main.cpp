@@ -3,6 +3,7 @@
 #include <iostream>
 #include <algorithm>
 #include <fstream>
+#include <map>
 
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
@@ -48,23 +49,33 @@ int main(int argc, char *argv[]) {
     tl::language::bind("ml", "./tools/language/");
     #endif
     
-    
-    //tl::files::hdf o("blub.hdf5");
-    
-    
+    #ifdef FILES
+    tl::files::hdf o("blub.hdf5");
+    #endif
+    /*
+    tl::sources::wikipedia w;
+    w.getRandomArticle();
+    */
     
     // ===== Newsgroup ======
-   /*
-    //tl::sources::nntp x("news.online.de");
+    // dt. große Gruppen: de.soc.politik.misc, de.rec.fotografie, de.talk.tagesgeschehen, de.etc.sprache.deutsch, de.comp.os.unix.linux.misc, de.sci.electronics, de.etc.fahrzeug.auto, de.comp.sys.mac.misc, de.comp.lang.java, de.soc.weltanschauung.christentum
+    
+    
+    tl::sources::nntp x("news.online.de");
     //tl::sources::nntp x("news.tu-clausthal.de");
     
     
-    std::map<std::string, std::size_t> y = x.getGroupList();
-    for (std::map<std::string, std::size_t>::iterator it = y.begin(); it != y.end(); ++it)
-        std::cout << it->first << "\t\t\t" << it->second << std::endl;
+    std::map<std::string, std::size_t> groups = x.getGroupList();
     
-
-    
+    /* sort with size
+    std::multimap<std::size_t, std::string> newsgroups;
+    for (std::map<std::string, std::size_t>::iterator it = groups.begin(); it != groups.end(); ++it)
+        if (it->first.substr(0,2) == "de")
+            newsgroups.insert( std::pair<std::size_t, std::string>(it->second, it->first) );
+    for (std::multimap<std::size_t, std::string>::iterator it = newsgroups.begin(); it != newsgroups.end(); ++it)
+        std::cout << it->second << "\t\t\t" << it->first << std::endl;
+    */
+    /*
     x.setGroup("1und1.announce");
     for(bool b=true; b; b=x.nextArticle())
         std::cout << x.getArticle() << "\n>=================================================================================<" << std::endl;
@@ -72,7 +83,7 @@ int main(int argc, char *argv[]) {
     
     
     // ===== Gradient ======
-    
+    /*
     boost::multi_array<double, 2> x;
     boost::multi_array<double, 2> y;
     boost::multi_array<double, 2> target;
@@ -90,7 +101,7 @@ int main(int argc, char *argv[]) {
     gd.setStaticVar("target", target);
     
     gd.optimize(1, 0.1);
-    
+    */
     
     
     // ===== Lazy Learner ======
