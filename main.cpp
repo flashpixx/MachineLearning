@@ -20,9 +20,6 @@
 
 #include <boost/numeric/bindings/ublas/matrix.hpp>
 #include <boost/numeric/bindings/ublas/vector.hpp>
-//#include <boost/xml/dom.hpp>
-//#include <boost/xml/reader.hpp>
-
 
 
 int main(int argc, char *argv[]) {
@@ -52,35 +49,41 @@ int main(int argc, char *argv[]) {
     #ifdef FILES
     tl::files::hdf o("blub.hdf5");
     #endif
-    /*
+
+    
+    
+    // ===== Wikipedia ======
+    
     tl::sources::wikipedia w;
-    w.getRandomArticle();
-    */
+    w.getArticle("test");
+    
     
     // ===== Newsgroup ======
+    /*
     // dt. große Gruppen: de.soc.politik.misc, de.rec.fotografie, de.talk.tagesgeschehen, de.etc.sprache.deutsch, de.comp.os.unix.linux.misc, de.sci.electronics, de.etc.fahrzeug.auto, de.comp.sys.mac.misc, de.comp.lang.java, de.soc.weltanschauung.christentum
     
-    
+    #ifdef SOURCES    
     tl::sources::nntp x("news.online.de");
     //tl::sources::nntp x("news.tu-clausthal.de");
     
     
     std::map<std::string, std::size_t> groups = x.getGroupList();
     
-    /* sort with size
+    sort with size
     std::multimap<std::size_t, std::string> newsgroups;
     for (std::map<std::string, std::size_t>::iterator it = groups.begin(); it != groups.end(); ++it)
         if (it->first.substr(0,2) == "de")
             newsgroups.insert( std::pair<std::size_t, std::string>(it->second, it->first) );
     for (std::multimap<std::size_t, std::string>::iterator it = newsgroups.begin(); it != newsgroups.end(); ++it)
         std::cout << it->second << "\t\t\t" << it->first << std::endl;
-    */
-    /*
+    
+    
     x.setGroup("1und1.announce");
     for(bool b=true; b; b=x.nextArticle())
         std::cout << x.getArticle() << "\n>=================================================================================<" << std::endl;
-    */
     
+    #endif
+    */
     
     // ===== Gradient ======
     /*

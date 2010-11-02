@@ -27,6 +27,7 @@
 #define MACHINELEARNING_TOOLS_SOURCES_WIKIPEDIA_H
 
 #include <boost/asio.hpp>
+#include <rapidxml/rapidxml.hpp>
 
 #include "../../exception/exception.h"
 #include "../language/language.h"
@@ -38,7 +39,8 @@ namespace machinelearning { namespace tools { namespace sources {
     
     
     /** class for reading Wikipedia article.
-     * The data will received over a HTTP socket for each call
+     * The data will received over a HTTP socket for each call and uses RapidXML library for parsing the XML structur
+     * @see http://rapidxml.sourceforge.net/
      **/
     class wikipedia {
         
@@ -76,8 +78,13 @@ namespace machinelearning { namespace tools { namespace sources {
         
             /** default wikipedia properties **/
             const wikiproperties m_defaultproperties;
+            /** io service objekt for resolving the server name**/
+            boost::asio::io_service m_io;
+            /** socket objekt for send / receive the data **/
+            bip::tcp::socket m_socket; 
         
             wikiproperties getProperties( const language& ) const;
+            std::string getRequest( const std::string&, const std::string& );
 
         
     };
@@ -87,7 +94,9 @@ namespace machinelearning { namespace tools { namespace sources {
      * @apram p_lang optional language parameter (default de_DE)
      **/
     inline wikipedia::wikipedia( const language& p_lang ) :
-        m_defaultproperties( getProperties(p_lang) )
+        m_defaultproperties( getProperties(p_lang) ),
+        m_io(),
+        m_socket(m_io)
     {}
     
 
@@ -129,7 +138,24 @@ namespace machinelearning { namespace tools { namespace sources {
     }
     
     
+    /** reads an article
+     * @param p_search keyword for searching
+     * @param p_lang optional language
+     **/
     void wikipedia::getArticle( const std::string& p_search, const language& p_lang )
+    {
+        wikiproperties l_prop = m_defaultproperties;
+        if (l_prop.lang != p_lang)
+            l_prop = getProperties( p_lang );
+        
+        getRequest( l_prop.exporturl.host, l_prop.exporturl.path + p_search );
+    }
+    
+    
+    /** reads an random article
+     * @param p_lang optional language
+     **/
+    void wikipedia::getRandomArticle( const language& p_lang )
     {
         wikiproperties l_prop = m_defaultproperties;
         if (l_prop.lang != p_lang)
@@ -137,11 +163,37 @@ namespace machinelearning { namespace tools { namespace sources {
     }
     
     
-    void wikipedia::getRandomArticle( const language& p_lang )
+    std::string wikipedia::getRequest( const std::string& p_server, const std::string& p_path )
     {
-        wikiproperties l_prop = m_defaultproperties;
-        if (l_prop.lang != p_lang)
-            l_prop = getProperties( p_lang );
+        // create resolver for server
+        bip::tcp::resolver l_resolver(m_io);
+        bip::tcp::resolver::query l_query(p_server, "http");
+        
+        // try to connect the server
+        bip::tcp::resolver::iterator l_endpoint = l_resolver.resolve( l_query );
+        bip::tcp::resolver::iterator l_endpointend;
+        boost::system::error_code l_error       = boost::asio::error::host_not_found;
+        
+        while (l_error && l_endpoint != l_endpointend) {
+            m_socket.close();
+            m_socket.connect(*l_endpoint++, l_error);
+        }
+        
+        if (l_error)
+            throw exception::parameter(_("cannot connect to wikipedia server"));
+        
+        // create HTTP request
+        boost::asio::streambuf l_request;
+        std::ostream l_request_stream(&l_request);
+        l_request_stream << "GET " << p_path << " HTTP/1.0\r\n";
+        l_request_stream << "Host: " << p_server << "\r\n";
+        l_request_stream << "Accept: */*\r\n";
+        l_request_stream << "Connection: close\r\n\r\n";
+        
+        
+        std::string l_xml;
+        return l_xml;
+        
     }
     
     
