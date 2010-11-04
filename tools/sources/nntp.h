@@ -180,7 +180,7 @@ namespace machinelearning { namespace tools { namespace sources {
         switch (p_status) {
             case 0   : throw exception::parameter(_("error while reading socket data"));     
                 
-                // nntp errors
+            // nntp errors
             case 411 : throw exception::parameter(_("no such group"));                       
             case 412 : throw exception::parameter(_("no newsgroup has been selected"));      
             case 420 : throw exception::parameter(_("no article has been selected"));          
@@ -194,7 +194,7 @@ namespace machinelearning { namespace tools { namespace sources {
             case 440 : throw exception::parameter(_("posting not allowed"));                  
             case 441 : throw exception::parameter(_("posting failed"));                       
                 
-                // default errors
+            // default errors
             case 500 : throw exception::parameter(_("command not recognized"));               
             case 501 : throw exception::parameter(_("command syntax error"));                 
             case 502 : throw exception::parameter(_("access restriction or permission denied")); 

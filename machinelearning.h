@@ -40,6 +40,7 @@
  * <ul>
  * <li><pre>RANDOMDEVICE</pre> for using the Boost Device Random support (required Boost Random Device Support), otherwise a Mersenne Twister is used</li>
  * <li><pre>MULTILANGUAGE</pre> option for compiling the framework with multilanguage support (uses gettext)</li>
+ * <li><pre>FILES</pre> adds the support for HDF & CSV file reading</li>
  * <li><pre>SOURCES</pre> compiles sources in that way, that e.g. NNTP data can be read directly</li>
  * <li><pre>CLUSTER</pre> enable MPI Support for the toolbox (required Boost MPI support)</li>
  * </ul>

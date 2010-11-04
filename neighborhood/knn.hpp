@@ -44,7 +44,9 @@ namespace machinelearning { namespace neighborhood {
     namespace ublas   = boost::numeric::ublas;
     
     
-    /** implementation for the k-nearest-neighbor **/
+    /** implementation for the k-nearest-neighbor
+     * @todo recreate the data structur with kd-trees for optimizing
+     **/
     template<typename T> class knn : public neighborhood<T> {
         
         public :
