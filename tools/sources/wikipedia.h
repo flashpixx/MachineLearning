@@ -251,6 +251,9 @@ namespace machinelearning { namespace tools { namespace sources {
         
         send(p_server, p_path);
         
+        // read header data until a double blank line
+        std::cout << getResponseData("\r\n\r\n") << std::endl;
+        
         std::string l_xml;
         return l_xml;
         
