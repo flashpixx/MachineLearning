@@ -53,9 +53,11 @@ int main(int argc, char *argv[]) {
     
     
     // ===== Wikipedia ======
-    
+    #ifdef SOURCES
     tl::sources::wikipedia w;
-    w.getArticle("test");
+    //w.getArticle("test");
+    w.getRandomArticle();
+    #endif
     
     
     // ===== Newsgroup ======

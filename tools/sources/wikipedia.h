@@ -79,16 +79,18 @@ namespace machinelearning { namespace tools { namespace sources {
         
             /** default wikipedia properties **/
             const wikiproperties m_defaultproperties;
+            /** http header **/
+            std::string m_httpheader;
             /** io service objekt for resolving the server name**/
             boost::asio::io_service m_io;
             /** socket objekt for send / receive the data **/
             bip::tcp::socket m_socket; 
         
             wikiproperties getProperties( const language& ) const;
-            std::string getArticleXMLData( const std::string&, const std::string& );
-            void throwHTTPError( const unsigned int& ) const;
+            unsigned int sendRequest( const std::string&, const std::string&, const bool& = true );
             unsigned int send( const std::string&, const std::string&, const bool& = true );
-            std::string getResponseData( const std::string& = "\r\n" );
+            std::string getContentData( void ); 
+            void throwHTTPError( const unsigned int& ) const;   
         
     };
     
@@ -98,6 +100,7 @@ namespace machinelearning { namespace tools { namespace sources {
      **/
     inline wikipedia::wikipedia( const language& p_lang ) :
         m_defaultproperties( getProperties(p_lang) ),
+        m_httpheader(),
         m_io(),
         m_socket(m_io)
     {}
@@ -151,7 +154,8 @@ namespace machinelearning { namespace tools { namespace sources {
         if (l_prop.lang != p_lang)
             l_prop = getProperties( p_lang );
         
-        getArticleXMLData( l_prop.exporturl.host, l_prop.exporturl.path + p_search );
+        sendRequest( l_prop.exporturl.host, l_prop.exporturl.path + p_search );
+        std::cout << getContentData() << std::endl;
     }
     
     
@@ -164,26 +168,35 @@ namespace machinelearning { namespace tools { namespace sources {
         if (l_prop.lang != p_lang)
             l_prop = getProperties( p_lang );
         
-        getArticleXMLData( l_prop.exporturl.host, l_prop.exporturl.path );
+        unsigned int l_status = sendRequest( l_prop.randomurl.host, l_prop.randomurl.path, false );
+        if (l_status != 302)
+            throwHTTPError(l_status);
+        
+        // read the location header tag and extract the URL
+        //std::cout << m_httpheader << std::endl;
+        std::size_t l_found = m_httpheader.find("Location:");
+        if (l_found != std::string::npos)
+            std::cout << m_httpheader.substr(l_found+10, m_httpheader.find("Content")) << std::endl;
+    
     }
+
     
-    
-    /** reads the response of the socket
-     * @param p_separator seperator for detecting the end (default CRLF DOT CRLF)
-     * @return response via string
+    /** reads the whole data until socket is EOF
+     * @return string data
      **/
-    inline std::string wikipedia::getResponseData( const std::string& p_separator )
+    inline std::string wikipedia::getContentData( void )
     {
-        // read data into response after the last entry is a "dot CR/LR"
+        // header is extract in the send command and only the data is now present in the socket, so we read it until EOF
+        boost::system::error_code l_error;
         boost::asio::streambuf l_response;
-        boost::asio::read_until(m_socket, l_response, p_separator);
+        std::istream l_response_stream(&l_response);
         
+        while (boost::asio::read(m_socket, l_response, boost::asio::transfer_at_least(1), l_error));
         
-        // convert stream data into string and remove the end seperator
-        std::istream l_response_stream( &l_response );
-        std::string l_data( (std::istreambuf_iterator<char>(l_response_stream)), std::istreambuf_iterator<char>());
-        l_data.erase( l_data.end()-p_separator.size(), l_data.end() );
+        if (l_error != boost::asio::error::eof)
+            throw exception::parameter(_("data can not received"));
         
+        std::string l_data( (std::istreambuf_iterator<char>(l_response_stream)), std::istreambuf_iterator<char>());        
         return l_data;
     }
     
@@ -208,14 +221,21 @@ namespace machinelearning { namespace tools { namespace sources {
         
         boost::asio::write( m_socket, l_request );
     
-    
-        // read the first line
-        const std::string l_returnline = getResponseData();
         
+        // read the complet HTTP header "CR/LR"
+        boost::asio::streambuf l_response;
+        boost::asio::read_until(m_socket, l_response, "\r\n");
+        
+        // convert stream data into string and remove the end seperator
+        std::istream l_response_stream( &l_response );
+        std::string l_header( (std::istreambuf_iterator<char>(l_response_stream)), std::istreambuf_iterator<char>());
+        l_header.erase( l_header.end()-2, l_header.end() );
+        m_httpheader = l_header;
+
         // copy the return value into a string and seperates the status code
         unsigned int l_status = 0;
         try {
-            l_status = boost::lexical_cast<unsigned int>( l_returnline.substr( l_returnline.find(" ")+1,3) );
+            l_status = boost::lexical_cast<unsigned int>( m_httpheader.substr( m_httpheader.find(" ")+1,3) );
         } catch (...) {}
         
         if ( p_throw )
@@ -223,14 +243,15 @@ namespace machinelearning { namespace tools { namespace sources {
         
         return l_status;
     }
+
     
-    
-    /** sends the request and returns the XML data
+    /** sends the request and returns the data
      * @param p_server server adress
      * @param p_path path to the document
-     * @return 
+     * @param p_throw bool for throwing error
+     * @return status code
      **/
-    inline std::string wikipedia::getArticleXMLData( const std::string& p_server, const std::string& p_path )
+    inline unsigned int wikipedia::sendRequest( const std::string& p_server, const std::string& p_path, const bool& p_throw )
     {
         // create resolver for server
         bip::tcp::resolver l_resolver(m_io);
@@ -247,16 +268,9 @@ namespace machinelearning { namespace tools { namespace sources {
         }
         
         if (l_error)
-            throw exception::parameter(_("cannot connect to wikipedia server"));
+            throw exception::parameter(_("can not connect to wikipedia server"));
         
-        send(p_server, p_path);
-        
-        // read header data until a double blank line
-        std::cout << getResponseData("\r\n\r\n") << std::endl;
-        
-        std::string l_xml;
-        return l_xml;
-        
+        return send(p_server, p_path, p_throw);
     }
     
     
@@ -274,7 +288,7 @@ namespace machinelearning { namespace tools { namespace sources {
             case 206    : throw exception::parameter(_("Partial Content"));
             case 300    : throw exception::parameter(_("Multiple Choices"));
             case 301    : throw exception::parameter(_("Moved Permanently"));
-            case 302    : throw exception::parameter(_("Found"));
+            case 302    : throw exception::parameter(_("Moved Temporarily"));
             case 303    : throw exception::parameter(_("See Other"));
             case 304    : throw exception::parameter(_("Not Modified"));
             case 305    : throw exception::parameter(_("Use Proxy"));
