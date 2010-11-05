@@ -73,22 +73,19 @@ namespace machinelearning { namespace tools { namespace sources {
                 std::string acronymref;
                 std::string acronym;
                 std::string category;
-                std::string titleadd;
             };
         
         
             /** default wikipedia properties **/
             const wikiproperties m_defaultproperties;
-            /** http header **/
-            std::string m_httpheader;
             /** io service objekt for resolving the server name**/
             boost::asio::io_service m_io;
             /** socket objekt for send / receive the data **/
             bip::tcp::socket m_socket; 
         
             wikiproperties getProperties( const language& ) const;
-            unsigned int sendRequest( const std::string&, const std::string&, const bool& = true );
-            unsigned int send( const std::string&, const std::string&, const bool& = true );
+            unsigned int sendRequest( const std::string&, const std::string&, std::string&, const bool& = true );
+            unsigned int send( const std::string&, const std::string&, std::string&, const bool& = true );
             std::string getContentData( void ); 
             void throwHTTPError( const unsigned int& ) const;   
         
@@ -100,7 +97,6 @@ namespace machinelearning { namespace tools { namespace sources {
      **/
     inline wikipedia::wikipedia( const language& p_lang ) :
         m_defaultproperties( getProperties(p_lang) ),
-        m_httpheader(),
         m_io(),
         m_socket(m_io)
     {}
@@ -124,7 +120,6 @@ namespace machinelearning { namespace tools { namespace sources {
                 l_prop.acronymref       = "can refer to";
                 l_prop.acronym          = "Acronyms";
                 l_prop.category         = "Category";
-                l_prop.titleadd         = "- Wikipedia, the free encyclopedia";
                 return l_prop;
                 
             case de_DE :
@@ -135,7 +130,6 @@ namespace machinelearning { namespace tools { namespace sources {
                 l_prop.acronymref       = "steht für";
                 l_prop.acronym          = "Abkürzung";
                 l_prop.category         = "Kategorie";
-                l_prop.titleadd         = "Wikipedia";
                 return l_prop;
 
         }
@@ -154,7 +148,9 @@ namespace machinelearning { namespace tools { namespace sources {
         if (l_prop.lang != p_lang)
             l_prop = getProperties( p_lang );
         
-        sendRequest( l_prop.exporturl.host, l_prop.exporturl.path + p_search );
+        std::string l_header;
+        sendRequest( l_prop.exporturl.host, l_prop.exporturl.path + p_search, l_header );
+        std::cout << l_header << "\n==================================================================================" << std::endl;
         std::cout << getContentData() << std::endl;
     }
     
@@ -168,17 +164,18 @@ namespace machinelearning { namespace tools { namespace sources {
         if (l_prop.lang != p_lang)
             l_prop = getProperties( p_lang );
         
-        unsigned int l_status = sendRequest( l_prop.randomurl.host, l_prop.randomurl.path, false );
+        std::string l_header;
+        unsigned int l_status = sendRequest( l_prop.randomurl.host, l_prop.randomurl.path, l_header, false );
         if (l_status != 302)
             throwHTTPError(l_status);
         
         // read the location header tag and extract the URL
-        std::size_t l_found = m_httpheader.find("Location:");
+        std::size_t l_found = l_header.find("Location:");
         if (l_found == std::string::npos)
             throw exception::parameter(_("can not find information within the http header"));
         
         // extract Location URL
-        const std::string l_url = m_httpheader.substr(l_found+10, m_httpheader.find("\r\n", l_found)-l_found-10);
+        const std::string l_url = l_header.substr(l_found+10, l_header.find("\r\n", l_found)-l_found-10);
         
         // extract document of the URL
         l_found = l_url.rfind("/");
@@ -210,13 +207,14 @@ namespace machinelearning { namespace tools { namespace sources {
     }
     
     
-    /** sends the HTTP request to the Wikipedua server and receives the status code
+    /** sends the HTTP request to the Wikipedua server and receives the header
      * @param p_server server adress
      * @param p_path path to the document
+     * @param p_header returning HTTP header
      * @param p_throw bool for throwing error
      * @return status code
      **/
-    inline unsigned int wikipedia::send( const std::string& p_server, const std::string& p_path, const bool& p_throw )
+    inline unsigned int wikipedia::send( const std::string& p_server, const std::string& p_path, std::string& p_header, const bool& p_throw )
     {
         // create HTTP request and send them over the socket
         // we need a field for the user-agent, because Wikipedia will blocked the IP
@@ -231,36 +229,37 @@ namespace machinelearning { namespace tools { namespace sources {
         boost::asio::write( m_socket, l_request );
     
         
-        // read the complet HTTP header "CR/LR"
+        // read the complet HTTP header "double CR/LR"
         boost::asio::streambuf l_response;
-        boost::asio::read_until(m_socket, l_response, "\r\n");
+        boost::asio::read_until(m_socket, l_response, "\r\n\r\n");
         
         // convert stream data into string and remove the end seperator
         std::istream l_response_stream( &l_response );
         std::string l_header( (std::istreambuf_iterator<char>(l_response_stream)), std::istreambuf_iterator<char>());
-        l_header.erase( l_header.end()-2, l_header.end() );
-        m_httpheader = l_header;
+        l_header.erase( l_header.end()-4, l_header.end() );
 
         // copy the return value into a string and seperates the status code
         unsigned int l_status = 0;
         try {
-            l_status = boost::lexical_cast<unsigned int>( m_httpheader.substr( m_httpheader.find(" ")+1,3) );
+            l_status = boost::lexical_cast<unsigned int>( l_header.substr( l_header.find(" ")+1,3) );
         } catch (...) {}
         
         if ( p_throw )
             throwHTTPError( l_status );
         
+        p_header = l_header;
         return l_status;
     }
 
     
-    /** sends the request and returns the data
+    /** create DNS and HTTP request and returns the status code and the HTTP header
      * @param p_server server adress
      * @param p_path path to the document
+     * @param p_header returning HTTP header
      * @param p_throw bool for throwing error
      * @return status code
      **/
-    inline unsigned int wikipedia::sendRequest( const std::string& p_server, const std::string& p_path, const bool& p_throw )
+    inline unsigned int wikipedia::sendRequest( const std::string& p_server, const std::string& p_path, std::string& p_header, const bool& p_throw )
     {
         // create resolver for server
         bip::tcp::resolver l_resolver(m_io);
@@ -279,7 +278,7 @@ namespace machinelearning { namespace tools { namespace sources {
         if (l_error)
             throw exception::parameter(_("can not connect to wikipedia server"));
         
-        return send(p_server, p_path, p_throw);
+        return send(p_server, p_path, p_header, p_throw);
     }
     
     
