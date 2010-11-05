@@ -173,11 +173,20 @@ namespace machinelearning { namespace tools { namespace sources {
             throwHTTPError(l_status);
         
         // read the location header tag and extract the URL
-        //std::cout << m_httpheader << std::endl;
         std::size_t l_found = m_httpheader.find("Location:");
-        if (l_found != std::string::npos)
-            std::cout << m_httpheader.substr(l_found+10, m_httpheader.find("Content")) << std::endl;
-    
+        if (l_found == std::string::npos)
+            throw exception::parameter(_("can not find information within the http header"));
+        
+        // extract Location URL
+        const std::string l_url = m_httpheader.substr(l_found+10, m_httpheader.find("\r\n", l_found)-l_found-10);
+        
+        // extract document of the URL
+        l_found = l_url.rfind("/");
+        if (l_found == std::string::npos)
+            throw exception::parameter(_("can not find wikipedia document within the URL"));
+        
+        // get the article
+        getArticle( l_url.substr(l_found+1), l_prop.lang );
     }
 
     
