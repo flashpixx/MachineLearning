@@ -49,6 +49,7 @@ namespace machinelearning { namespace tools {
     
     /** class for connection LAPACK calls with numerical bindings.
      * We can handle only dense / full matrix data with LAPACK
+     * @see http://svn.boost.org/svn/boost/sandbox/numerical_bindings
      **/
     class lapack {
         

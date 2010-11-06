@@ -27,7 +27,7 @@
 #define MACHINELEARNING_TOOLS_SOURCES_WIKIPEDIA_H
 
 #include <boost/asio.hpp>
-#include <rapidxml/rapidxml.hpp>
+#include <boost/xml/reader.hpp>
 
 #include "../../exception/exception.h"
 #include "../language/language.h"
@@ -36,12 +36,14 @@
 namespace machinelearning { namespace tools { namespace sources {
 
     namespace bip  = boost::asio::ip;
+    namespace bxml = boost::xml;
     
     
     /** class for reading Wikipedia article.
-     * The data will received over a HTTP socket for each call and uses RapidXML library for parsing the XML structur
-     * @see http://rapidxml.sourceforge.net/
+     * The data will received over a HTTP socket for each call and uses Boost XML templates for parsing the XML structur.
+     * The Boost XML templates use the libxml2 library
      * @see http://tools.ietf.org/html/rfc2616 [old http://tools.ietf.org/html/rfc1945]
+     * @see http://svn.boost.org/svn/boost/sandbox/xml
      **/
     class wikipedia {
         
@@ -150,8 +152,15 @@ namespace machinelearning { namespace tools { namespace sources {
         
         std::string l_header;
         sendRequest( l_prop.exporturl.host, l_prop.exporturl.path + p_search, l_header );
-        std::cout << l_header << "\n==================================================================================" << std::endl;
+
         std::cout << getContentData() << std::endl;
+        
+        
+        // XML content must be a non-const char array for parsing via RapidXML
+        //rapidxml::xml_document<> l_xml;
+        
+        //char l_content[] = getContentData().c_str();
+        //l_xml.parse<0>( l_content );
     }
     
     
@@ -203,6 +212,8 @@ namespace machinelearning { namespace tools { namespace sources {
             throw exception::parameter(_("data can not received"));
         
         std::string l_data( (std::istreambuf_iterator<char>(l_response_stream)), std::istreambuf_iterator<char>());        
+        m_socket.close();
+        
         return l_data;
     }
     

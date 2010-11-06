@@ -55,8 +55,8 @@ int main(int argc, char *argv[]) {
     // ===== Wikipedia ======
     #ifdef SOURCES
     tl::sources::wikipedia w;
-    w.getArticle("RMI");
-    //w.getRandomArticle();
+    //w.getArticle("RMI");
+    w.getRandomArticle();
     #endif
     
     
