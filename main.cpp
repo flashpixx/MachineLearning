@@ -49,14 +49,13 @@ int main(int argc, char *argv[]) {
     #ifdef FILES
     tl::files::hdf o("blub.hdf5");
     #endif
-
-    
-    
+   
     // ===== Wikipedia ======
     #ifdef SOURCES
     tl::sources::wikipedia w;
-    //w.getArticle("RMI");
-    w.getRandomArticle();
+    //w.getArticle("schäfer");
+    w.getArticle("RMI");
+    //w.getRandomArticle();
     #endif
     
     
@@ -71,7 +70,7 @@ int main(int argc, char *argv[]) {
     
     std::map<std::string, std::size_t> groups = x.getGroupList();
     
-    sort with size
+    // sort with size
     std::multimap<std::size_t, std::string> newsgroups;
     for (std::map<std::string, std::size_t>::iterator it = groups.begin(); it != groups.end(); ++it)
         if (it->first.substr(0,2) == "de")

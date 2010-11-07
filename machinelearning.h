@@ -33,6 +33,7 @@
  * <li>HDF (http://www.hdfgroup.org/)</li>
  * <li><i>optional Message-Passing-Interface-Support:</i> Open MPI (http://www.open-mpi.org/) for unix systems / MS MPI (Microsoft Cluster Pack) for Windows system</li>
  * <li><i>optional GetText:</i> (http://www.gnu.org/software/gettext) for including multilanguage support</li>
+ * <li><i>optional LibXML2:</i> (http://xmlsoft.org/)</li>
  * </ul>
  *
  * @section compileroptions Compiler Option
@@ -41,7 +42,7 @@
  * <li><pre>RANDOMDEVICE</pre> for using the Boost Device Random support (required Boost Random Device Support), otherwise a Mersenne Twister is used</li>
  * <li><pre>MULTILANGUAGE</pre> option for compiling the framework with multilanguage support (uses gettext)</li>
  * <li><pre>FILES</pre> adds the support for HDF & CSV file reading</li>
- * <li><pre>SOURCES</pre> compiles sources in that way, that e.g. NNTP data can be read directly</li>
+ * <li><pre>SOURCES</pre> compiles sources in that way, that e.g. NNTP / Wikipedia data can be read directly</li>
  * <li><pre>CLUSTER</pre> enable MPI Support for the toolbox (required Boost MPI support)</li>
  * </ul>
  * The following global compiler commands should be set

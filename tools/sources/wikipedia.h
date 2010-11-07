@@ -26,8 +26,13 @@
 #ifndef MACHINELEARNING_TOOLS_SOURCES_WIKIPEDIA_H
 #define MACHINELEARNING_TOOLS_SOURCES_WIKIPEDIA_H
 
+#include <algorithm>
 #include <boost/asio.hpp>
-#include <boost/xml/reader.hpp>
+#include <libxml/parser.h>
+#include <libxml/tree.h>
+#include <libxml/xpath.h>
+#include <libxml/xpathInternals.h>
+
 
 #include "../../exception/exception.h"
 #include "../language/language.h"
@@ -36,14 +41,14 @@
 namespace machinelearning { namespace tools { namespace sources {
 
     namespace bip  = boost::asio::ip;
-    namespace bxml = boost::xml;
     
     
     /** class for reading Wikipedia article.
-     * The data will received over a HTTP socket for each call and uses Boost XML templates for parsing the XML structur.
-     * The Boost XML templates use the libxml2 library
+     * The data will received over a HTTP socket for each call and uses the nativ C interface of libxml2 for parsing the XML data.
+     * There are no simple C++ interfaces for XML data, so we use the C source within the class. 
      * @see http://tools.ietf.org/html/rfc2616 [old http://tools.ietf.org/html/rfc1945]
-     * @see http://svn.boost.org/svn/boost/sandbox/xml
+     * @todo optimizing server connection: If article receives, a socket is exists. The Wikipedia server is not changed, if there is no change
+     * on the language, so the socket can be open until the language is change
      **/
     class wikipedia {
         
@@ -77,6 +82,14 @@ namespace machinelearning { namespace tools { namespace sources {
                 std::string category;
             };
         
+            /** struct for article content **/
+            struct wikiarticle {
+                std::string content;
+                std::string title;
+                std::size_t articleid;
+                std::size_t revisionid;
+            };
+        
         
             /** default wikipedia properties **/
             const wikiproperties m_defaultproperties;
@@ -90,6 +103,7 @@ namespace machinelearning { namespace tools { namespace sources {
             unsigned int send( const std::string&, const std::string&, std::string&, const bool& = true );
             std::string getContentData( void ); 
             void throwHTTPError( const unsigned int& ) const;   
+            wikiarticle parseXML( const std::string& ) const;
         
     };
     
@@ -150,17 +164,27 @@ namespace machinelearning { namespace tools { namespace sources {
         if (l_prop.lang != p_lang)
             l_prop = getProperties( p_lang );
         
+        
+        // whitespace with underscore replace
+        std::string l_search( p_search );
+        std::replace( l_search.begin(), l_search.end(), ' ', '_' );
+        
+        // send request 
         std::string l_header;
-        sendRequest( l_prop.exporturl.host, l_prop.exporturl.path + p_search, l_header );
-
-        std::cout << getContentData() << std::endl;
+        sendRequest( l_prop.exporturl.host, l_prop.exporturl.path + l_search, l_header );
+        const std::string l_xml = getContentData();
+        m_socket.close();
         
+        // get native XML data and analyse content
+        wikiarticle l_content = parseXML( l_xml );
         
-        // XML content must be a non-const char array for parsing via RapidXML
-        //rapidxml::xml_document<> l_xml;
+        // check if exists redirect in the content data, run a new request
+        if (l_content.content.find("#redirect") != std::string::npos) {
+            getArticle(l_content.content.substr(12, l_content.content.size()-14), p_lang);
+            return;
+        }
         
-        //char l_content[] = getContentData().c_str();
-        //l_xml.parse<0>( l_content );
+        std::cout << l_content.content << std::endl;
     }
     
     
@@ -175,6 +199,7 @@ namespace machinelearning { namespace tools { namespace sources {
         
         std::string l_header;
         unsigned int l_status = sendRequest( l_prop.randomurl.host, l_prop.randomurl.path, l_header, false );
+        m_socket.close();
         if (l_status != 302)
             throwHTTPError(l_status);
         
@@ -194,7 +219,101 @@ namespace machinelearning { namespace tools { namespace sources {
         // get the article
         getArticle( l_url.substr(l_found+1), l_prop.lang );
     }
+    
+    
+    /** method for parsing the XML data with libxml
+     * @param p_xml string with XML data
+     * @return struct with article native data
+     **/
+    inline wikipedia::wikiarticle wikipedia::parseXML( const std::string& p_xml ) const
+    {
+        wikiarticle l_data;
+        bool l_error = false;
+        
+        // convert std::string into char array for memory parsing
+        const char* l_xmlcontent = p_xml.c_str();
+        xmlDocPtr l_xml           = xmlParseMemory( l_xmlcontent, strlen(l_xmlcontent) );
+        if (l_xml == NULL)
+            throw exception::parameter(_("XML data can not be parsed"));
+        
+        // extract the namespace 
+        xmlNodePtr l_node = xmlDocGetRootElement( l_xml );
+        std::string l_namespace( (char*)xmlGetProp(l_node, (xmlChar*)"schemaLocation") );
+        std::size_t l_found = l_namespace.find(" ");
+        if ( (l_namespace.empty()) || (l_found == std::string::npos) ) {
+            xmlFreeDoc( l_xml );
+            xmlCleanupParser();
+            
+            throw exception::parameter(_("can not detect namespace"));
+        }
+        l_namespace = l_namespace.substr(0, l_found );
+  
+        
+        
+        // create XPath context and namespace (create a prefix "wiki" for searching the XML tree)
+        xmlXPathContextPtr l_tree = xmlXPathNewContext( l_xml );
+        xmlXPathRegisterNs(l_tree, (xmlChar*)"wiki", (xmlChar*)l_namespace.c_str());
+        xmlXPathObjectPtr l_result;
 
+        // extract the content data, search with XPath the node and extract the content
+        
+        // /mediawiki/page/title              => article title
+        // /mediawiki/page/id                 => article id
+        // /mediawiki/page/revision/text      => article data
+        // /mediawiki/page/revision/id        => revision id
+
+        l_result = xmlXPathEvalExpression( (xmlChar*)"/wiki:mediawiki/wiki:page/wiki:title", l_tree );
+        if ( (!l_error) && (!xmlXPathNodeSetIsEmpty(l_result->nodesetval)) && (l_result->nodesetval->nodeNr == 1) )
+            l_data.title = std::string(  (char*)xmlNodeListGetString(l_xml, l_result->nodesetval->nodeTab[0]->xmlChildrenNode, 1)  );
+        else
+            l_error = true;
+        xmlXPathFreeObject(l_result);
+        
+        
+        l_result = xmlXPathEvalExpression( (xmlChar*)"/wiki:mediawiki/wiki:page/wiki:id", l_tree );
+        if ( (!l_error) && (!xmlXPathNodeSetIsEmpty(l_result->nodesetval)) && (l_result->nodesetval->nodeNr == 1) )
+            try {
+                l_data.articleid = boost::lexical_cast<std::size_t>( (char*)xmlNodeListGetString(l_xml, l_result->nodesetval->nodeTab[0]->xmlChildrenNode, 1) );
+            } catch (...) {
+                l_error = true;
+            }
+        else
+            l_error = true;
+        xmlXPathFreeObject(l_result);
+        
+        
+        l_result = xmlXPathEvalExpression( (xmlChar*)"/wiki:mediawiki/wiki:page/wiki:revision/wiki:text", l_tree );
+        if ( (!l_error) && (!xmlXPathNodeSetIsEmpty(l_result->nodesetval)) && (l_result->nodesetval->nodeNr == 1) )
+            l_data.content = std::string(  (char*)xmlNodeListGetString(l_xml, l_result->nodesetval->nodeTab[0]->xmlChildrenNode, 1)  );
+        else
+            l_error = true;
+        xmlXPathFreeObject(l_result);
+
+        
+        l_result = xmlXPathEvalExpression( (xmlChar*)"/wiki:mediawiki/wiki:page/wiki:revision/wiki:id", l_tree );
+        if ( (!l_error) && (!xmlXPathNodeSetIsEmpty(l_result->nodesetval)) && (l_result->nodesetval->nodeNr == 1) )
+            try {
+                l_data.revisionid = boost::lexical_cast<std::size_t>( (char*)xmlNodeListGetString(l_xml, l_result->nodesetval->nodeTab[0]->xmlChildrenNode, 1) );
+            } catch (...) {
+                l_error = true;
+            }
+        else
+            l_error = true;
+        xmlXPathFreeObject(l_result);
+        
+        // clear libxml structure
+        xmlXPathFreeContext( l_tree );
+        xmlFreeDoc( l_xml );
+        xmlCleanupParser();
+        
+    
+        if (l_error)
+            throw exception::parameter(_("XML data can not be parsed"));
+
+        return l_data;
+        
+    }
+    
     
     /** reads the whole data until socket is EOF
      * @return string data
@@ -212,7 +331,6 @@ namespace machinelearning { namespace tools { namespace sources {
             throw exception::parameter(_("data can not received"));
         
         std::string l_data( (std::istreambuf_iterator<char>(l_response_stream)), std::istreambuf_iterator<char>());        
-        m_socket.close();
         
         return l_data;
     }
@@ -264,6 +382,7 @@ namespace machinelearning { namespace tools { namespace sources {
 
     
     /** create DNS and HTTP request and returns the status code and the HTTP header
+     * @note method open / creates a socket within the member variable, so after all is done, the socket must be closed manually
      * @param p_server server adress
      * @param p_path path to the document
      * @param p_header returning HTTP header
