@@ -69,6 +69,8 @@ namespace machinelearning { namespace tools { namespace sources {
             std::size_t getArticleRevision( void ) const;
             std::size_t getArticleID( void ) const;
             std::vector<std::string> getArticleLabel( void ) const;
+            bool isAcronym( void ) const;
+            bool isArticle( void ) const;
         
         
         private :
@@ -107,7 +109,9 @@ namespace machinelearning { namespace tools { namespace sources {
             bip::tcp::socket m_socket; 
             /** bool for founded article **/
             bool m_articlefound;
-            /** article data **/
+            /** bool for founded acronym page **/
+            bool m_acronymfound;
+            /** property for saving the last-call article data **/
             wikiarticle m_article;
         
             wikiproperties getProperties( const language& ) const;
@@ -127,7 +131,8 @@ namespace machinelearning { namespace tools { namespace sources {
         m_defaultproperties( getProperties(p_lang) ),
         m_io(),
         m_socket(m_io),
-        m_articlefound( false )
+        m_articlefound( false ),
+        m_acronymfound( false )
     {}
     
 
@@ -201,8 +206,16 @@ namespace machinelearning { namespace tools { namespace sources {
 
         
         // parse content data (category, acronyms, ...)
+        boost::smatch l_what;
         
         // check if the content is acronym page, than extract the acronyms
+        const boost::regex l_acronympattern( "'''" + m_article.title + "'''", boost::regex_constants::perl );
+        if (boost::regex_search(m_article.content, l_what, l_acronympattern)) {
+            m_acronymfound = true;
+            return;
+        }
+
+        
         /*
          % String für Kommata der Übersicht halber in eigene Variable
          % der Suchberiff steht in '''
@@ -213,13 +226,12 @@ namespace machinelearning { namespace tools { namespace sources {
         */
         
         // extract category with regular expression \[\[<category name>:(.*?)\]\] (hint: non-greedy excepted)
-        const boost::regex l_pattern( "\\[\\["+l_prop.category +":(.*?)\\]\\]", boost::regex_constants::icase | boost::regex_constants::perl );
+        const boost::regex l_categorypattern( "\\[\\[" + l_prop.category + ":(.*?)\\]\\]", boost::regex_constants::icase | boost::regex_constants::perl );
 
-        boost::smatch l_what;
         std::string::const_iterator it    = m_article.content.begin();
         std::string::const_iterator l_end = m_article.content.end();
         
-        while (boost::regex_search(it, l_end, l_what, l_pattern)) {
+        while (boost::regex_search(it, l_end, l_what, l_categorypattern)) {
             std::string l_label(l_what[1]);
             m_article.label.push_back( l_label.substr(0, l_label.find("|")) );
             it = l_what[0].second;
@@ -284,6 +296,21 @@ namespace machinelearning { namespace tools { namespace sources {
         return m_article.label;
     }
     
+    /** return bool if article is acronym page
+     * @return bool
+     **/
+    inline bool wikipedia::isAcronym( void ) const
+    {
+        return m_acronymfound;
+    }
+    
+    /** return bool if article is found
+     * @return bool
+     **/
+    inline bool wikipedia::isArticle( void ) const
+    {
+        return m_articlefound;
+    }
     
     
     /** reads an random article
