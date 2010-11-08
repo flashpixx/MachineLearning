@@ -54,8 +54,8 @@ int main(int argc, char *argv[]) {
     #ifdef SOURCES
     tl::sources::wikipedia w;
     //w.getArticle("schäfer");
-    w.getArticle("RMI");
-    //w.getRandomArticle();
+    //w.getArticle("RMI");
+    w.getRandomArticle();
     #endif
     
     

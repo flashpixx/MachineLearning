@@ -183,8 +183,10 @@ namespace machinelearning { namespace tools { namespace sources {
             getArticle(l_content.content.substr(12, l_content.content.size()-14), p_lang);
             return;
         }
+
         
-        std::cout << l_content.content << std::endl;
+        // parse content data (category, languages, ...)
+        
     }
     
     
