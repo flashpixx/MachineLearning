@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
     #endif
     
     #ifdef FILES
-    tl::files::hdf o("blub.hdf5");
+    //tl::files::hdf o("blub.hdf5");
     #endif
    
     // ===== Wikipedia ======
