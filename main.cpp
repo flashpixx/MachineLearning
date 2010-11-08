@@ -56,6 +56,8 @@ int main(int argc, char *argv[]) {
     //w.getArticle("schäfer");
     //w.getArticle("RMI");
     w.getRandomArticle();
+    
+    std::cout << w.getArticleContent() << std::endl;
     #endif
     
     

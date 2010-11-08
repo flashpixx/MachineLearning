@@ -54,7 +54,7 @@ def configuration_macosx(config, version, architecture) :
         
     if GetOption("withsources") != None :
         config["compileflags"]      += " -D SOURCES"
-        config["linkto"].extend( ["xml2"] )
+        config["linkto"].extend( ["xml2", "boost_regex"] )
         
     if GetOption("withfiles") != None :
         config["compileflags"]      += " -D FILES"
@@ -87,7 +87,7 @@ def configuration_posix(config, version, architecture) :
 
     if GetOption("withsources") != None :
         config["compileflags"]      += " -D SOURCES"
-        config["linkto"].extend( ["xml2"] )
+        config["linkto"].extend( ["xml2", "boost_regex"] )
 
     if GetOption("withfiles") != None :
         config["compileflags"]      += " -D FILES"

@@ -28,6 +28,7 @@
 
 #include <algorithm>
 #include <boost/asio.hpp>
+#include <boost/regex.hpp>
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
@@ -63,6 +64,12 @@ namespace machinelearning { namespace tools { namespace sources {
             void getArticle( const std::string&, const language& = de_DE );
             void getRandomArticle( const language& = de_DE );
         
+            std::string getArticleContent( void ) const;
+            std::string getArticleTitle( void ) const;
+            std::size_t getArticleRevision( void ) const;
+            std::size_t getArticleID( void ) const;
+            std::vector<std::string> getArticleLabel( void ) const;
+        
         
         private :
         
@@ -88,6 +95,7 @@ namespace machinelearning { namespace tools { namespace sources {
                 std::string title;
                 std::size_t articleid;
                 std::size_t revisionid;
+                std::vector<std::string> label;
             };
         
         
@@ -97,6 +105,10 @@ namespace machinelearning { namespace tools { namespace sources {
             boost::asio::io_service m_io;
             /** socket objekt for send / receive the data **/
             bip::tcp::socket m_socket; 
+            /** bool for founded article **/
+            bool m_articlefound;
+            /** article data **/
+            wikiarticle m_article;
         
             wikiproperties getProperties( const language& ) const;
             unsigned int sendRequest( const std::string&, const std::string&, std::string&, const bool& = true );
@@ -114,7 +126,8 @@ namespace machinelearning { namespace tools { namespace sources {
     inline wikipedia::wikipedia( const language& p_lang ) :
         m_defaultproperties( getProperties(p_lang) ),
         m_io(),
-        m_socket(m_io)
+        m_socket(m_io),
+        m_articlefound( false )
     {}
     
 
@@ -160,6 +173,8 @@ namespace machinelearning { namespace tools { namespace sources {
      **/
     inline void wikipedia::getArticle( const std::string& p_search, const language& p_lang )
     {
+        m_articlefound = false;
+        
         wikiproperties l_prop = m_defaultproperties;
         if (l_prop.lang != p_lang)
             l_prop = getProperties( p_lang );
@@ -176,18 +191,88 @@ namespace machinelearning { namespace tools { namespace sources {
         m_socket.close();
         
         // get native XML data and analyse content
-        wikiarticle l_content = parseXML( l_xml );
+        m_article = parseXML( l_xml );
         
         // check if exists redirect in the content data, run a new request
-        if (l_content.content.find("#redirect") != std::string::npos) {
-            getArticle(l_content.content.substr(12, l_content.content.size()-14), p_lang);
+        if (m_article.content.find("#redirect") != std::string::npos) {
+            getArticle(m_article.content.substr(12, m_article.content.size()-14), p_lang);
             return;
         }
 
         
         // parse content data (category, languages, ...)
         
+        // extract category with regular expression \[\[<category name>:(.*?)\]\] (hint: non-greedy excepted)
+        const boost::regex l_pattern( "\\[\\["+l_prop.category +":(.*?)\\]\\]", boost::regex_constants::icase | boost::regex_constants::perl );
+
+        boost::smatch l_what;
+        std::string::const_iterator it    = m_article.content.begin();
+        std::string::const_iterator l_end = m_article.content.end();
+        
+        while (boost::regex_search(it, l_end, l_what, l_pattern)) {
+            m_article.label.push_back( l_what[1] );
+            it = l_what[0].second;
+        }
+        
+        m_articlefound = true;    
     }
+    
+    
+    /** returns the article content
+     * @return content
+     **/
+    inline std::string wikipedia::getArticleContent( void ) const
+    {
+        if (!m_articlefound)
+            throw exception::parameter(_("no article is loaded"));
+        
+        return m_article.content;
+    }
+    
+    /** returns the article title
+     * @return title
+     **/
+    inline std::string wikipedia::getArticleTitle( void ) const
+    {
+        if (!m_articlefound)
+            throw exception::parameter(_("no article is loaded"));
+        
+        return m_article.title;
+    }
+    
+    /** return revision id
+     * @return article revision id
+     **/
+    inline std::size_t wikipedia::getArticleRevision( void ) const
+    {
+        if (!m_articlefound)
+            throw exception::parameter(_("no article is loaded"));
+        
+        return m_article.revisionid;
+    }
+    
+    /** return article id
+     * @return article id
+     **/
+    inline std::size_t wikipedia::getArticleID( void ) const
+    {
+        if (!m_articlefound)
+            throw exception::parameter(_("no article is loaded"));
+        
+        return m_article.articleid;
+    }
+    
+    /** return article labels
+     * @return label
+     **/
+    inline std::vector<std::string> wikipedia::getArticleLabel( void ) const
+    {
+        if (!m_articlefound)
+            throw exception::parameter(_("no article is loaded"));
+        
+        return m_article.label;
+    }
+    
     
     
     /** reads an random article
@@ -195,6 +280,8 @@ namespace machinelearning { namespace tools { namespace sources {
      **/
     inline void wikipedia::getRandomArticle( const language& p_lang )
     {
+        m_articlefound = false;
+        
         wikiproperties l_prop = m_defaultproperties;
         if (l_prop.lang != p_lang)
             l_prop = getProperties( p_lang );
@@ -307,8 +394,7 @@ namespace machinelearning { namespace tools { namespace sources {
         xmlXPathFreeContext( l_tree );
         xmlFreeDoc( l_xml );
         xmlCleanupParser();
-        
-    
+           
         if (l_error)
             throw exception::parameter(_("XML data can not be parsed"));
 
