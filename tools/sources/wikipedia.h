@@ -203,7 +203,14 @@ namespace machinelearning { namespace tools { namespace sources {
         // parse content data (category, acronyms, ...)
         
         // check if the content is acronym page, than extract the acronyms
-        
+        /*
+         % String für Kommata der Übersicht halber in eigene Variable
+         % der Suchberiff steht in '''
+         lc = '''''''';
+         lc = regexpi(this.gxLastArticle.content, strcat(lc,pcSearch,lc,'.*',this.gxLang.(pcLang).acronymref), 'match');
+         
+         rl = not(isempty(lc));
+        */
         
         // extract category with regular expression \[\[<category name>:(.*?)\]\] (hint: non-greedy excepted)
         const boost::regex l_pattern( "\\[\\["+l_prop.category +":(.*?)\\]\\]", boost::regex_constants::icase | boost::regex_constants::perl );
