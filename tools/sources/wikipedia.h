@@ -200,7 +200,10 @@ namespace machinelearning { namespace tools { namespace sources {
         }
 
         
-        // parse content data (category, languages, ...)
+        // parse content data (category, acronyms, ...)
+        
+        // check if the content is acronym page, than extract the acronyms
+        
         
         // extract category with regular expression \[\[<category name>:(.*?)\]\] (hint: non-greedy excepted)
         const boost::regex l_pattern( "\\[\\["+l_prop.category +":(.*?)\\]\\]", boost::regex_constants::icase | boost::regex_constants::perl );
@@ -210,7 +213,8 @@ namespace machinelearning { namespace tools { namespace sources {
         std::string::const_iterator l_end = m_article.content.end();
         
         while (boost::regex_search(it, l_end, l_what, l_pattern)) {
-            m_article.label.push_back( l_what[1] );
+            std::string l_label(l_what[1]);
+            m_article.label.push_back( l_label.substr(0, l_label.find("|")) );
             it = l_what[0].second;
         }
         

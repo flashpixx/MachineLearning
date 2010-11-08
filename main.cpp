@@ -54,10 +54,15 @@ int main(int argc, char *argv[]) {
     #ifdef SOURCES
     tl::sources::wikipedia w;
     //w.getArticle("schäfer");
-    //w.getArticle("RMI");
-    w.getRandomArticle();
+    w.getArticle("RMI");
+    //w.getRandomArticle();
     
-    std::cout << w.getArticleContent() << std::endl;
+    std::cout << w.getArticleContent() << "\n==========================================================" << std::endl;
+    std::vector<std::string> label = w.getArticleLabel();
+    
+    for(std::size_t i=0; i < label.size(); ++i)
+        std::cout << label[i] << std::endl;
+
     #endif
     
     
