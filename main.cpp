@@ -53,9 +53,9 @@ int main(int argc, char *argv[]) {
     // ===== Wikipedia ======
     #ifdef SOURCES
     tl::sources::wikipedia w;
-    w.getArticle("schäfer");
+    //w.getArticle("schäfer");
     //w.getArticle("RMI");
-    //w.getRandomArticle();
+    w.getRandomArticle();
     
     std::vector<std::string> k;
     if (w.isArticle()) {

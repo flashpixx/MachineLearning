@@ -106,8 +106,10 @@ namespace machinelearning { namespace tools { namespace sources {
             const wikiproperties m_defaultproperties;
             /** io service objekt for resolving the server name**/
             boost::asio::io_service m_io;
+
             /** socket objekt for send / receive the data **/
             bip::tcp::socket m_socket; 
+            std::string m_lastserver;
             /** bool for founded article **/
             bool m_articlefound;
             /** bool for founded acronym page **/
@@ -116,10 +118,10 @@ namespace machinelearning { namespace tools { namespace sources {
             wikiarticle m_article;
             /** acronym vector **/
             std::vector<std::string> m_acronym;
+
         
             wikiproperties getProperties( const language& ) const;
             unsigned int sendRequest( const std::string&, const std::string&, std::string&, const bool& = true );
-            unsigned int send( const std::string&, const std::string&, std::string&, const bool& = true );
             std::string getContentData( void ); 
             void throwHTTPError( const unsigned int& ) const;   
             wikiarticle parseXML( const std::string& ) const;
@@ -134,6 +136,7 @@ namespace machinelearning { namespace tools { namespace sources {
         m_defaultproperties( getProperties(p_lang) ),
         m_io(),
         m_socket(m_io),
+        m_lastserver(),
         m_articlefound( false ),
         m_acronymfound( false ),
         m_acronym()
@@ -476,15 +479,34 @@ namespace machinelearning { namespace tools { namespace sources {
     }
     
     
-    /** sends the HTTP request to the Wikipedua server and receives the header
+    /** sends the HTTP request to the Wikipedia server and receives the header
      * @param p_server server adress
      * @param p_path path to the document
      * @param p_header returning HTTP header
      * @param p_throw bool for throwing error
      * @return status code
      **/
-    inline unsigned int wikipedia::send( const std::string& p_server, const std::string& p_path, std::string& p_header, const bool& p_throw )
+    inline unsigned int wikipedia::sendRequest( const std::string& p_server, const std::string& p_path, std::string& p_header, const bool& p_throw )
     {
+        // create resolver for server
+        bip::tcp::resolver l_resolver(m_io);
+        bip::tcp::resolver::query l_query(p_server, "http");
+        
+        // try to connect the server
+        bip::tcp::resolver::iterator l_endpoint = l_resolver.resolve( l_query );
+        bip::tcp::resolver::iterator l_endpointend;
+        boost::system::error_code l_error       = boost::asio::error::host_not_found;
+        
+        while (l_error && l_endpoint != l_endpointend) {
+            m_socket.close();
+            m_socket.connect(*l_endpoint++, l_error);
+        }
+        
+        if (l_error)
+            throw exception::parameter(_("can not connect to wikipedia server"));
+        
+        
+        
         // create HTTP request and send them over the socket
         // we need a field for the user-agent, because Wikipedia will blocked the IP
         boost::asio::streambuf l_request;
@@ -520,37 +542,6 @@ namespace machinelearning { namespace tools { namespace sources {
         return l_status;
     }
 
-    
-    /** create DNS and HTTP request and returns the status code and the HTTP header
-     * @note method open / creates a socket within the member variable, so after all is done, the socket must be closed manually
-     * @param p_server server adress
-     * @param p_path path to the document
-     * @param p_header returning HTTP header
-     * @param p_throw bool for throwing error
-     * @return status code
-     **/
-    inline unsigned int wikipedia::sendRequest( const std::string& p_server, const std::string& p_path, std::string& p_header, const bool& p_throw )
-    {
-        // create resolver for server
-        bip::tcp::resolver l_resolver(m_io);
-        bip::tcp::resolver::query l_query(p_server, "http");
-        
-        // try to connect the server
-        bip::tcp::resolver::iterator l_endpoint = l_resolver.resolve( l_query );
-        bip::tcp::resolver::iterator l_endpointend;
-        boost::system::error_code l_error       = boost::asio::error::host_not_found;
-        
-        while (l_error && l_endpoint != l_endpointend) {
-            m_socket.close();
-            m_socket.connect(*l_endpoint++, l_error);
-        }
-        
-        if (l_error)
-            throw exception::parameter(_("can not connect to wikipedia server"));
-        
-        return send(p_server, p_path, p_header, p_throw);
-    }
-    
     
     /** create an exception on the status code
      * @param p_status status code
