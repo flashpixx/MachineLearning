@@ -32,7 +32,9 @@ namespace machinelearning { namespace exception {
     /** exception class for throwing on matrix errors **/
     matrix::matrix( const std::string& p_str ) : std::runtime_error(p_str) {}  
     
-    /** exception class for throwing on parameter errors **/
+    /** exception class for throwing on parameter errors 
+     * @todo rename to runtime
+     **/
     parameter::parameter( const std::string& p_str ) : std::runtime_error(p_str) {}
     
 };};

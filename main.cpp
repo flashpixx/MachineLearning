@@ -53,17 +53,21 @@ int main(int argc, char *argv[]) {
     // ===== Wikipedia ======
     #ifdef SOURCES
     tl::sources::wikipedia w;
-    //w.getArticle("schäfer");
-    w.getArticle("RMI");
+    w.getArticle("schäfer");
+    //w.getArticle("RMI");
     //w.getRandomArticle();
     
-    /*
-    std::cout << w.getArticleContent() << "\n==========================================================" << std::endl;
-    std::vector<std::string> label = w.getArticleLabel();
+    std::vector<std::string> k;
+    if (w.isArticle()) {
+        std::cout << w.getArticleContent() << "\n==========================================================" << std::endl;
+        k = w.getArticleLabel();
+    } else
+        k = w.getArticleAcronym();
     
-    for(std::size_t i=0; i < label.size(); ++i)
-        std::cout << label[i] << std::endl;
-    */
+    
+    for(std::size_t i=0; i < k.size(); ++i)
+        std::cout << k[i] << std::endl;
+    
     #endif
     
     

@@ -156,7 +156,6 @@ namespace machinelearning { namespace tools { namespace sources {
                 l_prop.randomurl.host   = "en.wikipedia.org";
                 l_prop.randomurl.path   = "/wiki/Special:Random";
                 l_prop.acronymref       = "can refer to";
-                l_prop.acronym          = "Acronyms";
                 l_prop.category         = "Category";
                 return l_prop;
                 
@@ -166,7 +165,6 @@ namespace machinelearning { namespace tools { namespace sources {
                 l_prop.randomurl.host   = "de.wikipedia.org";
                 l_prop.randomurl.path   = "/wiki/Spezial:Zuf%C3%A4llige_Seite";
                 l_prop.acronymref       = "steht für";
-                l_prop.acronym          = "Abkürzung";
                 l_prop.category         = "Kategorie";
                 return l_prop;
 
@@ -212,31 +210,38 @@ namespace machinelearning { namespace tools { namespace sources {
         
         // parse content data (category, acronyms, ...)
         boost::smatch l_what;
-        
-        // check if the content is acronym page, than extract the acronyms
-        const boost::regex l_acronympattern( "'''" + m_article.title + "'''", boost::regex_constants::perl );
-        if (boost::regex_search(m_article.content, l_what, l_acronympattern)) {
-            const boost::regex l_acronyms( "\\*[[:space:]]*\\[\\[" + l_prop.category + ":(.*?)\\]\\]", boost::regex_constants::icase | boost::regex_constants::perl );
+        std::string::const_iterator it    = m_article.content.begin();
+        std::string::const_iterator l_end = m_article.content.end();
 
-            
+        // check if the content is acronym page, than extract the acronyms (hint: non-greedy excepted)
+        const boost::regex l_acronympattern( "'''" + m_article.title + "'''[[:space:]]+"+l_prop.acronymref+":", boost::regex_constants::perl );
+        if (boost::regex_search(m_article.content, l_what, l_acronympattern)) {
+            const boost::regex l_acronyms( "\\*[[:space:]]*\\[\\[(.*?)\\]\\]", boost::regex_constants::perl );
+
+            while (boost::regex_search(it, l_end, l_what, l_acronyms)) {
+                m_acronym.push_back( l_what[1] );
+                it = l_what[0].second;
+            }
             
             m_acronymfound = true;
-            std::cout << m_article.content << std::endl;
             return;
         }
 
         
         // extract category with regular expression \[\[<category name>:(.*?)\]\] (hint: non-greedy excepted)
-        const boost::regex l_categorypattern( "\\[\\[" + l_prop.category + ":(.*?)\\]\\]", boost::regex_constants::icase | boost::regex_constants::perl );
-
-        std::string::const_iterator it    = m_article.content.begin();
-        std::string::const_iterator l_end = m_article.content.end();
+        const boost::regex l_categorypattern( "\\[\\[" + l_prop.category + ":(.*?)\\]\\][[:space:]]*", boost::regex_constants::icase | boost::regex_constants::perl );
         
         while (boost::regex_search(it, l_end, l_what, l_categorypattern)) {
             std::string l_label(l_what[1]);
             m_article.label.push_back( l_label.substr(0, l_label.find("|")) );
             it = l_what[0].second;
         }
+        
+        // remove languages (short codes are found in ISO 639-1) and labels (at the end of the expression we set a [[:space:]]* for removing CR or LF)
+        m_article.content = boost::regex_replace(m_article.content, l_categorypattern, "");
+        
+        const boost::regex l_langpattern( "\\[\\[(aa|ab|af|am|ar|as|ay|az|ba|be|bg|bh|bi|bn|bo|br|ca|co|cs|cy|da|de|dz|el|en|eo|es|et|eu|fa|fi|fj|fo|fr|fy|ga|gd|gl|gn|gu|ha|hi|he|hr|hu|hy|ia|id|ie|ik|in|is|it|iu|iw|ja|ji|jw|ka|kk|kl|km|kn|ko|ks|ku|ky|la|ln|lo|lt|lv|mg|mi|mk|ml|mn|mo|mr|ms|mt|my|na|ne|nl|no|oc|om|or|pa|pl|ps|pt|qu|rm|rn|ro|ru|rw|sa|sd|sg|sh|si|sk|sl|sm|sn|so|sq|sr|ss|st|su|sv|sw|ta|te|tg|th|ti|tk|tl|tn|to|tr|ts|tt|tw|ug|uk|ur|uz|vi|vo|wo|xh|yi|yo|za|zh|zu):(.*?)\\]\\][[:space:]]*", boost::regex_constants::perl );
+        m_article.content = boost::regex_replace(m_article.content, l_langpattern, "");
         
         m_articlefound = true;    
     }
