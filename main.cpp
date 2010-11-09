@@ -57,12 +57,13 @@ int main(int argc, char *argv[]) {
     w.getArticle("RMI");
     //w.getRandomArticle();
     
+    /*
     std::cout << w.getArticleContent() << "\n==========================================================" << std::endl;
     std::vector<std::string> label = w.getArticleLabel();
     
     for(std::size_t i=0; i < label.size(); ++i)
         std::cout << label[i] << std::endl;
-
+    */
     #endif
     
     

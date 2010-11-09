@@ -69,6 +69,7 @@ namespace machinelearning { namespace tools { namespace sources {
             std::size_t getArticleRevision( void ) const;
             std::size_t getArticleID( void ) const;
             std::vector<std::string> getArticleLabel( void ) const;
+            std::vector<std::string> getArticleAcronym( void ) const;
             bool isAcronym( void ) const;
             bool isArticle( void ) const;
         
@@ -113,6 +114,8 @@ namespace machinelearning { namespace tools { namespace sources {
             bool m_acronymfound;
             /** property for saving the last-call article data **/
             wikiarticle m_article;
+            /** acronym vector **/
+            std::vector<std::string> m_acronym;
         
             wikiproperties getProperties( const language& ) const;
             unsigned int sendRequest( const std::string&, const std::string&, std::string&, const bool& = true );
@@ -132,7 +135,8 @@ namespace machinelearning { namespace tools { namespace sources {
         m_io(),
         m_socket(m_io),
         m_articlefound( false ),
-        m_acronymfound( false )
+        m_acronymfound( false ),
+        m_acronym()
     {}
     
 
@@ -179,6 +183,7 @@ namespace machinelearning { namespace tools { namespace sources {
     inline void wikipedia::getArticle( const std::string& p_search, const language& p_lang )
     {
         m_articlefound = false;
+        m_acronym.clear();
         
         wikiproperties l_prop = m_defaultproperties;
         if (l_prop.lang != p_lang)
@@ -211,19 +216,15 @@ namespace machinelearning { namespace tools { namespace sources {
         // check if the content is acronym page, than extract the acronyms
         const boost::regex l_acronympattern( "'''" + m_article.title + "'''", boost::regex_constants::perl );
         if (boost::regex_search(m_article.content, l_what, l_acronympattern)) {
+            const boost::regex l_acronyms( "\\*[[:space:]]*\\[\\[" + l_prop.category + ":(.*?)\\]\\]", boost::regex_constants::icase | boost::regex_constants::perl );
+
+            
+            
             m_acronymfound = true;
+            std::cout << m_article.content << std::endl;
             return;
         }
 
-        
-        /*
-         % String für Kommata der Übersicht halber in eigene Variable
-         % der Suchberiff steht in '''
-         lc = '''''''';
-         lc = regexpi(this.gxLastArticle.content, strcat(lc,pcSearch,lc,'.*',this.gxLang.(pcLang).acronymref), 'match');
-         
-         rl = not(isempty(lc));
-        */
         
         // extract category with regular expression \[\[<category name>:(.*?)\]\] (hint: non-greedy excepted)
         const boost::regex l_categorypattern( "\\[\\[" + l_prop.category + ":(.*?)\\]\\]", boost::regex_constants::icase | boost::regex_constants::perl );
@@ -294,6 +295,14 @@ namespace machinelearning { namespace tools { namespace sources {
             throw exception::parameter(_("no article is loaded"));
         
         return m_article.label;
+    }
+    
+    /** return a std::vector with acronyms
+     * @return vector
+     **/
+    inline std::vector<std::string> wikipedia::getArticleAcronym( void ) const
+    {
+        return m_acronym;
     }
     
     /** return bool if article is acronym page
