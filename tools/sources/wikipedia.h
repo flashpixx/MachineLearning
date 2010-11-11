@@ -73,6 +73,8 @@ namespace machinelearning { namespace tools { namespace sources {
             bool isAcronym( void ) const;
             bool isArticle( void ) const;
         
+            ~wikipedia( void );
+        
         
         private :
         
@@ -109,7 +111,10 @@ namespace machinelearning { namespace tools { namespace sources {
 
             /** socket objekt for send / receive the data **/
             bip::tcp::socket m_socket; 
+            /** string for caching the server host name **/
             std::string m_lastserver;
+            /** IP for caching the server endpoint **/
+            bip::tcp::endpoint m_lastendpoint;
             /** bool for founded article **/
             bool m_articlefound;
             /** bool for founded acronym page **/
@@ -137,10 +142,18 @@ namespace machinelearning { namespace tools { namespace sources {
         m_io(),
         m_socket(m_io),
         m_lastserver(),
+        m_lastendpoint(),
         m_articlefound( false ),
         m_acronymfound( false ),
         m_acronym()
     {}
+    
+    
+    /** destructor for closing the socket **/
+    inline wikipedia::~wikipedia( void )
+    {
+        m_socket.close();
+    }
     
 
     /** creates the properties of a language 
@@ -250,6 +263,42 @@ namespace machinelearning { namespace tools { namespace sources {
     }
     
     
+    /** reads an random article
+     * @param p_lang optional language
+     **/
+    inline void wikipedia::getRandomArticle( const language& p_lang )
+    {
+        m_articlefound = false;
+        
+        wikiproperties l_prop = m_defaultproperties;
+        if (l_prop.lang != p_lang)
+            l_prop = getProperties( p_lang );
+        
+        std::string l_header;
+        unsigned int l_status = sendRequest( l_prop.randomurl.host, l_prop.randomurl.path, l_header, false );
+        m_socket.close();
+        if (l_status != 302)
+            throwHTTPError(l_status);
+        
+        // read the location header tag and extract the URL
+        std::size_t l_found = l_header.find("Location:");
+        if (l_found == std::string::npos)
+            throw exception::parameter(_("can not find information within the http header"));
+        
+        // extract Location URL
+        const std::string l_url = l_header.substr(l_found+10, l_header.find("\r\n", l_found)-l_found-10);
+        
+        // extract document of the URL
+        l_found = l_url.rfind("/");
+        if (l_found == std::string::npos)
+            throw exception::parameter(_("can not find wikipedia document within the URL"));
+        
+        // get the article
+        getArticle( l_url.substr(l_found+1), l_prop.lang );
+    }
+    
+    
+    
     /** returns the article content
      * @return content
      **/
@@ -327,41 +376,6 @@ namespace machinelearning { namespace tools { namespace sources {
     inline bool wikipedia::isArticle( void ) const
     {
         return m_articlefound;
-    }
-    
-    
-    /** reads an random article
-     * @param p_lang optional language
-     **/
-    inline void wikipedia::getRandomArticle( const language& p_lang )
-    {
-        m_articlefound = false;
-        
-        wikiproperties l_prop = m_defaultproperties;
-        if (l_prop.lang != p_lang)
-            l_prop = getProperties( p_lang );
-        
-        std::string l_header;
-        unsigned int l_status = sendRequest( l_prop.randomurl.host, l_prop.randomurl.path, l_header, false );
-        m_socket.close();
-        if (l_status != 302)
-            throwHTTPError(l_status);
-        
-        // read the location header tag and extract the URL
-        std::size_t l_found = l_header.find("Location:");
-        if (l_found == std::string::npos)
-            throw exception::parameter(_("can not find information within the http header"));
-        
-        // extract Location URL
-        const std::string l_url = l_header.substr(l_found+10, l_header.find("\r\n", l_found)-l_found-10);
-        
-        // extract document of the URL
-        l_found = l_url.rfind("/");
-        if (l_found == std::string::npos)
-            throw exception::parameter(_("can not find wikipedia document within the URL"));
-        
-        // get the article
-        getArticle( l_url.substr(l_found+1), l_prop.lang );
     }
     
     
@@ -471,7 +485,7 @@ namespace machinelearning { namespace tools { namespace sources {
         while (boost::asio::read(m_socket, l_response, boost::asio::transfer_at_least(1), l_error));
         
         if (l_error != boost::asio::error::eof)
-            throw exception::parameter(_("data can not received"));
+            throw exception::parameter(_("data can not be received"));
         
         std::string l_data( (std::istreambuf_iterator<char>(l_response_stream)), std::istreambuf_iterator<char>());        
         
@@ -488,20 +502,29 @@ namespace machinelearning { namespace tools { namespace sources {
      **/
     inline unsigned int wikipedia::sendRequest( const std::string& p_server, const std::string& p_path, std::string& p_header, const bool& p_throw )
     {
-        // create resolver for server
-        bip::tcp::resolver l_resolver(m_io);
-        bip::tcp::resolver::query l_query(p_server, "http");
+        // check if changed the server name, if not we use the cached IP
+        boost::system::error_code l_error = boost::asio::error::host_not_found;
+        if (p_server != m_lastserver) {
+            m_lastserver = p_server;
+            
+            // create resolver for server
+            bip::tcp::resolver l_resolver(m_io);
+            bip::tcp::resolver::query l_query(p_server, "http");
         
-        // try to connect the server
-        bip::tcp::resolver::iterator l_endpoint = l_resolver.resolve( l_query );
-        bip::tcp::resolver::iterator l_endpointend;
-        boost::system::error_code l_error       = boost::asio::error::host_not_found;
-        
-        while (l_error && l_endpoint != l_endpointend) {
-            m_socket.close();
-            m_socket.connect(*l_endpoint++, l_error);
-        }
-        
+            // try to connect the server
+            bip::tcp::resolver::iterator l_endpoint = l_resolver.resolve( l_query );
+            bip::tcp::resolver::iterator l_endpointend;
+  
+            while (l_error && l_endpoint != l_endpointend) {
+                m_socket.close();
+                m_lastendpoint = *l_endpoint;
+                m_socket.connect(*l_endpoint++, l_error);
+            }
+
+        } else
+            m_socket.connect(m_lastendpoint, l_error);
+
+            
         if (l_error)
             throw exception::parameter(_("can not connect to wikipedia server"));
         
