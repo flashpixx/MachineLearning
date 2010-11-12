@@ -135,7 +135,7 @@ namespace machinelearning { namespace tools { namespace sources {
     
     
     /** constructor
-     * @apram p_lang optional language parameter (default de_DE)
+     * @param p_lang optional language parameter (default de_DE)
      **/
     inline wikipedia::wikipedia( const language& p_lang ) :
         m_defaultproperties( getProperties(p_lang) ),

@@ -28,8 +28,8 @@
 
 #include <string>
 #include <iostream>
-#include <istream>
-#include <ostream>
+//#include <algorithm>
+//#include <iterator>
 #include <boost/asio.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp> 
@@ -43,6 +43,42 @@ namespace machinelearning { namespace tools { namespace sources {
     
     namespace bip  = boost::asio::ip;
 
+    /*
+     
+     class dingsda {
+     public:
+     bool readItem(item& theItem);   // false, wenn keins mehr da
+     // oder
+     std::auto_ptr<item> readItem(); // 0, wenn keins mehr da
+     };
+
+     
+     
+     
+     class dingsda_iterator
+     : public std::iterator<std::input_iterator_tag,
+     item, std::size_t, item*, item&>
+     {
+     dingsda* d;
+     std::auto_ptr<item> i;
+     bool atEnd() const { return i.get()==0; }
+     public:
+     dingsda_iterator(dingsda& d)
+     : d(&d), i(d.readItem()) { }
+     dingsda_iterator()
+     : d(0), i(0) { }
+     bool operator==(const dingsda_iterator& a) const
+     { return atEnd() && a.atEnd(); }
+     item& operator*() { return *i; }
+     item* operator->() { return &*i; }
+     dingsda_iterator& operator++()
+     { i.reset(d->readItem()); return *this; }
+     };
+     
+     */
+    
+    
+    
     
     /** class for creating nntp connection (exspecially for creating distance matrix).
      * The class is a nntp client class without any post functionality (implements the RFC 3977)
@@ -62,8 +98,6 @@ namespace machinelearning { namespace tools { namespace sources {
             };
                 
             nntp( const std::string&, const std::string& = "nntp" );
-            std::string getServer( void ) const;
-            std::string getPortProtocoll( void ) const;
             std::map<std::string, std::size_t> getGroupList( void );
             std::vector<std::string> getArticleIDs( const std::string& );
             void setGroup( const std::string& );
@@ -79,24 +113,28 @@ namespace machinelearning { namespace tools { namespace sources {
         
         
             /** iterator class for iterating over articles **/
-            /*class iterator {
+            //friend class iterator;
+            class iterator : public std::iterator<std::input_iterator_tag, std::string, std::size_t, std::string*, std::string&> {
                 
-                //public :
+                public :
                 
-                    
+                    iterator( void );
+                    iterator( nntp& );
+                    bool operator==(const nntp&) const;
                 
+                
+                private :
+                
+                    nntp* m_nntp;
             };
-        
-            iterator begin( void );*/
+ 
+            iterator begin( void );
+            iterator end( void );   
         
         
         
         private :
         
-            /** string with server name **/
-            const std::string m_server;
-            /** port or protocoll - should be "nntp" **/
-            const std::string m_portprotocoll;
             /** io service objekt for resolving the server name**/
             boost::asio::io_service m_io;
             /** socket objekt for send / receive the data **/
@@ -116,14 +154,12 @@ namespace machinelearning { namespace tools { namespace sources {
      * @param p_portprotocoll port or protocoll name - shoudl be "nntp"
      **/
     inline nntp::nntp( const std::string& p_server, const std::string& p_portprotocoll ) :
-        m_server( p_server ),
-        m_portprotocoll( p_portprotocoll ),
         m_io(),
         m_socket(m_io)
     {
         // create resolver for server
         bip::tcp::resolver l_resolver(m_io);
-        bip::tcp::resolver::query l_query(m_server, m_portprotocoll);
+        bip::tcp::resolver::query l_query(p_server, p_portprotocoll);
                
         // try to connect the server
         bip::tcp::resolver::iterator l_endpoint = l_resolver.resolve( l_query );
@@ -149,26 +185,7 @@ namespace machinelearning { namespace tools { namespace sources {
     inline nntp::~nntp( void )
     {
         send("quit");
-        
         m_socket.close();
-    }
-    
-    
-    /** returns the server name
-     * @return server name
-     **/
-    inline std::string nntp::getServer( void ) const
-    {
-        return m_server;
-    }
-    
-    
-    /** returns the protocoll / port 
-     * @return protocoll port
-     **/
-    inline std::string nntp::getPortProtocoll( void ) const
-    {
-        return m_portprotocoll;
     }
     
     
@@ -218,17 +235,19 @@ namespace machinelearning { namespace tools { namespace sources {
         boost::asio::write(m_socket, l_request);
  
         
-        // read the first line
-        const std::string l_returnline = getResponseData("\r\n");
+        // read the headerline
+        const std::string l_header = getResponseData("\r\n");
 
         // copy the return value into a string and seperates the status code
         unsigned int l_status = 0;
         try {
-            l_status = boost::lexical_cast<unsigned int>( l_returnline.substr(0,3) );
+            l_status = boost::lexical_cast<unsigned int>( l_header.substr(0, 3) );
         } catch (...) {}
  
         if ( p_throw )
             throwNNTPError( l_status );
+        
+        std::cout << "===>" << l_header << "<===" << std::endl;
         
         return l_status;
     }
@@ -240,7 +259,7 @@ namespace machinelearning { namespace tools { namespace sources {
      **/
     inline std::string nntp::getResponseData( const std::string& p_separator )
     {
-        // read data into response after the last entry is a "dot CR/LR"
+        // read data into response after the last entry
         boost::asio::streambuf l_response;
         boost::asio::read_until(m_socket, l_response, p_separator);
         
@@ -464,12 +483,40 @@ namespace machinelearning { namespace tools { namespace sources {
     }
     
     
-    /*
-    inline nntp::iterator nntp::begin( void )
+    /** returns the begin iterator to an article
+     * @return nntp iterator
+     **/
+    nntp::iterator nntp::begin( void )
     {
-        send("stat");
-    }*/
+        return nntp::iterator( *this );
+    }
     
+    /** return the end iterator 
+     * @return nntp iterator
+     **/
+    nntp::iterator nntp::end( void )
+    {
+        return nntp::iterator();
+    }
+    
+    
+
+    //======= Iterator ==================================================================================================================================
+
+    /** constructor
+     * @overload
+     * @param p_nntp pointer to the nntp object
+     **/
+    inline nntp::iterator::iterator( nntp& p_nntp ) :
+        m_nntp( &p_nntp )
+    {}
+    
+    /** default constructor
+     * @overload
+     **/
+    inline nntp::iterator::iterator( void ) :
+        m_nntp( NULL )
+    {}
     
 
 };};};

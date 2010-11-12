@@ -51,6 +51,7 @@ int main(int argc, char *argv[]) {
     #endif
    
     // ===== Wikipedia ======
+    /*
     #ifdef SOURCES
     tl::sources::wikipedia w;
     //w.getArticle("schäfer");
@@ -69,17 +70,18 @@ int main(int argc, char *argv[]) {
         std::cout << k[i] << std::endl;
     
     #endif
-    
+    */
     
     // ===== Newsgroup ======
-    /*
+    
     // dt. große Gruppen: de.soc.politik.misc, de.rec.fotografie, de.talk.tagesgeschehen, de.etc.sprache.deutsch, de.comp.os.unix.linux.misc, de.sci.electronics, de.etc.fahrzeug.auto, de.comp.sys.mac.misc, de.comp.lang.java, de.soc.weltanschauung.christentum
     
     #ifdef SOURCES    
-    tl::sources::nntp x("news.online.de");
+    //tl::sources::nntp x("news.online.de");
     //tl::sources::nntp x("news.tu-clausthal.de");
+    tl::sources::nntp x("news.t-online.de");
     
-    
+    /*
     std::map<std::string, std::size_t> groups = x.getGroupList();
     
     // sort with size
@@ -89,14 +91,17 @@ int main(int argc, char *argv[]) {
             newsgroups.insert( std::pair<std::size_t, std::string>(it->second, it->first) );
     for (std::multimap<std::size_t, std::string>::iterator it = newsgroups.begin(); it != newsgroups.end(); ++it)
         std::cout << it->second << "\t\t\t" << it->first << std::endl;
+    */
     
-    
-    x.setGroup("1und1.announce");
+    //x.setGroup("1und1.announce");
+    //x.setGroup("tuc.misc");
+    x.setGroup("de.comp.text.misc");
     for(bool b=true; b; b=x.nextArticle())
-        std::cout << x.getArticle() << "\n>=================================================================================<" << std::endl;
+        x.getArticle();
+        //std::cout << x.getArticle( tl::sources::nntp::body ) << "\n>=================================================================================<" << std::endl;
     
     #endif
-    */
+    
     
     // ===== Gradient ======
     /*
