@@ -101,11 +101,13 @@ namespace machinelearning { namespace tools { namespace sources {
             std::map<std::string, std::size_t> getGroupList( void );
             std::vector<std::string> getArticleIDs( const std::string& );
             void setGroup( const std::string& );
-            std::string getArticle( const content& = body );
-            std::string getArticle( const std::string&, const content& = body );
-            std::string getArticle( const std::string&, const std::string&, const content& = body );
-            std::vector<std::string> getArticle( const std::string&, const std::vector<std::string>&, const content& = body );
-            std::vector<std::string> getArticle( const std::vector<std::string>&, const content& = body );
+            void setContent( const content& );
+            content getContent( void ) const;
+            std::string getArticle( void );
+            std::string getArticle( const std::string& );
+            std::string getArticle( const std::string&, const std::string& );
+            std::vector<std::string> getArticle( const std::string&, const std::vector<std::string>& );
+            std::vector<std::string> getArticle( const std::vector<std::string>& );
             bool existArticle( const std::string& );
             bool existArticle( const std::string&, const std::string& );
             bool nextArticle( void );
@@ -120,12 +122,17 @@ namespace machinelearning { namespace tools { namespace sources {
                 
                     iterator( void );
                     iterator( nntp& );
-                    bool operator==(const nntp&) const;
-                
+                    bool operator==( const iterator& ) const;
+                    bool operator!=( const iterator& ) const;
+                    iterator& operator++( int );
+                    std::string operator*( void );
+
                 
                 private :
                 
                     nntp* m_nntp;
+                    bool m_end;
+                
             };
  
             iterator begin( void );
@@ -138,7 +145,11 @@ namespace machinelearning { namespace tools { namespace sources {
             /** io service objekt for resolving the server name**/
             boost::asio::io_service m_io;
             /** socket objekt for send / receive the data **/
-            bip::tcp::socket m_socket;    
+            bip::tcp::socket m_socket;  
+            /** content option **/
+            content m_content;
+            /** string data for saving the last returned header for iterators **/
+            std::string m_header;
         
             unsigned int send( const std::string&, const bool& = true );
             void throwNNTPError( const unsigned int& ) const;
@@ -155,7 +166,9 @@ namespace machinelearning { namespace tools { namespace sources {
      **/
     inline nntp::nntp( const std::string& p_server, const std::string& p_portprotocoll ) :
         m_io(),
-        m_socket(m_io)
+        m_socket(m_io),
+        m_content( body ),
+        m_header()
     {
         // create resolver for server
         bip::tcp::resolver l_resolver(m_io);
@@ -174,10 +187,7 @@ namespace machinelearning { namespace tools { namespace sources {
         if (l_error)
             throw exception::parameter(_("cannot connect to news server"));
         
-        // read welcome line
-        boost::asio::streambuf l_response;
-        std::istream l_response_stream( &l_response );
-        boost::asio::read_until(m_socket, l_response, "\r\n" );
+        m_header = getResponseData("\r\n");
     }
     
     
@@ -186,6 +196,24 @@ namespace machinelearning { namespace tools { namespace sources {
     {
         send("quit");
         m_socket.close();
+    }
+    
+    
+    /** sets the content option
+     * @param content option
+     **/
+    inline void nntp::setContent( const content& p_content )
+    {
+        m_content = p_content;
+    }
+    
+    
+    /** returns the content option
+     * @return content option
+     **/
+    inline nntp::content nntp::getContent( void ) const
+    {
+        return m_content;
     }
     
     
@@ -236,18 +264,16 @@ namespace machinelearning { namespace tools { namespace sources {
  
         
         // read the headerline
-        const std::string l_header = getResponseData("\r\n");
+        m_header = getResponseData("\r\n");
 
         // copy the return value into a string and seperates the status code
         unsigned int l_status = 0;
         try {
-            l_status = boost::lexical_cast<unsigned int>( l_header.substr(0, 3) );
+            l_status = boost::lexical_cast<unsigned int>( m_header.substr(0, 3) );
         } catch (...) {}
  
         if ( p_throw )
             throwNNTPError( l_status );
-        
-        std::cout << "===>" << l_header << "<===" << std::endl;
         
         return l_status;
     }
@@ -330,14 +356,13 @@ namespace machinelearning { namespace tools { namespace sources {
     /** returns an article
      * @param p_group newsgroup
      * @param p_articleid article ID (not message id)
-     * @param p_content switch for reading full article, head or body only (default body only)
      * @return message
      **/
-    inline std::string nntp::getArticle( const std::string& p_group, const std::string& p_articleid, const content& p_content )
+    inline std::string nntp::getArticle( const std::string& p_group, const std::string& p_articleid )
     {
         send("group "+p_group);
         
-        switch (p_content) {
+        switch (m_content) {
             case full   :   send("article "+p_articleid);   break;
             case body   :   send("body "+p_articleid);      break;
             case header :   send("head "+p_articleid);      break;
@@ -348,12 +373,11 @@ namespace machinelearning { namespace tools { namespace sources {
     
     
     /** returns an article data
-     * @param p_content switch for reading full article, head or body only (default body only)
      * @return message
      **/
-    inline std::string nntp::getArticle( const content& p_content )
+    inline std::string nntp::getArticle( void )
     {
-        switch (p_content) {
+        switch (m_content) {
             case full   :   send("article");   break;
             case body   :   send("body");      break;
             case header :   send("head");      break;
@@ -366,15 +390,14 @@ namespace machinelearning { namespace tools { namespace sources {
     /** reads grouparticles
      * @param p_group string with group name
      * @param p_articleid std::vector with article IDs within the group (not message id)
-     * @param p_content switch for reading full article, head or body only (default body only)
      * @return std::vector with string content
      **/
-    std::vector<std::string> nntp::getArticle( const std::string& p_group, const std::vector<std::string>& p_articleid, const content& p_content )
+    std::vector<std::string> nntp::getArticle( const std::string& p_group, const std::vector<std::string>& p_articleid )
     {
         send("group "+p_group);
         
         std::string l_cmd;
-        switch (p_content) {
+        switch (m_content) {
             case full   :   l_cmd = "article";   break;
             case body   :   l_cmd = "body";      break;
             case header :   l_cmd = "head";      break;
@@ -392,12 +415,11 @@ namespace machinelearning { namespace tools { namespace sources {
     
     /** reads a news article
      * @param p_messageid message ID
-     * @param p_content switch for reading full article, head or body only (default body only)
      * @return string with article
      **/
-    inline std::string nntp::getArticle( const std::string& p_messageid, const content& p_content )
+    inline std::string nntp::getArticle( const std::string& p_messageid )
     {
-        switch (p_content) {
+        switch (m_content) {
             case full   :   send("article "+ p_messageid);   break;
             case body   :   send("body "+ p_messageid);      break;
             case header :   send("head "+ p_messageid);      break;
@@ -409,15 +431,14 @@ namespace machinelearning { namespace tools { namespace sources {
     
     /** reads an article list witin their messages IDs
      * @param p_messageid std::vector with a list of message IDs
-     * @param p_content switch for reading full article, head or body only (default body only)
      * @return std::vector with messages
      **/
-    inline std::vector<std::string> nntp::getArticle( const std::vector<std::string>& p_messageid, const content& p_content )
+    inline std::vector<std::string> nntp::getArticle( const std::vector<std::string>& p_messageid )
     {
         std::vector<std::string> l_data;
         
         for (std::size_t i=0; i < p_messageid.size(); ++i)
-            l_data.push_back( getArticle(p_messageid[i], p_content) );
+            l_data.push_back( getArticle(p_messageid[i]) );
 
         return l_data;
     }
@@ -468,7 +489,7 @@ namespace machinelearning { namespace tools { namespace sources {
     }
     
     /** try to set the next article
-     * @return bool, if it set is correct
+     * @return bool, if the set is correct
      **/
     inline bool nntp::nextArticle( void )
     {
@@ -508,17 +529,65 @@ namespace machinelearning { namespace tools { namespace sources {
      * @param p_nntp pointer to the nntp object
      **/
     inline nntp::iterator::iterator( nntp& p_nntp ) :
-        m_nntp( &p_nntp )
+        m_nntp( &p_nntp ),
+        m_end( false )
     {}
+    
     
     /** default constructor
      * @overload
      **/
     inline nntp::iterator::iterator( void ) :
-        m_nntp( NULL )
+        m_nntp( NULL ),
+        m_end( true )
     {}
     
+    
+    /** increment operator **/
+    inline nntp::iterator& nntp::iterator::operator++( int )
+    {
+        if (m_nntp)
+            m_end = m_nntp->nextArticle();
+        
+        return *this;
+    }
+    
+    
+    
+    inline std::string nntp::iterator::operator*( void )
+    {
+        if (m_nntp)
+            return m_nntp->getArticle();
+        
+        return std::string();
+    }
+    
+    inline bool nntp::iterator::operator==( const nntp::iterator& p_it ) const
+    {
+        if (m_nntp && p_it.m_nntp)
+            return m_nntp->m_header == p_it.m_nntp->m_header;
+        
+        if (m_end == p_it.m_end)
+            return true;
+        
+        return false;
+    }
+    
 
+    inline bool nntp::iterator::operator!=( const nntp::iterator& p_it ) const
+    {
+        if (m_nntp && p_it.m_nntp)
+            return m_nntp->m_header != p_it.m_nntp->m_header;
+        
+            
+        
+        if (m_end != p_it.m_end)
+            return true;
+        
+        return true;
+    }
+    
+    
 };};};
 
 #endif

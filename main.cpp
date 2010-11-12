@@ -77,9 +77,10 @@ int main(int argc, char *argv[]) {
     // dt. große Gruppen: de.soc.politik.misc, de.rec.fotografie, de.talk.tagesgeschehen, de.etc.sprache.deutsch, de.comp.os.unix.linux.misc, de.sci.electronics, de.etc.fahrzeug.auto, de.comp.sys.mac.misc, de.comp.lang.java, de.soc.weltanschauung.christentum
     
     #ifdef SOURCES    
-    //tl::sources::nntp x("news.online.de");
+    tl::sources::nntp x("news.online.de");
     //tl::sources::nntp x("news.tu-clausthal.de");
-    tl::sources::nntp x("news.t-online.de");
+    //tl::sources::nntp x("news.t-online.de");
+    //tl::sources::nntp x("news.gmane.org");
     
     /*
     std::map<std::string, std::size_t> groups = x.getGroupList();
@@ -93,12 +94,14 @@ int main(int argc, char *argv[]) {
         std::cout << it->second << "\t\t\t" << it->first << std::endl;
     */
     
-    //x.setGroup("1und1.announce");
+    x.setGroup("1und1.announce");
+    //x.setContent( tl::sources::nntp::full );
     //x.setGroup("tuc.misc");
-    x.setGroup("de.comp.text.misc");
-    for(bool b=true; b; b=x.nextArticle())
-        x.getArticle();
-        //std::cout << x.getArticle( tl::sources::nntp::body ) << "\n>=================================================================================<" << std::endl;
+    //x.setGroup("de.comp.text.misc");
+    //x.setGroup("gmane.linux.gentoo.user");
+    for(tl::sources::nntp::iterator it=x.begin(); it != x.end(); it++)
+        std::cout << *it << "\n>=================================================================================<" << std::endl;
+    
     
     #endif
     
