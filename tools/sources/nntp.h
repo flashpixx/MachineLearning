@@ -48,7 +48,6 @@ namespace machinelearning { namespace tools { namespace sources {
      * The class is a nntp client class without any post functionality (implements the RFC 3977)
      * @see http://tools.ietf.org/html/rfc3977 [old RFC http://www.w3.org/Protocols/rfc977/rfc977]
      * @todo ssl connection
-     * @todo try to implementate a iterator over articles
      **/
     class nntp {
         
