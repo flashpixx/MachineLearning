@@ -37,7 +37,7 @@
 
 #include "../../exception/exception.h"
 
-//http://www.hdfgroup.uiuc.edu/UserSupport/code-examples/stratt.cpp
+
 
 namespace machinelearning { namespace tools { namespace files {
     
