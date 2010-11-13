@@ -78,7 +78,6 @@ namespace machinelearning { namespace tools { namespace sources {
         
         
             /** iterator class for iterating over articles **/
-            //friend class iterator;
             class iterator : public std::iterator<std::input_iterator_tag, std::string, std::size_t, std::string*, std::string&> {
                 
                 public :
@@ -94,7 +93,9 @@ namespace machinelearning { namespace tools { namespace sources {
                 
                 private :
                 
+                    /** pointer to nntp object **/
                     nntp* m_nntp;
+                    /** bool for marking the end (empty iterator) **/
                     bool m_end;
                 
             };
