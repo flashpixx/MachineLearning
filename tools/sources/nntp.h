@@ -42,42 +42,6 @@
 namespace machinelearning { namespace tools { namespace sources {
     
     namespace bip  = boost::asio::ip;
-
-    /*
-     
-     class dingsda {
-     public:
-     bool readItem(item& theItem);   // false, wenn keins mehr da
-     // oder
-     std::auto_ptr<item> readItem(); // 0, wenn keins mehr da
-     };
-
-     
-     
-     
-     class dingsda_iterator
-     : public std::iterator<std::input_iterator_tag,
-     item, std::size_t, item*, item&>
-     {
-     dingsda* d;
-     std::auto_ptr<item> i;
-     bool atEnd() const { return i.get()==0; }
-     public:
-     dingsda_iterator(dingsda& d)
-     : d(&d), i(d.readItem()) { }
-     dingsda_iterator()
-     : d(0), i(0) { }
-     bool operator==(const dingsda_iterator& a) const
-     { return atEnd() && a.atEnd(); }
-     item& operator*() { return *i; }
-     item* operator->() { return &*i; }
-     dingsda_iterator& operator++()
-     { i.reset(d->readItem()); return *this; }
-     };
-     
-     */
-    
-    
     
     
     /** class for creating nntp connection (exspecially for creating distance matrix).
