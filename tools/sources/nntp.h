@@ -125,6 +125,7 @@ namespace machinelearning { namespace tools { namespace sources {
                     bool operator==( const iterator& ) const;
                     bool operator!=( const iterator& ) const;
                     iterator& operator++( int );
+                    iterator& operator++( void );
                     std::string operator*( void );
 
                 
@@ -543,13 +544,24 @@ namespace machinelearning { namespace tools { namespace sources {
     {}
     
     
-    /** increment operator **/
+    /** increment operator (iterator++)
+     * @return pointer of iterator
+     **/
     inline nntp::iterator& nntp::iterator::operator++( int )
     {
         if (m_nntp)
-            m_end = m_nntp->nextArticle();
+            m_end = !m_nntp->nextArticle();
         
         return *this;
+    }
+    
+    
+    /** increment operator (++iterator)
+     * @return pointer of iterator
+     **/
+    inline nntp::iterator& nntp::iterator::operator++( void )
+    {
+        return (*this)++;
     }
     
     
@@ -562,29 +574,30 @@ namespace machinelearning { namespace tools { namespace sources {
         return std::string();
     }
     
+    
+    /** equal operator
+     * @param p_it iterator
+     * @return bool for equality
+     **/
     inline bool nntp::iterator::operator==( const nntp::iterator& p_it ) const
     {
         if (m_nntp && p_it.m_nntp)
             return m_nntp->m_header == p_it.m_nntp->m_header;
         
-        if (m_end == p_it.m_end)
-            return true;
-        
-        return false;
+        return m_end == p_it.m_end;
     }
     
 
+    /** inequal operator
+     * @param p_it iterator
+     * @return bool for inequality
+     **/
     inline bool nntp::iterator::operator!=( const nntp::iterator& p_it ) const
     {
         if (m_nntp && p_it.m_nntp)
             return m_nntp->m_header != p_it.m_nntp->m_header;
         
-            
-        
-        if (m_end != p_it.m_end)
-            return true;
-        
-        return true;
+        return m_end != p_it.m_end;
     }
     
     

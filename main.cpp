@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
     //x.setGroup("tuc.misc");
     //x.setGroup("de.comp.text.misc");
     //x.setGroup("gmane.linux.gentoo.user");
-    for(tl::sources::nntp::iterator it=x.begin(); it != x.end(); it++)
+    for(tl::sources::nntp::iterator it=x.begin(); it != x.end(); ++it)
         std::cout << *it << "\n>=================================================================================<" << std::endl;
     
     
