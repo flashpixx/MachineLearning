@@ -201,7 +201,7 @@ namespace machinelearning { namespace tools { namespace sources {
     
     
     /** sets the content option
-     * @param content option
+     * @param p_content content option
      **/
     inline void nntp::setContent( const content& p_content )
     {
@@ -565,13 +565,15 @@ namespace machinelearning { namespace tools { namespace sources {
     }
     
     
-    
+    /** dereference operator
+     * @return std::string or null with article content
+     **/
     inline std::string nntp::iterator::operator*( void )
     {
         if (m_nntp)
             return m_nntp->getArticle();
         
-        return std::string();
+        return NULL;
     }
     
     
