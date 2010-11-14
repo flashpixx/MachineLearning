@@ -38,7 +38,9 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     namespace ublas  = boost::numeric::ublas;
     
     
-    /** create the Multidimensional scaling (MDS) **/
+    /** create the Multidimensional scaling (MDS)
+     * @todo create a faster copy of the projection values
+     **/
     template<typename T> class mds : public nonsupervisedreduce<T> {
         
         public :
@@ -104,12 +106,14 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     
     
     /** caluate and project the input data
-     * @param p_data input datamatrix
+     * @param p_data input datamatrix (similarity matrix)
      **/
     template<typename T> inline ublas::matrix<T> mds<T>::map( const ublas::matrix<T>& p_data )
     {
         if (p_data.size2() <= m_dim)
             throw exception::runtime(_("datapoint dimension are less than target dimension"));
+        if (p_data.size1() != p_data.size2())
+            throw exception::runtime( _("matrix must be square") );
         
         switch (m_type) {
                 
@@ -123,17 +127,29 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     
     
     
-    /** caluate the metric MDS (for metric we use a PCA)
-     * @param p_data input datamatrix
+    /** caluate the metric MDS (for metric we use eigenvalues)
+     * @param p_data input datamatrix (similarity matrix)
      **/
     template<typename T> inline ublas::matrix<T> mds<T>::project_metric( const ublas::matrix<T>& p_data )
     {
-        pca<T> l_pca(m_dim);
+        // calculate the eigenvalues & -vectors
+        ublas::vector<T> l_eigenvalues;
+        ublas::matrix<T> l_eigenvectors;
+        tools::lapack::eigen<T>(p_data, l_eigenvalues, l_eigenvectors);
         
-        ublas::matrix<T> l_tmp = l_pca.map( p_data );
-        m_project              = l_pca.getMapping();
         
-        return l_tmp;
+        // rank the eigenvalues
+        const ublas::indirect_array< std::vector<std::size_t> > l_rank = tools::vector::rankIndex( l_eigenvalues );
+        
+        // create projection (largest eigenvectors correspondends with the largest eigenvalues -> last values in rank)
+        m_project = ublas::matrix<T>( l_eigenvectors.size2(), m_dim );
+        ublas::matrix<T> l_values(m_dim, m_dim, 0);
+        for(std::size_t i=0; i < m_dim; ++i) {
+            ublas::column(m_project, m_dim-i-1) = ublas::column(l_eigenvectors, l_rank(l_rank.size()-i-1));
+            l_values(m_dim-i-1, m_dim-i-1) = l_eigenvalues(l_rank(l_rank.size()-i-1));
+        }
+        
+        return ublas::prod(m_project, l_values);
     }
     
 
