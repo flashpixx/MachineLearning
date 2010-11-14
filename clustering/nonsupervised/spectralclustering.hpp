@@ -30,7 +30,7 @@
 #include <boost/numeric/bindings/blas.hpp>
 
 #include "../clustering.hpp"
-#include "neuralgas.hpp"
+#include "kmeans.hpp"
 #include "../../exception/exception.h"
 #include "../../tools/tools.h"
 #include "../../distances/distances.h"
@@ -46,7 +46,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * and creates the general eigenvector decomposition. A neuralgas algorithm with euclidian
      * distancesis used for clustering the data
      * @todo set all routines to sparse matrix if arpack can be used with boost
-     * @todo change neural gas to kmeans
      **/
     template<typename T> class spectralclustering {
         
@@ -74,7 +73,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             /** distance object for ng **/
             const distances::euclid<T> m_distance;
             /** neural gas for clustering the graph laplacian **/
-            neuralgas<T> m_ng;
+            kmeans<T> m_kmeans;
         
     };
     
@@ -85,7 +84,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> inline spectralclustering<T>::spectralclustering( const std::size_t& p_prototypes, const std::size_t& p_prototypesize ) :
         m_distance( distances::euclid<T>() ),
-        m_ng( neuralgas<T>( m_distance, p_prototypes, p_prototypesize) )
+        m_kmeans( neuralgas<T>( m_distance, p_prototypes, p_prototypesize) )
     {}
     
     
@@ -94,7 +93,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> inline ublas::matrix<T> spectralclustering<T>::getPrototypes( void ) const
     {
-        return m_ng.getPrototypes();
+        return m_kmeans.getPrototypes();
     }
     
     
@@ -104,7 +103,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> inline void spectralclustering<T>::setLogging( const bool& p )
     {
-        m_ng.setLogging(p);
+        m_kmeans.setLogging(p);
     }
     
     
@@ -114,7 +113,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> inline bool spectralclustering<T>::getLogging( void ) const
     {
-        return m_ng.getLogging();
+        return m_kmeans.getLogging();
     }
     
     
@@ -124,7 +123,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> inline std::vector< ublas::matrix<T> > spectralclustering<T>::getLoggedPrototypes( void ) const
     {
-        return m_ng.getLoggedPrototypes();
+        return m_kmeans.getLoggedPrototypes();
     }
     
     
@@ -133,7 +132,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> inline std::size_t spectralclustering<T>::getPrototypeSize( void ) const 
     {
-        return m_ng.getPrototypeSize();
+        return m_kmeans.getPrototypeSize();
     };
     
     
@@ -142,7 +141,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> inline std::size_t spectralclustering<T>::getPrototypeCount( void ) const 
     {
-        return m_ng.getPrototypeCount();
+        return m_kmeans.getPrototypeCount();
     };
     
     
@@ -151,7 +150,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> inline std::vector<T> spectralclustering<T>::getLoggedQuantizationError( void ) const
     {
-        return m_ng.getLoggedQuantizationError();
+        return m_kmeans.getLoggedQuantizationError();
     }    
     
     
@@ -164,7 +163,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     {
         if (p_similarity.size1() != p_similarity.size2())
             throw exception::runtime(_("matrix must be square"));
-        if (p_similarity.size2() < m_ng.getPrototypeCount())
+        if (p_similarity.size2() < m_kmeans.getPrototypeCount())
             throw exception::runtime(_("data and prototype dimension are not equal"));
 
         
@@ -182,16 +181,16 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         const ublas::indirect_array< std::vector<std::size_t> > l_rank = tools::vector::rankIndex<T>(l_eigenvalue);
         
         // extrakt the k eigenvectors, change the normalized laplacian back and normalize
-        ublas::matrix<T> l_eigenmatrix(m_ng.getPrototypeCount(), l_laplacian.size1());
+        ublas::matrix<T> l_eigenmatrix(m_kmeans.getPrototypeCount(), l_laplacian.size1());
         const ublas::vector<T> l_sum = tools::matrix::sum(p_similarity);
         
-        for(std::size_t i=0; i < m_ng.getPrototypeCount(); ++i) {
+        for(std::size_t i=0; i < m_kmeans.getPrototypeCount(); ++i) {
             ublas::row(l_eigenmatrix, i)  = ublas::element_div( ublas::column(l_eigenvector, l_rank(i)), l_sum );
             ublas::row(l_eigenmatrix, i) /= blas::nrm2( static_cast< ublas::vector<T> >(ublas::row(l_eigenmatrix, i)) ); 
         }
             
         // clustering
-        m_ng.train(l_eigenmatrix, p_iterations);
+        m_kmeans.train(l_eigenmatrix, p_iterations);
     }
     
         

@@ -27,6 +27,7 @@
 
 #include <boost/numeric/ublas/matrix.hpp>
 
+#include "pca.hpp"
 #include "../dimensionreduce.hpp"
 #include "../../exception/exception.h"
 #include "../../tools/tools.h"
@@ -63,6 +64,9 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             const project m_type;
             /** matrix with projection vectors (row orientated) **/
             ublas::matrix<T> m_project;
+        
+        
+            ublas::matrix<T> project_metric( const ublas::matrix<T>& );
 
     };
 
@@ -104,7 +108,34 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
      **/
     template<typename T> inline ublas::matrix<T> mds<T>::map( const ublas::matrix<T>& p_data )
     {
+        if (p_data.size2() <= m_dim)
+            throw exception::runtime(_("datapoint dimension are less than target dimension"));
+        
+        switch (m_type) {
+                
+            case metric:
+                return project_metric(p_data);
+                
+            default :
+                throw exception::runtime(_("project option is unkown"));
+        };
+    }
+    
+    
+    
+    /** caluate the metric MDS (for metric we use a PCA)
+     * @param p_data input datamatrix
+     **/
+    template<typename T> inline ublas::matrix<T> mds<T>::project_metric( const ublas::matrix<T>& p_data )
+    {
+        pca<T> l_pca(m_dim);
+        
+        ublas::matrix<T> l_tmp = l_pca.map( p_data );
+        m_project              = l_pca.getMapping();
+        
+        return l_tmp;
     }
     
 
 };};};
+#endif
