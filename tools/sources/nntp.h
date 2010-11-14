@@ -28,8 +28,7 @@
 
 #include <string>
 #include <iostream>
-//#include <algorithm>
-//#include <iterator>
+#include <iterator>
 #include <boost/asio.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp> 
@@ -150,7 +149,7 @@ namespace machinelearning { namespace tools { namespace sources {
         }
         
         if (l_error)
-            throw exception::runtime(_("cannot connect to news server"));
+            throw exception::runtime(_("can not connect to news server"));
         
         m_header = getResponseData("\r\n");
     }
