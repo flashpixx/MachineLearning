@@ -30,5 +30,6 @@
 #include "supervised/lda.hpp"
 #include "nonsupervised/pca.hpp"
 #include "nonsupervised/lle.hpp"
+#include "nonsupervised/mds.hpp"
 
 #endif

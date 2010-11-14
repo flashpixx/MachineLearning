@@ -43,7 +43,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     namespace ublas  = boost::numeric::ublas;
     
     
-    /** create the Local Linear Embedding (LLE) from data **/
+    /** create the Local Linear Embedding (LLE) **/
     template<typename T> class lle {
         
         public :

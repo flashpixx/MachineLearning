@@ -181,15 +181,24 @@ namespace machinelearning { namespace tools { namespace files {
         // get array size
         hsize_t l_size[1];
         l_dataspace.getSimpleExtentDims( l_size );      
+        //hsize_t l_strlength = l_dataset.getStorageSize(); 
         
-        // get data
-        std::vector<std::string> l_vec( l_size[0] );
+        // get data (we need the datatype of the data itself)
+        std::vector<std::string> l_vec;
+        char l_data[l_dataset.getStorageSize()];
+        l_dataset.read( l_data, l_dataset.getDataType() );
 
-        
+        //std::cout << l_strlength << std::endl;
+        std::cout << l_data << std::endl;
+        /*for(std::size_t i=0; i < l_size[0]; ++i)
+            std::cout << l_data[i] << std::endl;
+            //l_vec.push_back( l_data[i] );
+        */
         
         l_dataspace.close();
         l_dataset.close();
 
+        
         return l_vec;
     }
     
