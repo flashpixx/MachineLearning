@@ -50,6 +50,7 @@ namespace machinelearning { namespace tools { namespace files {
      * @note hdf uses their own datatypes http://www.hdfgroup.org/HDF5/doc/cpplus_RM/classH5_1_1PredType.html 
      * @todo implement array functions
      * @todo implement string functions (C sources)
+     * @todo add ndim cube support
      **/
     class hdf {
         
@@ -173,9 +174,9 @@ namespace machinelearning { namespace tools { namespace files {
         
         // check datasetdimension
         if (l_dataspace.getSimpleExtentNdims() != 1)
-            throw exception::parameter(_("dataset must be one-dimensional"));
+            throw exception::runtime(_("dataset must be one-dimensional"));
         if (!l_dataspace.isSimple())
-            throw exception::parameter(_("dataset must be a simple datatype"));
+            throw exception::runtime(_("dataset must be a simple datatype"));
         
         // get array size
         hsize_t l_size[1];
@@ -183,11 +184,12 @@ namespace machinelearning { namespace tools { namespace files {
         
         // get data
         std::vector<std::string> l_vec( l_size[0] );
-        //l_dataset.read(
+
+        
         
         l_dataspace.close();
         l_dataset.close();
-        
+
         return l_vec;
     }
     
@@ -214,9 +216,9 @@ namespace machinelearning { namespace tools { namespace files {
         
         // check datasetdimension
         if (l_dataspace.getSimpleExtentNdims() != 1)
-            throw exception::parameter(_("dataset must be one-dimensional"));
+            throw exception::runtime(_("dataset must be one-dimensional"));
         if (!l_dataspace.isSimple())
-            throw exception::parameter(_("dataset must be a simple datatype"));       
+            throw exception::runtime(_("dataset must be a simple datatype"));       
         
         // read size of chars
         hsize_t l_strlength = l_dataset.getStorageSize(); 
@@ -283,7 +285,7 @@ namespace machinelearning { namespace tools { namespace files {
         
         // path must have more than zero elements
         if (l_path.size() == 0)
-            throw exception::parameter(_("empty path is forbidden"));
+            throw exception::runtime(_("empty path is forbidden"));
         
         // if only one element then create dataset directly
         if (l_path.size() == 1) {
@@ -326,9 +328,9 @@ namespace machinelearning { namespace tools { namespace files {
 
         // check datasetdimension
         if (l_dataspace.getSimpleExtentNdims() != 2)
-            throw exception::parameter(_("dataset must be two-dimensional"));
+            throw exception::runtime(_("dataset must be two-dimensional"));
         if (!l_dataspace.isSimple())
-            throw exception::parameter(_("dataset must be a simple datatype"));
+            throw exception::runtime(_("dataset must be a simple datatype"));
         
         // read matrix size and create matrix
         // (first element is column size, second row size)
@@ -344,7 +346,7 @@ namespace machinelearning { namespace tools { namespace files {
         for(std::size_t i=0; i < l_mat.size1(); ++i)
             for(std::size_t j=0; j < l_mat.size2(); ++j)
                 l_mat(i,j) = l_data[j][i];
-    
+         
         l_dataspace.close();
         l_dataset.close();
         return l_mat;
@@ -364,9 +366,9 @@ namespace machinelearning { namespace tools { namespace files {
         
         // check datasetdimension
         if (l_dataspace.getSimpleExtentNdims() != 1)
-            throw exception::parameter(_("dataset must be one-dimensional"));
+            throw exception::runtime(_("dataset must be one-dimensional"));
         if (!l_dataspace.isSimple())
-            throw exception::parameter(_("dataset must be a simple datatype"));
+            throw exception::runtime(_("dataset must be a simple datatype"));
         
         // read matrix size and create vector
         hsize_t l_size[1];

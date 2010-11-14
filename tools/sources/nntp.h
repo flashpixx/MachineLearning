@@ -150,7 +150,7 @@ namespace machinelearning { namespace tools { namespace sources {
         }
         
         if (l_error)
-            throw exception::parameter(_("cannot connect to news server"));
+            throw exception::runtime(_("cannot connect to news server"));
         
         m_header = getResponseData("\r\n");
     }
@@ -188,27 +188,27 @@ namespace machinelearning { namespace tools { namespace sources {
     inline void nntp::throwNNTPError( const unsigned int& p_status ) const
     {
         switch (p_status) {
-            case 0   : throw exception::parameter(_("error while reading socket data"));     
+            case 0   : throw exception::runtime(_("error while reading socket data"));     
                 
             // nntp errors
-            case 411 : throw exception::parameter(_("no such group"));                       
-            case 412 : throw exception::parameter(_("no newsgroup has been selected"));      
-            case 420 : throw exception::parameter(_("no article has been selected"));          
-            case 421 : throw exception::parameter(_("no next article found"));               
-            case 422 : throw exception::parameter(_("no previous article found"));           
-            case 423 : throw exception::parameter(_("no such article number in this group")); 
-            case 430 : throw exception::parameter(_("no such article found"));                
-            case 435 : throw exception::parameter(_("article not wanted - do not send"));     
-            case 436 : throw exception::parameter(_("transfer failed - try again later"));    
-            case 437 : throw exception::parameter(_("article rejected - do not try again"));  
-            case 440 : throw exception::parameter(_("posting not allowed"));                  
-            case 441 : throw exception::parameter(_("posting failed"));                       
+            case 411 : throw exception::runtime(_("no such group"));                       
+            case 412 : throw exception::runtime(_("no newsgroup has been selected"));      
+            case 420 : throw exception::runtime(_("no article has been selected"));          
+            case 421 : throw exception::runtime(_("no next article found"));               
+            case 422 : throw exception::runtime(_("no previous article found"));           
+            case 423 : throw exception::runtime(_("no such article number in this group")); 
+            case 430 : throw exception::runtime(_("no such article found"));                
+            case 435 : throw exception::runtime(_("article not wanted - do not send"));     
+            case 436 : throw exception::runtime(_("transfer failed - try again later"));    
+            case 437 : throw exception::runtime(_("article rejected - do not try again"));  
+            case 440 : throw exception::runtime(_("posting not allowed"));                  
+            case 441 : throw exception::runtime(_("posting failed"));                       
                 
             // default errors
-            case 500 : throw exception::parameter(_("command not recognized"));               
-            case 501 : throw exception::parameter(_("command syntax error"));                 
-            case 502 : throw exception::parameter(_("access restriction or permission denied")); 
-            case 503 : throw exception::parameter(_("program fault"));                           
+            case 500 : throw exception::runtime(_("command not recognized"));               
+            case 501 : throw exception::runtime(_("command syntax error"));                 
+            case 502 : throw exception::runtime(_("access restriction or permission denied")); 
+            case 503 : throw exception::runtime(_("program fault"));                           
         }
     }
     

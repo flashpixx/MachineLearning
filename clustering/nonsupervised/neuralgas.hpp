@@ -121,9 +121,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         #endif
     {
         if (p_prototypesize == 0)
-            throw exception::parameter(_("prototype size must be greater than zero"));
+            throw exception::runtime(_("prototype size must be greater than zero"));
         if (p_prototypes == 0)
-            throw exception::parameter(_("number of prototypes must be greater than zero"));
+            throw exception::runtime(_("number of prototypes must be greater than zero"));
     
         // normalize the prototypes
         m_distance->normalize( m_prototypes );
@@ -216,13 +216,13 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     template<typename T> inline void neuralgas<T>::train( const ublas::matrix<T>& p_data, const std::size_t& p_iterations, const T& p_lambda )
     {
         if (p_data.size1() < m_prototypes.size1())
-            throw exception::parameter(_("number of datapoints are less than prototypes"));
+            throw exception::runtime(_("number of datapoints are less than prototypes"));
         if (p_iterations == 0)
-            throw exception::parameter(_("iterations must be greater than zero"));
+            throw exception::runtime(_("iterations must be greater than zero"));
         if (p_data.size2() != m_prototypes.size2())
-            throw exception::matrix(_("data and prototype dimension are not equal"));
+            throw exception::runtime(_("data and prototype dimension are not equal"));
         if (p_lambda <= 0)
-            throw exception::parameter(_("lambda must be greater than zero"));
+            throw exception::runtime(_("lambda must be greater than zero"));
         
         // creates logging
         if (m_logging) {
@@ -311,7 +311,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     template<typename T> inline ublas::indirect_array< std::vector<std::size_t> > neuralgas<T>::use( const ublas::matrix<T>& p_data ) const
     {
         if (p_data.size1() < m_prototypes.size1())
-            throw exception::parameter(_("number of datapoints are less than prototypes"));
+            throw exception::runtime(_("number of datapoints are less than prototypes"));
         
         std::vector<std::size_t> l_vec(p_data.size1());
         ublas::matrix<T> l_distance(m_prototypes.size1(), p_data.size1());
@@ -468,13 +468,13 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     template<typename T> inline void neuralgas<T>::train( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data, const std::size_t& p_iterations, const T& p_lambda )
     {
         if (p_data.size1() < m_prototypes.size1())
-            throw exception::parameter(_("number of datapoints are less than prototypes"));
+            throw exception::runtime(_("number of datapoints are less than prototypes"));
         if (p_iterations == 0)
-            throw exception::parameter(_("iterations must be greater than zero"));
+            throw exception::runtime(_("iterations must be greater than zero"));
         if (p_data.size2() != m_prototypes.size2())
-            throw exception::matrix(_("data and prototype dimension are not equal"));
+            throw exception::runtime(_("data and prototype dimension are not equal"));
         if (p_lambda <= 0)
-            throw exception::parameter(_("lambda must be greater than zero"));
+            throw exception::runtime(_("lambda must be greater than zero"));
         
         
         // process 0 sets the iteration and the lambda and we collect all needed data
@@ -638,7 +638,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     template<typename T> inline ublas::indirect_array< std::vector<std::size_t> > neuralgas<T>::use( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data ) const
     {
         if (p_data.size1() < m_prototypes.size1())
-            throw exception::parameter(_("number of datapoints are less than prototypes"));
+            throw exception::runtime(_("number of datapoints are less than prototypes"));
         
         //first we gathering all other prototypes
         const ublas::matrix<T> l_prototypes = gatherPrototypes( p_mpi );

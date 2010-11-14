@@ -76,9 +76,9 @@ namespace machinelearning { namespace tools {
     template<typename T> inline void lapack::eigen( const ublas::matrix<T>& p_matrix, const ublas::matrix<T>& p_diag, ublas::vector<T>& p_eigval, ublas::matrix<T>& p_eigvec )
     {
         if (  (p_matrix.size1() != p_matrix.size2()) || (p_diag.size1() != p_diag.size2())  )
-            throw exception::matrix( _("matrix must be square") );
+            throw exception::runtime( _("matrix must be square") );
         if ( (p_matrix.size1() != p_diag.size1()) || (p_matrix.size2() != p_diag.size2()) )
-            throw exception::matrix( _("both matrices have not the same size") );
+            throw exception::runtime( _("both matrices have not the same size") );
         
         // copy matrix for LAPACK
         ublas::matrix<T, ublas::column_major> l_matrix(p_matrix);
@@ -124,7 +124,7 @@ namespace machinelearning { namespace tools {
     template<typename T> inline void lapack::eigen( const ublas::matrix<T>& p_matrix, ublas::vector<T>& p_eigval, ublas::matrix<T>& p_eigvec )
     {
         if (p_matrix.size1() != p_matrix.size2())
-            throw exception::matrix(_("matrix must be square"));
+            throw exception::runtime(_("matrix must be square"));
         
         // copy matrix for LAPACK
         ublas::matrix<T, ublas::column_major> l_matrix(p_matrix);
@@ -184,7 +184,7 @@ namespace machinelearning { namespace tools {
     template<typename T> inline ublas::matrix<T> lapack::expm( const ublas::matrix<T>& p_matrix )
     {
         if (p_matrix.size1() != p_matrix.size2())
-            throw exception::matrix(_("matrix must be square"));
+            throw exception::runtime(_("matrix must be square"));
         
         const ublas::matrix<T> l_eye = matrix::eye<T>(p_matrix.size1());
         
@@ -235,7 +235,7 @@ namespace machinelearning { namespace tools {
     template<typename T> inline ublas::vector<T> lapack::perronfrobenius( const ublas::matrix<T>& p_matrix, const std::size_t& p_iteration )
     {
         if (p_matrix.size1() != p_matrix.size2())
-            throw exception::matrix(_("matrix must be square"));
+            throw exception::runtime(_("matrix must be square"));
         
         return perronfrobenius( p_matrix, p_iteration, vector::random<T>(p_matrix.size1()) );
     }
@@ -250,9 +250,9 @@ namespace machinelearning { namespace tools {
     template<typename T> inline ublas::vector<T> lapack::perronfrobenius( const ublas::matrix<T>& p_matrix, const std::size_t& p_iteration, const ublas::vector<T>& p_init )
     {
         if (p_matrix.size1() != p_matrix.size2())
-            throw exception::matrix(_("matrix must be square"));
+            throw exception::runtime(_("matrix must be square"));
         if (p_matrix.size1() != p_init.size())
-            throw exception::matrix(_("number of rows / columns of the matrix must have the same dimension like the initialisation vector"));
+            throw exception::runtime(_("number of rows / columns of the matrix must have the same dimension like the initialisation vector"));
         
         ublas::vector<T> l_vec = p_init;
         for(std::size_t i=0; i < p_iteration; ++i) {

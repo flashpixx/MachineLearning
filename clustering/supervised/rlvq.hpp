@@ -98,7 +98,7 @@ namespace machinelearning { namespace clustering { namespace supervised {
         m_quantizationerror( std::vector< T >() )
     {
         if (p_prototypesize == 0)
-            throw exception::parameter(_("prototype size must be greater than zero"));
+            throw exception::runtime(_("prototype size must be greater than zero"));
     }
     
     
@@ -209,17 +209,17 @@ namespace machinelearning { namespace clustering { namespace supervised {
     template<typename T, typename L> inline void rlvq<T, L>::train( const ublas::matrix<T>& p_data, const std::vector<L>& p_labels, const std::size_t& p_iterations, const T& p_lambda, const T& p_eta )
     {
         if (p_data.size1() < m_prototypes.size1())
-            throw exception::parameter(_("number of datapoints are less than prototypes"));
+            throw exception::runtime(_("number of datapoints are less than prototypes"));
         if (p_iterations == 0)
-            throw exception::parameter(_("iterations must be greater than zero"));
+            throw exception::runtime(_("iterations must be greater than zero"));
         if (p_labels.size() != p_data.size1())
-            throw exception::matrix(_("matrix rows and label size are not equal"));
+            throw exception::runtime(_("matrix rows and label size are not equal"));
         if (p_data.size2() != m_prototypes.size2())
-            throw exception::matrix(_("data and prototype dimension are not equal"));
+            throw exception::runtime(_("data and prototype dimension are not equal"));
         if (p_lambda <= 0)
-            throw exception::parameter(_("lambda must be greater than zero"));
+            throw exception::runtime(_("lambda must be greater than zero"));
         if (p_eta <= 0)
-            throw exception::parameter(_("eta must be greater than zero"));
+            throw exception::runtime(_("eta must be greater than zero"));
         
         // for every prototype create a own lambda, initialisate with 1 and normalize prototypes
         ublas::matrix<T> l_lambda(m_neuronlabels.size(), p_data.size2(), 1);
@@ -291,7 +291,7 @@ namespace machinelearning { namespace clustering { namespace supervised {
     template<typename T, typename L> inline ublas::indirect_array< std::vector<std::size_t> > rlvq<T, L>::use( const ublas::matrix<T>& p_data ) const
     {
         if (p_data.size2() != m_prototypes.size2())
-            throw exception::matrix( _("data and prototype dimension are not equal") );
+            throw exception::runtime( _("data and prototype dimension are not equal") );
         
         std::vector<std::size_t> l_vec;
         

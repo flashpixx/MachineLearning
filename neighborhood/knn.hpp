@@ -81,7 +81,7 @@ namespace machinelearning { namespace neighborhood {
         m_distance( &p_distance )
     {
         if (p_knn == 0)
-            throw exception::parameter(_("knn must be greater than zero"));
+            throw exception::runtime(_("knn must be greater than zero"));
     }
     
     
@@ -101,7 +101,7 @@ namespace machinelearning { namespace neighborhood {
     template<typename T> inline ublas::matrix<std::size_t> knn<T>::get( const ublas::matrix<T>& p_data ) const
     {
         if (m_knn > p_data.size1())
-            throw exception::parameter(_("knn is greater than datapoints"));
+            throw exception::runtime(_("knn is greater than datapoints"));
         
         
         ublas::symmetric_matrix<T, ublas::upper> l_distance = calculate( p_data );
@@ -132,7 +132,7 @@ namespace machinelearning { namespace neighborhood {
     template<typename T> inline ublas::matrix<std::size_t> knn<T>::get( const ublas::matrix<T>& p_fix, const ublas::matrix<T>& p_data  ) const
     {
         if (m_knn > p_data.size1())
-            throw exception::parameter(_("knn is greater than datapoints"));
+            throw exception::runtime(_("knn is greater than datapoints"));
         
         
         ublas::matrix<std::size_t> l_index(p_data.size1(), m_knn);

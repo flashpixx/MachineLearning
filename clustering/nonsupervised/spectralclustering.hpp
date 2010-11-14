@@ -46,6 +46,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * and creates the general eigenvector decomposition. A neuralgas algorithm with euclidian
      * distancesis used for clustering the data
      * @todo set all routines to sparse matrix if arpack can be used with boost
+     * @todo change neural gas to kmeans
      **/
     template<typename T> class spectralclustering {
         
@@ -162,9 +163,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     template<typename T> inline void spectralclustering<T>::train( const ublas::matrix<T>& p_similarity, const std::size_t& p_iterations )
     {
         if (p_similarity.size1() != p_similarity.size2())
-            throw exception::matrix(_("matrix must be square"));
+            throw exception::runtime(_("matrix must be square"));
         if (p_similarity.size2() < m_ng.getPrototypeCount())
-            throw exception::matrix(_("data and prototype dimension are not equal"));
+            throw exception::runtime(_("data and prototype dimension are not equal"));
 
         
         // create squared degree and normalized graph laplacian

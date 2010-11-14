@@ -185,7 +185,7 @@ namespace machinelearning { namespace classifier {
     template<typename T, typename L> inline void lazylearner<T, L>::setDatabase( const ublas::matrix<T>& p_data, const std::vector<L>& p_labels )
     {
         if (p_labels.size() != p_data.size1())
-            throw exception::matrix(_("matrix rows and label size are not equal"));
+            throw exception::runtime(_("matrix rows and label size are not equal"));
         
         clearLogging();
         m_basedata      = p_data;

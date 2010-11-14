@@ -69,7 +69,7 @@ namespace machinelearning { namespace dimensionreduce { namespace supervised {
         m_project()
     {
         if (p_dim == 0)
-            throw exception::parameter(_("dimension must be greater than zero"));
+            throw exception::runtime(_("dimension must be greater than zero"));
     }
     
     
@@ -100,7 +100,7 @@ namespace machinelearning { namespace dimensionreduce { namespace supervised {
     template<typename T, typename L> inline ublas::matrix<T> lda<T, L>::map( const ublas::matrix<T>& p_data, const std::vector<L>& p_label )
     {
         if (p_data.size1() != p_label.size())
-            throw exception::matrix(_("matrix rows and label size are not equal"));
+            throw exception::runtime(_("matrix rows and label size are not equal"));
         
         
         // create a unique label vector
@@ -108,7 +108,7 @@ namespace machinelearning { namespace dimensionreduce { namespace supervised {
         
         // we can only reduce to length(classes)-1
         if (m_dim >= l_uniquelabel.size())
-            throw exception::parameter(_("target dimension must be less than unique data classes"));
+            throw exception::runtime(_("target dimension must be less than unique data classes"));
         
         
         // centering the data

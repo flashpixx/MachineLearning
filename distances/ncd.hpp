@@ -376,7 +376,7 @@ namespace machinelearning { namespace distances {
     template<typename T> inline ublas::matrix<T> ncd<T>::unsymmetric( const std::vector<std::string>& p_strvec, const bool& p_isfile  )
     {
         if (p_strvec.size() == 0)
-            throw exception::parameter(_("vector size must be greater than zero"));
+            throw exception::runtime(_("vector size must be greater than zero"));
 
         // init data
         m_sources       = p_strvec;
@@ -442,7 +442,7 @@ namespace machinelearning { namespace distances {
     template<typename T> inline ublas::symmetric_matrix<T, ublas::upper> ncd<T>::symmetric( const std::vector<std::string>& p_strvec, const bool& p_isfile  )
     {
         if (p_strvec.size() == 0)
-            throw exception::parameter(_("vector size must be greater than zero"));
+            throw exception::runtime(_("vector size must be greater than zero"));
         
         // init data
         m_sources       = p_strvec;
@@ -504,7 +504,7 @@ namespace machinelearning { namespace distances {
     template<typename T> inline std::size_t ncd<T>::deflate( const std::string& p_str1, const std::string& p_str2 ) const
     {
         if (p_str1.empty())
-            throw exception::parameter(_("string size must be greater than zero"));
+            throw exception::runtime(_("string size must be greater than zero"));
         
         
         // create output null stream, compressor and counter structure
@@ -530,7 +530,7 @@ namespace machinelearning { namespace distances {
             // under pthread.
             bio::stream< bio::basic_file_source<char> > l_file(p_str1);
             if (!l_file.is_open())
-                throw exception::parameter(_("file can not be opened"));
+                throw exception::runtime(_("file can not be opened"));
             std::copy( std::istream_iterator<char>(l_file), std::istream_iterator<char>(), std::ostreambuf_iterator<char>(&l_deflate) );
             l_file.close();
             
@@ -539,7 +539,7 @@ namespace machinelearning { namespace distances {
                 
                 l_file.open(p_str2);
                 if (!l_file.is_open())
-                    throw exception::parameter(_("file can not be opened"));
+                    throw exception::runtime(_("file can not be opened"));
                 std::copy( std::istream_iterator<char>(l_file), std::istream_iterator<char>(), std::ostreambuf_iterator<char>(&l_deflate) );
                 l_file.close();
                 

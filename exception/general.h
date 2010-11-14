@@ -34,8 +34,7 @@
 namespace machinelearning { namespace exception {
     
     class classmethod      : public std::runtime_error      { public : classmethod( const std::string& ); };
-    class matrix           : public std::runtime_error      { public : matrix( const std::string& ); };
-    class parameter        : public std::runtime_error      { public : parameter( const std::string& ); };
+    class runtime          : public std::runtime_error      { public : runtime( const std::string& ); };
     
 };};
 
