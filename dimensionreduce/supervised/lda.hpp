@@ -41,9 +41,7 @@ namespace machinelearning { namespace dimensionreduce { namespace supervised {
 
     
     
-    /** class for projection the (Fisher) lineare discriminant analysis (LDA)
-     * @todo create a faster copy of the projection values
-     **/
+    /** class for projection the (Fisher) lineare discriminant analysis (LDA) **/
     template<typename T, typename L> class lda : public supervisedreduce<T,L> {
         
         public :

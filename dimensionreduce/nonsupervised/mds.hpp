@@ -27,7 +27,6 @@
 
 #include <boost/numeric/ublas/matrix.hpp>
 
-#include "pca.hpp"
 #include "../dimensionreduce.hpp"
 #include "../../exception/exception.h"
 #include "../../tools/tools.h"
@@ -38,17 +37,14 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     namespace ublas  = boost::numeric::ublas;
     
     
-    /** create the Multidimensional scaling (MDS)
-     * @todo create a faster copy of the projection values
-     **/
+    /** create the Multidimensional scaling (MDS) **/
     template<typename T> class mds : public nonsupervisedreduce<T> {
         
         public :
         
             enum project {
                 metric      = 0,
-                general     = 1,
-                sammon      = 2
+                sammon      = 1
             };
         
         
