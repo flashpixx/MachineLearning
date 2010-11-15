@@ -68,6 +68,9 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         
             ublas::matrix<T> project_metric( const ublas::matrix<T>& );
             ublas::matrix<T> project_sammon( const ublas::matrix<T>& );
+        
+            ublas::vector<T> sse( const ublas::matrix<T>&, const std::size_t& ) const;
+            ublas::matrix<T> doublecentering( const ublas::matrix<T>& ) const;
 
     };
 
@@ -114,6 +117,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             case sammon:
                 return project_sammon(p_data);
                 
+                
             default :
                 throw exception::runtime(_("project option is unkown"));
         };
@@ -148,7 +152,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     }
     
     
-    /** caluate the sammon mapping on MDS
+    /** caluate the sammon mapping on MDS (with newton method for optimization)
      * @param p_data input datamatrix (similarity matrix)
      * @return mapped data
      **/
@@ -158,17 +162,80 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             throw exception::runtime(_("iterations must be greater than zero"));
         
         // the similarity matrix must be double-centered
+        const ublas::matrix<T> l_center = doublecentering( p_data );
+        
+        // create mutal distances (it is the SSE of each row)
         ublas::matrix<T> l_data(p_data.size1(), p_data.size2());
         for(std::size_t i=0; i < l_data.size1(); ++i)
-            for(std::size_t j=0; j < l_data.size2(); ++j)
-                l_data(i,j) = p_data(i,i) + p_data(j,j) - (p_data(i,j)+p_data(j,i));
+            ublas::row(l_data,i) = sse(l_center, i);
         
+        
+        // target point matrix
+        ublas::matrix<T> l_target = tools::matrix::random( l_data.size1(), m_dim, tools::random::uniform, -0.5, 0.5 );
+        ublas::vector<T> l_adapt( l_data.size1(), 0);
         
         for(std::size_t i=0; i < m_iteration; ++i) {
+                        
+            
+            // for each row create the new position
+            for(std::size_t j=0; j < l_data.size1(); ++j) {
+                
+                // calculate the actually SSE
+                const ublas::vector<T> l_sse = sse(l_target, j);
+ 
+                // adaption
+                const ublas::vector<T> l_diff = ublas::row(l_data, j) - l_sse;
+                const ublas::vector<T> l_mul  = ublas::element_prod( ublas::row(l_data, j), l_sse );
+                
+                // calculate the division and check the numerical range
+                for(std::size_t n=0; n < l_adapt.size(); ++n)
+                    if (!tools::function::isNumericalZero(l_mul(n)))
+                        l_adapt(n) = 0;
+                    else
+                        l_adapt(n) = l_diff(n) / l_mul(n);
+                
+                
+            }
+  
             
         }
+        
+        return l_target;
     }
     
+    
+    /** calculate the SSE between a row of the matrix and the other rows
+     * @param p_matrix input matrix
+     * @param p_pos row number
+     * @return SSE vector
+     **/
+    template<typename T> inline ublas::vector<T> mds<T>::sse( const ublas::matrix<T>& p_matrix, const std::size_t& p_pos ) const
+    {
+        ublas::vector<T> l_sse( p_matrix.size1(), 0 );
+        
+        for(std::size_t n=0; n < l_sse.size(); ++n) {
+            const ublas::vector<T> l_tmp = ublas::row(p_matrix, n) - ublas::row(p_matrix, p_pos);
+            l_sse(n) = std::pow(ublas::sum( tools::vector::pow(l_tmp, static_cast<T>(2)) ), static_cast<T>(0.5));
+        }
+        
+        return l_sse;
+    }
+    
+    
+    /** create a double centering matrix
+     * @param p_data input matrix
+     * @return double centered matrix
+     **/
+    template<typename T> inline ublas::matrix<T> mds<T>::doublecentering( const ublas::matrix<T>& p_data ) const
+    {
+        ublas::matrix<T> l_center(p_data.size1(), p_data.size2());
+        
+        for(std::size_t i=0; i < p_data.size1(); ++i)
+            for(std::size_t j=0; j < p_data.size2(); ++j)
+                l_center(i,j) = p_data(i,i) + p_data(j,j) - (p_data(i,j)+p_data(j,i));
+        
+        return l_center;
+    }
 
 };};};
 #endif
