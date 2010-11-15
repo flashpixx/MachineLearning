@@ -58,7 +58,6 @@ namespace machinelearning { namespace distances {
     /**
      * class for calculating the normalized compression distance (NCD)
      * with some different algorithms like gzip and bzip2
-     * @todo set to unicode
      **/
     template<typename T> class ncd {
         

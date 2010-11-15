@@ -57,13 +57,13 @@ int main(int argc, char *argv[]) {
 
     
     // ===== MDS ======
-    /*
+    
     ublas::matrix<double> data = o.readMatrix<double>("/mds2", H5::PredType::NATIVE_DOUBLE); 
     ndim::mds<double> l(2);
      
     tl::files::hdf f("mds.hdf5", true);
     f.write<double>( "/data",  l.map(data), H5::PredType::NATIVE_DOUBLE );  
-    */
+    
    
     // ===== Wikipedia ======
     /*
@@ -88,7 +88,7 @@ int main(int argc, char *argv[]) {
     */
     
     // ===== Newsgroup ======
-    
+    /*
     // dt. große Gruppen: de.soc.politik.misc, de.rec.fotografie, de.talk.tagesgeschehen, de.etc.sprache.deutsch, de.comp.os.unix.linux.misc, de.sci.electronics, de.etc.fahrzeug.auto, de.comp.sys.mac.misc, de.comp.lang.java, de.soc.weltanschauung.christentum
     
     #ifdef SOURCES    
@@ -99,14 +99,14 @@ int main(int argc, char *argv[]) {
     
     
     // sort with size
-    /*std::map<std::string, std::size_t> groups = x.getGroupList();
+    std::map<std::string, std::size_t> groups = x.getGroupList();
     std::multimap<std::size_t, std::string> newsgroups;
     for (std::map<std::string, std::size_t>::iterator it = groups.begin(); it != groups.end(); ++it)
         if (it->first.substr(0,2) == "de")
             newsgroups.insert( std::pair<std::size_t, std::string>(it->second, it->first) );
     for (std::multimap<std::size_t, std::string>::iterator it = newsgroups.begin(); it != newsgroups.end(); ++it)
         std::cout << it->second << "\t\t\t" << it->first << std::endl;
-    */
+    
     
     x.setContent( tl::sources::nntp::full );
     x.setGroup("1und1.announce");
@@ -120,7 +120,7 @@ int main(int argc, char *argv[]) {
         std::cout << header << "\n-------------------------------------------------\n" << body << "\n>=================================================================================<" << std::endl;
     }
     #endif
-    
+    */
      
     
     // ===== Gradient ======

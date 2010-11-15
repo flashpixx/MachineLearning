@@ -43,9 +43,7 @@ namespace machinelearning { namespace tools { namespace files {
     
     
     
-    /** class for reading vector and matrix structur from csv file
-     * @todo set to unicode
-     **/
+    /** class for reading vector and matrix structur from csv file **/
     class csv {
         
         public :

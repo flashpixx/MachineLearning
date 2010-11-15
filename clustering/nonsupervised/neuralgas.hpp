@@ -49,6 +49,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     #endif
     
     /** class for calculate (batch) neural gas
+     * @todo parallel NG with >= 0 prototypes on each CPU
      **/
     template<typename T> class neuralgas : public nonsupervisedclustering<T> {
         
