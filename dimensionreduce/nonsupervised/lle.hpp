@@ -50,7 +50,6 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         
             lle( const neighborhood::neighborhood<T>&, const std::size_t& );
             ublas::matrix<T> map( const ublas::matrix<T>& );
-            ublas::matrix<T> getMapping( void ) const;
             std::size_t getDimension( void ) const;
         
         
@@ -60,8 +59,6 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             const neighborhood::neighborhood<T>* m_neighborhood;
             /** target dimension **/
             const std::size_t m_dim;
-            /** matrix with projection vectors (row orientated) **/
-            ublas::matrix<T> m_project;
         
     };
 
@@ -86,15 +83,6 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     template<typename T> inline std::size_t lle<T>::getDimension( void ) const
     {
         return m_dim;
-    }
-    
-    
-    /** returns the project vectors (largest eigenvectors)
-     * @return matrix with eigenvector
-     **/
-    template<typename T> inline ublas::matrix<T> lle<T>::getMapping( void ) const
-    {
-        return m_project;
     }
     
     

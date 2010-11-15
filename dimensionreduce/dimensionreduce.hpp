@@ -45,10 +45,7 @@ namespace machinelearning { namespace dimensionreduce {
 
             /** maps data to target dimension **/
             virtual ublas::matrix<T> map( const ublas::matrix<T>& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
-        
-            /** returns the direction **/
-            virtual ublas::matrix<T> getMapping( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
-      
+              
             /** returns the mapped dimension **/
             virtual std::size_t getDimension( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
         
@@ -68,9 +65,6 @@ namespace machinelearning { namespace dimensionreduce {
         
             /** maps data to target dimension **/
             virtual ublas::matrix<T> map( const ublas::matrix<T>&, const std::vector<L>& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
-        
-            /** returns the direction **/
-            virtual ublas::matrix<T> getMapping( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
         
             /** returns the mapped dimension **/
             virtual std::size_t getDimension( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };

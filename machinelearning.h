@@ -215,8 +215,9 @@
  * @code
     ublas::matrix<double> data = / fill similarity data /;
  
-    // create a mds object for reduce data to 2 dimensions (the optional second parameter adds the projection type)
-    dimensionreduce::nonsupervised::mds<double> mds(2, dimensionreduce::nonsupervised::mds::metric | dimensionreduce::nonsupervised::mds::sammon );
+    // create a mds object for reduce data to 2 dimensions (the optional second parameter adds the projection type and the third the number of iterations for the iterative algorithms)
+    // The algorithms are: metric, sammon, hit (High-Throughput), shepardkruskal (Shepard-Kruskal) and engerie
+    dimensionreduce::nonsupervised::mds<double> mds(2);
  
     // create reduce data
     ublas::matrix<double> reduce = mds.map(data);

@@ -37,34 +37,37 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     namespace ublas  = boost::numeric::ublas;
     
     
-    /** create the Multidimensional scaling (MDS) **/
+    /** create the Multidimensional scaling (MDS) with different algorithms **/
     template<typename T> class mds : public nonsupervisedreduce<T> {
         
         public :
         
             enum project {
-                metric      = 0,
-                sammon      = 1
+                metric          = 0,
+                sammon          = 1,
+                hit             = 2,    // http://dig.ipk-gatersleben.de/hitmds/hitmds.html
+                shepardkruskal  = 3,     // http://de.wikipedia.org/wiki/Multidimensionale_Skalierung#Shepard-Kruskal_Algorithmus
+                energie         = 4
             };
         
         
-            mds( const std::size_t&, const project& = metric );
+            mds( const std::size_t&, const project& = metric, const std::size_t& = 0 );
             ublas::matrix<T> map( const ublas::matrix<T>& );
-            ublas::matrix<T> getMapping( void ) const;
             std::size_t getDimension( void ) const;
         
         
         private :
         
+            /** number of iterations for sammon **/
+            const std::size_t m_iteration;
             /** target dimension **/
             const std::size_t m_dim;
             /** project type **/
             const project m_type;
-            /** matrix with projection vectors (row orientated) **/
-            ublas::matrix<T> m_project;
         
         
             ublas::matrix<T> project_metric( const ublas::matrix<T>& );
+            ublas::matrix<T> project_sammon( const ublas::matrix<T>& );
 
     };
 
@@ -72,11 +75,12 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     /** constructor
      * @param p_dim target dimension
      * @param p_type project type
+     * @param p_iteration number of iterations for sammon
      **/
-    template<typename T> inline mds<T>::mds( const std::size_t& p_dim, const project& p_type ) :
+    template<typename T> inline mds<T>::mds( const std::size_t& p_dim, const project& p_type, const std::size_t& p_iteration ) :
+        m_iteration( p_iteration ),
         m_dim( p_dim ),
-        m_type( p_type ),
-        m_project()
+        m_type( p_type )
     {
         if (p_dim == 0)
             throw exception::runtime(_("dimension must be greater than zero"));
@@ -89,15 +93,6 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     template<typename T> inline std::size_t mds<T>::getDimension( void ) const
     {
         return m_dim;
-    }
-    
-    
-    /** returns the project vectors (largest eigenvectors)
-     * @return matrix with eigenvector
-     **/
-    template<typename T> inline ublas::matrix<T> mds<T>::getMapping( void ) const
-    {
-        return m_project;
     }
     
     
@@ -116,6 +111,9 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             case metric:
                 return project_metric(p_data);
                 
+            case sammon:
+                return project_sammon(p_data);
+                
             default :
                 throw exception::runtime(_("project option is unkown"));
         };
@@ -125,6 +123,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     
     /** caluate the metric MDS (for metric we use eigenvalues)
      * @param p_data input datamatrix (similarity matrix)
+     * @return mapped data
      **/
     template<typename T> inline ublas::matrix<T> mds<T>::project_metric( const ublas::matrix<T>& p_data )
     {
@@ -138,14 +137,36 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         const ublas::indirect_array< std::vector<std::size_t> > l_rank = tools::vector::rankIndex( l_eigenvalues );
         
         // create projection (largest eigenvectors correspondends with the largest eigenvalues -> last values in rank)
-        m_project = ublas::matrix<T>( l_eigenvectors.size2(), m_dim );
+        ublas::matrix<T> l_project( l_eigenvectors.size2(), m_dim );
         ublas::matrix<T> l_values(m_dim, m_dim, 0);
         for(std::size_t i=0; i < m_dim; ++i) {
-            ublas::column(m_project, m_dim-i-1) = ublas::column(l_eigenvectors, l_rank(l_rank.size()-i-1));
-            l_values(m_dim-i-1, m_dim-i-1) = l_eigenvalues(l_rank(l_rank.size()-i-1));
+            ublas::column(l_project, m_dim-i-1) = ublas::column(l_eigenvectors, l_rank(l_rank.size()-i-1));
+            l_values(m_dim-i-1, m_dim-i-1) = std::pow(l_eigenvalues(l_rank(l_rank.size()-i-1)), static_cast<T>(0.5));
         }
         
-        return ublas::prod(m_project, l_values);
+        return ublas::prod(l_project, l_values);
+    }
+    
+    
+    /** caluate the sammon mapping on MDS
+     * @param p_data input datamatrix (similarity matrix)
+     * @return mapped data
+     **/
+    template<typename T> inline ublas::matrix<T> mds<T>::project_sammon( const ublas::matrix<T>& p_data )
+    {
+        if (m_iteration == 0)
+            throw exception::runtime(_("iterations must be greater than zero"));
+        
+        // the similarity matrix must be double-centered
+        ublas::matrix<T> l_data(p_data.size1(), p_data.size2());
+        for(std::size_t i=0; i < l_data.size1(); ++i)
+            for(std::size_t j=0; j < l_data.size2(); ++j)
+                l_data(i,j) = p_data(i,i) + p_data(j,j) - (p_data(i,j)+p_data(j,i));
+        
+        
+        for(std::size_t i=0; i < m_iteration; ++i) {
+            
+        }
     }
     
 
