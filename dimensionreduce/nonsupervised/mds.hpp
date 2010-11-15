@@ -46,8 +46,6 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                 metric          = 0,
                 sammon          = 1,
                 hit             = 2,    // http://dig.ipk-gatersleben.de/hitmds/hitmds.html
-                shepardkruskal  = 3,     // http://de.wikipedia.org/wiki/Multidimensionale_Skalierung#Shepard-Kruskal_Algorithmus
-                energie         = 4
             };
         
         
@@ -165,14 +163,13 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         const ublas::matrix<T> l_center = doublecentering( p_data );
         
         // create mutal distances (it is the SSE of each row)
-        ublas::matrix<T> l_data(p_data.size1(), p_data.size2());
+        ublas::matrix<T> l_data(l_center.size1(), l_center.size2());
         for(std::size_t i=0; i < l_data.size1(); ++i)
             ublas::row(l_data,i) = sse(l_center, i);
         
         
         // target point matrix
         ublas::matrix<T> l_target = tools::matrix::random( l_data.size1(), m_dim, tools::random::uniform, -0.5, 0.5 );
-        ublas::vector<T> l_adapt( l_data.size1(), 0);
         
         for(std::size_t i=0; i < m_iteration; ++i) {
                         
@@ -180,18 +177,17 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             // for each row create the new position
             for(std::size_t j=0; j < l_data.size1(); ++j) {
                 
-                // calculate the actually SSE
+                // calculate the actually SSE of the project points
                 const ublas::vector<T> l_sse = sse(l_target, j);
  
                 // adaption
+                ublas::vector<T> l_adapt( l_data.size1(), 0);
                 const ublas::vector<T> l_diff = ublas::row(l_data, j) - l_sse;
                 const ublas::vector<T> l_mul  = ublas::element_prod( ublas::row(l_data, j), l_sse );
                 
                 // calculate the division and check the numerical range
                 for(std::size_t n=0; n < l_adapt.size(); ++n)
                     if (!tools::function::isNumericalZero(l_mul(n)))
-                        l_adapt(n) = 0;
-                    else
                         l_adapt(n) = l_diff(n) / l_mul(n);
                 
                 
