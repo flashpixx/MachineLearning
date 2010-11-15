@@ -30,10 +30,10 @@
  * <li>Boost (http://www.boost.org/) (support for iostreams with gzip and bzip2 support and thread support musst be compiled, random and MPI support are optional)</li>
  * <li>Boost Bindings (SVN http://svn.boost.org/svn/boost/sandbox/numeric_bindings / ZIP http://mathema.tician.de/software/boost-numeric-bindings)</li>
  * <li>LAPACK (http://www.netlib.org/lapack/)</li>
- * <li>HDF (http://www.hdfgroup.org/)</li>
- * <li><i>optional Message-Passing-Interface-Support:</i> Open MPI (http://www.open-mpi.org/) for unix systems / MS MPI (Microsoft Cluster Pack) for Windows system</li>
- * <li><i>optional GetText:</i> (http://www.gnu.org/software/gettext) for including multilanguage support</li>
- * <li><i>optional LibXML2:</i> (http://xmlsoft.org/)</li>
+ * <li><i>optional Hierarchical Data Format (HDF)</i> (http://www.hdfgroup.org/)</li>
+ * <li><i>optional Message-Passing-Interface-Support</i> Open MPI (http://www.open-mpi.org/) for unix systems / MS MPI (Microsoft Cluster Pack) for Windows system</li>
+ * <li><i>optional GetText</i> (http://www.gnu.org/software/gettext) for including multilanguage support</li>
+ * <li><i>optional LibXML2</i> (http://xmlsoft.org/)</li>
  * </ul>
  *
  * @section compileroptions Compiler Option
@@ -41,7 +41,7 @@
  * <ul>
  * <li><pre>RANDOMDEVICE</pre> for using the Boost Device Random support (required Boost Random Device Support), otherwise a Mersenne Twister is used</li>
  * <li><pre>MULTILANGUAGE</pre> option for compiling the framework with multilanguage support (uses gettext)</li>
- * <li><pre>FILES</pre> adds the support for HDF & CSV file reading</li>
+ * <li><pre>FILES</pre> adds the support for HDF & CSV file reading and writing</li>
  * <li><pre>SOURCES</pre> compiles sources in that way, that e.g. NNTP / Wikipedia data can be read directly</li>
  * <li><pre>CLUSTER</pre> enable MPI Support for the toolbox (required Boost MPI support)</li>
  * </ul>
@@ -166,8 +166,6 @@
     distances::euclid<double> d;
     // create rlvq object (the size of label vector is the number of prototypes)
     clustering::supervised::rlvq<double, std::string> rlvq(d, prototypelabel, data.size2())
-    // enabled logging
-    rlvq.setLogging(true);
  
     // train prototypes in 15 iterations
     rlvq.train(data, labels, 15);
@@ -195,7 +193,7 @@
     ublas::matrix<double> data = / fill data (row orientated) /;
  
     // create a pca object for reduce data to 2 dimensions
-    dimensionreduce::nonsupervised::pca<double> p(2);
+    dimensionreduce::nonsupervised::pca<double> pca(2);
     
     // create reduce data matrix
     ublas::matrix<double> reduce = pca.map(data);
@@ -211,6 +209,17 @@
  
     // create reduce data
     ublas::matrix<double> reduce = lda.map(data, labels);
+ * @endcode
+ *
+ * @section mds multidimensional scaling (MDS)
+ * @code
+    ublas::matrix<double> data = / fill similarity data /;
+ 
+    // create a mds object for reduce data to 2 dimensions (the optional second parameter adds the projection type)
+    dimensionreduce::nonsupervised::mds<double> mds(2, dimensionreduce::nonsupervised::mds::metric | dimensionreduce::nonsupervised::mds::sammon );
+ 
+    // create reduce data
+    ublas::matrix<double> reduce = mds.map(data);
  * @endcode
  *
  * @section lle local linear embedding (LLE)
