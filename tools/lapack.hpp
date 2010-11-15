@@ -234,9 +234,6 @@ namespace machinelearning { namespace tools {
      **/
     template<typename T> inline ublas::vector<T> lapack::perronfrobenius( const ublas::matrix<T>& p_matrix, const std::size_t& p_iteration )
     {
-        if (p_matrix.size1() != p_matrix.size2())
-            throw exception::runtime(_("matrix must be square"));
-        
         return perronfrobenius( p_matrix, p_iteration, vector::random<T>(p_matrix.size1()) );
     }
     
