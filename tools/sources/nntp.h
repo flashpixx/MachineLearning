@@ -103,6 +103,9 @@ namespace machinelearning { namespace tools { namespace sources {
             iterator end( void );   
         
         
+            static void separateHeaderBody( const std::string&, std::string&, std::string& );
+        
+        
         
         private :
         
@@ -471,19 +474,37 @@ namespace machinelearning { namespace tools { namespace sources {
     /** returns the begin iterator to an article
      * @return nntp iterator
      **/
-    nntp::iterator nntp::begin( void )
+    inline nntp::iterator nntp::begin( void )
     {
         return nntp::iterator( *this );
     }
     
+    
     /** return the end iterator 
      * @return nntp iterator
      **/
-    nntp::iterator nntp::end( void )
+    inline nntp::iterator nntp::end( void )
     {
         return nntp::iterator();
     }
     
+    
+    /** static method for separating body and header. The separator is the first double CRLF
+     * @param p_article complete article
+     * @param p_header string reference in that the header will be filled
+     * @param p_body string reference in that the body will be filled
+     **/
+    inline void nntp::separateHeaderBody( const std::string& p_article, std::string& p_header, std::string& p_body )
+    {
+        std::size_t l_found = p_article.find("\r\n\r\n");
+        if (l_found != std::string::npos) {
+            p_header = p_article.substr(0, l_found);
+            p_body   = p_article.substr(l_found+4);
+        } else {
+            p_body   = p_article;
+            p_header = "";
+        }
+    }
     
 
     //======= Iterator ==================================================================================================================================
@@ -564,7 +585,6 @@ namespace machinelearning { namespace tools { namespace sources {
         
         return m_end != p_it.m_end;
     }
-    
     
 };};};
 

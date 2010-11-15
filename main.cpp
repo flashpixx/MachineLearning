@@ -88,7 +88,7 @@ int main(int argc, char *argv[]) {
     */
     
     // ===== Newsgroup ======
-    /*
+    
     // dt. große Gruppen: de.soc.politik.misc, de.rec.fotografie, de.talk.tagesgeschehen, de.etc.sprache.deutsch, de.comp.os.unix.linux.misc, de.sci.electronics, de.etc.fahrzeug.auto, de.comp.sys.mac.misc, de.comp.lang.java, de.soc.weltanschauung.christentum
     
     #ifdef SOURCES    
@@ -99,24 +99,28 @@ int main(int argc, char *argv[]) {
     
     
     // sort with size
-    std::map<std::string, std::size_t> groups = x.getGroupList();
+    /*std::map<std::string, std::size_t> groups = x.getGroupList();
     std::multimap<std::size_t, std::string> newsgroups;
     for (std::map<std::string, std::size_t>::iterator it = groups.begin(); it != groups.end(); ++it)
         if (it->first.substr(0,2) == "de")
             newsgroups.insert( std::pair<std::size_t, std::string>(it->second, it->first) );
     for (std::multimap<std::size_t, std::string>::iterator it = newsgroups.begin(); it != newsgroups.end(); ++it)
         std::cout << it->second << "\t\t\t" << it->first << std::endl;
-    
+    */
     
     x.setContent( tl::sources::nntp::full );
-    //x.setGroup("1und1.announce");
+    x.setGroup("1und1.announce");
     //x.setGroup("tuc.misc");
-    x.setGroup("de.comp.text.misc");
+    //x.setGroup("de.comp.text.misc");
     //x.setGroup("gmane.linux.gentoo.user");
-    for(tl::sources::nntp::iterator it=x.begin(); it != x.end(); ++it)
-        std::cout << *it << "\n>=================================================================================<" << std::endl;
+    for(tl::sources::nntp::iterator it=x.begin(); it != x.end(); ++it) {
+        std::string header, body;
+        tl::sources::nntp::separateHeaderBody( *it, header, body );
+        
+        std::cout << header << "\n-------------------------------------------------\n" << body << "\n>=================================================================================<" << std::endl;
+    }
     #endif
-    */
+    
      
     
     // ===== Gradient ======
