@@ -27,7 +27,7 @@
 
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
-
+#include <boost/numeric/ublas/matrix_sparse.hpp>
 
 #include "../dimensionreduce.hpp"
 #include "../../neighborhood/neighborhood.h"
@@ -130,7 +130,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
  
         
         // create weight matrix (I-W)' * (I-W) for the data
-        ublas::matrix<T> l_project = tools::matrix::eye<T>(p_data.size1());
+        ublas::mapped_matrix<T> l_project = tools::matrix::eye<T>(p_data.size1());
         for(std::size_t i=0; i < l_weight.size1(); ++i) {
             
             const ublas::vector<std::size_t> l_ndidx = ublas::row(l_neighborhood, i);

@@ -31,9 +31,10 @@
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix_proxy.hpp>
+#include <boost/numeric/ublas/matrix_sparse.hpp>
+
 
 #include "../exception/exception.h"
-//#include "../distances/distances.h"
 #include "vector.hpp"
 #include "function.hpp"
 #include "language/language.h"
@@ -59,13 +60,13 @@ namespace machinelearning { namespace tools {
         
             template<typename T> static ublas::matrix<T> random( const std::size_t&, const std::size_t&, const tools::random::distribution& = tools::random::uniform, const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon() );
             template<typename T> static ublas::matrix<T> random( const std::size_t&, const tools::random::distribution& = tools::random::uniform, const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon() );
-            //template<typename T> static ublas::matrix<T> eye( const std::size_t&, const std::size_t& );
-            //template<typename T> static ublas::matrix<T> eye( const std::size_t& );
+            template<typename T> static ublas::mapped_matrix<T> eye( const std::size_t&, const std::size_t&, const T& = 0 );
+            template<typename T> static ublas::mapped_matrix<T> eye( const std::size_t& );
             template<typename T> static ublas::matrix<T> pow( const ublas::matrix<T>&, const T& );
             template<typename T> static ublas::vector<T> min( const ublas::matrix<T>&, const rowtype& = row );
             template<typename T> static ublas::vector<T> mean( const ublas::matrix<T>&, const rowtype& = row );
             template<typename T> static ublas::vector<T> sum( const ublas::matrix<T>&, const rowtype& = row );
-            template<typename T> static ublas::matrix<T> diag( const ublas::vector<T>& );
+            template<typename T> static ublas::mapped_matrix<T> diag( const ublas::vector<T>& );
             template<typename T> static ublas::vector<T> diag( const ublas::matrix<T>& );
             template<typename T> static T trace( const ublas::matrix<T>& );
             template<typename T> static ublas::matrix<T> centering( const ublas::matrix<T>&, const rowtype& = column );
@@ -125,10 +126,10 @@ namespace machinelearning { namespace tools {
      * @overload
      * @param p_row rows
      * @param p_col columns
+     * @param p_val value for set (default 0)
      * @return matrix of type T
      **/  
-    /*
-    template<typename T> inline ublas::matrix<T> matrix::eye( const std::size_t& p_row, const std::size_t& p_col )
+    template<typename T> inline ublas::mapped_matrix<T> matrix::eye( const std::size_t& p_row, const std::size_t& p_col, const T& p_val )
     {
         if (p_row == 0)
             throw exception::runtime(_("row size must be greater than zero"));
@@ -138,12 +139,12 @@ namespace machinelearning { namespace tools {
         const std::size_t l_diag = (p_row < p_col) ? p_row : p_col;
         
         // initialisation of prototypes
-        ublas::matrix<T> l_matrix(p_row, p_col, 0);
+        ublas::mapped_matrix<T> l_matrix(p_row, p_col, l_diag);
         for (std::size_t i=0; i < l_diag; ++i)
-            l_matrix(i,i) = 1;
+            l_matrix(i,i) = p_val;
         
         return l_matrix;
-    } */  
+    }
     
     
     /** create a symmetric matrix of type T and
@@ -152,11 +153,10 @@ namespace machinelearning { namespace tools {
      * @param p_size element size
      * @return matrix of type T
      **/
-    /*
-    template<typename T> inline ublas::matrix<T> matrix::eye( const std::size_t& p_size )
+    template<typename T> inline ublas::mapped_matrix<T> matrix::eye( const std::size_t& p_size )
     {
         return eye<T>(p_size, p_size);
-    }  */  
+    }
     
     
     /** creates a blas vector in which every element hold the minimum of the row / column elements of the matrix
@@ -268,9 +268,9 @@ namespace machinelearning { namespace tools {
      * @param p_vec input vector
      * @return NxN matrix
     **/
-    template<typename T> inline ublas::matrix<T> matrix::diag( const ublas::vector<T>& p_vec )
+    template<typename T> inline ublas::mapped_matrix<T> matrix::diag( const ublas::vector<T>& p_vec )
     {
-        ublas::matrix<T> l_mat(p_vec.size(), p_vec.size(), 0);
+        ublas::mapped_matrix<T> l_mat(p_vec.size(), p_vec.size(), p_vec.size());
         for(std::size_t i=0; i < p_vec.size(); ++i)
             l_mat(i,i) = p_vec(i);
         return l_mat;

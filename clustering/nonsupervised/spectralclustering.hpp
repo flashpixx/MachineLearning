@@ -168,9 +168,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
 
         
         // create squared degree and normalized graph laplacian
-        const ublas::matrix<T> l_sqrtdegree = tools::matrix::pow( tools::matrix::diag(tools::matrix::sum(p_similarity)), static_cast<T>(-0.5));
-        const ublas::matrix<T> l_tmp        = ublas::prod(l_sqrtdegree, p_similarity);
-        const ublas::matrix<T> l_laplacian  = tools::matrix::eye<T>(p_similarity.size1()) - ublas::prod(l_tmp, l_sqrtdegree);
+        const ublas::matrix<T> l_sqrtdegree   = tools::matrix::pow( tools::matrix::diag(tools::matrix::sum(p_similarity)), static_cast<T>(-0.5));
+        const ublas::matrix<T> l_tmp          = ublas::prod(l_sqrtdegree, p_similarity);
+        const ublas::matrix<T> l_laplacian    = tools::matrix::eye<T>(p_similarity.size1()) - ublas::prod(l_tmp, l_sqrtdegree);
         
         // determine eigenvalues and -vector of the graph laplacian
         ublas::vector<T> l_eigenvalue;

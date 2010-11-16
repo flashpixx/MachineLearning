@@ -186,8 +186,6 @@ namespace machinelearning { namespace tools {
         if (p_matrix.size1() != p_matrix.size2())
             throw exception::runtime(_("matrix must be square"));
         
-        const ublas::matrix<T> l_eye = matrix::eye<T>(p_matrix.size1());
-        
         
         return p_matrix;
         
