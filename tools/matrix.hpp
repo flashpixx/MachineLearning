@@ -60,7 +60,7 @@ namespace machinelearning { namespace tools {
         
             template<typename T> static ublas::matrix<T> random( const std::size_t&, const std::size_t&, const tools::random::distribution& = tools::random::uniform, const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon() );
             template<typename T> static ublas::matrix<T> random( const std::size_t&, const tools::random::distribution& = tools::random::uniform, const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon() );
-            template<typename T> static ublas::mapped_matrix<T> eye( const std::size_t&, const std::size_t&, const T& = 0 );
+            template<typename T> static ublas::mapped_matrix<T> eye( const std::size_t&, const std::size_t&, const T& = 1 );
             template<typename T> static ublas::mapped_matrix<T> eye( const std::size_t& );
             template<typename T> static ublas::matrix<T> pow( const ublas::matrix<T>&, const T& );
             template<typename T> static ublas::vector<T> min( const ublas::matrix<T>&, const rowtype& = row );
@@ -126,7 +126,7 @@ namespace machinelearning { namespace tools {
      * @overload
      * @param p_row rows
      * @param p_col columns
-     * @param p_val value for set (default 0)
+     * @param p_val value for set (default 1)
      * @return matrix of type T
      **/  
     template<typename T> inline ublas::mapped_matrix<T> matrix::eye( const std::size_t& p_row, const std::size_t& p_col, const T& p_val )
