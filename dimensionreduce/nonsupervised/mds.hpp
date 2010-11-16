@@ -67,7 +67,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             ublas::matrix<T> project_metric( const ublas::matrix<T>& );
             ublas::matrix<T> project_sammon( const ublas::matrix<T>& );
         
-            ublas::vector<T> sse( const ublas::matrix<T>&, const std::size_t& ) const;
+            ublas::matrix<T> sse( const ublas::matrix<T>& ) const;
             ublas::matrix<T> doublecentering( const ublas::matrix<T>& ) const;
 
     };
@@ -162,57 +162,41 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         // the similarity matrix must be double-centered
         const ublas::matrix<T> l_center = doublecentering( p_data );
         
-        // create mutal distances (it is the SSE of each row)
-        ublas::matrix<T> l_data(l_center.size1(), l_center.size2());
-        for(std::size_t i=0; i < l_data.size1(); ++i)
-            ublas::row(l_data,i) = sse(l_center, i);
+        // create the SSE for each row/colum of the matrix and sets the diagonal elements to one
+        //const ublas::matrix<T> l_ones = tools::matrix::eye( l_center.size1(), l_center.size2() );   
+        ublas::matrix<T> l_data       = sse(l_center);
+        //ublas::matrix<T> l_dataInv  = tools::matrix::invert(l_data);
         
-        
+        std::cout << l_data << std::endl;
         // target point matrix
         ublas::matrix<T> l_target = tools::matrix::random( l_data.size1(), m_dim, tools::random::uniform, -0.5, 0.5 );
         
+        /*
         for(std::size_t i=0; i < m_iteration; ++i) {
                         
             
-            // for each row create the new position
-            for(std::size_t j=0; j < l_data.size1(); ++j) {
-                
-                // calculate the actually SSE of the project points
-                const ublas::vector<T> l_sse = sse(l_target, j);
- 
-                // adaption
-                ublas::vector<T> l_adapt( l_data.size1(), 0);
-                const ublas::vector<T> l_diff = ublas::row(l_data, j) - l_sse;
-                const ublas::vector<T> l_mul  = ublas::element_prod( ublas::row(l_data, j), l_sse );
-                
-                // calculate the division and check the numerical range
-                for(std::size_t n=0; n < l_adapt.size(); ++n)
-                    if (!tools::function::isNumericalZero(l_mul(n)))
-                        l_adapt(n) = l_diff(n) / l_mul(n);
-                
-                
-            }
   
             
-        }
+        }*/
         
         return l_target;
     }
     
     
-    /** calculate the SSE between a row of the matrix and the other rows
+    /** calculate the SSE between a every row of the matrix and the other rows
      * @param p_matrix input matrix
      * @param p_pos row number
-     * @return SSE vector
+     * @return SSE matrix
      **/
-    template<typename T> inline ublas::vector<T> mds<T>::sse( const ublas::matrix<T>& p_matrix, const std::size_t& p_pos ) const
+    template<typename T> inline ublas::matrix<T> mds<T>::sse( const ublas::matrix<T>& p_matrix ) const
     {
-        ublas::vector<T> l_sse( p_matrix.size1(), 0 );
+        ublas::matrix<T> l_sse( p_matrix.size1(), p_matrix.size2(), 0 );
         
-        for(std::size_t n=0; n < l_sse.size(); ++n) {
-            const ublas::vector<T> l_tmp = ublas::row(p_matrix, n) - ublas::row(p_matrix, p_pos);
-            l_sse(n) = std::pow(ublas::sum( tools::vector::pow(l_tmp, static_cast<T>(2)) ), static_cast<T>(0.5));
-        }
+        for(std::size_t i=0; i < l_sse.size1(); ++i)
+            for(std::size_t j=0; j < l_sse.size2(); ++j) {
+                const ublas::vector<T> l_tmp = ublas::row(p_matrix, j) - ublas::row(p_matrix, i);
+                l_sse(i,j) = std::pow(ublas::sum( tools::vector::pow(l_tmp, static_cast<T>(2)) ), static_cast<T>(0.5));
+            }
         
         return l_sse;
     }
@@ -232,6 +216,9 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         
         return l_center;
     }
+    
+    
+
 
 };};};
 #endif

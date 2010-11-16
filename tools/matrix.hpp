@@ -59,8 +59,8 @@ namespace machinelearning { namespace tools {
         
             template<typename T> static ublas::matrix<T> random( const std::size_t&, const std::size_t&, const tools::random::distribution& = tools::random::uniform, const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon() );
             template<typename T> static ublas::matrix<T> random( const std::size_t&, const tools::random::distribution& = tools::random::uniform, const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon() );
-            template<typename T> static ublas::matrix<T> eye( const std::size_t&, const std::size_t& );
-            template<typename T> static ublas::matrix<T> eye( const std::size_t& );
+            //template<typename T> static ublas::matrix<T> eye( const std::size_t&, const std::size_t& );
+            //template<typename T> static ublas::matrix<T> eye( const std::size_t& );
             template<typename T> static ublas::matrix<T> pow( const ublas::matrix<T>&, const T& );
             template<typename T> static ublas::vector<T> min( const ublas::matrix<T>&, const rowtype& = row );
             template<typename T> static ublas::vector<T> mean( const ublas::matrix<T>&, const rowtype& = row );
@@ -72,6 +72,7 @@ namespace machinelearning { namespace tools {
             template<typename T> static ublas::matrix<T> sort( const ublas::matrix<T>&, const ublas::vector<std::size_t>&, const rowtype& p_which = row);
             template<typename T> static ublas::matrix<T> cov( const ublas::matrix<T>& );
             template<typename T> static ublas::matrix<T> setNumericalZero( const ublas::matrix<T>&, const T& = 0);
+            template<typename T> static ublas::matrix<T> invert( const ublas::matrix<T>& p_matrix );
     };
     
     
@@ -125,7 +126,8 @@ namespace machinelearning { namespace tools {
      * @param p_row rows
      * @param p_col columns
      * @return matrix of type T
-     **/      
+     **/  
+    /*
     template<typename T> inline ublas::matrix<T> matrix::eye( const std::size_t& p_row, const std::size_t& p_col )
     {
         if (p_row == 0)
@@ -141,7 +143,7 @@ namespace machinelearning { namespace tools {
             l_matrix(i,i) = 1;
         
         return l_matrix;
-    }   
+    } */  
     
     
     /** create a symmetric matrix of type T and
@@ -150,10 +152,11 @@ namespace machinelearning { namespace tools {
      * @param p_size element size
      * @return matrix of type T
      **/
+    /*
     template<typename T> inline ublas::matrix<T> matrix::eye( const std::size_t& p_size )
     {
         return eye<T>(p_size, p_size);
-    }    
+    }  */  
     
     
     /** creates a blas vector in which every element hold the minimum of the row / column elements of the matrix
@@ -369,6 +372,23 @@ namespace machinelearning { namespace tools {
             for(std::size_t j=0; j < l_mat.size2(); ++j)
                 if (tools::function::isNumericalZero(l_mat(i,j)))
                     l_mat(i,j) = p_val; 
+        
+        return l_mat;
+    }
+    
+    
+    /** inverts a matrix for each element, if a element is numerical zero the inverted value is set to zero
+     * @param p_matrix matrix
+     * @param inverted matrix
+     **/
+    template<typename T> inline ublas::matrix<T> matrix::invert( const ublas::matrix<T>& p_matrix )
+    {
+        ublas::matrix<T> l_mat( p_matrix.size1(), p_matrix.size2(), 0 );
+        
+        for(std::size_t i=0; i < l_mat.size1(); ++i)
+            for(std::size_t j=0; j < l_mat.size2(); ++j)
+                if (!tools::function::isNumericalZero(p_matrix(i,j)))
+                    l_mat(i,j) = static_cast<T>(1) / p_matrix(i,j);
         
         return l_mat;
     }
