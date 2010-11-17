@@ -50,6 +50,7 @@ namespace machinelearning { namespace tools {
     /** class for connection LAPACK calls with numerical bindings.
      * We can handle only dense / full matrix data with LAPACK
      * @see http://svn.boost.org/svn/boost/sandbox/numerical_bindings
+     * @todo add matrix exponential via Pade approximation (shown in Matlab with expmdemo)
      **/
     class lapack {
         
@@ -58,7 +59,7 @@ namespace machinelearning { namespace tools {
             template<typename T> static void eigen( const ublas::matrix<T>&, ublas::vector<T>&, ublas::matrix<T>& );
             template<typename T> static void eigen( const ublas::matrix<T>&, const ublas::matrix<T>&, ublas::vector<T>&, ublas::matrix<T>& );
             template<typename T> static void solve( const ublas::matrix<T>&, const ublas::vector<T>&, ublas::vector<T>& );
-            template<typename T> static ublas::matrix<T> expm( const ublas::matrix<T>& );
+            //template<typename T> static ublas::matrix<T> expm( const ublas::matrix<T>& );
             template<typename T> static ublas::vector<T> perronfrobenius( const ublas::matrix<T>&, const std::size_t& );
             template<typename T> static ublas::vector<T> perronfrobenius( const ublas::matrix<T>&, const std::size_t&, const ublas::vector<T>& );
         
@@ -175,56 +176,8 @@ namespace machinelearning { namespace tools {
         // we must copy the reference
         p_solve = static_cast< ublas::vector<T> >(ublas::column(l_right,0));
     }
-   
   
-    /** matrix exponential via Pade approximation
-     * @param p_matrix input m atrix
-     * @return exponential matrix
-     **/
-    template<typename T> inline ublas::matrix<T> lapack::expm( const ublas::matrix<T>& p_matrix )
-    {
-        if (p_matrix.size1() != p_matrix.size2())
-            throw exception::runtime(_("matrix must be square"));
-        
-        
-        return p_matrix;
-        
-        /*
-        edit expmdemo1
-
-         
-         % Scale A by power of 2 so that its norm is < 1/2 .
-         [f,e] = log2(norm(A,'inf'));
-         s = max(0,e+1);
-         A = A/2^s;
-         
-         % Pade approximation for exp(A)
-         X = A; 
-         c = 1/2;
-         E = eye(size(A)) + c*A;
-         D = eye(size(A)) - c*A;
-         q = 6;
-         p = 1;
-         for k = 2:q
-            c = c * (q-k+1) / (k*(2*q-k+1));
-            X = A*X;
-            cX = c*X;
-            E = E + cX;
-            if p
-                D = D + cX;
-            else
-                D = D - cX;
-            end
-            p = ~p;
-         end
-         E = D\E;
-         
-         % Undo scaling by repeated squaring
-         for k=1:s, E = E*E; end
-         
-        */
-    }
-    
+     
     /** generates the eigenvalue / -vector with the perronforbenius theorem
      * @param p_matrix input matrix
      * @param p_iteration number of iterations

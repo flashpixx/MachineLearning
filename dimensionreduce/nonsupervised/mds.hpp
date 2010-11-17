@@ -26,6 +26,7 @@
 
 
 #include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/matrix_sparse.hpp>
 
 #include "../dimensionreduce.hpp"
 #include "../../exception/exception.h"
@@ -67,7 +68,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             ublas::matrix<T> project_metric( const ublas::matrix<T>& );
             ublas::matrix<T> project_sammon( const ublas::matrix<T>& );
         
-            ublas::matrix<T> sse( const ublas::matrix<T>& ) const;
+            ublas::matrix<T> distance( const ublas::matrix<T>&, const bool& = false ) const;
             ublas::matrix<T> doublecentering( const ublas::matrix<T>& ) const;
 
     };
@@ -151,6 +152,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     
     
     /** caluate the sammon mapping on MDS (with newton method for optimization)
+     * @note uses code idea of http://ticc.uvt.nl/~lvdrmaaten
      * @param p_data input datamatrix (similarity matrix)
      * @return mapped data
      **/
@@ -162,14 +164,20 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         // the similarity matrix must be double-centered
         const ublas::matrix<T> l_center = doublecentering( p_data );
         
-        // create the SSE for each row/colum of the matrix and sets the diagonal elements to one
-        //const ublas::matrix<T> l_ones = tools::matrix::eye( l_center.size1(), l_center.size2() );   
-        ublas::matrix<T> l_data       = sse(l_center);
-        //ublas::matrix<T> l_dataInv  = tools::matrix::invert(l_data);
+        // create the SSE for each row/colum (create distance matrix) of the matrix and sets the diagonal elements to one
+        const ublas::mapped_matrix<T> l_ones = tools::matrix::eye<T>( l_center.size1() );   
+        ublas::matrix<T> l_data              = distance(l_center) + l_ones;
+        ublas::matrix<T> l_dataInv           = tools::matrix::invert(l_data);
         
-        std::cout << l_data << std::endl;
+
         // target point matrix
-        ublas::matrix<T> l_target = tools::matrix::random( l_data.size1(), m_dim, tools::random::uniform, -0.5, 0.5 );
+        ublas::matrix<T> l_target       = tools::matrix::random( l_data.size1(), m_dim, tools::random::uniform, -0.5, 0.5 );
+        ublas::matrix<T> l_Distances    = distance(l_target, true) + l_ones;
+        ublas::matrix<T> l_DistancesInv = tools::matrix::invert(l_target);
+        ublas::matrix<T> l_delta        = l_target - l_Distances;
+        ublas::matrix<T> l_error        =
+        
+        std::cout << l_Distances << std::endl;
         
         /*
         for(std::size_t i=0; i < m_iteration; ++i) {
@@ -183,21 +191,24 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     }
     
     
-    /** calculate the SSE between a every row of the matrix and the other rows
+    /** calculate the distance between a every row of the matrix and the other rows
      * @param p_matrix input matrix
-     * @param p_pos row number
-     * @return SSE matrix
+     * @param p_double
+     * @return distance matrix
      **/
-    template<typename T> inline ublas::matrix<T> mds<T>::sse( const ublas::matrix<T>& p_matrix ) const
+    template<typename T> inline ublas::matrix<T> mds<T>::distance( const ublas::matrix<T>& p_matrix, const bool& p_double ) const
     {
-        ublas::matrix<T> l_sse( p_matrix.size1(), p_matrix.size2(), 0 );
-        
-        for(std::size_t i=0; i < l_sse.size1(); ++i)
-            for(std::size_t j=0; j < l_sse.size2(); ++j) {
-                const ublas::vector<T> l_tmp = ublas::row(p_matrix, j) - ublas::row(p_matrix, i);
-                l_sse(i,j) = std::pow(ublas::sum( tools::vector::pow(l_tmp, static_cast<T>(2)) ), static_cast<T>(0.5));
-            }
-        
+        ublas::matrix<T> l_sse( p_matrix.size1(), p_matrix.size1(), 0 );
+        if (p_double) {
+            l_sse = tools::matrix::pow(p_matrix, static_cast<T>(2));
+            const ublas::matrix<T> l_mat = ublas::outer_prod(tools::matrix::sum(l_sse), ublas::scalar_vector<T>(p_matrix.size1(),1));
+            l_sse = l_mat + ublas::trans(l_mat) - 2*ublas::prod(p_matrix, ublas::trans(p_matrix));
+            l_sse = tools::matrix::pow(l_sse, static_cast<T>(0.5));                       
+        } else 
+            for(std::size_t i=0; i < l_sse.size1(); ++i)
+                for(std::size_t j=0; j < l_sse.size2(); ++j)
+                    l_sse(i,j) = std::pow(ublas::sum( tools::vector::pow( static_cast< ublas::vector<T> >(ublas::row(p_matrix, j)-ublas::row(p_matrix, i)), static_cast<T>(2)) ), static_cast<T>(0.5));
+            
         return l_sse;
     }
     

@@ -315,7 +315,7 @@ namespace machinelearning { namespace tools {
             for(std::size_t j=0; j < l_mat.size2(); ++j)
                 l_mat(i,j) = std::pow(l_mat(i,j), p_ex);
         
-        return p_mat;
+        return l_mat;
     }
     
     
@@ -379,7 +379,7 @@ namespace machinelearning { namespace tools {
     
     /** inverts a matrix for each element, if a element is numerical zero the inverted value is set to zero
      * @param p_matrix matrix
-     * @param inverted matrix
+     * @return inverted matrix
      **/
     template<typename T> inline ublas::matrix<T> matrix::invert( const ublas::matrix<T>& p_matrix )
     {

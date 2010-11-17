@@ -47,7 +47,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * distancesis used for clustering the data
      * @todo set all routines to sparse matrix if arpack can be used with boost
      **/
-    template<typename T> class spectralclustering {
+    template<typename T> class spectralclustering : public nonsupervisedclustering<T> {
         
         
         public :
