@@ -175,15 +175,12 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         ublas::matrix<T> l_Distances    = distance(l_target, true) + l_ones;
         ublas::matrix<T> l_DistancesInv = tools::matrix::invert(l_target);
         ublas::matrix<T> l_delta        = l_target - l_Distances;
-        ublas::matrix<T> l_error        =
+        //ublas::matrix<T> l_error        =
         
         std::cout << l_Distances << std::endl;
         
         /*
         for(std::size_t i=0; i < m_iteration; ++i) {
-                        
-            
-  
             
         }*/
         
