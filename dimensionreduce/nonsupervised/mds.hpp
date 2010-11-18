@@ -164,25 +164,41 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         // the similarity matrix must be double-centered
         const ublas::matrix<T> l_center = doublecentering( p_data );
         
-        // create the SSE for each row/colum (create distance matrix) of the matrix and sets the diagonal elements to one
-        const ublas::mapped_matrix<T> l_ones = tools::matrix::eye<T>( l_center.size1() );   
-        ublas::matrix<T> l_data              = distance(l_center) + l_ones;
-        ublas::matrix<T> l_dataInv           = tools::matrix::invert(l_data);
         
-
-        // target point matrix
-        ublas::matrix<T> l_target       = tools::matrix::random( l_data.size1(), m_dim, tools::random::uniform, -0.5, 0.5 );
-        ublas::matrix<T> l_Distances    = distance(l_target, true) + l_ones;
-        ublas::matrix<T> l_DistancesInv = tools::matrix::invert(l_target);
-        ublas::matrix<T> l_delta        = l_target - l_Distances;
-        //ublas::matrix<T> l_error        =
+        // create the distance for each row/colum (create distance matrix) of the matrix and sets the diagonal elements to one
+        const ublas::mapped_matrix<T> l_DataOnes   = tools::matrix::eye<T>( l_center.size1() );   
+        const ublas::matrix<T> l_data              = distance(l_center) + l_DataOnes;
+        const ublas::matrix<T> l_dataInv           = tools::matrix::invert(l_data);
         
-        std::cout << l_Distances << std::endl;
+        // target point matrix und one matrix
+        ublas::matrix<T> l_target                  = tools::matrix::random( l_data.size1(), m_dim, tools::random::uniform, -0.5, 0.5 );
+        const ublas::mapped_matrix<T> l_TargetOnes = ublas::scalar_matrix<T>( l_target.size1(), l_target.size2(), static_cast<T>(1) );
         
-        /*
+        
         for(std::size_t i=0; i < m_iteration; ++i) {
+            const ublas::matrix<T> l_Distances       = distance(l_target, true) + l_DataOnes;
+            const ublas::matrix<T> l_DistancesInv    = tools::matrix::invert(l_target);
+            const ublas::matrix<T> l_DistancesInv3   = tools::matrix::pow(l_DistancesInv, static_cast<T>(3));
+            const ublas::matrix<T> l_target2         = tools::matrix::pow(l_target, static_cast<T>(2));
             
-        }*/
+            
+            const ublas::matrix<T> l_delta           = l_DistancesInv - l_dataInv;
+            const ublas::matrix<T> l_deltaOne        = ublas::prod( l_delta, l_TargetOnes );
+            
+            const ublas::matrix<T> l_gradient        = ublas::prod( l_delta, l_target) - ublas::element_prod( l_target, l_deltaOne );
+            const ublas::matrix<T> l_hesse           = ublas::prod(l_DistancesInv3, l_target2) -  l_deltaOne - 2 * ublas::element_prod(l_target, ublas::prod(l_DistancesInv3, l_target)); 
+            
+            
+         /*delta    = dinv - Dinv;
+         deltaone = delta * one;
+         g        = delta * y - y .* deltaone;
+         dinv3    = dinv .^ 3;
+         y2       = y .^ 2;
+         H        = dinv3 * y2 - deltaone - 2 * y .* (dinv3 * y) + y2 .* (dinv3 * one);
+         s        = -g(:) ./ abs(H(:));
+         y_old    = y;
+         */   
+        }
         
         return l_target;
     }
