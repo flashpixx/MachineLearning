@@ -31,6 +31,7 @@
 #include <boost/numeric/bindings/lapack/driver/geev.hpp>
 #include <boost/numeric/bindings/lapack/driver/ggev.hpp>
 #include <boost/numeric/bindings/lapack/driver/gesv.hpp> 
+#include <boost/numeric/bindings/lapack/driver/gesvd.hpp>
 #include <boost/numeric/bindings/lapack/computational/hseqr.hpp>
 
 
@@ -50,6 +51,7 @@ namespace machinelearning { namespace tools {
     /** class for connection LAPACK calls with numerical bindings.
      * We can handle only dense / full matrix data with LAPACK
      * @see http://svn.boost.org/svn/boost/sandbox/numerical_bindings
+     * @todo try to change the matrix copy in eigen / svd to static casts
      * @todo add matrix exponential via Pade approximation (shown in Matlab with expmdemo)
      **/
     class lapack {
@@ -58,6 +60,7 @@ namespace machinelearning { namespace tools {
         
             template<typename T> static void eigen( const ublas::matrix<T>&, ublas::vector<T>&, ublas::matrix<T>& );
             template<typename T> static void eigen( const ublas::matrix<T>&, const ublas::matrix<T>&, ublas::vector<T>&, ublas::matrix<T>& );
+            template<typename T> static void svd( const ublas::matrix<T>&, ublas::vector<T>&, ublas::matrix<T>&, ublas::matrix<T>& );
             template<typename T> static void solve( const ublas::matrix<T>&, const ublas::vector<T>&, ublas::vector<T>& );
             //template<typename T> static ublas::matrix<T> expm( const ublas::matrix<T>& );
             template<typename T> static ublas::vector<T> perronfrobenius( const ublas::matrix<T>&, const std::size_t& );
@@ -95,7 +98,7 @@ namespace machinelearning { namespace tools {
         ublas::matrix<T, ublas::column_major> l_tmp2(l_matrix.size1(),l_matrix.size2());
         
         // determine eigenvector without sorting and calculate eigenvalues
-        linalg::ggev( 'N', 'V', l_matrix, l_diag, l_eigval,  l_tmp1,  l_div,  l_tmp2,  l_eigvec, linalg::optimal_workspace() );
+        linalg::ggev( 'N', 'V', p_matrix, l_diag, l_eigval,  l_tmp1,  l_div,  l_tmp2,  l_eigvec, linalg::optimal_workspace() );
         
         // calculate eigenvalues
         for(std::size_t i=0; i < l_eigval.size(); ++i)
@@ -152,6 +155,34 @@ namespace machinelearning { namespace tools {
         // we must copy the reference
         p_eigvec = l_eigvec;
         p_eigval = l_eigval;
+    }
+    
+    
+    /** singular value decomposition
+     * @param p_matrix input matrix
+     * @param p_svdval blas vector for sorted eigenvalues [initialisation is not needed]
+     * @param p_svdvec1 blas matrix for singular values vectors (every column is a vector) [initialisation is not needed]
+     * @param p_svdvec2 blas matrix for singular values vectors (every column is a vector) [initialisation is not needed]
+     * @todo not complete - doesn't work
+     **/
+    template<typename T> inline void lapack::svd( const ublas::matrix<T>& p_matrix, ublas::vector<T>& p_svdval, ublas::matrix<T>& p_svdvec1, ublas::matrix<T>& p_svdvec2 )
+    {
+        // copy matrix for LAPACK
+        ublas::matrix<T, ublas::column_major> l_matrix(p_matrix);
+        
+        // create result structures
+        ublas::matrix<T, ublas::column_major> l_svdvec1(l_matrix.size1(), l_matrix.size2());
+        ublas::matrix<T, ublas::column_major> l_svdvec2(l_matrix.size2(), l_matrix.size1());
+        ublas::vector<T> l_svdval(l_matrix.size1());
+
+        
+        // determine svd without sorting
+        linalg::gesvd( 'N', 'V', l_matrix, l_svdval, l_svdvec1, l_svdvec2, linalg::optimal_workspace() );
+        
+        // we must copy the reference
+        p_svdval    = l_svdval;
+        p_svdvec1   = l_svdvec1;
+        p_svdvec2   = l_svdvec2;
     }
     
     

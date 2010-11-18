@@ -188,6 +188,12 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             const ublas::matrix<T> l_gradient        = ublas::prod( l_delta, l_target) - ublas::element_prod( l_target, l_deltaOne );
             const ublas::matrix<T> l_hesse           = ublas::prod(l_DistancesInv3, l_target2) -  l_deltaOne - 2 * ublas::element_prod(l_target, ublas::prod(l_DistancesInv3, l_target)); 
             
+            ublas::matrix<T> l_step(l_gradient.size1(), l_gradient.size2(), 0);
+            for(std::size_t i=0; i < l_step.size1(); ++i)
+                for(std::size_t j=0; j < l_step.size2(); ++j)
+                    if (tools::function::isNumericalZero(l_hesse(i,j)))
+                        l_step(i,j) = -l_gradient(i,j) / std::fabs( l_hesse(i,j) );
+            
             
          /*delta    = dinv - Dinv;
          deltaone = delta * one;

@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
     #endif
     
     #ifdef FILES
-    tl::files::hdf o("blub.hdf5");
+    //tl::files::hdf o("blub.hdf5");
     /*tl::files::hdf o("string.hdf5");
     std::vector<std::string> x = o.readStringVector("/array");
     for(std::size_t i=0; i < x.size(); ++i)
@@ -55,15 +55,30 @@ int main(int argc, char *argv[]) {
     #endif
     
 
+    ublas::matrix<double> x(2,4);
+    x(0,0)=1;   x(0,1)=2;   x(0,2)=3;   x(0,3)=4;
+    x(1,0)=5;   x(1,1)=6;   x(1,2)=7;   x(1,3)=8;
+    
+    std::cout << x << std::endl;
+    
+    ublas::matrix<double> u;
+    ublas::matrix<double> v;
+    ublas::vector<double> z;
+    tl::lapack::svd(x, z, u, v);
+    
+    std::cout << u << std::endl;
+    std::cout << v << std::endl;
+    std::cout << z << std::endl;
+    
     
     // ===== MDS ======
-    
+    /*
     ublas::matrix<double> data = o.readMatrix<double>("/mds2", H5::PredType::NATIVE_DOUBLE); 
     ndim::mds<double> l(2, ndim::mds<double>::sammon, 1);
      
     tl::files::hdf f("mds.hdf5", true);
     f.write<double>( "/data",  l.map(data), H5::PredType::NATIVE_DOUBLE );  
-    
+    */
    
     // ===== Wikipedia ======
     /*
