@@ -53,23 +53,7 @@ int main(int argc, char *argv[]) {
     for(std::size_t i=0; i < x.size(); ++i)
         std::cout << x[i] << std::endl;*/
     #endif
-    
-
-    ublas::matrix<double> x(2,4);
-    x(0,0)=1;   x(0,1)=2;   x(0,2)=3;   x(0,3)=4;
-    x(1,0)=5;   x(1,1)=6;   x(1,2)=7;   x(1,3)=8;
-    
-    std::cout << x << std::endl;
-    
-    ublas::matrix<double> u;
-    ublas::matrix<double> v;
-    ublas::vector<double> z;
-    tl::lapack::svd(x, z, u, v);
-    
-    std::cout << u << std::endl;
-    std::cout << v << std::endl;
-    std::cout << z << std::endl;
-    
+      
     
     // ===== MDS ======
     /*

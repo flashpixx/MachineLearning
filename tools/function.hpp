@@ -25,6 +25,7 @@
 #ifndef MACHINELEARNING_TOOLS_FUNCTION_HPP
 #define MACHINELEARNING_TOOLS_FUNCTION_HPP
 
+#include <fstream>
 #include <cmath>
 #include <limits>
 
@@ -39,6 +40,7 @@ namespace machinelearning { namespace tools {
 
             template<typename T> static bool isNumericalEqual( const T& p1, const T& p2 );
             template<typename T> static bool isNumericalZero( const T& p );
+            static bool fileExists( const std::string& );
     
     };
 
@@ -54,6 +56,7 @@ namespace machinelearning { namespace tools {
         return !( std::fabs(p1-p2) > std::numeric_limits<T>::epsilon() );
     }
     
+    
     /** check zero of floating point values
      * @param p value
      * @return equality to zero
@@ -62,6 +65,18 @@ namespace machinelearning { namespace tools {
     {
         return std::fabs(p) <= std::numeric_limits<T>::epsilon();
     }
+    
+    
+    /** check if file exists
+     * @param p_filename filename
+     * @return bool for existing
+     **/
+    inline bool function::fileExists( const std::string& p_filename )
+    {
+        std::ifstream l_file(p_filename.c_str());
+        return l_file;
+    }
+    
     
     
 };};
