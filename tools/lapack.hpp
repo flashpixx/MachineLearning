@@ -74,7 +74,7 @@ namespace machinelearning { namespace tools {
      * @overload
      * @param p_matrix input matrix
      * @param p_diag diagonal matrix
-     * @param p_eigval blas vector for sorted eigenvalues [initialisation is not needed]
+     * @param p_eigval blas vector for eigenvalues [initialisation is not needed]
      * @param p_eigvec blas matrix for (normalized) eigenvectors (every column is a eigenvector) [initialisation is not needed]
      **/
     template<typename T> inline void lapack::eigen( const ublas::matrix<T>& p_matrix, const ublas::matrix<T>& p_diag, ublas::vector<T>& p_eigval, ublas::matrix<T>& p_eigvec )
@@ -122,7 +122,7 @@ namespace machinelearning { namespace tools {
     /** calculates from a NxN matrix eigenvalues and eigenvector
      * @overload
      * @param p_matrix input matrix
-     * @param p_eigval blas vector for sorted eigenvalues [initialisation is not needed]
+     * @param p_eigval blas vector for eigenvalues [initialisation is not needed]
      * @param p_eigvec blas matrix for (normalized) eigenvectors (every column is a eigenvector) [initialisation is not needed]
     **/
     template<typename T> inline void lapack::eigen( const ublas::matrix<T>& p_matrix, ublas::vector<T>& p_eigval, ublas::matrix<T>& p_eigvec )
@@ -160,10 +160,9 @@ namespace machinelearning { namespace tools {
     
     /** singular value decomposition
      * @param p_matrix input matrix
-     * @param p_svdval blas vector for sorted eigenvalues [initialisation is not needed]
+     * @param p_svdval blas vector for eigenvalues [initialisation is not needed]
      * @param p_svdvec1 blas matrix for singular values vectors (every column is a vector) [initialisation is not needed]
      * @param p_svdvec2 blas matrix for singular values vectors (every column is a vector) [initialisation is not needed]
-     * @todo not complete - doesn't work
      **/
     template<typename T> inline void lapack::svd( const ublas::matrix<T>& p_matrix, ublas::vector<T>& p_svdval, ublas::matrix<T>& p_svdvec1, ublas::matrix<T>& p_svdvec2 )
     {
@@ -171,13 +170,16 @@ namespace machinelearning { namespace tools {
         ublas::matrix<T, ublas::column_major> l_matrix(p_matrix);
         
         // create result structures
-        ublas::matrix<T, ublas::column_major> l_svdvec1(l_matrix.size1(), l_matrix.size2());
-        ublas::matrix<T, ublas::column_major> l_svdvec2(l_matrix.size2(), l_matrix.size1());
-        ublas::vector<T> l_svdval(l_matrix.size1());
+        ublas::matrix<T, ublas::column_major> l_svdvec1(l_matrix.size1(), l_matrix.size1());
+        ublas::matrix<T, ublas::column_major> l_svdvec2(l_matrix.size2(), l_matrix.size2());
+        ublas::vector<T> l_svdval( l_matrix.size1() );
 
-        
         // determine svd without sorting
-        linalg::gesvd( 'N', 'V', l_matrix, l_svdval, l_svdvec1, l_svdvec2, linalg::optimal_workspace() );
+        linalg::gesvd( 'A', 'A', l_matrix, l_svdval, l_svdvec1, l_svdvec2, linalg::optimal_workspace() );
+        
+        // second matrix must be transpose
+        l_svdvec2 = ublas::trans( l_svdvec2 );
+        
         
         // we must copy the reference
         p_svdval    = l_svdval;
