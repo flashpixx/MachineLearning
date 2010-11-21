@@ -25,6 +25,7 @@
 #define MACHINELEARNING_DIMENSIONREDUCE_NONSUPERVISED_MDS_HPP
 
 
+#include <limits>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/matrix_sparse.hpp>
 
@@ -50,15 +51,19 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             };
         
         
-            mds( const std::size_t&, const project& = metric, const std::size_t& = 0 );
+            mds( const std::size_t&, const project& = metric );
             ublas::matrix<T> map( const ublas::matrix<T>& );
             std::size_t getDimension( void ) const;
+            void setIteration( const std::size_t& );
+            void setStep( const std::size_t& );
         
         
         private :
         
             /** number of iterations for sammon **/
-            const std::size_t m_iteration;
+            std::size_t m_iteration;
+            /** stepsize for sammon **/
+            std::size_t m_step;
             /** target dimension **/
             const std::size_t m_dim;
             /** project type **/
@@ -70,6 +75,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         
             ublas::matrix<T> distance( const ublas::matrix<T>&, const bool& = false ) const;
             ublas::matrix<T> doublecentering( const ublas::matrix<T>& ) const;
+            T calculateQuantizationError( const ublas::matrix<T>&, const ublas::matrix<T>& ) const;
 
     };
 
@@ -77,10 +83,10 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     /** constructor
      * @param p_dim target dimension
      * @param p_type project type
-     * @param p_iteration number of iterations for sammon
      **/
-    template<typename T> inline mds<T>::mds( const std::size_t& p_dim, const project& p_type, const std::size_t& p_iteration ) :
-        m_iteration( p_iteration ),
+    template<typename T> inline mds<T>::mds( const std::size_t& p_dim, const project& p_type ) :
+        m_iteration( 0 ),
+        m_step( 0 ),
         m_dim( p_dim ),
         m_type( p_type )
     {
@@ -95,6 +101,24 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     template<typename T> inline std::size_t mds<T>::getDimension( void ) const
     {
         return m_dim;
+    }
+    
+    
+    /** sets the iterations for iterative algorithms like Sammons mapping
+     * @param p_iteration iterations
+     **/
+    template<typename T> inline void mds<T>::setIteration( const std::size_t& p_iteration )
+    {
+        m_iteration = p_iteration;
+    }
+
+    
+    /** sets the steps for iterative algorithms
+     * @param p_step number of steps
+     **/
+    template<typename T> inline void mds<T>::setStep( const std::size_t& p_step )
+    {
+        m_step = p_step;
     }
     
     
@@ -151,7 +175,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     }
     
     
-    /** caluate the sammon mapping on MDS (with newton method for optimization)
+    /** caluate the sammon mapping on MDS (with pseudo-newton method for optimization)
      * @note uses code idea of http://ticc.uvt.nl/~lvdrmaaten
      * @param p_data input datamatrix (similarity matrix)
      * @return mapped data
@@ -160,53 +184,142 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     {
         if (m_iteration == 0)
             throw exception::runtime(_("iterations must be greater than zero"));
+        if (m_step == 0)
+            throw exception::runtime(_("steps must be greater than zero"));
         
         // the similarity matrix must be double-centered
         const ublas::matrix<T> l_center = doublecentering( p_data );
         
         
         // create the distance for each row/colum (create distance matrix) of the matrix and sets the diagonal elements to one
-        const ublas::mapped_matrix<T> l_DataOnes   = tools::matrix::eye<T>( l_center.size1() );   
-        const ublas::matrix<T> l_data              = distance(l_center) + l_DataOnes;
-        const ublas::matrix<T> l_dataInv           = tools::matrix::invert(l_data);
+        const ublas::mapped_matrix<T> l_DataOnes    = tools::matrix::eye<T>( l_center.size1() );   
+        const ublas::matrix<T> l_data               = distance(l_center) + l_DataOnes;
+        const ublas::matrix<T> l_dataInv            = tools::matrix::invert(l_data);
         
         // target point matrix und one matrix
-        ublas::matrix<T> l_target                  = tools::matrix::random( l_data.size1(), m_dim, tools::random::uniform, -0.5, 0.5 );
-        const ublas::mapped_matrix<T> l_TargetOnes = ublas::scalar_matrix<T>( l_target.size1(), l_target.size2(), static_cast<T>(1) );
+        ublas::matrix<T> l_target                   = tools::matrix::random( l_data.size1(), m_dim, tools::random::uniform, -0.5, 0.5 );
+        const ublas::mapped_matrix<T> l_TargetOnes  = ublas::scalar_matrix<T>( l_target.size1(), l_target.size2(), static_cast<T>(1) );
         
+        
+        ublas::matrix<T> l_Distance, l_DistanceInv, l_delta;
         
         for(std::size_t i=0; i < m_iteration; ++i) {
-            const ublas::matrix<T> l_Distances       = distance(l_target, true) + l_DataOnes;
-            const ublas::matrix<T> l_DistancesInv    = tools::matrix::invert(l_target);
-            const ublas::matrix<T> l_DistancesInv3   = tools::matrix::pow(l_DistancesInv, static_cast<T>(3));
+                                   l_Distance        = distance(l_target, true) + l_DataOnes;
+                                   l_DistanceInv     = tools::matrix::invert(l_Distance);
+            const ublas::matrix<T> l_DistanceInv3    = tools::matrix::pow(l_DistanceInv, static_cast<T>(3));
             const ublas::matrix<T> l_target2         = tools::matrix::pow(l_target, static_cast<T>(2));
             
             
-            const ublas::matrix<T> l_delta           = l_DistancesInv - l_dataInv;
+                                   l_delta           = l_DistanceInv - l_dataInv;
             const ublas::matrix<T> l_deltaOne        = ublas::prod( l_delta, l_TargetOnes );
             
+            // calculating gradient & hesse-matrix values
             const ublas::matrix<T> l_gradient        = ublas::prod( l_delta, l_target) - ublas::element_prod( l_target, l_deltaOne );
-            const ublas::matrix<T> l_hesse           = ublas::prod(l_DistancesInv3, l_target2) -  l_deltaOne - 2 * ublas::element_prod(l_target, ublas::prod(l_DistancesInv3, l_target)); 
+            const ublas::matrix<T> l_hesse           = ublas::prod( l_DistanceInv3, l_target2 ) -  l_deltaOne - 2 * ublas::element_prod(l_Distance, ublas::prod(l_DistanceInv3, l_Distance)); 
             
-            ublas::matrix<T> l_step(l_gradient.size1(), l_gradient.size2(), 0);
-            for(std::size_t i=0; i < l_step.size1(); ++i)
-                for(std::size_t j=0; j < l_step.size2(); ++j)
-                    if (tools::function::isNumericalZero(l_hesse(i,j)))
-                        l_step(i,j) = -l_gradient(i,j) / std::fabs( l_hesse(i,j) );
+            // create adaption
+            ublas::matrix<T> l_adapt(l_target.size1(), l_target.size2(), 0);
+            for(std::size_t i=0; i < l_adapt.size1(); ++i)
+                for(std::size_t j=0; j < l_adapt.size2(); ++j)
+                    if (!tools::function::isNumericalZero(l_hesse(i,j)))
+                        l_adapt(i,j) = -l_gradient(i,j) / std::fabs( l_hesse(i,j) );
+            
+            // get quantization error
+            const T l_error                          = calculateQuantizationError( l_delta, l_dataInv );
+            T l_errornew                             = l_error;
             
             
-         /*delta    = dinv - Dinv;
-         deltaone = delta * one;
-         g        = delta * y - y .* deltaone;
-         dinv3    = dinv .^ 3;
-         y2       = y .^ 2;
-         H        = dinv3 * y2 - deltaone - 2 * y .* (dinv3 * y) + y2 .* (dinv3 * one);
-         s        = -g(:) ./ abs(H(:));
-         y_old    = y;
-         */   
+            // try to optimize in half-steps
+            bool l_notconvergence                    = false;
+                
+            for(std::size_t n=0; n < m_step; ++n) {
+                const ublas::matrix<T> l_DistanceTmp     = distance(l_target + l_adapt, true) + l_DataOnes;
+                
+                l_errornew = calculateQuantizationError( tools::matrix::invert(l_DistanceTmp) - l_dataInv, l_dataInv );
+                if (l_errornew < l_error)
+                    break;
+                
+                l_adapt *= 0.5;
+                l_notconvergence = n == m_step;
+            }
+            
+            
+            if (l_notconvergence)
+                throw exception::runtime(_("Sammon mapping may not converge"));
+            
+            if (tools::function::isNumericalZero( (l_error - l_errornew) / l_error ) )
+                break;
+            
+            
+         /*
+          one   = ones(N,n);
+          d     = euclid(y,y) + eye(N);
+          dinv  = 1./d;
+          delta = D - d;
+          E     = sum(sum((delta.^2).*Dinv));
+          
+          % Get on with it
+          for i=1:opts.MaxIter
+          
+          % Compute gradient, Hessian and search direction (note it is actually
+          % 1/4 of the gradient and Hessian, but the step size is just the ratio
+          % of the gradient and the diagonal of the Hessian so it doesn't
+          % matter).
+          delta    = dinv - Dinv;
+          deltaone = delta * one;
+          g        = delta * y - y .* deltaone;
+          dinv3    = dinv .^ 3;
+          y2       = y .^ 2;
+          H        = dinv3 * y2 - deltaone - 2 * y .* (dinv3 * y) + y2 .* (dinv3 * one);
+          s        = -g(:) ./ abs(H(:));
+          y_old    = y;
+          
+          % Use step-halving procedure to ensure progress is made
+          for j=1:opts.MaxHalves
+          y(:) = y_old(:) + s;
+          d     = euclid(y, y) + eye(N);
+          dinv  = 1 ./ d;
+          delta = D - d;
+          E_new = sum(sum((delta .^ 2) .* Dinv));
+          if E_new < E
+          break;
+          else
+          s = 0.5*s;
+          end
+          end
+          
+          % Bomb out if too many halving steps are required
+          if j == opts.MaxHalves
+          warning('MaxHalves exceeded. Sammon mapping may not converge...');
+          end
+          
+          % Evaluate termination criterion
+          if abs((E - E_new) / E) < opts.TolFun
+          if display
+          fprintf(1, 'Optimisation terminated - TolFun exceeded.\n');
+          end
+          break;
+          end
+          
+          % Report progress
+          E = E_new;
+          if display > 1
+          fprintf(1, 'epoch = %d : E = %12.10f\n', i, E * scale);
+          end
+          end
+          
+          % Fiddle stress to match the original Sammon paper
+          E = E * scale;
+          */   
         }
         
         return l_target;
+    }
+    
+    template<typename T> inline T mds<T>::calculateQuantizationError( const ublas::matrix<T>& p_delta, const ublas::matrix<T>& p_invert ) const
+    {
+        ublas::matrix<T> l_mat = ublas::element_prod( tools::matrix::pow(p_delta, static_cast<T>(2)), p_invert);
+        return ublas::sum( tools::matrix::sum( l_mat ) );
     }
     
     

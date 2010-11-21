@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-11-15 16:45+0100\n"
-"PO-Revision-Date: 2010-11-15 16:46+0100\n"
+"POT-Creation-Date: 2010-11-19 21:02+0100\n"
+"PO-Revision-Date: 2010-11-19 21:27+0100\n"
 "Last-Translator: Philipp Kraus <philipp.kraus@flashpixx.de>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -96,7 +96,7 @@ msgstr "Anzahl der Prototypen muss größer Null sein"
 #: clustering/nonsupervised/relationalneuralgas.hpp:224
 #: clustering/nonsupervised/relationalneuralgas.hpp:500
 #: clustering/supervised/rlvq.hpp:214
-#: dimensionreduce/nonsupervised/mds.hpp:159
+#: dimensionreduce/nonsupervised/mds.hpp:162
 #: functionoptimization/gradientdescent.hpp:292
 msgid "iterations must be greater than zero"
 msgstr "Iterationen müssen größer Null sein"
@@ -135,11 +135,10 @@ msgid "lambda must be greater than zero"
 msgstr "Lambda muss größer Null sein"
 
 #: clustering/nonsupervised/spectralclustering.hpp:165
-#: dimensionreduce/nonsupervised/mds.hpp:107
-#: tools/lapack.hpp:79
-#: tools/lapack.hpp:127
-#: tools/lapack.hpp:187
-#: tools/lapack.hpp:250
+#: dimensionreduce/nonsupervised/mds.hpp:109
+#: tools/lapack.hpp:83
+#: tools/lapack.hpp:131
+#: tools/lapack.hpp:234
 msgid "matrix must be square"
 msgstr "Matrix muss quadratisch sein"
 
@@ -148,7 +147,7 @@ msgid "eta must be greater than zero"
 msgstr "Eta muss größer Null sein"
 
 #: dimensionreduce/nonsupervised/lle.hpp:76
-#: dimensionreduce/nonsupervised/mds.hpp:86
+#: dimensionreduce/nonsupervised/mds.hpp:88
 #: dimensionreduce/nonsupervised/pca.hpp:66
 #: dimensionreduce/supervised/lda.hpp:68
 msgid "dimension must be greater than zero"
@@ -158,14 +157,14 @@ msgstr "Dimension muss größer Null sein"
 msgid "data points are less than target dimension"
 msgstr "Datenpunktdimension ist kleiner als Dimension der Zielprojektion"
 
-#: dimensionreduce/nonsupervised/mds.hpp:105
+#: dimensionreduce/nonsupervised/mds.hpp:107
 #: dimensionreduce/nonsupervised/pca.hpp:85
 msgid "datapoint dimension are less than target dimension"
 msgstr "Datenpunktdimension ist kleiner als Dimension der Zielprojektion"
 
-#: dimensionreduce/nonsupervised/mds.hpp:119
+#: dimensionreduce/nonsupervised/mds.hpp:121
 msgid "project option is unkown"
-msgstr ""
+msgstr "Projektionsmethode ist nicht bekannt"
 
 #: dimensionreduce/supervised/lda.hpp:98
 msgid "target dimension must be less than unique data classes"
@@ -237,23 +236,23 @@ msgstr "Eta muss größer Null sein"
 msgid "knn is greater than datapoints"
 msgstr "KNN ist größer als Anzahl der Datenpunkte"
 
-#: tools/lapack.hpp:81
+#: tools/lapack.hpp:85
 msgid "both matrices have not the same size"
 msgstr "beide Matrizen haben nicht die gleiche Größe"
 
-#: tools/lapack.hpp:252
+#: tools/lapack.hpp:236
 msgid "number of rows / columns of the matrix must have the same dimension like the initialisation vector"
 msgstr "Anzahl der Zeilen / Spalten der Matrix müssen die gleiche Dimension wie Initialisierungsvektor haben"
 
-#: tools/matrix.hpp:93
-#: tools/matrix.hpp:132
-#: tools/matrix.hpp:352
+#: tools/matrix.hpp:95
+#: tools/matrix.hpp:135
+#: tools/matrix.hpp:355
 #: tools/files/csv.hpp:124
 msgid "row size must be greater than zero"
 msgstr "Zeilenanzahl muss größer Null sein"
 
-#: tools/matrix.hpp:95
-#: tools/matrix.hpp:134
+#: tools/matrix.hpp:97
+#: tools/matrix.hpp:137
 #: tools/files/csv.hpp:122
 msgid "column size must be greater than zero"
 msgstr "Spaltenanzahl muss größer Null sein"
@@ -487,7 +486,7 @@ msgstr ""
 
 #: tools/sources/wikipedia.h:595
 msgid "Request Time-out"
-msgstr ""
+msgstr "Anfragezeit abgelaufen"
 
 #: tools/sources/wikipedia.h:596
 msgid "Conflict"
