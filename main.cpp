@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
     // ===== MDS ======
     ublas::matrix<double> data = o.readMatrix<double>("/mds2", H5::PredType::NATIVE_DOUBLE); 
     ndim::mds<double> l(2, ndim::mds<double>::sammon);
-    l.setIteration( 500 );
+    l.setIteration( 2 );
     l.setStep( 40 );
     tl::files::hdf f("mds.hdf5", true);
     f.write<double>( "/data",  l.map(data), H5::PredType::NATIVE_DOUBLE );  

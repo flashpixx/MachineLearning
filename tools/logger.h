@@ -22,21 +22,64 @@
  **/
 
 
+#ifndef MACHINELEARNING_TOOLS_LOGGER_H
+#define MACHINELEARNING_TOOLS_LOGGER_H
 
-/** header file to connect all tools library for one include **/
+namespace machinelearning { namespace tools { 
 
-#ifndef MACHINELEARNING_TOOLS_H
-#define MACHINELEARNING_TOOLS_H
+    /** logger class for writing log information 
+     * @todo writer method
+     * @todo thread safe
+     * @todo MPI using
+     **/
+    class logger {
+        
+        public:
+        
+            enum state {
+                info  = 0,
+                warn  = 1,
+                error = 2
+            };
+        
+            
+            static logger &getInstance( void );
+            //void setMessage( const state&, const std::string& );
+                            
+        
+        private: 
+        
+            /** local instance **/
+            static logger m_instance;
+        
+            /** empty constructor **/
+            logger( void ) {}
+        
+            /** empty destructor **/
+            ~logger( void ) {} 
+            
+            /** empty copy-constructor **/
+            logger( const logger& );
+        
+            /** empty equal operator **/
+            logger& operator=( const logger& );
+        
+    };
+    
+    
+    /** returns the instance
+     * @return logger instance
+     **/
+    inline logger& logger::getInstance()
+    {
+        static logger m_instance;
+        return m_instance;
+    }
+    
+    
+    
+};};
 
-#include "random.hpp"
-#include "function.hpp"
-#include "matrix.hpp"
-#include "vector.hpp"
-#include "lapack.hpp"
-#include "logger.h"
-#include "sources/sources.h"
-#include "files/files.h"
 
-#include "language/language.h"
 
 #endif

@@ -44,51 +44,51 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         
         public :
         
-            enum project {
-                metric          = 0,
-                sammon          = 1,
-                hit             = 2,    // http://dig.ipk-gatersleben.de/hitmds/hitmds.html
-            };
+        enum project {
+            metric          = 0,
+            sammon          = 1,
+            hit             = 2,    // http://dig.ipk-gatersleben.de/hitmds/hitmds.html
+        };
         
         
-            mds( const std::size_t&, const project& = metric );
-            ublas::matrix<T> map( const ublas::matrix<T>& );
-            std::size_t getDimension( void ) const;
-            void setIteration( const std::size_t& );
-            void setStep( const std::size_t& );
+        mds( const std::size_t&, const project& = metric );
+        ublas::matrix<T> map( const ublas::matrix<T>& );
+        std::size_t getDimension( void ) const;
+        void setIteration( const std::size_t& );
+        void setStep( const std::size_t& );
         
         
         private :
         
-            /** number of iterations for sammon **/
-            std::size_t m_iteration;
-            /** stepsize for sammon **/
-            std::size_t m_step;
-            /** target dimension **/
-            const std::size_t m_dim;
-            /** project type **/
-            const project m_type;
+        /** number of iterations for sammon **/
+        std::size_t m_iteration;
+        /** stepsize for sammon **/
+        std::size_t m_step;
+        /** target dimension **/
+        const std::size_t m_dim;
+        /** project type **/
+        const project m_type;
         
         
-            ublas::matrix<T> project_metric( const ublas::matrix<T>& );
-            ublas::matrix<T> project_sammon( const ublas::matrix<T>& );
+        ublas::matrix<T> project_metric( const ublas::matrix<T>& );
+        ublas::matrix<T> project_sammon( const ublas::matrix<T>& );
         
-            ublas::matrix<T> distance( const ublas::matrix<T>& ) const;
-            ublas::matrix<T> doublecentering( const ublas::matrix<T>& ) const;
-            T calculateQuantizationError( const ublas::matrix<T>&, const ublas::matrix<T>& ) const;
-
+        ublas::matrix<T> distance( const ublas::matrix<T>& ) const;
+        ublas::matrix<T> doublecentering( const ublas::matrix<T>& ) const;
+        T calculateQuantizationError( const ublas::matrix<T>&, const ublas::matrix<T>& ) const;
+        
     };
-
-
+    
+    
     /** constructor
      * @param p_dim target dimension
      * @param p_type project type
      **/
     template<typename T> inline mds<T>::mds( const std::size_t& p_dim, const project& p_type ) :
-        m_iteration( 0 ),
-        m_step( 0 ),
-        m_dim( p_dim ),
-        m_type( p_type )
+    m_iteration( 500 ),
+    m_step( 20 ),
+    m_dim( p_dim ),
+    m_type( p_type )
     {
         if (p_dim == 0)
             throw exception::runtime(_("dimension must be greater than zero"));
@@ -111,7 +111,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     {
         m_iteration = p_iteration;
     }
-
+    
     
     /** sets the steps for iterative algorithms
      * @param p_step number of steps
@@ -198,32 +198,30 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         
         // target point matrix und one matrix
         ublas::matrix<T> l_target                   = tools::matrix::random( l_data.size1(), m_dim, tools::random::uniform, static_cast<T>(-1), static_cast<T>(1) );
+        const ublas::mapped_matrix<T> l_TargetOnes  = ublas::scalar_matrix<T>( l_target.size1(), l_target.size2(), static_cast<T>(1) );
+        
         for(std::size_t i=0; i < l_target.size1(); ++i) {
             l_target(i,0) = i+1; 
             l_target(i,1) = i+3;
         }
-
         
-        const ublas::mapped_matrix<T> l_TargetOnes  = ublas::scalar_matrix<T>( l_target.size1(), l_target.size2(), static_cast<T>(1) );
-    
-        ublas::matrix<T> l_Distance, l_DistanceInv, l_delta, l_targetTmp;
-        T l_error, l_errornew;
         
+        // optimize
         for(std::size_t i=0; i < m_iteration; ++i) {
-                                   l_Distance        = distance(l_target) + l_DataOnes;           
-                                   l_DistanceInv     = tools::matrix::invert(l_Distance);
+            const ublas::matrix<T> l_Distance        = distance(l_target) + l_DataOnes;           
+            const ublas::matrix<T> l_DistanceInv     = tools::matrix::invert(l_Distance);
             const ublas::matrix<T> l_DistanceInv3    = tools::matrix::pow(l_DistanceInv, static_cast<T>(3));
             const ublas::matrix<T> l_target2         = tools::matrix::pow(l_target, static_cast<T>(2));
             
             
-                                   l_delta           = l_DistanceInv - l_dataInv;
-            const ublas::matrix<T> l_deltaOne        = ublas::prod( l_delta, l_TargetOnes );
+            const ublas::matrix<T> l_delta           = l_data - l_Distance;
+            const ublas::matrix<T> l_deltaInv        = l_DistanceInv - l_dataInv;
+            const ublas::matrix<T> l_deltaOne        = ublas::prod( l_deltaInv, l_TargetOnes );
             
             // calculating gradient & hesse-matrix values
-            const ublas::matrix<T> l_gradient        = ublas::prod( l_delta, l_target) - ublas::element_prod( l_target, l_deltaOne );
+            const ublas::matrix<T> l_gradient        = ublas::prod( l_deltaInv, l_target) - ublas::element_prod( l_target, l_deltaOne );
             const ublas::matrix<T> l_hesse           = ublas::prod( l_DistanceInv3, l_target2 ) -  l_deltaOne - 2 * ublas::element_prod(l_target, ublas::prod(l_DistanceInv3, l_target)) + ublas::element_prod(l_target2, ublas::prod(l_DistanceInv3, l_TargetOnes)); 
             
-
             
             // create adaption
             ublas::matrix<T> l_adapt(l_target.size1(), l_target.size2(), 0);
@@ -231,33 +229,29 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                 for(std::size_t j=0; j < l_adapt.size2(); ++j)
                     if (!tools::function::isNumericalZero(l_hesse(n,j)))
                         l_adapt(n,j) = -l_gradient(n,j) / std::fabs( l_hesse(n,j) );
-
             
-            // get quantization error
-            l_error = l_errornew                     = calculateQuantizationError( l_delta, l_dataInv );
             
-            std::cout << l_error << std::endl;
-            throw exception::runtime(" ");
+            // get quantization error & try to optimize in half-steps
+            const T l_error                          = calculateQuantizationError( l_delta, l_dataInv );
+            T l_errornew                             = l_error;
+            const ublas::matrix<T> l_targetTmp       = l_target;
             
-            // try to optimize in half-steps
-            l_targetTmp                              = l_target;
-                
             for(std::size_t n=0; n < m_step; ++n) {
                 l_target                     = l_targetTmp + l_adapt;
-                //std::cout << l_target<< std::endl;
                 l_adapt                     *= 0.5;
-                const ublas::matrix<T> l_tmp = distance(l_target) + l_DataOnes;
                 
-                l_errornew = calculateQuantizationError( tools::matrix::invert(l_tmp) - l_dataInv, l_dataInv );
+                const ublas::matrix<T> l_tmp = distance(l_target) + l_DataOnes;
+                l_errornew                   = calculateQuantizationError( tools::matrix::invert(l_tmp) - l_dataInv, l_dataInv );
+                
+                
                 if (l_errornew < l_error)
                     break;
                 
                 if (n == m_step)
                     throw exception::runtime(_("Sammon mapping may not converge"));
             }
-            //std::cout << l_target<< std::endl;
-            throw exception::runtime(" ");
-                
+            
+            std::cout << l_target << "\n" << l_error << "\n\n" << std::endl;
             
             // if the error "numerical zero" we stop
             if (tools::function::isNumericalZero( (l_error - l_errornew) / l_error ) )
@@ -293,7 +287,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             for(std::size_t i=0; i < l_sse.size1(); ++i)
                 for(std::size_t j=0; j < l_sse.size2(); ++j)
                     l_sse(i,j) = std::pow(ublas::sum( tools::vector::pow( static_cast< ublas::vector<T> >(ublas::row(p_matrix, j)-ublas::row(p_matrix, i)), static_cast<T>(2)) ), static_cast<T>(0.5));
-            
+        
         return l_sse;
     }
     
@@ -314,7 +308,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     }
     
     
-
-
+    
+    
 };};};
 #endif
