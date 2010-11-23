@@ -33,7 +33,7 @@ namespace machinelearning { namespace tools {
     /** logger class for writing log information 
      * @todo writer method
      * @todo thread safe
-     * @todo MPI using
+     * @todo MPI using with non-blocking operation (every message should send to process 0 and write down - optiomal a thread checks some time if there are new messages)
      **/
     class logger {
         
@@ -49,8 +49,8 @@ namespace machinelearning { namespace tools {
             
             static logger* getInstance( void );
             //void setMessage( const logstate&, const std::string& );
-            //void setLogOn( void );
-            //void setLogOff( void );
+            void setEnable( const bool& );
+            bool getEnable( void ) const;
             std::string getFilename( void ) const;  
                             
         
@@ -62,9 +62,11 @@ namespace machinelearning { namespace tools {
             /** filename for logging output **/
             static std::string m_filename;
         
+            /** bool for writing the data **/
+            bool m_enable;
         
             /** empty constructor **/
-            logger( void ) {};  
+            logger( void ) : m_enable(false) {};  
         
             /** empty destructor **/
             ~logger( void ) {}; 
@@ -99,6 +101,23 @@ namespace machinelearning { namespace tools {
         return m_filename;
     }
     
+    
+    /** enable / disable logging
+     * @paramp p_onoff bool for enable / disable
+     **/
+    inline void logger::setEnable( const bool& p_onoff )
+    {
+        m_enable = p_onoff;
+    }
+    
+    
+    /** returns the status of logging
+     * @return boolean status
+     **/
+    inline bool logger::getEnable( void ) const
+    {
+        return m_enable;
+    }
     
 };};
 
