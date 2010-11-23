@@ -25,6 +25,9 @@
 #ifndef MACHINELEARNING_TOOLS_LOGGER_H
 #define MACHINELEARNING_TOOLS_LOGGER_H
 
+#include <string>
+
+
 namespace machinelearning { namespace tools { 
 
     /** logger class for writing log information 
@@ -34,48 +37,67 @@ namespace machinelearning { namespace tools {
      **/
     class logger {
         
-        public:
+        public :
         
-            enum state {
+            enum logstate {
                 info  = 0,
                 warn  = 1,
                 error = 2
             };
         
+        
             
-            static logger &getInstance( void );
-            //void setMessage( const state&, const std::string& );
+            static logger* getInstance( void );
+            //void setMessage( const logstate&, const std::string& );
+            //void setLogOn( void );
+            //void setLogOff( void );
+            std::string getFilename( void ) const;  
                             
         
-        private: 
+        private : 
         
             /** local instance **/
-            static logger m_instance;
+            static logger* m_instance;
+        
+            /** filename for logging output **/
+            static std::string m_filename;
+        
         
             /** empty constructor **/
-            logger( void ) {}
+            logger( void ) {};  
         
             /** empty destructor **/
-            ~logger( void ) {} 
+            ~logger( void ) {}; 
             
             /** empty copy-constructor **/
-            logger( const logger& );
+            logger( const logger& ) {};
         
             /** empty equal operator **/
-            logger& operator=( const logger& );
+            logger& operator=( const logger& ) {};
         
     };
     
+
     
     /** returns the instance
      * @return logger instance
      **/
-    inline logger& logger::getInstance()
+    inline logger* logger::getInstance()
     {
-        static logger m_instance;
+        if (!m_instance)
+            m_instance = new logger;
+        
         return m_instance;
     }
     
+    
+    /** returns the temporary filename for logging
+     * @return string with path and filename
+     **/
+    inline std::string logger::getFilename( void ) const
+    {
+        return m_filename;
+    }
     
     
 };};

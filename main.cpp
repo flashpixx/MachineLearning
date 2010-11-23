@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
     mpi::environment loMPIenv(argc, argv);
     mpi::communicator loMPICom;
     #endif
-    
+
     
     namespace tl        = machinelearning::tools;
     namespace dist      = machinelearning::distances;
@@ -54,15 +54,18 @@ int main(int argc, char *argv[]) {
         std::cout << x[i] << std::endl;*/
     #endif
       
+    std::cout << tl::logger::getInstance()->getFilename() << std::endl;
+    std::cout << tl::logger::getInstance()->getFilename() << std::endl;
     
     // ===== MDS ======
+    /*
     ublas::matrix<double> data = o.readMatrix<double>("/mds2", H5::PredType::NATIVE_DOUBLE); 
     ndim::mds<double> l(2, ndim::mds<double>::sammon);
     l.setIteration( 2 );
     l.setStep( 40 );
     tl::files::hdf f("mds.hdf5", true);
     f.write<double>( "/data",  l.map(data), H5::PredType::NATIVE_DOUBLE );  
-
+    */
    
     // ===== Wikipedia ======
     /*
