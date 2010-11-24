@@ -57,8 +57,8 @@ int main(int argc, char *argv[]) {
     
     std::cout << tl::logger::getInstance()->getFilename() << std::endl;
     
-    tl::logger::getInstance()->setLevel( tl::logger::error );
-    tl::logger::getInstance()->write( tl::logger::warn, "123");
+    tl::logger::getInstance()->setLevel( tl::logger::info );
+    tl::logger::getInstance()->write( tl::logger::error, "123");
     //tl::logger::getInstance()->write( tl::logger::info, o.readMatrix<double>("/mds2", H5::PredType::NATIVE_DOUBLE) );
 
     

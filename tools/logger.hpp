@@ -27,12 +27,13 @@
 
 #include <string>
 #include <fstream>
+#include <ctime>
 
 #ifdef CLUSTER
 #include <boost/mpi.hpp>
 #endif
 
-//#include "../exception/exception.h"
+#include "../exception/exception.h"
 #include "language/language.h"
 
 
@@ -54,12 +55,11 @@ namespace machinelearning { namespace tools {
         
             enum logstate {
                 none  = 0,
-                info  = 1,
+                error = 1,
                 warn  = 2,
-                error = 3
+                info  = 3
             };
-        
-        
+                
             
             static logger* getInstance( void );
             void setLevel( const logstate& );
@@ -90,26 +90,6 @@ namespace machinelearning { namespace tools {
             logger& operator=( const logger& );
         
     };
-
-    
-    template<typename T> inline void logger::write( const logstate& p_state, const T& p_val ) {
-        if ( (m_logstate == none) || (p_state == none) || (p_state > m_logstate) )
-            return;
-        
-        if (!m_file.is_open())
-            m_file.open( m_filename.c_str(), std::ios_base::app );
-        
-        
-        switch (p_state) {
-            case info   : m_file << "[info]\t";
-            case warn   : m_file << "[warn]\t";
-            case error  : m_file << "[error]\t";
-                
-            default     : m_file << "[unkown]\t";
-        }
-        m_file << p_val << "\n";
-        m_file.flush();
-    }
     
     
     /** constructor **/
@@ -146,7 +126,7 @@ namespace machinelearning { namespace tools {
     {
         if (!m_instance)
             m_instance = new logger();
-        
+
         return m_instance;
     }
     
@@ -177,6 +157,30 @@ namespace machinelearning { namespace tools {
         return m_logstate;
     }
     
+    
+    /** writes the data in the local log file 
+     * @param p_state log level
+     * @param p_val value
+     **/
+    template<typename T> inline void logger::write( const logstate& p_state, const T& p_val ) {
+        if ( (m_logstate == none) || (p_state == none) || (p_state > m_logstate) )
+            return;
+        
+        if (!m_file.is_open())
+            m_file.open( m_filename.c_str(), std::ios_base::app );
+        
+
+        switch (p_state) {
+            case info   : m_file << "[local info]       ";   break;
+            case warn   : m_file << "[local warn]       ";   break;
+            case error  : m_file << "[local error]      ";   break;
+                
+            default     : throw exception::runtime(_("log state is unkown"));
+        }
+        
+        m_file << p_val << "\n";
+        m_file.flush();
+    }
     
     
     //======= MPI ==================================================================================================================================
