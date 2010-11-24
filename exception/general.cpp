@@ -23,6 +23,7 @@
 
 
 #include "general.h"
+#include "../tools/tools.h"
 
 namespace machinelearning { namespace exception {
     
@@ -30,6 +31,8 @@ namespace machinelearning { namespace exception {
     classmethod::classmethod( const std::string& p_str ) : std::runtime_error(p_str) {}
     
     /** exception class for throwing on runtime errors **/
-    runtime::runtime( const std::string& p_str ) : std::runtime_error(p_str) {}
+    runtime::runtime( const std::string& p_str ) : std::runtime_error(p_str) {
+    //tools::logger::getInstance()->write( tools::logger::error, p_str );
+    }
     
 };};

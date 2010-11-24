@@ -21,11 +21,11 @@
  @endcond
  **/
 
-#include "logger.h"
+#include "logger.hpp"
 
 namespace machinelearning { namespace tools {
     
-    logger* logger::m_instance     = NULL;
-    std::string logger::m_filename = tmpnam(NULL);
+    logger::logger* logger::m_instance  = NULL;
+    std::string logger::m_filename      = tmpnam(NULL);
     
 };};

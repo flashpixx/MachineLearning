@@ -33,10 +33,9 @@
 #include "matrix.hpp"
 #include "vector.hpp"
 #include "lapack.hpp"
-#include "logger.h"
+#include "logger.hpp"
 #include "sources/sources.h"
 #include "files/files.h"
-
 #include "language/language.h"
 
 #endif

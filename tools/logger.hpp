@@ -22,17 +22,26 @@
  **/
 
 
-#ifndef MACHINELEARNING_TOOLS_LOGGER_H
-#define MACHINELEARNING_TOOLS_LOGGER_H
+#ifndef MACHINELEARNING_TOOLS_LOGGER_HPP
+#define MACHINELEARNING_TOOLS_LOGGER_HPP
 
 #include <string>
 #include <fstream>
 
-#include "../exception/exception.h"
+#ifdef CLUSTER
+#include <boost/mpi.hpp>
+#endif
+
+//#include "../exception/exception.h"
 #include "language/language.h"
 
 
 namespace machinelearning { namespace tools { 
+    
+    #ifdef CLUSTER
+    namespace mpi   = boost::mpi;
+    #endif
+    
 
     /** logger class for writing log information 
      * @todo writer method
@@ -44,35 +53,37 @@ namespace machinelearning { namespace tools {
         public :
         
             enum logstate {
-                info  = 0,
-                warn  = 1,
-                error = 2
+                none  = 0,
+                info  = 1,
+                warn  = 2,
+                error = 3
             };
         
         
             
             static logger* getInstance( void );
             //void setMessage( const logstate&, const std::string& );
-            void setEnable( const bool& );
-            bool getEnable( void ) const;
-            std::string getFilename( void ) const;  
+            void setLevel( const logstate& );
+            logstate getLevel( void ) const;
+            std::string getFilename( void ) const;
         
-            //friend std::ostream& operator<<( const std::string& );
+            template<typename T> void write( const logstate&, const T& );
                             
+         
         
         private : 
-        
             /** local instance **/
             static logger* m_instance;
         
             /** filename for logging output **/
             static std::string m_filename;
         
-            /** bool for writing the data **/
-            bool m_enable;
+            /** logstate for writing data **/
+            logstate m_logstate;
         
             /** file handle **/
             std::ofstream m_file;
+
         
             logger( void );  
             ~logger( void ); 
@@ -82,15 +93,33 @@ namespace machinelearning { namespace tools {
     };
 
     
+    template<typename T> inline void logger::write( const logstate& p_state, const T& p_val ) {
+        if ( (m_logstate == none) || (p_state == none) || (p_state > m_logstate) )
+            return;
+        
+        if (!m_file.is_open())
+            m_file.open( m_filename.c_str(), std::ios_base::app );
+        
+        
+        switch (p_state) {
+            case info   : m_file << "[info]\t";
+            case warn   : m_file << "[warn]\t";
+            case error  : m_file << "[error]\t";
+                
+            default     : m_file << "[unkown]\t";
+        }
+        m_file << p_val << "\n";
+        m_file.flush();
+    }
+    
     
     /** constructor **/
     inline logger::logger( void ) :
-        m_enable(false)
-    {
-        m_file.open( m_filename.c_str(), std::ios_base::app );
-        if (!m_file.is_open())
-            throw exception::runtime(_("can not create a log file"));
-    };
+        m_logstate(none)
+        #ifdef CLUSTER
+        , m_mpi(NULL)
+        #endif
+    {};
     
     
     /** copy constructor **/
@@ -132,23 +161,32 @@ namespace machinelearning { namespace tools {
     }
     
     
-    /** enable / disable logging
-     * @paramp p_onoff bool for enable / disable
+    /** set the log state
+     * @paramp p_state state for logging
      **/
-    inline void logger::setEnable( const bool& p_onoff )
+    inline void logger::setLevel( const logstate& p_state )
     {
-        m_enable = p_onoff;
+        m_logstate = p_state;
     }
     
     
     /** returns the status of logging
      * @return boolean status
      **/
-    inline bool logger::getEnable( void ) const
+    inline logger::logstate logger::getLevel( void ) const
     {
-        return m_enable;
+        return m_logstate;
     }
+    
+    
+    
+    //======= MPI ==================================================================================================================================
+    #ifdef CLUSTER
+    
+    
 
+    
+    #endif
     
     
 };};
