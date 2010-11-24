@@ -174,6 +174,7 @@ namespace machinelearning { namespace tools {
         
         // lock will remove with the destructor call
         boost::lock_guard<boost::mutex> l_lock(m_mutex);         
+        
         if (!m_file.is_open())
             m_file.open( m_filename.c_str(), std::ios_base::app );
         

@@ -40,20 +40,6 @@ namespace mpi	= boost::mpi;
 #endif
 
 
-void wait(int seconds) 
-{ 
-    boost::this_thread::sleep(boost::posix_time::seconds(seconds)); 
-} 
-void thread() 
-{ 
-    for (int i = 0; i < 5; ++i) 
-    { 
-        wait(1); 
-        tl::logger::getInstance()->write( tl::logger::error, i);
-    } 
-} 
-
-
 
 int main(int argc, char *argv[]) {
     #ifdef CLUSTER
@@ -72,18 +58,9 @@ int main(int argc, char *argv[]) {
     for(std::size_t i=0; i < x.size(); ++i)
         std::cout << x[i] << std::endl;*/
     #endif
-
-    
-    
-    
     
     std::cout << tl::logger::getInstance()->getFilename() << std::endl;
     tl::logger::getInstance()->setLevel( tl::logger::info );
-    
-    boost::thread t1(thread); 
-    boost::thread t2(thread); 
-    t1.join(); 
-    t2.join(); 
     
     
     
