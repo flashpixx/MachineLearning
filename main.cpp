@@ -9,6 +9,7 @@
 #include <boost/archive/text_iarchive.hpp>
 
 #include <boost/numeric/ublas/io.hpp>
+#include <boost/thread.hpp> 
 
 #include "boost/multi_array.hpp"
 #include <boost/numeric/ublas/matrix.hpp>
@@ -22,32 +23,50 @@
 #include <boost/numeric/bindings/ublas/vector.hpp>
 
 
+
+namespace tl        = machinelearning::tools;
+namespace dist      = machinelearning::distances;
+namespace ndim      = machinelearning::dimensionreduce::nonsupervised;
+namespace dim       = machinelearning::dimensionreduce::supervised;
+namespace sl        = machinelearning::clustering::supervised;
+namespace nsl       = machinelearning::clustering::nonsupervised;
+namespace nd        = machinelearning::neighborhood;
+namespace cl        = machinelearning::classifier;
+namespace func      = machinelearning::functionaloptimization;
+namespace linalg    = boost::numeric::bindings::lapack;
+namespace ublas     = boost::numeric::ublas;
+#ifdef CLUSTER
+namespace mpi	= boost::mpi;
+#endif
+
+
+void wait(int seconds) 
+{ 
+    boost::this_thread::sleep(boost::posix_time::seconds(seconds)); 
+} 
+void thread() 
+{ 
+    for (int i = 0; i < 5; ++i) 
+    { 
+        wait(1); 
+        tl::logger::getInstance()->write( tl::logger::error, i);
+    } 
+} 
+
+
+
 int main(int argc, char *argv[]) {
     #ifdef CLUSTER
-    namespace mpi	= boost::mpi;
     mpi::environment loMPIenv(argc, argv);
     mpi::communicator loMPICom;
     #endif
-
-    
-    namespace tl        = machinelearning::tools;
-    namespace dist      = machinelearning::distances;
-    namespace ndim      = machinelearning::dimensionreduce::nonsupervised;
-    namespace dim       = machinelearning::dimensionreduce::supervised;
-    namespace sl        = machinelearning::clustering::supervised;
-    namespace nsl       = machinelearning::clustering::nonsupervised;
-    namespace nd        = machinelearning::neighborhood;
-    namespace cl        = machinelearning::classifier;
-    namespace func      = machinelearning::functionaloptimization;
-    namespace linalg    = boost::numeric::bindings::lapack;
-    namespace ublas     = boost::numeric::ublas;
     
     #ifdef MULTILANGUAGE
     tl::language::bind("ml", "./tools/language/");
     #endif
     
     #ifdef FILES
-    tl::files::hdf o("blub.hdf5");
+    //tl::files::hdf o("blub.hdf5");
     /*tl::files::hdf o("string.hdf5");
     std::vector<std::string> x = o.readStringVector("/array");
     for(std::size_t i=0; i < x.size(); ++i)
@@ -55,12 +74,18 @@ int main(int argc, char *argv[]) {
     #endif
 
     
-    std::cout << tl::logger::getInstance()->getFilename() << std::endl;
     
+    
+    
+    std::cout << tl::logger::getInstance()->getFilename() << std::endl;
     tl::logger::getInstance()->setLevel( tl::logger::info );
-    tl::logger::getInstance()->write( tl::logger::error, "123");
-    //tl::logger::getInstance()->write( tl::logger::info, o.readMatrix<double>("/mds2", H5::PredType::NATIVE_DOUBLE) );
-
+    
+    boost::thread t1(thread); 
+    boost::thread t2(thread); 
+    t1.join(); 
+    t2.join(); 
+    
+    
     
     // ===== MDS ======
     /*

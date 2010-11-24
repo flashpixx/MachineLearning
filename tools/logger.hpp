@@ -29,6 +29,8 @@
 #include <fstream>
 #include <ctime>
 
+#include <boost/thread.hpp>
+
 #ifdef CLUSTER
 #include <boost/mpi.hpp>
 #endif
@@ -83,6 +85,9 @@ namespace machinelearning { namespace tools {
             /** file handle **/
             std::ofstream m_file;
 
+            /** mutex for locking **/
+            boost::mutex m_mutex;
+        
         
             logger( void );  
             ~logger( void ); 
@@ -94,7 +99,8 @@ namespace machinelearning { namespace tools {
     
     /** constructor **/
     inline logger::logger( void ) :
-        m_logstate(none)
+        m_logstate(none),
+        m_mutex()
         #ifdef CLUSTER
         , m_mpi(NULL)
         #endif
@@ -166,6 +172,8 @@ namespace machinelearning { namespace tools {
         if ( (m_logstate == none) || (p_state == none) || (p_state > m_logstate) )
             return;
         
+        // lock will remove with the destructor call
+        boost::lock_guard<boost::mutex> l_lock(m_mutex);         
         if (!m_file.is_open())
             m_file.open( m_filename.c_str(), std::ios_base::app );
         
