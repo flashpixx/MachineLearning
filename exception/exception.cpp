@@ -27,9 +27,9 @@
 namespace machinelearning { namespace exception {
     
     /** exception class for throwing on not implementated method **/
-    classmethod::classmethod( const std::string& p_str ) : std::runtime_error(p_str) { tools::logger::getInstance()->write( tools::logger::error, p_str ); }
+classmethod::classmethod( const std::string& p_str ) : std::runtime_error(p_str) {};
     
     /** exception class for throwing on runtime errors **/
-    runtime::runtime( const std::string& p_str ) : std::runtime_error(p_str) { tools::logger::getInstance()->write( tools::logger::error, p_str ); }
+runtime::runtime( const std::string& p_str ) : std::runtime_error(p_str) {};
     
 };};

@@ -27,8 +27,6 @@
 #include <string>
 #include <stdexcept>
 
-#include "../tools/logger.hpp"
-
 
 namespace machinelearning { namespace exception {
     

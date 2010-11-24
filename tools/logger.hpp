@@ -62,7 +62,6 @@ namespace machinelearning { namespace tools {
         
             
             static logger* getInstance( void );
-            //void setMessage( const logstate&, const std::string& );
             void setLevel( const logstate& );
             logstate getLevel( void ) const;
             std::string getFilename( void ) const;
