@@ -21,21 +21,17 @@
  @endcond
  **/
 
-#ifndef MACHINELEARNING_EXCEPTION_GENERAL_H
-#define MACHINELEARNING_EXCEPTION_GENERAL_H
 
-#include <string>
-#include <iostream>
-#include <stdexcept>
-#include <exception>
-
-
+#include "exception.h"
 
 namespace machinelearning { namespace exception {
     
-    class classmethod      : public std::runtime_error      { public : classmethod( const std::string& ); };
-    class runtime          : public std::runtime_error      { public : runtime( const std::string& ); };
+    /** exception class for throwing on not implementated method **/
+    classmethod::classmethod( const std::string& p_str ) : std::runtime_error(p_str) {}
+    
+    /** exception class for throwing on runtime errors **/
+    runtime::runtime( const std::string& p_str ) : std::runtime_error(p_str) {
+    //tools::logger::getInstance()->write( tools::logger::error, p_str );
+    }
     
 };};
-
-#endif

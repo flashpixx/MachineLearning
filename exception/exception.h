@@ -21,11 +21,20 @@
  @endcond
  **/
 
-/** header file to connect all exception library for one include **/
-
 #ifndef MACHINELEARNING_EXCEPTION_H
 #define MACHINELEARNING_EXCEPTION_H
 
-#include "general.h"
+#include <string>
+#include <stdexcept>
+
+//#include "../tools/tools.h"
+
+
+namespace machinelearning { namespace exception {
+    
+    class classmethod      : public std::runtime_error      { public : classmethod( const std::string& ); };
+    class runtime          : public std::runtime_error      { public : runtime( const std::string& ); };
+    
+};};
 
 #endif
