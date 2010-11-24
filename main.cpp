@@ -53,8 +53,8 @@ int main(int argc, char *argv[]) {
     for(std::size_t i=0; i < x.size(); ++i)
         std::cout << x[i] << std::endl;*/
     #endif
-      
-    std::cout << tl::logger::getInstance()->getFilename() << std::endl;
+
+    
     std::cout << tl::logger::getInstance()->getFilename() << std::endl;
     
     // ===== MDS ======

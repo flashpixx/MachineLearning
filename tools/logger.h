@@ -26,6 +26,10 @@
 #define MACHINELEARNING_TOOLS_LOGGER_H
 
 #include <string>
+#include <fstream>
+
+#include "../exception/exception.h"
+#include "language/language.h"
 
 
 namespace machinelearning { namespace tools { 
@@ -52,6 +56,8 @@ namespace machinelearning { namespace tools {
             void setEnable( const bool& );
             bool getEnable( void ) const;
             std::string getFilename( void ) const;  
+        
+            //friend std::ostream& operator<<( const std::string& );
                             
         
         private : 
@@ -65,20 +71,44 @@ namespace machinelearning { namespace tools {
             /** bool for writing the data **/
             bool m_enable;
         
-            /** empty constructor **/
-            logger( void ) : m_enable(false) {};  
+            /** file handle **/
+            std::ofstream m_file;
         
-            /** empty destructor **/
-            ~logger( void ) {}; 
-            
-            /** empty copy-constructor **/
-            logger( const logger& ) {};
-        
-            /** empty equal operator **/
-            logger& operator=( const logger& ) {};
+            logger( void );  
+            ~logger( void ); 
+            logger( const logger& );
+            logger& operator=( const logger& );
         
     };
+
     
+    
+    /** constructor **/
+    inline logger::logger( void ) :
+        m_enable(false)
+    {
+        m_file.open( m_filename.c_str(), std::ios_base::app );
+        if (!m_file.is_open())
+            throw exception::runtime(_("can not create a log file"));
+    };
+    
+    
+    /** copy constructor **/
+    inline logger::logger( const logger& ) {}
+
+    
+    /** destructor **/
+    inline logger::~logger( void )
+    {
+        m_file.close();
+    }
+    
+
+    /** equal operator **/
+    inline logger& logger::operator=( const logger& )
+    {
+        return *this;
+    }
 
     
     /** returns the instance
@@ -87,7 +117,7 @@ namespace machinelearning { namespace tools {
     inline logger* logger::getInstance()
     {
         if (!m_instance)
-            m_instance = new logger;
+            m_instance = new logger();
         
         return m_instance;
     }
@@ -118,6 +148,8 @@ namespace machinelearning { namespace tools {
     {
         return m_enable;
     }
+
+    
     
 };};
 
