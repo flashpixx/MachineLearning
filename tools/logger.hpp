@@ -47,8 +47,6 @@ namespace machinelearning { namespace tools {
     
 
     /** logger class for writing log information 
-     * @todo writer method
-     * @todo thread safe
      * @todo MPI using with non-blocking operation (every message should send to process 0 and write down - optiomal a thread checks some time if there are new messages)
      **/
     class logger {
@@ -67,10 +65,14 @@ namespace machinelearning { namespace tools {
             void setLevel( const logstate& );
             logstate getLevel( void ) const;
             std::string getFilename( void ) const;
-        
             template<typename T> void write( const logstate&, const T& );
                             
-         
+            #ifdef CLUSTER
+            void createListener( mpi::communicator& );
+            template<typename T> void write( const mpi::communicator&, const logstate&, const T& );
+            #endif
+        
+        
         
         private : 
             /** local instance **/
@@ -93,6 +95,16 @@ namespace machinelearning { namespace tools {
             ~logger( void ); 
             logger( const logger& );
             logger& operator=( const logger& );
+        
+        
+            #ifdef CLUSTER
+            
+            mpi::communicator* m_mpi;
+        
+            //class listener {
+            //};
+        
+            #endif
         
     };
     
@@ -190,12 +202,61 @@ namespace machinelearning { namespace tools {
         m_file << p_val << "\n";
         m_file.flush();
     }
+
     
     
     //======= MPI ==================================================================================================================================
     #ifdef CLUSTER
     
+    /** creates the local listener on CPU 0
+     * @param p_mpi MPI object (no const reference)
+     **/
+    inline void logger::createListener( mpi::communicator& p_mpi )
+    {
+       if (p_mpi.rank() != 0)
+            throw exception::runtime(_("the listener can be produced only on CPU 0"));
+        
+        m_mpi = &p_mpi;
+        
+        // create worker thread 
+    }
     
+    
+    /** write log entry. If the CPU rank == 0 the log will write to the file, on other CPU rank the message
+     * is send to the CPU 0 and write down there. The local log state is relevant for writing
+     * @param p_mpi MPI object
+     * @param p_state log level
+     * @param p_val value
+     **/     
+    template<typename T> inline void logger::write( const mpi::communicator& p_mpi, const logstate& p_state, const T& p_val )
+    {
+        if ( (m_logstate == none) || (p_state == none) || (p_state > m_logstate) )
+            return;
+        
+        
+        if (p_mpi.rank() != 0)
+            std::cout << "blub" << std::endl;
+        else {
+            
+            // lock will remove with the destructor call
+            boost::lock_guard<boost::mutex> l_lock(m_mutex);         
+            
+            if (!m_file.is_open())
+                m_file.open( m_filename.c_str(), std::ios_base::app );
+            
+            switch (p_state) {
+                case info   : m_file << "[CPU 0 info]       ";   break;
+                case warn   : m_file << "[CPU 0 warn]       ";   break;
+                case error  : m_file << "[CPU 0 error]      ";   break;
+                    
+                default     : throw exception::runtime(_("log state is unkown"));
+            }
+            
+            m_file << p_val << "\n";
+            m_file.flush();
+        }
+        
+    }
 
     
     #endif
