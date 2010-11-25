@@ -234,9 +234,9 @@ namespace machinelearning { namespace tools {
             return;
         
         
-        if (p_mpi.rank() != 0)
-            std::cout << "blub" << std::endl;
-        else {
+        if (p_mpi.rank() != 0) {
+            // create message and send it with non-blocking to CPU 0
+        } else {
             
             // lock will remove with the destructor call
             boost::lock_guard<boost::mutex> l_lock(m_mutex);         
