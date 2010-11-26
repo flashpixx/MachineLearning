@@ -48,6 +48,7 @@ namespace machinelearning { namespace tools {
 
     /** logger class for writing log information 
      * @todo MPI using with non-blocking operation (every message should send to process 0 and write down - optiomal a thread checks some time if there are new messages)
+     * @todo tmpnam(NULL) change to a safe variante (posix mkstemp(), but this isn't standard)
      **/
     class logger {
         

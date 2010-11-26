@@ -59,13 +59,33 @@ int main(int argc, char *argv[]) {
         std::cout << x[i] << std::endl;*/
     #endif
     
-    std::cout << tl::logger::getInstance()->getFilename() << std::endl;
-    tl::logger::getInstance()->setLevel( tl::logger::info );
+    //std::cout << tl::logger::getInstance()->getFilename() << std::endl;
+    //tl::logger::getInstance()->setLevel( tl::logger::info );
     
-    tl::logger::getInstance()->createListener(loMPICom);
-    tl::logger::getInstance()->createListener(loMPICom);
+    //tl::logger::getInstance()->createListener(loMPICom);
+    //tl::logger::getInstance()->createListener(loMPICom);
     
     
+    /* temp files !?
+    char sfn[15] = "";
+    FILE *sfp;
+    int fd = -1;
+    
+    strlcpy(sfn, "/tmp/ed.XXXXXX", sizeof sfn);
+    if ((fd = mkstemp(sfn)) == -1 ||
+        (sfp = fdopen(fd, "w+")) == NULL) {
+        if (fd != -1) {
+            unlink(sfn);
+            close(fd);
+            return 0;
+        }
+        fprintf(stderr, "%s: %s\n", sfn, strerror(errno));
+    }
+    fclose(sfp);
+    close(fd);
+    
+    std::cout << sfn << std::endl;
+    */
     
     
     // ===== MDS ======
