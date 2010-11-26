@@ -22,6 +22,9 @@
 #include <boost/numeric/bindings/ublas/matrix.hpp>
 #include <boost/numeric/bindings/ublas/vector.hpp>
 
+#include "boost/filesystem/path.hpp"
+#include "boost/filesystem/operations.hpp"
+
 
 
 namespace tl        = machinelearning::tools;
@@ -65,6 +68,8 @@ int main(int argc, char *argv[]) {
     //tl::logger::getInstance()->createListener(loMPICom);
     //tl::logger::getInstance()->createListener(loMPICom);
     
+    
+    std::cout << boost::filesystem::temp_dir_path() << std::endl;
     
     /* temp files !?
     char sfn[15] = "";
