@@ -62,6 +62,10 @@ int main(int argc, char *argv[]) {
     std::cout << tl::logger::getInstance()->getFilename() << std::endl;
     tl::logger::getInstance()->setLevel( tl::logger::info );
     
+    tl::logger::getInstance()->createListener(loMPICom);
+    tl::logger::getInstance()->createListener(loMPICom);
+    
+    
     
     
     // ===== MDS ======

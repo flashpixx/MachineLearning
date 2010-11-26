@@ -99,10 +99,8 @@ namespace machinelearning { namespace tools {
         
             #ifdef CLUSTER
             
+            /** MPI listener object **/
             mpi::communicator* m_mpi;
-        
-            //class listener {
-            //};
         
             #endif
         
@@ -215,6 +213,13 @@ namespace machinelearning { namespace tools {
     {
        if (p_mpi.rank() != 0)
             throw exception::runtime(_("the listener can be produced only on CPU 0"));
+        if (m_mpi)
+            throw exception::runtime(_("listener can be produced only once"));
+        
+        // if we use only one CPU, no listener is created
+        if (p_mpi.size() == 1)
+            return;
+        
         
         m_mpi = &p_mpi;
         
