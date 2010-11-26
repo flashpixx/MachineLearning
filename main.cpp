@@ -22,8 +22,7 @@
 #include <boost/numeric/bindings/ublas/matrix.hpp>
 #include <boost/numeric/bindings/ublas/vector.hpp>
 
-#include "boost/filesystem/path.hpp"
-#include "boost/filesystem/operations.hpp"
+#include <boost/filesystem.hpp>
 
 
 
@@ -55,42 +54,19 @@ int main(int argc, char *argv[]) {
     #endif
     
     #ifdef FILES
-    //tl::files::hdf o("blub.hdf5");
+    tl::files::hdf o("blub.hdf5");
     /*tl::files::hdf o("string.hdf5");
     std::vector<std::string> x = o.readStringVector("/array");
     for(std::size_t i=0; i < x.size(); ++i)
         std::cout << x[i] << std::endl;*/
     #endif
     
-    //std::cout << tl::logger::getInstance()->getFilename() << std::endl;
-    //tl::logger::getInstance()->setLevel( tl::logger::info );
+    std::cout << tl::logger::getInstance()->getFilename() << std::endl;
+    tl::logger::getInstance()->setLevel( tl::logger::info );
     
-    //tl::logger::getInstance()->createListener(loMPICom);
-    //tl::logger::getInstance()->createListener(loMPICom);
+    tl::logger::getInstance()->write( tl::logger::error, "huhu test" );
+    tl::logger::getInstance()->write( tl::logger::error, o.readMatrix<double>("/mds2", H5::PredType::NATIVE_DOUBLE) );
     
-    
-    std::cout << boost::filesystem::temp_dir_path() << std::endl;
-    
-    /* temp files !?
-    char sfn[15] = "";
-    FILE *sfp;
-    int fd = -1;
-    
-    strlcpy(sfn, "/tmp/ed.XXXXXX", sizeof sfn);
-    if ((fd = mkstemp(sfn)) == -1 ||
-        (sfp = fdopen(fd, "w+")) == NULL) {
-        if (fd != -1) {
-            unlink(sfn);
-            close(fd);
-            return 0;
-        }
-        fprintf(stderr, "%s: %s\n", sfn, strerror(errno));
-    }
-    fclose(sfp);
-    close(fd);
-    
-    std::cout << sfn << std::endl;
-    */
     
     
     // ===== MDS ======

@@ -26,6 +26,8 @@
 #define MACHINELEARNING_TOOLS_LOGGER_HPP
 
 #include <string>
+#include <iostream>
+#include <sstream>
 #include <fstream>
 #include <ctime>
 
@@ -76,20 +78,17 @@ namespace machinelearning { namespace tools {
         
         
         private : 
+        
             /** local instance **/
             static logger* m_instance;
-        
             /** filename for logging output **/
             static std::string m_filename;
-        
             /** logstate for writing data **/
             logstate m_logstate;
-        
             /** file handle **/
             std::ofstream m_file;
-
             /** mutex for locking **/
-            boost::mutex m_mutex;
+            boost::mutex m_muxwriter;
         
         
             logger( void );  
@@ -97,11 +96,18 @@ namespace machinelearning { namespace tools {
             logger( const logger& );
             logger& operator=( const logger& );
         
+            template<typename T> void logformat( const logstate&, const T&, std::ostringstream& ) const;
+            void writefile( const std::ostringstream& );
+        
         
             #ifdef CLUSTER
-            
+        
             /** MPI listener object **/
             mpi::communicator* m_mpi;
+            /** mutex for creating the listener **/
+            boost::mutex m_muxlistener;
+    
+            void listener( void );
         
             #endif
         
@@ -111,9 +117,10 @@ namespace machinelearning { namespace tools {
     /** constructor **/
     inline logger::logger( void ) :
         m_logstate(none),
-        m_mutex()
+        m_muxwriter()
         #ifdef CLUSTER
-        , m_mpi(NULL)
+        , m_mpi(NULL),
+        m_muxlistener()
         #endif
     {};
     
@@ -182,23 +189,43 @@ namespace machinelearning { namespace tools {
     template<typename T> inline void logger::write( const logstate& p_state, const T& p_val ) {
         if ( (m_logstate == none) || (p_state == none) || (p_state > m_logstate) )
             return;
-        
+  
+        std::ostringstream l_stream;
+        l_stream << "local - ";
+        logformat(p_state, p_val, l_stream);
+        writefile( l_stream );
+    }
+    
+    
+    /** create the log format 
+     * @param p_state log level
+     * @param p_val value for writing
+     * @param p_stream reference for input the data
+     **/
+    template<typename T> inline void logger::logformat( const logstate& p_state, const T& p_val, std::ostringstream& p_stream ) const
+    {
+        switch (p_state) {
+            case info   : p_stream << "[info]       " << p_val;   break;
+            case warn   : p_stream << "[warn]       " << p_val;   break;
+            case error  : p_stream << "[error]      " << p_val;   break;
+                
+            default     : throw exception::runtime(_("log state is unkown"));
+        }
+    }
+    
+    
+    /** writes the output stream to the file with thread locking
+     * @param p_data output stream
+     **/
+    inline void logger::writefile( const std::ostringstream& p_data )
+    {
         // lock will remove with the destructor call
-        boost::lock_guard<boost::mutex> l_lock(m_mutex);         
+        boost::lock_guard<boost::mutex> l_lock(m_muxwriter);         
         
         if (!m_file.is_open())
             m_file.open( m_filename.c_str(), std::ios_base::app );
         
-
-        switch (p_state) {
-            case info   : m_file << "[local info]       ";   break;
-            case warn   : m_file << "[local warn]       ";   break;
-            case error  : m_file << "[local error]      ";   break;
-                
-            default     : throw exception::runtime(_("log state is unkown"));
-        }
-        
-        m_file << p_val << "\n";
+        m_file << p_data.str() << "\n";
         m_file.flush();
     }
 
@@ -214,17 +241,18 @@ namespace machinelearning { namespace tools {
     {
        if (p_mpi.rank() != 0)
             throw exception::runtime(_("the listener can be produced only on CPU 0"));
-        if (m_mpi)
-            throw exception::runtime(_("listener can be produced only once"));
-        
-        // if we use only one CPU, no listener is created
         if (p_mpi.size() == 1)
             return;
         
+        // lock will remove with the destructor call
+        boost::lock_guard<boost::mutex> l_lock(m_muxlistener); 
         
+        if (m_mpi)
+            throw exception::runtime(_("listener can be produced only once"));
         m_mpi = &p_mpi;
         
-        // create worker thread 
+        boost::thread l_thread( boost::bind( &logger::listener, this ) );
+        l_thread.join();
     }
     
     
@@ -243,25 +271,24 @@ namespace machinelearning { namespace tools {
         if (p_mpi.rank() != 0) {
             // create message and send it with non-blocking to CPU 0
         } else {
-            
-            // lock will remove with the destructor call
-            boost::lock_guard<boost::mutex> l_lock(m_mutex);         
-            
-            if (!m_file.is_open())
-                m_file.open( m_filename.c_str(), std::ios_base::app );
-            
-            switch (p_state) {
-                case info   : m_file << "[CPU 0 info]       ";   break;
-                case warn   : m_file << "[CPU 0 warn]       ";   break;
-                case error  : m_file << "[CPU 0 error]      ";   break;
-                    
-                default     : throw exception::runtime(_("log state is unkown"));
-            }
-            
-            m_file << p_val << "\n";
-            m_file.flush();
+            std::ostringstream l_stream;
+            l_stream << "CPU 0 - ";
+            logformat(p_state, p_val, l_stream);
+            writefile( l_stream );
         }
         
+    }
+    
+    
+    /** thread method that reads the asynchrone messages of the MPI interface **/
+    inline void logger::listener( void )
+    {
+        while (true) {
+            try {
+                boost::thread::yield();
+                 
+            } catch (...) {}
+        }
     }
 
     

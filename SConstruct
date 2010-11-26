@@ -34,7 +34,7 @@ def configuration_macosx(config, version, architecture) :
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["LIBRARY_PATH"]
     config["compileflags"]      = "-O1 -pipe -Wall -pthread -finline-functions -arch "+arch+" -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
-    config["linkto"]            = ["boost_system", "boost_filesystem", "boost_thread", "boost_iostreams", "ginac", "atlas", "lapack", "ptcblas"]
+    config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "ginac", "atlas", "lapack", "ptcblas"]
     
     
     if GetOption("withmpi") == None :
@@ -68,7 +68,7 @@ def configuration_posix(config, version, architecture) :
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["LIBRARY_PATH"]
     config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
-    config["linkto"]            = ["boost_system", "boost_filesystem", "boost_thread", "boost_iostreams", "ginac", "atlas", "lapack", "ptcblas", "ptf77blas"]
+    config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "ginac", "atlas", "lapack", "ptcblas", "ptf77blas"]
     
     
     if GetOption("withmpi") == None :
