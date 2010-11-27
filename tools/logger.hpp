@@ -258,7 +258,7 @@ namespace machinelearning { namespace tools {
             throw exception::runtime(_("listener can be produced only once"));
         
         m_listenerrunnging = true;
-        boost::thread* l_thread = new boost::thread( boost::bind( &logger::listener, this, p_mpi ) );
+        boost::thread l_thread( boost::bind( &logger::listener, this, p_mpi ) );
         std::cout << "xxx" << std::endl;
     }
     
@@ -297,7 +297,7 @@ namespace machinelearning { namespace tools {
     inline void logger::listener( const mpi::communicator& p_mpi )
     {
         //try {
-        for(std::size_t i=0; i < 5; ++i) {
+        while (m_listenerrunnging) {
                 boost::this_thread::yield();
                 std::cout << "run" << std::endl;
                 /*std::string l_str;
