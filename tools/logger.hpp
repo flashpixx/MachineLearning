@@ -290,6 +290,7 @@ namespace machinelearning { namespace tools {
 
                 std::string l_str;
                 std::ostringstream l_stream;
+                p_mpi.probe( mpi::any_source, LOGGER_MPI_TAG );
                 p_mpi.irecv( mpi::any_source, LOGGER_MPI_TAG, l_str );
                 l_stream << l_str;
                 write2file( l_stream );
