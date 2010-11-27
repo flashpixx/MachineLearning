@@ -70,7 +70,6 @@ int main(int argc, char *argv[]) {
     
     tl::logger::getInstance()->setLevel( tl::logger::info );
     tl::logger::getInstance()->write( loMPICom, tl::logger::error, "huhu test" );
-    tl::logger::getInstance()->closeListener();
         
     #endif
     tl::logger::getInstance()->write( tl::logger::error, "huhu test" );

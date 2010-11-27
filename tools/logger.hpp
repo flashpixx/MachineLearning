@@ -74,7 +74,6 @@ namespace machinelearning { namespace tools {
                             
             #ifdef CLUSTER
             void createListener( mpi::communicator& );
-            void closeListener( void );
             template<typename T> void write( const mpi::communicator&, const logstate&, const T& );
             #endif
         
@@ -135,10 +134,6 @@ namespace machinelearning { namespace tools {
     /** destructor **/
     inline logger::~logger( void )
     {
-        #ifdef CLUSTER
-        closeListener();
-        #endif
-        
         m_file.close();
     }
     
@@ -260,12 +255,6 @@ namespace machinelearning { namespace tools {
         m_listenerrunnging = true;
         boost::thread l_thread( boost::bind( &logger::listener, this, p_mpi ) );
         std::cout << "xxx" << std::endl;
-    }
-    
-    
-    inline void logger::closeListener( void )
-    {
-        m_listenerrunnging = false;
     }
     
     /** write log entry. If the CPU rank == 0 the log will write to the file, on other CPU rank the message
