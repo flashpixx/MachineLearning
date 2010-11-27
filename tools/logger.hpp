@@ -298,7 +298,7 @@ namespace machinelearning { namespace tools {
     {
         //try {
             while (m_listenerrunnging) {
-                boost::thread::yield();
+                boost::this_thread::yield();
                                 
                 /*std::string l_str;
                 std::ostringstream l_stream;
