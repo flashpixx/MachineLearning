@@ -103,12 +103,10 @@ namespace machinelearning { namespace tools {
         
             #ifdef CLUSTER
         
-            /** MPI listener object **/
-            mpi::communicator* m_mpi;
             /** mutex for creating the listener **/
             boost::mutex m_muxlistener;
-        bool run;
-        
+            /** bool for running the listener **/
+            bool m_listenerrunnging;
         
             void listener( void );
         
@@ -122,9 +120,8 @@ namespace machinelearning { namespace tools {
         m_logstate(none),
         m_muxwriter()
         #ifdef CLUSTER
-        , m_mpi(NULL),
-        m_muxlistener(),
-    run(true)
+        , m_muxlistener(),
+        m_listenerrunnging(false)
         #endif
     {};
     
@@ -136,10 +133,6 @@ namespace machinelearning { namespace tools {
     /** destructor **/
     inline logger::~logger( void )
     {
-        #ifdef CLUSTER
-        run = false;
-        #endif
-        
         m_file.close();
     }
     
@@ -249,16 +242,16 @@ namespace machinelearning { namespace tools {
     {
        if (p_mpi.rank() != 0)
             throw exception::runtime(_("the listener can be produced only on CPU 0"));
-        if (p_mpi.size() == 1)
+       if (p_mpi.size() == 1)
             return;
         
-        // lock will remove with the destructor call
-        boost::lock_guard<boost::mutex> l_lock(m_muxlistener); 
+       // lock will remove with the destructor call
+       boost::lock_guard<boost::mutex> l_lock(m_muxlistener); 
         
-        if (m_mpi)
+        if (m_listenerrunnging)
             throw exception::runtime(_("listener can be produced only once"));
-        m_mpi = &p_mpi;
         
+        m_listenerrunnging = true;
         boost::thread l_thread( boost::bind( &logger::listener, this ) );
         l_thread.join();
     }
