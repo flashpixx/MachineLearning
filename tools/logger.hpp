@@ -258,7 +258,7 @@ namespace machinelearning { namespace tools {
         
         m_listenerrunnging = true;
         boost::thread l_thread( boost::bind( &logger::listener, this, p_mpi ) );
-        //l_thread.join();
+        l_thread.join();
         std::cout << "xxx" << std::endl;
     }
     
