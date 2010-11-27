@@ -256,13 +256,13 @@ namespace machinelearning { namespace tools {
         m_mpi = &p_mpi;
         
         boost::thread l_thread( boost::bind( &logger::listener, this ) );
-        l_thread.join();
+        //l_thread.join();
     }
     
     
     /** write log entry. If the CPU rank == 0 the log will write to the file, on other CPU rank the message
      * is send to the CPU 0 and write down there. The local log state is relevant for writing
-     * @note the tag for communication ist -999
+     * @note the tag for communication ist 999
      * @param p_mpi MPI object
      * @param p_state log level
      * @param p_val value
@@ -279,13 +279,13 @@ namespace machinelearning { namespace tools {
         if (p_mpi.rank() == 0)
             write2file( l_stream );
         else
-            p_mpi.isend(0, -999, l_stream.str());
+            p_mpi.isend(0, 999, l_stream.str());
     }
     
     
     /** thread method that receive the asynchrone messages of the MPI interface.
      * The listener method read the message and writes them down
-     * @note the tag for communication ist -999
+     * @note the tag for communication ist 999
      **/
     inline void logger::listener( void )
     {
@@ -295,7 +295,7 @@ namespace machinelearning { namespace tools {
                                 
                 std::string l_str;
                 std::ostringstream l_stream;
-                m_mpi->irecv( mpi::any_source, -999, l_str );
+                m_mpi->irecv( mpi::any_source, 999, l_str );
                 l_stream << l_str;
                 write2file( l_stream );
             }
