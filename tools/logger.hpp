@@ -297,6 +297,7 @@ namespace machinelearning { namespace tools {
                 m_mpi->irecv( mpi::any_source, LOGGER_MPI_TAG, l_str );
                 l_stream << l_str;
                 write2file( l_stream );*/
+                std::cout << m_listenerrunnging << std::endl;
             }
             
         //} catch (...) {}
