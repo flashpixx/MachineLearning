@@ -73,6 +73,7 @@ namespace machinelearning { namespace tools {
                             
             #ifdef CLUSTER
             void createListener( mpi::communicator& );
+            void closeListener( void );
             template<typename T> void write( const mpi::communicator&, const logstate&, const T& );
             #endif
         
@@ -134,7 +135,7 @@ namespace machinelearning { namespace tools {
     inline logger::~logger( void )
     {
         #ifdef CLUSTER
-        m_listenerrunnging = false;
+        closeListener();
         #endif
         
         m_file.close();
@@ -261,6 +262,11 @@ namespace machinelearning { namespace tools {
     }
     
     
+    inline void logger::closeListener( void )
+    {
+        m_listenerrunnging = false;
+    }
+    
     /** write log entry. If the CPU rank == 0 the log will write to the file, on other CPU rank the message
      * is send to the CPU 0 and write down there. The local log state is relevant for writing
      * @param p_mpi MPI object
@@ -297,7 +303,6 @@ namespace machinelearning { namespace tools {
                 m_mpi->irecv( mpi::any_source, LOGGER_MPI_TAG, l_str );
                 l_stream << l_str;
                 write2file( l_stream );*/
-                std::cout << m_listenerrunnging << std::endl;
             }
             
         //} catch (...) {}
