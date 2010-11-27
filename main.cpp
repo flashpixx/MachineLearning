@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
     #endif
     
     #ifdef FILES
-    tl::files::hdf o("blub.hdf5");
+    //tl::files::hdf o("blub.hdf5");
     /*tl::files::hdf o("string.hdf5");
     std::vector<std::string> x = o.readStringVector("/array");
     for(std::size_t i=0; i < x.size(); ++i)
