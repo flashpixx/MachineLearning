@@ -107,7 +107,9 @@ namespace machinelearning { namespace tools {
             mpi::communicator* m_mpi;
             /** mutex for creating the listener **/
             boost::mutex m_muxlistener;
-    
+        bool run;
+        
+        
             void listener( void );
         
             #endif
@@ -121,7 +123,8 @@ namespace machinelearning { namespace tools {
         m_muxwriter()
         #ifdef CLUSTER
         , m_mpi(NULL),
-        m_muxlistener()
+        m_muxlistener(),
+    run(true)
         #endif
     {};
     
@@ -134,7 +137,7 @@ namespace machinelearning { namespace tools {
     inline logger::~logger( void )
     {
         #ifdef CLUSTER
-        m_mpi = NULL;
+        run = false;
         #endif
         
         m_file.close();
@@ -289,7 +292,7 @@ namespace machinelearning { namespace tools {
     inline void logger::listener( void )
     {
         try {
-            while (m_mpi) {
+            while (run) {
                 boost::thread::yield();
                                 
                 /*std::string l_str;
