@@ -109,6 +109,7 @@ namespace machinelearning { namespace tools {
             boost::mutex m_muxlistener;
             /** bool for running the listener **/
             bool m_listenerrunnging;
+            boost::thread m_thread;
         
             void listener( const mpi::communicator& );
         
@@ -258,8 +259,8 @@ namespace machinelearning { namespace tools {
             throw exception::runtime(_("listener can be produced only once"));
         
         m_listenerrunnging = true;
-        boost::thread l_thread( boost::bind( &logger::listener, this, p_mpi ) );
-        l_thread.join();
+        m_thread = boost::thread( boost::bind( &logger::listener, this, p_mpi ) );
+        m_thread.join();
         std::cout << "xxx" << std::endl;
     }
     
