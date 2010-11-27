@@ -133,6 +133,10 @@ namespace machinelearning { namespace tools {
     /** destructor **/
     inline logger::~logger( void )
     {
+        #ifdef CLUSTER
+        m_listenerrunnging = false;
+        #endif
+        
         m_file.close();
     }
     
