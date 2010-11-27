@@ -97,7 +97,7 @@ namespace machinelearning { namespace tools {
             logger& operator=( const logger& );
         
             template<typename T> void logformat( const logstate&, const T&, std::ostringstream& ) const;
-            void writefile( const std::ostringstream& );
+            void write2file( const std::ostringstream& );
         
         
             #ifdef CLUSTER
@@ -132,6 +132,10 @@ namespace machinelearning { namespace tools {
     /** destructor **/
     inline logger::~logger( void )
     {
+        #ifdef CLUSTER
+        m_mpi = NULL;
+        #endif
+        
         m_file.close();
     }
     
@@ -193,7 +197,7 @@ namespace machinelearning { namespace tools {
         std::ostringstream l_stream;
         l_stream << "local - ";
         logformat(p_state, p_val, l_stream);
-        writefile( l_stream );
+        write2file( l_stream );
     }
     
     
@@ -217,7 +221,7 @@ namespace machinelearning { namespace tools {
     /** writes the output stream to the file with thread locking
      * @param p_data output stream
      **/
-    inline void logger::writefile( const std::ostringstream& p_data )
+    inline void logger::write2file( const std::ostringstream& p_data )
     {
         // lock will remove with the destructor call
         boost::lock_guard<boost::mutex> l_lock(m_muxwriter);         
@@ -273,7 +277,7 @@ namespace machinelearning { namespace tools {
         logformat(p_state, p_val, l_stream);
         
         if (p_mpi.rank() == 0)
-            writefile( l_stream );
+            write2file( l_stream );
         else
             p_mpi.isend(0, -999, l_stream.str());
     }
@@ -281,16 +285,22 @@ namespace machinelearning { namespace tools {
     
     /** thread method that receive the asynchrone messages of the MPI interface.
      * The listener method read the message and writes them down
-     * @note the tag for communication ist -99
+     * @note the tag for communication ist -999
      **/
     inline void logger::listener( void )
     {
-        while (true) {
-            try {
+        try {
+            while (m_mpi) {
                 boost::thread::yield();
-                 
-            } catch (...) {}
-        }
+                                
+                std::string l_str;
+                std::ostringstream l_stream;
+                m_mpi->irecv( mpi::any_source, -999, l_str );
+                l_stream << l_str;
+                write2file( l_stream );
+            }
+            
+        } catch (...) {}
     }
 
     

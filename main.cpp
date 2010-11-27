@@ -61,12 +61,16 @@ int main(int argc, char *argv[]) {
         std::cout << x[i] << std::endl;*/
     #endif
     
-    std::cout << tl::logger::getInstance()->getFilename() << std::endl;
+    
+    #ifdef CLUSTER
+    if (loMPICom.rank() == 0) {
+        tl::logger::getInstance()->createListener(loMPICom);
+        std::cout << tl::logger::getInstance()->getFilename() << std::endl;
+    }
     tl::logger::getInstance()->setLevel( tl::logger::info );
-    
+    tl::logger::getInstance()->write( loMPICom, tl::logger::error, "huhu test" );
+    #endif
     tl::logger::getInstance()->write( tl::logger::error, "huhu test" );
-    tl::logger::getInstance()->write( tl::logger::error, o.readMatrix<double>("/mds2", H5::PredType::NATIVE_DOUBLE) );
-    
     
     
     // ===== MDS ======
