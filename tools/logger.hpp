@@ -254,7 +254,6 @@ namespace machinelearning { namespace tools {
         
         m_listenerrunnging = true;
         boost::thread l_thread( boost::bind( &logger::listener, this, p_mpi ) );
-        std::cout << "xxx" << std::endl;
     }
     
     /** write log entry. If the CPU rank == 0 the log will write to the file, on other CPU rank the message
@@ -288,12 +287,12 @@ namespace machinelearning { namespace tools {
         //try {
         while (m_listenerrunnging) {
                 boost::this_thread::yield();
-                std::cout << "run" << std::endl;
-                /*std::string l_str;
+
+                std::string l_str;
                 std::ostringstream l_stream;
                 p_mpi.irecv( mpi::any_source, LOGGER_MPI_TAG, l_str );
                 l_stream << l_str;
-                write2file( l_stream );*/
+                write2file( l_stream );
             }
             
         //} catch (...) {}
