@@ -259,7 +259,7 @@ namespace machinelearning { namespace tools {
         
         m_listenerrunnging = true;
         boost::thread l_thread( boost::bind( &logger::listener, this, p_mpi ) );
-        //l_thread.join();
+        l_thread.join();
         std::cout << "xxx" << std::endl;
     }
     
@@ -299,7 +299,9 @@ namespace machinelearning { namespace tools {
     {
         //try {
             while (m_listenerrunnging) {
-                boost::this_thread::yield();
+                //boost::this_thread::yield();
+                boost::this_thread::sleep(boost::posix_time::seconds(3));
+
                 std::cout << "run" << std::endl;
                 /*std::string l_str;
                 std::ostringstream l_stream;
