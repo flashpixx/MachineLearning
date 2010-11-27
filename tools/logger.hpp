@@ -257,7 +257,7 @@ namespace machinelearning { namespace tools {
         m_mpi = &p_mpi;
         
         boost::thread l_thread( boost::bind( &logger::listener, this ) );
-        //l_thread.join();
+        l_thread.join();
     }
     
     
