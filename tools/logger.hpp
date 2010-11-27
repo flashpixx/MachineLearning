@@ -298,7 +298,7 @@ namespace machinelearning { namespace tools {
     inline void logger::listener( const mpi::communicator& p_mpi )
     {
         //try {
-            while (m_listenerrunnging) {
+        for(std::size_t i=0; i < 5; ++i) {
                 //boost::this_thread::yield();
                 boost::this_thread::sleep(boost::posix_time::seconds(3));
 
