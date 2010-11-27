@@ -64,15 +64,13 @@ int main(int argc, char *argv[]) {
     
     #ifdef CLUSTER
     if (loMPICom.rank() == 0) {
-        tl::logger::getInstance()->createListener(loMPICom);
         std::cout << tl::logger::getInstance()->getFilename() << std::endl;
+        tl::logger::getInstance()->createListener(loMPICom);
     }
     
     tl::logger::getInstance()->setLevel( tl::logger::info );
     tl::logger::getInstance()->write( loMPICom, tl::logger::error, "huhu test" );
-    
-    if (loMPICom.rank() == 0)
-        tl::logger::getInstance()->closeListener();
+    tl::logger::getInstance()->closeListener();
         
     #endif
     tl::logger::getInstance()->write( tl::logger::error, "huhu test" );

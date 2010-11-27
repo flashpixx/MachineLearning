@@ -109,7 +109,7 @@ namespace machinelearning { namespace tools {
             /** bool for running the listener **/
             bool m_listenerrunnging;
         
-            void listener( void );
+            void listener( const mpi::communicator& );
         
             #endif
         
@@ -257,7 +257,7 @@ namespace machinelearning { namespace tools {
             throw exception::runtime(_("listener can be produced only once"));
         
         m_listenerrunnging = true;
-        boost::thread l_thread( boost::bind( &logger::listener, this ) );
+        boost::thread l_thread( boost::bind( &logger::listener, this, p_mpi ) );
         l_thread.join();
     }
     
@@ -291,8 +291,9 @@ namespace machinelearning { namespace tools {
     
     /** thread method that receive the asynchrone messages of the MPI interface.
      * The listener method read the message and writes them down
+     * @param p_mpi MPI object of the listener
      **/
-    inline void logger::listener( void )
+    inline void logger::listener( const mpi::communicator& p_mpi )
     {
         //try {
             while (m_listenerrunnging) {
@@ -300,7 +301,7 @@ namespace machinelearning { namespace tools {
                                 
                 /*std::string l_str;
                 std::ostringstream l_stream;
-                m_mpi->irecv( mpi::any_source, LOGGER_MPI_TAG, l_str );
+                p_mpi.irecv( mpi::any_source, LOGGER_MPI_TAG, l_str );
                 l_stream << l_str;
                 write2file( l_stream );*/
             }
