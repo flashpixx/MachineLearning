@@ -300,7 +300,7 @@ namespace machinelearning { namespace tools {
         //try {
             while (m_listenerrunnging) {
                 boost::this_thread::yield();
-                std::cout << "run" <<ts::endl;
+                std::cout << "run" << std::endl;
                 /*std::string l_str;
                 std::ostringstream l_stream;
                 p_mpi.irecv( mpi::any_source, LOGGER_MPI_TAG, l_str );
