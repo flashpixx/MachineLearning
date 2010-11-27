@@ -284,18 +284,18 @@ namespace machinelearning { namespace tools {
      **/
     inline void logger::listener( void )
     {
-        try {
-            //while (run) {
-            //    boost::thread::yield();
+        //try {
+            while (m_listenerrunnging) {
+                boost::thread::yield();
                                 
                 /*std::string l_str;
                 std::ostringstream l_stream;
                 m_mpi->irecv( mpi::any_source, LOGGER_MPI_TAG, l_str );
                 l_stream << l_str;
                 write2file( l_stream );*/
-            //}
+            }
             
-        } catch (...) {}
+        //} catch (...) {}
     }
 
     
