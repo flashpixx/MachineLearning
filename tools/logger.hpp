@@ -73,7 +73,7 @@ namespace machinelearning { namespace tools {
             template<typename T> void write( const logstate&, const T& );
                             
             #ifdef CLUSTER
-            void createListener( const mpi::environment&, const mpi::communicator& );
+            void createListener( const mpi::communicator& );
             template<typename T> void write( const mpi::communicator&, const logstate&, const T& );
             #endif
         
@@ -109,7 +109,7 @@ namespace machinelearning { namespace tools {
             /** bool for running the listener **/
             bool m_listenerrunnging;
         
-            void listener( const mpi::environment&, const mpi::communicator& );
+            void listener( const mpi::communicator& );
         
             #endif
         
@@ -246,7 +246,7 @@ namespace machinelearning { namespace tools {
      * @param p_env MPI environmental object
      * @param p_com MPI object
      **/
-    inline void logger::createListener( const mpi::environment& p_env, const mpi::communicator& p_com )
+    inline void logger::createListener( const mpi::communicator& p_com )
     {
        if (p_com.rank() != 0)
             throw exception::runtime(_("the listener can be produced only on CPU 0"));
@@ -260,7 +260,7 @@ namespace machinelearning { namespace tools {
             throw exception::runtime(_("listener can be produced only once"));
         
         m_listenerrunnging = true;
-        boost::thread l_thread( boost::bind( &logger::listener, this, boost::cref(p_env), boost::cref(p_com)) );
+        boost::thread l_thread( boost::bind( &logger::listener, this, boost::cref(p_com)) );
     }
     
     
@@ -291,7 +291,7 @@ namespace machinelearning { namespace tools {
      * @param p_env MPI environmental object
      * @param p_com MPI object of the listener
      **/
-    inline void logger::listener( const mpi::environment& p_env, const mpi::communicator& p_com )
+    inline void logger::listener( const mpi::communicator& p_com )
     {
         //try {
         while (p_com && m_listenerrunnging) {
