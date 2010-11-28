@@ -297,10 +297,10 @@ namespace machinelearning { namespace tools {
         while (m_listenerrunnging && !p_env.finalized()) {
                 boost::this_thread::yield();
 
-                if (p_com.iprobe(mpi::any_source, LOGGER_MPI_TAG)) {
+                while (boost::optional<mpi::status> l_status = p_com.iprobe(mpi::any_source, LOGGER_MPI_TAG)) {
                     std::string l_str;
                     std::ostringstream l_stream;
-                    p_com.recv(mpi::any_source, LOGGER_MPI_TAG, l_str);
+                    p_com.recv( l_status->source(), l_status->tag(), l_str);
                     l_stream << l_str;
                     write2file( l_stream );
                 }
