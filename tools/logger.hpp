@@ -301,7 +301,7 @@ namespace machinelearning { namespace tools {
     inline void logger::listener( const mpi::communicator& p_com )
     {
         while (m_listenerrunnging) {
-            if (boost::optional<mpi::status> l_status = p_com.iprobe(mpi::any_source, LOGGER_MPI_TAG)) {
+            while (boost::optional<mpi::status> l_status = p_com.iprobe(mpi::any_source, LOGGER_MPI_TAG)) {
                 std::string l_str;
                 std::ostringstream l_stream;
                     
