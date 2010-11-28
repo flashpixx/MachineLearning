@@ -134,6 +134,9 @@ namespace machinelearning { namespace tools {
     /** destructor **/
     inline logger::~logger( void )
     {
+        #ifdef CLUSTER
+        m_listenerrunnging = false;
+        #endif
         m_file.close();
     }
     
@@ -285,7 +288,7 @@ namespace machinelearning { namespace tools {
     inline void logger::listener( const mpi::environment& p_env, const mpi::communicator& p_com )
     {
         //try {
-        while (!p_env.finalized()) {
+        while (m_listenerrunnging && !p_env.finalized()) {
                 boost::this_thread::yield();
 
                 std::string l_str;
