@@ -259,6 +259,7 @@ namespace machinelearning { namespace tools {
         boost::thread l_thread( boost::bind( &logger::listener, this, boost::cref(p_env), boost::cref(p_com)) );
     }
     
+    
     /** write log entry. If the CPU rank == 0 the log will write to the file, on other CPU rank the message
      * is send to the CPU 0 and write down there. The local log state is relevant for writing
      * @param p_mpi MPI object
@@ -291,12 +292,14 @@ namespace machinelearning { namespace tools {
         while (m_listenerrunnging && !p_env.finalized()) {
                 boost::this_thread::yield();
 
-                std::string l_str;
-                std::ostringstream l_stream;
-                p_com.recv( mpi::any_source, LOGGER_MPI_TAG, l_str );
-                if (!l_str.empty()) {
-                    l_stream << l_str;
-                    write2file( l_stream );
+                while(boost::optional<mpi::status> status = p_com.iprobe(mpi::any_source, LOGGER_MPI_TAG)) {
+                    std::string l_str;
+                    std::ostringstream l_stream;
+                    mpi::recv(status->source(), status->tag(), l_str);
+                    if (!l_str.empty()) {
+                        l_stream << l_str;
+                        write2file( l_stream );
+                    }
                 }
             }
             
