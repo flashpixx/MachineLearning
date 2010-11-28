@@ -66,6 +66,7 @@
  * <li>@subpage clustering</li>
  * <li>@subpage distances</li>
  * <li>@subpage dimreduce</li>
+ * <li>@subpage logger</li>
  * </ul>
  *
  *
@@ -251,7 +252,47 @@
     std::cout << "unsymmetric: " << ncd1.unsymmetric<double>(val) << std::endl;
     std::cout << "symmetric: " << ncd1.symmetric<double>(val) << std::endl;
  * @endcode
+ *
+ *
+ *
+ * @page logger logger
+ * Within The toolbox is a logger class which implements a thread-safe and optional MPI logger. The logger create a singletone object that create a file access for writing messages. The MPI component sends all messages with non-
+ * blocking communication to the CPU 0. See in the logger class for log states, which must be used for writing the messages.
+ * @section normal normal use
+ * @code
+    // sets the log level for writing messages 
+    tools::logger::getInstance()->setLevel( tools::logger::info );
  
+    // creates a message
+    tools::logger::getInstance()->write( tools::logger::warn, "test message" );
+ 
+    // shows the filename in which the messages are write down
+    std::cout << tools::logger::getInstance()->getFilename() << std::endl;
+ * @endcode
+ *
+ * @section mpi mpi use
+ * @code
+    boost::mpi::communicator l_mpi;
+ 
+    // create the listener 
+    tools::logger::getInstance()->startListener( l_mpi );
+ 
+ 
+    // sets the log level for writing messages (it is seperated for each CPU)
+    tools::logger::getInstance()->setLevel( tools::logger::info );
+ 
+    // creates a message in the local log
+    tools::logger::getInstance()->write( tools::logger::warn, "test message" );
+ 
+    // creates a message with MPI use
+    tools::logger::getInstance()->write( l_mpi, tools::logger::warn, "test message with MPI" );
+ 
+ 
+ 
+    // shows the filename of each CPU (only CPU 0 collected all messages with MPI support)
+    std::cout << tools::logger::getInstance()->getFilename() << std::endl;
+ * @endcode
+ *
 **/
 
 #ifndef MACHINELEARNING_H
