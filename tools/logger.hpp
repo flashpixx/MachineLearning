@@ -288,9 +288,11 @@ namespace machinelearning { namespace tools {
     inline void logger::listener( const mpi::environment& p_env, const mpi::communicator& p_com )
     {
         //try {
+        std::cout << "blub" << std::endl;
         while (m_listenerrunnging && !p_env.finalized()) {
                 boost::this_thread::yield();
 
+                std::cout << "blubxxx" << std::endl;
                 std::string l_str;
                 std::ostringstream l_stream;
                 p_com.irecv( mpi::any_source, LOGGER_MPI_TAG, l_str );
