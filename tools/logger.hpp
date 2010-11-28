@@ -243,7 +243,8 @@ namespace machinelearning { namespace tools {
     #ifdef CLUSTER
     
     /** creates the local listener on CPU 0
-     * @param p_com MPI object (no const reference)
+     * @param p_env MPI environmental object
+     * @param p_com MPI object
      **/
     inline void logger::createListener( const mpi::environment& p_env, const mpi::communicator& p_com )
     {
@@ -287,6 +288,7 @@ namespace machinelearning { namespace tools {
     
     /** thread method that receive the asynchrone messages of the MPI interface.
      * The listener method read the message and writes them down
+     * @param p_env MPI environmental object
      * @param p_com MPI object of the listener
      **/
     inline void logger::listener( const mpi::environment& p_env, const mpi::communicator& p_com )
@@ -295,10 +297,10 @@ namespace machinelearning { namespace tools {
         while (m_listenerrunnging && !p_env.finalized()) {
                 boost::this_thread::yield();
 
-                if (boost::optional<mpi::status> status = p_com.iprobe(mpi::any_source, LOGGER_MPI_TAG)) {
+                if (p_com.iprobe(mpi::any_source, LOGGER_MPI_TAG)) {
                     std::string l_str;
                     std::ostringstream l_stream;
-                    p_com.recv(status->source(), status->tag(), l_str);
+                    p_com.recv(mpi::any_source, LOGGER_MPI_TAG, l_str);
                     l_stream << l_str;
                     write2file( l_stream );
                 }
