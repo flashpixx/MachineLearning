@@ -224,6 +224,9 @@ namespace machinelearning { namespace tools {
      **/
     inline void logger::write2file( const std::ostringstream& p_data )
     {
+        if (p_data.str().empty())
+            return;
+        
         // lock will remove with the destructor call
         boost::lock_guard<boost::mutex> l_lock(m_muxwriter);         
         
@@ -292,14 +295,15 @@ namespace machinelearning { namespace tools {
         while (m_listenerrunnging && !p_env.finalized()) {
                 boost::this_thread::yield();
 
-                while(boost::optional<mpi::status> status = p_com.iprobe(mpi::any_source, LOGGER_MPI_TAG)) {
+                while (boost::optional<mpi::status> status = p_com.iprobe(mpi::any_source, LOGGER_MPI_TAG)) {
+                    if (m_listenerrunnging && !p_env.finalized())
+                        break;
+                        
                     std::string l_str;
                     std::ostringstream l_stream;
                     p_com.recv(status->source(), status->tag(), l_str);
-                    if (!l_str.empty()) {
-                        l_stream << l_str;
-                        write2file( l_stream );
-                    }
+                    l_stream << l_str;
+                    write2file( l_stream );
                 }
             }
             
