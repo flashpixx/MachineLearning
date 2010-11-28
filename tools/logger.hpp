@@ -249,17 +249,14 @@ namespace machinelearning { namespace tools {
     inline void logger::startListener( const mpi::communicator& p_com )
     {
        p_com.barrier();
-       if ( (p_com.rank() != 0) || (p_com.size() == 1) )
+       if ( (p_com.rank() != 0) || (p_com.size() == 1) || m_listenerrunnging )
             return;
         
        // lock will remove with the destructor call
        boost::lock_guard<boost::mutex> l_lock(m_muxlistener); 
-        
-        if (m_listenerrunnging)
-            throw exception::runtime(_("listener can be produced only once"));
-        
-        m_listenerrunnging = true;
-        boost::thread l_thread( boost::bind( &logger::listener, this, boost::cref(p_com)) );
+
+       m_listenerrunnging = true;
+       boost::thread l_thread( boost::bind( &logger::listener, this, boost::cref(p_com)) );
     }
     
     
@@ -301,6 +298,7 @@ namespace machinelearning { namespace tools {
     inline void logger::listener( const mpi::communicator& p_com )
     {
         while (m_listenerrunnging) {
+            
             while (boost::optional<mpi::status> l_status = p_com.iprobe(mpi::any_source, LOGGER_MPI_TAG)) {
                 std::string l_str;
                 std::ostringstream l_stream;
