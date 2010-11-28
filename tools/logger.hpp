@@ -295,7 +295,7 @@ namespace machinelearning { namespace tools {
                 while(boost::optional<mpi::status> status = p_com.iprobe(mpi::any_source, LOGGER_MPI_TAG)) {
                     std::string l_str;
                     std::ostringstream l_stream;
-                    mpi::recv(status->source(), status->tag(), l_str);
+                    p_com.recv(status->source(), status->tag(), l_str);
                     if (!l_str.empty()) {
                         l_stream << l_str;
                         write2file( l_stream );
