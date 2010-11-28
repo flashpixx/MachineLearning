@@ -295,7 +295,6 @@ namespace machinelearning { namespace tools {
                 std::ostringstream l_stream;
                 p_com.irecv( mpi::any_source, LOGGER_MPI_TAG, l_str );
                 l_stream << l_str;
-            std::cout << l_str << std::endl;
                 write2file( l_stream );
             }
             

@@ -74,6 +74,8 @@ int main(int argc, char *argv[]) {
     #endif
     tl::logger::getInstance()->write( tl::logger::error, "huhu test" );
     
+    loMPICom.barrier();
+    
     
     // ===== MDS ======
     /*
