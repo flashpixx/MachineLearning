@@ -73,7 +73,7 @@ namespace machinelearning { namespace tools {
             template<typename T> void write( const logstate&, const T& );
                             
             #ifdef CLUSTER
-            void createListener( mpi::communicator& );
+            void createListener( const mpi::environment&, const mpi::communicator& );
             template<typename T> void write( const mpi::communicator&, const logstate&, const T& );
             #endif
         
@@ -109,7 +109,7 @@ namespace machinelearning { namespace tools {
             /** bool for running the listener **/
             bool m_listenerrunnging;
         
-            void listener( const mpi::communicator& );
+            void listener( const mpi::environment&, const mpi::communicator& );
         
             #endif
         
@@ -237,13 +237,13 @@ namespace machinelearning { namespace tools {
     #ifdef CLUSTER
     
     /** creates the local listener on CPU 0
-     * @param p_mpi MPI object (no const reference)
+     * @param p_com MPI object (no const reference)
      **/
-    inline void logger::createListener( mpi::communicator& p_mpi )
+    inline void logger::createListener( const mpi::environment& p_env, const mpi::communicator& p_com )
     {
-       if (p_mpi.rank() != 0)
+       if (p_com.rank() != 0)
             throw exception::runtime(_("the listener can be produced only on CPU 0"));
-       if (p_mpi.size() == 1)
+       if (p_com.size() == 1)
             return;
         
        // lock will remove with the destructor call
@@ -253,7 +253,7 @@ namespace machinelearning { namespace tools {
             throw exception::runtime(_("listener can be produced only once"));
         
         m_listenerrunnging = true;
-        boost::thread l_thread( boost::bind( &logger::listener, this, p_mpi ) );
+        boost::thread l_thread( boost::bind( &logger::listener, this, boost::cref(p_env), boost::cref(p_com)) );
     }
     
     /** write log entry. If the CPU rank == 0 the log will write to the file, on other CPU rank the message
@@ -280,18 +280,17 @@ namespace machinelearning { namespace tools {
     
     /** thread method that receive the asynchrone messages of the MPI interface.
      * The listener method read the message and writes them down
-     * @param p_mpi MPI object of the listener
+     * @param p_com MPI object of the listener
      **/
-    inline void logger::listener( const mpi::communicator& p_mpi )
+    inline void logger::listener( const mpi::environment& p_env, const mpi::communicator& p_com )
     {
         //try {
-        while (m_listenerrunnging) {
+        while (!p_env.finalized()) {
                 boost::this_thread::yield();
 
                 std::string l_str;
                 std::ostringstream l_stream;
-                p_mpi.probe( mpi::any_source, LOGGER_MPI_TAG );
-                p_mpi.irecv( mpi::any_source, LOGGER_MPI_TAG, l_str );
+                p_com.irecv( mpi::any_source, LOGGER_MPI_TAG, l_str );
                 l_stream << l_str;
                 write2file( l_stream );
             }

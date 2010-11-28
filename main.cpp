@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
     #ifdef CLUSTER
     if (loMPICom.rank() == 0) {
         std::cout << tl::logger::getInstance()->getFilename() << std::endl;
-        tl::logger::getInstance()->createListener(loMPICom);
+        tl::logger::getInstance()->createListener(loMPIenv, loMPICom);
     }
     
     tl::logger::getInstance()->setLevel( tl::logger::info );
