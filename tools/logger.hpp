@@ -295,10 +295,7 @@ namespace machinelearning { namespace tools {
         while (m_listenerrunnging && !p_env.finalized()) {
                 boost::this_thread::yield();
 
-                while (boost::optional<mpi::status> status = p_com.iprobe(mpi::any_source, LOGGER_MPI_TAG)) {
-                    if (m_listenerrunnging && !p_env.finalized())
-                        break;
-                        
+                if (boost::optional<mpi::status> status = p_com.iprobe(mpi::any_source, LOGGER_MPI_TAG)) {
                     std::string l_str;
                     std::ostringstream l_stream;
                     p_com.recv(status->source(), status->tag(), l_str);
