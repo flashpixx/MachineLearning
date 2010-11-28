@@ -294,17 +294,16 @@ namespace machinelearning { namespace tools {
     inline void logger::listener( const mpi::environment& p_env, const mpi::communicator& p_com )
     {
         //try {
-        while (m_listenerrunnging && !p_env.finalized()) {
+        while (m_listenerrunnging) {
                 while (boost::optional<mpi::status> l_status = p_com.iprobe(mpi::any_source, LOGGER_MPI_TAG)) {
                     std::string l_str;
                     std::ostringstream l_stream;
                     
-                    if (!p_env.finalized()) {
-                        p_com.recv( l_status->source(), l_status->tag(), l_str);
-                        l_stream << l_str;
-                        write2file( l_stream );
-                    }
+                    p_com.recv( l_status->source(), l_status->tag(), l_str);
+                    l_stream << l_str;
+                    write2file( l_stream );
                 }
+            
                 boost::this_thread::yield();
             }
             
