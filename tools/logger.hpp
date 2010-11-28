@@ -73,7 +73,8 @@ namespace machinelearning { namespace tools {
             template<typename T> void write( const logstate&, const T& );
                             
             #ifdef CLUSTER
-            void createListener( const mpi::communicator& );
+            void startListener( const mpi::communicator& );
+            void shutdownListener( const mpi::communicator& );
             template<typename T> void write( const mpi::communicator&, const logstate&, const T& );
             #endif
         
@@ -246,11 +247,9 @@ namespace machinelearning { namespace tools {
      * @param p_env MPI environmental object
      * @param p_com MPI object
      **/
-    inline void logger::createListener( const mpi::communicator& p_com )
+    inline void logger::startListener( const mpi::communicator& p_com )
     {
-       if (p_com.rank() != 0)
-            throw exception::runtime(_("the listener can be produced only on CPU 0"));
-       if (p_com.size() == 1)
+       if ( (p_com.rank() != 0) || (p_com.size() == 1) )
             return;
         
        // lock will remove with the destructor call
@@ -261,6 +260,12 @@ namespace machinelearning { namespace tools {
         
         m_listenerrunnging = true;
         boost::thread l_thread( boost::bind( &logger::listener, this, boost::cref(p_com)) );
+    }
+    
+    
+    inline void logger::shutdownListener( const mpi::communicator& p_com ) {
+        p_com.barrier();
+        m_listenerrunnging = false;
     }
     
     
@@ -294,21 +299,19 @@ namespace machinelearning { namespace tools {
     inline void logger::listener( const mpi::communicator& p_com )
     {
         //try {
-        while (p_com && m_listenerrunnging) {
-            if (p_com)
-                while (boost::optional<mpi::status> l_status = p_com.iprobe(mpi::any_source, LOGGER_MPI_TAG)) {
-                    std::string l_str;
-                    std::ostringstream l_stream;
+        while (m_listenerrunnging) {
+            while (boost::optional<mpi::status> l_status = p_com.iprobe(mpi::any_source, LOGGER_MPI_TAG)) {
+                std::string l_str;
+                std::ostringstream l_stream;
                     
-                    if (p_com) {
-                        p_com.recv( l_status->source(), l_status->tag(), l_str);
-                        l_stream << l_str;
-                        write2file( l_stream );
-                    }
-                }
-            
-                boost::this_thread::yield();
+                p_com.recv( l_status->source(), l_status->tag(), l_str);
+                l_stream << l_str;
+                write2file( l_stream );
+                    
             }
+            
+            boost::this_thread::yield();
+        }
             
         //} catch (...) {}
     }
