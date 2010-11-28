@@ -295,8 +295,6 @@ namespace machinelearning { namespace tools {
     {
         //try {
         while (m_listenerrunnging && !p_env.finalized()) {
-                boost::this_thread::yield();
-
                 while (boost::optional<mpi::status> l_status = p_com.iprobe(mpi::any_source, LOGGER_MPI_TAG)) {
                     std::string l_str;
                     std::ostringstream l_stream;
@@ -307,6 +305,7 @@ namespace machinelearning { namespace tools {
                         write2file( l_stream );
                     }
                 }
+                boost::this_thread::yield();
             }
             
         //} catch (...) {}
