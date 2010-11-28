@@ -99,8 +99,8 @@ namespace machinelearning { namespace tools {
      * @param p_length vector size
      * @param p_distribution name of the distribution
      * @param p_a first value for distribution
-     * @param p_b first value for distribution
-     * @param p_c first value for distribution
+     * @param p_b second value for distribution
+     * @param p_c third value for distribution
      * @return vector of type T
      **/
     template<typename T> inline ublas::vector<T> vector::random( const std::size_t& p_length, const tools::random::distribution& p_distribution, const T& p_a, const T& p_b, const T& p_c )
