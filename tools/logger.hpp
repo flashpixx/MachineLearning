@@ -274,6 +274,8 @@ namespace machinelearning { namespace tools {
         l_stream << "CPU " << p_mpi.rank() << " - ";
         logformat(p_state, p_val, l_stream);
         
+        std::cout << l_stream.str() << std::endl;
+        
         if (p_mpi.rank() == 0)
             write2file( l_stream );
         else
