@@ -47,7 +47,11 @@ int main(int argc, char *argv[]) {
     #ifdef CLUSTER
     mpi::environment loMPIenv(argc, argv);
     mpi::communicator loMPICom;
+    tl::logger::getInstance()->startListener(loMPICom);
     #endif
+    
+    tl::logger::getInstance()->setLevel( tl::logger::info );
+    
     
     #ifdef MULTILANGUAGE
     tl::language::bind("ml", "./tools/language/");
@@ -62,17 +66,6 @@ int main(int argc, char *argv[]) {
     #endif
     
     
-    #ifdef CLUSTER
-    tl::logger::getInstance()->startListener(loMPICom);
-    if (loMPICom.rank() == 0)
-        std::cout << tl::logger::getInstance()->getFilename() << std::endl;
-    
-    tl::logger::getInstance()->setLevel( tl::logger::info );
-    tl::logger::getInstance()->write( loMPICom, tl::logger::error, "huhu test" );
-        
-    tl::logger::getInstance()->write( tl::logger::error, "huhu test" );
-    tl::logger::getInstance()->shutdownListener(loMPICom);
-    #endif
     
     
     // ===== MDS ======
@@ -469,5 +462,12 @@ int main(int argc, char *argv[]) {
     std::cout << "\nsymmetric: " << ncd.symmetric(val, true) << std::endl;
     */
     
+    #ifdef CLUSTER
+    tl::logger::getInstance()->shutdownListener(loMPICom);
+    if (loMPICom.rank() == 0)
+        std::cout << tl::logger::getInstance()->getFilename() << std::endl;
+    #else
+    std::cout << tl::logger::getInstance()->getFilename() << std::endl;
+    #endif
     return EXIT_SUCCESS;
 }

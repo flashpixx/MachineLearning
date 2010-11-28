@@ -244,28 +244,28 @@ namespace machinelearning { namespace tools {
     #ifdef CLUSTER
     
     /** creates the local listener on CPU 0
-      * @param p_com MPI object
+      * @param p_mpi MPI object
      **/
-    inline void logger::startListener( const mpi::communicator& p_com )
+    inline void logger::startListener( const mpi::communicator& p_mpi )
     {
-       p_com.barrier();
-       if ( (p_com.rank() != 0) || (p_com.size() == 1) || m_listenerrunnging )
+       p_mpi.barrier();
+       if ( (p_mpi.rank() != 0) || (p_mpi.size() == 1) || m_listenerrunnging )
             return;
         
        // lock will remove with the destructor call
        boost::lock_guard<boost::mutex> l_lock(m_muxlistener); 
 
        m_listenerrunnging = true;
-       boost::thread l_thread( boost::bind( &logger::listener, this, boost::cref(p_com)) );
+       boost::thread l_thread( boost::bind( &logger::listener, this, boost::cref(p_mpi)) );
     }
     
     
     /** shutdown the listener thread and synchronize the CPUs
-     * @param p_com MPI object
+     * @param p_mpi MPI object
      **/
-    inline void logger::shutdownListener( const mpi::communicator& p_com ) {
+    inline void logger::shutdownListener( const mpi::communicator& p_mpi ) {
         m_listenerrunnging = false;
-        p_com.barrier();
+        p_mpi.barrier();
     }
     
     
@@ -293,17 +293,17 @@ namespace machinelearning { namespace tools {
     
     /** thread method that receive the asynchrone messages of the MPI interface.
      * The listener method read the message and writes them down
-     * @param p_com MPI object
+     * @param p_mpi MPI object
      **/
-    inline void logger::listener( const mpi::communicator& p_com )
+    inline void logger::listener( const mpi::communicator& p_mpi )
     {
         while (m_listenerrunnging) {
             
-            while (boost::optional<mpi::status> l_status = p_com.iprobe(mpi::any_source, LOGGER_MPI_TAG)) {
+            while (boost::optional<mpi::status> l_status = p_mpi.iprobe(mpi::any_source, LOGGER_MPI_TAG)) {
                 std::string l_str;
                 std::ostringstream l_stream;
                     
-                p_com.recv( l_status->source(), l_status->tag(), l_str);
+                p_mpi.recv( l_status->source(), l_status->tag(), l_str);
                 l_stream << l_str;
                 write2file( l_stream );
             }
