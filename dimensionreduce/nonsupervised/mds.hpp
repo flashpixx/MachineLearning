@@ -200,10 +200,10 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         ublas::matrix<T> l_target                   = tools::matrix::random( l_data.size1(), m_dim, tools::random::uniform, static_cast<T>(-1), static_cast<T>(1) );
         const ublas::mapped_matrix<T> l_TargetOnes  = ublas::scalar_matrix<T>( l_target.size1(), l_target.size2(), static_cast<T>(1) );
         
-        //for(std::size_t i=0; i < l_target.size1(); ++i) {
-        //    l_target(i,0) = i+1; 
-        //    l_target(i,1) = i+3;
-        //}
+        for(std::size_t i=0; i < l_target.size1(); ++i) {
+            l_target(i,0) = i+1; 
+            l_target(i,1) = i+3;
+        }
         
         
         // optimize
@@ -234,7 +234,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             T l_errornew                             = l_error;
             const ublas::matrix<T> l_targetTmp       = l_target;
              
-            for(std::size_t n=0; n < m_step; ++n) {
+            for(std::size_t n=1; n <= m_step; ++n) {
                 l_target                     = l_targetTmp + l_adapt;
                 l_adapt                     *= 0.5;
                 l_errornew                   = calculateQuantizationError( l_data - (distance(l_target) + l_DataOnes), l_dataInv );
@@ -243,8 +243,10 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                     break;
                 
                 if (n == m_step)
-                    throw exception::runtime(_("Sammon mapping may not converge"));
+                    throw exception::runtime(_("sammon mapping may not converge"));
             }
+            
+            //std::cout << l_target << std::endl;
             
             // if the error "numerical zero" we stop
             if (tools::function::isNumericalZero( (l_error - l_errornew) / l_error ) )

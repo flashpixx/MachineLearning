@@ -73,7 +73,7 @@ int main(int argc, char *argv[]) {
     ublas::matrix<double> data = o.readMatrix<double>("/mds1", H5::PredType::NATIVE_DOUBLE); 
     ndim::mds<double> l(2, ndim::mds<double>::sammon);
     l.setIteration( 500 );
-    l.setStep( 40 );
+    l.setStep( 400 );
     tl::files::hdf f("mds.hdf5", true);
     f.write<double>( "/data",  l.map(data), H5::PredType::NATIVE_DOUBLE );  
     
@@ -465,9 +465,9 @@ int main(int argc, char *argv[]) {
     #ifdef CLUSTER
     tl::logger::getInstance()->shutdownListener(loMPICom);
     if (loMPICom.rank() == 0)
-        std::cout << tl::logger::getInstance()->getFilename() << std::endl;
+        std::cout << "\nlog file see: " << tl::logger::getInstance()->getFilename() << std::endl;
     #else
-    std::cout << tl::logger::getInstance()->getFilename() << std::endl;
+    std::cout << "\nlog file see: " << tl::logger::getInstance()->getFilename() << std::endl;
     #endif
     return EXIT_SUCCESS;
 }
