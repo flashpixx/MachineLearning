@@ -58,25 +58,25 @@ int main(int argc, char *argv[]) {
     #endif
     
     #ifdef FILES
-    //tl::files::hdf o("blub.hdf5");
+    tl::files::hdf o("blub.hdf5");
     /*tl::files::hdf o("string.hdf5");
     std::vector<std::string> x = o.readStringVector("/array");
     for(std::size_t i=0; i < x.size(); ++i)
-        std::cout << x[i] << std::endl;*/
+        std::cout << x[i] << std::endl;*/    
     #endif
     
-    tl::logger::getInstance()->write(loMPICom, tl::logger::warn, "ich teste alles");
+    //tl::logger::getInstance()->write(loMPICom, tl::logger::warn, "ich teste alles");
     
     
     // ===== MDS ======
-    /*
-    ublas::matrix<double> data = o.readMatrix<double>("/mds2", H5::PredType::NATIVE_DOUBLE); 
+    
+    ublas::matrix<double> data = o.readMatrix<double>("/mds1", H5::PredType::NATIVE_DOUBLE); 
     ndim::mds<double> l(2, ndim::mds<double>::sammon);
     l.setIteration( 2 );
-    l.setStep( 40 );
+    l.setStep( 2 );
     tl::files::hdf f("mds.hdf5", true);
     f.write<double>( "/data",  l.map(data), H5::PredType::NATIVE_DOUBLE );  
-    */
+    
    
     // ===== Wikipedia ======
     /*

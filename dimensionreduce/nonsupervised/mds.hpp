@@ -176,7 +176,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     
     
     /** caluate the sammon mapping on MDS (with pseudo-newton method for optimization)
-     * @note uses code idea of http://ticc.uvt.nl/~lvdrmaaten
+     * @note uses code idea of http://ticc.uvt.nl/~lvdrmaaten (in the Matlab code there are duplicated variables)
      * @param p_data input datamatrix (similarity matrix)
      * @return mapped data
      **/
@@ -188,12 +188,12 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             throw exception::runtime(_("steps must be greater than zero"));
         
         // the similarity matrix must be double-centered
-        const ublas::matrix<T> l_center = doublecentering( p_data );
+        //const ublas::matrix<T> l_center = doublecentering( p_data );
         
         
         // create the distance for each row/colum (create distance matrix) of the matrix and sets the diagonal elements to one
-        const ublas::mapped_matrix<T> l_DataOnes    = tools::matrix::eye<T>( l_center.size1() );   
-        const ublas::matrix<T> l_data               = distance(l_center) + l_DataOnes;
+        const ublas::mapped_matrix<T> l_DataOnes    = tools::matrix::eye<T>( p_data.size1() );   
+        const ublas::matrix<T> l_data               = p_data + l_DataOnes;
         const ublas::matrix<T> l_dataInv            = tools::matrix::invert(l_data);
         
         // target point matrix und one matrix
@@ -213,13 +213,12 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             const ublas::matrix<T> l_DistanceInv3    = tools::matrix::pow(l_DistanceInv, static_cast<T>(3));
             const ublas::matrix<T> l_target2         = tools::matrix::pow(l_target, static_cast<T>(2));
             
-            
             const ublas::matrix<T> l_delta           = l_data - l_Distance;
             const ublas::matrix<T> l_deltaInv        = l_DistanceInv - l_dataInv;
             const ublas::matrix<T> l_deltaOne        = ublas::prod( l_deltaInv, l_TargetOnes );
             
             // calculating gradient & hesse-matrix values
-            const ublas::matrix<T> l_gradient        = ublas::prod( l_deltaInv, l_target) - ublas::element_prod( l_target, l_deltaOne );
+            const ublas::matrix<T> l_gradient        = ublas::prod( l_deltaInv, l_target ) - ublas::element_prod( l_target, l_deltaOne );
             const ublas::matrix<T> l_hesse           = ublas::prod( l_DistanceInv3, l_target2 ) -  l_deltaOne - 2 * ublas::element_prod(l_target, ublas::prod(l_DistanceInv3, l_target)) + ublas::element_prod(l_target2, ublas::prod(l_DistanceInv3, l_TargetOnes)); 
             
             
@@ -236,13 +235,17 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             T l_errornew                             = l_error;
             const ublas::matrix<T> l_targetTmp       = l_target;
             
+            //std::cout << l_adapt << std::endl;
+            //std::cout << l_target << "\n" << l_error << "\n\n" << std::endl;
+            //throw exception::runtime(" ");
+            
             for(std::size_t n=0; n < m_step; ++n) {
                 l_target                     = l_targetTmp + l_adapt;
                 l_adapt                     *= 0.5;
                 
+                // here is an error
                 const ublas::matrix<T> l_tmp = distance(l_target) + l_DataOnes;
-                l_errornew                   = calculateQuantizationError( tools::matrix::invert(l_tmp) - l_dataInv, l_dataInv );
-                
+                l_errornew                   = calculateQuantizationError( l_data - l_target, tools::matrix::invert(l_tmp) );
                 
                 if (l_errornew < l_error)
                     break;
@@ -250,8 +253,10 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                 if (n == m_step)
                     throw exception::runtime(_("Sammon mapping may not converge"));
             }
+            std::cout << l_target << std::endl;
+            throw exception::runtime(" ");
             
-            std::cout << l_target << "\n" << l_error << "\n\n" << std::endl;
+            
             
             // if the error "numerical zero" we stop
             if (tools::function::isNumericalZero( (l_error - l_errornew) / l_error ) )
