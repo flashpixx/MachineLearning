@@ -114,7 +114,6 @@ namespace machinelearning { namespace tools {
             bool m_listenerrunnging;
         
             void listener( const mpi::communicator& );
-            void receiving( const mpi::communicator& );
         
             #endif
         
@@ -280,12 +279,7 @@ namespace machinelearning { namespace tools {
             return;
         
         m_listenerrunnging = false;
-
-        //wait (if needed) that the thread function is finalized
-        boost::lock_guard<boost::mutex> l_lock(m_muxfinalize);
-        if (p_mpi.rank() == 0)
-            receiving( p_mpi );
-        
+        boost::lock_guard<boost::mutex> l_lock(m_muxfinalize);       
         p_mpi.barrier();
     }
     
@@ -320,29 +314,20 @@ namespace machinelearning { namespace tools {
         boost::lock_guard<boost::mutex> l_lock(m_muxfinalize);
         
         while (m_listenerrunnging) {
-            receiving( p_mpi );
-            boost::this_thread::yield();
-        }
-    }
-
-    
-    /** receiving method with error handling
-     * @param p_mpi MPI object
-     **/
-    inline void logger::receiving( const mpi::communicator& p_mpi )
-    {
-        //try {
             while (boost::optional<mpi::status> l_status = p_mpi.iprobe(mpi::any_source, LOGGER_MPI_TAG)) {
                 std::string l_str;
                 std::ostringstream l_stream;
-            
+                
                 p_mpi.recv(  l_status->source(), l_status->tag(), l_str );
                 l_stream << l_str;
                 write2file( l_stream );
             }
-        //} catch (...) {}
+            
+            
+            boost::this_thread::yield();
+        }
     }
-    
+
     #endif
     
     
