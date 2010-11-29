@@ -255,14 +255,14 @@ namespace machinelearning { namespace tools {
     {
         if ( (p_mpi.rank() != 0) || (p_mpi.size() == 1) || m_listenerrunnging )
             return;
-        
+    
+             p_mpi.barrier();
         // lock will remove with the destructor call
         boost::lock_guard<boost::mutex> l_lock(m_muxlistener); 
 
         m_listenerrunnging = true;
         boost::thread l_thread( boost::bind( &logger::listener, this, boost::cref(p_mpi)) );
-       
-        p_mpi.barrier();
+    
     }
     
     
@@ -273,10 +273,10 @@ namespace machinelearning { namespace tools {
         m_listenerrunnging = false;
 
         // for the CPU 0 we wait (if needed) that the thread function is finalized
-        /*if (p_mpi.rank() == 0) {
+        if (p_mpi.rank() == 0) {
             boost::lock_guard<boost::mutex> l_lock(m_muxfinalize);
             receive(p_mpi);
-        }*/
+        }
         
         p_mpi.barrier();
     }
@@ -312,7 +312,7 @@ namespace machinelearning { namespace tools {
         boost::lock_guard<boost::mutex> l_lock(m_muxfinalize);
         
         while (m_listenerrunnging) {
-            receive( p_mpi);
+            receive( p_mpi );
             boost::this_thread::yield();
         }
     }
