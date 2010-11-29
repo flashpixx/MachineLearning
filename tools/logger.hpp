@@ -114,7 +114,6 @@ namespace machinelearning { namespace tools {
             bool m_listenerrunnging;
         
             void listener( const mpi::communicator& );
-            void receive( const mpi::communicator& );
         
             #endif
         
@@ -276,9 +275,6 @@ namespace machinelearning { namespace tools {
         
         m_listenerrunnging = false;
         boost::lock_guard<boost::mutex> l_lock(m_muxfinalize);
-        if (p_mpi.rank() == 0)
-            receive( p_mpi );
-        
         p_mpi.barrier();
     }
     
@@ -313,20 +309,15 @@ namespace machinelearning { namespace tools {
         boost::lock_guard<boost::mutex> l_lock(m_muxfinalize);
         
         while (m_listenerrunnging) {
-            receive( p_mpi );
+            while (boost::optional<mpi::status> l_status = p_mpi.iprobe(mpi::any_source, LOGGER_MPI_TAG)) {
+                std::string l_str;
+                std::ostringstream l_stream;
+                
+                p_mpi.recv(  l_status->source(), l_status->tag(), l_str );
+                l_stream << l_str;
+                write2file( l_stream );
+            }
             boost::this_thread::yield();
-        }
-    }
-
-    inline void logger::receive( const mpi::communicator& p_mpi )
-    {
-        while (boost::optional<mpi::status> l_status = p_mpi.iprobe(mpi::any_source, LOGGER_MPI_TAG)) {
-            std::string l_str;
-            std::ostringstream l_stream;
-        
-            p_mpi.recv(  l_status->source(), l_status->tag(), l_str );
-            l_stream << l_str;
-            write2file( l_stream );
         }
     }
     
