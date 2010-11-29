@@ -256,16 +256,16 @@ namespace machinelearning { namespace tools {
         if ((p_mpi.size() == 1) || (m_listenerrunnging))
             return;
         
-        // synchonize all CPUs
+        // synchonize all CPUs thread-safe
+        boost::lock_guard<boost::mutex> l_lock(m_muxlistener); 
+        m_listenerrunnging = true;
+        
         if (p_mpi.rank() != 0) {
             p_mpi.barrier();
             return;
         }
         
         // lock will remove with the destructor call
-        boost::lock_guard<boost::mutex> l_lock(m_muxlistener); 
-
-        m_listenerrunnging = true;
         boost::thread l_thread( boost::bind( &logger::listener, this, boost::cref(p_mpi)) );
        
         p_mpi.barrier();
