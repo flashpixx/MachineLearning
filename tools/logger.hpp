@@ -107,6 +107,8 @@ namespace machinelearning { namespace tools {
         
             /** mutex for creating the listener **/
             boost::mutex m_muxlistener;
+            /** mutex for finalizing **/
+            boost::mutex m_muxfinalize;
             /** bool for running the listener **/
             bool m_listenerrunnging;
         
@@ -123,6 +125,7 @@ namespace machinelearning { namespace tools {
         m_muxwriter()
         #ifdef CLUSTER
         , m_muxlistener(),
+        m_muxfinalize(),
         m_listenerrunnging(false)
         #endif
     {};
@@ -266,6 +269,10 @@ namespace machinelearning { namespace tools {
     inline void logger::shutdownListener( const mpi::communicator& p_mpi ) {
         m_listenerrunnging = false;
         p_mpi.barrier();
+        
+        // for the CPU 0 we wait (if needed) that the thread function is finalized
+        if (p_mpi.rank() == 0)
+            boost::lock_guard<boost::mutex> l_lock(m_muxfinalize);
     }
     
     
@@ -297,6 +304,8 @@ namespace machinelearning { namespace tools {
      **/
     inline void logger::listener( const mpi::communicator& p_mpi )
     {
+        boost::lock_guard<boost::mutex> l_lock(m_muxfinalize);
+        
         while (m_listenerrunnging) {
             
             while (boost::optional<mpi::status> l_status = p_mpi.iprobe(mpi::any_source, LOGGER_MPI_TAG)) {
