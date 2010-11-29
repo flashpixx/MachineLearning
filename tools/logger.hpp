@@ -282,10 +282,8 @@ namespace machinelearning { namespace tools {
         m_listenerrunnging = false;
 
         // for the CPU 0 we wait (if needed) that the thread function is finalized
-        if (p_mpi.rank() == 0) {
-            boost::lock_guard<boost::mutex> l_lock(m_muxfinalize);
-            receive(p_mpi);
-        }
+        boost::lock_guard<boost::mutex> l_lock(m_muxfinalize);
+
         
         p_mpi.barrier();
     }
@@ -321,26 +319,18 @@ namespace machinelearning { namespace tools {
         boost::lock_guard<boost::mutex> l_lock(m_muxfinalize);
         
         while (m_listenerrunnging) {
-            receive( p_mpi );
+            while (boost::optional<mpi::status> l_status = p_mpi.iprobe(mpi::any_source, LOGGER_MPI_TAG)) {
+                std::string l_str;
+                std::ostringstream l_stream;
+                
+                p_mpi.recv( l_status->source(), l_status->tag(), l_str);
+                l_stream << l_str;
+                write2file( l_stream );
+            }
             boost::this_thread::yield();
         }
     }
 
-    
-    /** method for check and receiving messages 
-     * @param p_mpi MPI object
-     **/
-   inline void logger::receive( const mpi::communicator& p_mpi )
-    {
-        while (boost::optional<mpi::status> l_status = p_mpi.iprobe(mpi::any_source, LOGGER_MPI_TAG)) {
-            std::string l_str;
-            std::ostringstream l_stream;
-            
-            p_mpi.recv( l_status->source(), l_status->tag(), l_str);
-            l_stream << l_str;
-            write2file( l_stream );
-        }
-    }
     
     #endif
     
