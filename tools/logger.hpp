@@ -269,11 +269,13 @@ namespace machinelearning { namespace tools {
      **/
     inline void logger::shutdownListener( const mpi::communicator& p_mpi ) {
         m_listenerrunnging = false;
-        p_mpi.barrier();
-        
+
         // for the CPU 0 we wait (if needed) that the thread function is finalized
         if (p_mpi.rank() == 0)
             boost::lock_guard<boost::mutex> l_lock(m_muxfinalize);
+        
+        
+        p_mpi.barrier();
     }
     
     
