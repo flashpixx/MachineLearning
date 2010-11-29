@@ -259,13 +259,8 @@ namespace machinelearning { namespace tools {
         boost::lock_guard<boost::mutex> l_lock(m_muxlistener); 
         m_listenerrunnging = true;
         
-        if (p_mpi.rank() != 0) {
-            p_mpi.barrier();
-            return;
-        }
-        
-        // lock will remove with the destructor call
-        boost::thread l_thread( boost::bind( &logger::listener, this, boost::cref(p_mpi)) );
+        if (p_mpi.rank() == 0)
+            boost::thread l_thread( boost::bind( &logger::listener, this, boost::cref(p_mpi)) );
        
         p_mpi.barrier();
     }
