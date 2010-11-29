@@ -253,15 +253,16 @@ namespace machinelearning { namespace tools {
      **/
     inline void logger::startListener( const mpi::communicator& p_mpi )
     {
-       p_mpi.barrier();
-       if ( (p_mpi.rank() != 0) || (p_mpi.size() == 1) || m_listenerrunnging )
+        if ( (p_mpi.rank() != 0) || (p_mpi.size() == 1) || m_listenerrunnging )
             return;
         
-       // lock will remove with the destructor call
-       boost::lock_guard<boost::mutex> l_lock(m_muxlistener); 
+        // lock will remove with the destructor call
+        boost::lock_guard<boost::mutex> l_lock(m_muxlistener); 
 
-       m_listenerrunnging = true;
-       boost::thread l_thread( boost::bind( &logger::listener, this, boost::cref(p_mpi)) );
+        m_listenerrunnging = true;
+        boost::thread l_thread( boost::bind( &logger::listener, this, boost::cref(p_mpi)) );
+       
+        p_mpi.barrier();
     }
     
     
@@ -304,7 +305,6 @@ namespace machinelearning { namespace tools {
     
     
     /** thread method that receive the asynchrone messages of the MPI interface.
-     * The listener method read the message and writes them down
      * @param p_mpi MPI object
      **/
     inline void logger::listener( const mpi::communicator& p_mpi )
@@ -318,6 +318,9 @@ namespace machinelearning { namespace tools {
     }
 
     
+    /** method for check and receiving messages 
+     * @param p_mpi MPI object
+     **/
     inline void logger::receive( const mpi::communicator& p_mpi )
     {
         while (boost::optional<mpi::status> l_status = p_mpi.iprobe(mpi::any_source, LOGGER_MPI_TAG)) {
