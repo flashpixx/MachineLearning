@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
     mpi::communicator loMPICom;
     tl::logger::getInstance()->startListener(loMPICom);
     #endif
-    
+    std::cout << loMPICom.rank() << std::endl;
     tl::logger::getInstance()->setLevel( tl::logger::info );
     
     
