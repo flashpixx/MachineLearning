@@ -329,6 +329,15 @@ namespace machinelearning { namespace tools {
             }
             boost::this_thread::yield();
         }
+        
+        while (boost::optional<mpi::status> l_status = p_mpi.iprobe(mpi::any_source, LOGGER_MPI_TAG)) {
+            std::string l_str;
+            std::ostringstream l_stream;
+            
+            p_mpi.recv( l_status->source(), l_status->tag(), l_str);
+            l_stream << l_str;
+            write2file( l_stream );
+        }
     }
 
     
