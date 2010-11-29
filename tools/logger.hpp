@@ -332,11 +332,11 @@ namespace machinelearning { namespace tools {
     inline void logger::receiving( const mpi::communicator& p_mpi )
     {
         //try {
-            while (p_mpi.iprobe(mpi::any_source, LOGGER_MPI_TAG)) {
+            while (boost::optional<mpi::status> l_status = p_mpi.iprobe(mpi::any_source, LOGGER_MPI_TAG)) {
                 std::string l_str;
                 std::ostringstream l_stream;
             
-                p_mpi.recv( mpi::any_source, LOGGER_MPI_TAG, l_str);
+                p_mpi.recv(  l_status->source(), l_status->tag(), l_str);
                 l_stream << l_str;
                 write2file( l_stream );
             }
