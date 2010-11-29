@@ -336,7 +336,7 @@ namespace machinelearning { namespace tools {
                 std::string l_str;
                 std::ostringstream l_stream;
             
-                p_mpi.recv(  l_status->source(), l_status->tag(), l_str);
+                p_mpi.recv(  l_status->source(), l_status->tag(), l_str );
                 l_stream << l_str;
                 write2file( l_stream );
             }
