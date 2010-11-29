@@ -279,6 +279,7 @@ namespace machinelearning { namespace tools {
         if (!m_listenerrunnging)
             return;
         
+        p_mpi.barrier();
         m_listenerrunnging = false;
 
         //wait (if needed) that the thread function is finalized
