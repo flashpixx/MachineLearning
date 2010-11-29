@@ -271,8 +271,8 @@ namespace machinelearning { namespace tools {
         m_listenerrunnging = false;
 
         // for the CPU 0 we wait (if needed) that the thread function is finalized
-        if (p_mpi.rank() == 0)
-            boost::lock_guard<boost::mutex> l_lock(m_muxfinalize);
+        //if (p_mpi.rank() == 0)
+        //    boost::lock_guard<boost::mutex> l_lock(m_muxfinalize);
         
         
         p_mpi.barrier();
