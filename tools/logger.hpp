@@ -51,7 +51,8 @@ namespace machinelearning { namespace tools {
     
 
     /** logger class for writing log information 
-     * @note for MPI using every process must call startListener and shutdownListener for synchronize the CPUs and the tag for logtargets ist set with a preprocessor flag (LOGGER_MPI_TAG)
+     * @note for MPI using every process must call startListener and shutdownListener for synchronize the CPUs and the tag for logtargets ist set with a preprocessor flag (LOGGER_MPI_TAG).
+     * The singletone object works only "between" the calls start- and shutdownListener because the MPI object must exists.
      * @todo tmpnam(NULL) change to a safe variante (posix mkstemp(), but this isn't standard)
      **/
     class logger {
