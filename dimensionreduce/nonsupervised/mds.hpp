@@ -233,9 +233,6 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             const T l_error                          = calculateQuantizationError( l_delta, l_dataInv );
             T l_errornew                             = l_error;
             const ublas::matrix<T> l_targetTmp       = l_target;
-            
-            //std::cout << l_adapt << std::endl;
-            //std::cout << l_target << "\n" << l_error << "\n\n" << std::endl;
              
             for(std::size_t n=0; n < m_step; ++n) {
                 l_target                     = l_targetTmp + l_adapt;
