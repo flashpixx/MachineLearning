@@ -327,16 +327,21 @@ namespace machinelearning { namespace tools {
     }
 
     
+    /** receiving method with error handling
+     * @param p_mpi MPI object
+     **/
     inline void logger::receiving( const mpi::communicator& p_mpi )
     {
-        while (p_mpi.iprobe(mpi::any_source, LOGGER_MPI_TAG)) {
-            std::string l_str;
-            std::ostringstream l_stream;
+        try {
+            while (p_mpi.iprobe(mpi::any_source, LOGGER_MPI_TAG)) {
+                std::string l_str;
+                std::ostringstream l_stream;
             
-            p_mpi.recv( mpi::any_source, LOGGER_MPI_TAG, l_str);
-            l_stream << l_str;
-            write2file( l_stream );
-        }
+                p_mpi.recv( mpi::any_source, LOGGER_MPI_TAG, l_str);
+                l_stream << l_str;
+                write2file( l_stream );
+            }
+        } catch (...) {}
     }
     
     #endif
