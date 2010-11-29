@@ -253,8 +253,14 @@ namespace machinelearning { namespace tools {
      **/
     inline void logger::startListener( const mpi::communicator& p_mpi )
     {
-        if ( (p_mpi.rank() != 0) || (p_mpi.size() == 1) || m_listenerrunnging )
+        if ((p_mpi.size() == 1) || (m_listenerrunnging))
             return;
+        
+        // synchonize all CPUs
+        if (p_mpi.rank() != 0) {
+            p_mpi.barrier();
+            return;
+        }
         
         // lock will remove with the destructor call
         boost::lock_guard<boost::mutex> l_lock(m_muxlistener); 
@@ -270,6 +276,9 @@ namespace machinelearning { namespace tools {
      * @param p_mpi MPI object
      **/
     inline void logger::shutdownListener( const mpi::communicator& p_mpi ) {
+        if (!m_listenerrunnging)
+            return;
+        
         m_listenerrunnging = false;
 
         // for the CPU 0 we wait (if needed) that the thread function is finalized
