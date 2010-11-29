@@ -66,7 +66,6 @@ int main(int argc, char *argv[]) {
     #endif
     
     tl::logger::getInstance()->write(loMPICom, tl::logger::warn, "ich teste alles");
-    loMPICom.barrier();
     
     
     // ===== MDS ======
