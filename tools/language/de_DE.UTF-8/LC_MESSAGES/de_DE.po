@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-11-19 21:02+0100\n"
-"PO-Revision-Date: 2010-11-19 21:27+0100\n"
+"POT-Creation-Date: 2010-11-29 23:38+0100\n"
+"PO-Revision-Date: 2010-11-29 23:40+0100\n"
 "Last-Translator: Philipp Kraus <philipp.kraus@flashpixx.de>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -96,7 +96,7 @@ msgstr "Anzahl der Prototypen muss größer Null sein"
 #: clustering/nonsupervised/relationalneuralgas.hpp:224
 #: clustering/nonsupervised/relationalneuralgas.hpp:500
 #: clustering/supervised/rlvq.hpp:214
-#: dimensionreduce/nonsupervised/mds.hpp:162
+#: dimensionreduce/nonsupervised/mds.hpp:186
 #: functionoptimization/gradientdescent.hpp:292
 msgid "iterations must be greater than zero"
 msgstr "Iterationen müssen größer Null sein"
@@ -135,7 +135,7 @@ msgid "lambda must be greater than zero"
 msgstr "Lambda muss größer Null sein"
 
 #: clustering/nonsupervised/spectralclustering.hpp:165
-#: dimensionreduce/nonsupervised/mds.hpp:109
+#: dimensionreduce/nonsupervised/mds.hpp:133
 #: tools/lapack.hpp:83
 #: tools/lapack.hpp:131
 #: tools/lapack.hpp:234
@@ -147,7 +147,7 @@ msgid "eta must be greater than zero"
 msgstr "Eta muss größer Null sein"
 
 #: dimensionreduce/nonsupervised/lle.hpp:76
-#: dimensionreduce/nonsupervised/mds.hpp:88
+#: dimensionreduce/nonsupervised/mds.hpp:94
 #: dimensionreduce/nonsupervised/pca.hpp:66
 #: dimensionreduce/supervised/lda.hpp:68
 msgid "dimension must be greater than zero"
@@ -157,14 +157,22 @@ msgstr "Dimension muss größer Null sein"
 msgid "data points are less than target dimension"
 msgstr "Datenpunktdimension ist kleiner als Dimension der Zielprojektion"
 
-#: dimensionreduce/nonsupervised/mds.hpp:107
+#: dimensionreduce/nonsupervised/mds.hpp:131
 #: dimensionreduce/nonsupervised/pca.hpp:85
 msgid "datapoint dimension are less than target dimension"
 msgstr "Datenpunktdimension ist kleiner als Dimension der Zielprojektion"
 
-#: dimensionreduce/nonsupervised/mds.hpp:121
+#: dimensionreduce/nonsupervised/mds.hpp:145
 msgid "project option is unkown"
 msgstr "Projektionsmethode ist nicht bekannt"
+
+#: dimensionreduce/nonsupervised/mds.hpp:188
+msgid "steps must be greater than zero"
+msgstr "Schrittweite muss größer Null sein"
+
+#: dimensionreduce/nonsupervised/mds.hpp:246
+msgid "sammon mapping may not converge"
+msgstr "Sammons Map konnte nicht konvergieren"
 
 #: dimensionreduce/supervised/lda.hpp:98
 msgid "target dimension must be less than unique data classes"
@@ -243,6 +251,10 @@ msgstr "beide Matrizen haben nicht die gleiche Größe"
 #: tools/lapack.hpp:236
 msgid "number of rows / columns of the matrix must have the same dimension like the initialisation vector"
 msgstr "Anzahl der Zeilen / Spalten der Matrix müssen die gleiche Dimension wie Initialisierungsvektor haben"
+
+#: tools/logger.hpp:222
+msgid "log state is unkown"
+msgstr "Sprache ist nicht bekannt"
 
 #: tools/matrix.hpp:95
 #: tools/matrix.hpp:135
