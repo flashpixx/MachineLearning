@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-11-29 23:38+0100\n"
-"PO-Revision-Date: 2010-11-29 23:40+0100\n"
+"PO-Revision-Date: 2010-11-29 23:43+0100\n"
 "Last-Translator: Philipp Kraus <philipp.kraus@flashpixx.de>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -430,15 +430,15 @@ msgstr "kein Inhalt"
 
 #: tools/sources/wikipedia.h:577
 msgid "Reset Content"
-msgstr ""
+msgstr "Inhalt wurde zurückgesetzt"
 
 #: tools/sources/wikipedia.h:578
 msgid "Partial Content"
-msgstr ""
+msgstr "Teilinhalt"
 
 #: tools/sources/wikipedia.h:579
 msgid "Multiple Choices"
-msgstr ""
+msgstr "Mehrfachauswahl"
 
 #: tools/sources/wikipedia.h:580
 msgid "Moved Permanently"
@@ -454,7 +454,7 @@ msgstr ""
 
 #: tools/sources/wikipedia.h:583
 msgid "Not Modified"
-msgstr ""
+msgstr "nicht geändert"
 
 #: tools/sources/wikipedia.h:584
 msgid "Use Proxy"
@@ -490,7 +490,7 @@ msgstr "Methode nicht erlaubt"
 
 #: tools/sources/wikipedia.h:592
 msgid "Not Acceptable"
-msgstr ""
+msgstr "nicht erreichbar"
 
 #: tools/sources/wikipedia.h:594
 msgid "Proxy Authentication Required"
