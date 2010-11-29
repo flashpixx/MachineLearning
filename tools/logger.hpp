@@ -283,8 +283,8 @@ namespace machinelearning { namespace tools {
 
         //wait (if needed) that the thread function is finalized
         boost::lock_guard<boost::mutex> l_lock(m_muxfinalize);
-        //if (p_mpi.rank() == 0)
-        //    receiving( p_mpi );
+        if (p_mpi.rank() == 0)
+            receiving( p_mpi );
         
         p_mpi.barrier();
     }
@@ -328,7 +328,7 @@ namespace machinelearning { namespace tools {
     
     inline void logger::receiving( const mpi::communicator& p_mpi )
     {
-        while (boost::optional<mpi::status> l_status = p_mpi.iprobe(mpi::any_source, LOGGER_MPI_TAG)) {
+        while (p_mpi.iprobe(mpi::any_source, LOGGER_MPI_TAG)) {
             std::string l_str;
             std::ostringstream l_stream;
             
