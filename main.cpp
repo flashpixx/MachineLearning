@@ -22,6 +22,9 @@
 #include <boost/numeric/bindings/ublas/matrix.hpp>
 #include <boost/numeric/bindings/ublas/vector.hpp>
 
+#ifdef CLUSTER
+#include <mpi.h>
+#endif
 
 
 
@@ -42,9 +45,11 @@ namespace mpi	= boost::mpi;
 
 
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
     #ifdef CLUSTER
-    mpi::environment loMPIenv(argc, argv);
+    //mpi::environment loMPIenv(argc, argv);
+    //MPI::Init_thread( &argc, &argv, MPI::THREAD_SERIALIZED );
+    MPI::Init_thread( argc, argv, MPI_THREAD_SERIALIZED );
     mpi::communicator loMPICom;
     tl::logger::getInstance()->startListener(loMPICom);
     #endif
@@ -57,23 +62,23 @@ int main(int argc, char *argv[]) {
     #endif
     
     #ifdef FILES
-    tl::files::hdf o("blub.hdf5");
+    //tl::files::hdf o("blub.hdf5");
     /*tl::files::hdf o("string.hdf5");
     std::vector<std::string> x = o.readStringVector("/array");
     for(std::size_t i=0; i < x.size(); ++i)
         std::cout << x[i] << std::endl;*/    
     #endif
     
-    //tl::logger::getInstance()->write(loMPICom, tl::logger::warn, "ich teste alles");
+    tl::logger::getInstance()->write(loMPICom, tl::logger::warn, "ich teste alles");
     
     
     // ===== MDS ======
-    
+    /*
     ublas::matrix<double> data = o.readMatrix<double>("/mds1", H5::PredType::NATIVE_DOUBLE); 
     ndim::mds<double> l(2, ndim::mds<double>::sammon);
     tl::files::hdf f("mds.hdf5", true);
     f.write<double>( "/data",  l.map(data), H5::PredType::NATIVE_DOUBLE );  
-    
+    */
    
     // ===== Wikipedia ======
     /*
@@ -463,6 +468,7 @@ int main(int argc, char *argv[]) {
     tl::logger::getInstance()->shutdownListener(loMPICom);
     if (loMPICom.rank() == 0)
         std::cout << "\nlog file see: " << tl::logger::getInstance()->getFilename() << std::endl;
+    MPI::Finalize();
     #else
     std::cout << "\nlog file see: " << tl::logger::getInstance()->getFilename() << std::endl;
     #endif
