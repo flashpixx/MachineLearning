@@ -48,7 +48,6 @@ namespace mpi	= boost::mpi;
 int main(int argc, char* argv[]) {
     #ifdef CLUSTER
     //mpi::environment loMPIenv(argc, argv);
-    //MPI::Init_thread( &argc, &argv, MPI::THREAD_SERIALIZED );
     MPI::Init_thread( argc, argv, MPI_THREAD_SERIALIZED );
     mpi::communicator loMPICom;
     tl::logger::getInstance()->startListener(loMPICom);

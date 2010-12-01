@@ -35,6 +35,7 @@
 
 #ifdef CLUSTER
 #define LOGGER_MPI_TAG 999
+#include <mpi.h>
 #include <boost/mpi.hpp>
 #include <boost/bind.hpp>
 #endif
@@ -53,6 +54,8 @@ namespace machinelearning { namespace tools {
     /** logger class for writing log information 
      * @note for MPI using every process must call startListener and shutdownListener for synchronize the CPUs and the tag for logtargets ist set with a preprocessor flag (LOGGER_MPI_TAG).
      * The singletone object works only "between" the calls start- and shutdownListener because the MPI object must exists.
+     * @note If the listener function is used, you don't use the Boost::MPI::Environmental initialisation. Use the default MPI calls of the mpi.h (MPI::Init_thread( argc, argv, MPI_THREAD_SERIALIZED ) &
+     * MPI::Finalize())
      * @todo tmpnam(NULL) change to a safe variante (posix mkstemp(), but this isn't standard)
      **/
     class logger {
