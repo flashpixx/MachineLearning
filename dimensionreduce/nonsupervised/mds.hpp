@@ -85,7 +85,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
      * @param p_type project type
      **/
     template<typename T> inline mds<T>::mds( const std::size_t& p_dim, const project& p_type ) :
-    m_iteration( 500 ),
+    m_iteration( 150 ),
     m_step( 20 ),
     m_dim( p_dim ),
     m_type( p_type )
@@ -200,11 +200,6 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         ublas::matrix<T> l_target                   = tools::matrix::random( l_data.size1(), m_dim, tools::random::uniform, static_cast<T>(-1), static_cast<T>(1) );
         const ublas::mapped_matrix<T> l_TargetOnes  = ublas::scalar_matrix<T>( l_target.size1(), l_target.size2(), static_cast<T>(1) );
         
-        for(std::size_t i=0; i < l_target.size1(); ++i) {
-            l_target(i,0) = i+1; 
-            l_target(i,1) = i+3;
-        }
-        
         
         // optimize
         for(std::size_t i=0; i < m_iteration; ++i) {
@@ -233,10 +228,10 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             const T l_error                          = calculateQuantizationError( l_delta, l_dataInv );
             T l_errornew                             = l_error;
             const ublas::matrix<T> l_targetTmp       = l_target;
-             
+
+            
             for(std::size_t n=1; n <= m_step; ++n) {
                 l_target                     = l_targetTmp + l_adapt;
-                l_adapt                     *= 0.5;
                 l_errornew                   = calculateQuantizationError( l_data - (distance(l_target) + l_DataOnes), l_dataInv );
                 
                 if (l_errornew < l_error)
@@ -244,9 +239,9 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                 
                 if (n == m_step)
                     throw exception::runtime(_("sammon mapping may not converge"));
+                
+                l_adapt                     *= 0.5;
             }
-            
-            //std::cout << l_target << std::endl;
             
             // if the error "numerical zero" we stop
             if (tools::function::isNumericalZero( (l_error - l_errornew) / l_error ) )
@@ -255,12 +250,15 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         
         return l_target;
     }
+
     
+    /** creates the error value
+     * @param p_delta delta values (differnce between original and target points)
+     * @param p_invert inverted data values
+     * @return error value
+     **/
     template<typename T> inline T mds<T>::calculateQuantizationError( const ublas::matrix<T>& p_delta, const ublas::matrix<T>& p_invert ) const
     {
-        //std::cout << p_delta << std::endl;
-        //std::cout << p_invert << std::endl;
-        
         ublas::matrix<T> l_mat = ublas::element_prod( tools::matrix::pow(p_delta, static_cast<T>(2)), p_invert);
         return ublas::sum( tools::matrix::sum( l_mat ) );
     }
