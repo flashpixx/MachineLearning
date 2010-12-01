@@ -277,17 +277,6 @@ namespace machinelearning { namespace tools {
         
         m_listenerrunnging = false;
         boost::lock_guard<boost::mutex> l_lock(m_muxfinalize);
-        
-        if (p_mpi.rank())
-            while (boost::optional<mpi::status> l_status = p_mpi.iprobe(mpi::any_source, LOGGER_MPI_TAG)) {
-                std::string l_str;
-                std::ostringstream l_stream;
-                
-                p_mpi.recv(  l_status->source(), l_status->tag(), l_str );
-                l_stream << l_str;
-                write2file( l_stream );
-            }
-        
         p_mpi.barrier();
     }
     
