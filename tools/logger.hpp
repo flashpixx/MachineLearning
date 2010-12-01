@@ -35,7 +35,6 @@
 
 #ifdef CLUSTER
 #define LOGGER_MPI_TAG 999
-#include <mpi.h>
 #include <boost/mpi.hpp>
 #include <boost/bind.hpp>
 #endif
