@@ -272,6 +272,7 @@
  *
  * @section mpi mpi use
  * @code
+    MPI::Init_thread( argc, argv, MPI_THREAD_SERIALIZED )
     boost::mpi::communicator l_mpi;
  
     // create the listener 
@@ -291,6 +292,7 @@
  
     // shows the filename of each CPU (only CPU 0 collected all messages with MPI support)
     std::cout << tools::logger::getInstance()->getFilename() << std::endl;
+    MPI::Finalize()
  * @endcode
  *
 **/
