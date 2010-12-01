@@ -16,7 +16,7 @@
  # GNU Lesser General Public License for more details.                      #
  #                                                                          #
  # You should have received a copy of the GNU Lesser General Public License #
- # along with this program.  If not, see <http://www.gnu.org/licenses/>.    #
+ # along with this program. If not, see <http://www.gnu.org/licenses/>.     #
  ############################################################################
  @endcond
  **/
@@ -46,6 +46,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * and creates the general eigenvector decomposition. A neuralgas algorithm with euclidian
      * distancesis used for clustering the data
      * @todo set all routines to sparse matrix if arpack can be used with boost
+     * @todo create eigengap heurstic
      **/
     template<typename T> class spectralclustering : public nonsupervisedclustering<T> {
         
