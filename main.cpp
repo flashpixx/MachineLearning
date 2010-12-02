@@ -22,7 +22,7 @@
 #include <boost/numeric/bindings/ublas/matrix.hpp>
 #include <boost/numeric/bindings/ublas/vector.hpp>
 
-#ifdef CLUSTER
+#ifdef ML_CLUSTER
 #include <mpi.h>
 #endif
 
