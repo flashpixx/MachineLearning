@@ -291,12 +291,11 @@ namespace machinelearning { namespace tools {
             std::size_t l_eot = p_mpi.size() - 1;
             while (l_eot > 0)
                 while (boost::optional<mpi::status> l_status = p_mpi.iprobe(mpi::any_source, LOGGER_MPI_TAG)) {
-                    std::string l_str;
-                    std::ostringstream l_stream;
-                
+                    std::string l_str;               
                     p_mpi.recv(  l_status->source(), l_status->tag(), l_str );
                 
                     if (l_str != LOGGER_MPI_EOT) {
+                        std::ostringstream l_stream;
                         l_stream << l_str;
                         write2file( l_stream );
                     } else

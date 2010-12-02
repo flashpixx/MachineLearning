@@ -79,6 +79,7 @@ int main(int argc, char* argv[]) {
     f.write<double>( "/data",  l.map(data), H5::PredType::NATIVE_DOUBLE );  
     */
    
+    
     // ===== Wikipedia ======
     /*
     #ifdef SOURCES
@@ -100,6 +101,7 @@ int main(int argc, char* argv[]) {
     
     #endif
     */
+    
     
     // ===== Newsgroup ======
     /*
