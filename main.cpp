@@ -47,13 +47,13 @@ namespace mpi	= boost::mpi;
 
 int main(int argc, char* argv[]) {
     #ifdef ML_CLUSTER
-    //mpi::environment loMPIenv(argc, argv);
-    MPI::Init_thread( argc, argv, MPI_THREAD_SERIALIZED );
+    mpi::environment loMPIenv(argc, argv);
+    //MPI::Init_thread( argc, argv, MPI_THREAD_SERIALIZED );
     mpi::communicator loMPICom;
-    tl::logger::getInstance()->startListener(loMPICom);
+    //tl::logger::getInstance()->startListener(loMPICom);
     #endif
     
-    tl::logger::getInstance()->setLevel( tl::logger::info );
+    //tl::logger::getInstance()->setLevel( tl::logger::info );
     
     
     #ifdef ML_MULTILANGUAGE
@@ -467,10 +467,10 @@ int main(int argc, char* argv[]) {
     */
     
     #ifdef ML_CLUSTER
-    tl::logger::getInstance()->shutdownListener(loMPICom);
-    if (loMPICom.rank() == 0)
-        std::cout << "\nlog file see: " << tl::logger::getInstance()->getFilename() << std::endl;
-    MPI::Finalize();
+    //tl::logger::getInstance()->shutdownListener(loMPICom);
+    //if (loMPICom.rank() == 0)
+        //std::cout << "\nlog file see: " << tl::logger::getInstance()->getFilename() << std::endl;
+    //MPI::Finalize();
     #else
     std::cout << "\nlog file see: " << tl::logger::getInstance()->getFilename() << std::endl;
     #endif
