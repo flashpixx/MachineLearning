@@ -35,6 +35,7 @@
 
 #ifdef CLUSTER
 #define LOGGER_MPI_TAG 999
+#define LOGGER_MPI_EOT "$EOT$"
 #include <boost/mpi.hpp>
 #include <boost/bind.hpp>
 #endif
@@ -282,7 +283,26 @@ namespace machinelearning { namespace tools {
         
         m_listenerrunnging = false;
         boost::lock_guard<boost::mutex> l_lock(m_muxfinalize);
-        std::cout << p_mpi.rank() << std::endl;
+        
+        // we create a end-of-transmission message which sends every process except the CPU 0. CPU 0 receives messages until
+        // the EOT is transmitted. This is needed because MPI has no timeslot in which the messages must be received
+        if (p_mpi.rank() == 0) {
+            std::size_t l_eot = p_mpi.size() - 1;
+            while (l_eot > 0)
+                while (boost::optional<mpi::status> l_status = p_mpi.iprobe(mpi::any_source, LOGGER_MPI_TAG)) {
+                    std::string l_str;
+                    std::ostringstream l_stream;
+                
+                    p_mpi.recv(  l_status->source(), l_status->tag(), l_str );
+                
+                    if (l_str != LOGGER_MPI_EOT) {
+                        l_stream << l_str;
+                        write2file( l_stream );
+                    } else
+                        l_eot--;
+                }
+        } else 
+            p_mpi.isend(0, LOGGER_MPI_TAG, std::string(LOGGER_MPI_EOT));
         
         p_mpi.barrier();
     }

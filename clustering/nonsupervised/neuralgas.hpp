@@ -443,8 +443,12 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         for(int i=0; i < p_mpi.size(); ++i)
             mpi::gather(p_mpi, m_prototypes.size1(), l_numbers, i);
         
+        //std::cout << std::accumulate( l_numbers.begin(), l_numbers.end(), 0 ) << std::endl;
+        //std::cout << mpi::all_reduce(p_mpi, m_prototypes.size1(), std::accumulate()) << std::endl;
+        //throw exception::runtime(" ");
+        
         // calculate the sum and return
-        return std::accumulate( l_numbers.begin(), l_numbers.end(), 0 );;
+        return std::accumulate( l_numbers.begin(), l_numbers.end(), 0 );
     }
     
     
