@@ -188,7 +188,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             throw exception::runtime(_("steps must be greater than zero"));
         
         // the similarity matrix must be double-centered
-        //const ublas::matrix<T> l_center = doublecentering( p_data );
+        const ublas::matrix<T> l_center = doublecentering( p_data );
         
         
         // create the distance for each row/colum (create distance matrix) of the matrix and sets the diagonal elements to one
