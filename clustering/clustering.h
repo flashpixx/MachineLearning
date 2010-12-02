@@ -29,7 +29,7 @@
 #include "clustering.hpp"
 
 #include "nonsupervised/neuralgas.hpp"
-#include "nonsupervised/relationalneuralgas.hpp"
+//#include "nonsupervised/relationalneuralgas.hpp"
 #include "nonsupervised/kmeans.hpp"
 #include "nonsupervised/spectralclustering.hpp"
 #include "supervised/rlvq.hpp"
