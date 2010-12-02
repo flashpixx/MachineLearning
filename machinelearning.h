@@ -290,7 +290,8 @@
     // creates a message with MPI use
     tools::logger::getInstance()->write( l_mpi, tools::logger::warn, "test message with MPI" );
  
- 
+    // close the listener
+    tools::logger::getInstance()->shutdownListener( l_mpi );
  
     // shows the filename of each CPU (only CPU 0 collected all messages with MPI support)
     std::cout << tools::logger::getInstance()->getFilename() << std::endl;
