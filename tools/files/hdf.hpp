@@ -21,7 +21,7 @@
  @endcond
  **/
 
-#ifdef FILES
+#ifdef ML_FILES
 
 #ifndef MACHINELEARNING_TOOLS_FILES_HDF_HPP
 #define MACHINELEARNING_TOOLS_FILES_HDF_HPP

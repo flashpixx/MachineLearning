@@ -21,7 +21,7 @@
  @endcond
  **/
 
-#ifndef MULTILANGUAGE
+#ifndef ML_MULTILANGUAGE
     #define _(string) string
 #else
 

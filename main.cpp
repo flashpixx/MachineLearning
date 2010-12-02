@@ -56,11 +56,11 @@ int main(int argc, char* argv[]) {
     tl::logger::getInstance()->setLevel( tl::logger::info );
     
     
-    #ifdef MULTILANGUAGE
+    #ifdef ML_MULTILANGUAGE
     tl::language::bind("ml", "./tools/language/");
     #endif
     
-    #ifdef FILES
+    #ifdef ML_FILES
     //tl::files::hdf o("blub.hdf5");
     /*tl::files::hdf o("string.hdf5");
     std::vector<std::string> x = o.readStringVector("/array");

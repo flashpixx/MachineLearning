@@ -45,19 +45,19 @@ def configuration_macosx(config, version, architecture) :
         config["linkto"].extend( ["boost_mpi", "boost_serialization"] )
                 
     if GetOption("withrandom") != None :   
-        config["compileflags"]      += " -D RANDOMDEVICE"
+        config["compileflags"]      += " -D ML_RANDOMDEVICE"
         config["linkto"].append("boost_random");
             
     if GetOption("withmultilanguage") != None :
-        config["compileflags"]      += " -D MULTILANGUAGE"
+        config["compileflags"]      += " -D ML_MULTILANGUAGE"
         config["linkto"].append("intl");
         
     if GetOption("withsources") != None :
-        config["compileflags"]      += " -D SOURCES"
+        config["compileflags"]      += " -D ML_SOURCES"
         config["linkto"].extend( ["xml2", "boost_regex"] )
         
     if GetOption("withfiles") != None :
-        config["compileflags"]      += " -D FILES"
+        config["compileflags"]      += " -D ML_FILES"
         config["linkto"].extend( ["hdf5_cpp", "hdf5"] )
     
     
@@ -79,7 +79,7 @@ def configuration_posix(config, version, architecture) :
         config["linkto"].extend( ["boost_mpi", "boost_serialization"] )
                 
     if GetOption("withrandom") != None :   
-        config["compileflags"]      += " -D RANDOMDEVICE"
+        config["compileflags"]      += " -D ML_RANDOMDEVICE"
         config["linkto"].append("boost_random");
             
     if GetOption("withmultilanguage") != None :
@@ -90,7 +90,7 @@ def configuration_posix(config, version, architecture) :
         config["linkto"].extend( ["xml2", "boost_regex"] )
 
     if GetOption("withfiles") != None :
-        config["compileflags"]      += " -D FILES"
+        config["compileflags"]      += " -D ML_FILES"
         config["linkto"].extend( ["hdf5_cpp", "hdf5"] )
         
         

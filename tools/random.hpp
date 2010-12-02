@@ -32,7 +32,7 @@
 #include <boost/thread/thread.hpp>
 #include <boost/random.hpp>
 
-#ifdef RANDOMDEVICE
+#ifdef ML_RANDOMDEVICE
 #include <boost/nondet_random.hpp>
 #endif
 
@@ -81,7 +81,7 @@ namespace machinelearning { namespace tools {
             };
             
             
-            #ifndef RANDOMDEVICE
+            #ifndef ML_RANDOMDEVICE
             random( void );
             #endif
             template<typename T> T get( const distribution&, const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon() );
@@ -89,7 +89,7 @@ namespace machinelearning { namespace tools {
         
         private :
         
-            #ifdef RANDOMDEVICE
+            #ifdef ML_RANDOMDEVICE
             /** static random device pbject **/
             static boost::random_device m_random;
             #else
@@ -113,7 +113,7 @@ namespace machinelearning { namespace tools {
             template<typename T> T getChiSquared( const T& );
             template<typename T> T getTriangular( const T&, const T&, const T& );
         
-            #ifndef RANDOMDEVICE
+            #ifndef ML_RANDOMDEVICE
             static std::time_t getThreadID( void );
             #endif
         
@@ -125,7 +125,7 @@ namespace machinelearning { namespace tools {
      * for multithrading. Read thread-id and create xor
      * with time
      **/
-    #ifndef RANDOMDEVICE
+    #ifndef ML_RANDOMDEVICE
     inline random::random( void ) :
         m_random(  boost::mt19937(getThreadID() ^ time(NULL))  )
     {}

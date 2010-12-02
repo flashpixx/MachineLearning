@@ -21,7 +21,7 @@
  @endcond
  **/
 
-#ifdef FILES
+#ifdef ML_FILES
 
 /** headerfile for include all sources **/
 

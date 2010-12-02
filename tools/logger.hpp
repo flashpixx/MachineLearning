@@ -34,8 +34,8 @@
 #include <boost/thread.hpp>
 
 #ifdef CLUSTER
-#define LOGGER_MPI_TAG  999
-#define LOGGER_MPI_EOT  "$EOT$"
+#define ML_LOGGER_MPI_TAG  999
+#define ML_LOGGER_MPI_EOT  "$EOT$"
 #include <boost/mpi.hpp>
 #include <boost/bind.hpp>
 #endif
@@ -52,9 +52,9 @@ namespace machinelearning { namespace tools {
     
 
     /** logger class for writing log information 
-     * @note for MPI using every process must call startListener and shutdownListener for synchronize the CPUs and the tag for logtargets is set with a preprocessor flag (LOGGER_MPI_TAG).
+     * @note for MPI using every process must call startListener and shutdownListener for synchronize the CPUs and the tag for logtargets is set with a preprocessor flag (ML_LOGGER_MPI_TAG).
      * The singletone object works only "between" the calls start- and shutdownListener because the MPI object must exists. The connection is closed in the shutdown call and use a message
-     * that is defined with the preprocessor flog LOGGER_MPI_EOT.
+     * that is defined with the preprocessor flog ML_LOGGER_MPI_EOT.
      * @note If the listener function is used, you don't use the Boost::MPI::Environmental initialisation. Use the default MPI calls of the mpi.h: 
      * @code
         #include <mpi.h>
@@ -290,11 +290,11 @@ namespace machinelearning { namespace tools {
         if (p_mpi.rank() == 0) {
             std::size_t l_eot = p_mpi.size() - 1;
             while (l_eot > 0)
-                while (boost::optional<mpi::status> l_status = p_mpi.iprobe(mpi::any_source, LOGGER_MPI_TAG)) {
+                while (boost::optional<mpi::status> l_status = p_mpi.iprobe(mpi::any_source, ML_LOGGER_MPI_TAG)) {
                     std::string l_str;               
                     p_mpi.recv(  l_status->source(), l_status->tag(), l_str );
                 
-                    if (l_str != LOGGER_MPI_EOT) {
+                    if (l_str != ML_LOGGER_MPI_EOT) {
                         std::ostringstream l_stream;
                         l_stream << l_str;
                         write2file( l_stream );
@@ -302,7 +302,7 @@ namespace machinelearning { namespace tools {
                         l_eot--;
                 }
         } else 
-            p_mpi.isend(0, LOGGER_MPI_TAG, std::string(LOGGER_MPI_EOT));
+            p_mpi.isend(0, ML_LOGGER_MPI_TAG, std::string(ML_LOGGER_MPI_EOT));
         
         p_mpi.barrier();
     }
@@ -326,7 +326,7 @@ namespace machinelearning { namespace tools {
         if (p_mpi.rank() == 0)
             write2file( l_stream );
         else
-            p_mpi.isend(0, LOGGER_MPI_TAG, l_stream.str());
+            p_mpi.isend(0, ML_LOGGER_MPI_TAG, l_stream.str());
     }
     
     
@@ -338,7 +338,7 @@ namespace machinelearning { namespace tools {
         boost::lock_guard<boost::mutex> l_lock(m_muxfinalize);
         
         while (m_listenerrunnging) {
-            while (boost::optional<mpi::status> l_status = p_mpi.iprobe(mpi::any_source, LOGGER_MPI_TAG)) {
+            while (boost::optional<mpi::status> l_status = p_mpi.iprobe(mpi::any_source, ML_LOGGER_MPI_TAG)) {
                 std::string l_str;
                 std::ostringstream l_stream;
 
