@@ -438,21 +438,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> inline std::size_t neuralgas<T>::gatherNumberPrototypes( const mpi::communicator& p_mpi ) const
     {
-        // gathering number of prototypes
-        std::vector<std::size_t> l_numbers;
-        for(int i=0; i < p_mpi.size(); ++i)
-            mpi::gather(p_mpi, m_prototypes.size1(), l_numbers, i);
-        
-        std::cout << std::accumulate( l_numbers.begin(), l_numbers.end(), 0 ) << std::endl;
-        
-        std::size_t x = 0;
-        mpi::all_reduce(p_mpi, m_prototypes.size1(), x, std::plus<std::size_t>());
-        std::cout << x << std::endl;
-        
-        throw exception::runtime(" ");
-        
-        // calculate the sum and return
-        return std::accumulate( l_numbers.begin(), l_numbers.end(), 0 );
+        std::size_t l_count = 0;
+        mpi::all_reduce(p_mpi, m_prototypes.size1(), l_count, std::plus<std::size_t>());
+        return l_count;
     }
     
     
