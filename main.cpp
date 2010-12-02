@@ -39,14 +39,14 @@ namespace cl        = machinelearning::classifier;
 namespace func      = machinelearning::functionaloptimization;
 namespace linalg    = boost::numeric::bindings::lapack;
 namespace ublas     = boost::numeric::ublas;
-#ifdef CLUSTER
+#ifdef ML_CLUSTER
 namespace mpi	= boost::mpi;
 #endif
 
 
 
 int main(int argc, char* argv[]) {
-    #ifdef CLUSTER
+    #ifdef ML_CLUSTER
     //mpi::environment loMPIenv(argc, argv);
     MPI::Init_thread( argc, argv, MPI_THREAD_SERIALIZED );
     mpi::communicator loMPICom;
@@ -267,7 +267,7 @@ int main(int argc, char* argv[]) {
     const std::size_t ngit      = 25;
     const std::size_t numproto  = 3;
     
-    #ifdef CLUSTER
+    #ifdef ML_CLUSTER
     // extract the data for the process (every process has load the whole data and shuffel them with the broadcasted shuffle vector)
     std::size_t nums     		= data.size1() / loMPICom.size();
     std::size_t protonum 		= numproto / loMPICom.size();
@@ -295,7 +295,7 @@ int main(int argc, char* argv[]) {
     
     
     
-    #ifdef CLUSTER
+    #ifdef ML_CLUSTER
 	ublas::matrix<double> proto                   = tl::matrix::setNumericalZero(ng.getPrototypes(loMPICom));
     ublas::vector<double> qerror                  = tl::vector::copy(ng.getLoggedQuantizationError(loMPICom));
     std::vector< ublas::matrix<double> > logproto = ng.getLoggedPrototypes(loMPICom);
@@ -345,7 +345,7 @@ int main(int argc, char* argv[]) {
     const std::size_t numproto  = 22;
 
     
-    #ifdef CLUSTER
+    #ifdef ML_CLUSTER
     // we must create a shuffle vector for disjoint datasets and shuffle the matrix - it's not nice, but it works
     ublas::vector<std::size_t> disjoint = static_cast< ublas::vector<std::size_t> >( tl::vector::random<double>(data.size1(), tl::random::uniform, 0, data.size1()) );
     mpi::broadcast(loMPICom, disjoint, 0);
@@ -383,7 +383,7 @@ int main(int argc, char* argv[]) {
     
     
     
-    #ifdef CLUSTER
+    #ifdef ML_CLUSTER
 	ublas::matrix<double> proto                   = tl::matrix::setNumericalZero(ng.getPrototypes(loMPICom));
     ublas::vector<double> qerror                  = tl::vector::copy(ng.getLoggedQuantizationError(loMPICom));
     std::vector< ublas::matrix<double> > logproto = ng.getLoggedPrototypes(loMPICom);
@@ -467,7 +467,7 @@ int main(int argc, char* argv[]) {
     std::cout << "\nsymmetric: " << ncd.symmetric(val, true) << std::endl;
     */
     
-    #ifdef CLUSTER
+    #ifdef ML_CLUSTER
     tl::logger::getInstance()->shutdownListener(loMPICom);
     if (loMPICom.rank() == 0)
         std::cout << "\nlog file see: " << tl::logger::getInstance()->getFilename() << std::endl;

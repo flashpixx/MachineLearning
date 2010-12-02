@@ -37,13 +37,13 @@
  * </ul>
  *
  * @section compileroptions Compiler Option
- * global toolbox compilerflags (all compiler flags use the prefix ML_)
+ * global toolbox compilerflags (all compiler flags start the prefix ML_)
  * <ul>
  * <li><pre>ML_RANDOMDEVICE</pre> for using the Boost Device Random support (required Boost Random Device Support), otherwise a Mersenne Twister is used</li>
  * <li><pre>ML_MULTILANGUAGE</pre> option for compiling the framework with multilanguage support (uses gettext)</li>
  * <li><pre>ML_FILES</pre> adds the support for HDF & CSV file reading and writing</li>
  * <li><pre>ML_SOURCES</pre> compiles sources in that way, that e.g. NNTP / Wikipedia data can be read directly</li>
- * <li><pre>CLUSTER</pre> enable MPI Support for the toolbox (required Boost MPI support)</li>
+ * <li><pre>ML_CLUSTER</pre> enable MPI Support for the toolbox (required Boost MPI support)</li>
  * </ul>
  * The following global compiler commands should be set
  * <ul>

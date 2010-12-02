@@ -30,7 +30,7 @@
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 
-#ifdef CLUSTER
+#ifdef ML_CLUSTER
 #include <boost/mpi.hpp>
 #endif
 
@@ -44,7 +44,7 @@
 namespace machinelearning { namespace clustering { namespace nonsupervised {
     
     namespace ublas = boost::numeric::ublas;
-    #ifdef CLUSTER
+    #ifdef ML_CLUSTER
     namespace mpi   = boost::mpi;
     #endif
     
@@ -67,7 +67,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             std::vector<T> getLoggedQuantizationError( void ) const;
             ublas::indirect_array< std::vector<std::size_t> > use( const ublas::matrix<T>& ) const;
             
-            #ifdef CLUSTER
+            #ifdef ML_CLUSTER
             void train( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t& );
             void train( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t&, const T& );
             ublas::matrix<T> getPrototypes( const mpi::communicator& ) const;
@@ -93,7 +93,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             
             T calculateQuantizationError( const ublas::matrix<T>&, const ublas::matrix<T>& ) const;
             
-            #ifdef CLUSTER
+            #ifdef ML_CLUSTER
             /** map with information to every process and prototype **/
             std::map<int, std::pair<std::size_t,std::size_t> > m_processprototypinfo;
             /** map with information to every process and size of data matrix rows **/
@@ -118,7 +118,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         m_logging( false ),
         m_logprototypes( std::vector< ublas::matrix<T> >() ),
         m_quantizationerror( std::vector<T>() )
-        #ifdef CLUSTER
+        #ifdef ML_CLUSTER
         , m_processprototypinfo(),
         m_processdatasize()
         #endif
@@ -338,7 +338,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     }
     
     //======= MPI ==================================================================================================================================
-    #ifdef CLUSTER
+    #ifdef ML_CLUSTER
     
     /** gathering prototypes of every process and return the full prototypes matrix (row oriantated)
      * @param p_mpi MPI object for communication

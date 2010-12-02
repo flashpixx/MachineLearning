@@ -33,7 +33,7 @@
 
 #include <boost/thread.hpp>
 
-#ifdef CLUSTER
+#ifdef ML_CLUSTER
 #define ML_LOGGER_MPI_TAG  999
 #define ML_LOGGER_MPI_EOT  "$EOT$"
 #include <boost/mpi.hpp>
@@ -46,7 +46,7 @@
 
 namespace machinelearning { namespace tools { 
     
-    #ifdef CLUSTER
+    #ifdef ML_CLUSTER
     namespace mpi   = boost::mpi;
     #endif
     
@@ -82,7 +82,7 @@ namespace machinelearning { namespace tools {
             std::string getFilename( void ) const;
             template<typename T> void write( const logstate&, const T& );
                             
-            #ifdef CLUSTER
+            #ifdef ML_CLUSTER
             void startListener( const mpi::communicator& );
             void shutdownListener( const mpi::communicator& );
             template<typename T> void write( const mpi::communicator&, const logstate&, const T& );
@@ -113,7 +113,7 @@ namespace machinelearning { namespace tools {
             void write2file( const std::ostringstream& );
         
         
-            #ifdef CLUSTER
+            #ifdef ML_CLUSTER
         
             /** mutex for creating the listener **/
             boost::mutex m_muxlistener;
@@ -133,7 +133,7 @@ namespace machinelearning { namespace tools {
     inline logger::logger( void ) :
         m_logstate(none),
         m_muxwriter()
-        #ifdef CLUSTER
+        #ifdef ML_CLUSTER
         , m_muxlistener(),
         m_muxfinalize(),
         m_listenerrunnging(false)
@@ -148,7 +148,7 @@ namespace machinelearning { namespace tools {
     /** destructor **/
     inline logger::~logger( void )
     {
-        #ifdef CLUSTER
+        #ifdef ML_CLUSTER
         m_listenerrunnging = false;
         #endif
         m_file.close();
@@ -254,7 +254,7 @@ namespace machinelearning { namespace tools {
     
     
     //======= MPI ==================================================================================================================================
-    #ifdef CLUSTER
+    #ifdef ML_CLUSTER
     
     /** creates the local listener on CPU 0
       * @param p_mpi MPI object
@@ -289,7 +289,7 @@ namespace machinelearning { namespace tools {
         // the EOT is transmitted. This is needed because MPI has no timeslot in which the messages must be received
         if (p_mpi.rank() == 0) {
             std::size_t l_eot = p_mpi.size() - 1;
-            while (l_eot > 0)
+            while (l_eot > 0) {
                 while (boost::optional<mpi::status> l_status = p_mpi.iprobe(mpi::any_source, ML_LOGGER_MPI_TAG)) {
                     std::string l_str;               
                     p_mpi.recv(  l_status->source(), l_status->tag(), l_str );
@@ -301,6 +301,8 @@ namespace machinelearning { namespace tools {
                     } else
                         l_eot--;
                 }
+                boost::this_thread::yield();
+            }
         } else 
             p_mpi.isend(0, ML_LOGGER_MPI_TAG, std::string(ML_LOGGER_MPI_EOT));
         
