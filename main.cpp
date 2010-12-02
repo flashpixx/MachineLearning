@@ -68,7 +68,7 @@ int main(int argc, char* argv[]) {
         std::cout << x[i] << std::endl;*/    
     #endif
     
-    tl::logger::getInstance()->write(loMPICom, tl::logger::warn, "ich teste alles");
+    //tl::logger::getInstance()->write(loMPICom, tl::logger::warn, "ich teste alles");
     
     
     // ===== MDS ======
