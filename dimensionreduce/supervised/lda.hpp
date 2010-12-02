@@ -49,12 +49,15 @@ namespace machinelearning { namespace dimensionreduce { namespace supervised {
             lda( const std::size_t& );
             ublas::matrix<T> map( const ublas::matrix<T>&, const std::vector<L>& );
             std::size_t getDimension( void ) const;
+            ublas::matrix<T> getProject( void ) const;
         
         
         private :
         
             /** target dimension **/
             const std::size_t m_dim;
+            /** project vectors **/
+            ublas::matrix<T> m_project;
     };
     
     
@@ -62,7 +65,8 @@ namespace machinelearning { namespace dimensionreduce { namespace supervised {
      * @param p_dim dimension
     **/
     template<typename T, typename L> inline lda<T,L>::lda( const std::size_t& p_dim) :
-        m_dim(p_dim)
+        m_dim(p_dim),
+        m_project()
     {
         if (p_dim == 0)
             throw exception::runtime(_("dimension must be greater than zero"));
@@ -77,6 +81,15 @@ namespace machinelearning { namespace dimensionreduce { namespace supervised {
         return m_dim;
     }
 
+    
+    /** returns the vectors, which projects the data
+     * @return matrix with vectors
+     **/
+    template<typename T, typename L> ublas::matrix<T> lda<T,L>::getProject( void ) const
+    {
+        return m_project;
+    }
+    
     
     /** caluate and project the input data
      * @param p_data input datamatrix
@@ -137,11 +150,11 @@ namespace machinelearning { namespace dimensionreduce { namespace supervised {
         const ublas::indirect_array< std::vector<std::size_t> > l_rank = tools::vector::rankIndex( l_eigenvalues );
         
         // create projection (largest eigenvectors correspondends with the largest eigenvalues -> last values in rank)
-        ublas::matrix<T> l_project( l_eigenvectors.size2(), m_dim );
+        m_project = ublas::matrix<T>( l_eigenvectors.size2(), m_dim );
         for(std::size_t i=0; i < m_dim; ++i)
-            ublas::column(l_project, i) = ublas::column(l_eigenvectors, l_rank(l_rank.size()-i-1));
+            ublas::column(m_project, i) = ublas::column(l_eigenvectors, l_rank(l_rank.size()-i-1));
         
-        return ublas::prod(p_data, l_project);
+        return ublas::prod(p_data, m_project);
         
         
     }

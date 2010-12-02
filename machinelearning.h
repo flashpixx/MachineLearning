@@ -37,7 +37,7 @@
  * </ul>
  *
  * @section compileroptions Compiler Option
- * global toolbox compilerflags (all compiler flags start the prefix ML_)
+ * toolbox compilerflags
  * <ul>
  * <li><pre>ML_RANDOMDEVICE</pre> for using the Boost Device Random support (required Boost Random Device Support), otherwise a Mersenne Twister is used</li>
  * <li><pre>ML_MULTILANGUAGE</pre> option for compiling the framework with multilanguage support (uses gettext)</li>
@@ -45,7 +45,7 @@
  * <li><pre>ML_SOURCES</pre> compiles sources in that way, that e.g. NNTP / Wikipedia data can be read directly</li>
  * <li><pre>ML_CLUSTER</pre> enable MPI Support for the toolbox (required Boost MPI support)</li>
  * </ul>
- * The following global compiler commands should be set
+ * The following compiler commands should be set
  * <ul>
  * <li><pre>NDEBUG</pre> for disabling Boost and local debugging</li>
  * <li><pre>BOOST_UBLAS_NDEBUG</pre> for disabling Boost UBlas support</li>
@@ -58,6 +58,8 @@
  * @section defs definitions / specifications
  * <ul>
  * <li>data points should be matrix data and the matrix is row-orientated, so for K data points with every point dimension P, we have a K x P matrix (prototype matrices are equal)</li>
+ * <li>all compiler flags start with "ML_"</li>
+ * <li>all structures are in the namespace "machinelearning"</li>
  * </ul>
  *
  * @section ex advanced documentation

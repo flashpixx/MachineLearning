@@ -52,6 +52,7 @@ namespace machinelearning { namespace functionaloptimization {
     /** class for using a (stochastic) gradient descent.
      * For symbolic numerical algorithms @see http://www.ginac.de .
      * GiNaC is not thread-safe, so for the thread we create only std::string vars
+     * @todo uncomplete, so doesn't work
      **/
     template<typename T, std::size_t D=1> class gradientdescent {
         BOOST_STATIC_ASSERT(D > 0);         // array dimension must be greater than 0
