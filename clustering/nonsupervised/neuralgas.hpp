@@ -50,7 +50,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     
     /** class for calculate (batch) neural gas
      * $LastChangedDate$
-     * @todo switch gather operation to "all-to-all" operation http://www.boost.org/doc/libs/1_45_0/doc/html/boost/mpi/all_to_all.html
      * @todo parallel NG with >= 0 prototypes on each CPU
      **/
     template<typename T> class neuralgas : public nonsupervisedclustering<T> {
@@ -370,6 +369,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * of the dot product of every prototype dimension. The prototypes are a matrix-matrix-product of the
      * adaption value and the data values. The matrix-matrix-product is a dot product of rows and columns so
      * the commutativity is used for parallelism / the gathering uses the commutativity for create the correct prototype values
+     * @todo switch gather operation to "all-to-all" operation http://www.boost.org/doc/libs/1_45_0/doc/html/boost/mpi/all_to_all.html
      * @param p_mpi MPI object for communication
      * @param p_localprototypes local prototype matrix
      * @param p_localnorm normalize vector
@@ -420,17 +420,12 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     {
         // gathering the number of prototypes
         std::vector< std::size_t > l_processdata;
-        //for(int i=0; i < p_mpi.size(); ++i)
-        //    mpi::gather(p_mpi, m_prototypes.size1(), l_processdata, i);
-        
         mpi::all_gather(p_mpi, m_prototypes.size1(), l_processdata);
-        
         
         // create map
         std::size_t l_sum = 0;
         for(std::size_t i=0; i < l_processdata.size(); ++i) {
             m_processprototypinfo[static_cast<int>(i)]  = std::pair<std::size_t,std::size_t>(l_sum, l_processdata[i]);
-            
             l_sum += l_processdata[i];
         }
     }
