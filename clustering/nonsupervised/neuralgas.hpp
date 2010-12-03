@@ -423,6 +423,23 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         for(int i=0; i < p_mpi.size(); ++i)
             mpi::gather(p_mpi, m_prototypes.size1(), l_processdata, i);
         
+        
+        if (p_mpi.rank() == 0) {
+            
+            for(std::size_t i=0; i < l_processdata.size(); ++i)
+                std::cout << l_processdata[i] << std::endl;
+         
+            std::vector< std::size_t > l_processdata2;
+            mpi::all_gather(p_mpi, m_prototypes.size1(), l_processdata2);
+            
+            for(std::size_t i=0; i < l_processdata2.size(); ++i)
+                std::cout << l_processdata2[i] << std::endl;
+            
+        }
+        
+        throw exception::runtime(" ");
+        
+        
         // create map
         std::size_t l_sum = 0;
         for(std::size_t i=0; i < l_processdata.size(); ++i) {
