@@ -22,7 +22,8 @@
  **/
 
 /**
- * @mainpage Machine Learning Framework $Rev$
+ * @mainpage Machine Learning Framework
+ * $Rev$
  *
  * @section requirements Requirements
  * <ul>
