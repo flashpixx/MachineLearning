@@ -101,7 +101,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
 
             ublas::matrix<T> gatherPrototypes( const mpi::communicator& ) const;
             void gatherLocalPrototypes( const mpi::communicator&, ublas::matrix<T>&, ublas::vector<T>& );
-            std::size_t gatherNumberPrototypes( const mpi::communicator& ) const;
+            std::size_t getNumberPrototypes( const mpi::communicator& ) const;
             void setProcessPrototypeInfo( const mpi::communicator& );
             #endif
     };
@@ -437,7 +437,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * @param p_mpi MPI object for communication
      * @return number of prototypes
      **/
-    template<typename T> inline std::size_t neuralgas<T>::gatherNumberPrototypes( const mpi::communicator& p_mpi ) const
+    template<typename T> inline std::size_t neuralgas<T>::getNumberPrototypes( const mpi::communicator& p_mpi ) const
     {
         std::size_t l_count = 0;
         mpi::all_reduce(p_mpi, m_prototypes.size1(), l_count, std::plus<std::size_t>());
@@ -476,19 +476,15 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             throw exception::runtime(_("lambda must be greater than zero"));
         
         
-        // process 0 sets the iteration and the lambda and we collect all needed data
+        // we use the max. of all values of each process
         m_processprototypinfo.clear();
-        std::size_t l_iterationsBrd = p_iterations;
-        T l_lambdaBrd               = p_lambda;
         
+        const std::size_t l_iterationsMPI = mpi::all_reduce(p_mpi, p_iterations, mpi::maximum<std::size_t>());
+        const T l_lambdaMPI               = mpi::all_reduce(p_mpi, p_lambda, mpi::maximum<T>());
+        m_logging                         = mpi::all_reduce(p_mpi, m_logging, std::plus<bool>());
         
-        std::cout << l_iterationsBrd << std::endl;
-        std::cout << mpi::all_reduce(p_mpi, p_iterations, mpi::maximum<std::size_t>()) << std::endl;
-        
+        std::cout << m_logging << std::endl;
         throw exception::runtime(" ");
-        
-        mpi::broadcast(p_mpi, l_iterationsBrd, 0);
-        mpi::broadcast(p_mpi, l_lambdaBrd, 0);
         mpi::broadcast(p_mpi, m_logging, 0);
         
         setProcessPrototypeInfo(p_mpi);
@@ -498,23 +494,20 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         if (m_logging) {
             m_logprototypes     = std::vector< ublas::matrix<T> >();
             m_quantizationerror = std::vector< T >();
-            m_logprototypes.reserve(p_iterations);
-            m_quantizationerror.reserve(p_iterations);
+            m_logprototypes.reserve(l_iterationsMPI);
+            m_quantizationerror.reserve(l_iterationsMPI);
         }
         
         
         // run neural gas       
-        const T l_multi = 0.01/p_lambda;
-        T l_lambda      = 0;
-        ublas::vector<T> l_normvec(gatherNumberPrototypes(p_mpi),0);
-        ublas::matrix<T> l_adaptmatrix(l_normvec.size(), p_data.size1() );
-        ublas::vector<T> l_rank;
+        const T l_multi = 0.01/l_lambdaMPI;
+        ublas::vector<T> l_normvec( getNumberPrototypes(p_mpi), 0 );
+        ublas::matrix<T> l_adaptmatrix( l_normvec.size(), p_data.size1() );
         
-        
-        for(std::size_t i=0; (i < l_iterationsBrd); ++i) {
+        for(std::size_t i=0; (i < l_iterationsMPI); ++i) {
             
             // create adapt values
-            l_lambda = l_lambdaBrd * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(l_iterationsBrd));
+            const T l_lambda = l_lambdaMPI * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(l_iterationsMPI));
             
             // we get all prototypes of every process
             ublas::matrix<T> l_prototypes = gatherPrototypes( p_mpi );
@@ -530,7 +523,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             // use the value of the ranking for calculate the 
             // adapt value
             for(std::size_t n=0; n < l_adaptmatrix.size2(); ++n) {
-                l_rank = ublas::column(l_adaptmatrix, n);
+                ublas::vector<T> l_rank = ublas::column(l_adaptmatrix, n);
                 l_rank = tools::vector::rank( l_rank );
                 
                 // calculate adapt value
