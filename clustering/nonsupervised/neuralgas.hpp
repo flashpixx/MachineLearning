@@ -376,38 +376,43 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> inline void neuralgas<T>::gatherLocalPrototypes( const mpi::communicator& p_mpi, ublas::matrix<T>& p_localprototypes, ublas::vector<T>& p_localnorm )
     {
-        std::vector< ublas::matrix<T> > l_localprototypes;
-		std::vector< ublas::vector<T> > l_localnorm;
+        // create for each process the norm and prototypes
+        // we need two vectors, in which the index is the process ID
+
+        std::vector< ublas::matrix<T> > l_prototypes;
+		std::vector< ublas::vector<T> > l_norm;
         for(int i=0; i < p_mpi.size(); ++i) {
 
-            // gather prototypes
+            // prototypes
             ublas::matrix_range< ublas::matrix<T> > l_protorange(p_localprototypes, 
                     ublas::range( m_processprototypinfo[i].first, m_processprototypinfo[i].first + m_processprototypinfo[i].second ), 
                     ublas::range( 0, p_localprototypes.size2() )
             );
-            mpi::gather(p_mpi, static_cast< ublas::matrix<T> >(l_protorange), l_localprototypes, i);
+            l_prototypes.push_back(l_protorange);
 
-            // gather norm
+            //norm
             ublas::vector_range< ublas::vector<T> > l_normrange(p_localnorm,
                     ublas::range( m_processprototypinfo[i].first, m_processprototypinfo[i].first + m_processprototypinfo[i].second )
             );
-            mpi::gather(p_mpi, static_cast< ublas::vector<T> >(l_normrange), l_localnorm, i);
+            l_norm.push_back(l_normrange);
         }
+        
+        
+        // collect the norm and prototype data in each process
+		std::vector< ublas::vector<T> > l_collectnorm;
+        std::vector< ublas::matrix<T> > l_collectprototypes;
+        
+        mpi::all_to_all( p_mpi, l_norm, l_collectnorm );
+        mpi::all_to_all( p_mpi, l_prototypes, l_collectprototypes );
 
-        // create local prototypes (sum) and normalize (sum)
-        // because every dimension of the prototype can be written as a dot product
-        // and the datasets are disjoint sets, so we can create the dot product as disjount sum functions
-        // (normalization in the same way)
-        m_prototypes             = l_localprototypes[0];
-        ublas::vector<T> l_norm  = l_localnorm[0];
-        for(std::size_t i=1; i < l_localprototypes.size(); ++i) {
-            m_prototypes += l_localprototypes[i];
-            l_norm       += l_localnorm[i];
-        }
+        
+        // both std::vectors will be summerized
+                               m_prototypes = std::accumulate( l_collectprototypes.begin(), l_collectprototypes.end(), ublas::matrix<T>(m_prototypes.size1(), m_prototypes.size2(), 0) );
+        const ublas::vector<T> l_sumnorm    = std::accumulate( l_collectnorm.begin(), l_collectnorm.end(), ublas::vector<T>(l_collectnorm[0].size(), 0) );
 
-        for(std::size_t i=0; i < m_prototypes.size1(); ++i)
-            if (!tools::function::isNumericalZero(l_norm(i)))
-                ublas::row(m_prototypes, i) /= l_norm(i);
+        for(std::size_t i=0; i < l_sumnorm.size(); ++i)
+            if (!tools::function::isNumericalZero(l_sumnorm(i)))
+                ublas::row(m_prototypes, i) /= l_sumnorm(i);
     }
 
     
