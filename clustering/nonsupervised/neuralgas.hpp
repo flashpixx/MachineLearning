@@ -98,8 +98,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             /** map with information to every process and prototype**/
             std::map<int, std::pair<std::size_t,std::size_t> > m_processprototypinfo;
 
+            void synchronizePrototypes( const mpi::communicator&, ublas::matrix<T>&, ublas::vector<T>& );
             ublas::matrix<T> gatherPrototypes( const mpi::communicator& ) const;
-            void gatherLocalPrototypes( const mpi::communicator&, ublas::matrix<T>&, ublas::vector<T>& );
             std::size_t getNumberPrototypes( const mpi::communicator& ) const;
             void setProcessPrototypeInfo( const mpi::communicator& );
             #endif
@@ -343,20 +343,19 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     template<typename T> inline ublas::matrix<T> neuralgas<T>::gatherPrototypes( const mpi::communicator& p_mpi ) const
     {
         // gathering in this way, that every process get all prototypes
-        std::vector< ublas::matrix<T> > l_processdata;
-        for(int i=0; i < p_mpi.size(); ++i)
-            mpi::gather(p_mpi, m_prototypes, l_processdata, i);
+        std::vector< ublas::matrix<T> > l_prototypedata;
+        mpi::all_gather(p_mpi, m_prototypes, l_prototypedata);
         
         // create full prototype matrix with processprotos
-        ublas::matrix<T> l_prototypes = l_processdata[0];
-        for(std::size_t i=1; i < l_processdata.size(); ++i) {
-            l_prototypes.resize( l_prototypes.size1()+l_processdata[i].size1(), l_prototypes.size2());
+        ublas::matrix<T> l_prototypes = l_prototypedata[0];
+        for(std::size_t i=1; i < l_prototypedata.size(); ++i) {
+            l_prototypes.resize( l_prototypes.size1()+l_prototypedata[i].size1(), l_prototypes.size2());
 
             ublas::matrix_range< ublas::matrix<T> > l_range(l_prototypes, 
-                    ublas::range( l_prototypes.size1()-l_processdata[i].size1(), l_prototypes.size1() ), 
+                    ublas::range( l_prototypes.size1()-l_prototypedata[i].size1(), l_prototypes.size1() ), 
                     ublas::range( 0, l_prototypes.size2() )
             );
-            l_range.assign(l_processdata[i]);
+            l_range.assign(l_prototypedata[i]);
         }
         
         return l_prototypes;
@@ -364,21 +363,19 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
 
     
 
-    /** gathering prototypes of every process and set with them the local prototypematrix.
+    /** synchronize prototypes of every process and set with them the local prototypematrix.
      * We can not use const references because of the range. The idea is the commutativity
      * of the dot product of every prototype dimension. The prototypes are a matrix-matrix-product of the
      * adaption value and the data values. The matrix-matrix-product is a dot product of rows and columns so
      * the commutativity is used for parallelism / the gathering uses the commutativity for create the correct prototype values
-     * @todo switch gather operation to "all-to-all" operation http://www.boost.org/doc/libs/1_45_0/doc/html/boost/mpi/all_to_all.html
      * @param p_mpi MPI object for communication
      * @param p_localprototypes local prototype matrix
      * @param p_localnorm normalize vector
      **/
-    template<typename T> inline void neuralgas<T>::gatherLocalPrototypes( const mpi::communicator& p_mpi, ublas::matrix<T>& p_localprototypes, ublas::vector<T>& p_localnorm )
+    template<typename T> inline void neuralgas<T>::synchronizePrototypes( const mpi::communicator& p_mpi, ublas::matrix<T>& p_localprototypes, ublas::vector<T>& p_localnorm )
     {
         // create for each process the norm and prototypes
-        // we need two vectors, in which the index is the process ID
-
+        // we need two vectors, in which the index is the process ID and sends the data back to the process
         std::vector< ublas::matrix<T> > l_prototypes;
 		std::vector< ublas::vector<T> > l_norm;
         for(int i=0; i < p_mpi.size(); ++i) {
@@ -410,6 +407,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
                                m_prototypes = std::accumulate( l_collectprototypes.begin(), l_collectprototypes.end(), ublas::matrix<T>(m_prototypes.size1(), m_prototypes.size2(), 0) );
         const ublas::vector<T> l_sumnorm    = std::accumulate( l_collectnorm.begin(), l_collectnorm.end(), ublas::vector<T>(l_collectnorm[0].size(), 0) );
 
+        // normalize the prototypes
         for(std::size_t i=0; i < l_sumnorm.size(); ++i)
             if (!tools::function::isNumericalZero(l_sumnorm(i)))
                 ublas::row(m_prototypes, i) /= l_sumnorm(i);
@@ -541,7 +539,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             for(std::size_t n=0; n < l_prototypes.size1(); ++n)
                 l_normvec(n) = ublas::sum( ublas::row(l_adaptmatrix, n) );
 
-            gatherLocalPrototypes(p_mpi, l_prototypes, l_normvec);
+            synchronizePrototypes(p_mpi, l_prototypes, l_normvec);
             
             
             // determine quantization error for logging
