@@ -159,7 +159,7 @@
     ublas::indirect_array< std::vector<std::size_t> > protoidx = ng.use(unkown);
  * @endcode
  *
- * @section rlvq relevance vector quantization (RLVQ)
+ * @section rlvq relevance learning vector quantization (RLVQ)
  * @code
     ublas::matrix<double> data = / fill data (row orientated) /;
     std::vector<std::string> labels = / fill label for each row /;
