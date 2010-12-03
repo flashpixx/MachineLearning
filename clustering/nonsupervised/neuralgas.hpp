@@ -482,11 +482,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         const std::size_t l_iterationsMPI = mpi::all_reduce(p_mpi, p_iterations, mpi::maximum<std::size_t>());
         const T l_lambdaMPI               = mpi::all_reduce(p_mpi, p_lambda, mpi::maximum<T>());
         m_logging                         = mpi::all_reduce(p_mpi, m_logging, std::plus<bool>());
-        
-        std::cout << m_logging << std::endl;
-        throw exception::runtime(" ");
-        mpi::broadcast(p_mpi, m_logging, 0);
-        
         setProcessPrototypeInfo(p_mpi);
          
         
