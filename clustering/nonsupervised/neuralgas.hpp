@@ -49,7 +49,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     #endif
     
     /** class for calculate (batch) neural gas
-     * @date $LastChangedDate$
+     * $LastChangedDate$
      * @todo switch gather operation to "all-to-all" operation http://www.boost.org/doc/libs/1_45_0/doc/html/boost/mpi/all_to_all.html
      * @todo parallel NG with >= 0 prototypes on each CPU
      **/
