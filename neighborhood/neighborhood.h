@@ -23,7 +23,9 @@
 
 
 
-/** header file to connect all tools library for one include **/
+/** header file to connect all tools library for one include
+ * $LastChangedDate$
+ **/
 
 #ifndef MACHINELEARNING_NEIGHBORHOOD_H
 #define MACHINELEARNING_NEIGHBORHOOD_H

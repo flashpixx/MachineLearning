@@ -52,6 +52,7 @@ namespace machinelearning { namespace tools {
     
 
     /** logger class for writing log information 
+     * $LastChangedDate$
      * @note for MPI using every process must call startListener and shutdownListener for synchronize the CPUs and the tag for logtargets is set with a preprocessor flag (ML_LOGGER_MPI_TAG).
      * The singletone object works only "between" the calls start- and shutdownListener because the MPI object must exists. The connection is closed in the shutdown call and use a message
      * that is defined with the preprocessor flog ML_LOGGER_MPI_EOT.

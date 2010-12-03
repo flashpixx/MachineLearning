@@ -37,7 +37,9 @@
 namespace machinelearning { namespace tools {
     
     
-    /** class for create langugage bindings **/
+    /** class for create langugage bindings
+     * $LastChangedDate$
+     **/
     class language {
       
         public :

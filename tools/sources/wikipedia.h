@@ -47,6 +47,7 @@ namespace machinelearning { namespace tools { namespace sources {
     /** class for reading Wikipedia article.
      * The data will received over a HTTP socket for each call and uses the nativ C interface of libxml2 for parsing the XML data.
      * There are no simple C++ interfaces for XML data, so we use the C source within the class. 
+     * $LastChangedDate$
      * @see http://tools.ietf.org/html/rfc2616 [old http://tools.ietf.org/html/rfc1945]
      **/
     class wikipedia {

@@ -21,6 +21,10 @@
  @endcond
  **/
 
+/** header file for function optimization
+ * $LastChangedDate$
+ **/
+
 #ifndef MACHINELEARNING_FUNCTIONALOPTIMIZATION_H
 #define MACHINELEARNING_FUNCTIONALOPTIMIZATION_H
 

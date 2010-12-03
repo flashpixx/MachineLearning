@@ -42,7 +42,9 @@ namespace machinelearning { namespace classifier {
     namespace ublas   = boost::numeric::ublas;
     
     
-    /** class for create a lazy learner **/
+    /** class for create a lazy learner
+     * $LastChangedDate$
+     **/
     template<typename T, typename L> class lazylearner : public classifier<T, L>  {
         
         public :

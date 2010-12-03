@@ -39,6 +39,7 @@ namespace machinelearning { namespace clustering {
     
     
     /** abstract class for all supervised clustering classes
+     * $LastChangedDate$
      * @note every data / prototype matrix must be row orientated.
      * data matrix NxM with n number of datapoints and M data dimension
      **/      
@@ -89,6 +90,7 @@ namespace machinelearning { namespace clustering {
     
     
     /** abstract class for all non-supervised clustering classes
+     * $LastChangedDate$
      * @note every data / prototype matrix must be row orientated.
      * data matrix NxM with n number of datapoints and M data dimension
      **/      

@@ -39,7 +39,9 @@ namespace machinelearning { namespace neighborhood {
     
     
     
-    /** abstract class for neighborhood classes. **/      
+    /** abstract class for neighborhood classes
+     * $LastChangedDate$
+     **/      
     template<typename T> class neighborhood {
         
         

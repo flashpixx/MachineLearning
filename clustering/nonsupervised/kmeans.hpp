@@ -42,7 +42,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     
     
     
-    /** class for calculate (batch) k-means **/
+    /** class for calculate (batch) k-means
+     * $LastChangedDate$
+     **/
     template<typename T> class kmeans : public nonsupervisedclustering<T> {
         
         public:

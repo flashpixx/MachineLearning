@@ -23,9 +23,6 @@
 
 
 
-/** template header file with implementation for some vector functions **/
-
-
 #ifndef MACHINELEARNING_TOOLS_VECTOR_HPP
 #define MACHINELEARNING_TOOLS_VECTOR_HPP
 
@@ -74,7 +71,9 @@ namespace machinelearning { namespace tools {
     namespace lam   = boost::lambda;
     
     
-    /** class for vector operations **/
+    /** class for vector operations
+     * $LastChangedDate$
+     **/
     class vector {
         
         public :

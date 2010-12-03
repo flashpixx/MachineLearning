@@ -41,7 +41,9 @@ namespace machinelearning { namespace dimensionreduce { namespace supervised {
 
     
     
-    /** class for projection the (Fisher) lineare discriminant analysis (LDA) **/
+    /** class for projection the (Fisher) lineare discriminant analysis (LDA)
+     * $LastChangedDate$
+     **/
     template<typename T, typename L> class lda : public supervisedreduce<T,L> {
         
         public :

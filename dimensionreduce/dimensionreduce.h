@@ -21,7 +21,9 @@
  @endcond
  **/
 
-/** header file to connect all dimensional reducing algorithm for one include **/
+/** header file to connect all dimensional reducing algorithm for one include
+ * $LastChangedDate$
+ **/
 
 #ifndef MACHINELEARNING_DIMENSIONREDUCE_H
 #define MACHINELEARNING_DIMENSIONREDUCE_H

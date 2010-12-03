@@ -21,7 +21,9 @@
  @endcond
  **/
 
-/** header file to connect all clustering algorithm for one include **/
+/** header file to connect all clustering algorithm for one include 
+ * $LastChangedDate$
+ **/
 
 #ifndef MACHINELEARNING_CLASSIFIER_H
 #define MACHINELEARNING_CLASSIFIER_H

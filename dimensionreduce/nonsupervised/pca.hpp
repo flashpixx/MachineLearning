@@ -37,7 +37,9 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     namespace ublas  = boost::numeric::ublas;
 
     
-    /** create the Principal Component Analysis (PCA) **/
+    /** create the Principal Component Analysis (PCA)
+     * $LastChangedDate$
+     **/
     template<typename T> class pca : public nonsupervisedreduce<T> {
         
         public :

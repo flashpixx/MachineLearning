@@ -23,7 +23,9 @@
 
 #ifdef SOURCES
 
-/** headerfile for include all sources **/
+/** headerfile for include all sources
+ * $LastChangedDate$
+ **/
 
 #ifndef MACHINELEARNING_TOOLS_SOURCES_H
 #define MACHINELEARNING_TOOLS_SOURCES_H

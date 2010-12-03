@@ -45,6 +45,7 @@ namespace machinelearning { namespace neighborhood {
     
     
     /** implementation for the k-nearest-neighbor
+     * $LastChangedDate$
      * @todo recreate the data structur with kd-trees for optimizing
      **/
     template<typename T> class knn : public neighborhood<T> {

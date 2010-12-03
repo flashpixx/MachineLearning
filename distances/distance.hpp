@@ -40,6 +40,7 @@ namespace machinelearning { namespace distances {
     
     /** abstract class for distance classes. Calculates 
      * between matrix-, vectordata and weighted data
+     * $LastChangedDate$
      **/      
     template<typename T> class distance {
         

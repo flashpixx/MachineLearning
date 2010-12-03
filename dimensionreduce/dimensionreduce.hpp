@@ -38,7 +38,9 @@ namespace machinelearning { namespace dimensionreduce {
     
     
     
-    /** abstract class for nonsupervised dimension reducing classes **/      
+    /** abstract class for nonsupervised dimension reducing classes
+     * $LastChangedDate$
+     **/      
     template<typename T> class nonsupervisedreduce {
         
         public :
@@ -58,7 +60,9 @@ namespace machinelearning { namespace dimensionreduce {
 
     
     
-    /** abstract class for supervised dimension reducing classes **/      
+    /** abstract class for supervised dimension reducing classes
+     * $LastChangedDate$
+     **/      
     template<typename T, typename L> class supervisedreduce {
         
         public :

@@ -42,7 +42,9 @@ namespace machinelearning { namespace distances {
     namespace blas   = boost::numeric::bindings::blas;
 
     
-    /** class for calculating euclid distance beween datapoints **/
+    /** class for calculating euclid distance beween datapoints
+     * $LastChangedDate$
+     **/
     template<typename T> class euclid : public distance<T> {
         
 
