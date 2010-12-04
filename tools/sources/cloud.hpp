@@ -48,10 +48,18 @@ namespace machinelearning { namespace tools { namespace sources {
         
         
         public :
+        
+            enum cloudecreate {
+                all         = 0,
+                alternate   = 1,
+                random      = 2
+            };
+        
+        
             
             cloud( const std::size_t& );
         
-            ublas::matrix<T> generate( void ) const;
+            ublas::matrix<T> generate( const cloudecreate& = alternate, const T& = 0 ) const;
         
             void setVariance( const std::size_t&, const T& );
             void setVarianceRandom( const std::size_t&, const bool& );
@@ -85,7 +93,7 @@ namespace machinelearning { namespace tools { namespace sources {
         m_dimension( p_dim ),
         m_mean( p_dim, 0 ),
         m_variance( p_dim, 1 ),
-        m_sampling(p_dim, 10)
+        m_sampling(p_dim, 5)
     {
         if (p_dim == 0)
             throw exception::runtime(_("number dimensions must be greater than zero"));
@@ -95,7 +103,7 @@ namespace machinelearning { namespace tools { namespace sources {
             m_randomvariance.push_back( true );
             
             m_randompoints.push_back( true );
-            m_points.push_back( std::pair<std::size_t,std::size_t>(100, 500) );
+            m_points.push_back( std::pair<std::size_t,std::size_t>(0, 500) );
             
             m_range.push_back( std::pair<T,T>(0,1) );
         }
@@ -112,8 +120,8 @@ namespace machinelearning { namespace tools { namespace sources {
         if ( p_dim >= m_dimension )
             throw exception::runtime(_("dimension must be smaller than saved dimension"));
         
-        if (tools::function::isNumericalZero(p_var))
-            throw exception::runtime(_("varians need not be zero"));
+        if ( (tools::function::isNumericalZero(p_var)) || (p_var > 1))
+            throw exception::runtime(_("variance must between (0,1]"));
         
         m_variance(p_dim)       = p_var;
         m_randomvariance[p_dim] = false;
@@ -141,6 +149,9 @@ namespace machinelearning { namespace tools { namespace sources {
     {
         if ( p_dim >= m_dimension )
             throw exception::runtime(_("dimension must be smaller than saved dimension"));
+        
+        if ((p_var < -1) || (p_var > 1))
+            throw exception::runtime(_("mean value must be between [-1,1]"));
         
         m_mean(p_dim)       = p_var;
         m_randommean[p_dim] = false;
@@ -214,11 +225,14 @@ namespace machinelearning { namespace tools { namespace sources {
     
     
     
-    /** generates the clouds **/
-    template<typename T> inline ublas::matrix<T> cloud<T>::generate( void ) const
+    /** generates the clouds
+     * @param p_build type of cloud generation
+     * @param p_random random value for random-cloud-generation
+     **/
+    template<typename T> inline ublas::matrix<T> cloud<T>::generate( const cloudecreate& p_build, const T& p_random ) const
     {
-        
-
+        if ( (p_build == random) && ((p_random < 0) || (p_random > 1)) )
+            throw exception::runtime(_("random value must be between [0,1]"));
         
     }
     
