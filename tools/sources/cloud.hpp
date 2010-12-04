@@ -116,7 +116,7 @@ namespace machinelearning { namespace tools { namespace sources {
             throw exception::runtime(_("varians need not be zero"));
         
         m_variance(p_dim)       = p_var;
-        m_randomvariance[p_dim] = true;
+        m_randomvariance[p_dim] = false;
     }
     
     
@@ -143,7 +143,7 @@ namespace machinelearning { namespace tools { namespace sources {
             throw exception::runtime(_("dimension must be smaller than saved dimension"));
         
         m_mean(p_dim)       = p_var;
-        m_randommean[p_dim] = true;
+        m_randommean[p_dim] = false;
     }
     
     
@@ -174,7 +174,7 @@ namespace machinelearning { namespace tools { namespace sources {
             throw exception::runtime(_("minimal value is greater than maximal value"));
         
         m_points[p_dim]       = std::pair<std::size_t,std::size_t>(p_min, p_max);
-        m_randompoints[p_dim] = true;
+        m_randompoints[p_dim] = false;
     }
     
     
@@ -217,6 +217,9 @@ namespace machinelearning { namespace tools { namespace sources {
     /** generates the clouds **/
     template<typename T> inline ublas::matrix<T> cloud<T>::generate( void ) const
     {
+        
+
+        
     }
     
     
