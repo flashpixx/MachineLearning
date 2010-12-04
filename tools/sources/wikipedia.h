@@ -21,10 +21,12 @@
  @endcond
  **/
 
-#ifdef SOURCES
+#ifdef ML_SOURCES
 
 #ifndef MACHINELEARNING_TOOLS_SOURCES_WIKIPEDIA_H
 #define MACHINELEARNING_TOOLS_SOURCES_WIKIPEDIA_H
+
+#define ML_WIKIPEDIA_HTTPAGENT  "Machine-Learning-Toolbox"
 
 #include <algorithm>
 #include <boost/asio.hpp>
@@ -71,6 +73,7 @@ namespace machinelearning { namespace tools { namespace sources {
             std::vector<std::string> getArticleAcronym( void ) const;
             bool isAcronym( void ) const;
             bool isArticle( void ) const;
+            void setHTTPAgent( const std::string& );
         
             ~wikipedia( void );
         
@@ -122,6 +125,8 @@ namespace machinelearning { namespace tools { namespace sources {
             wikiarticle m_article;
             /** acronym vector **/
             std::vector<std::string> m_acronym;
+            /** name for the HTTP agent **/
+            std::string m_httpagent;
 
         
             wikiproperties getProperties( const language& ) const;
@@ -144,7 +149,8 @@ namespace machinelearning { namespace tools { namespace sources {
         m_lastendpoint(),
         m_articlefound( false ),
         m_acronymfound( false ),
-        m_acronym()
+        m_acronym(),
+        m_httpagent(ML_WIKIPEDIA_HTTPAGENT)
     {}
     
     
@@ -296,6 +302,16 @@ namespace machinelearning { namespace tools { namespace sources {
         getArticle( l_url.substr(l_found+1), l_prop.lang );
     }
     
+    
+    /** sets the name of the HTTP agent
+     * @param p_agent name
+     **/
+    inline void wikipedia::setHTTPAgent( const std::string& p_agent) 
+    {
+        if (p_agent.empty())
+            throw exception::runtime(_("HTTP agent name need not be empty"));
+        m_httpagent = p_agent;
+    }
     
     
     /** returns the article content
@@ -536,7 +552,7 @@ namespace machinelearning { namespace tools { namespace sources {
         l_request_stream << "GET " << p_path << " HTTP/1.1\r\n";
         l_request_stream << "Host: " << p_server << "\r\n";
         l_request_stream << "Accept: */*\r\n";
-        l_request_stream << "User-Agent: Machine-Learning-Toolbox\r\n";
+        l_request_stream << "User-Agent: " << m_httpagent << "\r\n";
         l_request_stream << "Connection: close\r\n\r\n";
         
         boost::asio::write( m_socket, l_request );

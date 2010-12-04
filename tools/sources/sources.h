@@ -21,7 +21,7 @@
  @endcond
  **/
 
-#ifdef SOURCES
+#ifdef ML_SOURCES
 
 /** headerfile for include all sources
  * $LastChangedDate$

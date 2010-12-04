@@ -61,7 +61,7 @@ int main(int argc, char* argv[]) {
     #endif
     
     #ifdef ML_FILES
-    tl::files::hdf o("blub.hdf5");
+    //tl::files::hdf o("blub.hdf5");
     /*tl::files::hdf o("string.hdf5");
     std::vector<std::string> x = o.readStringVector("/array");
     for(std::size_t i=0; i < x.size(); ++i)
@@ -81,8 +81,8 @@ int main(int argc, char* argv[]) {
    
     
     // ===== Wikipedia ======
-    /*
-    #ifdef SOURCES
+    
+    #ifdef ML_SOURCES
     tl::sources::wikipedia w;
     //w.getArticle("schäfer");
     //w.getArticle("RMI");
@@ -100,14 +100,14 @@ int main(int argc, char* argv[]) {
         std::cout << k[i] << std::endl;
     
     #endif
-    */
+    
     
     
     // ===== Newsgroup ======
     /*
     // dt. große Gruppen: de.soc.politik.misc, de.rec.fotografie, de.talk.tagesgeschehen, de.etc.sprache.deutsch, de.comp.os.unix.linux.misc, de.sci.electronics, de.etc.fahrzeug.auto, de.comp.sys.mac.misc, de.comp.lang.java, de.soc.weltanschauung.christentum
     
-    #ifdef SOURCES    
+    #ifdef ML_SOURCES    
     tl::sources::nntp x("news.online.de");
     //tl::sources::nntp x("news.tu-clausthal.de");
     //tl::sources::nntp x("news.t-online.de");
@@ -332,7 +332,8 @@ int main(int argc, char* argv[]) {
     */
     
    
-    // ===== NG =====    
+    // ===== NG =====
+    /*
     //ublas::matrix<double> data = o.readMatrix<double>("/ngdata", H5::PredType::NATIVE_DOUBLE);
     //ublas::matrix<double> data = o.readMatrix<double>("/ngmini", H5::PredType::NATIVE_DOUBLE);
     ublas::matrix<double> data = o.readMatrix<double>("/ngbigdata", H5::PredType::NATIVE_DOUBLE);
@@ -416,7 +417,7 @@ int main(int argc, char* argv[]) {
             f.write<double>("/log" + boost::lexical_cast<std::string>( i ), tl::matrix::setNumericalZero(logproto[i]), H5::PredType::NATIVE_DOUBLE );
     }
     #endif
-    
+    */
     
     
     // ===== RLVQ ======
