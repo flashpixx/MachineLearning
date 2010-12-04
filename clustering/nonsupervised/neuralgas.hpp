@@ -577,8 +577,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     {
         // we must gather every logged prototype and create the full prototype matrix
         std::vector< std::vector< ublas::matrix<T> > > l_gatherProto;
-        for(int i=0; i < p_mpi.size(); ++i)
-            mpi::gather(p_mpi, m_logprototypes, l_gatherProto, i);
+        mpi::all_gather(p_mpi, m_logprototypes, l_gatherProto);
         
         // now we create the full prototype matrix for every log
         std::vector< ublas::matrix<T> > l_logProto = l_gatherProto[0];
