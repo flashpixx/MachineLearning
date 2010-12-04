@@ -23,16 +23,27 @@
 
 #ifdef ML_SOURCES
 
-/** headerfile for include all sources
- * $LastChangedDate$
- **/
+#ifndef MACHINELEARNING_TOOLS_SOURCES_CLOUD_HPP
+#define MACHINELEARNING_TOOLS_SOURCES_CLOUD_HPP
 
-#ifndef MACHINELEARNING_TOOLS_SOURCES_H
-#define MACHINELEARNING_TOOLS_SOURCES_H
 
-#include "nntp.h"
-#include "wikipedia.h"
-#include "cloud.hpp"
+
+#include "../../exception/exception.h"
+#include "../language/language.h"
+
+
+namespace machinelearning { namespace tools { namespace sources {
+    
+    namespace ublas  = boost::numeric::ublas;
+    
+    
+    template<typename T> class cloud {
+        
+    };
+    
+    
+};};};
+
 
 #endif
 #endif

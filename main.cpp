@@ -81,7 +81,7 @@ int main(int argc, char* argv[]) {
    
     
     // ===== Wikipedia ======
-    
+    /*
     #ifdef ML_SOURCES
     tl::sources::wikipedia w;
     //w.getArticle("schäfer");
@@ -100,7 +100,7 @@ int main(int argc, char* argv[]) {
         std::cout << k[i] << std::endl;
     
     #endif
-    
+    */
     
     
     // ===== Newsgroup ======
@@ -123,7 +123,9 @@ int main(int argc, char* argv[]) {
     for (std::multimap<std::size_t, std::string>::iterator it = newsgroups.begin(); it != newsgroups.end(); ++it)
         std::cout << it->second << "\t\t\t" << it->first << std::endl;
     
-    
+    std::cout << "\n>=================================================================================<" << std::endl;
+     
+     
     x.setContent( tl::sources::nntp::full );
     x.setGroup("1und1.announce");
     //x.setGroup("tuc.misc");
