@@ -75,6 +75,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             std::vector< ublas::matrix<T> > getLoggedPrototypes( const mpi::communicator& ) const;
             std::vector<T> getLoggedQuantizationError( const mpi::communicator& ) const;
             ublas::indirect_array< std::vector<std::size_t> > use( const mpi::communicator&, const ublas::matrix<T>& ) const;
+            void use( const mpi::communicator& ) const;
             #endif
         
         
@@ -653,6 +654,15 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         return ublas::indirect_array< std::vector<std::size_t> >(l_vec.size(), l_vec);
     }
     
+    
+    /** blank method for receiving all prototypes. The method can be used in combination with the use-method and the matrix parameter, so
+     * only one process can calculate the distances between prototypes and its data, all other process must call only this methode
+     * @param p_mpi MPI object for communication 
+     **/
+    template<typename T> inline void neuralgas<T>::use( const mpi::communicator& p_mpi ) const
+    {
+        gatherAllPrototypes( p_mpi );
+    }
     
     #endif
     
