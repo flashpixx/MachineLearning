@@ -312,8 +312,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     **/
     template<typename T> inline ublas::indirect_array< std::vector<std::size_t> > neuralgas<T>::use( const ublas::matrix<T>& p_data ) const
     {
-        if (p_data.size1() < m_prototypes.size1())
-            throw exception::runtime(_("number of datapoints are less than prototypes"));
+        if (p_data.size2() != m_prototypes.size2())
+            throw exception::runtime(_("data and prototype dimension are not equal"));
         
         std::vector<std::size_t> l_vec(p_data.size1());
         ublas::matrix<T> l_distance(m_prototypes.size1(), p_data.size1());
@@ -629,8 +629,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> inline ublas::indirect_array< std::vector<std::size_t> > neuralgas<T>::use( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data ) const
     {
-        if (p_data.size1() < m_prototypes.size1())
-            throw exception::runtime(_("number of datapoints are less than prototypes"));
+        if (p_data.size2() != m_prototypes.size2())
+            throw exception::runtime(_("data and prototype dimension are not equal"));
         
         //first we gathering all other prototypes
         const ublas::matrix<T> l_prototypes = gatherAllPrototypes( p_mpi );
