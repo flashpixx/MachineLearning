@@ -62,10 +62,10 @@ namespace machinelearning { namespace tools { namespace sources {
         
             ublas::matrix<T> generate( const bool& = true, const cloudecreate& = alternate, const T& = 0 ) const;
         
-            void setScale( const std::size_t&, const T& );
-            void setScaleRandom( const std::size_t&, const bool& );
-            void setPoints( const std::size_t&, const std::size_t&, const std::size_t& );
-            void setPointsRandom( const std::size_t&, const bool& );
+            void setScale( const T& );
+            void setScaleRandom( const bool& );
+            void setPoints( const std::size_t&, const std::size_t& );
+            void setPointsRandom( const bool& );
             void setRange( const std::size_t&, const T&, const T&, const std::size_t& );
         
         
@@ -74,11 +74,11 @@ namespace machinelearning { namespace tools { namespace sources {
             /** number of dimensions **/
             const std::size_t m_dimension;
         
-            std::vector<bool> m_randomscale;
-            std::vector<bool> m_randompoints;
-            ublas::vector<T> m_scale;
+            bool m_randompoints;
+            std::pair<std::size_t,std::size_t> m_points;
+            T m_scale;
+            bool m_randomscale;
             ublas::vector<std::size_t> m_sampling;
-            std::vector< std::pair<std::size_t,std::size_t> > m_points;
             std::vector< std::pair<T,T> > m_range;
         
             void createCenter( const std::vector< ublas::vector<T> >&, const std::size_t&, ublas::vector<T>&, ublas::matrix<T>& ) const;
@@ -90,82 +90,62 @@ namespace machinelearning { namespace tools { namespace sources {
      **/
     template<typename T> inline cloud<T>::cloud( const std::size_t& p_dim ) :
         m_dimension( p_dim ),
-        m_scale( p_dim, 1 ),
+        m_randompoints( true ),
+        m_points( std::pair<std::size_t,std::size_t>(100, 500) ),
+        m_scale( 1 ),
+        m_randomscale( false ),
         m_sampling(p_dim, 5)
     {
         if (p_dim < 2)
             throw exception::runtime(_("number dimensions must be greater than one"));
         
-        for(std::size_t i=0; i < p_dim; ++i) {
-            m_randomscale.push_back( false );
-            
-            m_randompoints.push_back( true );
-            m_points.push_back( std::pair<std::size_t,std::size_t>(0, 500) );
-            
+        for(std::size_t i=0; i < p_dim; ++i)
             m_range.push_back( std::pair<T,T>(0,1) );
-        }
-        
     }
     
     
-    /** scales the values in the dimension
-     * @param p_dim dimension value (between [0, max. dimension)
+    /** scales the distribution values
      * @param p_var scale
      **/
-    template<typename T> inline void cloud<T>::setScale( const std::size_t& p_dim, const T& p_var )
+    template<typename T> inline void cloud<T>::setScale( const T& p_var )
     {
-        if ( p_dim >= m_dimension )
-            throw exception::runtime(_("dimension must be smaller than saved dimension"));
-        
         if (tools::function::isNumericalZero(p_var))
             throw exception::runtime(_("scale need not be zero"));
         
-        m_scale(p_dim)       = p_var;
-        m_randomscale[p_dim] = false;
+        m_scale       = p_var;
+        m_randomscale = false;
     }
     
     
     /** enable / disable random value for scaling
-     * @param p_dim dimension value (between [0, max. dimension)
      * @param p_bool bool for enable / disable
      **/
-    template<typename T> inline void cloud<T>::setScaleRandom( const std::size_t& p_dim, const bool& p_bool )
+    template<typename T> inline void cloud<T>::setScaleRandom( const bool& p_bool )
     {
-        if ( p_dim >= m_dimension )
-            throw exception::runtime(_("dimension must be smaller than saved dimension"));
-        
-        m_randomscale[p_dim] = p_bool;
+        m_randomscale = p_bool;
     }
     
     
     /** sets the minimal and maximal number of points
-     * @param p_dim dimension value (between [0, max. dimension)
      * @param p_min minimal number of points
      * @param p_max maximal number of points
      **/
-    template<typename T> inline void cloud<T>::setPoints( const std::size_t& p_dim, const std::size_t& p_min, const std::size_t& p_max )
+    template<typename T> inline void cloud<T>::setPoints( const std::size_t& p_min, const std::size_t& p_max )
     {
-        if ( p_dim >= m_dimension )
-            throw exception::runtime(_("dimension must be smaller than saved dimension"));
-        
         if (p_min > p_max)
             throw exception::runtime(_("minimal value is greater than maximal value"));
         
-        m_points[p_dim]       = std::pair<std::size_t,std::size_t>(p_min, p_max);
-        m_randompoints[p_dim] = false;
+        m_points       = std::pair<std::size_t,std::size_t>(p_min, p_max);
+        m_randompoints = false;
     }
     
     
     /** enable / disable random value for number of points
-     * @param p_dim dimension value (between [0, max. dimension)
      * @param p_bool bool for enable / disable
      **/     
-    template<typename T> inline void cloud<T>::setPointsRandom( const std::size_t& p_dim, const bool& p_bool )
+    template<typename T> inline void cloud<T>::setPointsRandom( const bool& p_bool )
     {
-        if ( p_dim >= m_dimension )
-            throw exception::runtime(_("dimension must be smaller than saved dimension"));
-        
-        m_randompoints[p_dim] = p_bool;
+        m_randompoints = p_bool;
     }
     
     
@@ -227,14 +207,15 @@ namespace machinelearning { namespace tools { namespace sources {
         tools::random l_rand;
         for(std::size_t i=0; i < l_center.size1(); ++i) {
         
-            std::size_t l_numpoints;
-            /*if (m_randompoints[i] && (m_range[i].first != m_range[i].second))
-                l_numpoints = static_cast<std::size_t>(l_rand.get<T>( tools::random::uniform, m_range[i].first, m_range[i].second ));
-            else*/
-            //    l_numpoints = 0.5 * (m_range[i].second + m_range[i].first) ;
+            std::size_t l_numpoints = 0;
+            if (m_randompoints && (m_points.first != m_points.second))
+                l_numpoints = static_cast<std::size_t>(l_rand.get<T>( tools::random::uniform, m_points.first, m_points.second ));
+            else
+                l_numpoints = 0.5 * (m_points.second + m_points.first) ;
             
-            //std::cout << l_numpoints << std::endl;
-
+            
+            ublas::matrix<T> l_points = tools::matrix::random<T>( l_numpoints, l_center.size2(), tools::random::uniform, -1, 1 );
+            
         }
         
         
