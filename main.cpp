@@ -71,8 +71,10 @@ int main(int argc, char* argv[]) {
     //tl::logger::getInstance()->write(loMPICom, tl::logger::warn, "ich teste alles");
     
     tl::sources::cloud<double> x(2);
-    x.setRange(0, 0, 1, 2);
-    x.setRange(1, 0, 1, 2);
+    x.setPointsRandom(0, false);
+    x.setPointsRandom(1, false);
+    x.setRange(0, 0, 1, 4);
+    x.setRange(1, 0, 1, 4);
     x.generate();
     
     

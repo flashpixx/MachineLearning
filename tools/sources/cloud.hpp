@@ -32,7 +32,8 @@
 
 #include "../../exception/exception.h"
 #include "../language/language.h"
-#include "../vector.hpp"
+#include "../matrix.hpp"
+#include "../random.hpp"
 #include "../function.hpp"
 
 
@@ -79,6 +80,8 @@ namespace machinelearning { namespace tools { namespace sources {
             ublas::vector<std::size_t> m_sampling;
             std::vector< std::pair<std::size_t,std::size_t> > m_points;
             std::vector< std::pair<T,T> > m_range;
+        
+            void createCenter( const std::vector< ublas::vector<T> >&, const std::size_t&, ublas::vector<T>&, ublas::matrix<T>& ) const;
     };
     
     
@@ -194,7 +197,7 @@ namespace machinelearning { namespace tools { namespace sources {
      * @param p_build type of cloud generation
      * @param p_random random value for random-cloud-generation
      **/
-    template<typename T> inline ublas::matrix<T> cloud<T>::generate( const bool&, p_shuffle, const cloudecreate& p_build, const T& p_random ) const
+    template<typename T> inline ublas::matrix<T> cloud<T>::generate( const bool& p_shuffle, const cloudecreate& p_build, const T& p_random ) const
     {
         if ( (p_build == random) && ((p_random < 0) || (p_random > 1)) )
             throw exception::runtime(_("random value must be between [0,1]"));
@@ -204,37 +207,60 @@ namespace machinelearning { namespace tools { namespace sources {
         for(std::size_t i=0; i < l_sampleadaption.size(); ++i)
             l_sampleadaption(i) = (m_range[i].second - m_range[i].first) / m_sampling(i);
         
-        // samples for each dimension
+        // samples for each dimension (begin / end values are not used)
         std::vector< ublas::vector<T> > l_samples;
         for(std::size_t i=0; i < m_dimension; ++i) {
-            ublas::vector<T> l_val( m_sampling(i)+1 );
+            ublas::vector<T> l_val( m_sampling(i)-1 );
             for(std::size_t j=0; j < l_val.size(); ++j)
-                l_val(j) = m_range[i].first + j*l_sampleadaption(i);
+                l_val(j) = m_range[i].first + (j+1)*l_sampleadaption(i);
             
             l_samples.push_back(l_val);
         }
         
+        // create center values (each row is a center of the normal disribution)
+        ublas::vector<T> l_vec(l_samples.size(), 0);
+        ublas::matrix<T> l_center;
+        createCenter( l_samples, 0, l_vec, l_center );
         
-        for(std::size_t i=0; i < m_dimension; ++i)
-            std::cout << l_samples[i] << std::endl;
+        // create the cloud values
+        ublas::matrix<T> l_cloud;
+        tools::random l_rand;
+        for(std::size_t i=0; i < l_center.size1(); ++i) {
+        
+            std::size_t l_numpoints;
+            /*if (m_randompoints[i] && (m_range[i].first != m_range[i].second))
+                l_numpoints = static_cast<std::size_t>(l_rand.get<T>( tools::random::uniform, m_range[i].first, m_range[i].second ));
+            else*/
+            //    l_numpoints = 0.5 * (m_range[i].second + m_range[i].first) ;
+            
+            //std::cout << l_numpoints << std::endl;
+
+        }
         
         
-        
+        return l_cloud;
     }
     
-    /*
-     function combine(v, k)
-     if k < #vectors
-     for i = 0 to size(v_k)-1
-     v[k] = v_k[i];
-     combine(v, k+1);
-     else
-     add v as a row to the matrix;
-     
-     create v;
-     combine(v, 0);
-     */
     
+    /** create recursive a matrix with position of the centers
+     * @param p_allvec vector with vector of sampling points
+     * @param p_pos position with sampling vector is used
+     * @param p_vec row vector which will be added to the matrix (size must be allocated first [size of p_allvec] )
+     * @param p_mat matrix
+     **/
+    template<typename T> inline void cloud<T>::createCenter( const std::vector< ublas::vector<T> >& p_allvec, const std::size_t& p_pos, ublas::vector<T>& p_vec, ublas::matrix<T>& p_mat ) const
+    {
+        if (p_pos < p_allvec.size())
+            for(std::size_t i=0; i < p_allvec[p_pos].size(); ++i) {
+                p_vec(p_pos) = p_allvec[p_pos](i);
+                createCenter( p_allvec, p_pos+1, p_vec, p_mat );
+            }
+        else {
+            p_mat.resize( p_mat.size1()+1, p_vec.size() );
+            ublas::row(p_mat, p_mat.size1()-1) = p_vec;
+        }
+
+    }    
     
 };};};
 
