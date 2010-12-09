@@ -70,12 +70,19 @@ int main(int argc, char* argv[]) {
     
     //tl::logger::getInstance()->write(loMPICom, tl::logger::warn, "ich teste alles");
     
+    
+    
+    // ===== Cloud ======
+    /*
     tl::sources::cloud<double> x(2);
-    //x.setPointsRandom(0, false);
-    //x.setPointsRandom(1, false);
-    x.setRange(0, 0, 1, 4);
-    x.setRange(1, 0, 1, 4);
-    x.generate();
+    x.setVariance(0.2, 0.8);
+    x.setRange(0, 0, 100, 20);
+    x.setRange(1, 0, 100, 20);
+    
+    
+    tl::files::hdf f("cloud.hdf5", true);
+    f.write<double>( "/data",  x.generate(), H5::PredType::NATIVE_DOUBLE );
+    */
     
     
     // ===== MDS ======

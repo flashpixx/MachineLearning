@@ -48,6 +48,7 @@ namespace machinelearning { namespace tools { namespace sources {
      * $LastChangedDate$
      * @see http://tools.ietf.org/html/rfc3977 [old RFC http://www.w3.org/Protocols/rfc977/rfc977]
      * @todo ssl connection
+     * @todo authentification
      **/
     class nntp {
         

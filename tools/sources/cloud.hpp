@@ -26,7 +26,6 @@
 #ifndef MACHINELEARNING_TOOLS_SOURCES_CLOUD_HPP
 #define MACHINELEARNING_TOOLS_SOURCES_CLOUD_HPP
 
-
 #include <boost/numeric/ublas/matrix.hpp>
 
 
@@ -44,6 +43,7 @@ namespace machinelearning { namespace tools { namespace sources {
     
     /** class for creating cloudpoints. The class creates in the n-dimensional cube points
      *  with a normalized distribution
+     * $LastChangedDate$
      **/
     template<typename T> class cloud {
         
@@ -60,10 +60,10 @@ namespace machinelearning { namespace tools { namespace sources {
             
             cloud( const std::size_t& );
         
-            ublas::matrix<T> generate( const bool& = true, const cloudecreate& = alternate, const T& = 0 ) const;
+            ublas::matrix<T> generate( const cloudecreate& = all, const T& = 0.5, const bool& = false ) const;
         
-            void setScale( const T& );
-            void setScaleRandom( const bool& );
+            void setVariance( const T&, const T& );
+            void setVarianceRandom( const bool& );
             void setPoints( const std::size_t&, const std::size_t& );
             void setPointsRandom( const bool& );
             void setRange( const std::size_t&, const T&, const T&, const std::size_t& );
@@ -76,8 +76,8 @@ namespace machinelearning { namespace tools { namespace sources {
         
             bool m_randompoints;
             std::pair<std::size_t,std::size_t> m_points;
-            T m_scale;
-            bool m_randomscale;
+            std::pair<T,T> m_variance;
+            bool m_randomvariance;
             ublas::vector<std::size_t> m_sampling;
             std::vector< std::pair<T,T> > m_range;
         
@@ -90,10 +90,10 @@ namespace machinelearning { namespace tools { namespace sources {
      **/
     template<typename T> inline cloud<T>::cloud( const std::size_t& p_dim ) :
         m_dimension( p_dim ),
-        m_randompoints( true ),
-        m_points( std::pair<std::size_t,std::size_t>(100, 500) ),
-        m_scale( 1 ),
-        m_randomscale( false ),
+        m_randompoints( false ),
+        m_points( std::pair<std::size_t,std::size_t>(500, 500) ),
+        m_variance( std::pair<T,T>(1,1) ),
+        m_randomvariance( false ),
         m_sampling(p_dim, 5)
     {
         if (p_dim < 2)
@@ -104,25 +104,35 @@ namespace machinelearning { namespace tools { namespace sources {
     }
     
     
-    /** scales the distribution values
-     * @param p_var scale
+    /** sets the variance for each cloud
+     * @param p_min minimum value
+     * @param p_max maximum value
      **/
-    template<typename T> inline void cloud<T>::setScale( const T& p_var )
+    template<typename T> inline void cloud<T>::setVariance( const T& p_min, const T& p_max )
     {
-        if (tools::function::isNumericalZero(p_var))
-            throw exception::runtime(_("scale need not be zero"));
+        if (tools::function::isNumericalZero(p_min))
+            throw exception::runtime(_("minimum need not be zero"));
         
-        m_scale       = p_var;
-        m_randomscale = false;
+        if (tools::function::isNumericalZero(p_max))
+            throw exception::runtime(_("maximum need not be zero"));       
+        
+        if (p_min > p_max)
+            throw exception::runtime(_("minimal value is greater than maximal value"));
+        
+        if ((p_min < 0) || (p_max < 0))
+            throw exception::runtime(_("minimum and maximum must be greater than zero"));
+        
+        m_variance       = std::pair<T,T>(p_min, p_max);
+        m_randomvariance = true;
     }
     
     
-    /** enable / disable random value for scaling
+    /** enable / disable random value for variance
      * @param p_bool bool for enable / disable
      **/
-    template<typename T> inline void cloud<T>::setScaleRandom( const bool& p_bool )
+    template<typename T> inline void cloud<T>::setVarianceRandom( const bool& p_bool )
     {
-        m_randomscale = p_bool;
+        m_randomvariance = p_bool;
     }
     
     
@@ -136,7 +146,7 @@ namespace machinelearning { namespace tools { namespace sources {
             throw exception::runtime(_("minimal value is greater than maximal value"));
         
         m_points       = std::pair<std::size_t,std::size_t>(p_min, p_max);
-        m_randompoints = false;
+        m_randompoints = true;
     }
     
     
@@ -173,11 +183,11 @@ namespace machinelearning { namespace tools { namespace sources {
     
     
     /** generates the clouds
-     * @param p_shuffle shuffle the generated data points (if not the cloud will be generated along the sampling values)
      * @param p_build type of cloud generation
      * @param p_random random value for random-cloud-generation
+     * @param p_shuffle shuffel the datapoints
      **/
-    template<typename T> inline ublas::matrix<T> cloud<T>::generate( const bool& p_shuffle, const cloudecreate& p_build, const T& p_random ) const
+    template<typename T> inline ublas::matrix<T> cloud<T>::generate( const cloudecreate& p_build, const T& p_random, const bool& p_shuffle ) const
     {
         if ( (p_build == random) && ((p_random < 0) || (p_random > 1)) )
             throw exception::runtime(_("random value must be between [0,1]"));
@@ -205,8 +215,16 @@ namespace machinelearning { namespace tools { namespace sources {
         // create the cloud values
         ublas::matrix<T> l_cloud;
         tools::random l_rand;
-        for(std::size_t i=0; i < l_center.size1(); ++i) {
         
+        for(std::size_t i=0; i < l_center.size1(); ++i) {
+            
+            if ((p_build == alternate) && (i%2 != 0))
+                continue;
+            if ((p_build == random) && (l_rand.get<T>(tools::random::uniform, 0, 1) >= p_random))
+                continue;
+            
+            
+            // sets number of points
             std::size_t l_numpoints = 0;
             if (m_randompoints && (m_points.first != m_points.second))
                 l_numpoints = static_cast<std::size_t>(l_rand.get<T>( tools::random::uniform, m_points.first, m_points.second ));
@@ -214,10 +232,44 @@ namespace machinelearning { namespace tools { namespace sources {
                 l_numpoints = 0.5 * (m_points.second + m_points.first) ;
             
             
-            ublas::matrix<T> l_points = tools::matrix::random<T>( l_numpoints, l_center.size2(), tools::random::uniform, -1, 1 );
+            // sets the variance
+            T l_variance;
+            if ((m_randomvariance) && (!function::isNumericalEqual(m_variance.first, m_variance.second)) )
+                l_variance = l_rand.get<T>( tools::random::uniform, m_variance.first, m_variance.second );
+            else
+                l_variance = 0.5 * (m_variance.first + m_variance.second);
+            
+            
+            // create one cloud
+            ublas::matrix<T> l_points = tools::matrix::random<T>( l_numpoints, l_center.size2(), tools::random::normal, 0, l_variance );
+
+            
+            // translation to center
+            for(std::size_t j=0; j < l_points.size1(); ++j)
+                ublas::row(l_points, j) += ublas::row(l_center, i);
+                
+            
+            // add to dataset
+            l_cloud.resize( l_cloud.size1()+l_points.size1(), l_points.size2());
+            ublas::matrix_range< ublas::matrix<T> > l_range(l_cloud, 
+                                                            ublas::range( l_cloud.size1()-l_points.size1(), l_cloud.size1() ), 
+                                                            ublas::range( 0, l_cloud.size2() )
+                                                            );
+            l_range.assign(l_points);
             
         }
         
+        
+        // we shuffel all rows
+        if (p_shuffle) {
+            const ublas::vector<std::size_t> l_idx = static_cast< ublas::vector<std::size_t> >(tools::vector::random<T>(l_cloud.size1(), tools::random::uniform, 0, l_cloud.size1()));
+            for(std::size_t i=0; i < l_idx.size(); ++i) {
+                ublas::vector<T> l_tmp        = ublas::row(l_cloud, i);
+                ublas::row(l_cloud, i)        = ublas::row(l_cloud, l_idx(i));
+                ublas::row(l_cloud, l_idx(i)) = l_tmp;
+            }
+        }
+            
         
         return l_cloud;
     }

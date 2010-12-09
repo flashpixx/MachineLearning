@@ -185,7 +185,7 @@ namespace machinelearning { namespace tools {
     
     
     /** set the log state
-     * @paramp p_state state for logging
+     * @param p_state state for logging
      **/
     inline void logger::setLevel( const logstate& p_state )
     {

@@ -28,13 +28,14 @@
  * @section requirements Requirements
  * <ul>
  * <li>ATLAS (http://math-atlas.sourceforge.net/)</li>
- * <li>Boost (http://www.boost.org/) (support for iostreams with gzip and bzip2 support and thread support musst be compiled, random and MPI support are optional)</li>
- * <li>Boost Bindings (SVN http://svn.boost.org/svn/boost/sandbox/numeric_bindings / ZIP http://mathema.tician.de/software/boost-numeric-bindings)</li>
+ * <li>Boost (http://www.boost.org/) (iostreams with gzip and bzip2 support and thread support musst be compiled within, random device and MPI support are optional)</li>
+ * <li>Boost Bindings (SVN http://svn.boost.org/svn/boost/sandbox/numeric_bindings</li>
+ * <li>GiNaC (http://www.ginac.de/)</li>
  * <li>LAPACK (http://www.netlib.org/lapack/)</li>
  * <li><i>optional Hierarchical Data Format (HDF)</i> (http://www.hdfgroup.org/)</li>
- * <li><i>optional Message-Passing-Interface-Support</i> Open MPI (http://www.open-mpi.org/) for unix systems / MS MPI (Microsoft Cluster Pack) for Windows system</li>
+ * <li><i>optional Message-Passing-Interface-Support</i> Open MPI (http://www.open-mpi.org/) / MPICH2 (http://www.mcs.anl.gov/research/projects/mpich2/) / MS MPI (Microsoft Cluster Pack) for Windows system</li>
  * <li><i>optional GetText</i> (http://www.gnu.org/software/gettext) for including multilanguage support</li>
- * <li><i>optional LibXML2</i> (http://xmlsoft.org/)</li>
+ * <li><i>optional LibXML2</i> (http://xmlsoft.org/) (used by wikipedia support)</li>
  * </ul>
  *
  * @section compileroptions Compiler Option
@@ -49,7 +50,7 @@
  * The following compiler commands should be set
  * <ul>
  * <li><pre>NDEBUG</pre> for disabling Boost and local debugging</li>
- * <li><pre>BOOST_UBLAS_NDEBUG</pre> for disabling Boost UBlas support</li>
+ * <li><pre>BOOST_UBLAS_NDEBUG</pre> for disabling Boost Ublas support</li>
  * <li><pre>BOOST_NUMERIC_BINDINGS_BLAS_CBLAS</pre> add LAPACK support for the Boost Bindings</li>
  * </ul>
  *
@@ -67,6 +68,7 @@
  * <ul>
  * <li>@subpage classifier</li>
  * <li>@subpage clustering</li>
+ * <li>@subpage sources</li>
  * <li>@subpage distances</li>
  * <li>@subpage dimreduce</li>
  * <li>@subpage logger</li>
@@ -262,9 +264,71 @@
  *
  *
  *
+ * @page sources data sources
+ * The toolbox implements some structures for geting datasets. The compile option <dfn>ML_SOURCES</dfn> must be set for compiling the namespace
+ * machinelearning::tools::sources.
+ * @section nntp newsgroups
+ * The class allows to browse newsgroups in a naitve way for extraction the message content. The class throws different exception if there
+ * are connection or stream errors during sending or receiving data (see exceptions within the class).
+ * @code
+    tools::sources::nntp news("<news server>");
+    
+    // read group list
+    std::map<std::string, std::size_t> groups = news.getGroupList();
+    for (std::map<std::string, std::size_t>::iterator it = groups.begin(); it != groups.end(); ++it)
+        std::cout << it->first << "     (" << it->second << ")" << std::endl;
+    std::cout << "\n===================================================================================" << std::endl;
+ 
+    // sets which part of a messages is read
+    news.setContent( tl::sources::nntp::full );
+ 
+    // sets the newsgroup for browsing 
+    news.setGroup("<newsgroup>");
+ 
+    // browse each article in the group
+    for(tools::sources::nntp::iterator it=news.begin(); it != news.end(); ++it) {
+        
+        // splits header and body of the message (should be only used with full articles)
+        std::string header, body;
+        tools::sources::nntp::separateHeaderBody( *it, header, body );
+ 
+        std::cout << header << "\n-----------------------------------------------------------------------------------\n";
+        std::cout << body   << "\n===================================================================================" << std::endl;
+    }
+ * @endcode
+ *
+ * @section wiki wikipedia
+ * The wikipedia class can be used for read the article data of wikipedia articles in different languages
+ * @code
+    tools::sources::wikipedia wiki; // optional parameter for language (see class)
+ 
+    // reads a random article
+    wiki.getRandomArticle();
+    // or read a article with name
+    wiki.getArticle("<article name>");
+ 
+    // create a vector for article labels or acronyms
+    std::vector<std::string> tags;
+ 
+    // check if result is an article
+    if (wiki.isArticle()) {
+        std::cout << wiki.getArticleContent() << "\n===================================================================================" << std::endl;
+        tags = wiki.getArticleLabel();
+    } else
+        tags = wiki.getArticleAcronym();
+ 
+    // write arcronym / label data
+    for(std::size_t i=0; i < tags.size(); ++i)
+        std::cout << tags[i] << std::endl;
+ * @endcode
+ *
+ *
+ *
+ * 
  * @page logger logger
- * Within The toolbox is a logger class which implements a thread-safe and optional MPI logger. The logger create a singletone object that create a file access for writing messages. The MPI component sends all messages with non-
- * blocking communication to the CPU 0. See in the logger class for log states, which must be used for writing the messages.
+ * Within the toolbox is a logger class which implements a thread-safe and optional MPI logger. The logger create a singletone object that create
+ * a file access for writing messages. The MPI component sends all messages with non-blocking communication to the CPU 0. See in the logger class
+ * for log states, which must be used for writing the messages.
  * @section normal normal use
  * @code
     // sets the log level for writing messages 
@@ -278,6 +342,7 @@
  * @endcode
  *
  * @section mpi mpi use
+ * <strong>The MPI library must be compiled with thread-support and must be initialized manually</strong>
  * @code
     MPI::Init_thread( argc, argv, MPI_THREAD_SERIALIZED )
     boost::mpi::communicator l_mpi;
