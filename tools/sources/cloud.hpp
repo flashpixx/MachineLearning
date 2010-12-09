@@ -41,8 +41,8 @@ namespace machinelearning { namespace tools { namespace sources {
     namespace ublas  = boost::numeric::ublas;
     
     
-    /** class for creating cloudpoints. The class creates in the n-dimensional cube points
-     *  with a normalized distribution
+    /** class for creating multimodal cloudpoints. The class creates in the n-dimensional
+     * cube points with a normalized distribution
      * $LastChangedDate$
      **/
     template<typename T> class cloud {

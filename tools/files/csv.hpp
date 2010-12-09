@@ -54,7 +54,7 @@ namespace machinelearning { namespace tools { namespace files {
             template<typename T> ublas::matrix<T> readBlasMatrix( const std::string&, const std::string& = ",; " ) const;
             template<typename T> std::vector<T> readVector( const std::string&, const std::size_t& = 100 ) const;
             template<typename T> void write( const std::string&, const ublas::vector<T>& ) const;
-            template<typename T> void write( const std::string&, const ublas::matrix<T>&, const std::string& =" " ) const;
+            template<typename T> void write( const std::string&, const ublas::matrix<T>&, const char& = ' ' ) const;
             template<typename T> void write( const std::string&, const std::vector<T>& ) const;
         
     };
@@ -193,7 +193,7 @@ namespace machinelearning { namespace tools { namespace files {
      * @param p_mat blas matrix
      * @param p_separator separator 
      **/    
-    template<typename T> inline void csv::write( const std::string& p_file, const ublas::matrix<T>& p_mat, const std::string& p_separator ) const
+    template<typename T> inline void csv::write( const std::string& p_file, const ublas::matrix<T>& p_mat, const char& p_separator ) const
     {
         if ( (p_mat.size1() == 0) || (p_mat.size2() == 0) )
             return;

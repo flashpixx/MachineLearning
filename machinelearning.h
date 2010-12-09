@@ -27,15 +27,15 @@
  *
  * @section requirements Requirements
  * <ul>
- * <li>ATLAS (http://math-atlas.sourceforge.net/)</li>
- * <li>Boost (http://www.boost.org/) (iostreams with gzip and bzip2 support and thread support musst be compiled within, random device and MPI support are optional)</li>
- * <li>Boost Bindings (SVN http://svn.boost.org/svn/boost/sandbox/numeric_bindings</li>
- * <li>GiNaC (http://www.ginac.de/)</li>
- * <li>LAPACK (http://www.netlib.org/lapack/)</li>
- * <li><i>optional Hierarchical Data Format (HDF)</i> (http://www.hdfgroup.org/)</li>
- * <li><i>optional Message-Passing-Interface-Support</i> Open MPI (http://www.open-mpi.org/) / MPICH2 (http://www.mcs.anl.gov/research/projects/mpich2/) / MS MPI (Microsoft Cluster Pack) for Windows system</li>
- * <li><i>optional GetText</i> (http://www.gnu.org/software/gettext) for including multilanguage support</li>
- * <li><i>optional LibXML2</i> (http://xmlsoft.org/) (used by wikipedia support)</li>
+ * <li>ATLAS ( http://math-atlas.sourceforge.net/ )</li>
+ * <li>Boost ( http://www.boost.org/ ) (iostreams with gzip and bzip2 support and thread support musst be compiled within, random device and MPI support are optional)</li>
+ * <li>Boost Bindings (SVN http://svn.boost.org/svn/boost/sandbox/numeric_bindings )</li>
+ * <li>GiNaC ( http://www.ginac.de/ )</li>
+ * <li>LAPACK ( http://www.netlib.org/lapack/ )</li>
+ * <li><i>optional Hierarchical Data Format (HDF)</i> ( http://www.hdfgroup.org/ )</li>
+ * <li><i>optional Message-Passing-Interface-Support</i> Open MPI ( http://www.open-mpi.org/ ) / MPICH2 ( http://www.mcs.anl.gov/research/projects/mpich2/ ) / MS MPI (Microsoft Cluster Pack) for Windows system</li>
+ * <li><i>optional GetText</i> ( http://www.gnu.org/software/gettext ) for including multilanguage support</li>
+ * <li><i>optional LibXML2</i> ( http://xmlsoft.org/ ) (used by wikipedia support)</li>
  * </ul>
  *
  * @section compileroptions Compiler Option
@@ -47,11 +47,11 @@
  * <li><pre>ML_SOURCES</pre> compiles sources in that way, that e.g. NNTP / Wikipedia data can be read directly</li>
  * <li><pre>ML_CLUSTER</pre> enable MPI Support for the toolbox (required Boost MPI support)</li>
  * </ul>
- * The following compiler commands should be set
+ * The following compiler commands should / must be set
  * <ul>
  * <li><pre>NDEBUG</pre> for disabling Boost and local debugging</li>
  * <li><pre>BOOST_UBLAS_NDEBUG</pre> for disabling Boost Ublas support</li>
- * <li><pre>BOOST_NUMERIC_BINDINGS_BLAS_CBLAS</pre> add LAPACK support for the Boost Bindings</li>
+ * <li><pre>BOOST_NUMERIC_BINDINGS_BLAS_CBLAS</pre> add CBLAS / LAPACK support for the Boost Bindings</li>
  * </ul>
  *
  * @section License
@@ -71,6 +71,7 @@
  * <li>@subpage sources</li>
  * <li>@subpage distances</li>
  * <li>@subpage dimreduce</li>
+ * <li>@subpage files</li>
  * <li>@subpage logger</li>
  * </ul>
  *
@@ -322,9 +323,29 @@
         std::cout << tags[i] << std::endl;
  * @endcode
  *
- *
- *
+ * @section cloud cloud
+ * The cloud class creates a multimodal n-dimensional data set with normal distribution. The n-dimensional cube is sampled in equidistant
+ * steps and on the cross-points a normal distribution is created.
+ * @code
+    // creates a plane with clouds (parameter is the number of dimensions)
+    tools::sources::cloud<double> cloud(2);
+ 
+    // set (random) number of points within the cluster
+    cloud.setPoints( 100, 1000 );
+ 
+    // sets the variance for each cluster (the value is random generated, see within the class for disabling random values)
+    cloud.setVariance(0.2, 0.8);
+ 
+    // sets the ranges and sampling point for each dimension (dimension, start value, end value, number of samples)
+    cloud.setRange(0, 0, 100, 20);
+    cloud.setRange(1, 0, 100, 20);
+ 
+    // the method generate supports different parametes, see the parameters within the class
+    std::cout << cloud.generate() << std::endl; 
+ * @endcode
  * 
+ *
+ *
  * @page logger logger
  * Within the toolbox is a logger class which implements a thread-safe and optional MPI logger. The logger create a singletone object that create
  * a file access for writing messages. The MPI component sends all messages with non-blocking communication to the CPU 0. See in the logger class
@@ -363,9 +384,67 @@
     // close the listener
     tools::logger::getInstance()->shutdownListener( l_mpi );
  
-    // shows the filename of each CPU (only CPU 0 collected all messages with MPI support)
+    // shows the filename of each CPU (only CPU 0 collectes all messages with MPI support)
     std::cout << tools::logger::getInstance()->getFilename() << std::endl;
     MPI::Finalize()
+ * @endcode
+ *
+ *
+ *
+ * @page files file support
+ * The toolbox supports different file formats. The compile option <dfn>ML_FILES</dfn> must be set for
+ * using the support and all components are within the namespace machinelearning::tools::files
+ * @section csv comma separated values (csv)
+ * @code
+    tools::sources::csv csv;
+ 
+    // read matrix data (optional second parameter is a string with separator characters)
+    // the file content must be followed this order:
+    // <number or rows> <number of columns>
+    // 1. row: 1. column, 2.column ....
+    // ....
+    boost::numeric::ublas::matrix<double> matrix = csv.readBlasMatrix<double>("<filename>");
+ 
+    // read vector data
+    // the file content must be followd this order:
+    // <number of elements>
+    // 1. element
+    // ....
+    boost::numeric::ublas::vector<double> vector = csv.readBlasVector<double>("<filename>");
+ 
+    // read any vector data
+    // the file content must be followd this order:
+    // 1. element
+    // 2. element
+    // ....
+    std::vector<T> vec = csv::readVector<T>("<filename>");
+ 
+ 
+    // write data
+    csv.write<double>("<filename>", vector);
+    // third parameter set the separater character
+    csv.write<double>(""<filename>", matrix);
+ * @endcode
+ *
+ * @section hdf hierarchical data format (hdf)
+ * HDF files need on reading and writing own data formats that description can found on http://www.hdfgroup.org/HDF5/doc/cpplus_RM/classH5_1_1PredType.html 
+ * @code
+    // only read access
+    tools::files::hdf source("<path to hdf file>");
+ 
+    // read matrix data
+    boost::numeric::ublas::matrix<double> matrix = source.readMatrix<double>("<path to dataset>", H5::PredType::NATIVE_DOUBLE);
+    // read vector data
+    boost::numeric::ublas::vector<unsigned int> vector = source.readVector<unsigned int>("<path to dataset>", H5::PredType::NATIVE_UINT);
+    // read string
+    std::string str = source.readString("<path to data>");
+ 
+    // create a new & empty hdf file (read / write access)
+    tools::files::hdf target("path to hdf file", true);
+    target.write<double>( "<path for dataset>",  matrix, H5::PredType::NATIVE_DOUBLE );
+    target.write<double>( "<path for dataset>",  vector, H5::PredType::NATIVE_DOUBLE );
+ 
+    // hdf file will be closed and flushed if variable lost the scope
  * @endcode
  *
 **/
