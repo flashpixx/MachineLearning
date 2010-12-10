@@ -255,7 +255,7 @@
  *
  * @section ncd normalize compression distance (NCD)
  * @code
-    std::vector< std:: string > val;
+    std::vector< std::string > val;
     val.push_back( / add file path or string data / );
      
     distances::ncd ncd1( distances::ncd::gzip );
