@@ -23,10 +23,6 @@
 
 #ifdef ML_FILES
 
-/** headerfile for include all sources
- * $LastChangedDate$
- **/
-
 #ifndef MACHINELEARNING_TOOLS_FILES_H
 #define MACHINELEARNING_TOOLS_FILES_H
 

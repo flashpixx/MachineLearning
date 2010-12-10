@@ -21,12 +21,17 @@
  @endcond
  **/
 
-/** header file for function optimization
- * $LastChangedDate$
- **/
 
 #ifndef MACHINELEARNING_FUNCTIONALOPTIMIZATION_H
 #define MACHINELEARNING_FUNCTIONALOPTIMIZATION_H
+
+namespace machinelearning { 
+    
+    /** namespace with structurs for fitting functions
+     * $LastChangedDate$
+     **/
+    namespace functionaloptimization {};
+};
 
 #include "gradientdescent.hpp"
 

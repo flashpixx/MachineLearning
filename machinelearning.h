@@ -24,7 +24,7 @@
 /**
  * @mainpage Machine Learning Framework
  * $Rev$
- * @author Philipp Kraus philipp.kraus@flashpixx.de
+ * @author Philipp Kraus <philipp.kraus@flashpixx.de> 
  *
  * @section License
  * The framework is supported under the @subpage license
@@ -470,6 +470,12 @@
 
 #ifndef MACHINELEARNING_H
 #define MACHINELEARNING_H
+
+
+/** main namespace for the framework
+ * $LastChangedDate: 2010-12-03 01:19:39 +0100 (Fr, 03 Dez 2010) $
+ **/
+namespace machinelearning {};
 
 
 #include "exception/exception.h"

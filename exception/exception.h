@@ -30,7 +30,9 @@
 
 namespace machinelearning { 
     
-    /** namespace for all exceptions of the framework **/
+    /** namespace for all exceptions of the framework
+     * $LastChangedDate$
+     **/
     namespace exception {
     
         /** exception class for throwing on not implementated method 

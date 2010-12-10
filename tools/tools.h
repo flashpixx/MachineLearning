@@ -23,13 +23,20 @@
 
 
 
-/** header file to connect all tools library for one include
- * $LastChangedDate$
- **/
-
 #ifndef MACHINELEARNING_TOOLS_H
 #define MACHINELEARNING_TOOLS_H
 
+namespace machinelearning { 
+    
+    /** namespace for all tools, which are used within the toolbox 
+     * $LastChangedDate$
+     **/
+    namespace tools {};
+
+};
+
+        
+        
 #include "random.hpp"
 #include "function.hpp"
 #include "matrix.hpp"

@@ -32,54 +32,59 @@
 #include "../tools/tools.h"
 
 
-namespace machinelearning { namespace dimensionreduce {
-
-    namespace ublas = boost::numeric::ublas;
+namespace machinelearning { 
     
-    
-    
-    /** abstract class for nonsupervised dimension reducing classes
+    /** namespace for all algorithms to reduce data dimension
      * $LastChangedDate$
-     **/      
-    template<typename T> class nonsupervisedreduce {
-        
-        public :
+     **/    
+    namespace dimensionreduce {
 
-            /** maps data to target dimension **/
-            virtual ublas::matrix<T> map( const ublas::matrix<T>& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
-              
-            /** returns the mapped dimension **/
-            virtual std::size_t getDimension( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+        namespace ublas = boost::numeric::ublas;
         
-        protected :
         
-            /** destructor **/
-            virtual ~nonsupervisedreduce( void ) {}
+        
+        /** abstract class for nonsupervised dimension reducing classes
+         * $LastChangedDate$
+         **/      
+        template<typename T> class nonsupervisedreduce {
+            
+            public :
 
+                /** maps data to target dimension **/
+                virtual ublas::matrix<T> map( const ublas::matrix<T>& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
+                  
+                /** returns the mapped dimension **/
+                virtual std::size_t getDimension( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+            
+            protected :
+            
+                /** destructor **/
+                virtual ~nonsupervisedreduce( void ) {}
+
+        };
+
+        
+        
+        /** abstract class for supervised dimension reducing classes
+         * $LastChangedDate$
+         **/      
+        template<typename T, typename L> class supervisedreduce {
+            
+            public :
+            
+                /** maps data to target dimension **/
+                virtual ublas::matrix<T> map( const ublas::matrix<T>&, const std::vector<L>& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
+            
+                /** returns the mapped dimension **/
+                virtual std::size_t getDimension( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+            
+            protected :
+            
+                /** destructor **/
+                virtual ~supervisedreduce( void ) {}
+            
+        };
+        
     };
-
-    
-    
-    /** abstract class for supervised dimension reducing classes
-     * $LastChangedDate$
-     **/      
-    template<typename T, typename L> class supervisedreduce {
-        
-        public :
-        
-            /** maps data to target dimension **/
-            virtual ublas::matrix<T> map( const ublas::matrix<T>&, const std::vector<L>& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
-        
-            /** returns the mapped dimension **/
-            virtual std::size_t getDimension( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
-        
-        protected :
-        
-            /** destructor **/
-            virtual ~supervisedreduce( void ) {}
-        
-    };
-    
-    
-};};
+};
 #endif
