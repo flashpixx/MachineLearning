@@ -25,6 +25,9 @@
  * @mainpage Machine Learning Framework
  * $Rev$
  *
+ * @section License
+ * The framework is supported under the @subpage license
+ *
  * @section requirements Requirements
  * <ul>
  * <li>ATLAS ( http://math-atlas.sourceforge.net/ )</li>
@@ -33,7 +36,12 @@
  * <li>GiNaC ( http://www.ginac.de/ )</li>
  * <li>LAPACK ( http://www.netlib.org/lapack/ )</li>
  * <li><i>optional Hierarchical Data Format (HDF)</i> ( http://www.hdfgroup.org/ )</li>
- * <li><i>optional Message-Passing-Interface-Support</i> Open MPI ( http://www.open-mpi.org/ ) / MPICH2 ( http://www.mcs.anl.gov/research/projects/mpich2/ ) / MS MPI (Microsoft Cluster Pack) for Windows system</li>
+ * <li><i>optional Message-Passing-Interface-Support</i>
+ *      <ul>
+ *          <li>Open MPI ( http://www.open-mpi.org/ )</li>
+ *          <li>MPICH2 ( http://www.mcs.anl.gov/research/projects/mpich2/ )</li>
+ *          <li>Microsoft High Performance Computing Pack 2008 R2 SDK ( http://www.microsoft.com/downloads/en/details.aspx?FamilyID=bc671b22-f158-4a5f-828b-7a374b881172 )</li>
+ *      </ul>
  * <li><i>optional GetText</i> ( http://www.gnu.org/software/gettext ) for including multilanguage support</li>
  * <li><i>optional LibXML2</i> ( http://xmlsoft.org/ ) (used by wikipedia support)</li>
  * </ul>
@@ -53,9 +61,6 @@
  * <li><dfn>BOOST_UBLAS_NDEBUG</dfn> for disabling Boost Ublas support</li>
  * <li><dfn>BOOST_NUMERIC_BINDINGS_BLAS_CBLAS</dfn> add CBLAS / LAPACK support for the Boost Bindings</li>
  * </ul>
- *
- * @section License
- * The framework is supported under the @subpage license
  *
  * @section defs definitions / specifications
  * <ul>
