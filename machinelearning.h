@@ -26,9 +26,9 @@
  * $Rev$
  * @author Philipp Kraus <philipp.kraus@flashpixx.de> 
  *
- * @section license
+ * @section lic license
  * The framework is supported under the @subpage license
- *
+ * 
  * @section requirements requirements
  * <ul>
  * <li>ATLAS ( http://math-atlas.sourceforge.net/ )</li>
