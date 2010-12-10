@@ -38,6 +38,20 @@ namespace machinelearning {
      * $LastChangedDate$
      **/    
     namespace dimensionreduce {
+        
+        /** namespace for all non-supervised reducing algorithms
+         * $LastChangedDate$
+         **/
+        namespace nonsupervised {};
+        
+        /** namespace for all supervised reducing algorithms
+         * $LastChangedDate$
+         **/
+        namespace supervised {};
+        
+        
+        
+        
 
         namespace ublas = boost::numeric::ublas;
         

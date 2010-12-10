@@ -39,6 +39,19 @@ namespace machinelearning {
      **/
     namespace clustering {
         
+        /** namespace for all non-supervised cluster algorithms
+         * $LastChangedDate$
+         **/
+        namespace nonsupervised {};
+        
+        /** namespace for all supervised cluster algorithms
+         * $LastChangedDate$
+         **/
+        namespace supervised {};
+        
+        
+        
+        
         namespace ublas = boost::numeric::ublas;
         
         
