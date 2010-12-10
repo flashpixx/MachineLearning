@@ -24,6 +24,7 @@
 /**
  * @mainpage Machine Learning Framework
  * $Rev$
+ * @author Philipp Kraus philipp.kraus@flashpixx.de
  *
  * @section License
  * The framework is supported under the @subpage license
