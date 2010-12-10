@@ -41,17 +41,17 @@
  * @section compileroptions Compiler Option
  * toolbox compilerflags
  * <ul>
- * <li><pre>ML_RANDOMDEVICE</pre> for using the Boost Device Random support (required Boost Random Device Support), otherwise a Mersenne Twister is used</li>
- * <li><pre>ML_MULTILANGUAGE</pre> option for compiling the framework with multilanguage support (uses gettext)</li>
- * <li><pre>ML_FILES</pre> adds the support for HDF & CSV file reading and writing</li>
- * <li><pre>ML_SOURCES</pre> compiles sources in that way, that e.g. NNTP / Wikipedia data can be read directly</li>
- * <li><pre>ML_CLUSTER</pre> enable MPI Support for the toolbox (required Boost MPI support)</li>
+ * <li><dfn>ML_RANDOMDEVICE</dfn> for using the Boost Device Random support (required Boost Random Device Support), otherwise a Mersenne Twister is used</li>
+ * <li><dfn>ML_MULTILANGUAGE</dfn> option for compiling the framework with multilanguage support (uses gettext)</li>
+ * <li><dfn>ML_FILES</dfn> adds the support for HDF & CSV file reading and writing</li>
+ * <li><dfn>ML_SOURCES</dfn> compiles sources in that way, that e.g. NNTP / Wikipedia data can be read directly</li>
+ * <li><dfn>ML_CLUSTER</dfn> enable MPI Support for the toolbox (required Boost MPI support)</li>
  * </ul>
  * The following compiler commands should / must be set
  * <ul>
- * <li><pre>NDEBUG</pre> for disabling Boost and local debugging</li>
- * <li><pre>BOOST_UBLAS_NDEBUG</pre> for disabling Boost Ublas support</li>
- * <li><pre>BOOST_NUMERIC_BINDINGS_BLAS_CBLAS</pre> add CBLAS / LAPACK support for the Boost Bindings</li>
+ * <li><dfn>NDEBUG</dfn> for disabling Boost and local debugging</li>
+ * <li><dfn>BOOST_UBLAS_NDEBUG</dfn> for disabling Boost Ublas support</li>
+ * <li><dfn>BOOST_NUMERIC_BINDINGS_BLAS_CBLAS</dfn> add CBLAS / LAPACK support for the Boost Bindings</li>
  * </ul>
  *
  * @section License
@@ -62,6 +62,7 @@
  * <li>data points should be matrix data and the matrix is row-orientated, so for K data points with every point dimension P, we have a K x P matrix (prototype matrices are equal)</li>
  * <li>all compiler flags start with "ML_"</li>
  * <li>all structures are in the namespace "machinelearning"</li>
+ * <li>all messages should get the structure <dfn>_("<message>")</dfn>, because the underline prefix is the support for different languages</li>
  * </ul>
  *
  * @section ex advanced documentation
@@ -73,6 +74,7 @@
  * <li>@subpage dimreduce</li>
  * <li>@subpage files</li>
  * <li>@subpage logger</li>
+ * <li>@subpage lang</li>
  * </ul>
  *
  *
@@ -447,6 +449,17 @@
     // hdf file will be closed and flushed if variable lost the scope
  * @endcode
  *
+ *
+ *
+ @page lang multilanguage support
+ * The toolbox uses <dfn>gettext</dfn> to translate the messages. The source code must include the language header file and all messages,
+ * which should be supported multilanguage must be written in this way <dfn>_("messages")</dfn>. The mesages will be collcted with the
+ * gettext tools and safed under <dfn>tools/language/#language eg. de_DE.UTF-8#/LC_MESSAGES/#language eg de_DE#.po</dfn>. The compiler flag
+ * <dfn>ML_MULTILANGUAGE</dfn> must be set for using the support. The message files can be edited with Poedit ( http://www.poedit.net/ ).
+ * For using the language support, a call for setting the correct languages must be written wihin the main program:
+ * @code
+    tools::language::bind(<name of the language file, should be "ml">, <path to the language directory, shoudl be "./tools/language/">);
+ * @endcode
 **/
 
 #ifndef MACHINELEARNING_H
