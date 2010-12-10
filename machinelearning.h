@@ -26,16 +26,16 @@
  * $Rev$
  * @author Philipp Kraus <philipp.kraus@flashpixx.de> 
  *
- * @section lic license
+ * @section licenseSection license
  * The framework is supported under the @subpage license
  * 
  * @section requirements requirements
  * <ul>
- * <li>ATLAS ( http://math-atlas.sourceforge.net/ )</li>
+ * <li>Automatically Tuned Linear Algebra Software ( http://math-atlas.sourceforge.net/ )</li>
  * <li>Boost ( http://www.boost.org/ ) (iostreams with gzip and bzip2 support and thread support musst be compiled within, random device and MPI support are optional)</li>
  * <li>Boost Bindings (SVN http://svn.boost.org/svn/boost/sandbox/numeric_bindings )</li>
  * <li>GiNaC ( http://www.ginac.de/ )</li>
- * <li>LAPACK ( http://www.netlib.org/lapack/ )</li>
+ * <li>Linear Algebra PACKage ( http://www.netlib.org/lapack/ )</li>
  * <li><i>optional Hierarchical Data Format (HDF)</i> ( http://www.hdfgroup.org/ )</li>
  * <li><i>optional Message-Passing-Interface-Support</i>
  *      <ul>
