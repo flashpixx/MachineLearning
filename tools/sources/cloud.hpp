@@ -59,9 +59,7 @@ namespace machinelearning { namespace tools { namespace sources {
         
             
             cloud( const std::size_t& );
-        
             ublas::matrix<T> generate( const cloudecreate& = all, const T& = 0.5, const bool& = false ) const;
-        
             void setVariance( const T&, const T& );
             void setVarianceRandom( const bool& );
             void setPoints( const std::size_t&, const std::size_t& );
@@ -73,12 +71,17 @@ namespace machinelearning { namespace tools { namespace sources {
             
             /** number of dimensions **/
             const std::size_t m_dimension;
-        
+            /** bool for creating random number of points **/
             bool m_randompoints;
+            /** minimum and maximum value for number of points **/
             std::pair<std::size_t,std::size_t> m_points;
+            /** minimum and maximum variance value **/
             std::pair<T,T> m_variance;
+            /** bool for creating variance randomly **/
             bool m_randomvariance;
+            /** sampling values for each dimension **/
             ublas::vector<std::size_t> m_sampling;
+            /** ranges of the each dimension **/
             std::vector< std::pair<T,T> > m_range;
         
             void createCenter( const std::vector< ublas::vector<T> >&, const std::size_t&, ublas::vector<T>&, ublas::matrix<T>& ) const;
