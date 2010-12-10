@@ -97,7 +97,7 @@ namespace machinelearning { namespace tools { namespace sources {
         m_sampling(p_dim, 5)
     {
         if (p_dim < 2)
-            throw exception::runtime(_("number dimensions must be greater than one"));
+            throw exception::runtime(_("number of dimensions must be greater than one"));
         
         for(std::size_t i=0; i < p_dim; ++i)
             m_range.push_back( std::pair<T,T>(0,1) );

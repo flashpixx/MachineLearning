@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-04 17:02+0100\n"
-"PO-Revision-Date: 2010-12-04 17:03+0100\n"
+"POT-Creation-Date: 2010-12-10 17:31+0100\n"
+"PO-Revision-Date: 2010-12-10 17:34+0100\n"
 "Last-Translator: Philipp Kraus <philipp.kraus@flashpixx.de>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -78,19 +78,19 @@ msgid "matrix rows and label size are not equal"
 msgstr "Matrixzeilen und Labelanzahl sind nicht identisch"
 
 #: clustering/nonsupervised/kmeans.hpp:96
-#: clustering/nonsupervised/neuralgas.hpp:127
+#: clustering/nonsupervised/neuralgas.hpp:125
 #: clustering/supervised/rlvq.hpp:102
 msgid "prototype size must be greater than zero"
 msgstr "Prototypdimension musst größer Null sein"
 
 #: clustering/nonsupervised/kmeans.hpp:98
-#: clustering/nonsupervised/neuralgas.hpp:129
+#: clustering/nonsupervised/neuralgas.hpp:127
 msgid "number of prototypes must be greater than zero"
 msgstr "Anzahl der Prototypen muss größer Null sein"
 
 #: clustering/nonsupervised/kmeans.hpp:157
-#: clustering/nonsupervised/neuralgas.hpp:224
-#: clustering/nonsupervised/neuralgas.hpp:474
+#: clustering/nonsupervised/neuralgas.hpp:222
+#: clustering/nonsupervised/neuralgas.hpp:472
 #: clustering/supervised/rlvq.hpp:215
 #: dimensionreduce/nonsupervised/mds.hpp:188
 #: functionoptimization/gradientdescent.hpp:294
@@ -98,10 +98,10 @@ msgid "iterations must be greater than zero"
 msgstr "Iterationen müssen größer Null sein"
 
 #: clustering/nonsupervised/kmeans.hpp:159
-#: clustering/nonsupervised/neuralgas.hpp:226
-#: clustering/nonsupervised/neuralgas.hpp:317
-#: clustering/nonsupervised/neuralgas.hpp:476
-#: clustering/nonsupervised/neuralgas.hpp:634
+#: clustering/nonsupervised/neuralgas.hpp:224
+#: clustering/nonsupervised/neuralgas.hpp:315
+#: clustering/nonsupervised/neuralgas.hpp:474
+#: clustering/nonsupervised/neuralgas.hpp:632
 #: clustering/nonsupervised/spectralclustering.hpp:169
 #: clustering/supervised/rlvq.hpp:219
 #: clustering/supervised/rlvq.hpp:295
@@ -110,14 +110,14 @@ msgstr "Daten- und Prototypdimension sind nicht identisch"
 
 #: clustering/nonsupervised/kmeans.hpp:161
 #: clustering/nonsupervised/kmeans.hpp:256
-#: clustering/nonsupervised/neuralgas.hpp:222
-#: clustering/nonsupervised/neuralgas.hpp:472
+#: clustering/nonsupervised/neuralgas.hpp:220
+#: clustering/nonsupervised/neuralgas.hpp:470
 #: clustering/supervised/rlvq.hpp:213
 msgid "number of datapoints are less than prototypes"
 msgstr "Anzahl der Datenpunkte ist weniger als Anzahl der Prototypen"
 
-#: clustering/nonsupervised/neuralgas.hpp:228
-#: clustering/nonsupervised/neuralgas.hpp:478
+#: clustering/nonsupervised/neuralgas.hpp:226
+#: clustering/nonsupervised/neuralgas.hpp:476
 #: clustering/supervised/rlvq.hpp:221
 msgid "lambda must be greater than zero"
 msgstr "Lambda muss größer Null sein"
@@ -298,76 +298,110 @@ msgstr "Eine leere Pfadangabe ist verboten"
 msgid "dataset must be two-dimensional"
 msgstr "Datensatz muss zwei-dimensional sein"
 
-#: tools/sources/nntp.h:156
+#: tools/sources/cloud.hpp:100
+msgid "number of dimensions must be greater than one"
+msgstr "Anzahl der Dimensionen muss größer Eins sein"
+
+#: tools/sources/cloud.hpp:114
+msgid "minimum need not be zero"
+msgstr "Minimum darf nicht Null sein"
+
+#: tools/sources/cloud.hpp:117
+msgid "maximum need not be zero"
+msgstr "Maximum darf nicht Null sein"
+
+#: tools/sources/cloud.hpp:120
+#: tools/sources/cloud.hpp:146
+#: tools/sources/cloud.hpp:174
+msgid "minimal value is greater than maximal value"
+msgstr "Minimumwert ist größer als Maximumswert"
+
+#: tools/sources/cloud.hpp:123
+msgid "minimum and maximum must be greater than zero"
+msgstr "Minimum und Maximum müssen größer Null sein"
+
+#: tools/sources/cloud.hpp:171
+msgid "dimension must be smaller than saved dimension"
+msgstr "Dimensionswert muss kleiner sein als gespeicherter Wert"
+
+#: tools/sources/cloud.hpp:177
+msgid "sampling value must be greater than zero"
+msgstr "Samplingwert muss größer Null sein"
+
+#: tools/sources/cloud.hpp:193
+msgid "random value must be between [0,1]"
+msgstr "Zufallswert muss zwischen [0,1] einliegen"
+
+#: tools/sources/nntp.h:157
 msgid "can not connect to news server"
 msgstr "Newsserver ist nicht erreichbar"
 
-#: tools/sources/nntp.h:194
+#: tools/sources/nntp.h:195
 #: tools/sources/wikipedia.h:590
 msgid "error while reading socket data"
 msgstr "Fehler während des Lesens des Sockets"
 
-#: tools/sources/nntp.h:197
+#: tools/sources/nntp.h:198
 msgid "no such group"
 msgstr "keine Gruppe gefunden"
 
-#: tools/sources/nntp.h:198
+#: tools/sources/nntp.h:199
 msgid "no newsgroup has been selected"
 msgstr "keine Newsgroup wurde ausgewählt"
 
-#: tools/sources/nntp.h:199
+#: tools/sources/nntp.h:200
 msgid "no article has been selected"
 msgstr "kein Artikel ausgewählt"
 
-#: tools/sources/nntp.h:200
+#: tools/sources/nntp.h:201
 msgid "no next article found"
 msgstr "kein weiterer Artikel gefunden"
 
-#: tools/sources/nntp.h:201
+#: tools/sources/nntp.h:202
 msgid "no previous article found"
 msgstr "kein Vorgängerartikel gefunden"
 
-#: tools/sources/nntp.h:202
+#: tools/sources/nntp.h:203
 msgid "no such article number in this group"
 msgstr "Artikelnummer nicht in der Gruppe gefunden"
 
-#: tools/sources/nntp.h:203
+#: tools/sources/nntp.h:204
 msgid "no such article found"
 msgstr "keinen Artikel gefunden"
 
-#: tools/sources/nntp.h:204
+#: tools/sources/nntp.h:205
 msgid "article not wanted - do not send"
 msgstr "Artikel nicht gewollt - nicht senden"
 
-#: tools/sources/nntp.h:205
+#: tools/sources/nntp.h:206
 msgid "transfer failed - try again later"
 msgstr "Transfer fehlgeschlagen, später versuchen"
 
-#: tools/sources/nntp.h:206
+#: tools/sources/nntp.h:207
 msgid "article rejected - do not try again"
 msgstr "Artikel abgelehnt - nicht erneut senden"
 
-#: tools/sources/nntp.h:207
+#: tools/sources/nntp.h:208
 msgid "posting not allowed"
 msgstr "Posting ist nicht erlaubt"
 
-#: tools/sources/nntp.h:208
+#: tools/sources/nntp.h:209
 msgid "posting failed"
 msgstr "Posting fehlgeschlagen"
 
-#: tools/sources/nntp.h:211
+#: tools/sources/nntp.h:212
 msgid "command not recognized"
 msgstr "Größe konnte nicht ermittelt werden"
 
-#: tools/sources/nntp.h:212
+#: tools/sources/nntp.h:213
 msgid "command syntax error"
 msgstr "Kommando Syntax Fehler"
 
-#: tools/sources/nntp.h:213
+#: tools/sources/nntp.h:214
 msgid "access restriction or permission denied"
 msgstr "Zugriff eingeschränkt oder verboten"
 
-#: tools/sources/nntp.h:214
+#: tools/sources/nntp.h:215
 msgid "program fault"
 msgstr "Programm Abbruch"
 
