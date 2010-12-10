@@ -26,10 +26,10 @@
  * $Rev$
  * @author Philipp Kraus <philipp.kraus@flashpixx.de> 
  *
- * @section License
+ * @section license
  * The framework is supported under the @subpage license
  *
- * @section requirements Requirements
+ * @section requirements requirements
  * <ul>
  * <li>ATLAS ( http://math-atlas.sourceforge.net/ )</li>
  * <li>Boost ( http://www.boost.org/ ) (iostreams with gzip and bzip2 support and thread support musst be compiled within, random device and MPI support are optional)</li>
@@ -45,9 +45,10 @@
  *      </ul>
  * <li><i>optional GetText</i> ( http://www.gnu.org/software/gettext ) for including multilanguage support</li>
  * <li><i>optional LibXML2</i> ( http://xmlsoft.org/ ) (used by wikipedia support)</li>
+ * <li><i>optional Scons</i> ( http://www.scons.org/ )</li>
  * </ul>
  *
- * @section compileroptions Compiler Option
+ * @section compileroptions compiler option
  * toolbox compilerflags
  * <ul>
  * <li><dfn>ML_RANDOMDEVICE</dfn> for using the Boost Device Random support (required Boost Random Device Support), otherwise a Mersenne Twister is used</li>
@@ -61,6 +62,23 @@
  * <li><dfn>NDEBUG</dfn> for disabling Boost and local debugging</li>
  * <li><dfn>BOOST_UBLAS_NDEBUG</dfn> for disabling Boost Ublas support</li>
  * <li><dfn>BOOST_NUMERIC_BINDINGS_BLAS_CBLAS</dfn> add CBLAS / LAPACK support for the Boost Bindings</li>
+ * </ul>
+ *
+ * @section scons compiler tools
+ * The framework supports Scons for compiling. The script reads the environment (Linux, OS X & Microsoft) and uses the
+ * plattform specified options for compiling the sources. The Scons script supports some different parameters:
+ * <ul>
+ * <li><dfn>--create-documentation</dfn> creates the doxygen documentation (doxygen must be called, so it should be within the path)</li>
+ * <li><dfn>--create-language</dfn> creates the language files / adds new messages to the existing files (xgettext must be called, so it should be within the path)</li>
+ * <li><dfn>--compile-language</dfn> compiles all language files (msgfmt must be called, so it should be within the path)</li>
+ * </ul>
+ * For compiling any cpp file in the root directory the following option can be set
+ * <ul>
+ * <li><dfn>--with-randomdevice</dfn> adds the compilerflag for random device support</li>
+ * <li><dfn>--with-mpi</dfn> adds the compilerflag for cluster / MPI support</li>
+ * <li><dfn>--with-multilanguage</dfn> adds the multilanguage support with gettext</li>
+ * <li><dfn>--with-sources</dfn> support for the namespace machinelearning::tools::sources</li>
+ * <li><dfn>--with-files</dfn> support for the namespace machinelearning::tools::files</li>
  * </ul>
  *
  * @section defs definitions / specifications
