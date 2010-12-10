@@ -22,9 +22,6 @@
  **/
 
 
-/** template header file with implementation for some matrix functions **/
-
-
 #ifndef MACHINELEARNING_TOOLS_MATRIX_HPP
 #define MACHINELEARNING_TOOLS_MATRIX_HPP
 
