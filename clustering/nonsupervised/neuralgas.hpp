@@ -25,6 +25,7 @@
 #ifndef MACHINELEARNING_CLUSTERING_NONSUPERVISED_NG_HPP
 #define MACHINELEARNING_CLUSTERING_NONSUPERVISED_NG_HPP
 
+#include <numeric>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 
