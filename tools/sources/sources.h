@@ -26,6 +26,17 @@
 #ifndef MACHINELEARNING_TOOLS_SOURCES_H
 #define MACHINELEARNING_TOOLS_SOURCES_H
 
+namespace machinelearning { 
+    namespace tools { 
+        
+        /** namespace with classes for generating example data
+         * $LastChangedDate$
+         **/
+        namespace sources {};
+    
+    };
+};
+
 #include "nntp.h"
 #include "wikipedia.h"
 #include "cloud.hpp"

@@ -199,9 +199,9 @@
  *
  *
  * @page dimreduce dimension reducing
- * The dimension reducing classes are in the namespace machinelearning::dimensionreduce and can be used for dimension reduction. The are two subnamespaces machinelearning::dimensionreduce::nonsupervised and 
- * machinelearning::dimensionreduce::supervised. Supervised uses two template parameter first one for datatype, second one for labeling. The nonsupervised is used only one parameter (for datatype). The examples
- * show the different option
+ * The dimension reducing classes are in the namespace machinelearning::dimensionreduce::nonsupervised and machinelearning::dimensionreduce::supervised can be used
+ * for dimension reduction. Supervised uses two template parameter first one for datatype, second one for labeling. The nonsupervised is used only one parameter
+ * (for datatype). The examples show the different option
  *
  * @section pca principle component analysis (PCA)
  * @code
@@ -249,9 +249,10 @@
  *
  *
  * @page distances distances
- * The namespace machinelearning::distances holds all types of distances. Every distance function is a subclass of <i>distance</i> and calculates distances values for vector- and matrixdata. The class must be implementated
- * as a template class and must hold some special functions for using the distance operation. In the namespace is also the ncd-class that creates a symmetric/asymmetric dissimilarity matrix of string- or filedata with the
- * <i>normalized compression distance</i>, that based on an approximation of the the Kolmogorov complexity. The example show how to use these classes.
+ * The namespace machinelearning::distances holds all types of distances. Every distance function is a subclass of <i>distance</i> and calculates distances values for vector- and matrixdata.
+ * The class must be implementated as a template class and must hold some special functions for using the distance operation. In the namespace is also the ncd-class that creates a
+ * symmetric/asymmetric dissimilarity matrix of string- or filedata with the <i>normalized compression distance</i>, that based on an approximation of the the Kolmogorov complexity. The
+ * example show how to use these classes.
  *
  * @section ncd normalize compression distance (NCD)
  * @code
@@ -275,7 +276,7 @@
  *
  * @page sources data sources
  * The toolbox implements some structures for geting datasets. The compile option <dfn>ML_SOURCES</dfn> must be set for compiling the namespace
- * machinelearning::tools::sources.
+ * machinelearning::tools::sources .
  * @section nntp newsgroups
  * The class allows to browse newsgroups in a naitve way for extraction the message content. The class throws different exception if there
  * are connection or stream errors during sending or receiving data (see exceptions within the class).

@@ -26,6 +26,18 @@
 #ifndef MACHINELEARNING_TOOLS_FILES_H
 #define MACHINELEARNING_TOOLS_FILES_H
 
+namespace machinelearning { 
+    namespace tools { 
+        
+        /** namespace for file support
+         * $LastChangedDate$
+         **/
+        namespace files {};
+    
+    };
+};
+
+
 #include "csv.hpp"
 #include "hdf.hpp"
 
