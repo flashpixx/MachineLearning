@@ -43,66 +43,67 @@
 namespace machinelearning { namespace clustering { namespace nonsupervised {
     
     namespace ublas = boost::numeric::ublas;
-#ifdef ML_CLUSTER
+    #ifdef ML_CLUSTER
     namespace mpi   = boost::mpi;
-#endif
+    #endif
     
     /** class for calculate (batch) neural gas
      * $LastChangedDate$
-     * @todo parallel NG with >= 0 prototypes on each CPU
+     * @note The MPI methods do not check the correct ranges / dimension of the prototype
+     * data, so it is the task of the developer to use the correct ranges
      **/
     template<typename T> class neuralgas : public nonsupervisedclustering<T> {
         
-    public:
-        
-        neuralgas( const distances::distance<T>&, const std::size_t&, const std::size_t& );
-        void train( const ublas::matrix<T>&, const std::size_t& );
-        void train( const ublas::matrix<T>&, const std::size_t&, const T& );
-        ublas::matrix<T> getPrototypes( void ) const;
-        void setLogging( const bool& );
-        std::vector< ublas::matrix<T> > getLoggedPrototypes( void ) const;
-        bool getLogging( void ) const;
-        std::size_t getPrototypeSize( void ) const;
-        std::size_t getPrototypeCount( void ) const;
-        std::vector<T> getLoggedQuantizationError( void ) const;
-        ublas::indirect_array< std::vector<std::size_t> > use( const ublas::matrix<T>& ) const;
-        
-#ifdef ML_CLUSTER
-        void train( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t& );
-        void train( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t&, const T& );
-        ublas::matrix<T> getPrototypes( const mpi::communicator& ) const;
-        std::vector< ublas::matrix<T> > getLoggedPrototypes( const mpi::communicator& ) const;
-        std::vector<T> getLoggedQuantizationError( const mpi::communicator& ) const;
-        ublas::indirect_array< std::vector<std::size_t> > use( const mpi::communicator&, const ublas::matrix<T>& ) const;
-        void use( const mpi::communicator& ) const;
-#endif
+        public:
+            
+            neuralgas( const distances::distance<T>&, const std::size_t&, const std::size_t& );
+            void train( const ublas::matrix<T>&, const std::size_t& );
+            void train( const ublas::matrix<T>&, const std::size_t&, const T& );
+            ublas::matrix<T> getPrototypes( void ) const;
+            void setLogging( const bool& );
+            std::vector< ublas::matrix<T> > getLoggedPrototypes( void ) const;
+            bool getLogging( void ) const;
+            std::size_t getPrototypeSize( void ) const;
+            std::size_t getPrototypeCount( void ) const;
+            std::vector<T> getLoggedQuantizationError( void ) const;
+            ublas::indirect_array< std::vector<std::size_t> > use( const ublas::matrix<T>& ) const;
+            
+            #ifdef ML_CLUSTER
+            void train( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t& );
+            void train( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t&, const T& );
+            ublas::matrix<T> getPrototypes( const mpi::communicator& ) const;
+            std::vector< ublas::matrix<T> > getLoggedPrototypes( const mpi::communicator& ) const;
+            std::vector<T> getLoggedQuantizationError( const mpi::communicator& ) const;
+            ublas::indirect_array< std::vector<std::size_t> > use( const mpi::communicator&, const ublas::matrix<T>& ) const;
+            void use( const mpi::communicator& ) const;
+            #endif
         
         
         
         private :
         
-        /** distance object **/
-        const distances::distance<T>* m_distance;        
-        /** prototypes **/
-        ublas::matrix<T> m_prototypes;                
-        /** bool for logging prototypes **/
-        bool m_logging;
-        /** std::vector for prototypes for each iteration **/
-        std::vector< ublas::matrix<T> > m_logprototypes;
-        /** std::vector for quantisation error in each iteration **/
-        std::vector<T> m_quantizationerror;
-        
-        T calculateQuantizationError( const ublas::matrix<T>&, const ublas::matrix<T>& ) const;
-        
-#ifdef ML_CLUSTER
-        /** map with information to every process and prototype**/
-        std::map<int, std::pair<std::size_t,std::size_t> > m_processprototypinfo;
-        
-        void synchronizePrototypes( const mpi::communicator&, ublas::matrix<T>&, ublas::vector<T>& );
-        ublas::matrix<T> gatherAllPrototypes( const mpi::communicator& ) const;
-        std::size_t getNumberPrototypes( const mpi::communicator& ) const;
-        void setProcessPrototypeInfo( const mpi::communicator& );
-#endif
+            /** distance object **/
+            const distances::distance<T>* m_distance;        
+            /** prototypes **/
+            ublas::matrix<T> m_prototypes;                
+            /** bool for logging prototypes **/
+            bool m_logging;
+            /** std::vector for prototypes for each iteration **/
+            std::vector< ublas::matrix<T> > m_logprototypes;
+            /** std::vector for quantisation error in each iteration **/
+            std::vector<T> m_quantizationerror;
+            
+            T calculateQuantizationError( const ublas::matrix<T>&, const ublas::matrix<T>& ) const;
+            
+            #ifdef ML_CLUSTER
+            /** map with information to every process and prototype**/
+            std::map<int, std::pair<std::size_t,std::size_t> > m_processprototypinfo;
+            
+            void synchronizePrototypes( const mpi::communicator&, ublas::matrix<T>&, ublas::vector<T>& );
+            ublas::matrix<T> gatherAllPrototypes( const mpi::communicator& ) const;
+            std::size_t getNumberPrototypes( const mpi::communicator& ) const;
+            void setProcessPrototypeInfo( const mpi::communicator& );
+            #endif
     };
     
     
@@ -113,14 +114,14 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * @param p_prototypesize size of each prototype (data dimension)
      **/
     template<typename T> inline neuralgas<T>::neuralgas( const distances::distance<T>& p_distance, const std::size_t& p_prototypes, const std::size_t& p_prototypesize ) :
-    m_distance( &p_distance ),
-    m_prototypes( tools::matrix::random<T>(p_prototypes, p_prototypesize) ),
-    m_logging( false ),
-    m_logprototypes( std::vector< ublas::matrix<T> >() ),
-    m_quantizationerror( std::vector<T>() )
-#ifdef ML_CLUSTER
-    , m_processprototypinfo()
-#endif
+        m_distance( &p_distance ),
+        m_prototypes( tools::matrix::random<T>(p_prototypes, p_prototypesize) ),
+        m_logging( false ),
+        m_logprototypes( std::vector< ublas::matrix<T> >() ),
+        m_quantizationerror( std::vector<T>() )
+        #ifdef ML_CLUSTER
+        , m_processprototypinfo()
+        #endif
     {
         if (p_prototypesize == 0)
             throw exception::runtime(_("prototype size must be greater than zero"));
@@ -338,7 +339,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     }
     
     //======= MPI ==================================================================================================================================
-#ifdef ML_CLUSTER
+    #ifdef ML_CLUSTER
     
     /** gathering prototypes of every process and return the full prototypes matrix (row oriantated)
      * @param p_mpi MPI object for communication
@@ -667,7 +668,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         gatherAllPrototypes( p_mpi );
     }
     
-#endif
+    #endif
     
 };};};
 
