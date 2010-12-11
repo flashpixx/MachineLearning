@@ -351,8 +351,12 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         mpi::all_gather(p_mpi, m_prototypes, l_prototypedata);
         
         // create full prototype matrix with processprotos
-        ublas::matrix<T> l_prototypes = l_prototypedata[0];
-        for(std::size_t i=1; i < l_prototypedata.size(); ++i) {
+        ublas::matrix<T> l_prototypes;
+        for(std::size_t i=0; i < l_prototypedata.size(); ++i) {
+            if ((l_prototypedata[i].size1() == 0) || (l_prototypes.size2() < l_prototypes.size2()))
+                continue;
+            
+            
             l_prototypes.resize( l_prototypes.size1()+l_prototypedata[i].size1(), l_prototypes.size2());
 
             ublas::matrix_range< ublas::matrix<T> > l_range(l_prototypes, 
@@ -406,6 +410,10 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         mpi::all_to_all( p_mpi, l_norm, l_collectnorm );
         mpi::all_to_all( p_mpi, l_prototypes, l_collectprototypes );
 
+        
+        // if the local prototypes are empty, we can break
+        if (m_prototypes.size1() == 0)
+            return;
         
         // both std::vectors will be summerized
                                m_prototypes = std::accumulate( l_collectprototypes.begin(), l_collectprototypes.end(), ublas::matrix<T>(m_prototypes.size1(), m_prototypes.size2(), 0) );
@@ -496,10 +504,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         const T l_lambdaMPI               = mpi::all_reduce(p_mpi, p_lambda, mpi::maximum<T>());
         m_logging                         = mpi::all_reduce(p_mpi, m_logging, std::plus<bool>());
         setProcessPrototypeInfo(p_mpi);
-         
-        // if the local process has no prototypes, the logging must be disabled
-        if (m_prototypes.size1() == 0)
-            m_logging = false;
+        
         
         // creates logging
         if (m_logging) {
