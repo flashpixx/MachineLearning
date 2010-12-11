@@ -458,7 +458,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> inline void neuralgas<T>::train( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data, const std::size_t& p_iterations )
     {
-        train(p_mpi, p_data, p_iterations, m_prototypes.size1() * 0.5);
+        train(p_mpi, p_data, p_iterations, ((m_prototypes.size1() == 0) ? std::numeric_limits<T>::epsilon() :  m_prototypes.size1() * 0.5) );
     }
 
     

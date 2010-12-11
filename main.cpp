@@ -383,8 +383,8 @@ int main(int argc, char* argv[]) {
 
     ublas::matrix_range< ublas::matrix<double> > datarange(data, ublas::range(loMPICom.rank()*nums, (loMPICom.rank()+1)*nums + add), ublas::range(0, data.size2()));
     
-    //if (loMPICom.rank() == 0)
-    //    protonum = 0;
+    if (loMPICom.rank() == 0)
+        protonum = 0;
     nsl::neuralgas<double> ng(d, protonum, data.size2());
     ng.setLogging(true);
     mpi::timer t;
