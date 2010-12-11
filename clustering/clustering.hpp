@@ -27,6 +27,10 @@
 
 #include <boost/numeric/ublas/matrix.hpp>
 
+#ifdef ML_CLUSTER
+#include <boost/mpi.hpp>
+#endif
+
 #include "../exception/exception.h"
 #include "../distances/distances.h"
 #include "../tools/tools.h"
@@ -53,7 +57,9 @@ namespace machinelearning {
         
         
         namespace ublas = boost::numeric::ublas;
-        
+        #ifdef ML_CLUSTER
+        namespace mpi   = boost::mpi;
+        #endif
         
         
         /** abstract class for all supervised clustering classes
