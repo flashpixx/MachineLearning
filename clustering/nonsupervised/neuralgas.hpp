@@ -585,13 +585,18 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         // we must gather every logged prototype and create the full prototype matrix
         std::vector< std::vector< ublas::matrix<T> > > l_gatherProto;
         mpi::all_gather(p_mpi, m_logprototypes, l_gatherProto);
-        
+
         // now we create the full prototype matrix for every log
         std::vector< ublas::matrix<T> > l_logProto = l_gatherProto[0];
         for(std::size_t i=1; i < l_gatherProto.size(); ++i)
-            for(std::size_t n=0; n < l_logProto.size(); ++n) {
+            for(std::size_t n=0; n < l_gatherProto[i].size(); ++n) {
                 
-                l_logProto[n].resize( l_logProto[n].size1()+l_gatherProto[i][n].size1(), l_logProto[n].size2());
+                // resizing must be in the correct way, so we check the dimensions
+                if (l_gatherProto[i][n].size2() < l_logProto[n].size2())
+                    l_logProto[n].resize( l_logProto[n].size1()+l_gatherProto[i][n].size1(), l_logProto[n].size2());
+                else
+                    l_logProto[n].resize( l_logProto[n].size1()+l_gatherProto[i][n].size1(), l_gatherProto[i][n].size2());
+                
                 
                 ublas::matrix_range< ublas::matrix<T> > l_range(l_logProto[n], 
                                                                 ublas::range( l_logProto[n].size1()-l_gatherProto[i][n].size1(), l_logProto[n].size1() ), 
@@ -619,7 +624,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         // we get every quantization error
         std::vector<T> l_error = l_gatherError[0];
         for(std::size_t i=1; i < l_gatherError.size(); ++i)
-            for(std::size_t n=0; n < l_error.size(); ++n)
+            for(std::size_t n=0; n < l_gatherError[i].size(); ++n)
                 l_error[n] += l_gatherError[i][n];
         
         return l_error;
