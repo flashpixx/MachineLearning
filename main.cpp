@@ -372,7 +372,7 @@ int main(int argc, char* argv[]) {
     }
     
     // extract the data for the process (every process has load the whole data and shuffel them with the broadcasted shuffle vector)
-    std::size_t nums     		= data.size1() / (loMPICom.size()-0);
+    std::size_t nums     		= data.size1() / (loMPICom.size());
     std::size_t protonum 		= numproto / loMPICom.size();
     std::size_t add      		= 0;
     

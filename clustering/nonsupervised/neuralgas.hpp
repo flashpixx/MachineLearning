@@ -351,7 +351,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         mpi::all_gather(p_mpi, m_prototypes, l_prototypedata);
         
         // create full prototype matrix with processprotos
-        ublas::matrix<T> l_prototypes;
+        ublas::matrix<T> l_prototypes = l_prototypedata[0];
         for(std::size_t i=0; i < l_prototypedata.size(); ++i) {
             //if ((l_prototypedata[i].size1() == 0) || (l_prototypes.size2() < l_prototypes.size2()))
             //    continue;
