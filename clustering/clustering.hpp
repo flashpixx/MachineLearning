@@ -143,6 +143,28 @@ namespace machinelearning {
                 /** calculate prototype index for datapoints **/
                 virtual ublas::indirect_array< std::vector<std::size_t> > use( const ublas::matrix<T>& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
 
+            
+                #ifdef ML_CLUSTER
+            
+                /** MPI method for training prototypes **/
+                virtual void train( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
+
+                /** MPI method which returns prototypes **/
+                virtual ublas::matrix<T> getPrototypes( const mpi::communicator& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+
+                /** MPI method for returning history of trained prototypes **/
+                virtual std::vector< ublas::matrix<T> > getLoggedPrototypes( const mpi::communicator& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+
+                /** MPI method for returning the quantizationerror **/
+                virtual std::vector<T> getLoggedQuantizationError( const mpi::communicator& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+
+                /** MPI calculate prototype index for datapoints **/
+                virtual ublas::indirect_array< std::vector<std::size_t> > use( const mpi::communicator&, const ublas::matrix<T>& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+
+                /** MPI call for determine the distance **/
+                virtual void use( const mpi::communicator& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+            
+                #endif
 
             
             protected :
