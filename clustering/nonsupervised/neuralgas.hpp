@@ -483,18 +483,11 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         if (p_lambda <= 0)
             throw exception::runtime(_("lambda must be greater than zero"));
         
-        // check if each process has the same prototype size (size2())
-        std::vector<std::size_t> l_protodim;
-        mpi::all_gather(p_mpi, m_prototypes.size2(), l_protodim);
-        for(std::size_t i=0; i < l_protodim.size(); ++i)
-            if (l_protodim[i] != m_prototypes.size2())
-                throw exception::runtime(_("prototype dimensions are not equal on the processes"));
-        
         
         // we use the max. of all values of each process
         const std::size_t l_iterationsMPI = mpi::all_reduce(p_mpi, p_iterations, mpi::maximum<std::size_t>());
         const T l_lambdaMPI               = mpi::all_reduce(p_mpi, p_lambda, mpi::maximum<T>());
-        m_logging                         = mpi::all_reduce(p_mpi, m_logging, std::plus<bool>());
+        m_logging                         = mpi::all_reduce(p_mpi, m_logging, std::multiplies<bool>());
         setProcessPrototypeInfo(p_mpi);
         
         // creates logging
