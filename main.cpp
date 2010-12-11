@@ -372,8 +372,8 @@ int main(int argc, char* argv[]) {
     }
     
     // extract the data for the process (every process has load the whole data and shuffel them with the broadcasted shuffle vector)
-    std::size_t nums     		= data.size1() / (loMPICom.size()-1);
-    std::size_t protonum 		= numproto / (loMPICom.size()-1);
+    std::size_t nums     		= data.size1() / (loMPICom.size());
+    std::size_t protonum 		= numproto / (loMPICom.size());
     std::size_t add      		= 0;
     
     if (loMPICom.rank() == loMPICom.size()-1) {
@@ -383,8 +383,8 @@ int main(int argc, char* argv[]) {
 
     ublas::matrix_range< ublas::matrix<double> > datarange(data, ublas::range(loMPICom.rank()*nums, (loMPICom.rank()+1)*nums + add), ublas::range(0, data.size2()));
     
-    if (loMPICom.rank() == 0)
-        protonum = 0;
+    //if (loMPICom.rank() == 0)
+    //    protonum = 0;
     nsl::neuralgas<double> ng(d, protonum, data.size2());
     ng.setLogging(true);
     mpi::timer t;

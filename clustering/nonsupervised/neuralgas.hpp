@@ -591,7 +591,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         for(std::size_t i=1; i < l_gatherProto.size(); ++i)
             for(std::size_t n=0; n < l_gatherProto[i].size(); ++n) {
                 
-                // resizing must be in the correct way, so we check the dimensions
+                // resizing must be in the correct way, so we check the dimensions (the condition 
+                // must check if the prototypes are empty)
                 if (l_gatherProto[i][n].size2() < l_logProto[n].size2())
                     l_logProto[n].resize( l_logProto[n].size1()+l_gatherProto[i][n].size1(), l_logProto[n].size2());
                 else
@@ -621,7 +622,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         std::vector< std::vector<T> > l_gatherError;
         mpi::all_gather(p_mpi, m_quantizationerror, l_gatherError);
         
-        // we get every quantization error
+        // we get every quantization error (if the prototypes are empty on the process, the quantization error exists for all other prototypes)
         std::vector<T> l_error = l_gatherError[0];
         for(std::size_t i=1; i < l_gatherError.size(); ++i)
             for(std::size_t n=0; n < l_gatherError[i].size(); ++n)
