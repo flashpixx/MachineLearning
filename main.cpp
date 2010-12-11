@@ -386,7 +386,7 @@ int main(int argc, char* argv[]) {
     if (loMPICom.rank() == 0)
         protonum = 0;
     nsl::neuralgas<double> ng(d, protonum, data.size2());
-    //ng.setLogging(true);
+    ng.setLogging(true);
     mpi::timer t;
     ng.train(loMPICom, datarange, ngit);
     if (loMPICom.rank() == 0)

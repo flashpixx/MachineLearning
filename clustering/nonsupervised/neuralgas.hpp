@@ -469,6 +469,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * @param p_data datapoints
      * @param p_iterations iterations
      * @param p_lambda max adapet size
+     * @todo logging is not correct
      **/
     template<typename T> inline void neuralgas<T>::train( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data, const std::size_t& p_iterations, const T& p_lambda )
     {
@@ -480,6 +481,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             throw exception::runtime(_("data and prototype dimension are not equal"));
         if (p_lambda <= 0)
             throw exception::runtime(_("lambda must be greater than zero"));
+        
+        // check if each process has the same prototype size (size2())
         
         
         // we use the max. of all values of each process
