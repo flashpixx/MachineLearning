@@ -50,7 +50,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     /** class for calculate (batch) neural gas
      * $LastChangedDate$
      * @note The MPI methods do not check the correct ranges / dimension of the prototype
-     * data, so it is the task of the developer to use the correct ranges
+     * data, so it is the task of the developer to use the correct ranges. Also the MPI
+     * methods must be called in the correct order, so the MPI calls must be run
+     * on each process.
      **/
     template<typename T> class neuralgas : public nonsupervisedclustering<T> {
         
