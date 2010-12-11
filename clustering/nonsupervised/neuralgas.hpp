@@ -483,6 +483,11 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             throw exception::runtime(_("lambda must be greater than zero"));
         
         // check if each process has the same prototype size (size2())
+        std::vector<std::size_t> l_protodim;
+        mpi::all_gather(p_mpi, m_prototypes.size2(), l_protodim);
+        for(std::size_t i=0; i < l_protodim.size(); ++i)
+            if (l_protodim[i] != m_prototypes.size2())
+                throw exception::runtime(_("prototype dimensions are not equal on the processes"));
         
         
         // we use the max. of all values of each process
