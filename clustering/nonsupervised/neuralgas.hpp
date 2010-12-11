@@ -353,8 +353,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         // create full prototype matrix with processprotos
         ublas::matrix<T> l_prototypes;
         for(std::size_t i=0; i < l_prototypedata.size(); ++i) {
-            if ((l_prototypedata[i].size1() == 0) || (l_prototypes.size2() < l_prototypes.size2()))
-                continue;
+            //if ((l_prototypedata[i].size1() == 0) || (l_prototypes.size2() < l_prototypes.size2()))
+            //    continue;
             
             
             l_prototypes.resize( l_prototypes.size1()+l_prototypedata[i].size1(), l_prototypes.size2());
@@ -412,8 +412,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
 
         
         // if the local prototypes are empty, we can break
-        if (m_prototypes.size1() == 0)
-            return;
+        //if (m_prototypes.size1() == 0)
+        //    return;
         
         // both std::vectors will be summerized
                                m_prototypes = std::accumulate( l_collectprototypes.begin(), l_collectprototypes.end(), ublas::matrix<T>(m_prototypes.size1(), m_prototypes.size2(), 0) );
