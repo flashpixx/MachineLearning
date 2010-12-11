@@ -124,8 +124,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     {
         if (p_prototypesize == 0)
             throw exception::runtime(_("prototype size must be greater than zero"));
-        if (p_prototypes == 0)
-            throw exception::runtime(_("number of prototypes must be greater than zero"));
+        if (m_prototypes.size1() > 0)
+        //    throw exception::runtime(_("number of prototypes must be greater than zero"));
     
         // normalize the prototypes
         m_distance->normalize( m_prototypes );
@@ -217,6 +217,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     **/
     template<typename T> inline void neuralgas<T>::train( const ublas::matrix<T>& p_data, const std::size_t& p_iterations, const T& p_lambda )
     {
+        if (m_prototypes.size1() == 0)
+            throw exception::runtime(_("number of prototypes must be greater than zero"));
         if (p_data.size1() < m_prototypes.size1())
             throw exception::runtime(_("number of datapoints are less than prototypes"));
         if (p_iterations == 0)
@@ -312,6 +314,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     **/
     template<typename T> inline ublas::indirect_array< std::vector<std::size_t> > neuralgas<T>::use( const ublas::matrix<T>& p_data ) const
     {
+        if (m_prototypes.size1() == 0)
+            throw exception::runtime(_("number of prototypes must be greater than zero"));
         if (p_data.size2() != m_prototypes.size2())
             throw exception::runtime(_("data and prototype dimension are not equal"));
         

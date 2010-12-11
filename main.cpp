@@ -61,7 +61,7 @@ int main(int argc, char* argv[]) {
     #endif
     
     #ifdef ML_FILES
-    //tl::files::hdf o("blub.hdf5");
+    tl::files::hdf o("blub.hdf5");
     /*tl::files::hdf o("string.hdf5");
     std::vector<std::string> x = o.readStringVector("/array");
     for(std::size_t i=0; i < x.size(); ++i)
@@ -349,10 +349,10 @@ int main(int argc, char* argv[]) {
     
    
     // ===== NG =====
-    /*
-    //ublas::matrix<double> data = o.readMatrix<double>("/ngdata", H5::PredType::NATIVE_DOUBLE);
+    
+    ublas::matrix<double> data = o.readMatrix<double>("/ngdata", H5::PredType::NATIVE_DOUBLE);
     //ublas::matrix<double> data = o.readMatrix<double>("/ngmini", H5::PredType::NATIVE_DOUBLE);
-    ublas::matrix<double> data = o.readMatrix<double>("/ngbigdata", H5::PredType::NATIVE_DOUBLE);
+    //ublas::matrix<double> data = o.readMatrix<double>("/ngbigdata", H5::PredType::NATIVE_DOUBLE);
     	
     
     dist::euclid<double> d;
@@ -392,7 +392,7 @@ int main(int argc, char* argv[]) {
     
     
     #else    
-    nsl::neuralgas<double> ng(d, numproto, data.size2());
+    nsl::neuralgas<double> ng(d, 0, data.size2());
     ng.setLogging(true);
     ng.train(data, ngit);
     #endif
@@ -433,7 +433,7 @@ int main(int argc, char* argv[]) {
             f.write<double>("/log" + boost::lexical_cast<std::string>( i ), tl::matrix::setNumericalZero(logproto[i]), H5::PredType::NATIVE_DOUBLE );
     }
     #endif
-    */
+    
     
     
     // ===== RLVQ ======

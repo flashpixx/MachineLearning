@@ -104,9 +104,6 @@ namespace machinelearning { namespace tools {
      **/
     template<typename T> inline ublas::vector<T> vector::random( const std::size_t& p_length, const tools::random::distribution& p_distribution, const T& p_a, const T& p_b, const T& p_c )
     {
-        if (p_length == 0)
-            throw exception::runtime(_("length must be greater than zero"));
-        
         // initialisation of prototypes
         tools::random l_rand;
         ublas::vector<T> l_vec(p_length);
