@@ -425,6 +425,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     **/
     template<typename T> inline void neuralgas<T>::setProcessPrototypeInfo( const mpi::communicator& p_mpi )
     {
+        m_processprototypinfo.clear();
         // gathering the number of prototypes
         std::vector< std::size_t > l_processdata;
         mpi::all_gather(p_mpi, m_prototypes.size1(), l_processdata);
@@ -491,8 +492,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
         
         // we use the max. of all values of each process
-        m_processprototypinfo.clear();
-        
         const std::size_t l_iterationsMPI = mpi::all_reduce(p_mpi, p_iterations, mpi::maximum<std::size_t>());
         const T l_lambdaMPI               = mpi::all_reduce(p_mpi, p_lambda, mpi::maximum<T>());
         m_logging                         = mpi::all_reduce(p_mpi, m_logging, std::plus<bool>());
