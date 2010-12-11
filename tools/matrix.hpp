@@ -90,6 +90,9 @@ namespace machinelearning { namespace tools {
      **/
     template<typename T> inline ublas::matrix<T> matrix::random( const std::size_t& p_row, const std::size_t& p_col, const tools::random::distribution& p_distribution, const T& p_a, const T& p_b, const T& p_c )
     {         
+        if ((p_row == 0) || (p_col == 0))
+            return ublas::matrix<T>(p_row, p_col);
+        
         // initialisation of prototypes
         tools::random l_rand;
         ublas::matrix<T> l_matrix(p_row, p_col);
