@@ -458,6 +458,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> inline void neuralgas<T>::train( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data, const std::size_t& p_iterations )
     {
+        // if the process has no prototypes, than ne lambda will be zero, so we set it to a minimal numerical value, so the exception is not thrown
         train(p_mpi, p_data, p_iterations, ((m_prototypes.size1() == 0) ? std::numeric_limits<T>::epsilon() :  m_prototypes.size1() * 0.5) );
     }
 
@@ -489,6 +490,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         m_logging                         = mpi::all_reduce(p_mpi, m_logging, std::plus<bool>());
         setProcessPrototypeInfo(p_mpi);
          
+        // if the local process has no prototypes, the logging must be disabled
+        if (m_prototypes.size1() == 0)
+            m_logging = false;
         
         // creates logging
         if (m_logging) {
