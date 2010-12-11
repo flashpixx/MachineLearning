@@ -497,10 +497,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         m_logging                         = mpi::all_reduce(p_mpi, m_logging, std::plus<bool>());
         setProcessPrototypeInfo(p_mpi);
         
-        // if the local process has no prototypes, the logging must be disabled
-        if (m_prototypes.size1() == 0)
-            m_logging = false;
-        
         // creates logging
         if (m_logging) {
             m_logprototypes     = std::vector< ublas::matrix<T> >();
