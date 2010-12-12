@@ -473,7 +473,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * @param p_data datapoints
      * @param p_iterations iterations
      * @param p_lambda max adapet size
-     * @todo logging is not correct
      **/
     template<typename T> inline void neuralgas<T>::train( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data, const std::size_t& p_iterations, const T& p_lambda )
     {
