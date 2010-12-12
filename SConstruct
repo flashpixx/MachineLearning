@@ -163,7 +163,7 @@ def getConfig():
     
        
 # get rekursiv all files
-def getRekusivFiles(startdir, ending, pdontuse=[], pShowPath=True) :
+def getRekusivFiles(startdir, ending, pdontuse=[], pShowPath=True, pAbsPath=False) :
     lst = []
     ldontuse = [os.path.join(startdir, i) for i in pdontuse]
     
@@ -172,9 +172,18 @@ def getRekusivFiles(startdir, ending, pdontuse=[], pShowPath=True) :
             if not(root in ldontuse) :
                 if filename.endswith(ending):
                     if pShowPath :
-                        lst.append( os.path.join(root, filename) )
+                    
+                        if pAbsPath :
+                            lst.append( os.path.abspath(os.path.join(root, filename)) )  
+                        else :
+                            lst.append( os.path.join(root, filename) )
                     else :
-                        lst.append(filename)
+                    
+                        if pAbsPath :
+                            lst.append(os.path.abspath(filename))
+                        else :
+                            lst.append(filename)
+    print lst
     return lst
         
        
@@ -228,4 +237,5 @@ elif GetOption("compilelang") != None :
 elif GetOption("createdocu") != None :
     os.system("doxygen documentation.doxyfile")
 else :
-    env.Program( getRekusivFiles(os.curdir, ".cpp") )
+    # XCode 3.2 need absolut path
+    env.Program( getRekusivFiles(os.curdir, ".cpp", [], True, True) )

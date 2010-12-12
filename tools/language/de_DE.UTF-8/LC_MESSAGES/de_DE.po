@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-10 17:31+0100\n"
+"POT-Creation-Date: 2010-12-12 17:48+0100\n"
 "PO-Revision-Date: 2010-12-10 17:34+0100\n"
 "Last-Translator: Philipp Kraus <philipp.kraus@flashpixx.de>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,82 +15,60 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: classifier/classifier.hpp:50
-#: classifier/classifier.hpp:53
-#: classifier/classifier.hpp:56
-#: classifier/classifier.hpp:59
-#: classifier/classifier.hpp:62
-#: classifier/classifier.hpp:65
-#: classifier/classifier.hpp:68
-#: classifier/classifier.hpp:71
-#: classifier/classifier.hpp:74
-#: clustering/clustering.hpp:51
-#: clustering/clustering.hpp:54
-#: clustering/clustering.hpp:57
-#: clustering/clustering.hpp:60
-#: clustering/clustering.hpp:63
-#: clustering/clustering.hpp:66
-#: clustering/clustering.hpp:69
-#: clustering/clustering.hpp:72
-#: clustering/clustering.hpp:75
-#: clustering/clustering.hpp:78
-#: clustering/clustering.hpp:102
-#: clustering/clustering.hpp:105
-#: clustering/clustering.hpp:108
-#: clustering/clustering.hpp:111
-#: clustering/clustering.hpp:114
-#: clustering/clustering.hpp:117
-#: clustering/clustering.hpp:120
-#: clustering/clustering.hpp:123
-#: clustering/clustering.hpp:126
-#: dimensionreduce/dimensionreduce.hpp:49
-#: dimensionreduce/dimensionreduce.hpp:52
+#: classifier/classifier.hpp:53 classifier/classifier.hpp:56
+#: classifier/classifier.hpp:59 classifier/classifier.hpp:62
+#: classifier/classifier.hpp:65 classifier/classifier.hpp:68
+#: classifier/classifier.hpp:71 classifier/classifier.hpp:74
+#: classifier/classifier.hpp:77 clustering/clustering.hpp:76
+#: clustering/clustering.hpp:79 clustering/clustering.hpp:82
+#: clustering/clustering.hpp:85 clustering/clustering.hpp:88
+#: clustering/clustering.hpp:91 clustering/clustering.hpp:94
+#: clustering/clustering.hpp:97 clustering/clustering.hpp:100
+#: clustering/clustering.hpp:103 clustering/clustering.hpp:127
+#: clustering/clustering.hpp:130 clustering/clustering.hpp:133
+#: clustering/clustering.hpp:136 clustering/clustering.hpp:139
+#: clustering/clustering.hpp:142 clustering/clustering.hpp:145
+#: clustering/clustering.hpp:148 clustering/clustering.hpp:151
+#: clustering/clustering.hpp:158 clustering/clustering.hpp:161
+#: clustering/clustering.hpp:164 clustering/clustering.hpp:167
+#: clustering/clustering.hpp:170 clustering/clustering.hpp:173
+#: dimensionreduce/dimensionreduce.hpp:68
 #: dimensionreduce/dimensionreduce.hpp:71
-#: dimensionreduce/dimensionreduce.hpp:74
-#: distances/distance.hpp:51
-#: distances/distance.hpp:54
-#: distances/distance.hpp:57
-#: distances/distance.hpp:60
-#: distances/distance.hpp:65
-#: distances/distance.hpp:68
-#: distances/distance.hpp:71
-#: distances/distance.hpp:74
-#: distances/distance.hpp:77
-#: distances/distance.hpp:82
-#: distances/distance.hpp:85
-#: distances/distance.hpp:88
-#: distances/distance.hpp:93
-#: distances/distance.hpp:96
-#: distances/distance.hpp:99
-#: distances/distance.hpp:102
-#: neighborhood/neighborhood.hpp:51
-#: neighborhood/neighborhood.hpp:54
-#: neighborhood/neighborhood.hpp:57
-#: neighborhood/neighborhood.hpp:60
-#: neighborhood/neighborhood.hpp:63
+#: dimensionreduce/dimensionreduce.hpp:90
+#: dimensionreduce/dimensionreduce.hpp:93 distances/distance.hpp:56
+#: distances/distance.hpp:59 distances/distance.hpp:62
+#: distances/distance.hpp:65 distances/distance.hpp:70
+#: distances/distance.hpp:73 distances/distance.hpp:76
+#: distances/distance.hpp:79 distances/distance.hpp:82
+#: distances/distance.hpp:87 distances/distance.hpp:90
+#: distances/distance.hpp:93 distances/distance.hpp:98
+#: distances/distance.hpp:101 distances/distance.hpp:104
+#: distances/distance.hpp:107 neighborhood/neighborhood.hpp:57
+#: neighborhood/neighborhood.hpp:60 neighborhood/neighborhood.hpp:63
+#: neighborhood/neighborhood.hpp:66 neighborhood/neighborhood.hpp:69
 msgid "method is not implementated in the base class"
 msgstr "Methode ist nicht implementiert, da sie Teil einer Basisklasse ist"
 
-#: classifier/lazylearner.hpp:190
-#: clustering/supervised/rlvq.hpp:217
+#: classifier/lazylearner.hpp:190 clustering/supervised/rlvq.hpp:217
 #: dimensionreduce/supervised/lda.hpp:105
 msgid "matrix rows and label size are not equal"
 msgstr "Matrixzeilen und Labelanzahl sind nicht identisch"
 
 #: clustering/nonsupervised/kmeans.hpp:96
-#: clustering/nonsupervised/neuralgas.hpp:125
+#: clustering/nonsupervised/neuralgas.hpp:129
 #: clustering/supervised/rlvq.hpp:102
 msgid "prototype size must be greater than zero"
 msgstr "Prototypdimension musst größer Null sein"
 
 #: clustering/nonsupervised/kmeans.hpp:98
-#: clustering/nonsupervised/neuralgas.hpp:127
+#: clustering/nonsupervised/neuralgas.hpp:224
+#: clustering/nonsupervised/neuralgas.hpp:321
 msgid "number of prototypes must be greater than zero"
 msgstr "Anzahl der Prototypen muss größer Null sein"
 
 #: clustering/nonsupervised/kmeans.hpp:157
-#: clustering/nonsupervised/neuralgas.hpp:222
-#: clustering/nonsupervised/neuralgas.hpp:472
+#: clustering/nonsupervised/neuralgas.hpp:228
+#: clustering/nonsupervised/neuralgas.hpp:482
 #: clustering/supervised/rlvq.hpp:215
 #: dimensionreduce/nonsupervised/mds.hpp:188
 #: functionoptimization/gradientdescent.hpp:294
@@ -98,35 +76,32 @@ msgid "iterations must be greater than zero"
 msgstr "Iterationen müssen größer Null sein"
 
 #: clustering/nonsupervised/kmeans.hpp:159
-#: clustering/nonsupervised/neuralgas.hpp:224
-#: clustering/nonsupervised/neuralgas.hpp:315
-#: clustering/nonsupervised/neuralgas.hpp:474
-#: clustering/nonsupervised/neuralgas.hpp:632
+#: clustering/nonsupervised/neuralgas.hpp:230
+#: clustering/nonsupervised/neuralgas.hpp:323
+#: clustering/nonsupervised/neuralgas.hpp:484
+#: clustering/nonsupervised/neuralgas.hpp:645
 #: clustering/nonsupervised/spectralclustering.hpp:169
-#: clustering/supervised/rlvq.hpp:219
-#: clustering/supervised/rlvq.hpp:295
+#: clustering/supervised/rlvq.hpp:219 clustering/supervised/rlvq.hpp:295
 msgid "data and prototype dimension are not equal"
 msgstr "Daten- und Prototypdimension sind nicht identisch"
 
 #: clustering/nonsupervised/kmeans.hpp:161
 #: clustering/nonsupervised/kmeans.hpp:256
-#: clustering/nonsupervised/neuralgas.hpp:220
-#: clustering/nonsupervised/neuralgas.hpp:470
+#: clustering/nonsupervised/neuralgas.hpp:226
+#: clustering/nonsupervised/neuralgas.hpp:480
 #: clustering/supervised/rlvq.hpp:213
 msgid "number of datapoints are less than prototypes"
 msgstr "Anzahl der Datenpunkte ist weniger als Anzahl der Prototypen"
 
-#: clustering/nonsupervised/neuralgas.hpp:226
-#: clustering/nonsupervised/neuralgas.hpp:476
+#: clustering/nonsupervised/neuralgas.hpp:232
+#: clustering/nonsupervised/neuralgas.hpp:486
 #: clustering/supervised/rlvq.hpp:221
 msgid "lambda must be greater than zero"
 msgstr "Lambda muss größer Null sein"
 
 #: clustering/nonsupervised/spectralclustering.hpp:167
-#: dimensionreduce/nonsupervised/mds.hpp:135
-#: tools/lapack.hpp:84
-#: tools/lapack.hpp:132
-#: tools/lapack.hpp:235
+#: dimensionreduce/nonsupervised/mds.hpp:135 tools/lapack.hpp:84
+#: tools/lapack.hpp:132 tools/lapack.hpp:235
 msgid "matrix must be square"
 msgstr "Matrix muss quadratisch sein"
 
@@ -166,8 +141,7 @@ msgstr "Sammons Map konnte nicht konvergieren"
 msgid "target dimension must be less than unique data classes"
 msgstr "Zieldimension musst kleiner sein als Anzahl der eindeutigen Klassen"
 
-#: distances/ncd.hpp:379
-#: distances/ncd.hpp:445
+#: distances/ncd.hpp:379 distances/ncd.hpp:445
 msgid "vector size must be greater than zero"
 msgstr "Vektor Puffer muss größer Null sein"
 
@@ -175,8 +149,7 @@ msgstr "Vektor Puffer muss größer Null sein"
 msgid "string size must be greater than zero"
 msgstr "Zeichenanzahl muss größer Null sein"
 
-#: distances/ncd.hpp:533
-#: distances/ncd.hpp:542
+#: distances/ncd.hpp:533 distances/ncd.hpp:542
 msgid "file can not be opened"
 msgstr "Datei konnte nicht geöffnet werden"
 
@@ -227,8 +200,7 @@ msgstr "es existieren unbenutze Variablen (Variablen ohne Wertzuweisung)"
 msgid "knn must be greater than zero"
 msgstr "Eta muss größer Null sein"
 
-#: neighborhood/knn.hpp:105
-#: neighborhood/knn.hpp:136
+#: neighborhood/knn.hpp:105 neighborhood/knn.hpp:136
 msgid "knn is greater than datapoints"
 msgstr "KNN ist größer als Anzahl der Datenpunkte"
 
@@ -244,26 +216,17 @@ msgstr "Anzahl der Zeilen / Spalten der Matrix müssen die gleiche Dimension wie
 msgid "log state is unkown"
 msgstr "Sprache ist nicht bekannt"
 
-#: tools/matrix.hpp:97
-#: tools/matrix.hpp:137
-#: tools/matrix.hpp:357
-#: tools/files/csv.hpp:126
+#: tools/matrix.hpp:132 tools/matrix.hpp:352 tools/files/csv.hpp:126
 msgid "row size must be greater than zero"
 msgstr "Zeilenanzahl muss größer Null sein"
 
-#: tools/matrix.hpp:99
-#: tools/matrix.hpp:139
-#: tools/files/csv.hpp:124
+#: tools/matrix.hpp:134 tools/files/csv.hpp:124
 msgid "column size must be greater than zero"
 msgstr "Spaltenanzahl muss größer Null sein"
 
 #: tools/random.hpp:177
 msgid "distribution is not kwon"
 msgstr "Verteilung ist nicht bekannt"
-
-#: tools/vector.hpp:108
-msgid "length must be greater than zero"
-msgstr "Länge muss größer Null sein"
 
 #: tools/files/csv.hpp:81
 msgid "vector dimension must be greater than zero"
@@ -277,15 +240,11 @@ msgstr "Größe konnte nicht ermittelt werden"
 msgid "vector reserve must be greater than zero"
 msgstr "Vektor Puffer muss größer Null sein"
 
-#: tools/files/hdf.hpp:178
-#: tools/files/hdf.hpp:229
-#: tools/files/hdf.hpp:379
+#: tools/files/hdf.hpp:178 tools/files/hdf.hpp:229 tools/files/hdf.hpp:379
 msgid "dataset must be one-dimensional"
 msgstr "Datensatz muss ein-dimensional sein"
 
-#: tools/files/hdf.hpp:180
-#: tools/files/hdf.hpp:231
-#: tools/files/hdf.hpp:343
+#: tools/files/hdf.hpp:180 tools/files/hdf.hpp:231 tools/files/hdf.hpp:343
 #: tools/files/hdf.hpp:381
 msgid "dataset must be a simple datatype"
 msgstr "Datensatz muss ein Simpledatentyp sein"
@@ -298,37 +257,36 @@ msgstr "Eine leere Pfadangabe ist verboten"
 msgid "dataset must be two-dimensional"
 msgstr "Datensatz muss zwei-dimensional sein"
 
-#: tools/sources/cloud.hpp:100
+#: tools/sources/cloud.hpp:103
 msgid "number of dimensions must be greater than one"
 msgstr "Anzahl der Dimensionen muss größer Eins sein"
 
-#: tools/sources/cloud.hpp:114
+#: tools/sources/cloud.hpp:117
 msgid "minimum need not be zero"
 msgstr "Minimum darf nicht Null sein"
 
-#: tools/sources/cloud.hpp:117
+#: tools/sources/cloud.hpp:120
 msgid "maximum need not be zero"
 msgstr "Maximum darf nicht Null sein"
 
-#: tools/sources/cloud.hpp:120
-#: tools/sources/cloud.hpp:146
-#: tools/sources/cloud.hpp:174
+#: tools/sources/cloud.hpp:123 tools/sources/cloud.hpp:149
+#: tools/sources/cloud.hpp:177
 msgid "minimal value is greater than maximal value"
 msgstr "Minimumwert ist größer als Maximumswert"
 
-#: tools/sources/cloud.hpp:123
+#: tools/sources/cloud.hpp:126
 msgid "minimum and maximum must be greater than zero"
 msgstr "Minimum und Maximum müssen größer Null sein"
 
-#: tools/sources/cloud.hpp:171
+#: tools/sources/cloud.hpp:174
 msgid "dimension must be smaller than saved dimension"
 msgstr "Dimensionswert muss kleiner sein als gespeicherter Wert"
 
-#: tools/sources/cloud.hpp:177
+#: tools/sources/cloud.hpp:180
 msgid "sampling value must be greater than zero"
 msgstr "Samplingwert muss größer Null sein"
 
-#: tools/sources/cloud.hpp:193
+#: tools/sources/cloud.hpp:196
 msgid "random value must be between [0,1]"
 msgstr "Zufallswert muss zwischen [0,1] einliegen"
 
@@ -336,8 +294,7 @@ msgstr "Zufallswert muss zwischen [0,1] einliegen"
 msgid "can not connect to news server"
 msgstr "Newsserver ist nicht erreichbar"
 
-#: tools/sources/nntp.h:195
-#: tools/sources/wikipedia.h:590
+#: tools/sources/nntp.h:195 tools/sources/wikipedia.h:590
 msgid "error while reading socket data"
 msgstr "Fehler während des Lesens des Sockets"
 
@@ -421,16 +378,13 @@ msgstr "kein Wikipedia Dokument mit der URL gefunden"
 msgid "HTTP agent name need not be empty"
 msgstr "HTTP Agent name darf nicht leer sein"
 
-#: tools/sources/wikipedia.h:323
-#: tools/sources/wikipedia.h:334
-#: tools/sources/wikipedia.h:345
-#: tools/sources/wikipedia.h:356
+#: tools/sources/wikipedia.h:323 tools/sources/wikipedia.h:334
+#: tools/sources/wikipedia.h:345 tools/sources/wikipedia.h:356
 #: tools/sources/wikipedia.h:367
 msgid "no article is loaded"
 msgstr "Artikel wurde nicht geladen"
 
-#: tools/sources/wikipedia.h:410
-#: tools/sources/wikipedia.h:483
+#: tools/sources/wikipedia.h:410 tools/sources/wikipedia.h:483
 msgid "XML data can not be parsed"
 msgstr "Datei konnte nicht geöffnet werden"
 
@@ -585,6 +539,9 @@ msgstr "Gateway Zeitüberschreitung"
 #: tools/sources/wikipedia.h:627
 msgid "HTTP Version not supported"
 msgstr "HTTP Version wird nicht unterstützt"
+
+#~ msgid "length must be greater than zero"
+#~ msgstr "Länge muss größer Null sein"
 
 #~ msgid "number of vertices must be greater than zero"
 #~ msgstr "Anzahl der Prototypen muss größer Null sein"
