@@ -42,7 +42,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     /** create the Multidimensional scaling (MDS) with different algorithms
      * $LastChangedDate$
      **/
-    template<typename T> class mds : public nonsupervisedreduce<T> {
+    template<typename T> class mds : public reduce<T> {
         
         public :
         

@@ -54,7 +54,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * methods must be called in the correct order, so the MPI calls must be run
      * on each process.
      **/
-    template<typename T> class neuralgas : public nonsupervisedclustering<T> {
+    template<typename T> class neuralgas : public clustering<T>, public patch<T> {
         
         public:
             

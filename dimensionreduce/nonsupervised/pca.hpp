@@ -40,7 +40,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     /** create the Principal Component Analysis (PCA)
      * $LastChangedDate$
      **/
-    template<typename T> class pca : public nonsupervisedreduce<T> {
+    template<typename T> class pca : public reduce<T> {
         
         public :
             

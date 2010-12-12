@@ -47,7 +47,7 @@ namespace machinelearning { namespace clustering { namespace supervised {
      * of the label structure
      * $LastChangedDate$
     **/
-    template<typename T, typename L> class rlvq : public supervisedclustering<T, L>  {
+    template<typename T, typename L> class rlvq : public clustering<T, L>  {
         
         public:
         

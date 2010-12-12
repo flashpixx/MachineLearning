@@ -38,64 +38,66 @@ namespace machinelearning {
      * $LastChangedDate$
      **/    
     namespace dimensionreduce {
+ 
+        
+        namespace ublas = boost::numeric::ublas;
+        
         
         /** namespace for all non-supervised reducing algorithms
          * $LastChangedDate$
          **/
-        namespace nonsupervised {};
+        namespace nonsupervised {
+   
+            
+            /** abstract class for nonsupervised dimension reducing classes
+             * $LastChangedDate$
+             **/      
+            template<typename T> class reduce {
+                
+                public :
+
+                    /** maps data to target dimension **/
+                    virtual ublas::matrix<T> map( const ublas::matrix<T>& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
+                      
+                    /** returns the mapped dimension **/
+                    virtual std::size_t getDimension( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                
+                protected :
+                
+                    /** destructor **/
+                    virtual ~reduce( void ) {}
+
+            };
+        
+        };
+        
+        
+        
         
         /** namespace for all supervised reducing algorithms
          * $LastChangedDate$
          **/
-        namespace supervised {};
+        namespace supervised {
         
-        
-        
-        
-
-        namespace ublas = boost::numeric::ublas;
-        
-        
-        
-        /** abstract class for nonsupervised dimension reducing classes
-         * $LastChangedDate$
-         **/      
-        template<typename T> class nonsupervisedreduce {
-            
-            public :
-
-                /** maps data to target dimension **/
-                virtual ublas::matrix<T> map( const ublas::matrix<T>& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
-                  
-                /** returns the mapped dimension **/
-                virtual std::size_t getDimension( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
-            
-            protected :
-            
-                /** destructor **/
-                virtual ~nonsupervisedreduce( void ) {}
-
-        };
-
-        
-        
-        /** abstract class for supervised dimension reducing classes
-         * $LastChangedDate$
-         **/      
-        template<typename T, typename L> class supervisedreduce {
-            
-            public :
-            
-                /** maps data to target dimension **/
-                virtual ublas::matrix<T> map( const ublas::matrix<T>&, const std::vector<L>& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
-            
-                /** returns the mapped dimension **/
-                virtual std::size_t getDimension( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
-            
-            protected :
-            
-                /** destructor **/
-                virtual ~supervisedreduce( void ) {}
+            /** abstract class for supervised dimension reducing classes
+             * $LastChangedDate$
+             **/      
+            template<typename T, typename L> class reduce {
+                
+                public :
+                
+                    /** maps data to target dimension **/
+                    virtual ublas::matrix<T> map( const ublas::matrix<T>&, const std::vector<L>& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
+                
+                    /** returns the mapped dimension **/
+                    virtual std::size_t getDimension( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                
+                protected :
+                
+                    /** destructor **/
+                    virtual ~reduce( void ) {}
+                
+            };
             
         };
         

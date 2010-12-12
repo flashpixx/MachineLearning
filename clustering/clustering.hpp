@@ -44,141 +44,161 @@ namespace machinelearning {
      **/
     namespace clustering {
         
-        /** namespace for all non-supervised cluster algorithms
-         * $LastChangedDate$
-         **/
-        namespace nonsupervised {};
-        
-        /** namespace for all supervised cluster algorithms
-         * $LastChangedDate$
-         **/
-        namespace supervised {};
-        
-        
-        
-        
         namespace ublas = boost::numeric::ublas;
         #ifdef ML_CLUSTER
         namespace mpi   = boost::mpi;
         #endif
         
         
-        /** abstract class for all supervised clustering classes
+        /** namespace for all supervised cluster algorithms
          * $LastChangedDate$
-         * @note every data / prototype matrix must be row orientated.
-         * data matrix NxM with n number of datapoints and M data dimension
-         **/      
-        template<typename T, typename L> class supervisedclustering {
-            
-            public :
+         **/
+        namespace supervised {
+        
+            /** abstract class for all supervised clustering classes
+             * $LastChangedDate$
+             * @note every data / prototype matrix must be row orientated.
+             * data matrix NxM with n number of datapoints and M data dimension
+             **/      
+            template<typename T, typename L> class clustering {
+                
+                public :
 
-                /** method for training prototypes **/
-                virtual void train( const ublas::matrix<T>&, const std::vector<L>&, const std::size_t&  ) { throw exception::classmethod(_("method is not implementated in the base class")); };
-            
-                /** method which returns prototypes **/
-                virtual ublas::matrix<T> getPrototypes( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
-            
-                /** return lables of prototypes **/
-                virtual std::vector<L> getPrototypesLabel( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
-            
-                /** disable and enable logging **/
-                virtual void setLogging( const bool& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
-            
-                /** shows logging status **/
-                virtual bool getLogging( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
-            
-                /** return history of trained prototypes **/
-                virtual std::vector< ublas::matrix<T> > getLoggedPrototypes( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
-            
-                /** returns the dimension of prototypes **/
-                virtual std::size_t getPrototypeSize( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
-            
-                /** number of prototypes / classes **/
-                virtual std::size_t getPrototypeNumber( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
-            
-                /** return the quantizationerror **/
-                virtual std::vector<T> getLoggedQuantizationError( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
-            
-                /** index position for prototype or label **/
-                virtual ublas::indirect_array< std::vector<std::size_t> > use( const ublas::matrix<T>& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                    /** method for training prototypes **/
+                    virtual void train( const ublas::matrix<T>&, const std::vector<L>&, const std::size_t&  ) { throw exception::classmethod(_("method is not implementated in the base class")); };
+                
+                    /** method which returns prototypes **/
+                    virtual ublas::matrix<T> getPrototypes( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                
+                    /** return lables of prototypes **/
+                    virtual std::vector<L> getPrototypesLabel( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                
+                    /** disable and enable logging **/
+                    virtual void setLogging( const bool& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
+                
+                    /** shows logging status **/
+                    virtual bool getLogging( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                
+                    /** return history of trained prototypes **/
+                    virtual std::vector< ublas::matrix<T> > getLoggedPrototypes( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                
+                    /** returns the dimension of prototypes **/
+                    virtual std::size_t getPrototypeSize( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                
+                    /** number of prototypes / classes **/
+                    virtual std::size_t getPrototypeNumber( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                
+                    /** return the quantizationerror **/
+                    virtual std::vector<T> getLoggedQuantizationError( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                
+                    /** index position for prototype or label **/
+                    virtual ublas::indirect_array< std::vector<std::size_t> > use( const ublas::matrix<T>& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
 
-            
-            
-            protected :
-            
-                /** destructor **/
-                virtual ~supervisedclustering( void ) {}
-            
+                
+                
+                protected :
+                
+                    /** destructor **/
+                    virtual ~clustering( void ) {}
+                
+            };
+        
         };
 
         
         
         
-        /** abstract class for all non-supervised clustering classes
+        /** namespace for all non-supervised cluster algorithms
          * $LastChangedDate$
-         * @note every data / prototype matrix must be row orientated.
-         * data matrix NxM with n number of datapoints and M data dimension
-         **/      
-        template<typename T> class nonsupervisedclustering {
-            
-            public :
+         **/
+        namespace nonsupervised {
+        
+            /** abstract class for all non-supervised clustering classes
+             * $LastChangedDate$
+             * @note every data / prototype matrix must be row orientated.
+             * data matrix NxM with n number of datapoints and M data dimension
+             **/      
+            template<typename T> class clustering {
+                
+                public :
 
-                /** method for training prototypes **/
-                virtual void train( const ublas::matrix<T>&, const std::size_t& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
-            
-                /** method which returns prototypes **/
-                virtual ublas::matrix<T> getPrototypes( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
-            
-                /** disable and enable logging **/
-                virtual void setLogging( const bool& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
-            
-                /** shows logging status **/
-                virtual bool getLogging( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
-            
-                /** return history of trained prototypes **/
-                virtual std::vector< ublas::matrix<T> > getLoggedPrototypes( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
-            
-                /** returns the dimension of prototypes **/
-                virtual std::size_t getPrototypeSize( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
-            
-                /** number of prototypes / classes **/
-                virtual std::size_t getPrototypeNumber( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
-            
-                /** return the quantizationerror **/
-                virtual std::vector<T> getLoggedQuantizationError( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
-            
-                /** calculate prototype index for datapoints **/
-                virtual ublas::indirect_array< std::vector<std::size_t> > use( const ublas::matrix<T>& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                    /** method for training prototypes **/
+                    virtual void train( const ublas::matrix<T>&, const std::size_t& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
+                
+                    /** method which returns prototypes **/
+                    virtual ublas::matrix<T> getPrototypes( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                
+                    /** disable and enable logging **/
+                    virtual void setLogging( const bool& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
+                
+                    /** shows logging status **/
+                    virtual bool getLogging( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                
+                    /** return history of trained prototypes **/
+                    virtual std::vector< ublas::matrix<T> > getLoggedPrototypes( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                
+                    /** returns the dimension of prototypes **/
+                    virtual std::size_t getPrototypeSize( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                
+                    /** number of prototypes / classes **/
+                    virtual std::size_t getPrototypeNumber( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                
+                    /** return the quantizationerror **/
+                    virtual std::vector<T> getLoggedQuantizationError( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                
+                    /** calculate prototype index for datapoints **/
+                    virtual ublas::indirect_array< std::vector<std::size_t> > use( const ublas::matrix<T>& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
 
+                
+                
+                    #ifdef ML_CLUSTER
+                
+                    /** MPI method for training prototypes **/
+                    virtual void train( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
+                
+                    /** MPI method which returns prototypes **/
+                    virtual ublas::matrix<T> getPrototypes( const mpi::communicator& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                
+                    /** MPI method for returning history of trained prototypes **/
+                    virtual std::vector< ublas::matrix<T> > getLoggedPrototypes( const mpi::communicator& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                
+                    /** MPI method for returning the quantizationerror **/
+                    virtual std::vector<T> getLoggedQuantizationError( const mpi::communicator& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                
+                    /** MPI calculate prototype index for datapoints **/
+                    virtual ublas::indirect_array< std::vector<std::size_t> > use( const mpi::communicator&, const ublas::matrix<T>& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                
+                    /** MPI call for determine the distance without returning and input values, only for MPI connection **/
+                    virtual void use( const mpi::communicator& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                
+                    #endif
+                
+                
+                protected :
+                
+                    /** destructor **/
+                    virtual ~clustering( void ) {}
+                
+            };
             
             
-                #ifdef ML_CLUSTER
             
-                /** MPI method for training prototypes **/
-                virtual void train( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
-            
-                /** MPI method which returns prototypes **/
-                virtual ublas::matrix<T> getPrototypes( const mpi::communicator& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
-            
-                /** MPI method for returning history of trained prototypes **/
-                virtual std::vector< ublas::matrix<T> > getLoggedPrototypes( const mpi::communicator& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
-            
-                /** MPI method for returning the quantizationerror **/
-                virtual std::vector<T> getLoggedQuantizationError( const mpi::communicator& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
-            
-                /** MPI calculate prototype index for datapoints **/
-                virtual ublas::indirect_array< std::vector<std::size_t> > use( const mpi::communicator&, const ublas::matrix<T>& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
-            
-                /** MPI call for determine the distance without returning and input values, only for MPI connection **/
-                virtual void use( const mpi::communicator& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
-            
-                #endif
-            
-            
-            protected :
-            
-                /** destructor **/
-                virtual ~nonsupervisedclustering( void ) {}
+            /** abstract class for patch clustering
+             * $LastChangedDate$
+             **/
+            template<typename T> class patch {
+                
+                public :
+                
+                    /** method for getting prototype weights **/
+                    virtual ublas::vector<T> getPrototypeWeights( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+
+                
+                protected :
+                
+                    /** destructor **/
+                    virtual ~patch( void ) {}
+            };
             
         };
     
