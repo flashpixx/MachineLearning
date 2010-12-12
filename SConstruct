@@ -237,5 +237,4 @@ elif GetOption("compilelang") != None :
 elif GetOption("createdocu") != None :
     os.system("doxygen documentation.doxyfile")
 else :
-    # XCode 3.2 need absolut path
     env.Program( getRekusivFiles(os.curdir, ".cpp", [], True, True) )
