@@ -653,7 +653,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
         // calculate distance for every prototype
         for(std::size_t i=0; i < l_prototypes.size1(); ++i)
-            ublas::row(l_distance, i)  = m_distance->calculate( p_data,  ublas::outer_prod(l_ones, ublas::row(l_prototypes, i)) );
+            ublas::row(l_distance, i)  = m_distance->getDistance( p_data, ublas::outer_prod(l_ones, ublas::row(l_prototypes, i)) ) ;
         
         // determine nearest prototype
         for(std::size_t i=0; i < l_prototypes.size2(); ++i) {

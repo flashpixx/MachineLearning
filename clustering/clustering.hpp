@@ -167,7 +167,7 @@ namespace machinelearning {
                 virtual std::vector<T> getLoggedQuantizationError( const mpi::communicator& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
             
                 /** MPI calculate prototype index for datapoints **/
-                //virtual ublas::indirect_array< std::vector<std::size_t> > use( const mpi::communicator&, const ublas::matrix<T>& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                virtual ublas::indirect_array< std::vector<std::size_t> > use( const mpi::communicator&, const ublas::matrix<T>& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
             
                 /** MPI call for determine the distance without returning and input values, only for MPI connection **/
                 virtual void use( const mpi::communicator& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
