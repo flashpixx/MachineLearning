@@ -183,7 +183,6 @@ def getRekusivFiles(startdir, ending, pdontuse=[], pShowPath=True, pAbsPath=Fals
                             lst.append(os.path.abspath(filename))
                         else :
                             lst.append(filename)
-    print lst
     return lst
         
        
