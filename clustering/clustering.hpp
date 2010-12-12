@@ -26,6 +26,7 @@
 
 
 #include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/vector.hpp>
 
 #ifdef ML_CLUSTER
 #include <boost/mpi.hpp>
