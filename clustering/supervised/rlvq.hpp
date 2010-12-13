@@ -175,7 +175,6 @@ namespace machinelearning { namespace clustering { namespace supervised {
     
     
     /** trains the prototypes from the data
-     * @overload
      * @param p_data Matrix with data (rows are the vectors)
      * @param p_labels vector for labels
      * @param p_iterations iterations
@@ -187,7 +186,6 @@ namespace machinelearning { namespace clustering { namespace supervised {
     
     
     /** trains the prototypes from the data
-     * @overload
      * @param p_data Matrix with data (rows are the vectors)
      * @param p_labels vector for labels
      * @param p_iterations iterations
@@ -200,7 +198,6 @@ namespace machinelearning { namespace clustering { namespace supervised {
     
 
     /** trains the prototypes from the data
-     * @overload
      * @param p_data Matrix with data (rows are the vectors)
      * @param p_labels vector for labels
      * @param p_iterations iterations

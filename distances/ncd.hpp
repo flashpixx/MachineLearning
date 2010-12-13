@@ -125,9 +125,7 @@ namespace machinelearning { namespace distances {
 
     
     
-    /** default constructor
-     * @overload
-     **/
+    /** default constructor **/
     template<typename T> inline ncd<T>::ncd() :
         m_compress ( gzip ),
         m_gzipparam( bio::gzip::default_compression ),
@@ -144,7 +142,6 @@ namespace machinelearning { namespace distances {
     
     
     /** constructor with the compression parameter
-     * @overload
      * @param p_compress enum value that is declared inside the class
      **/
     template<typename T> inline ncd<T>::ncd( const compresstype& p_compress ) :

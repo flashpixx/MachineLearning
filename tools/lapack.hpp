@@ -72,7 +72,6 @@ namespace machinelearning { namespace tools {
     
     
     /** calulate from a NxN and a diagonalized matrix the generalized eigenvalues and -vectors
-     * @overload
      * @param p_matrix input matrix
      * @param p_diag diagonal matrix
      * @param p_eigval blas vector for eigenvalues [initialisation is not needed]
@@ -121,7 +120,6 @@ namespace machinelearning { namespace tools {
     
     
     /** calculates from a NxN matrix eigenvalues and eigenvector
-     * @overload
      * @param p_matrix input matrix
      * @param p_eigval blas vector for eigenvalues [initialisation is not needed]
      * @param p_eigvec blas matrix for (normalized) eigenvectors (every column is a eigenvector) [initialisation is not needed]

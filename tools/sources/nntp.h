@@ -512,7 +512,6 @@ namespace machinelearning { namespace tools { namespace sources {
     //======= Iterator ==================================================================================================================================
 
     /** constructor
-     * @overload
      * @param p_nntp pointer to the nntp object
      **/
     inline nntp::iterator::iterator( nntp& p_nntp ) :
@@ -522,7 +521,6 @@ namespace machinelearning { namespace tools { namespace sources {
     
     
     /** default constructor
-     * @overload
      **/
     inline nntp::iterator::iterator( void ) :
         m_nntp( NULL ),

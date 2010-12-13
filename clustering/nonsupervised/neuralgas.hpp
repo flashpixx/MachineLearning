@@ -205,8 +205,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     }    
     
     
-    /** train the prototypes
-     * @overload
+    /** 
+     * train the prototypes
      * @param p_data data matrix
      * @param p_iterations number of iterations
      **/
@@ -226,7 +226,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     
     
     /** training the prototypes
-     * @overload
      * @param p_data datapoints
      * @param p_iterations iterations
      * @param p_lambda max adapet size
@@ -468,7 +467,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     
     
     /** train the data on the cluster
-     * @overload
      * @param p_mpi MPI object for communication
      * @param p_data datapoints
      * @param p_iterations iterations
@@ -481,7 +479,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     
     
     /** train the data on the cluster
-     * @overload
      * @param p_mpi MPI object for communication
      * @param p_data datapoints
      * @param p_iterations iterations
@@ -577,7 +574,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     
     
     /** return all prototypes of the cluster
-     * @overload
      * @param p_mpi MPI object for communication
      * @return matrix (rows = prototypes)
      **/
@@ -588,7 +584,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     
     
     /** returns all logged prototypes in all processes
-     * @overload
      * @param p_mpi MPI object for communication
      * @return std::vector with all logged prototypes
      **/
@@ -624,7 +619,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     
     
     /** returns the logged quantisation error
-     * @overload
      * @param p_mpi MPI object for communication
      * @return std::vector with quantization error
      **/
@@ -647,7 +641,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     
     /** calulates distance between datapoints and prototypes and returns a std::vector
      * with index of the nearest prototype
-     * @overload
      * @param p_mpi MPI object for communication     
      * @param p_data matrix
      * @return index array of prototype indices

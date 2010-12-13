@@ -97,7 +97,6 @@ namespace machinelearning { namespace tools { namespace files {
     
     
     /** constructor
-     * @overload
      * @param p_file filename
      **/
     inline hdf::hdf( const std::string& p_file ) :
@@ -110,7 +109,6 @@ namespace machinelearning { namespace tools { namespace files {
     
     
     /** constructor
-     * @overload
      * @param p_file filename
      * @param p_write bool for clear/create file
      **/

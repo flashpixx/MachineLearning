@@ -79,7 +79,6 @@ namespace machinelearning { namespace tools {
     
     
     /** creates a random NxM matrix of type T
-     * @overload
      * @param p_row rows
      * @param p_col columns
      * @param p_distribution name of the distribution
@@ -105,7 +104,6 @@ namespace machinelearning { namespace tools {
     
     
     /** create a random symmetric matrix of type T
-     * @overload
      * @param p_size element size
      * @param p_distribution name of the distribution
      * @param p_a first value for distribution
@@ -120,7 +118,6 @@ namespace machinelearning { namespace tools {
     
     
     /** creates a matrix and sets "1" on the diagonal elements
-     * @overload
      * @param p_row rows
      * @param p_col columns
      * @param p_val value for set (default 1)
@@ -146,7 +143,6 @@ namespace machinelearning { namespace tools {
     
     /** create a symmetric matrix of type T and
      * sets "1" on the diagonal elements
-     * @overload
      * @param p_size element size
      * @return matrix of type T
      **/
