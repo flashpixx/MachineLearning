@@ -192,12 +192,21 @@ namespace machinelearning {
                 
                     /** method for using patch clustering with one patch **/
                     virtual void trainpatch( const ublas::matrix<T>&, const std::size_t& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
-                
-                    /** method for patch clustering with one patch and prototype weights **/ 
-                    virtual void trainpatch( const ublas::matrix<T>&, const ublas::vector<T>&, const std::size_t& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
-                
+                                
                     /** method for getting prototype weights **/
                     virtual ublas::vector<T> getPrototypeWeights( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                
+                
+                
+                    #ifdef ML_CLUSTER
+                
+                    /** MPI method for getting prototype weights **/
+                    virtual ublas::vector<T> getPrototypeWeights( const mpi::communicator& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                
+                    /** MPI method for training patch prototypes **/
+                    virtual void trainpatch( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
+                
+                    #endif
 
                 
                 protected :

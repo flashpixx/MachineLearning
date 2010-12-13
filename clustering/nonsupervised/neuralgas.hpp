@@ -69,6 +69,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             std::size_t getPrototypeCount( void ) const;
             std::vector<T> getLoggedQuantizationError( void ) const;
             ublas::indirect_array< std::vector<std::size_t> > use( const ublas::matrix<T>& ) const;
+            ublas::vector<T> getPrototypeWeights( void ) const;
             
             #ifdef ML_CLUSTER
             void train( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t& );
@@ -94,6 +95,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             std::vector< ublas::matrix<T> > m_logprototypes;
             /** std::vector for quantisation error in each iteration **/
             std::vector<T> m_quantizationerror;
+            /** prototype weights for patch clustering **/
+            ublas::vector<T> m_prototypeWeights;
             
             T calculateQuantizationError( const ublas::matrix<T>&, const ublas::matrix<T>& ) const;
             
@@ -120,7 +123,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         m_prototypes( tools::matrix::random<T>(p_prototypes, p_prototypesize) ),
         m_logging( false ),
         m_logprototypes( std::vector< ublas::matrix<T> >() ),
-        m_quantizationerror( std::vector<T>() )
+        m_quantizationerror( std::vector<T>() ),
+        m_prototypeWeights( p_prototypes, 1 )
         #ifdef ML_CLUSTER
         , m_processprototypinfo()
         #endif
@@ -209,6 +213,15 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     template<typename T> inline void neuralgas<T>::train( const ublas::matrix<T>& p_data, const std::size_t& p_iterations )
     {
         train(p_data, p_iterations, m_prototypes.size1() * 0.5);
+    }
+    
+    
+    /** returns the weights of prototypes on patch clustering
+     * @return weights vector
+     **/
+    template<typename T> inline ublas::vector<T> neuralgas<T>::getPrototypeWeights( void ) const
+    {
+        return m_prototypeWeights;
     }
     
     
