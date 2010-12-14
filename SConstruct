@@ -236,4 +236,4 @@ elif GetOption("compilelang") != None :
 elif GetOption("createdocu") != None :
     os.system("doxygen documentation.doxyfile")
 else :
-    env.Program( getRekusivFiles(os.curdir, ".cpp", [], True, True) )
+    env.Program( getRekusivFiles(os.curdir, ".cpp") )
