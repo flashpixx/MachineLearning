@@ -23,7 +23,7 @@
 
 /** 
  * @mainpage Machine Learning Framework
- * $Rev$
+ * $Rev: 533 $
  * @author Philipp Kraus <philipp.kraus@flashpixx.de> 
  *
  * @section licenseSection license
@@ -553,7 +553,7 @@
 
 
 /** main namespace for the framework
- * $LastChangedDate: 2010-12-03 01:19:39 +0100 (Fr, 03 Dez 2010) $
+ * $LastChangedDate$
  **/
 namespace machinelearning {};
 
