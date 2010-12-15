@@ -21,7 +21,7 @@
  @endcond
  **/
 
-/**
+/** 
  * @mainpage Machine Learning Framework
  * $Rev$
  * @author Philipp Kraus <philipp.kraus@flashpixx.de> 
@@ -485,6 +485,67 @@
  * @code
     tools::language::bind(<name of the language file, should be "ml">, <path to the language directory, shoudl be "./tools/language/">);
  * @endcode
+ *
+ *
+ *
+ * @file machinelearning.h main header for including in a project
+ *
+ * @file ncd.cpp testprogram for the normalized compression distance
+ * @file neuralgas.cpp testprogram for the neural gas algorithm
+ *
+ * @file classifier.h main header for all classifier structurs
+ * @file classifier.hpp header for the abstract class implementation of the classifiers
+ * @file lazylearner.hpp lazy learner algorithm
+ *
+ * @file clustering.h main header for all clustering algorithms
+ * @file clustering.hpp header for abstract clustering classes
+ * @file kmeans.hpp k-means implementation
+ * @file neuralgas.hpp neuralgas implemention for real vector space
+ * @file spectralclustering.hpp implementation of the spectral clustering
+ * @file rlvq.hpp implementation of relevance vector quantization
+ *
+ * @file dimensionreduce.h main header of dimension reducing algorithms
+ * @file dimensionreduce.hpp abstract class for dimension reducing classes
+ * @file lle.hpp local linear embedding implementation
+ * @file pca.hpp principal component analysis implementation
+ * @file mds.hpp multidimensional scaling implementation
+ * @file lda.hpp lineare discriminant analysis implementation
+ * 
+ * @file distances.h main header for all distance structures
+ * @file distance.hpp abstract class for distance algorithms
+ * @file euclid.hpp class for euclidian distances
+ * @file ncd.hpp implementation of the normalize compression distance
+ *
+ * @file exception.cpp implementation of the exceptions
+ * @file exception.h header file for exceptions
+ *
+ * @file functionoptimization.h main header for function optimization
+ * @file gradientdescent.hpp gradient descent implementation
+ *
+ * @file neighborhood.h main header for neighborhood structurs
+ * @file neighborhood.hpp abstract class for neighborhood implementation
+ * @file knn.hpp k-nearest-neighborhood implementation
+ *
+ * @file tools.h main header for tools algorithms
+ * @file function.hpp different functions eg. numerical limit checking
+ * @file logger.cpp logger static implementation
+ * @file logger.hpp logger implementation
+ * @file lapack.hpp wrapper class for LAPack calls
+ * @file matrix.hpp implementation of matrix operations
+ * @file vector.hpp implementation of vector operations
+ * @file random.hpp random implementation 
+ * @file random.cpp random static implementation
+ *
+ * @file sources.h main header for all sources
+ * @file nntp.h NNTP client
+ * @file wikipedia.h wikipedia client
+ * @file cloud.hpp implementation of cloud datasets
+ *
+ * @file language.h multilanguage calls
+ *
+ * @file files.h main header for file structurs
+ * @file csv.hpp implementation for reading and writing csv files
+ * @file hdf.hpp implementation for reading and writing hdf files
 **/
 
 #ifndef MACHINELEARNING_H

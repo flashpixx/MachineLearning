@@ -39,7 +39,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     namespace ublas  = boost::numeric::ublas;
     
     
-    /** create the Multidimensional scaling (MDS) with different algorithms
+    /** create the multidimensional scaling (MDS) with different algorithms
      * $LastChangedDate$
      **/
     template<typename T> class mds : public reduce<T> {
