@@ -191,7 +191,7 @@ def createLanguage(env, onlycompile=False) :
     # compiling with: msgfmt -v -o target.mo source.po
     # add new data: msgmerge --no-wrap --update old_file.po newer_file.pot
 
-    po = getRekusivFiles(os.curdir, ".po", ["test"])
+    po = getRekusivFiles(os.curdir, ".po", ["examples"])
     
     if onlycompile :
         # compiling all files
@@ -201,7 +201,7 @@ def createLanguage(env, onlycompile=False) :
     else :
         sources = []
         for i in env["CPPSUFFIXES"] :
-            sources.extend( getRekusivFiles(os.curdir, i, ["test"]) )
+            sources.extend( getRekusivFiles(os.curdir, i, ["examples"]) )
 
         cmd = "xgettext --output=tools/language/language.po --keyword=_ --language=c++ ";
         for i in sources :
@@ -236,10 +236,10 @@ elif GetOption("compilelang") != None :
 elif GetOption("createdocu") != None :
     os.system("doxygen documentation.doxyfile")
 else :
-    testfiles = getRekusivFiles(os.path.join(os.curdir, "test"), ".cpp")
-    framework = getRekusivFiles(os.curdir, ".cpp", ["test"])
+    examplefiles = getRekusivFiles(os.path.join(os.curdir, "examples"), ".cpp")
+    framework    = getRekusivFiles(os.curdir, ".cpp", ["examples"])
     
-    for i in testfiles :
+    for i in examplesfiles :
         lst = []
         lst.extend(framework)
         lst.append( i )
