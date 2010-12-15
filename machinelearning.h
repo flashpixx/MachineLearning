@@ -48,6 +48,14 @@
  * <li><i>optional Scons</i> ( http://www.scons.org/ )</li>
  * </ul>
  *
+ * @section defs definitions / specifications
+ * <ul>
+ * <li>data points should be matrix data and the matrix is row-orientated, so for K data points with every point dimension P, we have a K x P matrix (prototype matrices are equal)</li>
+ * <li>all compiler flags start with "ML_"</li>
+ * <li>all structures are in the namespace "machinelearning"</li>
+ * <li>all messages should get the structure <dfn>_("<message>")</dfn>, because the underline prefix is the support for different languages</li>
+ * </ul>
+ *
  * @section compileroptions compiler option
  * toolbox compilerflags
  * <ul>
@@ -79,14 +87,6 @@
  * <li><dfn>--with-multilanguage</dfn> adds the multilanguage support with gettext</li>
  * <li><dfn>--with-sources</dfn> support for the namespace machinelearning::tools::sources</li>
  * <li><dfn>--with-files</dfn> support for the namespace machinelearning::tools::files</li>
- * </ul>
- *
- * @section defs definitions / specifications
- * <ul>
- * <li>data points should be matrix data and the matrix is row-orientated, so for K data points with every point dimension P, we have a K x P matrix (prototype matrices are equal)</li>
- * <li>all compiler flags start with "ML_"</li>
- * <li>all structures are in the namespace "machinelearning"</li>
- * <li>all messages should get the structure <dfn>_("<message>")</dfn>, because the underline prefix is the support for different languages</li>
  * </ul>
  *
  * @section examples example program
