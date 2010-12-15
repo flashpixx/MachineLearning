@@ -72,7 +72,7 @@
  * <li><dfn>--create-language</dfn> creates the language files / adds new messages to the existing files (xgettext must be called, so it should be within the path)</li>
  * <li><dfn>--compile-language</dfn> compiles all language files (msgfmt must be called, so it should be within the path)</li>
  * </ul>
- * For compiling any cpp file in the root directory the following option can be set
+ * For compiling the test cpp files in the test directory the following option can be set
  * <ul>
  * <li><dfn>--with-randomdevice</dfn> adds the compilerflag for random device support</li>
  * <li><dfn>--with-mpi</dfn> adds the compilerflag for cluster / MPI support</li>
@@ -89,6 +89,12 @@
  * <li>all messages should get the structure <dfn>_("<message>")</dfn>, because the underline prefix is the support for different languages</li>
  * </ul>
  *
+ * @section examples example program
+ * <ul>
+ * <li><dfn>ncd.cpp</dfn> program for the normalized compression distance</li>
+ * <li><dfn>neuralgas.cpp</dfn> program for the neural gas with real vector spaces</li>
+ * </ul>
+ *
  * @section ex advanced documentation
  * <ul>
  * <li>@subpage classifier</li>
@@ -99,7 +105,6 @@
  * <li>@subpage files</li>
  * <li>@subpage logger</li>
  * <li>@subpage lang</li>
- * <li>@subpage test</li>
  * </ul>
  *
  *
@@ -486,10 +491,6 @@
  * @code
     tools::language::bind(<name of the language file, should be "ml">, <path to the language directory, shoudl be "./tools/language/">);
  * @endcode
- *
- *
- *
- * @page test example test programs
  *
  *
  *
