@@ -28,9 +28,8 @@
 #include <boost/numeric/ublas/io.hpp>
 
 
-namespace tools     = machinelearning::tools;
-namespace distance  = machinelearning::distances;
-namespace ublas     = boost::numeric::ublas;
+using namespace boost::numeric;
+using namespace machinelearning;
 
 
 int main(std::size_t argc, char* argv[]) {
@@ -39,22 +38,21 @@ int main(std::size_t argc, char* argv[]) {
         throw std::runtime_error("you need at least two files as input");
     
     
-    distance::ncd<double> ncd( distance::ncd<double>::bzip2 );
+    distances::ncd<double> ncd( distances::ncd<double>::bzip2 );
     //ncd.setCompressionLevel( dist::ncd::bestspeed );
     
     std::vector<std::string> val;
     for(std::size_t i=1; i < argc; i++)
         val.push_back( argv[i] );
     
-    ublas::matrix<double> distances = ncd.unsymmetric(val, true);
+    ublas::matrix<double> distancematrix = ncd.unsymmetric(val, true);
     //ublas::matrix<double> distances = ncd.symmetric(val, true);
     
     
-    tools::files::hdf f("ncd.hdf5", true);
-    f.write<double>( "/data",  distances, H5::PredType::NATIVE_DOUBLE );
+    tools::files::hdf file("ncd.hdf5", true);
+    file.write<double>( "/data",  distancematrix, H5::PredType::NATIVE_DOUBLE );
         
-    std::cout << distances << std::endl;
+    std::cout << "distance matrix (create HDF file \"ncd.hdf5\" with dataset \"/data\"): \n" << distancematrix << std::endl;
 
-        
     return EXIT_SUCCESS;
 }

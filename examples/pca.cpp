@@ -20,29 +20,28 @@
  ############################################################################
  @endcond
  **/
-/*
+
 #include "../machinelearning.h"
+
 #include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/io.hpp>
 
-namespace tl        = machinelearning::tools;
-namespace ndim      = machinelearning::dimensionreduce::nonsupervised;
-namespace ublas     = boost::numeric::ublas;
-*/
+using namespace boost::numeric;
+using namespace machinelearning;
+namespace dim = machinelearning::dimensionreduce::nonsupervised;
+ 
 
-int main(int argc, char* argv[]) {
- /**   
+int main(std::size_t argc, char* argv[]) {
     if (argc < 3)
         throw std::runtime_error("you need at least two parameter as input. first HDF file, second path to dataset");
     
-    tl::files::hdf hdf( argv[1] );
-    ublas::matrix<double> data = hdf.readMatrix<double>(argv[1], H5::PredType::NATIVE_DOUBLE); 
-    ndim::pca<double> p(2);
-    
-    tl::files::hdf f("pca.hdf5", true);
-    f.write<double>( "/data",  p.map(data), H5::PredType::NATIVE_DOUBLE );
+    tools::files::hdf source( argv[1] );
+    tools::files::hdf target("pca.hdf5", true);
+
+    dim::pca<double> pca(2);
+    target.write<double>( "/data",  pca.map( source.readMatrix<double>(argv[1], H5::PredType::NATIVE_DOUBLE) ), H5::PredType::NATIVE_DOUBLE );
     
     std::cout << "create HDF file \"pca.hdf5\" with dataset \"/data\"" << std::endl;
+
     return EXIT_SUCCESS;
-**/
-    return 0;
-  }
+}
