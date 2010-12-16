@@ -20,17 +20,17 @@
  ############################################################################
  @endcond
  **/
-
+/*
 #include "../machinelearning.h"
 #include <boost/numeric/ublas/matrix.hpp>
 
 namespace tl        = machinelearning::tools;
 namespace ndim      = machinelearning::dimensionreduce::nonsupervised;
 namespace ublas     = boost::numeric::ublas;
-
+*/
 
 int main(std::size_t argc, char* argv[]) {
-    
+ /**   
     if (argc < 3)
         throw std::runtime_error("you need at least two parameter as input. first HDF file, second path to dataset");
     
@@ -43,4 +43,6 @@ int main(std::size_t argc, char* argv[]) {
     
     std::cout << "create HDF file \"pca.hdf5\" with dataset \"/data\"" << std::endl;
     return EXIT_SUCCESS;
-}
+**/
+  
+  }

@@ -22,10 +22,10 @@
  **/
 
 #include "../machinelearning.h"
-
+/**
 namespace dist      = machinelearning::distances;
 namespace nsl       = machinelearning::clustering::nonsupervised;
-
+**/
 
 int main(std::size_t argc, char* argv[]) {
     
