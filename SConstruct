@@ -236,11 +236,16 @@ elif GetOption("compilelang") != None :
 elif GetOption("createdocu") != None :
     os.system("doxygen documentation.doxyfile")
 else :
-    examplefiles = getRekusivFiles(os.path.join(os.curdir, "examples"), ".cpp")
-    framework    = getRekusivFiles(os.curdir, ".cpp", ["examples"])
+    #BuildDir('examples', '.')
+
+    # building object files of the framework first
+    env.Object( getRekusivFiles(os.curdir, ".cpp", ["examples"]) )
+    objectfiles = getRekusivFiles(os.curdir, ".o", ["examples"])
     
-    for i in examplesfiles :
-        lst = []
-        lst.extend(framework)
-        lst.append( i )
-        env.Program( lst )
+    for i in getRekusivFiles(os.path.join(os.curdir, "examples"), ".cpp") :
+        sources = []
+        sources.extend(objectfiles)
+        #sources.append( i )
+        #env.Object(i)
+        print sources
+        #env.Program( target=os.path.basename(i), source=sources )

@@ -23,7 +23,17 @@
 
 #include "../machinelearning.h"
 
-
+namespace tl        = machinelearning::tools;
+namespace dist      = machinelearning::distances;
+namespace ndim      = machinelearning::dimensionreduce::nonsupervised;
+namespace dim       = machinelearning::dimensionreduce::supervised;
+namespace sl        = machinelearning::clustering::supervised;
+namespace nsl       = machinelearning::clustering::nonsupervised;
+namespace nd        = machinelearning::neighborhood;
+namespace cl        = machinelearning::classifier;
+namespace func      = machinelearning::functionaloptimization;
+namespace linalg    = boost::numeric::bindings::lapack;
+namespace ublas     = boost::numeric::ublas;
 
 int main(int argc, char* argv[]) {
 
