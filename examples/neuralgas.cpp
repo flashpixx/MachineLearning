@@ -21,15 +21,16 @@
  @endcond
  **/
 
-#include "../machinelearning.h"
+//#include "../machinelearning.h"
 /**
 namespace dist      = machinelearning::distances;
 namespace nsl       = machinelearning::clustering::nonsupervised;
 **/
 
-int main(std::size_t argc, char* argv[]) {
+int main(int argc, char* argv[]) {
     
     
     
-    return EXIT_SUCCESS;
+    //return EXIT_SUCCESS;
+    return 0;
 }
