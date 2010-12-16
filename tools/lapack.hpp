@@ -106,12 +106,8 @@ namespace machinelearning { namespace tools {
                 l_eigval(i) /= l_div(i);
         
         // normalize every eigenvector
-        for(std::size_t i=0; i < l_eigvec.size2(); ++i) {
-            const T l_val = blas::nrm2( static_cast< ublas::vector<T> >(ublas::column(l_eigvec, i)) );
-            if (!function::isNumericalZero<T>(l_val))
-                ublas::column(l_eigvec, i) /= l_val;
-        }
-        
+        for(std::size_t i=0; i < l_eigvec.size2(); ++i)
+            ublas::column(l_eigvec, i) /= blas::nrm2( static_cast< ublas::vector<T> >(ublas::column(l_eigvec, i)) );        
         
         // we must copy the reference
         p_eigvec = l_eigvec;
@@ -145,11 +141,8 @@ namespace machinelearning { namespace tools {
         linalg::geev( 'N', 'V', l_matrix, l_eigval,  l_tmp1,l_tmp2,  l_eigvec, linalg::optimal_workspace() );
         
         // normalize every eigenvector
-        for(std::size_t i=0; i < l_eigvec.size2(); ++i) {
-            const T l_val = blas::nrm2( static_cast< ublas::vector<T> >(ublas::column(l_eigvec, i)) );
-            if (!function::isNumericalZero<T>(l_val))
-                ublas::column(l_eigvec, i) /= l_val;
-        }
+        for(std::size_t i=0; i < l_eigvec.size2(); ++i)
+             ublas::column(l_eigvec, i) /= blas::nrm2( static_cast< ublas::vector<T> >(ublas::column(l_eigvec, i)) );
         
         // we must copy the reference
         p_eigvec = l_eigvec;
