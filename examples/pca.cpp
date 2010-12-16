@@ -22,27 +22,25 @@
  **/
 
 #include "../machinelearning.h"
-#include <string>
+#include <boost/numeric/ublas/matrix.hpp>
 
-
-namespace dist      = machinelearning::distances;
+namespace tl        = machinelearning::tools;
+namespace ndim      = machinelearning::dimensionreduce::nonsupervised;
+namespace ublas     = boost::numeric::ublas;
 
 
 int main(std::size_t argc, char* argv[]) {
-
+    
     if (argc < 3)
-        throw std::runtime_error("you need at least two files as input");
+        throw std::runtime_error("you need at least two parameter as input. first HDF file, second path to dataset");
     
+    tl::files::hdf hdf( argv[1] );
+    ublas::matrix<double> data = hdf.readMatrix<double>(argv[1], H5::PredType::NATIVE_DOUBLE); 
+    ndim::pca<double> p(2);
     
-    dist::ncd<double> ncd(dist::ncd<double>::bzip2);
-    //ncd.setCompressionLevel( dist::ncd::bestspeed );
+    tl::files::hdf f("pca.hdf5", true);
+    f.write<double>( "/data",  p.map(data), H5::PredType::NATIVE_DOUBLE );
     
-    std::vector<std::string> val;
-    for(std::size_t i=1; i < argc; i++)
-        val.push_back( argv[i] );
-    
-    std::cout << "unsymmetric: " << ncd.unsymmetric(val, true) << std::endl;
-    //std::cout << "symmetric: " << ncd.symmetric(val, true) << std::endl;
-        
+    std::cout << "create HDF file \"pca.hdf5\" with dataset \"/data\"" << std::endl;
     return EXIT_SUCCESS;
 }

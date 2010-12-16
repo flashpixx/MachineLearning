@@ -93,6 +93,7 @@
  * <ul>
  * <li><dfn>ncd.cpp</dfn> program for the normalized compression distance</li>
  * <li><dfn>neuralgas.cpp</dfn> program for the neural gas with real vector spaces</li>
+ * <li><dfn>pca.cpp</dfn> program for the principal component analysis</li>
  * </ul>
  *
  * @section ex advanced documentation
@@ -498,6 +499,7 @@
  *
  * @file ncd.cpp testprogram for the normalized compression distance
  * @file neuralgas.cpp testprogram for the neural gas algorithm
+ * @file pca.cpp testprogram for the pca
  *
  * @file classifier.h main header for all classifier structurs
  * @file classifier.hpp header for the abstract class implementation of the classifiers
