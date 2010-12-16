@@ -166,7 +166,7 @@ def getConfig():
 def getRekusivFiles(startdir, ending, pdontuse=[], pShowPath=True, pAbsPath=False) :
     lst = []
     ldontuse = [os.path.join(startdir, i) for i in pdontuse]
-    
+
     for root, dirs, filenames in os.walk(startdir):
         for filename in filenames:
             if not(root in ldontuse) :
@@ -239,13 +239,14 @@ else :
     #BuildDir('examples', '.')
 
     # building object files of the framework first
-    env.Object( getRekusivFiles(os.curdir, ".cpp", ["examples"]) )
-    objectfiles = getRekusivFiles(os.curdir, ".o", ["examples"])
+    #env.Object( getRekusivFiles(os.curdir, ".cpp", ["examples"]) )
+    objectfiles = getRekusivFiles(os.curdir, env["OBJSUFFIX"], ["examples"])
     
+   
     for i in getRekusivFiles(os.path.join(os.curdir, "examples"), ".cpp") :
         sources = []
         sources.extend(objectfiles)
-        #sources.append( i )
+        sources.append( i )
         #env.Object(i)
         print sources
-        #env.Program( target=os.path.basename(i), source=sources )
+        env.Program( target=os.path.basename(i), source=sources )
