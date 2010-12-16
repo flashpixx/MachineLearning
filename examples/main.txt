@@ -245,13 +245,13 @@ int main(int argc, char* argv[]) {
     
     
     // ==== PCA ====
-    
+    /*
     ublas::matrix<double> data = o.readMatrix<double>("/pcadata", H5::PredType::NATIVE_DOUBLE); 
     ndim::pca<double> p(2);
     
     tl::files::hdf f("pca.hdf5", true);
     f.write<double>( "/data",  p.map(data), H5::PredType::NATIVE_DOUBLE );
-    
+    */
     
     
     // ===== kmeans ===== 
