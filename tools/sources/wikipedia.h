@@ -31,7 +31,6 @@
 #include <algorithm>
 #include <boost/asio.hpp>
 #include <boost/regex.hpp>
-#include <boost/algorithm/string.hpp>
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
@@ -223,21 +222,23 @@ namespace machinelearning { namespace tools { namespace sources {
         
         // get native XML data and analyse content
         m_article = parseXML( l_xml );
+
+        
+        // parse content data (category, acronyms, redirect...)
+        boost::smatch l_what;
+        std::string::const_iterator it    = m_article.content.begin();
+        std::string::const_iterator l_end = m_article.content.end();
+        
         
         // check if exists redirect in the content data, run a new request (we use a case-insensitive search)
-        std::string l_cisearch = m_article.content;
-        boost::to_lower(l_cisearch);
-        if ( l_cisearch.find("#redirect") != std::string::npos ) {
-            getArticle(m_article.content.substr(12, m_article.content.size()-14), p_lang);
+        const boost::regex l_redirectpattern( "#redirect \\[\\[.*?\\]\\]", boost::regex_constants::icase | boost::regex_constants::perl );
+        if (boost::regex_search(m_article.content, l_what, l_redirectpattern)) {
+            const std::string l_pattern(l_what[0]);
+            getArticle(l_pattern.substr(12, l_pattern.size()-14), p_lang);
             return;
         }
 
         
-        // parse content data (category, acronyms, ...)
-        boost::smatch l_what;
-        std::string::const_iterator it    = m_article.content.begin();
-        std::string::const_iterator l_end = m_article.content.end();
-
         // check if the content is acronym page, than extract the acronyms (hint: non-greedy excepted)
         const boost::regex l_acronympattern( "'''" + m_article.title + "'''[[:space:]]+"+l_prop.acronymref+":", boost::regex_constants::perl );
         if (boost::regex_search(m_article.content, l_what, l_acronympattern)) {
@@ -255,7 +256,6 @@ namespace machinelearning { namespace tools { namespace sources {
         
         // extract category with regular expression \[\[<category name>:(.*?)\]\] (hint: non-greedy excepted)
         const boost::regex l_categorypattern( "\\[\\[" + l_prop.category + ":(.*?)\\]\\][[:space:]]*", boost::regex_constants::icase | boost::regex_constants::perl );
-        
         while (boost::regex_search(it, l_end, l_what, l_categorypattern)) {
             std::string l_label(l_what[1]);
             m_article.label.push_back( l_label.substr(0, l_label.find("|")) );
@@ -265,7 +265,7 @@ namespace machinelearning { namespace tools { namespace sources {
         // remove languages (short codes are found in ISO 639-1) and labels (at the end of the expression we set a [[:space:]]* for removing CR or LF)
         m_article.content = boost::regex_replace(m_article.content, l_categorypattern, "");
         
-        const boost::regex l_langpattern( "\\[\\[(aa|ab|af|am|ar|as|ay|az|ba|be|bg|bh|bi|bn|bo|br|ca|co|cs|cy|da|de|dz|el|en|eo|es|et|eu|fa|fi|fj|fo|fr|fy|ga|gd|gl|gn|gu|ha|hi|he|hr|hu|hy|ia|id|ie|ik|in|is|it|iu|iw|ja|ji|jw|ka|kk|kl|km|kn|ko|ks|ku|ky|la|ln|lo|lt|lv|mg|mi|mk|ml|mn|mo|mr|ms|mt|my|na|ne|nl|no|oc|om|or|pa|pl|ps|pt|qu|rm|rn|ro|ru|rw|sa|sd|sg|sh|si|sk|sl|sm|sn|so|sq|sr|ss|st|su|sv|sw|ta|te|tg|th|ti|tk|tl|tn|to|tr|ts|tt|tw|ug|uk|ur|uz|vi|vo|wo|xh|yi|yo|za|zh|zu):(.*?)\\]\\][[:space:]]*", boost::regex_constants::perl );
+        const boost::regex l_langpattern( "\\[\\[(aa|ab|af|am|ar|as|ay|az|ba|be|bg|bh|bi|bn|bo|br|ca|co|cs|cy|da|de|dz|el|en|eo|es|et|eu|fa|fi|fj|fo|fr|fy|ga|gd|gl|gn|gu|ha|hi|he|hr|hu|hy|ia|id|ie|ik|in|is|it|iu|iw|ja|ji|jw|ka|kk|kl|km|kn|ko|ks|ku|ky|la|ln|lo|lt|lv|mg|mi|mk|ml|mn|mo|mr|ms|mt|my|na|ne|nl|no|oc|om|or|pa|pl|ps|pt|qu|rm|rn|ro|ru|rw|sa|sd|sg|sh|si|sk|sl|sm|sn|so|sq|sr|ss|st|su|sv|sw|ta|te|tg|th|ti|tk|tl|tn|to|tr|ts|tt|tw|ug|uk|ur|uz|vi|vo|wo|xh|yi|yo|za|zh|zu):(.*?)\\]\\][[:space:]]*", boost::regex_constants::icase | boost::regex_constants::perl );
         m_article.content = boost::regex_replace(m_article.content, l_langpattern, "");
         
         m_articlefound = true;    

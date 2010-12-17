@@ -279,28 +279,7 @@
  *
  * @section wiki wikipedia
  * The wikipedia class can be used for read the article data of wikipedia articles in different languages
- * @code
-    tools::sources::wikipedia wiki; // optional parameter for language (see class)
- 
-    // reads a random article
-    wiki.getRandomArticle();
-    // or read a article with name
-    wiki.getArticle("<article name>");
- 
-    // create a vector for article labels or acronyms
-    std::vector<std::string> tags;
- 
-    // check if result is an article
-    if (wiki.isArticle()) {
-        std::cout << wiki.getArticleContent() << "\n===================================================================================" << std::endl;
-        tags = wiki.getArticleLabel();
-    } else
-        tags = wiki.getArticleAcronym();
- 
-    // write arcronym / label data
-    for(std::size_t i=0; i < tags.size(); ++i)
-        std::cout << tags[i] << std::endl;
- * @endcode
+ * @include examples/wikipedia.cpp
  *
  * @section cloud cloud
  * The cloud class creates a multimodal n-dimensional data set with normal distribution. The n-dimensional cube is sampled in equidistant
@@ -445,6 +424,8 @@
  * @file ncd.cpp testprogram for the normalized compression distance
  * @file neuralgas.cpp testprogram for the neural gas algorithm
  * @file pca.cpp testprogram for the pca
+ * @file newsgroup.cpp testprogram for NNTP using
+ * @file wikipedia.cpp testprogram for using Wikipedia
  *
  * @file classifier.h main header for all classifier structurs
  * @file classifier.hpp header for the abstract class implementation of the classifiers
