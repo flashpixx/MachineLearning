@@ -237,9 +237,10 @@ elif GetOption("createdocu") != None :
     os.system("doxygen documentation.doxyfile")
 else :
     # building object files of the framework first
-    env.Object( getRekusivFiles(os.curdir, ".cpp", ["examples"]) )
+    for i in getRekusivFiles(os.curdir, ".cpp", ["examples"]) :
+        env.Object(i)
     objectfiles = getRekusivFiles(os.curdir, env["OBJSUFFIX"], ["examples"])
-    
+
     # build each example
     for i in getRekusivFiles(os.path.join(os.curdir, "examples"), ".cpp") :
         env.Object(i)
