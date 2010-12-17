@@ -284,23 +284,7 @@
  * @section cloud cloud
  * The cloud class creates a multimodal n-dimensional data set with normal distribution. The n-dimensional cube is sampled in equidistant
  * steps and on the cross-points a normal distribution is created.
- * @code
-    // creates a plane with clouds (parameter is the number of dimensions)
-    tools::sources::cloud<double> cloud(2);
- 
-    // set (random) number of points within the cluster
-    cloud.setPoints( 100, 1000 );
- 
-    // sets the variance for each cluster (the value is random generated, see within the class for disabling random values)
-    cloud.setVariance(0.2, 0.8);
- 
-    // sets the ranges and sampling point for each dimension (dimension, start value, end value, number of samples)
-    cloud.setRange(0, 0, 100, 20);
-    cloud.setRange(1, 0, 100, 20);
- 
-    // the method generate supports different parametes, see the parameters within the class
-    std::cout << cloud.generate() << std::endl; 
- * @endcode
+ * @include examples/cloud.cpp
  * 
  *
  *
@@ -426,6 +410,7 @@
  * @file pca.cpp testprogram for the pca
  * @file newsgroup.cpp testprogram for NNTP using
  * @file wikipedia.cpp testprogram for using Wikipedia
+ * @file cloud.cpp testprogram for create n-dimensional normal distribution
  *
  * @file classifier.h main header for all classifier structurs
  * @file classifier.hpp header for the abstract class implementation of the classifiers
