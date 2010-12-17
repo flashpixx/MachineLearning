@@ -198,7 +198,6 @@ namespace machinelearning { namespace tools { namespace sources {
     /** reads an article
      * @param p_search keyword for searching
      * @param p_lang optional language
-     * @todo change case-insensitive search to search with regular expression
      **/
     inline void wikipedia::getArticle( const std::string& p_search, const language& p_lang )
     {
