@@ -31,6 +31,7 @@
 #include <algorithm>
 #include <boost/asio.hpp>
 #include <boost/regex.hpp>
+#include <boost/algorithm/string.hpp>
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
@@ -198,6 +199,7 @@ namespace machinelearning { namespace tools { namespace sources {
     /** reads an article
      * @param p_search keyword for searching
      * @param p_lang optional language
+     * @todo change case-insensitive search to search with regular expression
      **/
     inline void wikipedia::getArticle( const std::string& p_search, const language& p_lang )
     {
@@ -222,8 +224,10 @@ namespace machinelearning { namespace tools { namespace sources {
         // get native XML data and analyse content
         m_article = parseXML( l_xml );
         
-        // check if exists redirect in the content data, run a new request
-        if (m_article.content.find("#redirect") != std::string::npos) {
+        // check if exists redirect in the content data, run a new request (we use a case-insensitive search)
+        std::string l_cisearch = m_article.content;
+        boost::to_lower(l_cisearch);
+        if ( l_cisearch.find("#redirect") != std::string::npos ) {
             getArticle(m_article.content.substr(12, m_article.content.size()-14), p_lang);
             return;
         }
