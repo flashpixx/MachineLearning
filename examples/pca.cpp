@@ -22,26 +22,26 @@
  **/
 
 #include "../machinelearning.h"
-
+#include <boost/lexical_cast.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
-#include <boost/numeric/ublas/io.hpp>
 
-using namespace boost::numeric;
-using namespace machinelearning;
-namespace dim = machinelearning::dimensionreduce::nonsupervised;
- 
+namespace ublas = boost::numeric::ublas;
+namespace dim   = machinelearning::dimensionreduce::nonsupervised;
+namespace tl   = machinelearning::tools;
 
-int main(std::size_t argc, char* argv[]) {
-    if (argc < 3)
-        throw std::runtime_error("you need at least two parameter as input. first HDF file, second path to dataset");
+
+int main(int argc, char* argv[]) {
+    if (argc < 4)
+        throw std::runtime_error("you need at least three parameter as input. first HDF file, second path to dataset, third number of projected dimensions");
     
-    tools::files::hdf source( argv[1] );
-    tools::files::hdf target("pca.hdf5", true);
+    tl::files::hdf source( argv[1] );
+    tl::files::hdf target("pca.hdf5", true);
 
-    dim::pca<double> pca(2);
+    dim::pca<double> pca( boost::lexical_cast<std::size_t>(argv[4]) );
     target.write<double>( "/data",  pca.map( source.readMatrix<double>(argv[1], H5::PredType::NATIVE_DOUBLE) ), H5::PredType::NATIVE_DOUBLE );
     
     std::cout << "create HDF file \"pca.hdf5\" with dataset \"/data\"" << std::endl;
-
+    
+    
     return EXIT_SUCCESS;
 }

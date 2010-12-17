@@ -28,6 +28,8 @@
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/bindings/blas.hpp>
+#include <boost/numeric/bindings/ublas/vector.hpp>
+#include <boost/numeric/bindings/ublas/matrix.hpp>
 #include <boost/numeric/bindings/lapack/driver/geev.hpp>
 #include <boost/numeric/bindings/lapack/driver/ggev.hpp>
 #include <boost/numeric/bindings/lapack/driver/gesv.hpp> 
@@ -43,7 +45,6 @@ namespace machinelearning { namespace tools {
     
     namespace ublas     = boost::numeric::ublas;
     namespace blas      = boost::numeric::bindings::blas;
-    namespace bindings  = boost::numeric::bindings;
     namespace linalg    = boost::numeric::bindings::lapack;
     
     
@@ -139,6 +140,7 @@ namespace machinelearning { namespace tools {
         
         // determine eigenvector without sorting
         linalg::geev( 'N', 'V', l_matrix, l_eigval,  l_tmp1,l_tmp2,  l_eigvec, linalg::optimal_workspace() );
+        
         
         // normalize every eigenvector
         for(std::size_t i=0; i < l_eigvec.size2(); ++i)
