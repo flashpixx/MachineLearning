@@ -275,32 +275,7 @@
  * @section nntp newsgroups
  * The class allows to browse newsgroups in a naitve way for extraction the message content. The class throws different exception if there
  * are connection or stream errors during sending or receiving data (see exceptions within the class).
- * @code
-    tools::sources::nntp news("<news server>");
-    
-    // read group list
-    std::map<std::string, std::size_t> groups = news.getGroupList();
-    for (std::map<std::string, std::size_t>::iterator it = groups.begin(); it != groups.end(); ++it)
-        std::cout << it->first << "     (" << it->second << ")" << std::endl;
-    std::cout << "\n===================================================================================" << std::endl;
- 
-    // sets which part of a messages is read
-    news.setContent( tl::sources::nntp::full );
- 
-    // sets the newsgroup for browsing 
-    news.setGroup("<newsgroup>");
- 
-    // browse each article in the group
-    for(tools::sources::nntp::iterator it=news.begin(); it != news.end(); ++it) {
-        
-        // splits header and body of the message (should be only used with full articles)
-        std::string header, body;
-        tools::sources::nntp::separateHeaderBody( *it, header, body );
- 
-        std::cout << header << "\n-----------------------------------------------------------------------------------\n";
-        std::cout << body   << "\n===================================================================================" << std::endl;
-    }
- * @endcode
+ * @include examples/newsgroup.cpp
  *
  * @section wiki wikipedia
  * The wikipedia class can be used for read the article data of wikipedia articles in different languages
