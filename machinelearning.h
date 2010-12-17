@@ -89,13 +89,6 @@
  * <li><dfn>--with-files</dfn> support for the namespace machinelearning::tools::files</li>
  * </ul>
  *
- * @section examples example program
- * <ul>
- * <li><dfn>ncd.cpp</dfn> program for the normalized compression distance</li>
- * <li><dfn>neuralgas.cpp</dfn> program for the neural gas with real vector spaces</li>
- * <li><dfn>pca.cpp</dfn> program for the principal component analysis</li>
- * </ul>
- *
  * @section ex advanced documentation
  * <ul>
  * <li>@subpage classifier</li>
@@ -229,15 +222,7 @@
  * (for datatype). The examples show the different option
  *
  * @section pca principle component analysis (PCA)
- * @code
-    ublas::matrix<double> data = / fill data (row orientated) /;
- 
-    // create a pca object for reduce data to 2 dimensions
-    dimensionreduce::nonsupervised::pca<double> pca(2);
-    
-    // create reduce data matrix
-    ublas::matrix<double> reduce = pca.map(data);
- * @endcode
+ * @include examples/pca.cpp
  *
  * @section lda linear discriminant analysis (LDA)
  * @code
@@ -280,22 +265,7 @@
  * example show how to use these classes.
  *
  * @section ncd normalize compression distance (NCD)
- * @code
-    std::vector< std::string > val;
-    val.push_back( / add file path or string data / );
-     
-    distances::ncd ncd1( distances::ncd::gzip );
-    ncd1.setCompressionLevel( ncd::bestspeed );
-    std::cout << "read data as file and use gzip" << std::endl; 
-    std::cout << "unsymmetric: " << ncd1.unsymmetric<double>(val, true) << std::endl;
-    std::cout << "symmetric: " << ncd1.symmetric<double>(val, true) << std::endl;
- 
-    distances::ncd ncd2( distances::ncd::bzip2 );
-    ncd2.setCompressionLevel( ncd::bestcompression );
-    std::cout << "read data as string and use bzip2" << std::endl; 
-    std::cout << "unsymmetric: " << ncd1.unsymmetric<double>(val) << std::endl;
-    std::cout << "symmetric: " << ncd1.symmetric<double>(val) << std::endl;
- * @endcode
+ * @include examples/ncd.cpp
  *
  *
  *

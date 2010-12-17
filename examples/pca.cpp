@@ -27,21 +27,32 @@
 
 namespace ublas = boost::numeric::ublas;
 namespace dim   = machinelearning::dimensionreduce::nonsupervised;
-namespace tl   = machinelearning::tools;
+namespace tl    = machinelearning::tools;
 
 
-int main(int argc, char* argv[]) {
+int main(std::size_t argc, char* argv[]) {
     if (argc < 4)
         throw std::runtime_error("you need at least three parameter as input. first HDF file, second path to dataset, third number of projected dimensions");
     
+    // convert string parameter to numerical data
+    std::size_t targetdim = 0;
+    try {
+        targetdim = boost::lexical_cast<std::size_t>(argv[3]);
+    } catch (...) {
+        throw std::runtime_error("target dimension can not be read");
+    }
+    
+    // read source target hdf file
     tl::files::hdf source( argv[1] );
-    tl::files::hdf target("pca.hdf5", true);
 
-    dim::pca<double> pca( boost::lexical_cast<std::size_t>(argv[4]) );
-    target.write<double>( "/data",  pca.map( source.readMatrix<double>(argv[1], H5::PredType::NATIVE_DOUBLE) ), H5::PredType::NATIVE_DOUBLE );
+    // create pca object and map the data
+    dim::pca<double> pca( targetdim );
+    ublas::matrix<double> project = pca.map( source.readMatrix<double>(argv[2], H5::PredType::NATIVE_DOUBLE) );
+    
+    // create file and write data to hdf
+    tl::files::hdf target("pca.hdf5", true);
+    target.write<double>( "/data",  project, H5::PredType::NATIVE_DOUBLE );
     
     std::cout << "create HDF file \"pca.hdf5\" with dataset \"/data\"" << std::endl;
-    
-    
     return EXIT_SUCCESS;
 }

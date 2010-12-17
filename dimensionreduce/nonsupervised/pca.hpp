@@ -109,7 +109,6 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         else
             l_data =  (1.0 / l_center.size1()) * ublas::prod(ublas::trans(l_center), l_center);
         
-        
         // calculate the eigenvalues & -vectors
         ublas::vector<T> l_eigenvalues;
         ublas::matrix<T> l_eigenvectors;
