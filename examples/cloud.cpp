@@ -32,6 +32,8 @@ int main(std::size_t argc, char* argv[]) {
     // set default values
     std::size_t dim                 = 0;
     std::size_t sampling            = 10;
+    std::size_t pointsmin           = 50;
+    std::size_t pointsmax           = 500;
     double rangemin                 = 0;
     double rangemax                 = 1;
     double variancemin              = 0.1;
@@ -43,29 +45,38 @@ int main(std::size_t argc, char* argv[]) {
 
     // try to convert string arguments to numeric values
     try {
-        dim         = boost::lexical_cast<std::size_t>(argv[1]);
+        dim             = boost::lexical_cast<std::size_t>(argv[1]);
         
         if (argc > 2) 
             sampling    = boost::lexical_cast<std::size_t>(argv[2]);
         
         if (argc > 3)
-            rangemin    = boost::lexical_cast<double>(argv[3]);
+            pointsmin   = boost::lexical_cast<std::size_t>(argv[3]);
         if (argc > 4)
-            rangemax    = boost::lexical_cast<double>(argv[4]);
+            pointsmax   = boost::lexical_cast<std::size_t>(argv[4]);
         
         if (argc > 5)
-            variancemin    = boost::lexical_cast<double>(argv[5]);
+            rangemin    = boost::lexical_cast<double>(argv[5]);
         if (argc > 6)
-            variancemax    = boost::lexical_cast<double>(argv[6]);
+            rangemax    = boost::lexical_cast<double>(argv[6]);
+        
+        if (argc > 7)
+            variancemin = boost::lexical_cast<double>(argv[7]);
+        if (argc > 8)
+            variancemax = boost::lexical_cast<double>(argv[8]);
         
     } catch (...) {
         throw std::runtime_error("numerical parameter not correct");
     }    
+
     
     
     // create cloud object and set the data
     tools::sources::cloud<double> cloud(dim);
 
+    // set range of the points
+    cloud.setPoints(pointsmin, pointsmax);
+    
     // set variance, range and samples
     cloud.setVariance(variancemin, variancemax);
     for(std::size_t i=0; i < dim; ++i)
