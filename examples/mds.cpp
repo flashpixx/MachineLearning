@@ -70,10 +70,10 @@ int main(std::size_t argc, char* argv[]) {
     
     
     // create file and write data to hdf
-    tl::files::hdf target("lda.hdf5", true);
+    tl::files::hdf target("mds.hdf5", true);
     target.write<double>( "/data",  project, H5::PredType::NATIVE_DOUBLE );
     
-    std::cout << "create HDF file \"lda.hdf5\" with dataset \"/data\"" << std::endl;
+    std::cout << "create HDF file \"mds.hdf5\" with dataset \"/data\"" << std::endl;
     return EXIT_SUCCESS;
 
 }

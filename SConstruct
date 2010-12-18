@@ -229,13 +229,25 @@ elif GetOption("compilelang") != None :
     createLanguage(env, True)
 elif GetOption("createdocu") != None :
     os.system("doxygen documentation.doxyfile")
+elif GetOption("clean") != None :
+    objectfiles = getRekusivFiles(os.curdir, env["OBJSUFFIX"])
+    Delete(objectfiles)
 else :
     # catch all cpps within the framework directories
     sourcefiles = getRekusivFiles(os.curdir, ".cpp", ["examples"])
 
-    # build each example
-    for i in getRekusivFiles(os.path.join(os.curdir, "examples"), ".cpp") :
+    # examples are build with parameter
+    buildfiles = []
+    
+    if GetOption("withfiles") != None :
+        buildfiles.extend( ["ncd.cpp", "neuralgas.cpp", "pca.cpp", "lda.cpp", "mds.cpp"] )
+        
+    if GetOption("withsources") != None :
+        buildfiles.extend( ["newsgroup.cpp", "wikipedia.cpp", "cloud.cpp"] )
+    
+    
+    for i in buildfiles :
         builds = []
         builds.extend(sourcefiles)
-        builds.append(i)
+        builds.append( os.path.join("examples",i) )
         env.Program( target=os.path.splitext(i)[0], source=builds )
