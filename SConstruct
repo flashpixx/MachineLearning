@@ -16,10 +16,6 @@ AddOption("--create-documentation", dest="createdocu", type="string", nargs=0, a
 
 
 #=== function for os configuration ===================================================================================================
-# using CPUs for compiling (default)
-COMPILECPU = 2
-
-
 # configuration for OSX build
 def configuration_macosx(config, version, architecture) :
     # check the OSX build for set the correct architecture
@@ -226,8 +222,6 @@ def createLanguage(env, onlycompile=False) :
 #=== create environment and compiling ==================================================================================================
 env = getConfig()
 
-SetOption('num_jobs',   int(os.environ.get('NUM_CPU', COMPILECPU)))
-
 # get all cpp-files and compile and create language file
 if GetOption("createlang") != None :
     createLanguage(env)
@@ -236,16 +230,12 @@ elif GetOption("compilelang") != None :
 elif GetOption("createdocu") != None :
     os.system("doxygen documentation.doxyfile")
 else :
-    # building object files of the framework first
-    for i in getRekusivFiles(os.curdir, ".cpp", ["examples"]) :
-        env.Object(i)
-    objectfiles = getRekusivFiles(os.curdir, env["OBJSUFFIX"], ["examples"])
+    # catch all cpps within the framework directories
+    sourcefiles = getRekusivFiles(os.curdir, ".cpp", ["examples"])
 
     # build each example
     for i in getRekusivFiles(os.path.join(os.curdir, "examples"), ".cpp") :
-        env.Object(i)
-
-        sources = []
-        sources.extend(objectfiles)
-        sources.append( os.path.splitext(i)[0]+env["OBJSUFFIX"] )
-        env.Program( target=os.path.splitext(i)[0], source=sources )
+        builds = []
+        builds.extend(sourcefiles)
+        builds.append(i)
+        env.Program( target=os.path.splitext(i)[0], source=builds )
