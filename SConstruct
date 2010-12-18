@@ -230,8 +230,8 @@ elif GetOption("compilelang") != None :
 elif GetOption("createdocu") != None :
     os.system("doxygen documentation.doxyfile")
 elif GetOption("clean") != None :
-    objectfiles = getRekusivFiles(os.curdir, env["OBJSUFFIX"])
-    Delete(objectfiles)
+    for i in getRekusivFiles(os.curdir, env["OBJSUFFIX"]) :
+        os.remove(i)
 else :
     # catch all cpps within the framework directories
     sourcefiles = getRekusivFiles(os.curdir, ".cpp", ["examples"])
