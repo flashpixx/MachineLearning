@@ -229,7 +229,7 @@ elif GetOption("compilelang") != None :
     createLanguage(env, True)
 elif GetOption("createdocu") != None :
     os.system("doxygen documentation.doxyfile")
-elif GetOption("clean") != None :
+elif GetOption("clean") :
     for i in getRekusivFiles(os.curdir, env["OBJSUFFIX"]) :
         os.remove(i)
 else :
@@ -244,7 +244,6 @@ else :
         
     if GetOption("withsources") != None :
         buildfiles.extend( ["newsgroup.cpp", "wikipedia.cpp", "cloud.cpp"] )
-    
     
     for i in buildfiles :
         builds = []
