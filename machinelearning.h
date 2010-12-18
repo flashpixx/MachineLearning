@@ -225,16 +225,7 @@
  * @include examples/pca.cpp
  *
  * @section lda linear discriminant analysis (LDA)
- * @code
-    ublas::matrix<double> data      = / fill data (row orientated) /;
-    std::vector<std::string> labels = / fill label for each row /;
- 
-    // create lda object for reduce data to 2 dimensions
-    dimensionreduce::supervised::lda<double, std::string> lda(2);
- 
-    // create reduce data
-    ublas::matrix<double> reduce = lda.map(data, labels);
- * @endcode
+ * @include examples/lda.cpp
  *
  * @section mds multidimensional scaling (MDS)
  * @code
@@ -411,6 +402,7 @@
  * @file newsgroup.cpp testprogram for NNTP using
  * @file wikipedia.cpp testprogram for using Wikipedia
  * @file cloud.cpp testprogram for create n-dimensional normal distribution
+ * @file lda.cpp testprogramm for lda
  *
  * @file classifier.h main header for all classifier structurs
  * @file classifier.hpp header for the abstract class implementation of the classifiers

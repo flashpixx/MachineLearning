@@ -23,36 +23,75 @@
 
 #include "../machinelearning.h"
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 
 namespace ublas = boost::numeric::ublas;
-namespace dim   = machinelearning::dimensionreduce::nonsupervised;
+namespace dim   = machinelearning::dimensionreduce::supervised;
 namespace tl    = machinelearning::tools;
 
 
 int main(std::size_t argc, char* argv[]) {
-    if (argc < 4)
-        throw std::runtime_error("you need at least three parameter as input. first HDF file, second path to dataset, third number of projected dimensions");
     
+    if (argc < 6)
+        throw std::runtime_error("you need at least five parameter as input. first HDF file, second number of projected dimensions, third type of labels (string, int, uint, double), forth path to dataset, fifth path to labels");
+
     // convert string parameter to numerical data
     std::size_t targetdim = 0;
     try {
-        targetdim = boost::lexical_cast<std::size_t>(argv[3]);
+        targetdim = boost::lexical_cast<std::size_t>(argv[2]);
     } catch (...) {
         throw std::runtime_error("target dimension can not be read");
     }
     
-    // read source hdf file
+    
+    // read source hdf file and data
     tl::files::hdf source( argv[1] );
+    ublas::matrix<double> data = source.readMatrix<double>( argv[4], H5::PredType::NATIVE_DOUBLE);
+    ublas::matrix<double> project;
 
-    // create pca object and map the data
-    dim::pca<double> pca( targetdim );
-    ublas::matrix<double> project = pca.map( source.readMatrix<double>(argv[2], H5::PredType::NATIVE_DOUBLE) );
+    // read label type
+    std::string labeltype( argv[3] );
+    boost::to_lower(labeltype);
+    
+    // create projection
+    if (labeltype == "int") {
+        dim::lda<double, int> lda(targetdim);
+        std::vector<int> labels = tl::vector::copy( source.readVector<int>(argv[5], H5::PredType::NATIVE_INT) );
+        
+        project = lda.map(data, labels);
+    }
+        
+    if (labeltype == "uint") {
+        dim::lda<double, unsigned int> lda(targetdim);
+        std::vector<unsigned int> labels = tl::vector::copy( source.readVector<unsigned int>(argv[5], H5::PredType::NATIVE_UINT) );
+        
+        project = lda.map(data, labels);
+    }
+        
+    if (labeltype == "double") {
+        dim::lda<double, double> lda(targetdim);
+        std::vector<double> labels = tl::vector::copy( source.readVector<double>(argv[5], H5::PredType::NATIVE_DOUBLE) );
+        
+        project = lda.map(data, labels);
+    }
+    
+    if (labeltype == "string") {
+        dim::lda<double, std::string> lda(targetdim);
+        //std::vector<std::string> labels = source.readVector<std::string>(argv[5], H5::PredType::NATIVE_DOUBLE);
+        
+        //project = lda.map(data, labels);
+    }
+    
+    if ((project.size1() == 0) || (project.size2() == 0))
+        throw std::runtime_error("label type is unkown");
+    
+    
     
     // create file and write data to hdf
-    tl::files::hdf target("pca.hdf5", true);
+    tl::files::hdf target("lda.hdf5", true);
     target.write<double>( "/data",  project, H5::PredType::NATIVE_DOUBLE );
     
-    std::cout << "create HDF file \"pca.hdf5\" with dataset \"/data\"" << std::endl;
+    std::cout << "create HDF file \"lda.hdf5\" with dataset \"/data\"" << std::endl;
     return EXIT_SUCCESS;
 }

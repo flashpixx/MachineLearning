@@ -73,6 +73,7 @@ namespace machinelearning { namespace tools {
     
     
     /** calulate from a NxN and a diagonalized matrix the generalized eigenvalues and -vectors
+     * @bug ggev call creates error
      * @param p_matrix input matrix
      * @param p_diag diagonal matrix
      * @param p_eigval blas vector for eigenvalues [initialisation is not needed]
@@ -99,12 +100,11 @@ namespace machinelearning { namespace tools {
         ublas::matrix<T, ublas::column_major> l_tmp2(l_matrix.size1(),l_matrix.size2());
         
         // determine eigenvector without sorting and calculate eigenvalues
-        linalg::ggev( 'N', 'V', p_matrix, l_diag, l_eigval,  l_tmp1,  l_div,  l_tmp2,  l_eigvec, linalg::optimal_workspace() );
+        //linalg::ggev( 'N', 'V', p_matrix, l_diag, l_eigval,  l_tmp1,  l_div,  l_tmp2,  l_eigvec, linalg::optimal_workspace() );
         
         // calculate eigenvalues
         for(std::size_t i=0; i < l_eigval.size(); ++i)
-            if (!function::isNumericalZero<T>(l_div(i)))
-                l_eigval(i) /= l_div(i);
+            l_eigval(i) /= l_div(i);
         
         // normalize every eigenvector
         for(std::size_t i=0; i < l_eigvec.size2(); ++i)

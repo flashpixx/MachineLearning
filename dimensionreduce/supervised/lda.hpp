@@ -104,15 +104,12 @@ namespace machinelearning { namespace dimensionreduce { namespace supervised {
         if (p_data.size1() != p_label.size())
             throw exception::runtime(_("matrix rows and label size are not equal"));
         
-        
         // create a unique label vector
         std::vector<L> l_uniquelabel = tools::vector::unique<L>(p_label);
         
         // we can only reduce to length(classes)-1
         if (m_dim >= l_uniquelabel.size())
             throw exception::runtime(_("target dimension must be less than unique data classes"));
-        
-        
         // centering the data
         ublas::matrix<T> l_center = tools::matrix::centering<T>(p_data);        
         
@@ -127,7 +124,6 @@ namespace machinelearning { namespace dimensionreduce { namespace supervised {
         const T l_classes = static_cast<T>(l_uniquelabel.size()-1);
     
         for(std::size_t i=0; i < l_uniquelabel.size(); ++i) {
-            
             
             // extract index from map | typename must be first, because is a exotic structure of C++ :-)
             // create a matrix whitch holds the rows for every class. Create a matrix with index elements for the rows
@@ -146,8 +142,7 @@ namespace machinelearning { namespace dimensionreduce { namespace supervised {
         ublas::vector<T> l_eigenvalues;
         ublas::matrix<T> l_eigenvectors;
         tools::lapack::eigen<T>(l_st-l_sw, l_sw, l_eigenvalues, l_eigenvectors);
-
-        
+       
         // rank the eigenvalues
         const ublas::indirect_array< std::vector<std::size_t> > l_rank = tools::vector::rankIndex( l_eigenvalues );
         
@@ -157,8 +152,6 @@ namespace machinelearning { namespace dimensionreduce { namespace supervised {
             ublas::column(m_project, i) = ublas::column(l_eigenvectors, l_rank(l_rank.size()-i-1));
         
         return ublas::prod(p_data, m_project);
-        
-        
     }
 
 };};};
