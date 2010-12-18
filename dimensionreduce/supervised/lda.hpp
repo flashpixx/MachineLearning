@@ -119,8 +119,8 @@ namespace machinelearning { namespace dimensionreduce { namespace supervised {
             l_index.insert( std::make_pair(p_label[i], i) );
 
         // calculate covarianz for every class and all data
-        ublas::matrix<T> l_st = tools::matrix::cov(l_center);
-        ublas::matrix<T> l_sw(l_st.size1(), l_st.size2());
+        ublas::matrix<T> l_sb = tools::matrix::cov(l_center);
+        ublas::matrix<T> l_sw(l_sb.size1(), l_sb.size2());
         const T l_classes = static_cast<T>(l_uniquelabel.size()-1);
     
         for(std::size_t i=0; i < l_uniquelabel.size(); ++i) {
@@ -141,7 +141,8 @@ namespace machinelearning { namespace dimensionreduce { namespace supervised {
         // calculate the eigenvalues & -vectors
         ublas::vector<T> l_eigenvalues;
         ublas::matrix<T> l_eigenvectors;
-        tools::lapack::eigen<T>(l_st-l_sw, l_sw, l_eigenvalues, l_eigenvectors);
+        ublas::matrix<T> l_sdiff = l_sb-l_sw;
+        tools::lapack::eigen<T>(l_sdiff, l_sw, l_eigenvalues, l_eigenvectors);
        
         // rank the eigenvalues
         const ublas::indirect_array< std::vector<std::size_t> > l_rank = tools::vector::rankIndex( l_eigenvalues );

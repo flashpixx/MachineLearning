@@ -73,7 +73,6 @@ namespace machinelearning { namespace tools {
     
     
     /** calulate from a NxN and a diagonalized matrix the generalized eigenvalues and -vectors
-     * @bug ggev call creates error
      * @param p_matrix input matrix
      * @param p_diag diagonal matrix
      * @param p_eigval blas vector for eigenvalues [initialisation is not needed]
