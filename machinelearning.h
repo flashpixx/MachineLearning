@@ -137,32 +137,7 @@
  * @include examples/kmeans.cpp
  *
  * @section ng neural gas
- * @code
-    ublas::matrix<double> data = / fill data (row orientated) /;
- 
-    // create distance object
-    distances::euclid<double> d;
-    // create neural gas object with 11 prototypes
-    clustering::nonsupervised::neuralgas<double> ng(d, 11, data.size2());
-    // enabled logging
-    ng.setLogging(true);
-    // clustering with 15 iterations
-    ng.train(data, 15);
- 
-    // if logging is enabled
-    if (ng.getLogging()) {
- 
-        // get prototypes after every iteration 
-        std::vector< ublas::matrix<double> > p = ng.getLoggedPrototypes();
- 
-        for(std::size_t i=0; i < p.size(); ++i)
-            std::cout << p[i] << std::endl;
-    }
- 
-    // get row index for the prototype of every data point
-    ublas::matrix<double> unkown = / create matrix with unkown data /;
-    ublas::indirect_array< std::vector<std::size_t> > protoidx = ng.use(unkown);
- * @endcode
+ * @include examples/neuralgas.cpp
  *
  * @section rlvq relevance learning vector quantization (RLVQ)
  * @code

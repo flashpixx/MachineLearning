@@ -81,14 +81,16 @@ int main(std::size_t argc, char* argv[]) {
     cluster::kmeans<double> kmeans(d, numprotos, data.size2());
     kmeans.setLogging(log);
     
-    
     // train prototypes
     kmeans.train(data, iteration);
     
     
     // create file and write data to hdf
     tools::files::hdf target("kmeans.hdf5", true);
+    
     target.write<double>( "/protos",  kmeans.getPrototypes(), H5::PredType::NATIVE_DOUBLE );
+    target.write<double>( "/numprotos",  numprotos, H5::PredType::NATIVE_DOUBLE );
+    target.write<std::size_t>( "/iteration",  iteration, H5::PredType::NATIVE_ULONG );
     
     // if logging exists write data to file
     if (kmeans.getLogging()) {
@@ -98,6 +100,6 @@ int main(std::size_t argc, char* argv[]) {
             target.write<double>("/log" + boost::lexical_cast<std::string>( i ), p[i], H5::PredType::NATIVE_DOUBLE );
     }
     
-    std::cout << "create HDF file \"kmeans.hdf5\" with dataset \"/protos \" and if logging is enabled \"/error\" with quantization error and \"/log<0 to iterations-1>\" logged prototypes" << std::endl;
+    std::cout << "create HDF file \"kmeans.hdf5\" with dataset \"/protos \", \"/iteration\" number of iteration, \"numprotos\" number of prototypes and if logging is enabled \"/error\" with quantization error and \"/log<0 to iterations-1>\" logged prototypes" << std::endl;
     return EXIT_SUCCESS;
 }
