@@ -28,30 +28,29 @@
 
 namespace ublas = boost::numeric::ublas;
 namespace dim   = machinelearning::dimensionreduce::nonsupervised;
-namespace tl    = machinelearning::tools;
+namespace tools = machinelearning::tools;
 
 
 int main(std::size_t argc, char* argv[]) {
     
     if (argc < 4)
-        throw std::runtime_error("you need at least three parameter as input. first HDF file, second number of projected dimensions, third mapping type (metric / sammon) forth path to dataset");
+        throw std::runtime_error("you need at least three parameter as input. first HDF file, second path to dataset, third number of projected dimensions, forth mapping type (metric / sammon)");
     
+    // read source hdf file and data
+    tools::files::hdf source( argv[1] );
+    ublas::matrix<double> data = source.readMatrix<double>( argv[2], H5::PredType::NATIVE_DOUBLE);
+    ublas::matrix<double> project;
+
     // convert string parameter to numerical data
     std::size_t targetdim = 0;
     try {
-        targetdim = boost::lexical_cast<std::size_t>(argv[2]);
+        targetdim = boost::lexical_cast<std::size_t>(argv[3]);
     } catch (...) {
         throw std::runtime_error("target dimension can not be read");
     }
-
-
-    // read source hdf file and data
-    tl::files::hdf source( argv[1] );
-    ublas::matrix<double> data = source.readMatrix<double>( argv[4], H5::PredType::NATIVE_DOUBLE);
-    ublas::matrix<double> project;
     
     // read label type
-    std::string maptype( argv[3] );
+    std::string maptype( argv[4] );
     boost::to_lower(maptype);
     
     if (maptype == "metric") {
@@ -70,7 +69,7 @@ int main(std::size_t argc, char* argv[]) {
     
     
     // create file and write data to hdf
-    tl::files::hdf target("mds.hdf5", true);
+    tools::files::hdf target("mds.hdf5", true);
     target.write<double>( "/data",  project, H5::PredType::NATIVE_DOUBLE );
     
     std::cout << "create HDF file \"mds.hdf5\" with dataset \"/data\"" << std::endl;

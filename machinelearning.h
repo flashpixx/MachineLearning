@@ -134,32 +134,7 @@
  * for their labels, the nonsupervised uses only one template parameter. The examples show the different using.
  *
  * @section kmeans k-Means
- * @code
-    ublas::matrix<double> data = / fill data (row orientated) /;
-
-    // create euclidian distance object
-    distances::euclid<double> d;
-    // create kmeans with 11 prototypes and column dimension of data
-    clustering::nonsupervised::kmeans<double> kmeans(d, 11, data.size2());
-    // enabled logging
-    kmeans.setLogging(true);
-    // clustering with 15 iterations
-    kmeans.train(data, 15);
-
-    // if logging is enabled
-    if (kmeans.getLogging()) {
-        
-        // get prototypes after every iteration 
-        std::vector< ublas::matrix<double> > p = kmeans.getLoggedPrototypes();
-
-        for(std::size_t i=0; i < p.size(); ++i)
-            std::cout << p[i] << std::endl;
-    }
- 
-    // get row index for the prototype of every data point
-    ublas::matrix<double> unkown = / create matrix with unkown data /;
-    ublas::indirect_array< std::vector<std::size_t> > protoidx = kmeans.use(unkown);
- * @endcode
+ * @include examples/kmeans.cpp
  *
  * @section ng neural gas
  * @code
@@ -250,6 +225,7 @@
  * @page sources data sources
  * The toolbox implements some structures for geting datasets. The compile option <dfn>ML_SOURCES</dfn> must be set for compiling the namespace
  * machinelearning::tools::sources .
+ *
  * @section nntp newsgroups
  * The class allows to browse newsgroups in a naitve way for extraction the message content. The class throws different exception if there
  * are connection or stream errors during sending or receiving data (see exceptions within the class).

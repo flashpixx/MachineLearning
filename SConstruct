@@ -240,7 +240,7 @@ else :
     buildfiles = []
     
     if GetOption("withfiles") != None :
-        buildfiles.extend( ["ncd.cpp", "neuralgas.cpp", "pca.cpp", "lda.cpp", "mds.cpp"] )
+        buildfiles.extend( ["ncd.cpp", "neuralgas.cpp", "kmeans.cpp", "pca.cpp", "lda.cpp", "mds.cpp"] )
         
     if GetOption("withsources") != None :
         buildfiles.extend( ["newsgroup.cpp", "wikipedia.cpp", "cloud.cpp"] )
