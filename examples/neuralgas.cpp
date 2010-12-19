@@ -146,6 +146,6 @@ int main(int argc, char* argv[]) {
     #ifdef ML_CLUSTER
     if (loMPICom.rank() == 0)
     #endif
-    std::cout << "create HDF file \"kmeans.hdf5\" with dataset \"/protos \", \"/iteration\" number of iteration, \"numprotos\" number of prototypes and if logging is enabled \"/error\" with quantization error and \"/log<0 to iterations-1>\" logged prototypes" << std::endl;
+    std::cout << "create HDF file \"neuralgas.hdf5\" with dataset \"/protos \", \"/iteration\" number of iteration, \"numprotos\" number of prototypes and if logging is enabled \"/error\" with quantization error and \"/log<0 to iterations-1>\" logged prototypes" << std::endl;
     return EXIT_SUCCESS;
 }
