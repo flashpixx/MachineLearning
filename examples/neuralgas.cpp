@@ -142,44 +142,10 @@ int main(int argc, char* argv[]) {
     
     #endif
     
-    /*
     
-#ifdef ML_CLUSTER
-	ublas::matrix<double> proto                   = tl::matrix::setNumericalZero(ng.getPrototypes(loMPICom));
-    ublas::vector<double> qerror                  = tl::vector::copy(ng.getLoggedQuantizationError(loMPICom));
-    std::vector< ublas::matrix<double> > logproto = ng.getLoggedPrototypes(loMPICom);
-    
-    if (loMPICom.rank() == 0) {
-        tl::files::hdf f("ng.hdf5", true);
-        f.write<double>( "/numprotos",  numproto, H5::PredType::NATIVE_DOUBLE );
-        f.write<double>( "/protos",  proto, H5::PredType::NATIVE_DOUBLE );
-        f.write<std::size_t>( "/iteration",  ngit, H5::PredType::NATIVE_ULONG );
-        
-        if (ng.getLogging()) {
-            f.write<double>( "/error",  qerror, H5::PredType::NATIVE_DOUBLE );
-            
-            for(std::size_t i=0; i < logproto.size(); ++i)
-                f.write<double>("/log" + boost::lexical_cast<std::string>( i ), tl::matrix::setNumericalZero(logproto[i]), H5::PredType::NATIVE_DOUBLE );
-        }
-    }
-    
-#else
-    tl::files::hdf f("ng.hdf5", true);
-    f.write<double>( "/numprotos",  numproto, H5::PredType::NATIVE_DOUBLE );
-    f.write<double>( "/protos",  tl::matrix::setNumericalZero(ng.getPrototypes()), H5::PredType::NATIVE_DOUBLE );    
-    f.write<std::size_t>( "/iteration",  ngit, H5::PredType::NATIVE_ULONG );
-    
-    if (ng.getLogging()) {
-        f.write<double>( "/error",  tl::vector::copy(ng.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
-        
-        
-        std::vector< ublas::matrix<double> > logproto = ng.getLoggedPrototypes();
-        for(std::size_t i=0; i < logproto.size(); ++i)
-            f.write<double>("/log" + boost::lexical_cast<std::string>( i ), tl::matrix::setNumericalZero(logproto[i]), H5::PredType::NATIVE_DOUBLE );
-    }
-#endif
-    
-    */
-    
+    #ifdef ML_CLUSTER
+    if (loMPICom.rank() == 0)
+    #endif
+    std::cout << "create HDF file \"kmeans.hdf5\" with dataset \"/protos \", \"/iteration\" number of iteration, \"numprotos\" number of prototypes and if logging is enabled \"/error\" with quantization error and \"/log<0 to iterations-1>\" logged prototypes" << std::endl;
     return EXIT_SUCCESS;
 }
