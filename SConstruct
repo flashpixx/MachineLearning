@@ -179,12 +179,12 @@ def getRekusivFiles(startdir, ending, pdontuse=[], pShowPath=True, pAbsPath=Fals
                         lst.append(filename)
 
     ldontuse = [os.path.join(startdir, i) for i in pdontuse]
+    clst = []
     for n in ldontuse :
         for i in lst :
-            if i.startswith(n) :
-                lst.remove(i)
-
-    return lst
+            if not(i.startswith(n)) :
+                clst.append(i)
+    return clst
         
        
 # build languagefiles
@@ -246,13 +246,16 @@ else :
     buildfiles = []
     
     if GetOption("withfiles") != None :
-        buildfiles.extend( ["distance/ncd.cpp", "clustering/neuralgas.cpp", "clustering/kmeans.cpp", "reducing/pca.cpp", "reducing/lda.cpp", "reducing/mds.cpp"] )
+        buildfiles.extend( [ os.path.join("examples","distance", "ncd.cpp"), os.path.join("examples","distance", "neuralgas.cpp"), os.path.join("examples","distance", "kmeans.cpp"), os.path.join("examples","reducing", "pca.cpp"), os.path.join("examples","reducing", "lda.cpp"), os.path.join("examples","reducing", "mds.cpp") ] )
         
     if GetOption("withsources") != None :
-        buildfiles.extend( ["sources/newsgroup.cpp", "sources/wikipedia.cpp", "sources/cloud.cpp"] )
+        buildfiles.extend( [ os.path.join("examples","sources", "newsgroup.cpp"), os.path.join("examples","sources", "wikipedia.cpp") ] )
+        
+    if GetOption("withsources") != None and GetOption("withfiles") != None :
+        buildfiles.append( os.path.join("examples","sources", "cloud.cpp") )
     
     for i in buildfiles :
         builds = []
         builds.extend(sourcefiles)
-        builds.append( os.path.join("examples",i) )
+        builds.append(i)
         env.Program( target=os.path.splitext(i)[0], source=builds )
