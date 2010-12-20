@@ -161,24 +161,29 @@ def getConfig():
 # get rekursiv all files
 def getRekusivFiles(startdir, ending, pdontuse=[], pShowPath=True, pAbsPath=False) :
     lst = []
-    ldontuse = [os.path.join(startdir, i) for i in pdontuse]
-
-    for root, dirs, filenames in os.walk(startdir):
-        for filename in filenames:
-            if not(root in ldontuse) :
-                if filename.endswith(ending):
-                    if pShowPath :
+    
+    for root, dirs, filenames in os.walk(startdir) :
+        for filename in filenames :
+            if filename.endswith(ending) :
+                if pShowPath :
                     
-                        if pAbsPath :
-                            lst.append( os.path.abspath(os.path.join(root, filename)) )  
-                        else :
-                            lst.append( os.path.join(root, filename) )
+                    if pAbsPath :
+                        lst.append( os.path.abspath(os.path.join(root, filename)) )  
                     else :
+                        lst.append( os.path.join(root, filename) )
+                else :
                     
-                        if pAbsPath :
-                            lst.append(os.path.abspath(filename))
-                        else :
-                            lst.append(filename)
+                    if pAbsPath :
+                        lst.append(os.path.abspath(filename))
+                    else :
+                        lst.append(filename)
+
+    ldontuse = [os.path.join(startdir, i) for i in pdontuse]
+    for n in ldontuse :
+        for i in lst :
+            if i.startswith(n) :
+                lst.remove(i)
+
     return lst
         
        
@@ -220,6 +225,7 @@ def createLanguage(env, onlycompile=False) :
 
 
 #=== create environment and compiling ==================================================================================================
+#BuildDir('build', './')
 env = getConfig()
 
 # get all cpp-files and compile and create language file
@@ -235,18 +241,21 @@ elif GetOption("clean") :
 else :
     # catch all cpps within the framework directories
     sourcefiles = getRekusivFiles(os.curdir, ".cpp", ["examples"])
-
+    
     # examples are build with parameter
     buildfiles = []
     
     if GetOption("withfiles") != None :
-        buildfiles.extend( ["ncd.cpp", "neuralgas.cpp", "kmeans.cpp", "pca.cpp", "lda.cpp", "mds.cpp"] )
+        buildfiles.extend( ["distance/ncd.cpp", "clustering/neuralgas.cpp", "clustering/kmeans.cpp", "reducing/pca.cpp", "reducing/lda.cpp", "reducing/mds.cpp"] )
         
     if GetOption("withsources") != None :
-        buildfiles.extend( ["newsgroup.cpp", "wikipedia.cpp", "cloud.cpp"] )
+        buildfiles.extend( ["sources/newsgroup.cpp", "sources/wikipedia.cpp", "sources/cloud.cpp"] )
     
-    for i in buildfiles :
-        builds = []
-        builds.extend(sourcefiles)
-        builds.append( os.path.join("examples",i) )
-        env.Program( target=os.path.splitext(i)[0], source=builds )
+    print buildfiles
+    print sourcefiles
+    
+    #for i in buildfiles :
+    #    builds = []
+    #    builds.extend(sourcefiles)
+    #    builds.append( os.path.join("examples",i) )
+    #    env.Program( target=os.path.splitext(i)[0], source=builds )
