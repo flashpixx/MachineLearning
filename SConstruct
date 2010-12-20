@@ -247,6 +247,9 @@ def createTarget(env, alias, path, sources, framework) :
 
 
 def target_sources(env, framework) :
+    if GetOption("withsources") == None :
+        return
+
     path = os.path.join(".", "examples", "sources")
     sources = ["newsgroup.cpp", "newsgroup.cpp"]
     
@@ -308,7 +311,7 @@ else :
     framework = getRekusivFiles(os.curdir, ".cpp", ["examples"])        
         
     # create building targets
-    #target_sources( env, framework )
-    #target_clustering( env, framework )
-    #target_reducing( env, framework )
-    #target_distance(env, framework )
+    target_sources( env, framework )
+    target_clustering( env, framework )
+    target_reducing( env, framework )
+    target_distance(env, framework )
