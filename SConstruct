@@ -34,26 +34,27 @@ def configuration_macosx(config, version, architecture) :
     config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "ginac", "atlas", "lapack", "ptcblas"]
     
     
-    if GetOption("withmpi") == None :
-        config["compiler"]          =  "g++"
-    else :
+    if GetOption("withmpi") :
         config["compiler"]          = "mpic++"
         config["compileflags"]      += " -D ML_CLUSTER"
         config["linkto"].extend( ["boost_mpi", "boost_serialization"] )
+    else :
+        config["compiler"]          =  "g++"
+
                 
-    if GetOption("withrandom") != None :   
+    if GetOption("withrandom") :   
         config["compileflags"]      += " -D ML_RANDOMDEVICE"
         config["linkto"].append("boost_random");
             
-    if GetOption("withmultilanguage") != None :
+    if GetOption("withmultilanguage") :
         config["compileflags"]      += " -D ML_MULTILANGUAGE"
         config["linkto"].append("intl");
         
-    if GetOption("withsources") != None :
+    if GetOption("withsources") :
         config["compileflags"]      += " -D ML_SOURCES"
         config["linkto"].extend( ["xml2", "boost_regex"] )
         
-    if GetOption("withfiles") != None :
+    if GetOption("withfiles") :
         config["compileflags"]      += " -D ML_FILES"
         config["linkto"].extend( ["hdf5_cpp", "hdf5"] )
     
@@ -68,25 +69,25 @@ def configuration_posix(config, version, architecture) :
     config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "ginac", "atlas", "lapack", "ptcblas", "ptf77blas"]
     
     
-    if GetOption("withmpi") == None :
-        config["compiler"]          =  "g++"
-    else :
+    if GetOption("withmpi") :
         config["compiler"]          = "mpic++"
         config["compileflags"]      += " -D ML_CLUSTER"
         config["linkto"].extend( ["boost_mpi", "boost_serialization"] )
-                
-    if GetOption("withrandom") != None :   
+    else :
+        config["compiler"]          =  "g++"
+
+    if GetOption("withrandom") :   
         config["compileflags"]      += " -D ML_RANDOMDEVICE"
         config["linkto"].append("boost_random");
             
-    if GetOption("withmultilanguage") != None :
+    if GetOption("withmultilanguage") :
         config["compileflags"]      += " -D ML_MULTILANGUAGE"
 
-    if GetOption("withsources") != None :
+    if GetOption("withsources") :
         config["compileflags"]      += " -D ML_SOURCES"
         config["linkto"].extend( ["xml2", "boost_regex"] )
 
-    if GetOption("withfiles") != None :
+    if GetOption("withfiles") :
         config["compileflags"]      += " -D ML_FILES"
         config["linkto"].extend( ["hdf5_cpp", "hdf5"] )
         
@@ -182,12 +183,16 @@ def getRekusivFiles(startdir, ending, pdontuse=[], pShowPath=True, pAbsPath=Fals
                     else :
                         lst.append(filename)
 
-    ldontuse = [os.path.join(startdir, i) for i in pdontuse]
     clst = []
-    for n in ldontuse :
-        for i in lst :
-            if not(i.startswith(n)) :
-                clst.append(i)
+    if not pdontuse :
+        clst.extend(lst)
+    else :
+        ldontuse = [os.path.join(startdir, i) for i in pdontuse]
+        for n in ldontuse :
+            for i in lst :
+                if not(i.startswith(n)) :
+                    clst.append(i)
+
     return clst
         
        
@@ -297,16 +302,17 @@ def target_distance(env, framework) :
 env = getConfig()
 
 # get all cpp-files and compile and create language file
-if GetOption("createlang") != None :
+if GetOption("createlang") :
     createLanguage(env)
-elif GetOption("compilelang") != None :
+elif GetOption("compilelang") :
     createLanguage(env, True)
-elif GetOption("createdocu") != None :
+elif GetOption("createdocu") :
     os.system("doxygen documentation.doxyfile")
 elif GetOption("clean") :
     for i in getRekusivFiles(os.curdir, env["OBJSUFFIX"]) :
         os.remove(i)
 else :
+
     # catch all cpps within the framework directories and compile them to objectfiles into the builddir
     framework = getRekusivFiles(os.curdir, ".cpp", ["examples"])  
     
