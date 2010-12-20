@@ -145,12 +145,11 @@ def getConfig():
         env.Replace(CXX         = config["compiler"])
     
     env.Replace(CXXFLAGS    = config["compileflags"])
-    env.Replace(CPPPATH     = config["include"].split(":"))
+    env.Replace(CPPPATH     = config["include"].split(os.pathsep))
     env.Replace(LINKFLAGS   = config["linkerflags"])
     env.Replace(LIBS        = config["linkto"])
     env.Replace(LIBPATH     = config["librarypath"])
     env.Replace(CPPSUFFIXES = [".hpp", ".h", ".cpp"])
-           
            
     env.BuildDir("build", ".", duplicate=0)
     env.Append(CPPPATH=["."])
@@ -209,7 +208,7 @@ def createLanguage(env, onlycompile=False) :
         for i in env["CPPSUFFIXES"] :
             sources.extend( getRekusivFiles(os.curdir, i, ["examples"]) )
 
-        cmd = "xgettext --output=tools/language/language.po --keyword=_ --language=c++ ";
+        cmd = "xgettext --output="+os.path.join("tools", "language", "language.po")+" --keyword=_ --language=c++ ";
         for i in sources :
             cmd = cmd + i + " "
         os.system(cmd);
@@ -217,7 +216,7 @@ def createLanguage(env, onlycompile=False) :
         
         # get all language files in the subdirs and add the new texts
         for i in po :
-            os.system( "msgmerge --no-wrap --update " + i + " tools/language/language.po" )
+            os.system( "msgmerge --no-wrap --update " + i + " "+os.path.join("tools", "language", "language.po") )
             
         os.remove("tools/language/language.po")
         
@@ -308,11 +307,15 @@ elif GetOption("clean") :
     for i in getRekusivFiles(os.curdir, env["OBJSUFFIX"]) :
         os.remove(i)
 else :
-    # catch all cpps within the framework directories
-    framework = getRekusivFiles(os.curdir, ".cpp", ["examples"])        
+    # catch all cpps within the framework directories and compile them to objectfiles into the builddir
+    framework = getRekusivFiles(os.curdir, ".cpp", ["examples"])  
+    
+    #for i in framework :
+    #    env.Object( target=os.path.join("#build", os.path.splitext(os.path.basename(i))[0]), source=i )
         
     # create building targets
     target_sources( env, framework )
     target_clustering( env, framework )
     target_reducing( env, framework )
     target_distance(env, framework )
+    
