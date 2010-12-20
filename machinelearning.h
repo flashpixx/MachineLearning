@@ -46,14 +46,33 @@
  * <li><i>optional GetText</i> ( http://www.gnu.org/software/gettext ) for including multilanguage support</li>
  * <li><i>optional LibXML2</i> ( http://xmlsoft.org/ ) (used by wikipedia support)</li>
  * <li><i>optional Scons</i> ( http://www.scons.org/ )</li>
+ * <li><i>optional Doxygen</i> ( http://www.doxygen.org/ )</li>
  * </ul>
  *
  * @section defs definitions / specifications
  * <ul>
  * <li>data points should be matrix data and the matrix is row-orientated, so for K data points with every point dimension P, we have a K x P matrix (prototype matrices are equal)</li>
- * <li>all compiler flags start with "ML_"</li>
- * <li>all structures are in the namespace "machinelearning"</li>
+ * <li>all compiler flags start with <dfn>ML_</dfn></li>
+ * <li>all structures are in the namespace <dfn>machinelearning</dfn></li>
  * <li>all messages should get the structure <dfn>_("<message>")</dfn>, because the underline prefix is the support for different languages</li>
+ * </ul>
+ *
+ * @subsection codeguide code style guide
+ * The source code uses some style guides options:
+ * <ul>
+ * <li>all variables use a prefix for their scopde: 
+ *      <ul>
+ *          <li><dfn>l_</dfn> local variable / scope within a methode</li>
+ *          <li><dfn>m_</dfn> member variable / scope within an object</li>
+ *          <li><dfn>g_</dfn> globale variable / scope within the global code / namespace</li>
+ *      </ul>
+ *      The excepts are counting variables eg. <dfn>i</dfn>, <dfn>j</dfn>, <dfn>n</dfn> or iterator variables <dfn>it</dfn>
+ * </li>
+ * <li>classes, that implementates algorithms with numerical structures, should be written as template class</li>
+ * <li>methods, properties, classes and namespaces should be documentated with Doxygen</li>
+ * <li>each subdirectory of the framework, should have a header file with the same directoryname for including the whole directory. This header file must be appended to the main header file of the framework</li>
+ * <li>the svn keyword LastChangeDate should be set for all files</li>
+ * <li>all parameters should be a call-by-reference parameter</li>
  * </ul>
  *
  * @section compileroptions compiler option
@@ -89,7 +108,7 @@
  * <li><dfn>--with-files</dfn> support for the namespace machinelearning::tools::files</li>
  * </ul>
  *
- * @subsection examples examples
+ * @subsection targets build targets
  * The scons script supports different targets for building the examples. The call can be supplemented with the parameters above. Each subdirectory within the example directory
  * show a build target, but some targets will be build first if different parameters are set
  * <ul>

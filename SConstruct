@@ -34,7 +34,7 @@ def configuration_macosx(config, version, architecture) :
     config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "ginac", "atlas", "lapack", "ptcblas"]
     
     
-    if GetOption("withmpi") :
+    if optionExist("withmpi") :
         config["compiler"]          = "mpic++"
         config["compileflags"]      += " -D ML_CLUSTER"
         config["linkto"].extend( ["boost_mpi", "boost_serialization"] )
@@ -42,22 +42,22 @@ def configuration_macosx(config, version, architecture) :
         config["compiler"]          =  "g++"
 
                 
-    if GetOption("withrandom") :   
+    if optionExist("withrandom") :   
         config["compileflags"]      += " -D ML_RANDOMDEVICE"
         config["linkto"].append("boost_random");
             
-    if GetOption("withmultilanguage") :
+    if optionExist("withmultilanguage") :
         config["compileflags"]      += " -D ML_MULTILANGUAGE"
         config["linkto"].append("intl");
         
-    if GetOption("withsources") :
+    if optionExist("withsources") :
         config["compileflags"]      += " -D ML_SOURCES"
         config["linkto"].extend( ["xml2", "boost_regex"] )
         
-    if GetOption("withfiles") :
+    if optionExist("withfiles") :
         config["compileflags"]      += " -D ML_FILES"
         config["linkto"].extend( ["hdf5_cpp", "hdf5"] )
-    
+
     
 
 # configuration for Posix (Linux) build
@@ -69,25 +69,27 @@ def configuration_posix(config, version, architecture) :
     config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "ginac", "atlas", "lapack", "ptcblas", "ptf77blas"]
     
     
-    if GetOption("withmpi") :
+    if optionExist("withmpi") :
         config["compiler"]          = "mpic++"
         config["compileflags"]      += " -D ML_CLUSTER"
         config["linkto"].extend( ["boost_mpi", "boost_serialization"] )
     else :
         config["compiler"]          =  "g++"
 
-    if GetOption("withrandom") :   
+                
+    if optionExist("withrandom") :   
         config["compileflags"]      += " -D ML_RANDOMDEVICE"
         config["linkto"].append("boost_random");
             
-    if GetOption("withmultilanguage") :
+    if optionExist("withmultilanguage") :
         config["compileflags"]      += " -D ML_MULTILANGUAGE"
-
-    if GetOption("withsources") :
+        config["linkto"].append("intl");
+        
+    if optionExist("withsources") :
         config["compileflags"]      += " -D ML_SOURCES"
         config["linkto"].extend( ["xml2", "boost_regex"] )
-
-    if GetOption("withfiles") :
+        
+    if optionExist("withfiles") :
         config["compileflags"]      += " -D ML_FILES"
         config["linkto"].extend( ["hdf5_cpp", "hdf5"] )
         
@@ -101,6 +103,10 @@ def configuration_win32(config, version, architecture) :
 
 
 #=== function for configuration creation================================================================================================
+# checks if option exists and returns a boolean
+def optionExist(name) :
+    return GetOption(name) != None
+
 
 # function for reading os configuration
 # and setting environment
@@ -252,13 +258,13 @@ def createTarget(env, alias, path, sources, framework) :
 
 
 def target_sources(env, framework) :
-    if GetOption("withsources") == None :
+    if not optionExist("withsources") :
         return
 
     path = os.path.join(".", "examples", "sources")
     sources = ["newsgroup.cpp", "wikipedia.cpp"]
     
-    if GetOption("withfiles") != None :
+    if optionExist("withfiles") :
         sources.append( "cloud.cpp" )
 
     createTarget(env, "sources", path, sources, framework)
@@ -268,7 +274,7 @@ def target_clustering(env, framework) :
     path = os.path.join(".", "examples", "clustering")
     sources = []
     
-    if GetOption("withfiles") != None :
+    if optionExist("withfiles") :
         sources.extend( ["kmeans.cpp", "neuralgas.cpp"] )
 
     createTarget(env, "clustering", path, sources, framework)
@@ -278,7 +284,7 @@ def target_reducing(env, framework) :
     path = os.path.join(".", "examples", "reducing")
     sources = []
     
-    if GetOption("withfiles") != None :
+    if optionExist("withfiles") :
         sources.extend( ["lda.cpp", "mds.cpp", "pca.cpp"] )
 
     createTarget(env, "reducing", path, sources, framework)
@@ -287,8 +293,8 @@ def target_reducing(env, framework) :
 def target_distance(env, framework) :
     path = os.path.join(".", "examples", "distance")
     sources = []
-    
-    if GetOption("withfiles") != None :
+
+    if optionExist("withfiles") :
         sources.extend( ["ncd.cpp"] )
 
     createTarget(env, "distance", path, sources, framework)
@@ -301,27 +307,29 @@ def target_distance(env, framework) :
 #=== create environment and compiling ==================================================================================================
 env = getConfig()
 
-# get all cpp-files and compile and create language file
-if GetOption("createlang") :
-    createLanguage(env)
-elif GetOption("compilelang") :
-    createLanguage(env, True)
-elif GetOption("createdocu") :
-    os.system("doxygen documentation.doxyfile")
-elif GetOption("clean") :
-    for i in getRekusivFiles(os.curdir, env["OBJSUFFIX"]) :
-        os.remove(i)
-else :
+# add files for deleting
+files = []
+files.extend( getRekusivFiles(os.curdir, env["OBJSUFFIX"]) )
+files.extend( getRekusivFiles(os.curdir, ".po~") )
+env.Clean("clean", files)
 
+# get all cpp-files and compile and create language file
+if optionExist("createlang") :
+    createLanguage(env)
+elif optionExist("compilelang") :
+    createLanguage(env, True)
+elif optionExist("createdocu") :
+    os.system("doxygen documentation.doxyfile")
+else :
+        
     # catch all cpps within the framework directories and compile them to objectfiles into the builddir
     framework = getRekusivFiles(os.curdir, ".cpp", ["examples"])  
-    
-    #for i in framework :
-    #    env.Object( target=os.path.join("#build", os.path.splitext(os.path.basename(i))[0]), source=i )
-        
+
     # create building targets
     target_sources( env, framework )
     target_clustering( env, framework )
     target_reducing( env, framework )
     target_distance(env, framework )
+
+
     
