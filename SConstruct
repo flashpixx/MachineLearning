@@ -144,12 +144,16 @@ def getConfig():
         env.Replace(CXX         = config["compiler"])
     
     env.Replace(CXXFLAGS    = config["compileflags"])
-    env.Replace(CPPPATH     = config["include"])
+    env.Replace(CPPPATH     = config["include"]+":.")
     env.Replace(LINKFLAGS   = config["linkerflags"])
     env.Replace(LIBS        = config["linkto"])
     env.Replace(LIBPATH     = config["librarypath"])
     env.Replace(CPPSUFFIXES = [".hpp", ".h", ".cpp"])
-    
+           
+           
+    env.BuildDir("build", ".", duplicate=0)
+    #env.Append(CPPPATH=["."])
+           
     #dict = env.Dictionary()
     #for i,j in dict.iteritems():
     #    print i, j		   
@@ -223,9 +227,70 @@ def createLanguage(env, onlycompile=False) :
 
 #=======================================================================================================================================
 
+#=== build targets =====================================================================================================================
+
+# create compiling options
+def createTarget(env, alias, path, sources, framework) :
+    lst = []
+    if sources.count == 0 :
+        return
+        
+    for i in sources :
+        compilesource = [os.path.join(path, i)]
+        compilesource.extend(framework)
+        
+        lst.append( env.Program( target=os.path.join("#build", os.path.splitext(i)[0]), source=compilesource ) )
+
+    env.Alias(alias, lst)
+
+
+
+
+def target_sources(env, framework) :
+    path = os.path.join(".", "examples", "sources")
+    sources = ["newsgroup.cpp", "newsgroup.cpp"]
+    
+    if GetOption("withfiles") != None :
+        sources.append( "cloud.cpp" )
+
+    createTarget(env, "sources", path, sources, framework)
+    
+    
+def target_clustering(env, framework) :
+    path = os.path.join(".", "examples", "clustering")
+    sources = []
+    
+    if GetOption("withfiles") != None :
+        sources.extend( ["kmeans.cpp", "neuralgas.cpp"] )
+
+    createTarget(env, "clustering", path, sources, framework)
+    
+    
+def target_reducing(env, framework) :
+    path = os.path.join(".", "examples", "reducing")
+    sources = []
+    
+    if GetOption("withfiles") != None :
+        sources.extend( ["lda.cpp", "mds.cpp", "pca.cpp"] )
+
+    createTarget(env, "reducing", path, sources, framework)
+    
+
+def target_distance(env, framework) :
+    path = os.path.join(".", "examples", "distance")
+    sources = []
+    
+    if GetOption("withfiles") != None :
+        sources.extend( ["ncd.cpp"] )
+
+    createTarget(env, "distance", path, sources, framework)
+#=======================================================================================================================================
+
+
+
+
 
 #=== create environment and compiling ==================================================================================================
-#BuildDir('build', './')
 env = getConfig()
 
 # get all cpp-files and compile and create language file
@@ -240,22 +305,10 @@ elif GetOption("clean") :
         os.remove(i)
 else :
     # catch all cpps within the framework directories
-    sourcefiles = getRekusivFiles(os.curdir, ".cpp", ["examples"])
-    
-    # examples are build with parameter
-    buildfiles = []
-    
-    if GetOption("withfiles") != None :
-        buildfiles.extend( [ os.path.join("examples","distance", "ncd.cpp"), os.path.join("examples","clustering", "neuralgas.cpp"), os.path.join("examples","clustering", "kmeans.cpp"), os.path.join("examples","reducing", "pca.cpp"), os.path.join("examples","reducing", "lda.cpp"), os.path.join("examples","reducing", "mds.cpp") ] )
+    framework = getRekusivFiles(os.curdir, ".cpp", ["examples"])        
         
-    if GetOption("withsources") != None :
-        buildfiles.extend( [ os.path.join("examples","sources", "newsgroup.cpp"), os.path.join("examples","sources", "wikipedia.cpp") ] )
-        
-    if GetOption("withsources") != None and GetOption("withfiles") != None :
-        buildfiles.append( os.path.join("examples","sources", "cloud.cpp") )
-    
-    for i in buildfiles :
-        builds = []
-        builds.extend(sourcefiles)
-        builds.append(i)
-        env.Program( target=os.path.splitext(i)[0], source=builds )
+    # create building targets
+    #target_sources( env, framework )
+    #target_clustering( env, framework )
+    #target_reducing( env, framework )
+    #target_distance(env, framework )

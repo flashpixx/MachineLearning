@@ -21,7 +21,7 @@
  @endcond
  **/
 
-#include "../../machinelearning.h"
+#include <machinelearning.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/numeric/ublas/matrix.hpp>

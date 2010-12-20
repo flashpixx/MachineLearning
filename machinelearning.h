@@ -72,7 +72,7 @@
  * <li><dfn>BOOST_NUMERIC_BINDINGS_BLAS_CBLAS</dfn> add CBLAS / LAPACK support for the Boost Bindings</li>
  * </ul>
  *
- * @section scons compiler tools
+ * @subsection scons compiling with scons
  * The framework supports Scons for compiling. The script reads the environment (Linux, OS X & Microsoft) and uses the
  * plattform specified options for compiling the sources. The Scons script supports some different parameters:
  * <ul>
@@ -87,6 +87,16 @@
  * <li><dfn>--with-multilanguage</dfn> adds the multilanguage support with gettext</li>
  * <li><dfn>--with-sources</dfn> support for the namespace machinelearning::tools::sources</li>
  * <li><dfn>--with-files</dfn> support for the namespace machinelearning::tools::files</li>
+ * </ul>
+ *
+ * @subsection examples examples
+ * The scons script supports different targets for building the examples. The call can be supplemented with the parameters above. Each subdirectory within the example directory
+ * show a build target, but some targets will be build first if different parameters are set
+ * <ul>
+ * <li><dfn>source</dfn> sources are eg. Wikipedia, NNTP, but the parameter <dfn>--with-sources</dfn> must be set for compiling and for the cloud example the files parameter must be set additionally</li>
+ * <li><dfn>clustering</dfn> this target build all clustering algorithms, but the <dfn>--with-files</dfn> parameter must be set</li>
+ * <li><dfn>reducing</dfn> this target build all dimension reduce algorithms, but the <dfn>--with-files</dfn> parameter must be set</li>
+ * <li><dfn>distance</dfn> this target build all distance algorithms, but the <dfn>--with-files</dfn> parameter must be set</li>
  * </ul>
  *
  * @section ex advanced documentation
