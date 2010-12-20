@@ -282,7 +282,6 @@ namespace machinelearning { namespace classifier {
         
     
     /** label unkown data
-     * @todo logging implementation
      * @param p_data input data matrix (row orientated)
      * @return std::vector with label information
     **/
