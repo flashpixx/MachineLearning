@@ -251,11 +251,8 @@ else :
     if GetOption("withsources") != None :
         buildfiles.extend( ["sources/newsgroup.cpp", "sources/wikipedia.cpp", "sources/cloud.cpp"] )
     
-    print buildfiles
-    print sourcefiles
-    
-    #for i in buildfiles :
-    #    builds = []
-    #    builds.extend(sourcefiles)
-    #    builds.append( os.path.join("examples",i) )
-    #    env.Program( target=os.path.splitext(i)[0], source=builds )
+    for i in buildfiles :
+        builds = []
+        builds.extend(sourcefiles)
+        builds.append( os.path.join("examples",i) )
+        env.Program( target=os.path.splitext(i)[0], source=builds )
