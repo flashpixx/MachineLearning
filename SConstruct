@@ -274,7 +274,7 @@ def target_clustering(env, framework) :
     sources = []
     
     if optionExist("withfiles") :
-        sources.extend( ["kmeans.cpp", "neuralgas.cpp"] )
+        sources.extend( ["kmeans.cpp", "neuralgas.cpp", "spectral.cpp"] )
 
     createTarget(env, "clustering", path, sources, framework)
     

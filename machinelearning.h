@@ -184,14 +184,7 @@
  * @endcode
  *
  * @section spcl spectral clustering
- * @code
-    ublas::matrix<double> data = / similarity matrix /;
- 
-    // create spectral clustering object with 3 cluster
-    clustering::nonsupervised::spectralclustering<double> spectral(3, data.size1());
-    // run clustering with 15 iteration
-    spectral.train(data, 15);
- * @endcode
+ * @include examples/clustering/spectral.cpp
  *
  *
  *
