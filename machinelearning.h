@@ -134,10 +134,10 @@
  * for their labels, the nonsupervised uses only one template parameter. The examples show the different using.
  *
  * @section kmeans k-Means
- * @include examples/kmeans.cpp
+ * @include examples/clustering/kmeans.cpp
  *
  * @section ng neural gas
- * @include examples/neuralgas.cpp
+ * @include examples/clustering/neuralgas.cpp
  *
  * @section rlvq relevance learning vector quantization (RLVQ)
  * @code
@@ -172,13 +172,13 @@
  * (for datatype). The examples show the different option
  *
  * @section pca principle component analysis (PCA)
- * @include examples/pca.cpp
+ * @include examples/reducing/pca.cpp
  *
  * @section lda linear discriminant analysis (LDA)
- * @include examples/lda.cpp
+ * @include examples/reducing/lda.cpp
  *
  * @section mds multidimensional scaling (MDS)
- * @include examples/mds.cpp
+ * @include examples/reducing/mds.cpp
  *
  * @section lle local linear embedding (LLE)
  * @code
@@ -193,7 +193,7 @@
  * example show how to use these classes.
  *
  * @section ncd normalize compression distance (NCD)
- * @include examples/ncd.cpp
+ * @include examples/distance/ncd.cpp
  *
  *
  *
@@ -204,16 +204,16 @@
  * @section nntp newsgroups
  * The class allows to browse newsgroups in a naitve way for extraction the message content. The class throws different exception if there
  * are connection or stream errors during sending or receiving data (see exceptions within the class).
- * @include examples/newsgroup.cpp
+ * @include examples/sources/newsgroup.cpp
  *
  * @section wiki wikipedia
  * The wikipedia class can be used for read the article data of wikipedia articles in different languages
- * @include examples/wikipedia.cpp
+ * @include examples/sources/wikipedia.cpp
  *
  * @section cloud cloud
  * The cloud class creates a multimodal n-dimensional data set with normal distribution. The n-dimensional cube is sampled in equidistant
  * steps and on the cross-points a normal distribution is created.
- * @include examples/cloud.cpp
+ * @include examples/sources/cloud.cpp
  * 
  *
  *
@@ -334,67 +334,69 @@
  *
  * @file machinelearning.h main header for including in a project
  *
- * @file ncd.cpp testprogram for the normalized compression distance
- * @file neuralgas.cpp testprogram for the neural gas algorithm
- * @file pca.cpp testprogram for the pca
- * @file newsgroup.cpp testprogram for NNTP using
- * @file wikipedia.cpp testprogram for using Wikipedia
- * @file cloud.cpp testprogram for create n-dimensional normal distribution
- * @file lda.cpp testprogramm for lda
+ * @file examples/distance/ncd.cpp testprogram for the normalized compression distance
+ * @file examples/clustering/neuralgas.cpp testprogram for the neural gas algorithm
+ * @file examples/clustering/kmeans.cpp testprogram for the k-means algorithm
+ * @file examples/reducing/pca.cpp testprogram for the pca
+ * @file examples/reducing/lda.cpp testprogramm for lda
+ * @file examples/reducing/mds.cpp testprogramm for mds
+ * @file examples/sources/newsgroup.cpp testprogram for NNTP using
+ * @file examples/sources/wikipedia.cpp testprogram for using Wikipedia
+ * @file examples/sources/cloud.cpp testprogram for create n-dimensional normal distribution
  *
- * @file classifier.h main header for all classifier structurs
- * @file classifier.hpp header for the abstract class implementation of the classifiers
- * @file lazylearner.hpp lazy learner algorithm
+ * @file classifier/classifier.h main header for all classifier structurs
+ * @file classifier/classifier.hpp header for the abstract class implementation of the classifiers
+ * @file classifier/lazylearner.hpp lazy learner algorithm
  *
- * @file clustering.h main header for all clustering algorithms
- * @file clustering.hpp header for abstract clustering classes
- * @file kmeans.hpp k-means implementation
- * @file neuralgas.hpp neuralgas implemention for real vector space
- * @file spectralclustering.hpp implementation of the spectral clustering
- * @file rlvq.hpp implementation of relevance vector quantization
+ * @file clustering/clustering.h main header for all clustering algorithms
+ * @file clustering/clustering.hpp header for abstract clustering classes
+ * @file clustering/nonsupervised/kmeans.hpp k-means implementation
+ * @file clustering/nonsupervised/neuralgas.hpp neuralgas implemention for real vector space
+ * @file clustering/nonsupervised/spectralclustering.hpp implementation of the spectral clustering
+ * @file clustering/supervised/rlvq.hpp implementation of relevance vector quantization
  *
- * @file dimensionreduce.h main header of dimension reducing algorithms
- * @file dimensionreduce.hpp abstract class for dimension reducing classes
- * @file lle.hpp local linear embedding implementation
- * @file pca.hpp principal component analysis implementation
- * @file mds.hpp multidimensional scaling implementation
- * @file lda.hpp lineare discriminant analysis implementation
+ * @file dimensionreduce/dimensionreduce.h main header of dimension reducing algorithms
+ * @file dimensionreduce/dimensionreduce.hpp abstract class for dimension reducing classes
+ * @file dimensionreduce/nonsupervised/lle.hpp local linear embedding implementation
+ * @file dimensionreduce/nonsupervised/pca.hpp principal component analysis implementation
+ * @file dimensionreduce/nonsupervised/mds.hpp multidimensional scaling implementation
+ * @file dimensionreduce/supervised/lda.hpp lineare discriminant analysis implementation
  * 
- * @file distances.h main header for all distance structures
- * @file distance.hpp abstract class for distance algorithms
- * @file euclid.hpp class for euclidian distances
- * @file ncd.hpp implementation of the normalize compression distance
+ * @file distances/distances.h main header for all distance structures
+ * @file distances/distance.hpp abstract class for distance algorithms
+ * @file distances/norm/euclid.hpp class for euclidian distances
+ * @file distances/ncd.hpp implementation of the normalize compression distance
  *
- * @file exception.cpp implementation of the exceptions
- * @file exception.h header file for exceptions
+ * @file exception/exception.cpp implementation of the exceptions
+ * @file exception/exception.h header file for exceptions
  *
- * @file functionoptimization.h main header for function optimization
- * @file gradientdescent.hpp gradient descent implementation
+ * @file functionoptimization/functionoptimization.h main header for function optimization
+ * @file functionoptimization/gradientdescent.hpp gradient descent implementation
  *
- * @file neighborhood.h main header for neighborhood structurs
- * @file neighborhood.hpp abstract class for neighborhood implementation
- * @file knn.hpp k-nearest-neighborhood implementation
+ * @file neighborhood/neighborhood.h main header for neighborhood structurs
+ * @file neighborhood/neighborhood.hpp abstract class for neighborhood implementation
+ * @file neighborhood/knn.hpp k-nearest-neighborhood implementation
  *
- * @file tools.h main header for tools algorithms
- * @file function.hpp different functions eg. numerical limit checking
- * @file logger.cpp logger static implementation
- * @file logger.hpp logger implementation
- * @file lapack.hpp wrapper class for LAPack calls
- * @file matrix.hpp implementation of matrix operations
- * @file vector.hpp implementation of vector operations
- * @file random.hpp random implementation 
- * @file random.cpp random static implementation
+ * @file tools/tools.h main header for tools algorithms
+ * @file tools/function.hpp different functions eg. numerical limit checking
+ * @file tools/logger.cpp logger static implementation
+ * @file tools/logger.hpp logger implementation
+ * @file tools/lapack.hpp wrapper class for LAPack calls
+ * @file tools/matrix.hpp implementation of matrix operations
+ * @file tools/vector.hpp implementation of vector operations
+ * @file tools/random.hpp random implementation 
+ * @file tools/random.cpp random static implementation
  *
- * @file sources.h main header for all sources
- * @file nntp.h NNTP client
- * @file wikipedia.h wikipedia client
- * @file cloud.hpp implementation of cloud datasets
+ * @file tools/sources/sources.h main header for all sources
+ * @file tools/sources/nntp.h NNTP client
+ * @file tools/sources/wikipedia.h wikipedia client
+ * @file tools/sources/cloud.hpp implementation of cloud datasets
  *
- * @file language.h multilanguage calls
+ * @file tools/language/language.h multilanguage calls
  *
- * @file files.h main header for file structurs
- * @file csv.hpp implementation for reading and writing csv files
- * @file hdf.hpp implementation for reading and writing hdf files
+ * @file tools/files/files.h main header for file structurs
+ * @file tools/files/csv.hpp implementation for reading and writing csv files
+ * @file tools/files/hdf.hpp implementation for reading and writing hdf files
 **/
 
 #ifndef MACHINELEARNING_H
