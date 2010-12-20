@@ -251,7 +251,7 @@ def target_sources(env, framework) :
         return
 
     path = os.path.join(".", "examples", "sources")
-    sources = ["newsgroup.cpp", "newsgroup.cpp"]
+    sources = ["newsgroup.cpp", "wikipedia.cpp"]
     
     if GetOption("withfiles") != None :
         sources.append( "cloud.cpp" )
