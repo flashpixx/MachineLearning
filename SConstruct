@@ -83,7 +83,6 @@ def configuration_posix(config, version, architecture) :
             
     if optionExist("withmultilanguage") :
         config["compileflags"]      += " -D ML_MULTILANGUAGE"
-        config["linkto"].append("intl");
         
     if optionExist("withsources") :
         config["compileflags"]      += " -D ML_SOURCES"
