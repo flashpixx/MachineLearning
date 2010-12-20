@@ -84,12 +84,12 @@ int main(int argc, char* argv[]) {
     // create target file
     tools::files::hdf target("spectral.hdf5", true);
     target.write<double>( "/numprotos",  numprotos, H5::PredType::NATIVE_DOUBLE );
-    target.write<double>( "/protos",  ng.getPrototypes(), H5::PredType::NATIVE_DOUBLE );    
+    target.write<double>( "/protos",  spectral.getPrototypes(), H5::PredType::NATIVE_DOUBLE );    
     target.write<std::size_t>( "/iteration",  iteration, H5::PredType::NATIVE_ULONG );
     
-    if (ng.getLogging()) {
-        target.write<double>( "/error",  tools::vector::copy(ng.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
-        std::vector< ublas::matrix<double> > logproto =  ng.getLoggedPrototypes();
+    if (spectral.getLogging()) {
+        target.write<double>( "/error",  tools::vector::copy(spectral.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
+        std::vector< ublas::matrix<double> > logproto =  spectral.getLoggedPrototypes();
         for(std::size_t i=0; i < logproto.size(); ++i)
             target.write<double>("/log" + boost::lexical_cast<std::string>( i ), logproto[i], H5::PredType::NATIVE_DOUBLE );
     }

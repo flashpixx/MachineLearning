@@ -48,6 +48,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * $LastChangedDate$
      * @todo set all routines to sparse matrix if arpack can be used with boost
      * @todo create eigengap heurstic
+     * @todo incomplete (using not implementated)
      **/
     template<typename T> class spectralclustering : public clustering<T> {
         
@@ -64,7 +65,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             std::size_t getPrototypeSize( void ) const;
             std::size_t getPrototypeCount( void ) const;
             std::vector<T> getLoggedQuantizationError( void ) const;
-            std::vector<T> use( const ublas::matrix<T>& ) const;
+            //ublas::indirect_array< std::vector<std::size_t> > use( const ublas::matrix<T>& ) const;
             
             //static std::size_t getEigenGap( const ublas::matrix<T>& ) const;
             //static std::size_t getEigenGap( const ublas::matrix<T>&, const ublas::matrix<T>& ) const;
@@ -86,7 +87,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> inline spectralclustering<T>::spectralclustering( const std::size_t& p_prototypes, const std::size_t& p_prototypesize ) :
         m_distance( distances::euclid<T>() ),
-        m_kmeans( neuralgas<T>( m_distance, p_prototypes, p_prototypesize) )
+        m_kmeans( kmeans<T>( m_distance, p_prototypes, p_prototypesize) )
     {}
     
     
@@ -170,7 +171,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
 
         
         // create squared degree and normalized graph laplacian
-        const ublas::matrix<T> l_sqrtdegree   = tools::matrix::pow( tools::matrix::diag(tools::matrix::sum(p_similarity)), static_cast<T>(-0.5));
+        const ublas::matrix<T> l_sqrtdegree   = tools::matrix::pow( static_cast< ublas::matrix<T> >(tools::matrix::diag(tools::matrix::sum(p_similarity))), static_cast<T>(-0.5));
         const ublas::matrix<T> l_tmp          = ublas::prod(l_sqrtdegree, p_similarity);
         const ublas::matrix<T> l_laplacian    = tools::matrix::eye<T>(p_similarity.size1()) - ublas::prod(l_tmp, l_sqrtdegree);
         
