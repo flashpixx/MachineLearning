@@ -21,7 +21,7 @@
  @endcond
  **/
 
-#include "../machinelearning.h"
+#include "../../machinelearning.h"
 
 using namespace machinelearning;
 
