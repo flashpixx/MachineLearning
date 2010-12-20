@@ -2,6 +2,7 @@
 
 import os
 import glob
+import string
 import platform
 
 
@@ -144,7 +145,7 @@ def getConfig():
         env.Replace(CXX         = config["compiler"])
     
     env.Replace(CXXFLAGS    = config["compileflags"])
-    env.Replace(CPPPATH     = config["include"]+":.")
+    env.Replace(CPPPATH     = config["include"].split(":"))
     env.Replace(LINKFLAGS   = config["linkerflags"])
     env.Replace(LIBS        = config["linkto"])
     env.Replace(LIBPATH     = config["librarypath"])
@@ -152,7 +153,7 @@ def getConfig():
            
            
     env.BuildDir("build", ".", duplicate=0)
-    #env.Append(CPPPATH=["."])
+    env.Append(CPPPATH=["."])
            
     #dict = env.Dictionary()
     #for i,j in dict.iteritems():
