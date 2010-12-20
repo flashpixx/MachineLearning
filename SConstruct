@@ -246,7 +246,7 @@ else :
     buildfiles = []
     
     if GetOption("withfiles") != None :
-        buildfiles.extend( [ os.path.join("examples","distance", "ncd.cpp"), os.path.join("examples","distance", "neuralgas.cpp"), os.path.join("examples","distance", "kmeans.cpp"), os.path.join("examples","reducing", "pca.cpp"), os.path.join("examples","reducing", "lda.cpp"), os.path.join("examples","reducing", "mds.cpp") ] )
+        buildfiles.extend( [ os.path.join("examples","distance", "ncd.cpp"), os.path.join("examples","clustering", "neuralgas.cpp"), os.path.join("examples","clustering", "kmeans.cpp"), os.path.join("examples","reducing", "pca.cpp"), os.path.join("examples","reducing", "lda.cpp"), os.path.join("examples","reducing", "mds.cpp") ] )
         
     if GetOption("withsources") != None :
         buildfiles.extend( [ os.path.join("examples","sources", "newsgroup.cpp"), os.path.join("examples","sources", "wikipedia.cpp") ] )
