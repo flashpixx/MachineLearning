@@ -75,14 +75,12 @@ int main(std::size_t argc, char* argv[]) {
         
         project = lda.map(data, labels);
     }
-    
+
+    /*
     if (labeltype == "string") {
-        dim::lda<double, std::string> lda(targetdim);
-        //std::vector<std::string> labels = source.readVector<std::string>(argv[5], H5::PredType::NATIVE_DOUBLE);
-        
-        //project = lda.map(data, labels);
     }
-    
+    */
+     
     if ((project.size1() == 0) || (project.size2() == 0))
         throw std::runtime_error("label type is unkown");
     

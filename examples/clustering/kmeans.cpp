@@ -28,7 +28,7 @@
 
 namespace ublas     = boost::numeric::ublas;
 namespace cluster   = machinelearning::clustering::nonsupervised;
-namespace dist      = machinelearning::distances;
+namespace distance  = machinelearning::distances;
 namespace tools     = machinelearning::tools;
 
 
@@ -77,7 +77,7 @@ int main(std::size_t argc, char* argv[]) {
 
     
     // create distance object, k-means object and enable logging
-    dist::euclid<double> d;
+    distance::euclid<double> d;
     cluster::kmeans<double> kmeans(d, numprotos, data.size2());
     kmeans.setLogging(log);
     

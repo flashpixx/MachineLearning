@@ -169,19 +169,7 @@
  * @include examples/clustering/neuralgas.cpp
  *
  * @section rlvq relevance learning vector quantization (RLVQ)
- * @code
-    ublas::matrix<double> data = / fill data (row orientated) /;
-    std::vector<std::string> labels = / fill label for each row /;
-    std::vector<std::string> prototypelabel = / fill label for each prototype /;
- 
-    // create distance object
-    distances::euclid<double> d;
-    // create rlvq object (the size of label vector is the number of prototypes)
-    clustering::supervised::rlvq<double, std::string> rlvq(d, prototypelabel, data.size2())
- 
-    // train prototypes in 15 iterations
-    rlvq.train(data, labels, 15);
- * @endcode
+ * @include examples/clustering/rlvq.cpp
  *
  * @section spcl spectral clustering
  * @include examples/clustering/spectral.cpp
@@ -359,6 +347,7 @@
  * @file examples/distance/ncd.cpp testprogram for the normalized compression distance
  * @file examples/clustering/neuralgas.cpp testprogram for the neural gas algorithm
  * @file examples/clustering/kmeans.cpp testprogram for the k-means algorithm
+ * @file examples/clustering/rlvq.cpp testprogram for the rlvq algorithm
  * @file examples/reducing/pca.cpp testprogram for the pca
  * @file examples/reducing/lda.cpp testprogramm for lda
  * @file examples/reducing/mds.cpp testprogramm for mds

@@ -28,7 +28,7 @@
 
 namespace ublas     = boost::numeric::ublas;
 namespace cluster   = machinelearning::clustering::nonsupervised;
-namespace dist      = machinelearning::distances;
+namespace distance  = machinelearning::distances;
 namespace tools     = machinelearning::tools;
 #ifdef ML_CLUSTER
 namespace mpi       = boost::mpi;
@@ -85,7 +85,7 @@ int main(int argc, char* argv[]) {
     
         
     // create distance object, neural gas object and enable logging
-    dist::euclid<double> d;
+    distance::euclid<double> d;
     cluster::neuralgas<double> ng(d, numprotos, data.size2());
     ng.setLogging(log);
     
