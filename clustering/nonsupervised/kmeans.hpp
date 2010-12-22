@@ -80,7 +80,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     
     
 
-    /** contructor for initialization the neural gas
+    /** contructor for initialization the k-means
      * @param p_distance distance object
      * @param p_prototypes number of prototypes
      * @param p_prototypesize size of each prototype (data dimension)
