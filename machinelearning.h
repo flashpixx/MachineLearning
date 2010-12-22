@@ -49,7 +49,7 @@
  * <li><i>optional Doxygen</i> ( http://www.doxygen.org/ )</li>
  * </ul>
  *
- * @section defs definitions / specifications
+ * @section style code style guide
  * <ul>
  * <li>data points should be matrix data and the matrix is row-orientated, so for K data points with every point dimension P, we have a K x P matrix (prototype matrices are equal)</li>
  * <li>all compiler flags start with <dfn>ML_</dfn></li>
@@ -57,7 +57,6 @@
  * <li>all messages should get the structure <dfn>_("<message>")</dfn>, because the underline prefix is the support for different languages</li>
  * </ul>
  *
- * @subsection codeguide code style guide
  * The source code uses some style guides options:
  * <ul>
  * <li>all variables use a prefix for their scopde: 
