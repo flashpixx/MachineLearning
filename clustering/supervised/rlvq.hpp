@@ -181,7 +181,7 @@ namespace machinelearning { namespace clustering { namespace supervised {
      **/
     template<typename T, typename L> inline void rlvq<T, L>::train( const ublas::matrix<T>& p_data, const std::vector<L>& p_labels, const std::size_t& p_iterations )
     {
-        train(p_data, p_labels, p_iterations, m_prototypes.size1(), 0.1*m_prototypes.size1());
+        train(p_data, p_labels, p_iterations, 0.01/m_prototypes.size1());
     }
     
     
