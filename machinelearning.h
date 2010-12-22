@@ -347,6 +347,7 @@
  * @file examples/distance/ncd.cpp testprogram for the normalized compression distance
  * @file examples/clustering/neuralgas.cpp testprogram for the neural gas algorithm
  * @file examples/clustering/kmeans.cpp testprogram for the k-means algorithm
+ * @file examples/clustering/spectral.cpp testprogram for spectral clustering
  * @file examples/clustering/rlvq.cpp testprogram for the rlvq algorithm
  * @file examples/reducing/pca.cpp testprogram for the pca
  * @file examples/reducing/lda.cpp testprogramm for lda
