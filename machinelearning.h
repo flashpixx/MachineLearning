@@ -114,6 +114,7 @@
  * <ul>
  * <li><dfn>source</dfn> sources are eg. Wikipedia, NNTP, but the parameter <dfn>--with-sources</dfn> must be set for compiling and for the cloud example the files parameter must be set additionally</li>
  * <li><dfn>clustering</dfn> this target build all clustering algorithms, but the <dfn>--with-files</dfn> parameter must be set</li>
+ * <li><dfn>classifier</dfn> this target build all classifier algorithms, but the <dfn>--with-files</dfn> parameter must be set</li>
  * <li><dfn>reducing</dfn> this target build all dimension reduce algorithms, but the <dfn>--with-files</dfn> parameter must be set</li>
  * <li><dfn>distance</dfn> this target build all distance algorithms, but the <dfn>--with-files</dfn> parameter must be set</li>
  * </ul>
