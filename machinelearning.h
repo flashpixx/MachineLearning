@@ -349,6 +349,7 @@
  * @file examples/clustering/kmeans.cpp testprogram for the k-means algorithm
  * @file examples/clustering/spectral.cpp testprogram for spectral clustering
  * @file examples/clustering/rlvq.cpp testprogram for the rlvq algorithm
+ * @file examples/classifier/lazy.cpp testprogram for the lazy-learner algorithm
  * @file examples/reducing/pca.cpp testprogram for the pca
  * @file examples/reducing/lda.cpp testprogramm for lda
  * @file examples/reducing/mds.cpp testprogramm for mds

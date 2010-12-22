@@ -297,6 +297,16 @@ def target_distance(env, framework) :
         sources.extend( ["ncd.cpp"] )
 
     createTarget(env, "distance", path, sources, framework)
+    
+    
+def target_classifier(env, framework) :
+    path = os.path.join(".", "examples", "classifier")
+    sources = []
+
+    if optionExist("withfiles") :
+        sources.extend( ["lazy.cpp"] )
+
+    createTarget(env, "classifier", path, sources, framework)
 #=======================================================================================================================================
 
 
