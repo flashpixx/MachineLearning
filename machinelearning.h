@@ -49,7 +49,7 @@
  * <li><i>optional Doxygen</i> ( http://www.doxygen.org/ )</li>
  * </ul>
  *
- * @section style code style guide
+ * @section def definition / style guide
  * <ul>
  * <li>data points should be matrix data and the matrix is row-orientated, so for K data points with every point dimension P, we have a K x P matrix (prototype matrices are equal)</li>
  * <li>all compiler flags start with <dfn>ML_</dfn></li>
