@@ -23,7 +23,6 @@
 
 /** 
  * @mainpage Machine Learning Framework
- * $Rev$
  * @author Philipp Kraus <philipp.kraus@flashpixx.de> 
  *
  * @section licenseSection license

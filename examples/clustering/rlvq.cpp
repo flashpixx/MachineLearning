@@ -75,7 +75,7 @@ int main(std::size_t argc, char* argv[]) {
     tools::files::hdf target("rlvq.hdf5", true);
     
     
-    // create projection
+    // create data
     distance::euclid<double> d;
     
     if (labeltype == "int") {

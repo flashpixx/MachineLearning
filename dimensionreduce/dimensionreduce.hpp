@@ -51,6 +51,7 @@ namespace machinelearning {
             
             /** abstract class for nonsupervised dimension reducing classes
              * $LastChangedDate$
+             * @todo implement serializable interface
              **/      
             template<typename T> class reduce {
                 
@@ -76,6 +77,7 @@ namespace machinelearning {
         
         /** namespace for all supervised reducing algorithms
          * $LastChangedDate$
+         * @todo implement serializable interface
          **/
         namespace supervised {
         

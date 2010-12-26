@@ -339,6 +339,6 @@ else :
     target_clustering( env, framework )
     target_reducing( env, framework )
     target_distance(env, framework )
-
+    target_classifier(env, framework )
 
     

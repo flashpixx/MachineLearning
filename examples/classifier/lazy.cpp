@@ -29,125 +29,159 @@
 namespace ublas      = boost::numeric::ublas;
 namespace classifier = machinelearning::classifier;
 namespace distance   = machinelearning::distances;
+namespace neighbor   = machinelearning::neighborhood;
 namespace tools      = machinelearning::tools;
 
 
 int main(std::size_t argc, char* argv[]) {
 
-    if (argc < 6)
-        throw std::runtime_error("you need at least five parameter as input. first HDF file, second type of labels (string, int, uint, double), third path to dataset, forth path to labels, fifth type of distance (invert, distance), optional sixth number of iterations or/and (seventh) \"log\" for logging");
+    if (argc < 7)
+        throw std::runtime_error("you need at least five parameter as input. first HDF file, second type of labels (string, int, uint, double), third path to dataset, forth path to labels, fifth path to unkwon data, sixth type of distance (invert, distance), optional seventh for number of neighbours, eighth \"log\" for logging");
     
-    // convert iteration or logging if exists
-    std::size_t iteration = 15;
+    // convert logging if exists
+    std::size_t knn = 3;
     bool log = false;
     try {
-        std::string sixth(  (argc > 6) ? argv[6] : ""  );
         std::string seventh(  (argc > 7) ? argv[7] : ""  );
-               
-        if (!sixth.empty())
-            boost::to_lower( sixth );
+        std::string eighth(  (argc > 8) ? argv[8] : ""  );
+        
         if (!seventh.empty())
             boost::to_lower( seventh );
-        
-        if (sixth == "log")
-            log = true;
-        else
-            if (!sixth.empty())
-                iteration = boost::lexical_cast<std::size_t>(sixth);
+        if (!eighth.empty())
+            boost::to_lower( eighth );
         
         if (seventh == "log")
+            log = true;
+        else
+            if (!seventh.empty())
+                knn = boost::lexical_cast<std::size_t>(seventh);
+        
+        if (eighth == "log")
             log = true;
     } catch (...) {
         throw std::runtime_error("numerical data can not be read");
     }
     
     // distance value
-    std::string fifth( argv[5] )
-    if (!fifth.empty())
-        boost::to_lower( fifth );
+    std::string sixth( argv[6] );
+    if (!sixth.empty())
+        boost::to_lower( sixth );
     
-    std::size_t distancetyp = 0;
-    if (fifth == "distance")
-        distancetyp = 1;
-    else
-        if (fifth == "invert")
-            distancetyp = 2;
-        else
-            throw std::runtime_error("distance unkwon");
+    if ((sixth != "distance") || (sixth != "invert"))
+        throw std::runtime_error("distance unkwon");
     
     
     // read source hdf file and data
     tools::files::hdf source( argv[1] );
-    ublas::matrix<double> data = source.readMatrix<double>( argv[3], H5::PredType::NATIVE_DOUBLE);
-    ublas::matrix<double> prototypes;
+    ublas::matrix<double> data        = source.readMatrix<double>( argv[3], H5::PredType::NATIVE_DOUBLE);
+    ublas::matrix<double> unknowndata = source.readMatrix<double>( argv[5], H5::PredType::NATIVE_DOUBLE);
+
     
     // read label type
     std::string labeltype( argv[2] );
     boost::to_lower(labeltype);
+    bool labelcheck = true;
+    
     
     // create target file
     tools::files::hdf target("lazy.hdf5", true);
     
     
-    // create projection
+    // create data
     distance::euclid<double> d;
+    neighbor::knn<double> n(d, knn);
     
     if (labeltype == "int") {
-        std::vector<int> labels = tools::vector::copy( source.readVector<int>(argv[4], H5::PredType::NATIVE_INT) );
-        std::vector<int> unique = tools::vector::unique(labels);
+        labelcheck = false;
         
-        // create lazy learner object with double for data and int for labels
-        cluster::rlvq<double, int> rlvq(d, unique, data.size2());
-        rlvq.setLogging(log);
+        // create lazy learner object with double for data and labels
+        classifier::lazylearner<double, int>::weighttype dist;
+        if (sixth == "distance")
+            dist = classifier::lazylearner<double, int>::distance;
+        else
+            dist = classifier::lazylearner<double, int>::inversedistance;
         
-        // train data
-        rlvq.train( data, labels, iteration );
-        prototypes = rlvq.getPrototypes();
+        // create lazy-learner
+        classifier::lazylearner<double, int> lazy(n, dist);
+        
+        // set data and read new labels for unkown data
+        lazy.setLogging(log);
+        lazy.setDatabase( data, tools::vector::copy( source.readVector<int>(argv[4], H5::PredType::NATIVE_INT) ) );
+        std::vector<int> labels = lazy.use(unknowndata);
+        
         
         // write data to hdf
-        target.write<double>( "/numprotos",  unique.size(), H5::PredType::NATIVE_DOUBLE );
-        target.write<int>( "/protolabel", tools::vector::copy(unique), H5::PredType::NATIVE_INT );
+        target.write<int>( "/unkwonlabel", tools::vector::copy(labels), H5::PredType::NATIVE_INT );
         
         // if logging exists write data to file
-        if (rlvq.getLogging()) {
-            target.write<double>( "/error",  tools::vector::copy(rlvq.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
-            std::vector< ublas::matrix<double> > p = rlvq.getLoggedPrototypes();
-            for(std::size_t i=0; i < p.size(); ++i)
-                target.write<double>("/log" + boost::lexical_cast<std::string>( i ), p[i], H5::PredType::NATIVE_DOUBLE );
-        }
+        if (lazy.getLogging())
+            target.write<double>( "/error",  tools::vector::copy(lazy.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
+    }
+
+    if (labeltype == "uint") {
+        labelcheck = false;
+        
+        // create lazy learner object with double for data and labels
+        classifier::lazylearner<double, unsigned int>::weighttype dist;
+        if (sixth == "distance")
+            dist = classifier::lazylearner<double, unsigned int>::distance;
+        else
+            dist = classifier::lazylearner<double, unsigned int>::inversedistance;
+        
+        // create lazy-learner
+        classifier::lazylearner<double, unsigned int> lazy(n, dist);
+        
+        // set data and read new labels for unkown data
+        lazy.setLogging(log);
+        lazy.setDatabase( data, tools::vector::copy( source.readVector<unsigned int>(argv[4], H5::PredType::NATIVE_UINT) ) );
+        std::vector<unsigned int> labels = lazy.use(unknowndata);
+        
+        
+        // write data to hdf
+        target.write<unsigned int>( "/unkwonlabel", tools::vector::copy(labels), H5::PredType::NATIVE_UINT );
+        
+        // if logging exists write data to file
+        if (lazy.getLogging())
+            target.write<double>( "/error",  tools::vector::copy(lazy.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
     }
     
-    
+    if (labeltype == "double") {
+        labelcheck = false;
+        
+        // create lazy learner object with double for data and labels
+        classifier::lazylearner<double, double>::weighttype dist;
+        if (sixth == "distance")
+            dist = classifier::lazylearner<double, double>::distance;
+        else
+            dist = classifier::lazylearner<double, double>::inversedistance;
+        
+        // create lazy-learner
+        classifier::lazylearner<double, double> lazy(n, dist);
+        
+        // set data and read new labels for unkown data
+        lazy.setLogging(log);
+        lazy.setDatabase( data, tools::vector::copy( source.readVector<double>(argv[4], H5::PredType::NATIVE_DOUBLE) ) );
+        std::vector<double> labels = lazy.use(unknowndata);
+        
+        
+        // write data to hdf
+        target.write<double>( "/unkwonlabel", tools::vector::copy(labels), H5::PredType::NATIVE_DOUBLE );
+        
+        // if logging exists write data to file
+        if (lazy.getLogging())
+            target.write<double>( "/error",  tools::vector::copy(lazy.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
+    }
     
     /*
-     ublas::matrix<double> data       = o.readMatrix<double>("/iris/data", H5::PredType::NATIVE_DOUBLE); 
-     ublas::vector<std::size_t> label = o.readVector<std::size_t>("/iris/label", H5::PredType::NATIVE_ULONG); 
-     
-     
-     ublas::indirect_array<> x(10);
-     tl::random l_rand;
-     for(std::size_t i=0; i < x.size(); ++i)
-     x(i) = static_cast<std::size_t>(l_rand.get<double>( tl::random::uniform, 0, data.size1()));
-     
-     ublas::indirect_array<> y(data.size2());
-     for(std::size_t i=0; i < y.size(); ++i)
-     y(i) = i;
-     
-     
-     ublas::matrix<double>      blub1 = ublas::project(data, x, y);
-     ublas::vector<std::size_t> blub2 = ublas::project(label, x);
-     
-     dist::euclid<double> d;
-     nd::knn<double> k(d, 4);
-     cl::lazylearner<double, std::size_t> ll(k, cl::lazylearner<double, std::size_t>::inversedistance);
-     
-     ll.setDatabase( blub1,  tl::vector::copy(blub2) );
-     
-     
-     tl::files::hdf f("lazy.hdf5", true);
-     f.write<double>( "/data",  data, H5::PredType::NATIVE_DOUBLE );
-     f.write<double>( "/label",  tl::vector::copy( ll.use(data) ), H5::PredType::NATIVE_DOUBLE ); 
-     f.write<double>( "/basedata",  blub1, H5::PredType::NATIVE_DOUBLE );
-     f.write<double>( "/baselabel",  blub2, H5::PredType::NATIVE_DOUBLE );
-     */
+    if (labeltype == "string") {
+    }
+    */
+    
+    if (labelcheck)
+        throw std::runtime_error("label type is unkown");
+
+    
+
+    std::cout << "create HDF file \"lazy.hdf5\" with dataset \"/unkwonlabel\" for unkwon data, and if logging is enabled \"/error\" with quantization error" << std::endl;
+    return EXIT_SUCCESS;
 }

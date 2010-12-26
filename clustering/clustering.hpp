@@ -119,6 +119,7 @@ namespace machinelearning {
              * @note every data / prototype matrix must be row orientated.
              * data matrix NxM with n number of datapoints and M data dimension
              * @todo add method for setting prototypes
+             * @todo implement serializable interface
              **/      
             template<typename T> class clustering {
                 
@@ -188,6 +189,7 @@ namespace machinelearning {
             /** abstract class for patch clustering
              * $LastChangedDate$
              * @todo add method for setting weights
+             * @todo implement serializable interface
              **/
             template<typename T> class patch {
                 
