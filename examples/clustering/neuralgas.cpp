@@ -30,14 +30,14 @@ namespace ublas     = boost::numeric::ublas;
 namespace cluster   = machinelearning::clustering::nonsupervised;
 namespace distance  = machinelearning::distances;
 namespace tools     = machinelearning::tools;
-#ifdef ML_CLUSTER
+#ifdef MACHINELEARNING_MPI
 namespace mpi       = boost::mpi;
 #endif
 
 
 int main(int argc, char* argv[]) {
     
-    #ifdef ML_CLUSTER
+    #ifdef MACHINELEARNING_MPI
     mpi::environment loMPIenv(argc, argv);
     mpi::communicator loMPICom;
     #endif
@@ -90,7 +90,7 @@ int main(int argc, char* argv[]) {
     ng.setLogging(log);
     
     
-    #ifdef ML_CLUSTER
+    #ifdef MACHINELEARNING_MPI
     mpi::timer t;
     ng.train(loMPICom, data, iteration);
     std::cout << "number of process: " << loMPICom.size() << " Time: " << t.elapsed() << std::endl;
@@ -143,7 +143,7 @@ int main(int argc, char* argv[]) {
     #endif
     
     
-    #ifdef ML_CLUSTER
+    #ifdef MACHINELEARNING_MPI
     if (loMPICom.rank() == 0)
     #endif
     std::cout << "create HDF file \"neuralgas.hdf5\" with dataset \"/protos \", \"/iteration\" number of iteration, \"numprotos\" number of prototypes and if logging is enabled \"/error\" with quantization error and \"/log<0 to iterations-1>\" logged prototypes" << std::endl;

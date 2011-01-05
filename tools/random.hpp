@@ -32,7 +32,7 @@
 #include <boost/thread/thread.hpp>
 #include <boost/random.hpp>
 
-#ifdef ML_RANDOMDEVICE
+#ifdef MACHINELEARNING_RANDOMDEVICE
 #include <boost/nondet_random.hpp>
 #endif
 
@@ -81,7 +81,7 @@ namespace machinelearning { namespace tools {
             };
             
             
-            #ifndef ML_RANDOMDEVICE
+            #ifndef MACHINELEARNING_RANDOMDEVICE
             random( void );
             #endif
             template<typename T> T get( const distribution&, const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon() );
@@ -89,7 +89,7 @@ namespace machinelearning { namespace tools {
         
         private :
         
-            #ifdef ML_RANDOMDEVICE
+            #ifdef MACHINELEARNING_RANDOMDEVICE
             /** static random device pbject **/
             static boost::random_device m_random;
             #else
@@ -113,7 +113,7 @@ namespace machinelearning { namespace tools {
             template<typename T> T getChiSquared( const T& );
             template<typename T> T getTriangular( const T&, const T&, const T& );
         
-            #ifndef ML_RANDOMDEVICE
+            #ifndef MACHINELEARNING_RANDOMDEVICE
             static std::time_t getThreadID( void );
             #endif
         
@@ -125,7 +125,7 @@ namespace machinelearning { namespace tools {
      * for multithrading. Read thread-id and create xor
      * with time
      **/
-    #ifndef ML_RANDOMDEVICE
+    #ifndef MACHINELEARNING_RANDOMDEVICE
     inline random::random( void ) :
         m_random(  boost::mt19937(getThreadID() ^ time(NULL))  )
     {}
@@ -187,7 +187,7 @@ namespace machinelearning { namespace tools {
     {
         boost::uniform_real<T> l_range(p_min, p_max);
         
-        #ifdef ML_RANDOMDEVICE
+        #ifdef MACHINELEARNING_RANDOMDEVICE
         boost::variate_generator<boost::random_device&, boost::uniform_real<T> > l_noise( m_random, l_range );
         #else
         boost::variate_generator<boost::mt19937&, boost::uniform_real<T> > l_noise(  m_random, l_range );
@@ -205,7 +205,7 @@ namespace machinelearning { namespace tools {
     {
         boost::bernoulli_distribution<T> l_range(p_prop);
         
-        #ifdef ML_RANDOMDEVICE
+        #ifdef MACHINELEARNING_RANDOMDEVICE
         boost::variate_generator<boost::random_device&, boost::bernoulli_distribution<T> > l_noise( m_random, l_range );
         #else
         boost::variate_generator<boost::mt19937&, boost::bernoulli_distribution<T> > l_noise(  m_random, l_range );
@@ -224,7 +224,7 @@ namespace machinelearning { namespace tools {
     {
         boost::binomial_distribution<T> l_range(p_n, p_p);
         
-        #ifdef ML_RANDOMDEVICE
+        #ifdef MACHINELEARNING_RANDOMDEVICE
         boost::variate_generator<boost::random_device&, boost::binomial_distribution<T> > l_noise( m_random, l_range );
         #else
         boost::variate_generator<boost::mt19937&, boost::binomial_distribution<T> > l_noise(  m_random, l_range );
@@ -243,7 +243,7 @@ namespace machinelearning { namespace tools {
     {
         boost::cauchy_distribution<T> l_range(p_loc, p_scale);
         
-        #ifdef ML_RANDOMDEVICE
+        #ifdef MACHINELEARNING_RANDOMDEVICE
         boost::variate_generator<boost::random_device&, boost::cauchy_distribution<T> > l_noise( m_random, l_range );
         #else
         boost::variate_generator<boost::mt19937&, boost::cauchy_distribution<T> > l_noise(  m_random, l_range );
@@ -261,7 +261,7 @@ namespace machinelearning { namespace tools {
     {
         boost::gamma_distribution<T> l_range(p_shape);
         
-        #ifdef ML_RANDOMDEVICE
+        #ifdef MACHINELEARNING_RANDOMDEVICE
         boost::variate_generator<boost::random_device&, boost::gamma_distribution<T> > l_noise( m_random, l_range );
         #else
         boost::variate_generator<boost::mt19937&, boost::gamma_distribution<T> > l_noise(  m_random, l_range );
@@ -279,7 +279,7 @@ namespace machinelearning { namespace tools {
     {
         boost::poisson_distribution<std::size_t> l_range(p_lambda);
         
-        #ifdef ML_RANDOMDEVICE
+        #ifdef MACHINELEARNING_RANDOMDEVICE
         boost::variate_generator<boost::random_device&, boost::poisson_distribution<std::size_t> > l_noise( m_random, l_range );
         #else
         boost::variate_generator<boost::mt19937&, boost::poisson_distribution<std::size_t> > l_noise(  m_random, l_range );
@@ -297,7 +297,7 @@ namespace machinelearning { namespace tools {
     {
         boost::exponential_distribution<T> l_range(p_lambda);
         
-        #ifdef ML_RANDOMDEVICE
+        #ifdef MACHINELEARNING_RANDOMDEVICE
         boost::variate_generator<boost::random_device&, boost::exponential_distribution<T> > l_noise( m_random, l_range );
         #else
         boost::variate_generator<boost::mt19937&, boost::exponential_distribution<T> > l_noise(  m_random, l_range );
@@ -316,7 +316,7 @@ namespace machinelearning { namespace tools {
     {
         boost::normal_distribution<T> l_range(p_mean, p_sd);
         
-        #ifdef ML_RANDOMDEVICE
+        #ifdef MACHINELEARNING_RANDOMDEVICE
         boost::variate_generator<boost::random_device&, boost::normal_distribution<T> > l_noise( m_random, l_range );
         #else
         boost::variate_generator<boost::mt19937&, boost::normal_distribution<T> > l_noise(  m_random, l_range );
@@ -334,7 +334,7 @@ namespace machinelearning { namespace tools {
     {
         boost::math::students_t_distribution<T> l_range(p_v);
         
-        #ifdef ML_RANDOMDEVICE
+        #ifdef MACHINELEARNING_RANDOMDEVICE
         boost::variate_generator<boost::random_device&, boost::uniform_01<T> > l_uniform(  m_random, boost::uniform_01<T>() );
         #else
         boost::variate_generator<boost::mt19937&, boost::uniform_01<T> > l_uniform(  m_random, boost::uniform_01<T>() );
@@ -353,7 +353,7 @@ namespace machinelearning { namespace tools {
     {
         boost::math::weibull_distribution<T> l_range(p_shape, p_scale);
         
-        #ifdef ML_RANDOMDEVICE
+        #ifdef MACHINELEARNING_RANDOMDEVICE
         boost::variate_generator<boost::random_device&, boost::uniform_01<T> > l_uniform(  m_random, boost::uniform_01<T>() );
         #else
         boost::variate_generator<boost::mt19937&, boost::uniform_01<T> > l_uniform(  m_random, boost::uniform_01<T>() );
@@ -371,7 +371,7 @@ namespace machinelearning { namespace tools {
     {
         boost::math::rayleigh_distribution<T> l_range(p_sigma);
         
-        #ifdef ML_RANDOMDEVICE
+        #ifdef MACHINELEARNING_RANDOMDEVICE
         boost::variate_generator<boost::random_device&, boost::uniform_01<T> > l_uniform(  m_random, boost::uniform_01<T>() );
         #else
         boost::variate_generator<boost::mt19937&, boost::uniform_01<T> > l_uniform(  m_random, boost::uniform_01<T>() );
@@ -390,7 +390,7 @@ namespace machinelearning { namespace tools {
     {
         boost::math::beta_distribution<T> l_range(p_alpha, p_beta);
         
-        #ifdef ML_RANDOMDEVICE
+        #ifdef MACHINELEARNING_RANDOMDEVICE
         boost::variate_generator<boost::random_device&, boost::uniform_01<T> > l_uniform(  m_random, boost::uniform_01<T>() );
         #else
         boost::variate_generator<boost::mt19937&, boost::uniform_01<T> > l_uniform(  m_random, boost::uniform_01<T>() );
@@ -409,7 +409,7 @@ namespace machinelearning { namespace tools {
     {
         boost::math::pareto_distribution<T> l_range(p_loc, p_scale);
         
-        #ifdef ML_RANDOMDEVICE
+        #ifdef MACHINELEARNING_RANDOMDEVICE
         boost::variate_generator<boost::random_device&, boost::uniform_01<T> > l_uniform(  m_random, boost::uniform_01<T>() );
         #else
         boost::variate_generator<boost::mt19937&, boost::uniform_01<T> > l_uniform(  m_random, boost::uniform_01<T>() );
@@ -427,7 +427,7 @@ namespace machinelearning { namespace tools {
     {
         boost::math::chi_squared_distribution<T> l_range(p_v);
         
-        #ifdef ML_RANDOMDEVICE
+        #ifdef MACHINELEARNING_RANDOMDEVICE
         boost::variate_generator<boost::random_device&, boost::uniform_01<T> > l_uniform(  m_random, boost::uniform_01<T>() );
         #else
         boost::variate_generator<boost::mt19937&, boost::uniform_01<T> > l_uniform(  m_random, boost::uniform_01<T>() );
@@ -447,7 +447,7 @@ namespace machinelearning { namespace tools {
     {
         boost::math::triangular_distribution<T> l_range(p_min, p_center, p_max);
         
-        #ifdef ML_RANDOMDEVICE
+        #ifdef MACHINELEARNING_RANDOMDEVICE
         boost::variate_generator<boost::random_device&, boost::uniform_01<T> > l_uniform(  m_random, boost::uniform_01<T>() );
         #else
         boost::variate_generator<boost::mt19937&, boost::uniform_01<T> > l_uniform(  m_random, boost::uniform_01<T>() );

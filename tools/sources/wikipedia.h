@@ -21,12 +21,12 @@
  @endcond
  **/
 
-#ifdef ML_SOURCES
+#ifdef MACHINELEARNING_SOURCES
 
 #ifndef MACHINELEARNING_TOOLS_SOURCES_WIKIPEDIA_H
 #define MACHINELEARNING_TOOLS_SOURCES_WIKIPEDIA_H
 
-#define ML_WIKIPEDIA_HTTPAGENT  "Machine-Learning-Toolbox"
+#define MACHINELEARNING_WIKIPEDIA_HTTPAGENT  "Machine-Learning-Toolbox"
 
 #include <algorithm>
 #include <boost/asio.hpp>
@@ -150,7 +150,7 @@ namespace machinelearning { namespace tools { namespace sources {
         m_articlefound( false ),
         m_acronymfound( false ),
         m_acronym(),
-        m_httpagent(ML_WIKIPEDIA_HTTPAGENT)
+        m_httpagent(MACHINELEARNING_WIKIPEDIA_HTTPAGENT)
     {}
     
     

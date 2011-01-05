@@ -51,7 +51,7 @@
  * @section def definition / style guide
  * <ul>
  * <li>data points should be matrix data and the matrix is row-orientated, so for K data points with every point dimension P, we have a K x P matrix (prototype matrices are equal)</li>
- * <li>all compiler flags start with <dfn>ML_</dfn></li>
+ * <li>all compiler flags start with <dfn>MACHINELEARNING_</dfn></li>
  * <li>all structures are in the namespace <dfn>machinelearning</dfn></li>
  * <li>all messages should get the structure <dfn>_("<message>")</dfn>, because the underline prefix is the support for different languages</li>
  * </ul>
@@ -76,11 +76,11 @@
  * @section compileroptions compiler option
  * toolbox compilerflags
  * <ul>
- * <li><dfn>ML_RANDOMDEVICE</dfn> for using the Boost Device Random support (required Boost Random Device Support), otherwise a Mersenne Twister is used</li>
- * <li><dfn>ML_MULTILANGUAGE</dfn> option for compiling the framework with multilanguage support (uses gettext)</li>
- * <li><dfn>ML_FILES</dfn> adds the support for HDF & CSV file reading and writing</li>
- * <li><dfn>ML_SOURCES</dfn> compiles sources in that way, that e.g. NNTP / Wikipedia data can be read directly</li>
- * <li><dfn>ML_CLUSTER</dfn> enable MPI Support for the toolbox (required Boost MPI support)</li>
+ * <li><dfn>MACHINELEARNING_RANDOMDEVICE</dfn> for using the Boost Device Random support (required Boost Random Device Support), otherwise a Mersenne Twister is used</li>
+ * <li><dfn>MACHINELEARNING_MULTILANGUAGE</dfn> option for compiling the framework with multilanguage support (uses gettext)</li>
+ * <li><dfn>MACHINELEARNING_FILES</dfn> adds the support for HDF & CSV file reading and writing</li>
+ * <li><dfn>MACHINELEARNING_SOURCES</dfn> compiles sources in that way, that e.g. NNTP / Wikipedia data can be read directly</li>
+ * <li><dfn>MACHINELEARNING_MPI</dfn> enable MPI Support for the toolbox (required Boost MPI support)</li>
  * </ul>
  * The following compiler commands should / must be set
  * <ul>
@@ -194,7 +194,7 @@
  *
  *
  * @page sources data sources
- * The toolbox implements some structures for geting datasets. The compile option <dfn>ML_SOURCES</dfn> must be set for compiling the namespace
+ * The toolbox implements some structures for geting datasets. The compile option <dfn>MACHINELEARNING_SOURCES</dfn> must be set for compiling the namespace
  * machinelearning::tools::sources .
  *
  * @section nntp newsgroups
@@ -259,7 +259,7 @@
  *
  *
  * @page files file support
- * The toolbox supports different file formats. The compile option <dfn>ML_FILES</dfn> must be set for
+ * The toolbox supports different file formats. The compile option <dfn>MACHINELEARNING_FILES</dfn> must be set for
  * using the support and all components are within the namespace machinelearning::tools::files
  * @section csv comma separated values (csv)
  * @code
@@ -320,7 +320,7 @@
  * The toolbox uses <dfn>gettext</dfn> to translate the messages. The source code must include the language header file and all messages,
  * which should be supported multilanguage must be written in this way <dfn>_("messages")</dfn>. The mesages will be collcted with the
  * gettext tools and safed under <dfn>tools/language/#language eg. de_DE.UTF-8#/LC_MESSAGES/#language eg de_DE#.po</dfn>. The compiler flag
- * <dfn>ML_MULTILANGUAGE</dfn> must be set for using the support. The message files can be edited with Poedit ( http://www.poedit.net/ ).
+ * <dfn>MACHINELEARNING_MULTILANGUAGE</dfn> must be set for using the support. The message files can be edited with Poedit ( http://www.poedit.net/ ).
  * For using the language support, a call for setting the correct languages must be written wihin the main program:
  * @code
     tools::language::bind(<name of the language file, should be "ml">, <path to the language directory, shoudl be "./tools/language/">);

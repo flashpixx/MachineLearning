@@ -22,14 +22,14 @@
  **/
 
 
-#ifndef MACHINELEARNING_CLUSTERING_NONSUPERVISED_NG_HPP
-#define MACHINELEARNING_CLUSTERING_NONSUPERVISED_NG_HPP
+#ifndef MACHINELEARNING_MPIING_NONSUPERVISED_NG_HPP
+#define MACHINELEARNING_MPIING_NONSUPERVISED_NG_HPP
 
 #include <numeric>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 
-#ifdef ML_CLUSTER
+#ifdef MACHINELEARNING_MPI
 #include <boost/mpi.hpp>
 #endif
 
@@ -43,7 +43,7 @@
 namespace machinelearning { namespace clustering { namespace nonsupervised {
     
     namespace ublas = boost::numeric::ublas;
-    #ifdef ML_CLUSTER
+    #ifdef MACHINELEARNING_MPI
     namespace mpi   = boost::mpi;
     #endif
     
@@ -70,8 +70,10 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             std::vector<T> getLoggedQuantizationError( void ) const;
             ublas::indirect_array< std::vector<std::size_t> > use( const ublas::matrix<T>& ) const;
             ublas::vector<T> getPrototypeWeights( void ) const;
+            void trainpatch( const ublas::matrix<T>&, const std::size_t& );
+            void trainpatch( const ublas::matrix<T>&, const std::size_t&, const T& );
             
-            #ifdef ML_CLUSTER
+            #ifdef MACHINELEARNING_MPI
             void train( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t& );
             void train( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t&, const T& );
             ublas::matrix<T> getPrototypes( const mpi::communicator& ) const;
@@ -100,7 +102,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             
             T calculateQuantizationError( const ublas::matrix<T>&, const ublas::matrix<T>& ) const;
             
-            #ifdef ML_CLUSTER
+            #ifdef MACHINELEARNING_MPI
             /** map with information to every process and prototype**/
             std::map<int, std::pair<std::size_t,std::size_t> > m_processprototypinfo;
             
@@ -125,7 +127,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         m_logprototypes( std::vector< ublas::matrix<T> >() ),
         m_quantizationerror( std::vector<T>() ),
         m_prototypeWeights( p_prototypes, 1 )
-        #ifdef ML_CLUSTER
+        #ifdef MACHINELEARNING_MPI
         , m_processprototypinfo()
         #endif
     {
@@ -349,11 +351,113 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         }
         
         return ublas::indirect_array< std::vector<std::size_t> >(l_vec.size(), l_vec);
-        
+    }
+  
+    
+    /** train a patch (input data) with the data (include the weights)
+     * @param p_data datapoints
+     * @param p_iterations iterations
+     **/
+    template<typename T> inline void neuralgas<T>::trainpatch( const ublas::matrix<T>& p_data, const std::size_t& p_iterations )
+    {
+        trainpatch(p_data, p_iterations, m_prototypes.size1() * 0.5);
     }
     
+     
+    /** train a patch (input data) with the data (include the weights)
+     * @param p_data datapoints
+     * @param p_iterations iterations
+     * @param p_lambda max adapet size
+     **/
+    template<typename T> inline void neuralgas<T>::trainpatch( const ublas::matrix<T>& p_data, const std::size_t& p_iterations, const T& p_lambda )
+    {
+        if (m_prototypes.size1() == 0)
+            throw exception::runtime(_("number of prototypes must be greater than zero"));
+        if (p_data.size1() < m_prototypes.size1())
+            throw exception::runtime(_("number of datapoints are less than prototypes"));
+        if (p_iterations == 0)
+            throw exception::runtime(_("iterations must be greater than zero"));
+        if (p_data.size2() != m_prototypes.size2())
+            throw exception::runtime(_("data and prototype dimension are not equal"));
+        if (p_lambda <= 0)
+            throw exception::runtime(_("lambda must be greater than zero"));
+        
+        // creates logging
+        if (m_logging) {
+            m_logprototypes.clear();
+            m_quantizationerror.clear();
+            m_logprototypes.reserve(p_iterations);
+            m_quantizationerror.reserve(p_iterations);
+        }
+        
+        
+        // run neural gas       
+        const T l_multi = 0.01/p_lambda;
+        T l_lambda      = 0;
+        T l_norm        = 0;
+        ublas::matrix<T> l_adaptmatrix( m_prototypes.size1(), p_data.size1() );
+        ublas::vector<T> l_rank;
+        
+        for(std::size_t i=0; (i < p_iterations); ++i) {
+            
+            // create adapt values
+            l_lambda = p_lambda * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(p_iterations));
+            
+            
+            // calculate for every prototype the distance
+            for(std::size_t n=0; n < m_prototypes.size1(); ++n)
+                ublas::row(l_adaptmatrix, n)  = m_distance->getDistance( p_data, ublas::row(m_prototypes, n) ) ;
+            
+            // for every column ranks values and create adapts
+            // we need rank and not randIndex, because we 
+            // use the value of the ranking for calculate the 
+            // adapt value
+            for(std::size_t n=0; n < l_adaptmatrix.size2(); ++n) {
+                l_rank = ublas::column(l_adaptmatrix, n);
+                l_rank = tools::vector::rank( l_rank );
+                
+                // calculate adapt value
+                BOOST_FOREACH( T& p, l_rank)
+                    p = std::exp( -p / l_lambda );
+                
+                // return value to matrix
+                ublas::column(l_adaptmatrix, n) = l_rank;
+            }
+            
+            
+            //mpltHH = HH .* (ones(n,1)*Mplts');
+            //Neurons = mpltHH * Data;
+            
+            // create prototypes
+            m_prototypes = ublas::prod( l_adaptmatrix, p_data );
+            
+            // normalize prototypes
+            for(std::size_t n=0; n < m_prototypes.size1(); ++n) {
+                l_norm = ublas::sum( ublas::row(l_adaptmatrix, n) );
+                
+                if (!tools::function::isNumericalZero(l_norm))
+                    ublas::row(m_prototypes, n) /= l_norm;
+            }
+            
+            // determine quantization error for logging
+            if (m_logging) {
+                m_logprototypes.push_back( m_prototypes );
+                m_quantizationerror.push_back( calculateQuantizationError(p_data, m_prototypes) );
+            }
+        }
+        
+        
+        //% Determine size of receptive fields
+        //[dummy, WinnerIdx] = min(distNeuronsToData);
+        //for k = 1:n
+        //    NeuronMplts(k) = sum(Mplts(WinnerIdx == k));
+        //end
+    }
+    
+
+    
     //======= MPI ==================================================================================================================================
-    #ifdef ML_CLUSTER
+    #ifdef MACHINELEARNING_MPI
     
     /** gathering prototypes of every process and return the full prototypes matrix (row oriantated)
      * @param p_mpi MPI object for communication

@@ -28,7 +28,7 @@
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 
-#ifdef ML_CLUSTER
+#ifdef MACHINELEARNING_MPI
 #include <boost/mpi.hpp>
 #endif
 
@@ -45,7 +45,7 @@ namespace machinelearning {
     namespace clustering {
         
         namespace ublas = boost::numeric::ublas;
-        #ifdef ML_CLUSTER
+        #ifdef MACHINELEARNING_MPI
         namespace mpi   = boost::mpi;
         #endif
         
@@ -60,6 +60,7 @@ namespace machinelearning {
              * @note every data / prototype matrix must be row orientated.
              * data matrix NxM with n number of datapoints and M data dimension
              * @todo add method for setting prototypes
+             * @todo add supervised neural gas (see bng_supervised/bng_supervised.m)
              **/      
             template<typename T, typename L> class clustering {
                 
@@ -154,7 +155,7 @@ namespace machinelearning {
 
                 
                 
-                    #ifdef ML_CLUSTER
+                    #ifdef MACHINELEARNING_MPI
                 
                     /** MPI method for training prototypes **/
                     virtual void train( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
@@ -203,7 +204,7 @@ namespace machinelearning {
                 
                 
                 
-                    #ifdef ML_CLUSTER
+                    #ifdef MACHINELEARNING_MPI
                 
                     /** MPI method for getting prototype weights **/
                     virtual ublas::vector<T> getPrototypeWeights( const mpi::communicator& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };

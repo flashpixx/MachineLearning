@@ -25,7 +25,7 @@
 
 namespace machinelearning { namespace tools {
     
-    #ifdef ML_RANDOMDEVICE
+    #ifdef MACHINELEARNING_RANDOMDEVICE
     boost::random_device random::m_random;
     #endif
     
