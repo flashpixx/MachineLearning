@@ -52,6 +52,7 @@
  * <ul>
  * <li>data points should be matrix data and the matrix is row-orientated, so for K data points with every point dimension P, we have a K x P matrix (prototype matrices are equal)</li>
  * <li>all compiler flags start with <dfn>MACHINELEARNING_</dfn></li>
+ * <li>all include defines for header files are set in this way <dfn>MACHINELEARNING_DIRECTORY_FILE_H</dfn>
  * <li>all structures are in the namespace <dfn>machinelearning</dfn></li>
  * <li>all messages should get the structure <dfn>_("<message>")</dfn>, because the underline prefix is the support for different languages</li>
  * </ul>
@@ -93,7 +94,7 @@
  * The framework supports Scons for compiling. The script reads the environment (Linux, OS X & Microsoft) and uses the
  * plattform specified options for compiling the sources. The Scons script supports some different parameters:
  * <ul>
- * <li><dfn>--create-documentation</dfn> creates the doxygen documentation (doxygen must be called, so it should be within the path)</li>
+ * <li><dfn>--create-documentation</dfn> creates the Doxygen documentation (Doxygen must be called, so it should be within the path)</li>
  * <li><dfn>--create-language</dfn> creates the language files / adds new messages to the existing files (xgettext must be called, so it should be within the path)</li>
  * <li><dfn>--compile-language</dfn> compiles all language files (msgfmt must be called, so it should be within the path)</li>
  * </ul>
@@ -153,6 +154,9 @@
  *
  * @section ng neural gas
  * @include examples/clustering/neuralgas.cpp
+ *
+ * @section png patch neural gas
+ * @include examples/clustering/patch_neuralgas.cpp
  *
  * @section rlvq relevance learning vector quantization (RLVQ)
  * @include examples/clustering/rlvq.cpp
@@ -332,6 +336,7 @@
  *
  * @file examples/distance/ncd.cpp testprogram for the normalized compression distance
  * @file examples/clustering/neuralgas.cpp testprogram for the neural gas algorithm
+ * @file examples/clustering/patch_neuralgas.cpp testprogram for the patch neural gas algorithm
  * @file examples/clustering/kmeans.cpp testprogram for the k-means algorithm
  * @file examples/clustering/spectral.cpp testprogram for spectral clustering
  * @file examples/clustering/rlvq.cpp testprogram for the rlvq algorithm

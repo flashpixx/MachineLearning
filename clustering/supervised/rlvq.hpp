@@ -300,7 +300,7 @@ namespace machinelearning { namespace clustering { namespace supervised {
             ublas::indirect_array< std::vector<std::size_t> > l_rank    = tools::vector::rankIndex( l_distance );
             
             // add index
-            l_vec.push_back(l_rank(0) );
+            l_vec[i] = l_rank(0);
         }
         
         return ublas::indirect_array< std::vector<std::size_t> >(l_vec.size(), l_vec);;

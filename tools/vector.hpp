@@ -209,8 +209,7 @@ namespace machinelearning { namespace tools {
     }
     
     /** ranks the elements of the vector, each element
-     * holds the rank value [0..n-1]. Every value
-     * ist the ranking position 0, the smales, n-1 the biggest
+     * holds the rank value [0..n-1]
      * @param p_vec vector with elements
      * @return rank vector
      **/
@@ -231,7 +230,7 @@ namespace machinelearning { namespace tools {
     
     /** ranks the element of the vector and
      * returns a vector with index of the elements
-     * first element is the smallest, second the next grater element and so on
+     * first element is the smallest, second the next greater element and so on
      * @param p_vec vector with elements
      * @return index vector
      **/
