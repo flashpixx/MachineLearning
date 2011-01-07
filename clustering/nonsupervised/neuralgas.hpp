@@ -469,6 +469,11 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
                 ublas::column(l_adaptmatrix, n) = l_rank;
             }
             
+            
+            // add multiplier
+            for(std::size_t n=0; n < l_adaptmatrix.size1(); ++n)
+                ublas::row(l_adaptmatrix, n) = ublas::element_prod( ublas::row(l_adaptmatrix, n), l_multiplier );
+            
             // create prototypes
             m_prototypes = ublas::prod( l_adaptmatrix, l_data );
             
