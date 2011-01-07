@@ -210,12 +210,15 @@ namespace machinelearning {
                 
                 
                     #ifdef MACHINELEARNING_MPI
+
+                    /** MPI method for training patch prototypes **/
+                    virtual void trainpatch( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
                 
                     /** MPI method for getting prototype weights **/
                     virtual ublas::vector<std::size_t> getPrototypeWeights( const mpi::communicator& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
-                
-                    /** MPI method for training patch prototypes **/
-                    virtual void trainpatch( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
+
+                    /** MPI method for returning changes of the weights **/
+                    virtual std::vector< ublas::vector<std::size_t> > getLoggedPrototypeWeights( const mpi::communicator& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
                 
                     #endif
 
