@@ -83,6 +83,10 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             std::vector<T> getLoggedQuantizationError( const mpi::communicator& ) const;
             ublas::indirect_array< std::vector<std::size_t> > use( const mpi::communicator&, const ublas::matrix<T>& ) const;
             void use( const mpi::communicator& ) const;
+            ublas::vector<std::size_t> getPrototypeWeights( const mpi::communicator& ) const;
+            void trainpatch( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t& );
+            void trainpatch( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t&, const T& );
+            std::vector< ublas::vector<std::size_t> > getLoggedPrototypeWeights( const mpi::communicator& ) const;
             #endif
         
         
@@ -816,7 +820,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         for(std::size_t i=0; i < l_prototypes.size2(); ++i) {
             ublas::vector<T> l_col                                          = ublas::column(l_distance, i);
             const ublas::indirect_array< std::vector<std::size_t> > l_rank  = tools::vector::rankIndex( l_col );
-            l_vec.push_back( l_rank(0) );
+            l_vec[i] = l_rank(0);
         }
         
         return ublas::indirect_array< std::vector<std::size_t> >(l_vec.size(), l_vec);
@@ -830,6 +834,46 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     template<typename T> inline void neuralgas<T>::use( const mpi::communicator& p_mpi ) const
     {
         gatherAllPrototypes( p_mpi );
+    }
+    
+    
+    /** returns the log of the prototype weights
+     * @param p_mpi MPI object for communication 
+     * @return std::vector with weight vector
+     **/
+    template<typename T> inline std::vector< ublas::vector<std::size_t> > neuralgas<T>::getLoggedPrototypeWeights( const mpi::communicator& p_mpi ) const
+    {
+    }
+    
+    
+    /** returns the weights of prototypes on patch clustering
+     * @param p_mpi MPI object for communication
+     * @return weights vector
+     **/
+    template<typename T> inline ublas::vector<std::size_t> neuralgas<T>::getPrototypeWeights( const mpi::communicator& p_mpi ) const
+    {
+    }
+    
+    
+    /** train a patch (input data) with the data (include the weights)
+     * @param p_mpi MPI object for communication 
+     * @param p_data datapoints
+     * @param p_iterations iterations
+     **/
+    template<typename T> inline void neuralgas<T>::trainpatch( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data, const std::size_t& p_iterations )
+    {
+        trainpatch( p_mpi, p_data, p_iterations, m_prototypes.size1() * 0.5);
+    }
+    
+    
+    /** train a patch (input data) with the data (include the weights)
+     * @param p_mpi MPI object for communication 
+     * @param p_data datapoints
+     * @param p_iterations iterations
+     * @param p_lambda max adapet size
+     **/
+    template<typename T> inline void neuralgas<T>::trainpatch( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data, const std::size_t& p_iterations, const T& p_lambda )
+    {
     }
     
     #endif

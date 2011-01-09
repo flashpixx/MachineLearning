@@ -49,7 +49,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         enum project {
             metric          = 0,
             sammon          = 1,
-            hit             = 2,    // http://dig.ipk-gatersleben.de/hitmds/hitmds.html
+            hit             = 2
         };
         
         
@@ -74,6 +74,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         
         ublas::matrix<T> project_metric( const ublas::matrix<T>& );
         ublas::matrix<T> project_sammon( const ublas::matrix<T>& );
+        ublas::matrix<T> project_hit( const ublas::matrix<T>& );
         
         ublas::matrix<T> distance( const ublas::matrix<T>& ) const;
         ublas::matrix<T> doublecentering( const ublas::matrix<T>& ) const;
@@ -126,6 +127,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     
     /** caluate and project the input data
      * @param p_data input datamatrix (similarity matrix)
+     * @todo check which algorithm need a similarity and which a dissimilarity matrix
      **/
     template<typename T> inline ublas::matrix<T> mds<T>::map( const ublas::matrix<T>& p_data )
     {
@@ -141,6 +143,9 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                 
             case sammon:
                 return project_sammon(p_data);
+                
+            case hit :
+                return project_hit(p_data);
                 
                 
             default :
@@ -300,6 +305,17 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                 l_center(i,j) = p_data(i,i) + p_data(j,j) - (p_data(i,j)+p_data(j,i));
         
         return l_center;
+    }
+    
+    
+    /** caluate the High-Throughput Dimensional Scaling (HiT-MDS)
+     * @see http://dig.ipk-gatersleben.de/hitmds/hitmds.html
+     * @param p_data input datamatrix (dissimilarity matrix)
+     * @return mapped data
+     **/
+    template<typename T> inline ublas::matrix<T> mds<T>::project_hit( const ublas::matrix<T>& p_data )
+    {
+        return p_data;
     }
     
     
