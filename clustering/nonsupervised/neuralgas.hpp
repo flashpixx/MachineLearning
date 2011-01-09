@@ -69,6 +69,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             std::size_t getPrototypeCount( void ) const;
             std::vector<T> getLoggedQuantizationError( void ) const;
             ublas::indirect_array< std::vector<std::size_t> > use( const ublas::matrix<T>& ) const;
+        
+            // derived from patch clustering
             ublas::vector<std::size_t> getPrototypeWeights( void ) const;
             void trainpatch( const ublas::matrix<T>&, const std::size_t& );
             void trainpatch( const ublas::matrix<T>&, const std::size_t&, const T& );
@@ -83,6 +85,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             std::vector<T> getLoggedQuantizationError( const mpi::communicator& ) const;
             ublas::indirect_array< std::vector<std::size_t> > use( const mpi::communicator&, const ublas::matrix<T>& ) const;
             void use( const mpi::communicator& ) const;
+        
+            // derived from patch clustering
             ublas::vector<std::size_t> getPrototypeWeights( const mpi::communicator& ) const;
             void trainpatch( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t& );
             void trainpatch( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t&, const T& );
