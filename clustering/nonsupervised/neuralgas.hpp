@@ -402,6 +402,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> inline void neuralgas<T>::trainpatch( const ublas::matrix<T>& p_data, const std::size_t& p_iterations, const T& p_lambda )
     {
+        xxx
         if (m_prototypes.size1() == 0)
             throw exception::runtime(_("number of prototypes must be greater than zero"));
         if (p_data.size1() < m_prototypes.size1())
@@ -645,6 +646,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> inline void neuralgas<T>::train( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data, const std::size_t& p_iterations, const T& p_lambda )
     {
+        ddd
         if (p_data.size1() < m_prototypes.size1())
             throw exception::runtime(_("number of datapoints are less than prototypes"));
         if (p_iterations == 0)
@@ -878,6 +880,50 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> inline void neuralgas<T>::trainpatch( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data, const std::size_t& p_iterations, const T& p_lambda )
     {
+        if (p_data.size1() < m_prototypes.size1())
+            throw exception::runtime(_("number of datapoints are less than prototypes"));
+        if (p_iterations == 0)
+            throw exception::runtime(_("iterations must be greater than zero"));
+        if (p_data.size2() != m_prototypes.size2())
+            throw exception::runtime(_("data and prototype dimension are not equal"));
+        if (p_lambda <= 0)
+            throw exception::runtime(_("lambda must be greater than zero"));
+        
+        
+        // we use the max. of all values of each process
+        const std::size_t l_iterationsMPI = mpi::all_reduce(p_mpi, p_iterations, mpi::maximum<std::size_t>());
+        const T l_lambdaMPI               = mpi::all_reduce(p_mpi, p_lambda, mpi::maximum<T>());
+        m_logging                         = mpi::all_reduce(p_mpi, m_logging, std::multiplies<bool>());
+        m_firstpatch                      = mpi::all_reduce(p_mpi, m_firstpatch, std::multiplies<bool>());
+        setProcessPrototypeInfo(p_mpi);
+        
+        // creates logging
+        if (m_logging) {
+            m_logprototypes     = std::vector< ublas::matrix<T> >();
+            m_quantizationerror = std::vector< T >();
+            m_logprototypes.reserve(l_iterationsMPI);
+            m_quantizationerror.reserve(l_iterationsMPI);
+        }
+        
+        // if not the first patch add prototypes to data at the end and set the multiplier
+        ublas::matrix<T> l_data(p_data);
+        ublas::vector<std::size_t> l_multiplier(p_data.size1(), 1);
+        if (!m_firstpatch) {
+            
+            // resize data matrix
+            l_data.resize( l_data.size1()+m_prototypes.size1(), l_data.size2());
+            ublas::matrix_range< ublas::matrix<T> > l_datarange(l_data, 
+                                                                ublas::range( l_data.size1()-m_prototypes.size1(), l_data.size1() ), 
+                                                                ublas::range( 0, l_data.size2() )
+                                                                );
+            l_datarange.assign(m_prototypes);
+            
+            // resize multiplier
+            l_multiplier.resize( l_multiplier.size()+m_prototypeWeights.size() );
+            ublas::vector_range< ublas::vector<std::size_t> > l_multiplierrange( l_multiplier, ublas::range( l_multiplier.size()-m_prototypeWeights.size(), l_multiplier.size()) );
+            l_multiplierrange.assign(m_prototypeWeights);
+        }
+        m_firstpatch = false;
     }
     
     #endif

@@ -58,14 +58,17 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         std::size_t getDimension( void ) const;
         void setIteration( const std::size_t& );
         void setStep( const std::size_t& );
+        void setRate( const T& );
         
         
         private :
         
-        /** number of iterations for sammon **/
+        /** number of iterations for sammon and hit **/
         std::size_t m_iteration;
         /** stepsize for sammon **/
         std::size_t m_step;
+        /** rate value for hit **/
+        T m_rate;
         /** target dimension **/
         const std::size_t m_dim;
         /** project type **/
@@ -90,6 +93,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     template<typename T> inline mds<T>::mds( const std::size_t& p_dim, const project& p_type ) :
     m_iteration( 150 ),
     m_step( 20 ),
+    m_rate( 1 ),
     m_dim( p_dim ),
     m_type( p_type )
     {
@@ -104,6 +108,13 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     template<typename T> inline std::size_t mds<T>::getDimension( void ) const
     {
         return m_dim;
+    }
+    
+    /** sets the rate value for hit mds
+     * @param p_rate
+    **/
+    template<typename T> inline void mds<T>::setRate( const T& p_rate ) {
+        m_rate = p_rate;
     }
     
     
@@ -315,7 +326,25 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
      **/
     template<typename T> inline ublas::matrix<T> mds<T>::project_hit( const ublas::matrix<T>& p_data )
     {
-        return p_data;
+        ublas::matrix<T> l_target                   = tools::matrix::random( l_data.size1(), m_dim );
+        ublas::matrix<T> l_data                     = p_data;
+                
+        // check zeros in the data
+        for(std::size_t i=0; i < l_data.size1(); ++i)
+            for(std::size_t j=0; j < l_data.size2(); ++j)
+                if (tools::function::isNumericalZero(l_data(i,j))) {
+                    l_data(i,j) = 0;
+                }
+        
+        const T l_datainvs = 1 / (l_data.size1() * l_data.size2() - length(zeros));
+        
+        
+        
+        // optimize
+        for(std::size_t i=0; i < m_iteration; ++i) {
+        }
+        
+        return l_target;
     }
     
     

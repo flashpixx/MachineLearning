@@ -98,6 +98,10 @@ namespace machinelearning {
 
                 
                 
+                    #ifdef MACHINELEARNING_MPI
+                    #endif
+                
+                
                 protected :
                 
                     /** destructor **/

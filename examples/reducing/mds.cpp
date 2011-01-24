@@ -63,6 +63,11 @@ int main(std::size_t argc, char* argv[]) {
         project = mds.map(data);
     }
     
+    if (maptype == "hit") {
+        dim::mds<double> mds(targetdim, dim::mds<double>::hit);
+        project = mds.map(data);
+    }
+    
     if ((project.size1() == 0) || (project.size2() == 0))
         throw std::runtime_error("label type is unkown");
     

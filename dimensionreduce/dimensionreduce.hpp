@@ -28,6 +28,10 @@
 
 #include <boost/numeric/ublas/matrix.hpp>
 
+#ifdef MACHINELEARNING_MPI
+#include <boost/mpi.hpp>
+#endif
+
 #include "../exception/exception.h"
 #include "../tools/tools.h"
 
@@ -41,6 +45,9 @@ namespace machinelearning {
  
         
         namespace ublas = boost::numeric::ublas;
+        #ifdef MACHINELEARNING_MPI
+        namespace mpi   = boost::mpi;
+        #endif
         
         
         /** namespace for all non-supervised reducing algorithms
@@ -62,6 +69,13 @@ namespace machinelearning {
                       
                     /** returns the mapped dimension **/
                     virtual std::size_t getDimension( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                
+                    #ifdef MACHINELEARNING_MPI
+                    
+                    /** maps data to target dimension **/
+                    virtual ublas::matrix<T> map( const mpi::communicator&, const ublas::matrix<T>& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
+                
+                    #endif
                 
                 protected :
                 
