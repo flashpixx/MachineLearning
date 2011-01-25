@@ -922,12 +922,14 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
         // we need first all prototypes and their weights of each process
         ublas::matrix<T> l_prototypes       = gatherAllPrototypes( p_mpi );
-        ublas::vector<T> l_prototypeWeights = gatherAllPrototypeWeights( p_mpi );
         
         // if not the first patch add prototypes to data at the end and set the multiplier
         ublas::matrix<T> l_data(p_data);
         ublas::vector<std::size_t> l_multiplier(p_data.size1(), 1);
         if (!m_firstpatch) {
+            
+            // read weights of each process
+            ublas::vector<T> l_prototypeWeights = gatherAllPrototypeWeights( p_mpi );
             
             // resize data matrix
             l_data.resize( l_data.size1()+l_prototypes.size1(), l_data.size2());
@@ -946,6 +948,86 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             l_multiplierrange.assign(l_prototypeWeights);
         }
         m_firstpatch = false;
+        
+        
+        // run neural gas       
+        const T l_multi = 0.01/p_lambda;
+        T l_lambda      = 0;
+        T l_norm        = 0;
+        ublas::matrix<T> l_adaptmatrix( m_prototypes.size1(), l_data.size1() );
+        ublas::vector<T> l_rank;
+        
+        
+        for(std::size_t i=0; (i < p_iterations); ++i) {
+            
+            // create adapt values
+            l_lambda = p_lambda * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(p_iterations));
+            
+            
+            // calculate for every prototype the distance
+            for(std::size_t n=0; n < l_prototypes.size1(); ++n)
+                ublas::row(l_adaptmatrix, n)  = m_distance->getDistance( l_data, ublas::row(l_prototypes, n) ) ;
+            
+            // for every column ranks values and create adapts
+            // we need rank and not randIndex, because we 
+            // use the value of the ranking for calculate the 
+            // adapt value
+            for(std::size_t n=0; n < l_adaptmatrix.size2(); ++n) {
+                l_rank = ublas::column(l_adaptmatrix, n);
+                l_rank = tools::vector::rank( l_rank );
+                
+                // calculate adapt value
+                BOOST_FOREACH( T& p, l_rank)
+                p = std::exp( -p / l_lambda );
+                
+                // return value to matrix
+                ublas::column(l_adaptmatrix, n) = l_rank;
+            }
+            
+            
+            // add multiplier
+            for(std::size_t n=0; n < l_adaptmatrix.size1(); ++n)
+                ublas::row(l_adaptmatrix, n) = ublas::element_prod( ublas::row(l_adaptmatrix, n), l_multiplier );
+            
+            
+            ====> don't work so
+            
+            // create local prototypes
+            l_prototypes = ublas::prod( l_adaptmatrix, p_data );
+            
+            
+            // normalize prototypes
+            for(std::size_t n=0; n < l_prototypes.size1(); ++n)
+                l_normvec(n) = ublas::sum( ublas::row(l_adaptmatrix, n) );
+            
+            synchronizePrototypes(p_mpi, l_prototypes, l_normvec);
+            
+            // create prototypes
+            m_prototypes = ublas::prod( l_adaptmatrix, l_data );
+            
+            // normalize prototypes
+            for(std::size_t n=0; n < m_prototypes.size1(); ++n) {
+                l_norm = ublas::sum( ublas::row(l_adaptmatrix, n) );
+                
+                if (!tools::function::isNumericalZero(l_norm))
+                    ublas::row(m_prototypes, n) /= l_norm;
+            }
+            
+            // determine quantization error for logging
+            if (m_logging) {
+                m_logprototypes.push_back( m_prototypes );
+                m_quantizationerror.push_back( calculateQuantizationError(l_data, m_prototypes) );
+            }
+        }
+        
+        // determine size of receptive fields
+        const ublas::indirect_array< std::vector<std::size_t> > l_winner = use(l_data);
+        for(std::size_t i=0; i < l_winner.size(); ++i)
+            m_prototypeWeights( l_winner(i) )++;
+        
+        if (m_logging)
+            m_logprototypeWeights.push_back(m_prototypeWeights);
+        
         
     }
     
