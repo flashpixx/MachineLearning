@@ -905,25 +905,34 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             m_quantizationerror.reserve(l_iterationsMPI);
         }
         
+        // we need first all prototypes and their weights of each process
+        ublas::matrix<T> l_prototypes   = gatherAllPrototypes( p_mpi );
+        ublas::vector<T> l_protoweights = gatherAllPrototypeWeights( p_mpi );
+        
         // if not the first patch add prototypes to data at the end and set the multiplier
         ublas::matrix<T> l_data(p_data);
         ublas::vector<std::size_t> l_multiplier(p_data.size1(), 1);
         if (!m_firstpatch) {
             
             // resize data matrix
-            l_data.resize( l_data.size1()+m_prototypes.size1(), l_data.size2());
+            l_data.resize( l_data.size1()+l_prototypes.size1(), l_data.size2());
             ublas::matrix_range< ublas::matrix<T> > l_datarange(l_data, 
-                                                                ublas::range( l_data.size1()-m_prototypes.size1(), l_data.size1() ), 
+                                                                ublas::range( l_data.size1()-l_prototypes.size1(), l_data.size1() ), 
                                                                 ublas::range( 0, l_data.size2() )
                                                                 );
-            l_datarange.assign(m_prototypes);
+            l_datarange.assign(l_prototypes);
             
             // resize multiplier
-            l_multiplier.resize( l_multiplier.size()+m_prototypeWeights.size() );
-            ublas::vector_range< ublas::vector<std::size_t> > l_multiplierrange( l_multiplier, ublas::range( l_multiplier.size()-m_prototypeWeights.size(), l_multiplier.size()) );
-            l_multiplierrange.assign(m_prototypeWeights);
+            l_multiplier.resize( l_multiplier.size()+l_prototypeWeights.size() );
+            ublas::vector_range< ublas::vector<std::size_t> > l_multiplierrange( l_multiplier, ublas::range( l_multiplier.size()-l_prototypeWeights.size(), l_multiplier.size()) );
+            
+            // each prototype is used n (=CPU count) times, because each CPU uses a own data block and the prototypes are added to them,
+            // so the multipliers are also added n (=CPU count) time. To correct this, we divide the weights with the number of CPUs
+            l_multiplierrange.assign(l_prototypeWeights / p_mpi.size());
+            => move this scaling to the gatherWeight method
         }
         m_firstpatch = false;
+        
     }
     
     #endif
