@@ -31,6 +31,7 @@
 
 #ifdef MACHINELEARNING_MPI
 #include <boost/mpi.hpp>
+#include <boost/static_assert.hpp>
 #endif
 
 #include "../clustering.hpp"
@@ -122,6 +123,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             
             void synchronizePrototypes( const mpi::communicator&, ublas::matrix<T>&, ublas::vector<T>& );
             ublas::matrix<T> gatherAllPrototypes( const mpi::communicator& ) const;
+            ublas::vector<T> gatherAllPrototypeWeights( const mpi::communicator& ) const;
             std::size_t getNumberPrototypes( const mpi::communicator& ) const;
             void setProcessPrototypeInfo( const mpi::communicator& );
             #endif
@@ -402,7 +404,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> inline void neuralgas<T>::trainpatch( const ublas::matrix<T>& p_data, const std::size_t& p_iterations, const T& p_lambda )
     {
-        xxx
+        //xxx
         if (m_prototypes.size1() == 0)
             throw exception::runtime(_("number of prototypes must be greater than zero"));
         if (p_data.size1() < m_prototypes.size1())
@@ -646,7 +648,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> inline void neuralgas<T>::train( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data, const std::size_t& p_iterations, const T& p_lambda )
     {
-        ddd
+        //ddd
         if (p_data.size1() < m_prototypes.size1())
             throw exception::runtime(_("number of datapoints are less than prototypes"));
         if (p_iterations == 0)
@@ -871,8 +873,19 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         trainpatch( p_mpi, p_data, p_iterations, m_prototypes.size1() * 0.5);
     }
     
+    /** collect the prototype weights for each prototype
+     * @note each prototype is used n (=CPU count) times, because each CPU uses a own data block and the prototypes are added to them,
+     * so the multipliers are also added n (=CPU count) time. To correct this, we divide the weights with the number of CPUs
+     * @param p_mpi MPI object for communication 
+     * @return vector with prototype weights
+    **/
+    template<typename T> inline ublas::vector<T> neuralgas<T>::gatherAllPrototypeWeights( const mpi::communicator& ) const
+    {
+    }
     
     /** train a patch (input data) with the data (include the weights)
+     * @info The template type of this class need not be a countable datatype like (eg. int, long), because
+     * we need a floting point type vor the prototype weights. The weights mustr be divide by the number of processes
      * @param p_mpi MPI object for communication 
      * @param p_data datapoints
      * @param p_iterations iterations
@@ -880,6 +893,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> inline void neuralgas<T>::trainpatch( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data, const std::size_t& p_iterations, const T& p_lambda )
     {
+        BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
+        
         if (p_data.size1() < m_prototypes.size1())
             throw exception::runtime(_("number of datapoints are less than prototypes"));
         if (p_iterations == 0)
@@ -906,8 +921,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         }
         
         // we need first all prototypes and their weights of each process
-        ublas::matrix<T> l_prototypes   = gatherAllPrototypes( p_mpi );
-        ublas::vector<T> l_protoweights = gatherAllPrototypeWeights( p_mpi );
+        ublas::matrix<T> l_prototypes       = gatherAllPrototypes( p_mpi );
+        ublas::vector<T> l_prototypeWeights = gatherAllPrototypeWeights( p_mpi );
         
         // if not the first patch add prototypes to data at the end and set the multiplier
         ublas::matrix<T> l_data(p_data);
@@ -928,8 +943,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             
             // each prototype is used n (=CPU count) times, because each CPU uses a own data block and the prototypes are added to them,
             // so the multipliers are also added n (=CPU count) time. To correct this, we divide the weights with the number of CPUs
-            l_multiplierrange.assign(l_prototypeWeights / p_mpi.size());
-            => move this scaling to the gatherWeight method
+            l_multiplierrange.assign(l_prototypeWeights);
         }
         m_firstpatch = false;
         

@@ -319,24 +319,25 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     }
     
     
-    /** caluate the High-Throughput Dimensional Scaling (HiT-MDS)
+    /** caluate the High-Throughput Dimensional Scaling (HIT-MDS)
+     * @todo incomlete
      * @see http://dig.ipk-gatersleben.de/hitmds/hitmds.html
      * @param p_data input datamatrix (dissimilarity matrix)
      * @return mapped data
      **/
     template<typename T> inline ublas::matrix<T> mds<T>::project_hit( const ublas::matrix<T>& p_data )
     {
-        ublas::matrix<T> l_target                   = tools::matrix::random( l_data.size1(), m_dim );
+        ublas::matrix<T> l_target                   = tools::matrix::random( p_data.size1(), m_dim );
         ublas::matrix<T> l_data                     = p_data;
                 
         // check zeros in the data
         for(std::size_t i=0; i < l_data.size1(); ++i)
             for(std::size_t j=0; j < l_data.size2(); ++j)
-                if (tools::function::isNumericalZero(l_data(i,j))) {
+                if (tools::function::isNumericalZero<T>(l_data(i,j))) {
                     l_data(i,j) = 0;
                 }
         
-        const T l_datainvs = 1 / (l_data.size1() * l_data.size2() - length(zeros));
+        //const T l_datainvs = 1 / (l_data.size1() * l_data.size2() - length(zeros));
         
         
         
