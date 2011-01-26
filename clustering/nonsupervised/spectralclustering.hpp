@@ -48,7 +48,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * $LastChangedDate$
      * @todo set all routines to sparse matrix if arpack can be used with boost
      * @todo create eigengap heurstic
-     * @todo incomplete (using not implementated)
+     * @bug incomplete (using not implementated)
      **/
     template<typename T> class spectralclustering : public clustering<T> {
         
@@ -158,7 +158,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     
     
     /** cluster the graph with the <strong>normalized</strong> graph laplacian
-     * @todo copy function for matrix musst be optimized
+     * @todo copy function for matrix must be optimized
      * @param p_similarity similarity NxN matrix, needs to be squared and non-negative
      * @param p_iterations number of iterations
      **/

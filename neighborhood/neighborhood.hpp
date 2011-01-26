@@ -27,6 +27,7 @@
 #define MACHINELEARNING_NEIGHBORHOOD_HPP
 
 
+#include <boost/static_assert.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 
 #include "../tools/tools.h"
@@ -49,6 +50,7 @@ namespace machinelearning {
          * $LastChangedDate$
          **/      
         template<typename T> class neighborhood {
+            BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
             
             
             public :

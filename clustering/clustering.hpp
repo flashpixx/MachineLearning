@@ -25,6 +25,7 @@
 #define MACHINELEARNING_CLUSTERING_CLUSTERING_HPP
 
 
+#include <boost/static_assert.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 
@@ -59,10 +60,13 @@ namespace machinelearning {
              * $LastChangedDate$
              * @note every data / prototype matrix must be row orientated.
              * data matrix NxM with n number of datapoints and M data dimension
+             * @note The template type of this class need not be a countable datatype like (eg. int, long)
              * @todo add method for setting prototypes
              * @todo add supervised neural gas (see bng_supervised/bng_supervised.m)
              **/      
             template<typename T, typename L> class clustering {
+                BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
+                
                 
                 public :
 
@@ -121,12 +125,11 @@ namespace machinelearning {
         
             /** abstract class for all non-supervised clustering classes
              * $LastChangedDate$
-             * @note every data / prototype matrix must be row orientated.
-             * data matrix NxM with n number of datapoints and M data dimension
              * @todo add method for setting prototypes
              * @todo implement serializable interface
              **/      
             template<typename T> class clustering {
+                BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
                 
                 public :
 

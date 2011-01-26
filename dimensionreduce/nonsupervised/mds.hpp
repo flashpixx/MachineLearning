@@ -320,7 +320,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     
     
     /** caluate the High-Throughput Dimensional Scaling (HIT-MDS)
-     * @todo incomlete
+     * @bug incomlete
      * @see http://dig.ipk-gatersleben.de/hitmds/hitmds.html
      * @param p_data input datamatrix (dissimilarity matrix)
      * @return mapped data

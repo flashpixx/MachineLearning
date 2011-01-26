@@ -25,6 +25,7 @@
 #ifndef MACHINELEARNING_DISTANCES_DISTANCE_HPP
 #define MACHINELEARNING_DISTANCES_DISTANCE_HPP
 
+#include <boost/static_assert.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 
@@ -48,6 +49,7 @@ namespace machinelearning {
          * $LastChangedDate$
          **/      
         template<typename T> class distance {
+            BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );            
             
             
             public :

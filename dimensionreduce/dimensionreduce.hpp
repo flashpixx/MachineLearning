@@ -26,6 +26,7 @@
 #define MACHINELEARNING_DIMENSIONREDUCE_HPP
 
 
+#include <boost/static_assert.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 
 #ifdef MACHINELEARNING_MPI
@@ -61,6 +62,8 @@ namespace machinelearning {
              * @todo implement serializable interface
              **/      
             template<typename T> class reduce {
+                BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
+                
                 
                 public :
 

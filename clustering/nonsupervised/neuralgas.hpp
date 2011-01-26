@@ -31,7 +31,6 @@
 
 #ifdef MACHINELEARNING_MPI
 #include <boost/mpi.hpp>
-#include <boost/static_assert.hpp>
 #endif
 
 #include "../clustering.hpp"
@@ -884,8 +883,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     }
     
     /** train a patch (input data) with the data (include the weights)
-     * @info The template type of this class need not be a countable datatype like (eg. int, long), because
-     * we need a floting point type vor the prototype weights. The weights mustr be divide by the number of processes
      * @param p_mpi MPI object for communication 
      * @param p_data datapoints
      * @param p_iterations iterations
@@ -893,8 +890,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> inline void neuralgas<T>::trainpatch( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data, const std::size_t& p_iterations, const T& p_lambda )
     {
-        BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
-        
         if (p_data.size1() < m_prototypes.size1())
             throw exception::runtime(_("number of datapoints are less than prototypes"));
         if (p_iterations == 0)
@@ -990,7 +985,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
                 ublas::row(l_adaptmatrix, n) = ublas::element_prod( ublas::row(l_adaptmatrix, n), l_multiplier );
             
             
-            ====> don't work so
+            ====> don't work
             
             // create local prototypes
             l_prototypes = ublas::prod( l_adaptmatrix, p_data );

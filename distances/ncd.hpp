@@ -29,6 +29,7 @@
 #include <string>
 #include <sstream>
 
+#include <boost/static_assert.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/symmetric.hpp>
 
@@ -61,6 +62,8 @@ namespace machinelearning { namespace distances {
      * $LastChangedDate$
      **/
     template<typename T> class ncd {
+        BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
+        
         
         public:
             

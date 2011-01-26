@@ -25,6 +25,7 @@
 #define MACHINELEARNING_CLASSIFIER_HPP
 
 
+#include <boost/static_assert.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 
 #include "../exception/exception.h"
@@ -48,6 +49,8 @@ namespace machinelearning {
          * @todo implement serializable interface
          **/      
         template<typename T, typename L> class classifier {
+            BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
+            
             
             public :
                 
