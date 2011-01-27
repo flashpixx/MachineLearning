@@ -108,7 +108,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             /** std::vector for quantisation error in each iteration **/
             std::vector<T> m_quantizationerror;
             /** prototype weights for patch clustering **/
-            ublas::vector<std::size_t> m_prototypeWeights;
+            ublas::vector<T> m_prototypeWeights;
             /** std::vector for logging the prototype weights **/
             std::vector< ublas::vector<std::size_t> > m_logprototypeWeights;
             /** bool for check initialized patch **/
@@ -876,10 +876,29 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * @note each prototype is used n (=CPU count) times, because each CPU uses a own data block and the prototypes are added to them,
      * so the multipliers are also added n (=CPU count) time. To correct this, we divide the weights with the number of CPUs
      * @param p_mpi MPI object for communication 
-     * @return vector with prototype weights
+     * @return vector with prototype weights (the weights can be a float value)
     **/
-    template<typename T> inline ublas::vector<T> neuralgas<T>::gatherAllPrototypeWeights( const mpi::communicator& ) const
+    template<typename T> inline ublas::vector<T> neuralgas<T>::gatherAllPrototypeWeights( const mpi::communicator& p_mpi ) const
     {
+        // gathering on each process the weights for the prototypes
+        std::vector< ublas::vector<T> > l_weightdata;
+        mpi::all_gather(p_mpi, m_prototypeWeights, l_weightdata);
+        
+        // create full weight vector with processweights
+        ublas::vector<T> l_weights = l_weightdata[0];
+        for(std::size_t i=1; i < l_weightdata.size(); ++i) {
+            l_weights.resize( l_weights.size()+l_weightdata[i].size() );
+            
+            ublas::vector_range< ublas::vector<T> > l_range(l_weights,
+                                                            ublas::range( l_weights.size()-l_weightdata[i].size(), l_weights.size() )
+                                                            );
+            l_range.assign(l_weightdata[i]);
+        }
+        
+        // the weight vector must be divided with the number of CPUs for correct scaling (see note)
+        l_weights /= p_mpi.size();
+        
+        return l_weights;
     }
     
     /** train a patch (input data) with the data (include the weights)
@@ -984,7 +1003,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             for(std::size_t n=0; n < l_adaptmatrix.size1(); ++n)
                 ublas::row(l_adaptmatrix, n) = ublas::element_prod( ublas::row(l_adaptmatrix, n), l_multiplier );
             
-            
+            /*
             ====> don't work
             
             // create local prototypes
@@ -1012,9 +1031,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             if (m_logging) {
                 m_logprototypes.push_back( m_prototypes );
                 m_quantizationerror.push_back( calculateQuantizationError(l_data, m_prototypes) );
-            }
+            }*/
         }
-        
+        /*
         // determine size of receptive fields
         const ublas::indirect_array< std::vector<std::size_t> > l_winner = use(l_data);
         for(std::size_t i=0; i < l_winner.size(); ++i)
@@ -1023,7 +1042,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         if (m_logging)
             m_logprototypeWeights.push_back(m_prototypeWeights);
         
-        
+        */
     }
     
     #endif
