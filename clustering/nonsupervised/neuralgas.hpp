@@ -121,6 +121,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             std::map<int, std::pair<std::size_t,std::size_t> > m_processprototypinfo;
             
             void synchronizePrototypes( const mpi::communicator&, ublas::matrix<T>&, ublas::vector<T>& );
+            void synchronizePrototypeWeights( const mpi::communicator&, ublas::vector<T>& );
             ublas::matrix<T> gatherAllPrototypes( const mpi::communicator& ) const;
             ublas::vector<T> gatherAllPrototypeWeights( const mpi::communicator& ) const;
             std::size_t getNumberPrototypes( const mpi::communicator& ) const;
@@ -447,16 +448,13 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
 
         // run neural gas       
         const T l_multi = 0.01/p_lambda;
-        T l_lambda      = 0;
-        T l_norm        = 0;
         ublas::matrix<T> l_adaptmatrix( m_prototypes.size1(), l_data.size1() );
         ublas::vector<T> l_rank;
                 
-        
         for(std::size_t i=0; (i < p_iterations); ++i) {
             
             // create adapt values
-            l_lambda = p_lambda * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(p_iterations));
+            const T l_lambda = p_lambda * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(p_iterations));
             
             
             // calculate for every prototype the distance
@@ -489,7 +487,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             
             // normalize prototypes
             for(std::size_t n=0; n < m_prototypes.size1(); ++n) {
-                l_norm = ublas::sum( ublas::row(l_adaptmatrix, n) );
+                const T l_norm = ublas::sum( ublas::row(l_adaptmatrix, n) );
                 
                 if (!tools::function::isNumericalZero(l_norm))
                     ublas::row(m_prototypes, n) /= l_norm;
@@ -702,7 +700,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
                 
                 // calculate adapt value
                 BOOST_FOREACH( T& p, l_rank)
-                p = std::exp( -p / l_lambda );
+                    p = std::exp( -p / l_lambda );
                 
                 // return value to matrix
                 ublas::column(l_adaptmatrix, n) = l_rank;
@@ -901,6 +899,29 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         return l_weights;
     }
     
+    /** synchronize the weights of each prototype
+     * @param p_mpi MPI object for communication
+     * @param p_weight weight vector
+    **/
+    template<typename T> inline void neuralgas<T>::synchronizePrototypeWeights( const mpi::communicator& p_mpi, ublas::vector<T>& p_weight )
+    {
+        // create the weights for each process
+        std::vector< ublas::vector<T> > l_weights;
+        for(int i=0; i < p_mpi.size(); ++i) {
+            ublas::vector_range< ublas::vector<T> > l_weightrange(p_weight,
+                                                                ublas::range( m_processprototypinfo[i].first, m_processprototypinfo[i].first + m_processprototypinfo[i].second )
+                                                                );
+            l_weights.push_back(l_weightrange);
+        }
+        
+        // create vector for receiving
+        std::vector< ublas::vector<T> > l_collectweight;
+        mpi::all_to_all( p_mpi, l_weights, l_collectweight );
+        
+        // std::vectors will be summerized
+        m_prototypeWeights = std::accumulate( l_collectweight.begin(), l_collectweight.end(), ublas::vector<T>(m_prototypeWeights.size(), 0) );
+    }
+    
     /** train a patch (input data) with the data (include the weights)
      * @param p_mpi MPI object for communication 
      * @param p_data datapoints
@@ -936,6 +957,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
         // we need first all prototypes and their weights of each process
         ublas::matrix<T> l_prototypes       = gatherAllPrototypes( p_mpi );
+        ublas::vector<T> l_prototypeWeights(l_prototypes.size1(), 1);
         
         // if not the first patch add prototypes to data at the end and set the multiplier
         ublas::matrix<T> l_data(p_data);
@@ -943,7 +965,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         if (!m_firstpatch) {
             
             // read weights of each process
-            ublas::vector<T> l_prototypeWeights = gatherAllPrototypeWeights( p_mpi );
+            l_prototypeWeights = gatherAllPrototypeWeights( p_mpi );
             
             // resize data matrix
             l_data.resize( l_data.size1()+l_prototypes.size1(), l_data.size2());
@@ -965,17 +987,16 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
         
         // run neural gas       
-        const T l_multi = 0.01/p_lambda;
-        T l_lambda      = 0;
-        T l_norm        = 0;
-        ublas::matrix<T> l_adaptmatrix( m_prototypes.size1(), l_data.size1() );
+        const T l_multi = 0.01/l_lambdaMPI;
+        ublas::vector<T> l_normvec( getNumberPrototypes(p_mpi), 0 );
+        ublas::matrix<T> l_adaptmatrix( l_prototypes.size1(), l_data.size1() );
         ublas::vector<T> l_rank;
         
         
-        for(std::size_t i=0; (i < p_iterations); ++i) {
+        for(std::size_t i=0; (i < l_iterationsMPI); ++i) {
             
             // create adapt values
-            l_lambda = p_lambda * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(p_iterations));
+            const T l_lambda = l_lambdaMPI * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(l_iterationsMPI));
             
             
             // calculate for every prototype the distance
@@ -992,7 +1013,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
                 
                 // calculate adapt value
                 BOOST_FOREACH( T& p, l_rank)
-                p = std::exp( -p / l_lambda );
+                    p = std::exp( -p / l_lambda );
                 
                 // return value to matrix
                 ublas::column(l_adaptmatrix, n) = l_rank;
@@ -1003,46 +1024,33 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             for(std::size_t n=0; n < l_adaptmatrix.size1(); ++n)
                 ublas::row(l_adaptmatrix, n) = ublas::element_prod( ublas::row(l_adaptmatrix, n), l_multiplier );
             
-            /*
-            ====> don't work
-            
             // create local prototypes
-            l_prototypes = ublas::prod( l_adaptmatrix, p_data );
+            l_prototypes = ublas::prod( l_adaptmatrix, l_data );
             
-            
-            // normalize prototypes
+            // normalize prototypes and synch them on each process
             for(std::size_t n=0; n < l_prototypes.size1(); ++n)
                 l_normvec(n) = ublas::sum( ublas::row(l_adaptmatrix, n) );
-            
             synchronizePrototypes(p_mpi, l_prototypes, l_normvec);
-            
-            // create prototypes
-            m_prototypes = ublas::prod( l_adaptmatrix, l_data );
-            
-            // normalize prototypes
-            for(std::size_t n=0; n < m_prototypes.size1(); ++n) {
-                l_norm = ublas::sum( ublas::row(l_adaptmatrix, n) );
-                
-                if (!tools::function::isNumericalZero(l_norm))
-                    ublas::row(m_prototypes, n) /= l_norm;
-            }
             
             // determine quantization error for logging
             if (m_logging) {
                 m_logprototypes.push_back( m_prototypes );
                 m_quantizationerror.push_back( calculateQuantizationError(l_data, m_prototypes) );
-            }*/
+            }
         }
-        /*
-        // determine size of receptive fields
-        const ublas::indirect_array< std::vector<std::size_t> > l_winner = use(l_data);
-        for(std::size_t i=0; i < l_winner.size(); ++i)
-            m_prototypeWeights( l_winner(i) )++;
         
+        // determine size of receptive fields for the local data space
+        const ublas::indirect_array< std::vector<std::size_t> > l_winner = use(p_mpi, l_data);
+        for(std::size_t i=0; i < l_winner.size(); ++i)
+            l_prototypeWeights( l_winner(i) )++;
+        
+        // synchronize the weights for each process to get weights for the whole data space
+        synchronizePrototypeWeights(p_mpi, l_prototypeWeights);
+        
+        // do logging
         if (m_logging)
             m_logprototypeWeights.push_back(m_prototypeWeights);
         
-        */
     }
     
     #endif
