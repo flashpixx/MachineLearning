@@ -998,6 +998,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             // create adapt values
             const T l_lambda = l_lambdaMPI * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(l_iterationsMPI));
             
+            // we get all prototypes of every process
+            l_prototypes = gatherAllPrototypes( p_mpi );
             
             // calculate for every prototype the distance
             for(std::size_t n=0; n < l_prototypes.size1(); ++n)
