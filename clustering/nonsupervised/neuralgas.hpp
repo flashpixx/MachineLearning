@@ -71,12 +71,11 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             ublas::indirect_array< std::vector<std::size_t> > use( const ublas::matrix<T>& ) const;
         
             // derived from patch clustering
-            ublas::vector<std::size_t> getPrototypeWeights( void ) const;
+            ublas::vector<T> getPrototypeWeights( void ) const;
             void trainpatch( const ublas::matrix<T>&, const std::size_t& );
             void trainpatch( const ublas::matrix<T>&, const std::size_t&, const T& );
-            std::vector< ublas::vector<std::size_t> > getLoggedPrototypeWeights( void ) const;
-            void resetPatch( void );
-            
+            std::vector< ublas::vector<T> > getLoggedPrototypeWeights( void ) const;
+             
             #ifdef MACHINELEARNING_MPI
             void train( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t& );
             void train( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t&, const T& );
@@ -87,10 +86,10 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             void use( const mpi::communicator& ) const;
         
             // derived from patch clustering
-            ublas::vector<std::size_t> getPrototypeWeights( const mpi::communicator& ) const;
+            ublas::vector<T> getPrototypeWeights( const mpi::communicator& ) const;
             void trainpatch( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t& );
             void trainpatch( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t&, const T& );
-            std::vector< ublas::vector<std::size_t> > getLoggedPrototypeWeights( const mpi::communicator& ) const;
+            std::vector< ublas::vector<T> > getLoggedPrototypeWeights( const mpi::communicator& ) const;
             #endif
         
         
@@ -110,7 +109,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             /** prototype weights for patch clustering **/
             ublas::vector<T> m_prototypeWeights;
             /** std::vector for logging the prototype weights **/
-            std::vector< ublas::vector<std::size_t> > m_logprototypeWeights;
+            std::vector< ublas::vector<T> > m_logprototypeWeights;
             /** bool for check initialized patch **/
             bool m_firstpatch;
             
@@ -123,7 +122,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             void synchronizePrototypes( const mpi::communicator&, ublas::matrix<T>&, ublas::vector<T>& );
             void synchronizePrototypeWeights( const mpi::communicator&, ublas::vector<T>& );
             ublas::matrix<T> gatherAllPrototypes( const mpi::communicator& ) const;
-            ublas::vector<T> gatherAllPrototypeWeights( const mpi::communicator& ) const;
             std::size_t getNumberPrototypes( const mpi::communicator& ) const;
             void setProcessPrototypeInfo( const mpi::communicator& );
             #endif
@@ -239,23 +237,15 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     /** returns the weights of prototypes on patch clustering
      * @return weights vector
      **/
-    template<typename T> inline ublas::vector<std::size_t> neuralgas<T>::getPrototypeWeights( void ) const
+    template<typename T> inline ublas::vector<T> neuralgas<T>::getPrototypeWeights( void ) const
     {
         return m_prototypeWeights;
-    }
-    
-    /** resets the prototypes weights and logging structurs **/
-    template<typename T> inline void neuralgas<T>::resetPatch( void )
-    {
-        m_firstpatch = true;
-        m_logprototypeWeights.clear();
-        m_prototypeWeights = ublas::vector<std::size_t>( m_prototypes.size1(), 1 );
     }
     
     /** returns the log of the prototype weights
      * @return std::vector with weight vector
      **/
-    template<typename T> inline std::vector< ublas::vector<std::size_t> > neuralgas<T>::getLoggedPrototypeWeights( void ) const
+    template<typename T> inline std::vector< ublas::vector<T> > neuralgas<T>::getLoggedPrototypeWeights( void ) const
     {
         return m_logprototypeWeights;
     }
@@ -632,7 +622,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> inline void neuralgas<T>::train( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data, const std::size_t& p_iterations )
     {
-        // if the process has no prototypes, than ne lambda will be zero, so we set it to a minimal numerical value, so the exception is not thrown
+        // if the process has no prototypes, than lambda need not be zero, so we set it to a minimal numerical value, so the exception is not thrown
         train(p_mpi, p_data, p_iterations, ((m_prototypes.size1() == 0) ? std::numeric_limits<T>::epsilon() :  m_prototypes.size1() * 0.5) );
     }
     
@@ -843,11 +833,25 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     
     
     /** returns the log of the prototype weights
+     * @bug incomplete
      * @param p_mpi MPI object for communication 
      * @return std::vector with weight vector
      **/
-    template<typename T> inline std::vector< ublas::vector<std::size_t> > neuralgas<T>::getLoggedPrototypeWeights( const mpi::communicator& p_mpi ) const
+    template<typename T> inline std::vector< ublas::vector<T> > neuralgas<T>::getLoggedPrototypeWeights( const mpi::communicator& p_mpi ) const
     {
+        // we must gather every logged weight
+        std::vector< std::vector< ublas::vector<T> > > l_gatherWeights;
+        mpi::all_gather(p_mpi, m_logprototypeWeights, l_gatherWeights);
+        
+        // now we create the full prototype matrix for every log
+        std::vector< ublas::vector<T> > l_logWeight = l_gatherWeights[0];
+        for(std::size_t i=1; i < l_gatherWeights.size(); ++i)
+            for(std::size_t n=0; n < l_gatherWeights[i].size(); ++n) {
+
+            }
+        
+        
+        return l_logWeight;
     }
     
     
@@ -855,30 +859,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * @param p_mpi MPI object for communication
      * @return weights vector
      **/
-    template<typename T> inline ublas::vector<std::size_t> neuralgas<T>::getPrototypeWeights( const mpi::communicator& p_mpi ) const
+    template<typename T> inline ublas::vector<T> neuralgas<T>::getPrototypeWeights( const mpi::communicator& p_mpi ) const
     {
-    }
-    
-    
-    /** train a patch (input data) with the data (include the weights)
-     * @param p_mpi MPI object for communication 
-     * @param p_data datapoints
-     * @param p_iterations iterations
-     **/
-    template<typename T> inline void neuralgas<T>::trainpatch( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data, const std::size_t& p_iterations )
-    {
-        trainpatch( p_mpi, p_data, p_iterations, m_prototypes.size1() * 0.5);
-    }
-    
-    /** collect the prototype weights for each prototype
-     * @note each prototype is used n (=CPU count) times, because each CPU uses a own data block and the prototypes are added to them,
-     * so the multipliers are also added n (=CPU count) time. To correct this, we divide the weights with the number of CPUs
-     * @param p_mpi MPI object for communication 
-     * @return vector with prototype weights (the weights can be a float value)
-    **/
-    template<typename T> inline ublas::vector<T> neuralgas<T>::gatherAllPrototypeWeights( const mpi::communicator& p_mpi ) const
-    {
-        // gathering on each process the weights for the prototypes
         std::vector< ublas::vector<T> > l_weightdata;
         mpi::all_gather(p_mpi, m_prototypeWeights, l_weightdata);
         
@@ -893,10 +875,18 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             l_range.assign(l_weightdata[i]);
         }
         
-        // the weight vector must be divided with the number of CPUs for correct scaling (see note)
-        l_weights /= p_mpi.size();
-        
         return l_weights;
+    }
+    
+    
+    /** train a patch (input data) with the data (include the weights)
+     * @param p_mpi MPI object for communication 
+     * @param p_data datapoints
+     * @param p_iterations iterations
+     **/
+    template<typename T> inline void neuralgas<T>::trainpatch( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data, const std::size_t& p_iterations )
+    {
+        trainpatch( p_mpi, p_data, p_iterations, m_prototypes.size1() * 0.5);
     }
     
     /** synchronize the weights of each prototype
@@ -923,6 +913,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     }
     
     /** train a patch (input data) with the data (include the weights)
+     * @note each prototype is used n (=CPU count) times, because each CPU uses a own data block and the prototypes are added to them,
+     * so the multipliers are also added n (=CPU count) time. To correct this, we divide the weights with the number of CPUs
      * @param p_mpi MPI object for communication 
      * @param p_data datapoints
      * @param p_iterations iterations
@@ -957,15 +949,18 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
         // we need first all prototypes and their weights of each process
         ublas::matrix<T> l_prototypes       = gatherAllPrototypes( p_mpi );
-        ublas::vector<T> l_prototypeWeights(l_prototypes.size1(), 1);
+        ublas::vector<T> l_prototypeWeights(l_prototypes.size1(), 0);
         
         // if not the first patch add prototypes to data at the end and set the multiplier
         ublas::matrix<T> l_data(p_data);
         ublas::vector<std::size_t> l_multiplier(p_data.size1(), 1);
         if (!m_firstpatch) {
             
-            // read weights of each process
-            l_prototypeWeights = gatherAllPrototypeWeights( p_mpi );
+            // read weights of each process (each prototype) and 
+            l_prototypeWeights = getPrototypeWeights( p_mpi );
+            
+            // the weight vector must be divided with the number of CPUs for correct scaling (see note)
+            l_prototypeWeights /= p_mpi.size();
             
             // resize data matrix
             l_data.resize( l_data.size1()+l_prototypes.size1(), l_data.size2());

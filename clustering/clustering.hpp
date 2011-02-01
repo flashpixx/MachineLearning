@@ -207,13 +207,11 @@ namespace machinelearning {
                     virtual void trainpatch( const ublas::matrix<T>&, const std::size_t& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
                                 
                     /** method for getting prototype weights **/
-                    virtual ublas::vector<std::size_t> getPrototypeWeights( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                    virtual ublas::vector<T> getPrototypeWeights( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
                 
                     /** method for returning changes of the weights **/
-                    virtual std::vector< ublas::vector<std::size_t> > getLoggedPrototypeWeights( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
-                
-                    /** resets the prototype weights **/
-                    virtual void resetpatch( void ) { throw exception::classmethod(_("method is not implementated in the base class")); };
+                    virtual std::vector< ublas::vector<T> > getLoggedPrototypeWeights( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+
                 
                 
                     #ifdef MACHINELEARNING_MPI
@@ -222,10 +220,10 @@ namespace machinelearning {
                     virtual void trainpatch( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
                 
                     /** MPI method for getting prototype weights **/
-                    virtual ublas::vector<std::size_t> getPrototypeWeights( const mpi::communicator& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                    virtual ublas::vector<T> getPrototypeWeights( const mpi::communicator& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
 
                     /** MPI method for returning changes of the weights **/
-                    virtual std::vector< ublas::vector<std::size_t> > getLoggedPrototypeWeights( const mpi::communicator& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                    virtual std::vector< ublas::vector<T> > getLoggedPrototypeWeights( const mpi::communicator& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
                 
                     #endif
 
