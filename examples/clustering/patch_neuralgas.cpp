@@ -172,7 +172,7 @@ int main(int argc, char* argv[]) {
     target.write<std::size_t>( "/weights",  ng.getPrototypeWeights(), H5::PredType::NATIVE_UINT );    
     target.write<std::size_t>( "/iteration",  iteration, H5::PredType::NATIVE_ULONG );
     
-    std::vector< ublas::vector<std::size_t> > logweights =  ng.getLoggedPrototypeWeights();
+    std::vector< ublas::vector<double> > logweights =  ng.getLoggedPrototypeWeights();
     for(std::size_t i=0; i < logweights.size(); ++i)
         target.write<std::size_t>("/logweihgts" + boost::lexical_cast<std::string>( i ), logweights[i], H5::PredType::NATIVE_ULONG );
 
