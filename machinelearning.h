@@ -413,6 +413,7 @@
  **/
 namespace machinelearning {
     
+    /** version of the framework **/
     const double version = 0.1;
 
 };
