@@ -26,7 +26,7 @@
 #ifndef MACHINELEARNING_TOOLS_SOURCES_WIKIPEDIA_H
 #define MACHINELEARNING_TOOLS_SOURCES_WIKIPEDIA_H
 
-#define MACHINELEARNING_WIKIPEDIA_HTTPAGENT  "Machine-Learning-Toolbox"
+#define MACHINELEARNING_WIKIPEDIA_HTTPAGENT  "Machine Learning Framework"
 
 #include <algorithm>
 #include <boost/asio.hpp>

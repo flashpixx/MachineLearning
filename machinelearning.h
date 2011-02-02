@@ -411,12 +411,7 @@
 /** main namespace for the framework with version information
  * $LastChangedDate$
  **/
-namespace machinelearning {
-    
-    /** version of the framework **/
-    const double version = 0.1;
-
-};
+namespace machinelearning {};
 
 
 #include "exception/exception.h"
