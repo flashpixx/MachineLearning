@@ -408,10 +408,14 @@
 #define MACHINELEARNING_H
 
 
-/** main namespace for the framework
+/** main namespace for the framework with version information
  * $LastChangedDate$
  **/
-namespace machinelearning {};
+namespace machinelearning {
+    
+    const double version = 0.1;
+
+};
 
 
 #include "exception/exception.h"
