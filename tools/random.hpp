@@ -121,6 +121,11 @@ namespace machinelearning { namespace tools {
     
     
     
+    #ifdef MACHINELEARNING_RANDOMDEVICE
+    boost::random_device random::m_random;
+    #endif
+    
+    
     /** constructor with creating a own number generator
      * for multithrading. Read thread-id and create xor
      * with time
@@ -455,12 +460,6 @@ namespace machinelearning { namespace tools {
         
         return quantile(l_range, l_uniform());
     }
-    
-    
-    
-    #ifdef MACHINELEARNING_RANDOMDEVICE
-    boost::random_device random::m_random;
-    #endif
     
 };};
 

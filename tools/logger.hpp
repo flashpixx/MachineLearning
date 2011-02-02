@@ -130,6 +130,10 @@ namespace machinelearning { namespace tools {
     };
     
     
+    logger::logger* logger::m_instance  = NULL;
+    std::string logger::m_filename      = tmpnam(NULL);
+    
+    
     /** constructor **/
     inline logger::logger( void ) :
         m_logstate(none),
