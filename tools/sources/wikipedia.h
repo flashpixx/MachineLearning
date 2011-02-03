@@ -549,7 +549,7 @@ namespace machinelearning { namespace tools { namespace sources {
         
         
         // create HTTP request and send them over the socket
-        // we need a field for the user-agent, because Wikipedia will blocked the IP
+        // we need a field for the user-agent, because Wikipedia will blocked the IP otherwise
         boost::asio::streambuf l_request;
         std::ostream l_request_stream(&l_request);
         l_request_stream << "GET " << p_path << " HTTP/1.1\r\n";
