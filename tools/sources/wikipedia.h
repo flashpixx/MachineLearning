@@ -108,7 +108,7 @@ namespace machinelearning { namespace tools { namespace sources {
         
             /** default wikipedia properties **/
             const wikiproperties m_defaultproperties;
-            /** io service objekt for resolving the server name**/
+            /** io service objekt for resolving the server name **/
             boost::asio::io_service m_io;
 
             /** socket objekt for send / receive the data **/

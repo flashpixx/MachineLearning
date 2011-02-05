@@ -304,7 +304,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
                 
                 // calculate adapt value
                 BOOST_FOREACH( T& p, l_rank)
-                p = std::exp( -p / l_lambda );
+                    p = std::exp( -p / l_lambda );
                 
                 // return value to matrix
                 ublas::column(l_adaptmatrix, n) = l_rank;
@@ -832,8 +832,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     }
     
     
-    /** returns the log of the prototype weights
-     * @bug incomplete
+    /** returns the log of the prototype weight
      * @param p_mpi MPI object for communication 
      * @return std::vector with weight vector
      **/
@@ -843,11 +842,17 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         std::vector< std::vector< ublas::vector<T> > > l_gatherWeights;
         mpi::all_gather(p_mpi, m_logprototypeWeights, l_gatherWeights);
         
-        // now we create the full prototype matrix for every log
+        // now we create the full weight vector for every log
         std::vector< ublas::vector<T> > l_logWeight = l_gatherWeights[0];
         for(std::size_t i=1; i < l_gatherWeights.size(); ++i)
             for(std::size_t n=0; n < l_gatherWeights[i].size(); ++n) {
-
+                l_logWeight[n].resize( l_logWeight[n].size()+l_gatherWeights[i][n].size() );
+                
+                ublas::vector_range< ublas::vector<T> > l_range(l_logWeight[n],
+                                                                ublas::range( l_logWeight[n].size()-l_gatherWeights[i][n].size(), l_logWeight[n].size() )
+                                                               );
+                
+                l_range.assign(l_gatherWeights[i][n]);
             }
         
         
@@ -871,7 +876,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             
             ublas::vector_range< ublas::vector<T> > l_range(l_weights,
                                                             ublas::range( l_weights.size()-l_weightdata[i].size(), l_weights.size() )
-                                                            );
+                                                           );
             l_range.assign(l_weightdata[i]);
         }
         
