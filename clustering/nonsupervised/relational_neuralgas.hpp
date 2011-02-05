@@ -21,19 +21,46 @@
  @endcond
  **/
 
-/** header file to connect all clustering algorithm for one include
- * $LastChangedDate$
- **/
 
-#ifndef MACHINELEARNING_CLUSTERING_H
-#define MACHINELEARNING_CLUSTERING_H
+#ifndef MACHINELEARNING_CLUSTERING_NONSUPERVISED_RNG_HPP
+#define MACHINELEARNING_CLUSTERING_NONSUPERVISED_RNG_HPP
 
-#include "clustering.hpp"
+#include <numeric>
+#include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/vector.hpp>
 
-#include "nonsupervised/neuralgas.hpp"
-#include "nonsupervised/relational_neuralgas.hpp"
-#include "nonsupervised/kmeans.hpp"
-#include "nonsupervised/spectralclustering.hpp"
-#include "supervised/rlvq.hpp"
+#ifdef MACHINELEARNING_MPI
+#include <boost/mpi.hpp>
+#endif
 
+#include "../clustering.hpp"
+#include "../../exception/exception.h"
+#include "../../tools/tools.h"
+#include "../../distances/distances.h"
+
+
+
+namespace machinelearning { namespace clustering { namespace nonsupervised {
+    
+    namespace ublas = boost::numeric::ublas;
+    #ifdef MACHINELEARNING_MPI
+    namespace mpi   = boost::mpi;
+    #endif
+    
+    /** class for calculate (batch) relational neural gas
+     * $LastChangedDate$
+     * @note The MPI methods do not check the correct ranges / dimension of the prototype
+     * data, so it is the task of the developer to use the correct ranges. Also the MPI
+     * methods must be called in the correct order, so the MPI calls must be run
+     * on each process.
+     **/
+    //template<typename T> class relational_neuralgas : public clustering<T>, public patch<T> {
+    //}
+
+
+    //======= MPI ==================================================================================================================================
+    #ifdef MACHINELEARNING_MPI
+    #endif
+
+};};};
 #endif
