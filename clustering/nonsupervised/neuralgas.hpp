@@ -149,8 +149,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     {
         if (p_prototypesize == 0)
             throw exception::runtime(_("prototype size must be greater than zero"));
-        if (m_prototypes.size1() > 0)
-            //    throw exception::runtime(_("number of prototypes must be greater than zero"));
             
             // normalize the prototypes
             m_distance->normalize( m_prototypes );
