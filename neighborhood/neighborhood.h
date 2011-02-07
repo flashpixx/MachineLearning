@@ -27,5 +27,6 @@
 
 #include "neighborhood.hpp"
 #include "knn.hpp"
+#include "kapproximation.hpp"
 
 #endif

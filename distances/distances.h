@@ -33,7 +33,6 @@
 #include "distance.hpp"
 
 #include "ncd.hpp"
-#include "kapproximation.hpp"
 #include "norm/euclid.hpp"
 
 #endif
