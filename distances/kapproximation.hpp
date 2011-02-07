@@ -26,6 +26,7 @@
 #ifndef MACHINELEARNING_DISTANCES_KAPPROXIMATION_HPP
 #define MACHINELEARNING_DISTANCES_KAPPROXIMATION_HPP
 
+#include <boost/static_assert.hpp>  
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/bindings/blas.hpp>
@@ -36,6 +37,26 @@
 
 namespace machinelearning { namespace distances {  
 
+    namespace ublas = boost::numeric::ublas;
+    
+    
+    /** class for k-approximation
+     * $LastChangedDate$
+     **/
+    template<typename T> class kapproximation {
+        BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
+        
+        public:
+        
+            enum approximation
+            {
+                knn         = 0,
+                spread      = 1,
+                random      = 2
+            };
+        
+        
+    };
     
     
     
