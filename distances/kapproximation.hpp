@@ -23,17 +23,21 @@
 
 
 
-/** header file to connect all tools library for one includ
- * $LastChangedDate$
- **/
+#ifndef MACHINELEARNING_DISTANCES_KAPPROXIMATION_HPP
+#define MACHINELEARNING_DISTANCES_KAPPROXIMATION_HPP
 
-#ifndef MACHINELEARNING_DISTANCES_H
-#define MACHINELEARNING_DISTANCES_H
+#include <boost/numeric/ublas/vector.hpp>
+#include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/bindings/blas.hpp>
 
-#include "distance.hpp"
+#include "../exception/exception.h"
 
-#include "ncd.hpp"
-#include "kapproximation.hpp"
-#include "norm/euclid.hpp"
 
+
+namespace machinelearning { namespace distances {  
+
+    
+    
+    
+};};
 #endif
