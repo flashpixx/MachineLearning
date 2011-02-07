@@ -98,6 +98,7 @@ int main(int argc, char* argv[]) {
     
     
     #ifdef MACHINELEARNING_MPI
+    /*
     mpi::timer t;
     ng.trainpatch(loMPICom, data, iteration);
     std::cout << "number of process: " << loMPICom.size() << " Time: " << t.elapsed() << std::endl;
@@ -116,7 +117,7 @@ int main(int argc, char* argv[]) {
     
     // only process 0 writes hdf
     if (loMPICom.rank() == 0) {
-        tools::files::hdf target("neuralgas.hdf5", true);
+        tools::files::hdf target("patch_neuralgas.hdf5", true);
         
         target.write<double>( "/protos",  protos, H5::PredType::NATIVE_DOUBLE );
         target.write<double>( "/numprotos",  numprotos, H5::PredType::NATIVE_DOUBLE );
@@ -128,7 +129,7 @@ int main(int argc, char* argv[]) {
                 target.write<double>("/log" + boost::lexical_cast<std::string>( i ), logproto[i], H5::PredType::NATIVE_DOUBLE );
         }
     }
-    
+    */
     #else    
     
     // create target file
