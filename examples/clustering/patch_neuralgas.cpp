@@ -37,29 +37,37 @@ namespace mpi       = boost::mpi;
 
 int main(int argc, char* argv[]) {
     
-#ifdef MACHINELEARNING_MPI
+    #ifdef MACHINELEARNING_MPI
     mpi::environment loMPIenv(argc, argv);
     mpi::communicator loMPICom;
-#endif
+    #endif
     
     
     if (argc < 5)
-        throw std::runtime_error("you need at least three parameter as input. first HDF file, second path to dataset, third number of prototypes, forth number of patches, optional fifth number of iterations or/and (sixth) \"log\" for logging");
+        throw std::runtime_error("you need at least four parameter as input. first HDF file, second path to dataset, third number of prototypes, forth number of patches, optional fifth number of iterations or/and (sixth) \"log\" for logging");
     
     // convert string parameter to numerical data
     std::size_t numprotos = 0;
     try {
         numprotos = boost::lexical_cast<std::size_t>(argv[3]);
     } catch (...) {
-        throw std::runtime_error("target dimension can not be read");
+        throw std::runtime_error("number of prototypes can not be read");
     }
     
+    std::size_t numpatches = 0;
+    try {
+        numpatches = boost::lexical_cast<std::size_t>(argv[4]);
+    } catch (...) {
+        throw std::runtime_error("number of patches can not be read");
+    }
+    if (numpatches == 0)
+        throw std::runtime_error("number of patches need not be zero");
+    
+    
     // convert iteration or logging if exists
-    std::size_t numpatch  = 0;
     std::size_t iteration = 15;
     bool log = false;
     try {
-        std::string forth(  (argc > 4) ? argv[4] : ""  );
         std::string fifth(  (argc > 5) ? argv[5] : ""  );
         std::string sixth(  (argc > 6) ? argv[6] : ""  );
         
@@ -67,8 +75,6 @@ int main(int argc, char* argv[]) {
             boost::to_lower( fifth );
         if (!sixth.empty())
             boost::to_lower( sixth );
-        
-        numpatch = boost::lexical_cast<std::size_t>(forth);
         
         if (fifth == "log")
             log = true;
@@ -82,8 +88,7 @@ int main(int argc, char* argv[]) {
         throw std::runtime_error("numerical data can not be read");
     }
     
-    if (numpatch == 0)
-        throw std::runtime_error("number of patches need not be zero");
+    
     
     
     // read source hdf file and data 
@@ -137,18 +142,18 @@ int main(int argc, char* argv[]) {
     
     // create patches
     std::vector<std::size_t> range;
-    const std::size_t rows = data.size1() / numpatch;
+    const std::size_t rows = data.size1() / numpatches;
     std::size_t l_end = 0;
-    for(std::size_t j=0; j < numpatch; ++j) {
+    for(std::size_t j=0; j < numpatches; ++j) {
         l_end += rows;
         range.push_back( l_end );
     }
-    range[ range.size()-1 ] += data.size1() % numpatch;
+    range[ range.size()-1 ] += data.size1() % numpatches;
     
     
     // train prototypes for each patch
     l_end = 0;
-    for(std::size_t j=0; j < numpatch; ++j) {
+    for(std::size_t j=0; j < numpatches; ++j) {
         ublas::matrix_range< ublas::matrix<double> > l_patch(data, 
                                                         ublas::range( l_end, range[j] ), 
                                                         ublas::range( 0, data.size2() )
@@ -160,6 +165,7 @@ int main(int argc, char* argv[]) {
         if (ng.getLogging()) {
             std::string patchpath = "patch" + boost::lexical_cast<std::string>( j );
             
+            target.write<double>( patchpath + "/protos",  ng.getPrototypes(), H5::PredType::NATIVE_DOUBLE );    
             target.write<double>( patchpath + "/error",  tools::vector::copy(ng.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
             std::vector< ublas::matrix<double> > logproto =  ng.getLoggedPrototypes();
             for(std::size_t i=0; i < logproto.size(); ++i)
@@ -170,7 +176,7 @@ int main(int argc, char* argv[]) {
     
     target.write<double>( "/numprotos",  numprotos, H5::PredType::NATIVE_DOUBLE );
     target.write<double>( "/protos",  ng.getPrototypes(), H5::PredType::NATIVE_DOUBLE );    
-    target.write<std::size_t>( "/weights",  ng.getPrototypeWeights(), H5::PredType::NATIVE_UINT );    
+    target.write<double>( "/weights",  ng.getPrototypeWeights(), H5::PredType::NATIVE_DOUBLE );    
     target.write<std::size_t>( "/iteration",  iteration, H5::PredType::NATIVE_ULONG );
     
     std::vector< ublas::vector<double> > logweights =  ng.getLoggedPrototypeWeights();
@@ -184,6 +190,6 @@ int main(int argc, char* argv[]) {
     #ifdef MACHINELEARNING_MPI
     if (loMPICom.rank() == 0)
     #endif
-    std::cout << "create HDF file \"neuralgas.hdf5\" with dataset \"/protos \", \"/weights\", \"/iteration\" number of iteration, \"numprotos\" number of prototypes and if logging is enabled \"/patch<0 to number of patches-1>/error\" quantization error of each patch, \"/patch<0 to number of patches-1>/log<0 to iterations-1>\" logged prototypes of each patch and \"logweights<0 to number patches-1>\" log of prototype weights of each patch" << std::endl;
+    std::cout << "create HDF file \"patch_neuralgas.hdf5\" with dataset \"/protos \", \"/weights\", \"/iteration\" number of iteration, \"numprotos\" number of prototypes and if logging is enabled \"/patch<0 to number of patches-1>/error\" quantization error of each patch, \"/patch<0 to number of patches-1>/log<0 to iterations-1>\" logged prototypes of each patch and \"logweights<0 to number patches-1>\" log of prototype weights of each patch" << std::endl;
     return EXIT_SUCCESS;
 }

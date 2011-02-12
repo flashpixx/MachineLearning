@@ -51,7 +51,7 @@ int main(int argc, char* argv[]) {
     try {
         numprotos = boost::lexical_cast<std::size_t>(argv[3]);
     } catch (...) {
-        throw std::runtime_error("target dimension can not be read");
+        throw std::runtime_error("number of prototypes can not be read");
     }
     
     // convert iteration or logging if exists
