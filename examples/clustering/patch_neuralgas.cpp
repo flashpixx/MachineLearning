@@ -163,14 +163,13 @@ int main(int argc, char* argv[]) {
         
         // if logging is enabled, write log data to file
         if (ng.getLogging()) {
-            std::string patchpath = "patch" + boost::lexical_cast<std::string>( j );
+            std::string patchpath = "/patch" + boost::lexical_cast<std::string>( j );
             
             target.write<double>( patchpath + "/protos",  ng.getPrototypes(), H5::PredType::NATIVE_DOUBLE );    
             target.write<double>( patchpath + "/error",  tools::vector::copy(ng.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
             std::vector< ublas::matrix<double> > logproto =  ng.getLoggedPrototypes();
             for(std::size_t i=0; i < logproto.size(); ++i)
                 target.write<double>(patchpath + "/log" + boost::lexical_cast<std::string>( i ), logproto[i], H5::PredType::NATIVE_DOUBLE );
-            
         }
     }
     
@@ -181,7 +180,7 @@ int main(int argc, char* argv[]) {
     
     std::vector< ublas::vector<double> > logweights =  ng.getLoggedPrototypeWeights();
     for(std::size_t i=0; i < logweights.size(); ++i)
-        target.write<std::size_t>("/logweihgts" + boost::lexical_cast<std::string>( i ), logweights[i], H5::PredType::NATIVE_ULONG );
+        target.write<std::size_t>("/logweights" + boost::lexical_cast<std::string>( i ), logweights[i], H5::PredType::NATIVE_ULONG );
 
     
     #endif
