@@ -73,6 +73,8 @@
  * <li>each subdirectory of the framework, should have a header file with the same directoryname for including the whole directory. This header file must be appended to the main header file of the framework</li>
  * <li>the svn keyword LastChangeDate should be set for all files</li>
  * <li>all parameters should be a call-by-reference parameter</li>
+ * <li>matrix structures should be row-oriantated, so loops over the elements are first over the rows and columns on the second / inner loop</li>
+ * <li>template parameter should be asserted for the correct type</li>
  * </ul>
  *
  * @section compileroptions compiler option
