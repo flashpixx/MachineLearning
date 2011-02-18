@@ -60,7 +60,7 @@
  *
  * The source code uses some style guides options:
  * <ul>
- * <li>all variables use a prefix for their scopde: 
+ * <li>all variables use a prefix for their scope (derivated from <a href="http://en.wikipedia.org/wiki/Hungarian_notation">hungarian notation</a>): 
  *      <ul>
  *          <li><dfn>l_</dfn> local variable / scope within a methode</li>
  *          <li><dfn>m_</dfn> member variable / scope within an object</li>
