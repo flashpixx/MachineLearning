@@ -4,6 +4,7 @@ import os
 import glob
 import string
 import platform
+import sys
 
 
 AddOption("--with-randomdevice", dest="withrandom", type="string", nargs=0, action="store", help="installation with random device support")
@@ -60,7 +61,6 @@ def configuration_macosx(config, version, architecture) :
     if optionExist("withfiles") :
         config["compileflags"]      += " -D MACHINELEARNING_FILES"
         config["linkto"].extend( ["hdf5_cpp", "hdf5"] )
-
     
 
 # configuration for Posix (Linux) build
@@ -100,6 +100,8 @@ def configuration_posix(config, version, architecture) :
 # configuration for Windows build
 def configuration_win32(config, version, architecture) :
     config = []
+    print "Windows builds not yet available. Sorry"
+    sys.exit();
 #=======================================================================================================================================
 
 

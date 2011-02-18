@@ -44,6 +44,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     
     /** class for calculate (batch) k-means
      * $LastChangedDate$
+     * @todo determin best k with variance analyse
      **/
     template<typename T> class kmeans : public clustering<T> {
         
