@@ -46,14 +46,14 @@ namespace machinelearning { namespace neighborhood {
     template<typename T> class kapproximation {
         BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
         
-    public:
+        public:
         
-        enum approximation
-        {
-            knn         = 0,
-            spread      = 1,
-            random      = 2
-        };
+            enum approximation
+            {
+                knn         = 0,
+                spread      = 1,
+                random      = 2
+            };
         
         
     };

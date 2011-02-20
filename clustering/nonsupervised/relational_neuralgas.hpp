@@ -37,6 +37,7 @@
 #include "../../exception/exception.h"
 #include "../../tools/tools.h"
 #include "../../distances/distances.h"
+#include "../../neighborhood/neighborhood.h"
 
 
 
@@ -55,10 +56,11 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * on each process.
      **/
     template<typename T> class relational_neuralgas : public clustering<T>, public patch<T> {
+        BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
         
         public:
         
-            relational_neuralgas( const std::size_t&, const std::size_t&, const std::size_t& = 1 );
+            relational_neuralgas( const std::size_t&, const std::size_t&, const neighborhood::kapproximation<T>& );
             void train( const ublas::matrix<T>&, const std::size_t& );
             void train( const ublas::matrix<T>&, const std::size_t&, const T& );
             ublas::matrix<T> getPrototypes( void ) const;
@@ -75,8 +77,10 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
             /** prototypes **/
             ublas::matrix<T> m_prototypes;
-            /** k-approximation value **/
-            const std::size_t m_kapprox;
+            /** k-approximation object **/
+            const neighborhood::kapproximation<T>* m_kapprox;
+            /** distance object for normalization **/
+            const distances::euclid<T> m_euclid;
             /** bool for logging prototypes **/
             bool m_logging;
             /** std::vector for prototypes for each iteration **/
@@ -93,11 +97,12 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     /** contructor for initialization the neural gas
      * @param p_prototypes number of prototypes
      * @param p_prototypesize size of each prototype (data dimension)
-     * @param p_kapprox k-approximation value for patch neural gas (default 1)
+     * @param p_kapprox k-approximation object
      **/
-    template<typename T> inline relational_neuralgas<T>::relational_neuralgas( const std::size_t& p_prototypes, const std::size_t& p_prototypesize, const std::size_t& p_kapprox ) :
+    template<typename T> inline relational_neuralgas<T>::relational_neuralgas( const std::size_t& p_prototypes, const std::size_t& p_prototypesize, const neighborhood::kapproximation<T>& p_kapprox ) :
         m_prototypes( tools::matrix::random<T>(p_prototypes, p_prototypesize) ),
-        m_kapprox(p_kapprox),
+        m_kapprox( &p_kapprox ),
+        m_euclid(),
         m_logging( false ),
         m_logprototypes( std::vector< ublas::matrix<T> >() ),
         m_quantizationerror( std::vector<T>() ),
@@ -107,8 +112,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             throw exception::runtime(_("prototype size must be greater than zero"));
         
         // normalize the prototypes
-        distances::euclid<T> l_dist;
-        l_dist.normalize( m_prototypes );
+        m_euclid.normalize( m_prototypes );
     }
     
     /** returns the prototype matrix
@@ -187,7 +191,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         train(p_data, p_iterations, m_prototypes.size1() * 0.5);
     }
     
-
     
     /** training the prototypes
      * @param p_data datapoints
@@ -208,6 +211,30 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             throw exception::runtime(_("lambda must be greater than zero"));
         if (p_data.size1() != p_data.size2())
             throw exception::runtime(_("matrix must be square"));
+        
+        
+        // creates logging
+        if (m_logging) {
+            m_logprototypes.clear();
+            m_quantizationerror.clear();
+            m_logprototypes.reserve(p_iterations);
+            m_quantizationerror.reserve(p_iterations);
+        }
+        
+        
+        // run neural gas       
+        const T l_multi = 0.01/p_lambda;
+        T l_lambda      = 0;
+        T l_norm        = 0;
+        ublas::matrix<T> l_adaptmatrix( m_prototypes.size1(), p_data.size1() );
+        ublas::vector<T> l_rank;
+        
+        for(std::size_t i=0; (i < p_iterations); ++i) {
+            
+            // create adapt values
+            l_lambda = p_lambda * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(p_iterations));
+            
+        }
     }
 
     //======= MPI ==================================================================================================================================
