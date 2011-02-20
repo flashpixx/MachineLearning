@@ -60,6 +60,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
         public:
         
+            relational_neuralgas( const std::size_t&, const std::size_t& );
             relational_neuralgas( const std::size_t&, const std::size_t&, const neighborhood::kapproximation<T>& );
             void train( const ublas::matrix<T>&, const std::size_t& );
             void train( const ublas::matrix<T>&, const std::size_t&, const T& );
@@ -97,6 +98,28 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     /** contructor for initialization the neural gas
      * @param p_prototypes number of prototypes
      * @param p_prototypesize size of each prototype (data dimension)
+     **/
+    template<typename T> inline relational_neuralgas<T>::relational_neuralgas( const std::size_t& p_prototypes, const std::size_t& p_prototypesize ) :
+        m_prototypes( tools::matrix::random<T>(p_prototypes, p_prototypesize) ),
+        m_kapprox( NULL ),
+        m_euclid(),
+        m_logging( false ),
+        m_logprototypes( std::vector< ublas::matrix<T> >() ),
+        m_quantizationerror( std::vector<T>() ),
+        m_firstpatch(true)
+    {
+        if (p_prototypesize == 0)
+            throw exception::runtime(_("prototype size must be greater than zero"));
+        
+        // normalize the prototypes
+        m_euclid.normalize( m_prototypes );
+    }
+    
+    
+    
+    /** contructor for initialization the neural gas
+     * @param p_prototypes number of prototypes
+     * @param p_prototypesize size of each prototype (data dimension)
      * @param p_kapprox k-approximation object
      **/
     template<typename T> inline relational_neuralgas<T>::relational_neuralgas( const std::size_t& p_prototypes, const std::size_t& p_prototypesize, const neighborhood::kapproximation<T>& p_kapprox ) :
@@ -114,6 +137,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         // normalize the prototypes
         m_euclid.normalize( m_prototypes );
     }
+    
+
     
     /** returns the prototype matrix
      * @return matrix (rows = number of prototypes)
