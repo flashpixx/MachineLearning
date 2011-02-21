@@ -58,7 +58,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         private :
         
             /** neighborhood object **/
-            const neighborhood::neighborhood<T>* m_neighborhood;
+            const neighborhood::neighborhood<T>& m_neighborhood;
             /** target dimension **/
             const std::size_t m_dim;
         
@@ -71,7 +71,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
      * @param p_dim target dimension
      **/
     template<typename T> inline lle<T>::lle( const neighborhood::neighborhood<T>& p_neighborhood, const std::size_t& p_dim ) :
-        m_neighborhood( &p_neighborhood ),
+        m_neighborhood( p_neighborhood ),
         m_dim( p_dim )
     {
         if (p_dim == 0)
@@ -102,20 +102,20 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         // if number of neighborhood greate than data dimension (column size)
         // regularize weight-matrix
         const T l_tolerance = 1.0/10000.0;
-        const ublas::matrix<T> l_regular = tools::matrix::diag<T>( ublas::vector<T>(m_neighborhood->getNeighborCount(), l_tolerance) );
-        const bool l_regularize = m_neighborhood->getNeighborCount() > p_data.size2();
+        const ublas::matrix<T> l_regular = tools::matrix::diag<T>( ublas::vector<T>(m_neighborhood.getNeighborCount(), l_tolerance) );
+        const bool l_regularize = m_neighborhood.getNeighborCount() > p_data.size2();
         
         // calculate neighborhood index and create some structires
-        const ublas::scalar_vector<T> l_ones(m_neighborhood->getNeighborCount(), 1);
-        const ublas::matrix<std::size_t> l_neighborhood = m_neighborhood->get( p_data );
-        ublas::matrix<T> l_weight(p_data.size1(), m_neighborhood->getNeighborCount());
+        const ublas::scalar_vector<T> l_ones(m_neighborhood.getNeighborCount(), 1);
+        const ublas::matrix<std::size_t> l_neighborhood = m_neighborhood.get( p_data );
+        ublas::matrix<T> l_weight(p_data.size1(), m_neighborhood.getNeighborCount());
         
         // calculate weight matrix
         for(std::size_t i=0; i < p_data.size1(); ++i) {
         
             // subtract every point from their neighbors (centering neighbors to the point)
-            ublas::matrix<T> l_local( m_neighborhood->getNeighborCount(), p_data.size2() );
-            for(std::size_t j=0; j < m_neighborhood->getNeighborCount(); ++j)
+            ublas::matrix<T> l_local( m_neighborhood.getNeighborCount(), p_data.size2() );
+            for(std::size_t j=0; j < m_neighborhood.getNeighborCount(); ++j)
                 ublas::row(l_local, j) = ublas::row(p_data, l_neighborhood(i, j)) - ublas::row(p_data, i);
                     
             // symmetrize matrix (add tolerance)

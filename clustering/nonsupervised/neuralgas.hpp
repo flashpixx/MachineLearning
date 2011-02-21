@@ -97,7 +97,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         private :
         
             /** distance object **/
-            const distances::distance<T>* m_distance;        
+            const distances::distance<T>& m_distance;        
             /** prototypes **/
             ublas::matrix<T> m_prototypes;                
             /** bool for logging prototypes **/
@@ -135,7 +135,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * @param p_prototypesize size of each prototype (data dimension)
      **/
     template<typename T> inline neuralgas<T>::neuralgas( const distances::distance<T>& p_distance, const std::size_t& p_prototypes, const std::size_t& p_prototypesize ) :
-        m_distance( &p_distance ),
+        m_distance( p_distance ),
         m_prototypes( tools::matrix::random<T>(p_prototypes, p_prototypesize) ),
         m_logging( false ),
         m_logprototypes( std::vector< ublas::matrix<T> >() ),
@@ -151,7 +151,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             throw exception::runtime(_("prototype size must be greater than zero"));
             
             // normalize the prototypes
-            m_distance->normalize( m_prototypes );
+            m_distance.normalize( m_prototypes );
     }
     
     
@@ -294,7 +294,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             
             // calculate for every prototype the distance
             for(std::size_t n=0; n < m_prototypes.size1(); ++n)
-                ublas::row(l_adaptmatrix, n)  = m_distance->getDistance( p_data, ublas::row(m_prototypes, n) ) ;
+                ublas::row(l_adaptmatrix, n)  = m_distance.getDistance( p_data, ublas::row(m_prototypes, n) ) ;
             
             // for every column ranks values and create adapts
             // we need rank and not randIndex, because we 
@@ -343,9 +343,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         ublas::matrix<T> l_distances( p_prototypes.size1(), p_data.size1() );
         
         for(std::size_t i=0; i < p_prototypes.size1(); ++i)
-            ublas::row(l_distances, i) = m_distance->getDistance( p_data, ublas::row(p_prototypes, i) );
+            ublas::row(l_distances, i) = m_distance.getDistance( p_data, ublas::row(p_prototypes, i) );
         
-        return 0.5 * ublas::sum(  m_distance->getAbs(tools::matrix::min(l_distances, tools::matrix::column))  );  
+        return 0.5 * ublas::sum(  m_distance.getAbs(tools::matrix::min(l_distances, tools::matrix::column))  );  
     }
     
     
@@ -366,7 +366,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
         // calculate distance for every prototype
         for(std::size_t i=0; i < m_prototypes.size1(); ++i)
-            ublas::row(l_distance, i)  = m_distance->getDistance( p_data,  ublas::row(m_prototypes, i) );
+            ublas::row(l_distance, i)  = m_distance.getDistance( p_data,  ublas::row(m_prototypes, i) );
         
         // determine nearest prototype
         for(std::size_t i=0; i < l_distance.size2(); ++i) {
@@ -451,7 +451,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             
             // calculate for every prototype the distance
             for(std::size_t n=0; n < m_prototypes.size1(); ++n)
-                ublas::row(l_adaptmatrix, n)  = m_distance->getDistance( l_data, ublas::row(m_prototypes, n) ) ;
+                ublas::row(l_adaptmatrix, n)  = m_distance.getDistance( l_data, ublas::row(m_prototypes, n) ) ;
             
             // for every column ranks values and create adapts
             // we need rank and not randIndex, because we 
@@ -680,7 +680,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             // calculate for every prototype the distance (of the actually prototypes).
             // within the adapt matrix, we must specify the position of the prototypes 
             for(std::size_t n=0; n < l_prototypes.size1(); ++n)
-                ublas::row(l_adaptmatrix, n)  = m_distance->getDistance( p_data, ublas::row(l_prototypes, n) ) ;
+                ublas::row(l_adaptmatrix, n)  = m_distance.getDistance( p_data, ublas::row(l_prototypes, n) ) ;
             
             // for every column ranks values and create adapts
             // we need rank and not randIndex, because we 
@@ -811,7 +811,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
         // calculate distance for every prototype
         for(std::size_t i=0; i < l_prototypes.size1(); ++i)
-            ublas::row(l_distance, i)  = m_distance->getDistance( p_data, ublas::outer_prod(l_ones, ublas::row(l_prototypes, i)) ) ;
+            ublas::row(l_distance, i)  = m_distance.getDistance( p_data, ublas::outer_prod(l_ones, ublas::row(l_prototypes, i)) ) ;
         
         // determine nearest prototype
         for(std::size_t i=0; i < l_prototypes.size2(); ++i) {
@@ -1005,7 +1005,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             
             // calculate for every prototype the distance
             for(std::size_t n=0; n < l_prototypes.size1(); ++n)
-                ublas::row(l_adaptmatrix, n)  = m_distance->getDistance( l_data, ublas::row(l_prototypes, n) ) ;
+                ublas::row(l_adaptmatrix, n)  = m_distance.getDistance( l_data, ublas::row(l_prototypes, n) ) ;
             
             // for every column ranks values and create adapts
             // we need rank and not randIndex, because we 
