@@ -64,7 +64,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             
         private :
         
-            /** distance object **/
+            /** distance object
+             * @todo switch pointer eg to auto_ptr or smartpointer
+             **/
             const distances::distance<T>* m_distance;        
             /** prototypes **/
             ublas::matrix<T> m_prototypes;                

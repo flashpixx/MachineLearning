@@ -78,7 +78,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
             /** prototypes **/
             ublas::matrix<T> m_prototypes;
-            /** k-approximation object **/
+            /** k-approximation object 
+             * @todo switch pointer eg to auto_ptr or smartpointer
+             **/
             const neighborhood::kapproximation<T>* m_kapprox;
             /** distance object for normalization **/
             const distances::euclid<T> m_euclid;
