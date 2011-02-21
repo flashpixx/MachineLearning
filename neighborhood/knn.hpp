@@ -65,7 +65,7 @@ namespace machinelearning { namespace neighborhood {
             /** number of nearest **/
             const std::size_t m_knn;
             /** distance object **/
-            const distances::distance<T>* m_distance;       
+            const distances::distance<T>& m_distance;       
         
             ublas::symmetric_matrix<T, ublas::upper> calculate( const ublas::matrix<T>& ) const;
         
@@ -79,7 +79,7 @@ namespace machinelearning { namespace neighborhood {
      **/
     template<typename T> inline knn<T>::knn( const distances::distance<T>& p_distance, const std::size_t& p_knn ) :
         m_knn(p_knn),    
-        m_distance( &p_distance )
+        m_distance( p_distance )
     {
         if (p_knn == 0)
             throw exception::runtime(_("knn must be greater than zero"));
@@ -162,7 +162,7 @@ namespace machinelearning { namespace neighborhood {
      **/
     template<typename T> inline T knn<T>::calculateDistance( const ublas::vector<T>& p_first, const ublas::vector<T>& p_second ) const
     {
-        return m_distance->getDistance( p_first, p_second );
+        return m_distance.getDistance( p_first, p_second );
     }
     
     
@@ -172,7 +172,7 @@ namespace machinelearning { namespace neighborhood {
      **/
     template<typename T> inline T knn<T>::invert( const T& p_val ) const
     {
-        return m_distance->getInvert( p_val );
+        return m_distance.getInvert( p_val );
     }
     
     
