@@ -57,9 +57,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         
         private :
         
-            /** neighborhood object
-             * @todo switch pointer eg to auto_ptr or smartpointer
-             **/
+            /** neighborhood object **/
             const neighborhood::neighborhood<T>* m_neighborhood;
             /** target dimension **/
             const std::size_t m_dim;
