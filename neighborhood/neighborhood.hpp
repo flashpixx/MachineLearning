@@ -48,6 +48,7 @@ namespace machinelearning {
         
         /** abstract class for neighborhood classes
          * $LastChangedDate$
+         * @todo recreate base class for neighborhood
          **/      
         template<typename T> class neighborhood {
             BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );

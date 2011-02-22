@@ -58,7 +58,12 @@ namespace machinelearning { namespace neighborhood {
             ublas::matrix<std::size_t> get( const ublas::matrix<T>&, const ublas::matrix<T>& ) const;
             T calculateDistance( const ublas::vector<T>&, const ublas::vector<T>& ) const;
             T invert( const T& p_val ) const;
-
+        
+            //methods for kd-tree use
+            //knn( const distances::distance<T>&, const distances::metric<T>&, const ublas::matrix& );
+            //ublas::indirect_array< std::vector<std::size_t> > get( const ublas::vector<T>&, const std::size_t& ) const;
+            //std::vector< ublas::indirect_array< std::vector<std::size_t> > > get( const ublas::matrix<T>&, const std::size_t& ) const;
+            //std::vector< ublas::indirect_array< std::vector<std::size_t> > > get( const ublas::matrix<T>&, const ublas::vector<T>& ) const;
         
         private :
         
