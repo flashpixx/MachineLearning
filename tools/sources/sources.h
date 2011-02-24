@@ -31,6 +31,7 @@ namespace machinelearning {
         
         /** namespace with classes for generating example data
          * $LastChangedDate$
+         * @todo adding support for OpenStreetMap http://wiki.openstreetmap.org/wiki/API
          **/
         namespace sources {};
     
