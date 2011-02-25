@@ -115,13 +115,13 @@ int main(int argc, char* argv[]) {
     
         // create patches
         std::vector<std::size_t> range;
-        const std::size_t rows = datarange.size1() / numpatches;
+        const std::size_t rows = fulldata.size1() / numpatches;
         std::size_t l_end = 0;
         for(std::size_t j=0; j < numpatches; ++j) {
             l_end += rows;
             range.push_back( l_end );
         }
-        range[ range.size()-1 ] += datarange.size1() % numpatches;
+        range[ range.size()-1 ] += fulldata.size1() % numpatches;
     
     
         // do patch ng
