@@ -88,7 +88,7 @@ int main(int argc, char* argv[]) {
         throw std::runtime_error("numerical data can not be read");
     }
     
-    
+    /*
     
     
     // read source hdf file and data 
@@ -96,16 +96,39 @@ int main(int argc, char* argv[]) {
     ublas::matrix<double> data = source.readMatrix<double>(argv[2], H5::PredType::NATIVE_DOUBLE);
     
     
+    
+    
     // create distance object, neural gas object and enable logging
     distance::euclid<double> d;
-    cluster::neuralgas<double> ng(d, numprotos, data.size2());
+    cluster::neuralgas<double> ng(d, numprotos, pdata.size2());
     ng.setLogging(log);
+    
+    // create patches
+    std::vector<std::size_t> range;
+    const std::size_t rows = pdata.size1() / numpatches;
+    std::size_t l_end = 0;
+    for(std::size_t j=0; j < numpatches; ++j) {
+        l_end += rows;
+        range.push_back( l_end );
+    }
+    range[ range.size()-1 ] += pdata.size1() % numpatches;
     
     
     #ifdef MACHINELEARNING_MPI
-    /*
+    
+    // seperate patches
+    
     mpi::timer t;
-    ng.trainpatch(loMPICom, data, iteration);
+
+    l_end = 0;
+    for(std::size_t j=0; j < numpatches; ++j) {
+        ublas::matrix_range< ublas::matrix<double> > l_patch(pdata, 
+                                                             ublas::range( l_end, range[j] ), 
+                                                             ublas::range( 0, pdata.size2() )
+                                                             );
+        l_end = range[j];
+        ng.trainpatch( l_patch, iteration );
+    }
     std::cout << "number of process: " << loMPICom.size() << " Time: " << t.elapsed() << std::endl;
     
     
@@ -134,21 +157,11 @@ int main(int argc, char* argv[]) {
                 target.write<double>("/log" + boost::lexical_cast<std::string>( i ), logproto[i], H5::PredType::NATIVE_DOUBLE );
         }
     }
-    */
+    
     #else    
     
     // create target file
     tools::files::hdf target("patch_neuralgas.hdf5", true);
-    
-    // create patches
-    std::vector<std::size_t> range;
-    const std::size_t rows = data.size1() / numpatches;
-    std::size_t l_end = 0;
-    for(std::size_t j=0; j < numpatches; ++j) {
-        l_end += rows;
-        range.push_back( l_end );
-    }
-    range[ range.size()-1 ] += data.size1() % numpatches;
     
     
     // train prototypes for each patch
@@ -189,6 +202,6 @@ int main(int argc, char* argv[]) {
     #ifdef MACHINELEARNING_MPI
     if (loMPICom.rank() == 0)
     #endif
-    std::cout << "create HDF file \"patch_neuralgas.hdf5\" with dataset \"/protos \", \"/weights\", \"/iteration\" number of iteration, \"numprotos\" number of prototypes and if logging is enabled \"/patch<0 to number of patches-1>/error\" quantization error of each patch, \"/patch<0 to number of patches-1>/log<0 to iterations-1>\" logged prototypes of each patch and \"logweights<0 to number patches-1>\" log of prototype weights of each patch" << std::endl;
+    std::cout << "create HDF file \"patch_neuralgas.hdf5\" with dataset \"/protos \", \"/weights\", \"/iteration\" number of iteration, \"numprotos\" number of prototypes and if logging is enabled \"/patch<0 to number of patches-1>/error\" quantization error of each patch, \"/patch<0 to number of patches-1>/log<0 to iterations-1>\" logged prototypes of each patch and \"logweights<0 to number patches-1>\" log of prototype weights of each patch" << std::endl;*/
     return EXIT_SUCCESS;
 }
