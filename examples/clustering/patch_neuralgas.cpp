@@ -21,10 +21,17 @@
  @endcond
  **/
 
+#include <algorithm>
+#include <map>
+
 #include <machinelearning.h>
+#include <boost/any.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
+
+
+
 
 namespace ublas     = boost::numeric::ublas;
 namespace cluster   = machinelearning::clustering::nonsupervised;
@@ -35,195 +42,164 @@ namespace mpi       = boost::mpi;
 #endif
 
 
+bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_args ) {
+    
+    if (argc < 2) {
+        std::cout << "--inputfile" << "\t" << "one or many input HDF5 file(s)" << std::endl;
+        std::cout << "--inputpath" << "\t" << "one path (read in each file) or same number of pathes like input files" << std::endl;
+        std::cout << "--outfile" << "\t" << "output HDF5 file" << std::endl;
+        std::cout << "--iteration" << "\t" << "number of iteration" << std::endl;
+        std::cout << "--numproto" << "\t" << "number of prototypes" << std::endl;
+        std::cout << "--log" << "\t" << "'on' for enable logging" << std::endl;
+        
+        return false;
+    }
+    
+    
+    // set default arguments
+    std::map<std::string, std::vector<std::string> > l_argmap;
+    l_argmap["inputfile"] = std::vector<std::string>();
+    l_argmap["inputpath"] = std::vector<std::string>();
+    l_argmap["outfile"]   = std::vector<std::string>();
+    l_argmap["iteration"] = std::vector<std::string>();
+    l_argmap["numproto"]  = std::vector<std::string>();
+    l_argmap["log"]       = std::vector<std::string>();
+    
+    
+    // read all arguments
+    std::size_t n=1;
+    for(int i=1; i < argc; i+=n) {
+        n = 1;
+        std::string lc(argv[i]);
+        if (lc.length() < 2)
+            continue;
+        
+        lc = lc.substr(2);
+        boost::to_lower( lc );
+        
+        if (l_argmap.find(lc) != l_argmap.end()) {
+            std::vector<std::string> lv;
+            
+            for(int l=i+1; l < argc; ++l) {
+                std::string lc2(argv[l]);
+                if ( (lc2.length() >= 2) && (lc2.substr(0,2) == "--") )
+                    break;
+                
+                lv.push_back(lc2);
+                n++;
+            }
+            
+            l_argmap[lc] = lv;
+        }
+        
+    }
+    
+    //check map values and convert them
+    if ( (l_argmap["iteration"].size() != 1) || (l_argmap["numproto"].size() != 1) || (l_argmap["outfile"].size() != 1) || (l_argmap["inputfile"].size() == 0) || (l_argmap["inputpath"].size() == 0) )
+        throw std::runtime_error("number of arguments are incorrect");
+    
+    if (   (l_argmap["inputfile"].size() != l_argmap["inputpath"].size()) ||
+           ((l_argmap["inputpath"].size() == 1) && (l_argmap["inputfile"].size() > 0)) || 
+           ((l_argmap["inputpath"].size() > 0) && (l_argmap["inputfile"].size() == 1))
+       )
+        throw std::runtime_error("number of inputs incorrect");
+
+    
+    p_args["log"]           = !l_argmap["log"].empty();
+    p_args["inputfile"]     = l_argmap["inputfile"];
+    p_args["inputpath"]     = l_argmap["inputpath"];
+    p_args["outfile"]       = l_argmap["outfile"][0];
+    
+    try {
+        p_args["iteration"] = boost::lexical_cast<std::size_t>( l_argmap["iteration"][0] );
+        p_args["numproto"]  = boost::lexical_cast<std::size_t>( l_argmap["numproto"][0] );
+    } catch (...) {
+        throw std::runtime_error("numerical data can not extracted");
+    }  
+
+    return true;
+}
+
+
 int main(int argc, char* argv[]) {
+    
+    std::map<std::string, boost::any> l_args;
+    if (!cliArguments(argc, argv, l_args))
+        return EXIT_SUCCESS;
     
     #ifdef MACHINELEARNING_MPI
     mpi::environment loMPIenv(argc, argv);
     mpi::communicator loMPICom;
     #endif
-    
-    
-    if (argc < 5)
-        throw std::runtime_error("you need at least four parameter as input. first HDF file, second path to dataset, third number of prototypes, forth number of patches, optional fifth number of iterations or/and (sixth) \"log\" for logging");
-    
-    // convert string parameter to numerical data
-    std::size_t numprotos = 0;
-    try {
-        numprotos = boost::lexical_cast<std::size_t>(argv[3]);
-    } catch (...) {
-        throw std::runtime_error("number of prototypes can not be read");
-    }
-    
-    std::size_t numpatches = 0;
-    try {
-        numpatches = boost::lexical_cast<std::size_t>(argv[4]);
-    } catch (...) {
-        throw std::runtime_error("number of patches can not be read");
-    }
-    if (numpatches == 0)
-        throw std::runtime_error("number of patches need not be zero");
-    
-    
-    // convert iteration or logging if exists
-    std::size_t iteration = 15;
-    bool log = false;
-    try {
-        std::string fifth(  (argc > 5) ? argv[5] : ""  );
-        std::string sixth(  (argc > 6) ? argv[6] : ""  );
-        
-        if (!fifth.empty())
-            boost::to_lower( fifth );
-        if (!sixth.empty())
-            boost::to_lower( sixth );
-        
-        if (fifth == "log")
-            log = true;
-        else
-            if (!fifth.empty())
-                iteration = boost::lexical_cast<std::size_t>(fifth);
-        
-        if (sixth == "log")
-            log = true;
-    } catch (...) {
-        throw std::runtime_error("numerical data can not be read");
-    }
-    
 
-    // read source hdf file and data 
-    tools::files::hdf source( argv[1] );
-    ublas::matrix<double> data = source.readMatrix<double>(argv[2], H5::PredType::NATIVE_DOUBLE);
     
-    // create distance object
+    
+    // read input data
+    std::vector<std::string> lafiles = boost::any_cast< std::vector<std::string> >(l_args["inputfile"]);
+    std::vector<std::string> lapath  = boost::any_cast< std::vector<std::string> >(l_args["inputpath"]);
+    
+    tools::files::hdf target( boost::any_cast<std::string>(l_args["outfile"]), true );
+    tools::files::hdf source = tools::files::hdf( lafiles[0] );
+    ublas::matrix<double> data = source.readMatrix<double>(lafiles[0], H5::PredType::NATIVE_DOUBLE);
+
+    // create ng objects
     distance::euclid<double> d;
+    cluster::neuralgas<double> ng(d, boost::any_cast<std::size_t>(l_args["numproto"]), data.size2());
+    ng.setLogging( boost::any_cast<bool>(l_args["log"]) );
     
     
-    
-    #ifdef MACHINELEARNING_MPI
+    // do the first patch
+    ng.trainpatch( data, boost::any_cast<std::size_t>(l_args["iteration"]) );
+    if (ng.getLogging()) {
+        target.write<double>( "/patch0/weights",  ng.getPrototypeWeights(), H5::PredType::NATIVE_DOUBLE );
+        target.write<double>( "/patch0/protos",  ng.getPrototypes(), H5::PredType::NATIVE_DOUBLE );    
+        target.write<double>( "/patch0/error",  tools::vector::copy(ng.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
         
-        // extract data for the CPU
-        std::size_t nums     		= data.size1() / (loMPICom.size());
-        std::size_t mpiproto 		= numprotos / (loMPICom.size());
-        std::size_t add      		= 0;
+        std::vector< ublas::matrix<double> > logproto =  ng.getLoggedPrototypes();
+        for(std::size_t i=0; i < logproto.size(); ++i)
+            target.write<double>("/patch0/log" + boost::lexical_cast<std::string>( i )+"/protos", logproto[i], H5::PredType::NATIVE_DOUBLE );
+    }
     
-        if (loMPICom.rank() == loMPICom.size()-1) {
-            mpiproto += numprotos % loMPICom.size();
-            add       = data.size1() % loMPICom.size();
-        }
-    
-        ublas::matrix_range< ublas::matrix<double> > datarange(data, ublas::range(loMPICom.rank()*nums, (loMPICom.rank()+1)*nums + add), ublas::range(0, data.size2()));
-        ublas::matrix<double> fulldata = datarange;
-    
-        // create patches
-        std::vector<std::size_t> range;
-        const std::size_t rows = fulldata.size1() / numpatches;
-        std::size_t l_end = 0;
-        for(std::size_t j=0; j < numpatches; ++j) {
-            l_end += rows;
-            range.push_back( l_end );
-        }
-        range[ range.size()-1 ] += fulldata.size1() % numpatches;
-    
-    
-        // do patch ng
-        cluster::neuralgas<double> ng(d, mpiproto, data.size2());
-        ng.setLogging(log);
-        l_end = 0;
-        mpi::timer t;
-        for(std::size_t j=0; j < numpatches; ++j) {
-            ublas::matrix_range< ublas::matrix<double> > l_patch(fulldata, 
-                                                                 ublas::range( l_end, range[j] ), 
-                                                                 ublas::range( 0, fulldata.size2() )
-                                                                 );
-            l_end = range[j];
-            ng.trainpatch( loMPICom, l_patch, iteration );
-        }
-        std::cout << "number of process: " << loMPICom.size() << " Time: " << t.elapsed() << std::endl;
+    // do the rest patches
+    for (std::size_t i=1; i < std::max(lafiles.size(), lapath.size()); i++) {
+        source = tools::files::hdf( (lafiles.size() == 1) ? lafiles[0] : lafiles[i] );
+        data   = source.readMatrix<double>( (lapath.size() == 1) ? lapath[0] : lapath[i], H5::PredType::NATIVE_DOUBLE);
         
-        
-        // collect all data (of each process)
-        ublas::matrix<double> protos = ng.getPrototypes(loMPICom);
-        ublas::vector<double> qerror;
-        std::vector< ublas::matrix<double> > logproto;
-        
+        ng.trainpatch( data, boost::any_cast<std::size_t>(l_args["iteration"]) );
+
         if (ng.getLogging()) {
-            qerror      = tools::vector::copy(ng.getLoggedQuantizationError(loMPICom));
-            logproto    = ng.getLoggedPrototypes(loMPICom);
-        }
-        
-        
-        // only process 0 writes hdf
-        if (loMPICom.rank() == 0) {
-            tools::files::hdf target("patch_neuralgas.hdf5", true);
+            std::string patchpath = "/patch" + boost::lexical_cast<std::string>( i );
             
-            target.write<double>( "/protos",  protos, H5::PredType::NATIVE_DOUBLE );
-            target.write<double>( "/numprotos",  numprotos, H5::PredType::NATIVE_DOUBLE );
-            target.write<std::size_t>( "/iteration",  iteration, H5::PredType::NATIVE_ULONG );
+            target.write<double>( patchpath+"/weights",  ng.getPrototypeWeights(), H5::PredType::NATIVE_DOUBLE );
+            target.write<double>( patchpath+"/protos",  ng.getPrototypes(), H5::PredType::NATIVE_DOUBLE );    
+            target.write<double>( patchpath+"/error",  tools::vector::copy(ng.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
             
-            if (ng.getLogging()) {
-                target.write<double>( "/error", qerror, H5::PredType::NATIVE_DOUBLE );
-                for(std::size_t i=0; i < logproto.size(); ++i)
-                    target.write<double>("/log" + boost::lexical_cast<std::string>( i ), logproto[i], H5::PredType::NATIVE_DOUBLE );
-            }
+            std::vector< ublas::matrix<double> > logproto =  ng.getLoggedPrototypes();
+            for(std::size_t i=0; i < logproto.size(); ++i)
+                target.write<double>( patchpath+"/log" + boost::lexical_cast<std::string>( i )+"/protos", logproto[i], H5::PredType::NATIVE_DOUBLE );
         }
-    
-     
-    #else    
-        
-        // create target file
-        tools::files::hdf target("patch_neuralgas.hdf5", true);
-        
-        // create patches
-        std::vector<std::size_t> range;
-        const std::size_t rows = data.size1() / numpatches;
-        std::size_t l_end = 0;
-        for(std::size_t j=0; j < numpatches; ++j) {
-            l_end += rows;
-            range.push_back( l_end );
-        }
-        range[ range.size()-1 ] += data.size1() % numpatches;
-        
-    
-        // create neural gas object and enable logging
-        cluster::neuralgas<double> ng(d, numprotos, data.size2());
-        ng.setLogging(log);
-        
-        // train prototypes for each patch
-        l_end = 0;
-        for(std::size_t j=0; j < numpatches; ++j) {
-            ublas::matrix_range< ublas::matrix<double> > l_patch(data, 
-                                                            ublas::range( l_end, range[j] ), 
-                                                            ublas::range( 0, data.size2() )
-                                                            );
-            l_end = range[j];
-            ng.trainpatch( l_patch, iteration );
-            
-            // if logging is enabled, write log data to file
-            if (ng.getLogging()) {
-                std::string patchpath = "/patch" + boost::lexical_cast<std::string>( j );
-                
-                target.write<double>( patchpath + "/protos",  ng.getPrototypes(), H5::PredType::NATIVE_DOUBLE );    
-                target.write<double>( patchpath + "/error",  tools::vector::copy(ng.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
-                std::vector< ublas::matrix<double> > logproto =  ng.getLoggedPrototypes();
-                for(std::size_t i=0; i < logproto.size(); ++i)
-                    target.write<double>(patchpath + "/log" + boost::lexical_cast<std::string>( i ), logproto[i], H5::PredType::NATIVE_DOUBLE );
-            }
-        }
-        
-        target.write<double>( "/numprotos",  numprotos, H5::PredType::NATIVE_DOUBLE );
-        target.write<double>( "/protos",  ng.getPrototypes(), H5::PredType::NATIVE_DOUBLE );    
-        target.write<double>( "/weights",  ng.getPrototypeWeights(), H5::PredType::NATIVE_DOUBLE );    
-        target.write<std::size_t>( "/iteration",  iteration, H5::PredType::NATIVE_ULONG );
-        
-        std::vector< ublas::vector<double> > logweights =  ng.getLoggedPrototypeWeights();
-        for(std::size_t i=0; i < logweights.size(); ++i)
-            target.write<std::size_t>("/logweights" + boost::lexical_cast<std::string>( i ), logweights[i], H5::PredType::NATIVE_ULONG );
-    
-    #endif
+
+    }
+
+    target.write<double>( "/numprotos",   boost::any_cast<std::size_t>(l_args["numproto"]), H5::PredType::NATIVE_DOUBLE );
+    target.write<double>( "/protos",  ng.getPrototypes(), H5::PredType::NATIVE_DOUBLE );    
+    target.write<double>( "/weights",  ng.getPrototypeWeights(), H5::PredType::NATIVE_DOUBLE );    
+    target.write<std::size_t>( "/iteration",   boost::any_cast<std::size_t>(l_args["iteration"]), H5::PredType::NATIVE_ULONG );
     
     
-    #ifdef MACHINELEARNING_MPI
-    if (loMPICom.rank() == 0)
-    #endif
-    std::cout << "create HDF file \"patch_neuralgas.hdf5\" with dataset \"/protos \", \"/weights\", \"/iteration\" number of iteration, \"numprotos\" number of prototypes and if logging is enabled \"/patch<0 to number of patches-1>/error\" quantization error of each patch, \"/patch<0 to number of patches-1>/log<0 to iterations-1>\" logged prototypes of each patch and \"logweights<0 to number patches-1>\" log of prototype weights of each patch" << std::endl;
+    
+    std::cout << "structure of the output file" << std::endl;
+    std::cout << "/numprotos" << "\t" << "number of prototypes" << std::endl;
+    std::cout << "/protos" << "\t" << "prototype matrix (row orientated)" << std::endl;
+    std::cout << "/weight" << "\t" << "prototype weight" << std::endl;
+    std::cout << "/iteration" << "\t" << "number of iterations" << std::endl;
+    
+    if (ng.getLogging()) {
+        std::cout << "/patch<0 to number of patches-1>/weights" << "\t" << "prototype weights after calculating patch" << std::endl;
+        std::cout << "/patch<0 to number of patches-1>/protos" << "\t" << "prototypes after calculating patch" << std::endl;
+        std::cout << "/patch<0 to number of patches-1>/error" << "\t" << "quantization error on each patch iteration" << std::endl;
+        std::cout << "/patch<0 to number of patches-1>/log<0 to number of iteration-1>/protos" << "\t" << "prototypes on each patch iteration" << std::endl;
+    }
+    
     return EXIT_SUCCESS;
 }
