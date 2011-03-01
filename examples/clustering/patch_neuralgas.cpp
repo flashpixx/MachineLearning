@@ -98,10 +98,11 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
     //check map values and convert them
     if ( (l_argmap["iteration"].size() != 1) || (l_argmap["prototype"].size() != 1) || (l_argmap["outfile"].size() != 1) || (l_argmap["inputfile"].size() == 0) || (l_argmap["inputpath"].size() == 0) )
         throw std::runtime_error("number of arguments are incorrect");
-    
-    if (   ((l_argmap["inputpath"].size() != 1) && (l_argmap["inputfile"].size() == 0)) ||
-           ((l_argmap["inputpath"].size() == 0) && (l_argmap["inputfile"].size() != 1))
-       ) 
+
+    if (!( ((l_argmap["inputpath"].size() == 1) && (l_argmap["inputfile"].size() > 0)) ||
+           ((l_argmap["inputpath"].size() > 0) && (l_argmap["inputfile"].size() == 1)) ||
+           (l_argmap["inputpath"].size() == l_argmap["inputfile"].size())
+       )) 
         throw std::runtime_error("number of pathes / files are inclorrect");
 
     
@@ -182,7 +183,7 @@ int main(int argc, char* argv[]) {
                 target.write<double>( patchpath+"/log"+boost::lexical_cast<std::string>(j)+"/protos", logproto[j], H5::PredType::NATIVE_DOUBLE );
         }
     }
-    return 0;
+
     target.write<double>( "/numprotos",   boost::any_cast<std::size_t>(l_args["prototype"]), H5::PredType::NATIVE_DOUBLE );
     target.write<double>( "/protos",  ng.getPrototypes(), H5::PredType::NATIVE_DOUBLE );    
     target.write<double>( "/weights",  ng.getPrototypeWeights(), H5::PredType::NATIVE_DOUBLE );    
@@ -191,16 +192,16 @@ int main(int argc, char* argv[]) {
     
     
     std::cout << "structure of the output file" << std::endl;
-    std::cout << "/numprotos" << "\t" << "number of prototypes" << std::endl;
-    std::cout << "/protos" << "\t" << "prototype matrix (row orientated)" << std::endl;
-    std::cout << "/weight" << "\t" << "prototype weight" << std::endl;
-    std::cout << "/iteration" << "\t" << "number of iterations" << std::endl;
+    std::cout << "/numprotos" << "\t\t" << "number of prototypes" << std::endl;
+    std::cout << "/protos" << "\t\t" << "prototype matrix (row orientated)" << std::endl;
+    std::cout << "/weight" << "\t\t" << "prototype weight" << std::endl;
+    std::cout << "/iteration" << "\t\t" << "number of iterations" << std::endl;
     
     if (ng.getLogging()) {
-        std::cout << "/patch<0 to number of patches-1>/weights" << "\t" << "prototype weights after calculating patch" << std::endl;
-        std::cout << "/patch<0 to number of patches-1>/protos" << "\t" << "prototypes after calculating patch" << std::endl;
-        std::cout << "/patch<0 to number of patches-1>/error" << "\t" << "quantization error on each patch iteration" << std::endl;
-        std::cout << "/patch<0 to number of patches-1>/log<0 to number of iteration-1>/protos" << "\t" << "prototypes on each patch iteration" << std::endl;
+        std::cout << "/patch<0 to number of patches-1>/weights" << "\t\t" << "prototype weights after calculating patch" << std::endl;
+        std::cout << "/patch<0 to number of patches-1>/protos" << "\t\t" << "prototypes after calculating patch" << std::endl;
+        std::cout << "/patch<0 to number of patches-1>/error" << "\t\t" << "quantization error on each patch iteration" << std::endl;
+        std::cout << "/patch<0 to number of patches-1>/log<0 to number of iteration-1>/protos" << "\t\t" << "prototypes on each patch iteration" << std::endl;
     }
     
     return EXIT_SUCCESS;
