@@ -49,7 +49,7 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
         std::cout << "--inputpath" << "\t" << "one path (read in each file) or same number of pathes like input files" << std::endl;
         std::cout << "--outfile" << "\t" << "output HDF5 file" << std::endl;
         std::cout << "--iteration" << "\t" << "number of iteration" << std::endl;
-        std::cout << "--numproto" << "\t" << "number of prototypes" << std::endl;
+        std::cout << "--prototype" << "\t" << "number of prototypes" << std::endl;
         std::cout << "--log" << "\t" << "'on' for enable logging" << std::endl;
         
         return false;
@@ -62,7 +62,7 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
     l_argmap["inputpath"] = std::vector<std::string>();
     l_argmap["outfile"]   = std::vector<std::string>();
     l_argmap["iteration"] = std::vector<std::string>();
-    l_argmap["numproto"]  = std::vector<std::string>();
+    l_argmap["prototype"] = std::vector<std::string>();
     l_argmap["log"]       = std::vector<std::string>();
     
     
@@ -93,26 +93,26 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
         }
         
     }
-    
-    //check map values and convert them
-    if ( (l_argmap["iteration"].size() != 1) || (l_argmap["numproto"].size() != 1) || (l_argmap["outfile"].size() != 1) || (l_argmap["inputfile"].size() == 0) || (l_argmap["inputpath"].size() == 0) )
-        throw std::runtime_error("number of arguments are incorrect");
-    
-    if (   (l_argmap["inputfile"].size() != l_argmap["inputpath"].size()) ||
-           ((l_argmap["inputpath"].size() == 1) && (l_argmap["inputfile"].size() > 0)) || 
-           ((l_argmap["inputpath"].size() > 0) && (l_argmap["inputfile"].size() == 1))
-       )
-        throw std::runtime_error("number of inputs incorrect");
 
     
-    p_args["log"]           = !l_argmap["log"].empty();
+    //check map values and convert them
+    if ( (l_argmap["iteration"].size() != 1) || (l_argmap["prototype"].size() != 1) || (l_argmap["outfile"].size() != 1) || (l_argmap["inputfile"].size() == 0) || (l_argmap["inputpath"].size() == 0) )
+        throw std::runtime_error("number of arguments are incorrect");
+    
+    if (   ((l_argmap["inputpath"].size() != 1) && (l_argmap["inputfile"].size() == 0)) ||
+           ((l_argmap["inputpath"].size() == 0) && (l_argmap["inputfile"].size() != 1))
+       ) 
+        throw std::runtime_error("number of pathes / files are inclorrect");
+
+    
+    p_args["log"]           = l_argmap["log"].size() > 0;
     p_args["inputfile"]     = l_argmap["inputfile"];
     p_args["inputpath"]     = l_argmap["inputpath"];
     p_args["outfile"]       = l_argmap["outfile"][0];
     
     try {
         p_args["iteration"] = boost::lexical_cast<std::size_t>( l_argmap["iteration"][0] );
-        p_args["numproto"]  = boost::lexical_cast<std::size_t>( l_argmap["numproto"][0] );
+        p_args["prototype"]  = boost::lexical_cast<std::size_t>( l_argmap["prototype"][0] );
     } catch (...) {
         throw std::runtime_error("numerical data can not extracted");
     }  
@@ -140,19 +140,21 @@ int main(int argc, char* argv[]) {
     
     tools::files::hdf target( boost::any_cast<std::string>(l_args["outfile"]), true );
     tools::files::hdf source = tools::files::hdf( lafiles[0] );
-    ublas::matrix<double> data = source.readMatrix<double>(lafiles[0], H5::PredType::NATIVE_DOUBLE);
+    ublas::matrix<double> data = source.readMatrix<double>(lapath[0], H5::PredType::NATIVE_DOUBLE);
 
     // create ng objects
     distance::euclid<double> d;
-    cluster::neuralgas<double> ng(d, boost::any_cast<std::size_t>(l_args["numproto"]), data.size2());
+    cluster::neuralgas<double> ng(d, boost::any_cast<std::size_t>(l_args["prototype"]), data.size2());
     ng.setLogging( boost::any_cast<bool>(l_args["log"]) );
     
     
     // do the first patch
     ng.trainpatch( data, boost::any_cast<std::size_t>(l_args["iteration"]) );
+    
+    target.write<double>( "/patch0/weights",  ng.getPrototypeWeights(), H5::PredType::NATIVE_DOUBLE );
+    target.write<double>( "/patch0/protos",  ng.getPrototypes(), H5::PredType::NATIVE_DOUBLE );    
+    
     if (ng.getLogging()) {
-        target.write<double>( "/patch0/weights",  ng.getPrototypeWeights(), H5::PredType::NATIVE_DOUBLE );
-        target.write<double>( "/patch0/protos",  ng.getPrototypes(), H5::PredType::NATIVE_DOUBLE );    
         target.write<double>( "/patch0/error",  tools::vector::copy(ng.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
         
         std::vector< ublas::matrix<double> > logproto =  ng.getLoggedPrototypes();
@@ -160,28 +162,28 @@ int main(int argc, char* argv[]) {
             target.write<double>("/patch0/log" + boost::lexical_cast<std::string>( i )+"/protos", logproto[i], H5::PredType::NATIVE_DOUBLE );
     }
     
+    
     // do the rest patches
-    for (std::size_t i=1; i < std::max(lafiles.size(), lapath.size()); i++) {
-        source = tools::files::hdf( (lafiles.size() == 1) ? lafiles[0] : lafiles[i] );
+    for (std::size_t i=1; i < std::max(lafiles.size(), lapath.size()); ++i) {
+        source.open( (lafiles.size() == 1) ? lafiles[0] : lafiles[i] );
         data   = source.readMatrix<double>( (lapath.size() == 1) ? lapath[0] : lapath[i], H5::PredType::NATIVE_DOUBLE);
         
         ng.trainpatch( data, boost::any_cast<std::size_t>(l_args["iteration"]) );
 
+        std::string patchpath = "/patch" + boost::lexical_cast<std::string>(i);
+        target.write<double>( patchpath+"/weights",  ng.getPrototypeWeights(), H5::PredType::NATIVE_DOUBLE );
+        target.write<double>( patchpath+"/protos",  ng.getPrototypes(), H5::PredType::NATIVE_DOUBLE );    
+        
         if (ng.getLogging()) {
-            std::string patchpath = "/patch" + boost::lexical_cast<std::string>( i );
-            
-            target.write<double>( patchpath+"/weights",  ng.getPrototypeWeights(), H5::PredType::NATIVE_DOUBLE );
-            target.write<double>( patchpath+"/protos",  ng.getPrototypes(), H5::PredType::NATIVE_DOUBLE );    
             target.write<double>( patchpath+"/error",  tools::vector::copy(ng.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
             
             std::vector< ublas::matrix<double> > logproto =  ng.getLoggedPrototypes();
-            for(std::size_t i=0; i < logproto.size(); ++i)
-                target.write<double>( patchpath+"/log" + boost::lexical_cast<std::string>( i )+"/protos", logproto[i], H5::PredType::NATIVE_DOUBLE );
+            for(std::size_t j=0; j < logproto.size(); ++j)
+                target.write<double>( patchpath+"/log"+boost::lexical_cast<std::string>(j)+"/protos", logproto[j], H5::PredType::NATIVE_DOUBLE );
         }
-
     }
-
-    target.write<double>( "/numprotos",   boost::any_cast<std::size_t>(l_args["numproto"]), H5::PredType::NATIVE_DOUBLE );
+    return 0;
+    target.write<double>( "/numprotos",   boost::any_cast<std::size_t>(l_args["prototype"]), H5::PredType::NATIVE_DOUBLE );
     target.write<double>( "/protos",  ng.getPrototypes(), H5::PredType::NATIVE_DOUBLE );    
     target.write<double>( "/weights",  ng.getPrototypeWeights(), H5::PredType::NATIVE_DOUBLE );    
     target.write<std::size_t>( "/iteration",   boost::any_cast<std::size_t>(l_args["iteration"]), H5::PredType::NATIVE_ULONG );

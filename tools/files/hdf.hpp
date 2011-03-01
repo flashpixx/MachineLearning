@@ -61,6 +61,7 @@ namespace machinelearning { namespace tools { namespace files {
             hdf( const std::string&, const bool& );
             ~hdf( void );
         
+            void open( const std::string&, const bool& = false );
             void flush( void ) const;
             std::string getFilename( void ) const;
             std::size_t getFilesize( void ) const;
@@ -128,7 +129,20 @@ namespace machinelearning { namespace tools { namespace files {
         m_file.close();
     }
     
+    
+    /** open a file
+     * @param p_file filename
+     * @param p_write bool for clear/create file
+    **/
+    inline void hdf::open( const std::string& p_file, const bool& p_write )
+    {
+        flush();
+        m_file.close();
+        
+        m_file = H5::H5File( p_file.c_str(), (p_write ? H5F_ACC_TRUNC : H5F_ACC_RDWR) );
+    }
 
+    
     /** flushs all data for the file **/
     inline void hdf::flush( void ) const
     {
