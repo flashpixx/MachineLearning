@@ -140,7 +140,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         m_logging( false ),
         m_logprototypes( std::vector< ublas::matrix<T> >() ),
         m_quantizationerror( std::vector<T>() ),
-        m_prototypeWeights( p_prototypes, 1 ),
+        m_prototypeWeights( p_prototypes, 0 ),
         m_logprototypeWeights(),
         m_firstpatch(true)
         #ifdef MACHINELEARNING_MPI
@@ -435,7 +435,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             ublas::vector_range< ublas::vector<std::size_t> > l_multiplierrange( l_multiplier, ublas::range( l_multiplier.size()-m_prototypeWeights.size(), l_multiplier.size()) );
             l_multiplierrange.assign(m_prototypeWeights);
         }
-        m_firstpatch = false;
      
 
         // run neural gas       
@@ -492,13 +491,20 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             }
         }
         
-        // determine size of receptive fields
+        // determine size of receptive fields, but we must remove the prototypes if they are datapoints
         const ublas::indirect_array< std::vector<std::size_t> > l_winner = use(l_data);
-        for(std::size_t i=0; i < l_winner.size(); ++i)
+        std::size_t l_datasize = l_winner.size();
+        if (!m_firstpatch)
+            l_datasize -= m_prototypes.size1();
+
+        for(std::size_t i=0; i < l_datasize; ++i)
             m_prototypeWeights( l_winner(i) )++;
         
         if (m_logging)
             m_logprototypeWeights.push_back(m_prototypeWeights);
+        
+        // set bool for the first patch
+        m_firstpatch = false;
     }
     
 
@@ -985,7 +991,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             // so the multipliers are also added n (=CPU count) time. To correct this, we divide the weights with the number of CPUs
             l_multiplierrange.assign(l_prototypeWeights);
         }
-        m_firstpatch = false;
         
         
         // run neural gas       
@@ -1042,11 +1047,16 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
                 m_quantizationerror.push_back( calculateQuantizationError(l_data, m_prototypes) );
             }
         }
+
         
-        // determine size of receptive fields for the local data space
+        // determine size of receptive fields, but we must remove the prototypes if they are datapoints
         const ublas::indirect_array< std::vector<std::size_t> > l_winner = use(p_mpi, l_data);
-        for(std::size_t i=0; i < l_winner.size(); ++i)
-            l_prototypeWeights( l_winner(i) )++;
+        std::size_t l_datasize = l_winner.size();
+        if (!m_firstpatch)
+            l_datasize -= m_prototypes.size1();
+        
+        for(std::size_t i=0; i < l_datasize; ++i)
+            m_prototypeWeights( l_winner(i) )++;
         
         // synchronize the weights for each process to get weights for the whole data space
         synchronizePrototypeWeights(p_mpi, l_prototypeWeights);
@@ -1054,6 +1064,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         // do logging
         if (m_logging)
             m_logprototypeWeights.push_back(m_prototypeWeights);
+        
+        // set bool for the first patch
+        m_firstpatch = false;
         
     }
     
