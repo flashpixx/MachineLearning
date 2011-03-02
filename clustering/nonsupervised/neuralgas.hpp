@@ -1048,11 +1048,11 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         // determine size of receptive fields, but we use only the data points
         const ublas::indirect_array< std::vector<std::size_t> > l_winner = use(p_mpi, p_data);
         for(std::size_t i=0; i < l_winner.size(); ++i)
-            m_prototypeWeights( l_winner(i) )++;
+             l_prototypeWeights( l_winner(i) )++;
         
         // synchronize the weights for each process to get weights for the whole data space
         synchronizePrototypeWeights(p_mpi, l_prototypeWeights);
-        
+
         // do logging
         if (m_logging)
             m_logprototypeWeights.push_back(m_prototypeWeights);
