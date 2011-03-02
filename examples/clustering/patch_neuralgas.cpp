@@ -206,14 +206,16 @@ int main(int argc, char* argv[]) {
         logproto   = ng.getLoggedPrototypes(loMPICom);
         
         if (target) {
-            target->write<double>( "/patch0/weights",  weights, H5::PredType::NATIVE_DOUBLE );
-            target->write<double>( "/patch0/protos",  protos, H5::PredType::NATIVE_DOUBLE );    
+            std::string patchpath = "/patch" + boost::lexical_cast<std::string>(i);
+            
+            target->write<double>( patchpath+"/weights",  weights, H5::PredType::NATIVE_DOUBLE );
+            target->write<double>( patchpath+"/protos",  protos, H5::PredType::NATIVE_DOUBLE );    
             
             if (ng.getLogging()) {
-                target->write<double>( "/patch0/error", qerror, H5::PredType::NATIVE_DOUBLE );
+                target->write<double>( patchpath+"/error", qerror, H5::PredType::NATIVE_DOUBLE );
                 
-                for(std::size_t i=0; i < logproto.size(); ++i)
-                    target->write<double>("/patch0/log" + boost::lexical_cast<std::string>( i )+"/protos", logproto[i], H5::PredType::NATIVE_DOUBLE );
+                for(std::size_t j=0; j < logproto.size(); ++j)
+                    target->write<double>( patchpath+"/log" + boost::lexical_cast<std::string>( j )+"/protos", logproto[j], H5::PredType::NATIVE_DOUBLE );
             }
         }
     }
