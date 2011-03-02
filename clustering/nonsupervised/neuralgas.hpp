@@ -491,13 +491,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             }
         }
         
-        // determine size of receptive fields, but we must remove the prototypes if they are datapoints
-        const ublas::indirect_array< std::vector<std::size_t> > l_winner = use(l_data);
-        std::size_t l_datasize = l_winner.size();
-        if (!m_firstpatch)
-            l_datasize -= m_prototypes.size1();
-
-        for(std::size_t i=0; i < l_datasize; ++i)
+        // determine size of receptive fields, but we use only the data points
+        const ublas::indirect_array< std::vector<std::size_t> > l_winner = use(p_data);
+        for(std::size_t i=0; i < l_winner.size(); ++i)
             m_prototypeWeights( l_winner(i) )++;
         
         if (m_logging)
@@ -1049,13 +1045,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         }
 
         
-        // determine size of receptive fields, but we must remove the prototypes if they are datapoints
-        const ublas::indirect_array< std::vector<std::size_t> > l_winner = use(p_mpi, l_data);
-        std::size_t l_datasize = l_winner.size();
-        if (!m_firstpatch)
-            l_datasize -= m_prototypes.size1();
-        
-        for(std::size_t i=0; i < l_datasize; ++i)
+        // determine size of receptive fields, but we use only the data points
+        const ublas::indirect_array< std::vector<std::size_t> > l_winner = use(p_mpi, p_data);
+        for(std::size_t i=0; i < l_winner.size(); ++i)
             m_prototypeWeights( l_winner(i) )++;
         
         // synchronize the weights for each process to get weights for the whole data space
