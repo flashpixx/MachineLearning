@@ -99,12 +99,13 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
     if ( (l_argmap["iteration"].size() != 1) || (l_argmap["prototype"].size() != 1) || (l_argmap["outfile"].size() != 1) || (l_argmap["inputfile"].size() == 0) || (l_argmap["inputpath"].size() == 0) )
         throw std::runtime_error("number of arguments are incorrect");
 
+    #ifndef MACHINELEARNING_MPI
     if (!( ((l_argmap["inputpath"].size() == 1) && (l_argmap["inputfile"].size() > 0)) ||
            ((l_argmap["inputpath"].size() > 0) && (l_argmap["inputfile"].size() == 1)) ||
            (l_argmap["inputpath"].size() == l_argmap["inputfile"].size())
        )) 
         throw std::runtime_error("number of pathes / files are inclorrect");
-
+    #endif
     
     p_args["log"]           = l_argmap["log"].size() > 0;
     p_args["inputfile"]     = l_argmap["inputfile"];
@@ -131,6 +132,10 @@ int main(int argc, char* argv[]) {
     #ifdef MACHINELEARNING_MPI
     mpi::environment loMPIenv(argc, argv);
     mpi::communicator loMPICom;
+    
+    // we check CPU size and number of files
+    if ( static_cast<std::size_t>(loMPICom.size()) != boost::any_cast< std::vector<std::string> >(l_args["inputfile"]).size())
+        throw std::runtime_error("number of process and number of source files must be equal");
     #endif
 
     
@@ -139,15 +144,106 @@ int main(int argc, char* argv[]) {
     std::vector<std::string> lafiles = boost::any_cast< std::vector<std::string> >(l_args["inputfile"]);
     std::vector<std::string> lapath  = boost::any_cast< std::vector<std::string> >(l_args["inputpath"]);
     
-    tools::files::hdf target( boost::any_cast<std::string>(l_args["outfile"]), true );
-    tools::files::hdf source = tools::files::hdf( lafiles[0] );
+    
+    
+    #ifdef MACHINELEARNING_MPI
+    tools::files::hdf source( lafiles[static_cast<std::size_t>(loMPICom.rank())] );
+    #else
+    tools::files::hdf source( lafiles[0] );
+    #endif
     ublas::matrix<double> data = source.readMatrix<double>(lapath[0], H5::PredType::NATIVE_DOUBLE);
-
+    
+    
+    
     // create ng objects
     distance::euclid<double> d;
     cluster::neuralgas<double> ng(d, boost::any_cast<std::size_t>(l_args["prototype"]), data.size2());
     ng.setLogging( boost::any_cast<bool>(l_args["log"]) );
     
+    
+    
+    
+    #ifdef MACHINELEARNING_MPI
+    
+    //create target file (only on the first process)
+    tools::files::hdf* target = NULL;
+    
+    if (loMPICom.rank() == 0)
+        target = new tools::files::hdf( boost::any_cast<std::string>(l_args["outfile"]), true );
+    
+    
+    // do the first patch
+    ng.trainpatch(loMPICom, data, boost::any_cast<std::size_t>(l_args["iteration"]) );
+    
+    ublas::vector<double> weights                   = ng.getPrototypeWeights(loMPICom);
+    ublas::matrix<double> protos                    = ng.getPrototypes(loMPICom);
+    ublas::vector<double> qerror                    = tools::vector::copy(ng.getLoggedQuantizationError(loMPICom));
+    std::vector< ublas::matrix<double> > logproto   = ng.getLoggedPrototypes(loMPICom);
+    
+    if (target) {
+        target->write<double>( "/patch0/weights",  weights, H5::PredType::NATIVE_DOUBLE );
+        target->write<double>( "/patch0/protos",  protos, H5::PredType::NATIVE_DOUBLE );    
+        
+        if (ng.getLogging()) {
+            target->write<double>( "/patch0/error", qerror, H5::PredType::NATIVE_DOUBLE );
+            
+            for(std::size_t i=0; i < logproto.size(); ++i)
+                target->write<double>("/patch0/log" + boost::lexical_cast<std::string>( i )+"/protos", logproto[i], H5::PredType::NATIVE_DOUBLE );
+        }
+    }
+    
+    
+    
+    for (std::size_t i=1; i < lapath.size(); ++i) {
+        data   = source.readMatrix<double>( lapath[i], H5::PredType::NATIVE_DOUBLE);
+        
+        ng.trainpatch( data, boost::any_cast<std::size_t>(l_args["iteration"]) );
+        
+        
+        weights    = ng.getPrototypeWeights(loMPICom);
+        protos     = ng.getPrototypes(loMPICom);
+        qerror     = tools::vector::copy(ng.getLoggedQuantizationError(loMPICom));
+        logproto   = ng.getLoggedPrototypes(loMPICom);
+        
+        if (target) {
+            target->write<double>( "/patch0/weights",  weights, H5::PredType::NATIVE_DOUBLE );
+            target->write<double>( "/patch0/protos",  protos, H5::PredType::NATIVE_DOUBLE );    
+            
+            if (ng.getLogging()) {
+                target->write<double>( "/patch0/error", qerror, H5::PredType::NATIVE_DOUBLE );
+                
+                for(std::size_t i=0; i < logproto.size(); ++i)
+                    target->write<double>("/patch0/log" + boost::lexical_cast<std::string>( i )+"/protos", logproto[i], H5::PredType::NATIVE_DOUBLE );
+            }
+        }
+    }
+    
+    
+    weights    = ng.getPrototypeWeights(loMPICom);
+    protos     = ng.getPrototypes(loMPICom);
+    qerror     = tools::vector::copy(ng.getLoggedQuantizationError(loMPICom));
+    logproto   = ng.getLoggedPrototypes(loMPICom);
+    if (target) {
+        target->write<double>( "/patch0/weights",  weights, H5::PredType::NATIVE_DOUBLE );
+        target->write<double>( "/patch0/protos",  protos, H5::PredType::NATIVE_DOUBLE );    
+        
+        if (ng.getLogging()) {
+            target->write<double>( "/patch0/error", qerror, H5::PredType::NATIVE_DOUBLE );
+            
+            for(std::size_t i=0; i < logproto.size(); ++i)
+                target->write<double>("/patch0/log" + boost::lexical_cast<std::string>( i )+"/protos", logproto[i], H5::PredType::NATIVE_DOUBLE );
+        }
+    }
+    
+    
+    delete(target);
+    
+    
+    
+    #else
+    
+    //create target file
+    tools::files::hdf target( boost::any_cast<std::string>(l_args["outfile"]), true );
     
     // do the first patch
     ng.trainpatch( data, boost::any_cast<std::size_t>(l_args["iteration"]) );
@@ -189,7 +285,15 @@ int main(int argc, char* argv[]) {
     target.write<double>( "/weights",  ng.getPrototypeWeights(), H5::PredType::NATIVE_DOUBLE );    
     target.write<std::size_t>( "/iteration",   boost::any_cast<std::size_t>(l_args["iteration"]), H5::PredType::NATIVE_ULONG );
     
+    #endif
     
+    
+    
+    
+    // show info
+    #ifdef MACHINELEARNING_MPI
+    if (loMPICom.rank() == 0) {
+    #endif
     
     std::cout << "structure of the output file" << std::endl;
     std::cout << "/numprotos" << "\t\t" << "number of prototypes" << std::endl;
@@ -204,5 +308,9 @@ int main(int argc, char* argv[]) {
         std::cout << "/patch<0 to number of patches-1>/log<0 to number of iteration-1>/protos" << "\t\t" << "prototypes on each patch iteration" << std::endl;
     }
     
+    #ifdef MACHINELEARNING_MPI
+    }
+    #endif
+        
     return EXIT_SUCCESS;
 }
