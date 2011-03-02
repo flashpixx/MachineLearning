@@ -173,7 +173,7 @@ int main(int argc, char* argv[]) {
     
     
     // do the first patch
-    ng.trainpatch(loMPICom, data, boost::any_cast<std::size_t>(l_args["iteration"]) );
+    ng.trainpatch( loMPICom, data, boost::any_cast<std::size_t>(l_args["iteration"]) );
     
     ublas::vector<double> weights                   = ng.getPrototypeWeights(loMPICom);
     ublas::matrix<double> protos                    = ng.getPrototypes(loMPICom);
@@ -197,7 +197,7 @@ int main(int argc, char* argv[]) {
     for (std::size_t i=1; i < lapath.size(); ++i) {
         data   = source.readMatrix<double>( lapath[i], H5::PredType::NATIVE_DOUBLE);
         
-        ng.trainpatch( data, boost::any_cast<std::size_t>(l_args["iteration"]) );
+        ng.trainpatch( loMPICom, data, boost::any_cast<std::size_t>(l_args["iteration"]) );
         
         
         weights    = ng.getPrototypeWeights(loMPICom);
