@@ -220,21 +220,14 @@ int main(int argc, char* argv[]) {
         }
     }
     
-    
+ 
     weights    = ng.getPrototypeWeights(loMPICom);
     protos     = ng.getPrototypes(loMPICom);
-    qerror     = tools::vector::copy(ng.getLoggedQuantizationError(loMPICom));
-    logproto   = ng.getLoggedPrototypes(loMPICom);
     if (target) {
-        target->write<double>( "/patch0/weights",  weights, H5::PredType::NATIVE_DOUBLE );
-        target->write<double>( "/patch0/protos",  protos, H5::PredType::NATIVE_DOUBLE );    
-        
-        if (ng.getLogging()) {
-            target->write<double>( "/patch0/error", qerror, H5::PredType::NATIVE_DOUBLE );
-            
-            for(std::size_t i=0; i < logproto.size(); ++i)
-                target->write<double>("/patch0/log" + boost::lexical_cast<std::string>( i )+"/protos", logproto[i], H5::PredType::NATIVE_DOUBLE );
-        }
+        target->write<double>( "/numprotos",   boost::any_cast<std::size_t>(l_args["prototype"]), H5::PredType::NATIVE_DOUBLE );
+        target->write<double>( "/protos",  protos, H5::PredType::NATIVE_DOUBLE );    
+        target->write<double>( "/weights",  weights, H5::PredType::NATIVE_DOUBLE );    
+        target->write<std::size_t>( "/iteration",   boost::any_cast<std::size_t>(l_args["iteration"]), H5::PredType::NATIVE_ULONG );
     }
     
     
