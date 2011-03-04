@@ -32,6 +32,8 @@ namespace machinelearning {
         /** namespace with classes for generating example data
          * $LastChangedDate$
          * @todo adding support for OpenStreetMap http://wiki.openstreetmap.org/wiki/API
+         * @todo adding support for Apache Cassandra http://en.wikipedia.org/wiki/Apache_Cassandra
+         * @todo adding support for mySQL / MS SQL / Postgres SQL / Oracle
          **/
         namespace sources {};
     
