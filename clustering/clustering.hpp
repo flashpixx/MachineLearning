@@ -42,6 +42,7 @@ namespace machinelearning {
     
     /** namespace for all clustering algorithms
      * $LastChangedDate$
+     * @todo adding SOM
      **/
     namespace clustering {
         
