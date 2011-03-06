@@ -32,7 +32,7 @@ namespace distance  = machinelearning::distances;
 namespace tools     = machinelearning::tools;
 
 
-int main(std::size_t argc, char* argv[]) {
+int main(int argc, char* argv[]) {
     
     if (argc < 5)
         throw std::runtime_error("you need at least five parameter as input. first HDF file, second type of labels (string, int, uint, double), third path to dataset, forth path to labels, optional fifth number of iterations or/and (sixth) \"log\" for logging");
