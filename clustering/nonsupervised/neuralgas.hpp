@@ -955,18 +955,15 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             m_logprototypes.reserve(l_iterationsMPI);
             m_quantizationerror.reserve(l_iterationsMPI);
         }
-        
-        // we need first all prototypes and their weights of each process
-        ublas::matrix<T> l_prototypes       = gatherAllPrototypes( p_mpi );
-        ublas::vector<T> l_prototypeWeights(l_prototypes.size1(), 0);
-        
+
         // if not the first patch add prototypes to data at the end and set the multiplier
         ublas::matrix<T> l_data(p_data);
-        ublas::vector<std::size_t> l_multiplier(p_data.size1(), 1);
+        ublas::vector<std::size_t> l_multiplier(l_data.size1(), 1);
         if (!m_firstpatch) {
             
             // read weights of each process (each prototype) and 
-            l_prototypeWeights = getPrototypeWeights( p_mpi );
+            ublas::vector<T> l_prototypeWeights = getPrototypeWeights( p_mpi );
+            ublas::matrix<T> l_prototypes       = gatherAllPrototypes( p_mpi );
             
             // the weight vector must be divided with the number of CPUs for correct scaling (see note)
             l_prototypeWeights /= p_mpi.size();
@@ -991,8 +988,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
         // run neural gas       
         const T l_multi = 0.01/l_lambdaMPI;
-        ublas::vector<T> l_normvec( getNumberPrototypes(p_mpi), 0 );
-        ublas::matrix<T> l_adaptmatrix( l_prototypes.size1(), l_data.size1() );
+        const std::size_t l_numPrototypes = getNumberPrototypes(p_mpi);
+        ublas::vector<T> l_normvec( l_numPrototypes, 0 );
+        ublas::matrix<T> l_adaptmatrix( l_numPrototypes, l_data.size1() );
         ublas::vector<T> l_rank;
         
         
@@ -1002,7 +1000,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             const T l_lambda = l_lambdaMPI * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(l_iterationsMPI));
             
             // we get all prototypes of every process
-            l_prototypes = gatherAllPrototypes( p_mpi );
+            ublas::matrix<T> l_prototypes = gatherAllPrototypes( p_mpi );
             
             // calculate for every prototype the distance
             for(std::size_t n=0; n < l_prototypes.size1(); ++n)
@@ -1046,6 +1044,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
 
         
         // determine size of receptive fields, but we use only the data points
+        ublas::vector<T> l_prototypeWeights = getPrototypeWeights( p_mpi );
         const ublas::indirect_array< std::vector<std::size_t> > l_winner = use(p_mpi, p_data);
         for(std::size_t i=0; i < l_winner.size(); ++i)
              l_prototypeWeights( l_winner(i) )++;
