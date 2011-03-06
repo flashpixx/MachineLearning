@@ -961,14 +961,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         ublas::vector<T> l_multiplier(l_data.size1(), 1);
         if (!m_firstpatch) {
             
-            // read weights of each process (each prototype) and 
-            ublas::vector<T> l_prototypeWeights = getPrototypeWeights( p_mpi );
-            ublas::matrix<T> l_prototypes       = gatherAllPrototypes( p_mpi );
-            
-            // the weight vector must be divided with the number of CPUs for correct scaling (see note)
-            l_prototypeWeights /= p_mpi.size();
-            
-            // resize data matrix
+            // resize data matrix with prototypes
+            const ublas::matrix<T> l_prototypes       = gatherAllPrototypes( p_mpi );
             l_data.resize( l_data.size1()+l_prototypes.size1(), l_data.size2());
             ublas::matrix_range< ublas::matrix<T> > l_datarange(l_data, 
                                                                 ublas::range( l_data.size1()-l_prototypes.size1(), l_data.size1() ), 
@@ -976,7 +970,12 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
                                                                 );
             l_datarange.assign(l_prototypes);
             
-            // resize multiplier
+            
+            
+            // resize multiplier with prototype weights and  divided them with the number of CPUs for correct scaling (see note)
+            ublas::vector<T> l_prototypeWeights = getPrototypeWeights( p_mpi );
+            l_prototypeWeights /= p_mpi.size();
+            
             l_multiplier.resize( l_multiplier.size()+l_prototypeWeights.size() );
             ublas::vector_range< ublas::vector<T> > l_multiplierrange( l_multiplier, ublas::range( l_multiplier.size()-l_prototypeWeights.size(), l_multiplier.size()) );
             
