@@ -804,16 +804,16 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         if (p_data.size2() != m_prototypes.size2())
             throw exception::runtime(_("data and prototype dimension are not equal"));
         
+        
         //first we gathering all other prototypes
         const ublas::matrix<T> l_prototypes = gatherAllPrototypes( p_mpi );
         
         std::vector<std::size_t> l_vec(p_data.size1());
-        ublas::scalar_vector<T> l_ones(p_data.size1(), 1);
         ublas::matrix<T> l_distance(l_prototypes.size1(), p_data.size1());
         
         // calculate distance for every prototype
         for(std::size_t i=0; i < l_prototypes.size1(); ++i)
-            ublas::row(l_distance, i)  = m_distance.getDistance( p_data, ublas::outer_prod(l_ones, ublas::row(l_prototypes, i)) ) ;
+            ublas::row(l_distance, i)  = m_distance.getDistance( p_data, ublas::row(l_prototypes, i) ) ;
         
         // determine nearest prototype
         for(std::size_t i=0; i < l_prototypes.size2(); ++i) {
@@ -958,7 +958,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
 
         // if not the first patch add prototypes to data at the end and set the multiplier
         ublas::matrix<T> l_data(p_data);
-        ublas::vector<std::size_t> l_multiplier(l_data.size1(), 1);
+        ublas::vector<T> l_multiplier(l_data.size1(), 1);
         if (!m_firstpatch) {
             
             // read weights of each process (each prototype) and 
@@ -978,7 +978,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             
             // resize multiplier
             l_multiplier.resize( l_multiplier.size()+l_prototypeWeights.size() );
-            ublas::vector_range< ublas::vector<std::size_t> > l_multiplierrange( l_multiplier, ublas::range( l_multiplier.size()-l_prototypeWeights.size(), l_multiplier.size()) );
+            ublas::vector_range< ublas::vector<T> > l_multiplierrange( l_multiplier, ublas::range( l_multiplier.size()-l_prototypeWeights.size(), l_multiplier.size()) );
             
             // each prototype is used n (=CPU count) times, because each CPU uses a own data block and the prototypes are added to them,
             // so the multipliers are also added n (=CPU count) time. To correct this, we divide the weights with the number of CPUs
