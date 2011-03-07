@@ -173,7 +173,11 @@ int main(int argc, char* argv[]) {
     
     // create ng objects
     distance::euclid<double> d;
+    #ifdef MACHINELEARNING_MPI
+    cluster::neuralgas<double> ng(d, boost::any_cast< std::vector<std::size_t> >(l_args["prototype"])[static_cast<std::size_t>(loMPICom.rank())], data.size2());
+    #else
     cluster::neuralgas<double> ng(d, boost::any_cast<std::size_t>(l_args["prototype"]), data.size2());
+    #endif
     ng.setLogging( boost::any_cast<bool>(l_args["log"]) );
     
     
