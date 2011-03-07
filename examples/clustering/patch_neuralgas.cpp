@@ -96,7 +96,14 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
 
     
     //check map values and convert them
-    if ( (l_argmap["iteration"].size() != 1) || (l_argmap["prototype"].size() != 1) || (l_argmap["outfile"].size() != 1) || (l_argmap["inputfile"].size() == 0) || (l_argmap["inputpath"].size() == 0) )
+    if ( (l_argmap["iteration"].size() != 1) || 
+         #ifndef MACHINELEARNING_MPI
+         (l_argmap["prototype"].size() != 1) || 
+         #endif
+         (l_argmap["outfile"].size() != 1) || 
+         (l_argmap["inputfile"].size() == 0) || 
+         (l_argmap["inputpath"].size() == 0)
+       )
         throw std::runtime_error("number of arguments are incorrect");
 
     #ifndef MACHINELEARNING_MPI
@@ -114,7 +121,14 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
     
     try {
         p_args["iteration"] = boost::lexical_cast<std::size_t>( l_argmap["iteration"][0] );
+        #ifndef MACHINELEARNING_MPI
         p_args["prototype"]  = boost::lexical_cast<std::size_t>( l_argmap["prototype"][0] );
+        #else
+        std::vector<std::size_t> la;
+        for(std::size_t i=0; i < l_argmap["prototype"].size(); ++i)
+            la.push_back( boost::lexical_cast<std::size_t>(l_argmap["prototype"][i]) );
+        p_args["prototype"] = la;
+        #endif
     } catch (...) {
         throw std::runtime_error("numerical data can not extracted");
     }  
@@ -136,6 +150,8 @@ int main(int argc, char* argv[]) {
     // we check CPU size and number of files
     if ( static_cast<std::size_t>(loMPICom.size()) != boost::any_cast< std::vector<std::string> >(l_args["inputfile"]).size())
         throw std::runtime_error("number of process and number of source files must be equal");
+    if ( static_cast<std::size_t>(loMPICom.size()) != boost::any_cast< std::vector<std::size_t> >(l_args["prototype"]).size())
+        throw std::runtime_error("number of process and number of input prototypes must be equal");
     #endif
 
     

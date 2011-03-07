@@ -416,7 +416,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             m_quantizationerror.reserve(p_iterations);
         }
         
-        
         // if not the first patch add prototypes to data at the end and set the multiplier
         ublas::matrix<T> l_data(p_data);
         ublas::vector<std::size_t> l_multiplier(p_data.size1(), 1);
