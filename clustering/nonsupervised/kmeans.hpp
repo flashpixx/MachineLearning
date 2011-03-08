@@ -59,7 +59,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             std::size_t getPrototypeSize( void ) const;
             std::size_t getPrototypeCount( void ) const;
             std::vector<T> getLoggedQuantizationError( void ) const;
-            ublas::indirect_array< std::vector<std::size_t> > use( const ublas::matrix<T>& ) const;
+            ublas::indirect_array<> use( const ublas::matrix<T>& ) const;
             
             
         private :
@@ -251,12 +251,12 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * @param p_data matrix
      * @return index array of prototype indices
      **/
-    template<typename T> inline ublas::indirect_array< std::vector<std::size_t> > kmeans<T>::use( const ublas::matrix<T>& p_data ) const
+    template<typename T> inline ublas::indirect_array<> kmeans<T>::use( const ublas::matrix<T>& p_data ) const
     {
         if (p_data.size1() < m_prototypes.size1())
             throw exception::runtime(_("number of datapoints are less than prototypes"));        
         
-        std::vector<std::size_t> l_vec(p_data.size1());
+        ublas::indirect_array<> l_idx(p_data.size1());
         ublas::matrix<T> l_distance(m_prototypes.size1(), p_data.size1());
         
         // calculate distance for every prototype
@@ -267,10 +267,10 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         for(std::size_t i=0; i < l_distance.size2(); ++i) {
             ublas::vector<T> l_col                                          = ublas::column(l_distance, i);
             const ublas::indirect_array< std::vector<std::size_t> > l_rank  = tools::vector::rankIndex( l_col );
-            l_vec[i] = l_rank(0);
+            l_idx[i] = l_rank(0);
         }
         
-        return ublas::indirect_array< std::vector<std::size_t> >(l_vec.size(), l_vec);;
+        return l_idx;
         
     }
 

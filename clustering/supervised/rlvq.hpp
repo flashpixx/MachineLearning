@@ -63,7 +63,7 @@ namespace machinelearning { namespace clustering { namespace supervised {
             std::size_t getPrototypeSize( void ) const; 
             std::size_t getPrototypeCount( void ) const;
             std::vector<T> getLoggedQuantizationError( void ) const;
-            ublas::indirect_array< std::vector<std::size_t> > use( const ublas::matrix<T>& ) const;
+            ublas::indirect_array<> use( const ublas::matrix<T>& ) const;
         
         
         private :
@@ -237,7 +237,7 @@ namespace machinelearning { namespace clustering { namespace supervised {
                 
                 // calculate weighted distance and rank vector elements, the first element is the index of the winner prototype
                 ublas::vector<T> l_distance                                     = m_distance.getWeightedDistance( m_prototypes, ublas::row(p_data, j), l_lambda );
-                const ublas::indirect_array< std::vector<std::size_t> > l_rank  = tools::vector::rankIndex( l_distance );
+                const ublas::indirect_array< std::vector<std::size_t>  > l_rank = tools::vector::rankIndex( l_distance );
                 
                 // calculate adapt values
                 const ublas::vector<T> l_winnerdelta    = ublas::row(p_data, j) - ublas::row(m_prototypes, l_rank(0) );
@@ -286,13 +286,12 @@ namespace machinelearning { namespace clustering { namespace supervised {
      * @param p_data unkwon datamatrix
      * @return index position for every datapoint and its prototype / label
     **/
-    template<typename T, typename L> inline ublas::indirect_array< std::vector<std::size_t> > rlvq<T, L>::use( const ublas::matrix<T>& p_data ) const
+    template<typename T, typename L> inline ublas::indirect_array<> rlvq<T, L>::use( const ublas::matrix<T>& p_data ) const
     {
         if (p_data.size2() != m_prototypes.size2())
             throw exception::runtime( _("data and prototype dimension are not equal") );
         
-        std::vector<std::size_t> l_vec;
-        
+        ublas::indirect_array<> l_idx(p_data.size1());
         for(std::size_t i=0; i < p_data.size1(); ++i) {
             
             // calculate distance from datapoint to all prototyps and rank position
@@ -300,10 +299,9 @@ namespace machinelearning { namespace clustering { namespace supervised {
             ublas::indirect_array< std::vector<std::size_t> > l_rank    = tools::vector::rankIndex( l_distance );
             
             // add index
-            l_vec[i] = l_rank(0);
+            l_idx[i] = l_rank(0);
         }
-        
-        return ublas::indirect_array< std::vector<std::size_t> >(l_vec.size(), l_vec);;
+        return l_idx;
     }
 
 

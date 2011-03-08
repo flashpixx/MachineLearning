@@ -68,7 +68,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             std::size_t getPrototypeSize( void ) const;
             std::size_t getPrototypeCount( void ) const;
             std::vector<T> getLoggedQuantizationError( void ) const;
-            ublas::indirect_array< std::vector<std::size_t> > use( const ublas::matrix<T>& ) const;
+            ublas::indirect_array<> use( const ublas::matrix<T>& ) const;
         
             // derived from patch clustering
             ublas::vector<T> getPrototypeWeights( void ) const;
@@ -82,7 +82,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             ublas::matrix<T> getPrototypes( const mpi::communicator& ) const;
             std::vector< ublas::matrix<T> > getLoggedPrototypes( const mpi::communicator& ) const;
             std::vector<T> getLoggedQuantizationError( const mpi::communicator& ) const;
-            ublas::indirect_array< std::vector<std::size_t> > use( const mpi::communicator&, const ublas::matrix<T>& ) const;
+            ublas::indirect_array<> use( const mpi::communicator&, const ublas::matrix<T>& ) const;
             void use( const mpi::communicator& ) const;
         
             // derived from patch clustering
@@ -354,14 +354,14 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * @param p_data matrix
      * @return index array of prototype indices
      **/
-    template<typename T> inline ublas::indirect_array< std::vector<std::size_t> > neuralgas<T>::use( const ublas::matrix<T>& p_data ) const
+    template<typename T> inline ublas::indirect_array<> neuralgas<T>::use( const ublas::matrix<T>& p_data ) const
     {
         if (m_prototypes.size1() == 0)
             throw exception::runtime(_("number of prototypes must be greater than zero"));
         if (p_data.size2() != m_prototypes.size2())
             throw exception::runtime(_("data and prototype dimension are not equal"));
         
-        std::vector<std::size_t> l_vec(p_data.size1());
+        ublas::indirect_array<> l_idx(p_data.size1());
         ublas::matrix<T> l_distance(m_prototypes.size1(), p_data.size1());
         
         // calculate distance for every prototype
@@ -372,10 +372,10 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         for(std::size_t i=0; i < l_distance.size2(); ++i) {
             ublas::vector<T> l_col                                          = ublas::column(l_distance, i);
             const ublas::indirect_array< std::vector<std::size_t> > l_rank  = tools::vector::rankIndex( l_col );
-            l_vec[i] = l_rank(0);
+            l_idx[i] = l_rank(0);
          }
         
-        return ublas::indirect_array< std::vector<std::size_t> >(l_vec.size(), l_vec);
+        return l_idx;
     }
   
     
@@ -491,7 +491,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         }
         
         // determine size of receptive fields, but we use only the data points
-        const ublas::indirect_array< std::vector<std::size_t> > l_winner = use(p_data);
+        const ublas::indirect_array<> l_winner = use(p_data);
         for(std::size_t i=0; i < l_winner.size(); ++i)
             m_prototypeWeights( l_winner(i) )++;
         
@@ -798,7 +798,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * @param p_data matrix
      * @return index array of prototype indices
      **/
-    template<typename T> inline ublas::indirect_array< std::vector<std::size_t> > neuralgas<T>::use( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data ) const
+    template<typename T> inline ublas::indirect_array<> neuralgas<T>::use( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data ) const
     {
         if (p_data.size2() != m_prototypes.size2())
             throw exception::runtime(_("data and prototype dimension are not equal"));
@@ -807,7 +807,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         //first we gathering all other prototypes
         const ublas::matrix<T> l_prototypes = gatherAllPrototypes( p_mpi );
         
-        std::vector<std::size_t> l_vec(p_data.size1());
+        ublas::indirect_array<> l_idx(p_data.size1());
         ublas::matrix<T> l_distance(l_prototypes.size1(), p_data.size1());
         
         // calculate distance for every prototype
@@ -818,10 +818,10 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         for(std::size_t i=0; i < l_prototypes.size2(); ++i) {
             ublas::vector<T> l_col                                          = ublas::column(l_distance, i);
             const ublas::indirect_array< std::vector<std::size_t> > l_rank  = tools::vector::rankIndex( l_col );
-            l_vec[i] = l_rank(0);
+            l_idx[i] = l_rank(0);
         }
         
-        return ublas::indirect_array< std::vector<std::size_t> >(l_vec.size(), l_vec);
+        return l_idx;
     }
     
     
@@ -1043,7 +1043,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
         // determine size of receptive fields, but we use only the data points
         ublas::vector<T> l_prototypeWeights = getPrototypeWeights( p_mpi );
-        const ublas::indirect_array< std::vector<std::size_t> > l_winner = use(p_mpi, p_data);
+        const ublas::indirect_array<> l_winner = use(p_mpi, p_data);
         for(std::size_t i=0; i < l_winner.size(); ++i)
              l_prototypeWeights( l_winner(i) )++;
         
