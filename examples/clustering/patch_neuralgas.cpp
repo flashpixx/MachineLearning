@@ -237,25 +237,10 @@ int main(int argc, char* argv[]) {
     #else
         
         //create target file
-        tools::files::hdf target( boost::any_cast<std::string>(l_args["outfile"]), true );
+        tools::files::hdf target( boost::any_cast<std::string>(l_args["outfile"]), true );       
         
-        // do the first patch
-        ng.trainpatch( data, boost::any_cast<std::size_t>(l_args["iteration"]) );
-        
-        target.write<double>( "/patch0/weights",  ng.getPrototypeWeights(), H5::PredType::NATIVE_DOUBLE );
-        target.write<double>( "/patch0/protos",  ng.getPrototypes(), H5::PredType::NATIVE_DOUBLE );    
-        
-        if (ng.getLogging()) {
-            target.write<double>( "/patch0/error",  tools::vector::copy(ng.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
-            
-            std::vector< ublas::matrix<double> > logproto =  ng.getLoggedPrototypes();
-            for(std::size_t i=0; i < logproto.size(); ++i)
-                target.write<double>("/patch0/log" + boost::lexical_cast<std::string>( i )+"/protos", logproto[i], H5::PredType::NATIVE_DOUBLE );
-        }
-        
-        
-        // do the rest patches
-        for (std::size_t i=1; i < std::max(lafiles.size(), lapath.size()); ++i) {
+        // do each patch
+        for (std::size_t i=0; i < std::max(lafiles.size(), lapath.size()); ++i) {
             source.open( (lafiles.size() == 1) ? lafiles[0] : lafiles[i] );
             data   = source.readMatrix<double>( (lapath.size() == 1) ? lapath[0] : lapath[i], H5::PredType::NATIVE_DOUBLE);
             
