@@ -168,8 +168,7 @@ int main(int argc, char* argv[]) {
         tools::files::hdf source( lafiles[0] );
     #endif
     ublas::matrix<double> data = source.readMatrix<double>(lapath[0], H5::PredType::NATIVE_DOUBLE);
-    
-    
+
     
     // create ng objects
     distance::euclid<double> d;
@@ -179,7 +178,6 @@ int main(int argc, char* argv[]) {
         cluster::neuralgas<double> ng(d, boost::any_cast<std::size_t>(l_args["prototype"]), data.size2());
     #endif
     ng.setLogging( boost::any_cast<bool>(l_args["log"]) );
-    
     
     
     #ifdef MACHINELEARNING_MPI
@@ -195,7 +193,7 @@ int main(int argc, char* argv[]) {
 						   source.readMatrix<double>( lapath[i], H5::PredType::NATIVE_DOUBLE), 
 						   boost::any_cast<std::size_t>(l_args["iteration"])
 					     );
-            
+					
             ublas::vector<double> weights               = ng.getPrototypeWeights(loMPICom);
             ublas::matrix<double> protos                = ng.getPrototypes(loMPICom);
             
@@ -204,7 +202,7 @@ int main(int argc, char* argv[]) {
                 
                 target->write<double>( patchpath+"/weights",  weights, H5::PredType::NATIVE_DOUBLE );
                 target->write<double>( patchpath+"/protos",  protos, H5::PredType::NATIVE_DOUBLE );    
-                
+
                 if (ng.getLogging()) {
                     ublas::vector<double> qerror                   = tools::vector::copy(ng.getLoggedQuantizationError(loMPICom));
                     std::vector< ublas::matrix<double> > logproto  = ng.getLoggedPrototypes(loMPICom);
@@ -221,7 +219,7 @@ int main(int argc, char* argv[]) {
         ublas::vector<double> weights    = ng.getPrototypeWeights(loMPICom);
         ublas::matrix<double> protos     = ng.getPrototypes(loMPICom);
         if (target) {
-            target->write<double>( "/numprotos",   boost::any_cast<std::size_t>(l_args["prototype"]), H5::PredType::NATIVE_DOUBLE );
+            target->write<double>( "/numprotos",  protos.size1(), H5::PredType::NATIVE_DOUBLE );
             target->write<double>( "/protos",  protos, H5::PredType::NATIVE_DOUBLE );    
             target->write<double>( "/weights",  weights, H5::PredType::NATIVE_DOUBLE );    
             target->write<std::size_t>( "/iteration",   boost::any_cast<std::size_t>(l_args["iteration"]), H5::PredType::NATIVE_ULONG );
