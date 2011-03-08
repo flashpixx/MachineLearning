@@ -159,9 +159,8 @@ int main(int argc, char* argv[]) {
     // read input data
     std::vector<std::string> lafiles = boost::any_cast< std::vector<std::string> >(l_args["inputfile"]);
     std::vector<std::string> lapath  = boost::any_cast< std::vector<std::string> >(l_args["inputpath"]);
-    
-    
-    
+
+
     #ifdef MACHINELEARNING_MPI
         tools::files::hdf source( lafiles[static_cast<std::size_t>(loMPICom.rank())] );
     #else
@@ -189,6 +188,7 @@ int main(int argc, char* argv[]) {
 
         // do each patch
         for (std::size_t i=0; i < lapath.size(); ++i) {
+
             ng.trainpatch( loMPICom, 
 						   source.readMatrix<double>( lapath[i], H5::PredType::NATIVE_DOUBLE), 
 						   boost::any_cast<std::size_t>(l_args["iteration"])
