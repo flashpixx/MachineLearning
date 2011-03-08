@@ -33,7 +33,7 @@ namespace neighbor   = machinelearning::neighborhood;
 namespace tools      = machinelearning::tools;
 
 
-int main(std::size_t argc, char* argv[]) {
+int main(int argc, char* argv[]) {
 
     if (argc < 7)
         throw std::runtime_error("you need at least five parameter as input. first HDF file, second type of labels (string, int, uint, double), third path to dataset, forth path to labels, fifth path to unkwon data, sixth type of distance (invert, distance), optional seventh for number of neighbours, eighth \"log\" for logging");

@@ -30,7 +30,7 @@ namespace dim   = machinelearning::dimensionreduce::nonsupervised;
 namespace tools  = machinelearning::tools;
 
 
-int main(std::size_t argc, char* argv[]) {
+int main(int argc, char* argv[]) {
     if (argc < 4)
         throw std::runtime_error("you need at least three parameter as input. first HDF file, second path to dataset, third number of projected dimensions");
     

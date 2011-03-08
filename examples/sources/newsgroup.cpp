@@ -26,7 +26,7 @@
 using namespace machinelearning;
 
 
-int main(std::size_t argc, char* argv[]) {
+int main(int argc, char* argv[]) {
     
     if (argc < 2)
         throw std::runtime_error("you need at least one parameter as input. first newsgroup server and optional second parameter for the group name");

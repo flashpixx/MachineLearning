@@ -31,7 +31,7 @@ namespace dim   = machinelearning::dimensionreduce::supervised;
 namespace tools = machinelearning::tools;
 
 
-int main(std::size_t argc, char* argv[]) {
+int main(int argc, char* argv[]) {
     
     if (argc < 6)
         throw std::runtime_error("you need at least five parameter as input. first HDF file, second number of projected dimensions, third type of labels (string, int, uint, double), forth path to dataset, fifth path to labels");

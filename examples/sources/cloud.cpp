@@ -27,7 +27,7 @@
 using namespace machinelearning;
 
 
-int main(std::size_t argc, char* argv[]) {
+int main(int argc, char* argv[]) {
     
     // set default values
     std::size_t dim                 = 0;

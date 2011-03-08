@@ -30,7 +30,7 @@ using namespace boost::numeric;
 using namespace machinelearning;
 
 
-int main(std::size_t argc, char* argv[]) {
+int main(int argc, char* argv[]) {
 
     if (argc < 3)
         throw std::runtime_error("you need at least two files as input");
