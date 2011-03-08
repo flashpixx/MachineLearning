@@ -50,6 +50,7 @@
  *
  * @section def definition / style guide
  * <ul>
+ * <li>the framework is only header-based so you don't need compile any files</li>
  * <li>data points should be matrix data and the matrix is row-orientated, so for K data points with every point dimension P, we have a K x P matrix (prototype matrices are equal)</li>
  * <li>all template classes / algorithms must have a floating point datatype on instantiation, because the datastructurs need this types for correct value calculating. The (base) classes use a static assertion for checking the value type</li>
  * <li>all compiler flags start with <dfn>MACHINELEARNING_</dfn></li>
