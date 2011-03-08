@@ -141,7 +141,7 @@ int main(int argc, char* argv[]) {
     
     std::map<std::string, boost::any> l_args;
     if (!cliArguments(argc, argv, l_args))
-        return EXIT_SUCCESS;
+        return EXIT_FAILURE;
     
     #ifdef MACHINELEARNING_MPI
         mpi::environment loMPIenv(argc, argv);
@@ -182,21 +182,19 @@ int main(int argc, char* argv[]) {
     
     
     
-    
     #ifdef MACHINELEARNING_MPI
         
         //create target file (only on the first process)
         tools::files::hdf* target = NULL;
-        
         if (loMPICom.rank() == 0)
             target = new tools::files::hdf( boost::any_cast<std::string>(l_args["outfile"]), true );
-        
+
         // do each patch
         for (std::size_t i=0; i < lapath.size(); ++i) {
-            data   = source.readMatrix<double>( lapath[i], H5::PredType::NATIVE_DOUBLE);
-            
-            ng.trainpatch( loMPICom, data, boost::any_cast<std::size_t>(l_args["iteration"]) );
-            
+            ng.trainpatch( loMPICom, 
+						   source.readMatrix<double>( lapath[i], H5::PredType::NATIVE_DOUBLE), 
+						   boost::any_cast<std::size_t>(l_args["iteration"])
+					     );
             
             ublas::vector<double> weights               = ng.getPrototypeWeights(loMPICom);
             ublas::matrix<double> protos                = ng.getPrototypes(loMPICom);
@@ -242,9 +240,10 @@ int main(int argc, char* argv[]) {
         // do each patch
         for (std::size_t i=0; i < std::max(lafiles.size(), lapath.size()); ++i) {
             source.open( (lafiles.size() == 1) ? lafiles[0] : lafiles[i] );
-            data   = source.readMatrix<double>( (lapath.size() == 1) ? lapath[0] : lapath[i], H5::PredType::NATIVE_DOUBLE);
-            
-            ng.trainpatch( data, boost::any_cast<std::size_t>(l_args["iteration"]) );
+            ng.trainpatch(  
+						   source.readMatrix<double>( lapath[i], H5::PredType::NATIVE_DOUBLE), 
+						   boost::any_cast<std::size_t>(l_args["iteration"])
+					     );
 
             std::string patchpath = "/patch" + boost::lexical_cast<std::string>(i);
             target.write<double>( patchpath+"/weights",  ng.getPrototypeWeights(), H5::PredType::NATIVE_DOUBLE );

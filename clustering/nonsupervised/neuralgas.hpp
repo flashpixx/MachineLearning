@@ -815,7 +815,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             ublas::row(l_distance, i)  = m_distance.getDistance( p_data, ublas::row(l_prototypes, i) ) ;
         
         // determine nearest prototype
-        for(std::size_t i=0; i < l_prototypes.size2(); ++i) {
+        for(std::size_t i=0; i < l_distance.size2(); ++i) {
             ublas::vector<T> l_col                                          = ublas::column(l_distance, i);
             const ublas::indirect_array< std::vector<std::size_t> > l_rank  = tools::vector::rankIndex( l_col );
             l_idx[i] = l_rank(0);
@@ -991,7 +991,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         ublas::matrix<T> l_adaptmatrix( l_numPrototypes, l_data.size1() );
         ublas::vector<T> l_rank;
         
-        
         for(std::size_t i=0; (i < l_iterationsMPI); ++i) {
             
             // create adapt values
@@ -1039,14 +1038,13 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
                 m_quantizationerror.push_back( calculateQuantizationError(l_data, m_prototypes) );
             }
         }
-
         
         // determine size of receptive fields, but we use only the data points
-        ublas::vector<T> l_prototypeWeights = getPrototypeWeights( p_mpi );
+        ublas::vector<T> l_prototypeWeights    = getPrototypeWeights( p_mpi );
         const ublas::indirect_array<> l_winner = use(p_mpi, p_data);
-        for(std::size_t i=0; i < l_winner.size(); ++i)
+		for(std::size_t i=0; i < l_winner.size(); ++i)
              l_prototypeWeights( l_winner(i) )++;
-        
+
         // synchronize the weights for each process to get weights for the whole data space
         synchronizePrototypeWeights(p_mpi, l_prototypeWeights);
 
