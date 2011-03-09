@@ -958,6 +958,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         // if not the first patch add prototypes to data at the end and set the multiplier
         ublas::matrix<T> l_data(p_data);
         ublas::vector<T> l_multiplier(l_data.size1(), 1);
+        
+        ublas::vector<T> l_prototypeWeights = getPrototypeWeights( p_mpi );
+        
         if (!m_firstpatch) {
             
             // resize data matrix with prototypes
@@ -971,8 +974,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             
             
             
-            // resize multiplier with prototype weights and  divided them with the number of CPUs for correct scaling (see note)
-            ublas::vector<T> l_prototypeWeights = getPrototypeWeights( p_mpi );
+            // resize multiplier with prototype weights and divided them with the number of CPUs for correct scaling (see note)
             l_prototypeWeights /= p_mpi.size();
             
             l_multiplier.resize( l_multiplier.size()+l_prototypeWeights.size() );
@@ -1040,7 +1042,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         }
         
         // determine size of receptive fields, but we use only the data points
-        ublas::vector<T> l_prototypeWeights    = getPrototypeWeights( p_mpi );
         const ublas::indirect_array<> l_winner = use(p_mpi, p_data);
 		for(std::size_t i=0; i < l_winner.size(); ++i)
              l_prototypeWeights( l_winner(i) )++;

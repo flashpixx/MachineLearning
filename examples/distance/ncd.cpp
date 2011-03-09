@@ -23,6 +23,8 @@
 
 #include <machinelearning.h>
 #include <string>
+#include <map>
+#include <boost/any.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/symmetric.hpp>
 
@@ -30,29 +32,128 @@ using namespace boost::numeric;
 using namespace machinelearning;
 
 
+bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_args ) {
+    
+    if (argc < 2) {
+        std::cout << "--inputfile" << "\t" << "input HDF5 file" << std::endl;
+        std::cout << "--outfile" << "\t" << "optional output HDF5 file" << std::endl;
+        std::cout << "--compress" << "\t" << "compression level (allowed values are: default, bestspeed or bestcompression)" << std::endl;
+        std::cout << "--algorithm" << "\t" << "compression algorithm (allowed values are: gzip, bzip)" << std::endl;
+        std::cout << "--matrix" << "\t" << "structure of the matrix (allowed values are: symmetric or unsymmetric" << std::endl;
+        return false;
+    }
+    
+    
+    // set default arguments
+    std::map<std::string, std::vector<std::string> > l_argmap;
+    l_argmap["inputfile"] = std::vector<std::string>();
+    l_argmap["outfile"]   = std::vector<std::string>();
+    l_argmap["compress"] = std::vector<std::string>();
+    l_argmap["algorithm"] = std::vector<std::string>();
+    l_argmap["matrix"] = std::vector<std::string>();
+    
+    
+    // read all arguments
+    std::size_t n=1;
+    for(int i=1; i < argc; i+=n) {
+        n = 1;
+        std::string lc(argv[i]);
+        if (lc.length() < 2)
+            continue;
+        
+        lc = lc.substr(2);
+        boost::to_lower( lc );
+        
+        if (l_argmap.find(lc) != l_argmap.end()) {
+            std::vector<std::string> lv;
+            
+            for(int l=i+1; l < argc; ++l) {
+                std::string lc2(argv[l]);
+                if ( (lc2.length() >= 2) && (lc2.substr(0,2) == "--") )
+                    break;
+                
+                lv.push_back(lc2);
+                n++;
+            }
+            
+            l_argmap[lc] = lv;
+        }
+        
+    }
+    
+    
+    //check map values and convert them
+    if (l_argmap["inputfile"].size() < 2)
+        throw std::runtime_error("number of input files must be equal or greater than two");
+    
+    //set default arguments
+    p_args["inputfile"]   = l_argmap["inputfile"];
+    p_args["outfile"]     = std::string();
+
+    if (l_argmap["outfile"].size() > 0)
+        p_args["outfile"]     = l_argmap["outfile"][0];
+    
+    if (l_argmap["algorithm"].size() != 1);
+        l_argmap["algorithm"].push_back("bzip");
+    
+    if (l_argmap["compress"].size() != 1)
+        l_argmap["compress"].push_back("default");
+    
+    if (l_argmap["matrix"].size() != 1)
+        l_argmap["matrix"].push_back("unsymmetric");
+
+    // check input arguments and convert them
+    boost::to_lower(l_argmap["algorithm"][0]);
+    if (l_argmap["algorithm"][0] == "gzip")
+        p_args["algorithm"]   = distances::ncd<double>::gzip;
+    if (l_argmap["algorithm"][0] == "bzip")
+        p_args["algorithm"]   = distances::ncd<double>::bzip2;
+
+    boost::to_lower(l_argmap["compress"][0]);
+    if (l_argmap["compress"][0] == "default")
+        p_args["compress"]    = distances::ncd<double>::defaultcompression;
+    if (l_argmap["compress"][0] == "bestspeed")
+        p_args["compress"]    = distances::ncd<double>::bestspeed;
+    if (l_argmap["compress"][0] == "bestcompression")
+        p_args["compress"]    = distances::ncd<double>::bestcompression;
+
+    boost::to_lower(l_argmap["matrix"][0]);
+    if ( (l_argmap["matrix"][0] == "symmetric") || (l_argmap["matrix"][0] == "unsymmetric"))
+        p_args["matrix"] = l_argmap["matrix"][0];
+    
+    return true;
+}
+
+
 int main(int argc, char* argv[]) {
 
-    if (argc < 3)
-        throw std::runtime_error("you need at least two files as input");
+    std::map<std::string, boost::any> l_args;
+    if (!cliArguments(argc, argv, l_args))
+        return EXIT_FAILURE;
     
-    // create ncd object (set optional compression level)
-    distances::ncd<double> ncd( distances::ncd<double>::bzip2 );
-    //ncd.setCompressionLevel( dist::ncd::bestspeed );
-    
-    // copy parameters to a std::vector
-    std::vector<std::string> val;
-    for(std::size_t i=1; i < argc; i++)
-        val.push_back( argv[i] );
+    // create ncd object
+    distances::ncd<double> ncd( boost::any_cast< distances::ncd<double>::compresstype >(l_args["algorithm"]) );
+    ncd.setCompressionLevel( boost::any_cast< distances::ncd<double>::compresslevel >(l_args["compress"]) );
     
     // create the distance matrix and use the each element of the vector as a filename
-    // optional can be created a symmetric distance matrix (it's a little bit faster) 
-    ublas::matrix<double> distancematrix = ncd.unsymmetric(val, true);
-    //ublas::matrix<double> distancematrix = ncd.symmetric(val, true);
+    ublas::matrix<double> distancematrix;
     
-    // create hdf file and write data
-    tools::files::hdf file("ncd.hdf5", true);
-    file.write<double>( "/data",  distancematrix, H5::PredType::NATIVE_DOUBLE );
-        
-    std::cout << "distance matrix (create HDF file \"ncd.hdf5\" with dataset \"/data\"): \n" << std::endl;
+    
+    if (boost::any_cast<std::string>(l_args["matrix"]) == "unsymmetric")
+        distancematrix = ncd.unsymmetric( boost::any_cast< std::vector<std::string> >(l_args["inputfile"]), true);
+    else
+        distancematrix = ncd.symmetric( boost::any_cast< std::vector<std::string> >(l_args["inputfile"]), true);
+
+    
+    if (boost::any_cast<std::string>(l_args["outfile"]).empty())
+        std::cout << distancematrix << std::endl;
+    else {
+        // create hdf file and write data
+        tools::files::hdf file(boost::any_cast<std::string>(l_args["outfile"]), true);
+        file.write<double>( "/ncd",  distancematrix, H5::PredType::NATIVE_DOUBLE );
+        std::cout << "structure of the output file" << std::endl;
+        std::cout << "/ncd" << "\t\t" << "distance matrix" << std::endl;
+    }
+    
     return EXIT_SUCCESS;
 }

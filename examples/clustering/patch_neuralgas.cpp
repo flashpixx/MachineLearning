@@ -21,7 +21,6 @@
  @endcond
  **/
 
-#include <algorithm>
 #include <map>
 
 #include <machinelearning.h>
