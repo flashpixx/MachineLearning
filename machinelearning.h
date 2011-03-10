@@ -412,7 +412,7 @@
 #define MACHINELEARNING_H
 
 
-/** main namespace for the framework with version information
+/** main namespace of the framework
  * $LastChangedDate$
  **/
 namespace machinelearning {};
