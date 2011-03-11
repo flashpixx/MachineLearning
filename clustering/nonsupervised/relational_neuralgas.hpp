@@ -258,7 +258,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             // create adapt values
             const T l_lambda = p_lambda * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(p_iterations));
             
-            // calculate for every prototype the distance (relational)
+            // calculate for every prototype the distance
+            // relational: (D * alpha_i)_j - 0.5 * alpha_i^t * D * alpha_i = || x^j - w^i || 
+            // D = distance, alpha = weight of the prototype for the konvex combination
             const ublas::matrix<T> l_temp1 = ublas::prod(m_prototypes, p_data);
             
             ublas::vector<T> l_temp2(l_temp1.size1());
