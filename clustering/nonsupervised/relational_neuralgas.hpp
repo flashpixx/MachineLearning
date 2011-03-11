@@ -78,7 +78,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
             /** prototypes **/
             ublas::matrix<T> m_prototypes;
-            /** k-approximation object **/
+            /** k-approximation object
+             * @todo swap pointer to reference and initialize it with default object
+             **/
             const neighborhood::kapproximation<T>* m_kapprox;
             /** distance object for normalization **/
             const distances::euclid<T> m_euclid;
@@ -249,16 +251,51 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
         // run neural gas       
         const T l_multi = 0.01/p_lambda;
-        T l_lambda      = 0;
-        T l_norm        = 0;
         ublas::matrix<T> l_adaptmatrix( m_prototypes.size1(), p_data.size1() );
-        ublas::vector<T> l_rank;
         
         for(std::size_t i=0; (i < p_iterations); ++i) {
             
             // create adapt values
-            l_lambda = p_lambda * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(p_iterations));
+            const T l_lambda = p_lambda * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(p_iterations));
             
+            // calculate for every prototype the distance (relational)
+            const ublas::matrix<T> l_temp1 = ublas::prod(m_prototypes, p_data);
+            
+            ublas::vector<T> l_temp2(l_temp1.size1());
+            for(std::size_t n=0; n < l_temp1.size1(); ++n)
+                l_temp2(i) = 0.5 * ublas::prod( ublas::row(m_prototypes, i), ublas::row(l_temp1, i) );
+            
+            
+            
+            // for every column ranks values and create adapts
+            // we need rank and not randIndex, because we 
+            // use the value of the ranking for calculate the 
+            // adapt value
+            for(std::size_t n=0; n < l_adaptmatrix.size2(); ++n) {
+                ublas::vector<T> l_rank = ublas::column(l_adaptmatrix, n);
+                l_rank = tools::vector::rank( l_rank );
+                
+                // calculate adapt value
+                BOOST_FOREACH( T& p, l_rank)
+                    p = std::exp( -p / l_lambda );
+                
+                // return value to matrix
+                ublas::column(l_adaptmatrix, n) = l_rank;
+            }
+            
+            // create prototypes (sum of each row of the adapt matrix and element divide row by row)
+            for(std::size_t n=0; n < m_prototypes.size1(); ++n) {
+                const T l_sum = ublas::sum( ublas::row(m_prototypes, n) );
+                
+                if (!tools::function::isNumericalZero(l_sum))
+                    ublas::row(m_prototypes, n) /= l_sum;
+            }
+                
+            // determine quantization error for logging
+            if (m_logging) {
+                m_logprototypes.push_back( m_prototypes );
+                m_quantizationerror.push_back( calculateQuantizationError(p_data, m_prototypes) );
+            }
         }
     }
 

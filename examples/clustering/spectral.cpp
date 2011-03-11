@@ -21,7 +21,10 @@
  @endcond
  **/
 
+#include <map>
+
 #include <machinelearning.h>
+#include <boost/any.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
@@ -31,69 +34,132 @@ namespace cluster   = machinelearning::clustering::nonsupervised;
 namespace tools     = machinelearning::tools;
 
 
+
+bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_args ) {
+    
+    if (argc < 2) {
+        std::cout << "--inputfile" << "\t" << "input HDF5 file" << std::endl;
+        std::cout << "--inputpath" << "\t" << "path to dataset" << std::endl;
+        std::cout << "--outfile" << "\t" << "output HDF5 file" << std::endl;
+        std::cout << "--iteration" << "\t" << "number of iteration" << std::endl;
+        std::cout << "--prototype" << "\t" << "number of prototypes" << std::endl;
+        std::cout << "--log" << "\t" << "'on' for enable logging" << std::endl;
+        
+        return false;
+    }
+    
+    
+    // set default arguments
+    std::map<std::string, std::vector<std::string> > l_argmap;
+    l_argmap["inputfile"] = std::vector<std::string>();
+    l_argmap["inputpath"] = std::vector<std::string>();
+    l_argmap["outfile"]   = std::vector<std::string>();
+    l_argmap["iteration"] = std::vector<std::string>();
+    l_argmap["prototype"] = std::vector<std::string>();
+    l_argmap["log"]       = std::vector<std::string>();
+    
+    
+    // read all arguments
+    std::size_t n=1;
+    for(int i=1; i < argc; i+=n) {
+        n = 1;
+        std::string lc(argv[i]);
+        if (lc.length() < 2)
+            continue;
+        
+        lc = lc.substr(2);
+        boost::to_lower( lc );
+        
+        if (l_argmap.find(lc) != l_argmap.end()) {
+            std::vector<std::string> lv;
+            
+            for(int l=i+1; l < argc; ++l) {
+                std::string lc2(argv[l]);
+                if ( (lc2.length() >= 2) && (lc2.substr(0,2) == "--") )
+                    break;
+                
+                lv.push_back(lc2);
+                n++;
+            }
+            
+            l_argmap[lc] = lv;
+        }
+        
+    }
+    
+    
+    //check map values and convert them
+    if ( (l_argmap["iteration"].size() != 1) || 
+        (l_argmap["prototype"].size() != 1) || 
+        (l_argmap["outfile"].size() != 1) || 
+        (l_argmap["inputfile"].size() != 1) || 
+        (l_argmap["inputpath"].size() != 1)
+        )
+        throw std::runtime_error("number of arguments are incorrect");
+    
+    p_args["log"]           = l_argmap["log"].size() > 0;
+    p_args["inputfile"]     = l_argmap["inputfile"][0];
+    p_args["inputpath"]     = l_argmap["inputpath"][0];
+    p_args["outfile"]       = l_argmap["outfile"][0];
+    
+    try {
+        p_args["iteration"] = boost::lexical_cast<std::size_t>( l_argmap["iteration"][0] );
+        p_args["prototype"]  = boost::lexical_cast<std::size_t>( l_argmap["prototype"][0] );
+    } catch (...) {
+        throw std::runtime_error("numerical data can not extracted");
+    }  
+    
+    return true;
+}
+
+
+
 int main(int argc, char* argv[]) {
     
-    if (argc < 4)
-        throw std::runtime_error("you need at least three parameter as input. first HDF file, second path to dataset, third number of prototypes, optional forth number of iterations or/and (fifth) \"log\" for logging");
+    std::map<std::string, boost::any> l_args;
+    if (!cliArguments(argc, argv, l_args))
+        return EXIT_FAILURE;
     
-    // convert string parameter to numerical data
-    std::size_t numprotos = 0;
-    try {
-        numprotos = boost::lexical_cast<std::size_t>(argv[3]);
-    } catch (...) {
-        throw std::runtime_error("target dimension can not be read");
-    }
-    
-    // convert iteration or logging if exists
-    std::size_t iteration = 15;
-    bool log = false;
-    try {
-        std::string forth(  (argc > 4) ? argv[4] : ""  );
-        std::string fifth(  (argc > 5) ? argv[5] : ""  );
-        
-        if (!forth.empty())
-            boost::to_lower( forth );
-        if (!fifth.empty())
-            boost::to_lower( fifth );
-        
-        if (forth == "log")
-            log = true;
-        else
-            if (!forth.empty())
-                iteration = boost::lexical_cast<std::size_t>(forth);
-        
-        if (fifth == "log")
-            log = true;
-    } catch (...) {
-        throw std::runtime_error("numerical data can not be read");
-    }
-    
-    
+
     // read source hdf file and data 
-    tools::files::hdf source( argv[1] );
-    ublas::matrix<double> data = source.readMatrix<double>(argv[2], H5::PredType::NATIVE_DOUBLE);
+    tools::files::hdf source( boost::any_cast<std::string>(l_args["inputfile"]) );
+    ublas::matrix<double> data = source.readMatrix<double>(boost::any_cast<std::string>(l_args["inputpath"]), H5::PredType::NATIVE_DOUBLE);
     
     // create spectral clustering object, set number of prototypes, data size and logging
-    cluster::spectralclustering<double> spectral(numprotos, data.size2());
-    spectral.setLogging(log);
+    cluster::spectralclustering<double> spectral(boost::any_cast<std::size_t>(l_args["prototype"]), data.size2());
+    spectral.setLogging(boost::any_cast<bool>(l_args["log"]));
     
     // do clustering
-    spectral.train(data, iteration);
+    spectral.train(data, boost::any_cast<std::size_t>(l_args["iteration"]));
     
     
-    // create target file
-    tools::files::hdf target("spectral.hdf5", true);
-    target.write<double>( "/numprotos",  numprotos, H5::PredType::NATIVE_DOUBLE );
-    target.write<double>( "/protos",  spectral.getPrototypes(), H5::PredType::NATIVE_DOUBLE );    
-    target.write<std::size_t>( "/iteration",  iteration, H5::PredType::NATIVE_ULONG );
+    // create file and write data to hdf
+    tools::files::hdf target(boost::any_cast<std::string>(l_args["outfile"]), true);
     
+    target.write<double>( "/protos",  spectral.getPrototypes(), H5::PredType::NATIVE_DOUBLE );
+    target.write<double>( "/numprotos",  boost::any_cast<std::size_t>(l_args["prototype"]), H5::PredType::NATIVE_DOUBLE );
+    target.write<std::size_t>( "/iteration",  boost::any_cast<std::size_t>(l_args["iteration"]), H5::PredType::NATIVE_ULONG );
+    
+    // if logging exists write data to file
     if (spectral.getLogging()) {
         target.write<double>( "/error",  tools::vector::copy(spectral.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
-        std::vector< ublas::matrix<double> > logproto =  spectral.getLoggedPrototypes();
-        for(std::size_t i=0; i < logproto.size(); ++i)
-            target.write<double>("/log" + boost::lexical_cast<std::string>( i ), logproto[i], H5::PredType::NATIVE_DOUBLE );
+        std::vector< ublas::matrix<double> > p = spectral.getLoggedPrototypes();
+        for(std::size_t i=0; i < p.size(); ++i)
+            target.write<double>("/log" + boost::lexical_cast<std::string>( i )+"/protos", p[i], H5::PredType::NATIVE_DOUBLE );
     }
     
-    std::cout << "create HDF file \"spectral.hdf5\" with dataset \"/protos \", \"/iteration\" number of iteration, \"numprotos\" number of prototypes and if logging is enabled \"/error\" with quantization error and \"/log<0 to iterations-1>\" logged prototypes" << std::endl;
+    
+    std::cout << "structure of the output file" << std::endl;
+    std::cout << "/numprotos" << "\t\t" << "number of prototypes" << std::endl;
+    std::cout << "/protos" << "\t\t" << "prototype matrix (row orientated)" << std::endl;
+    std::cout << "/iteration" << "\t\t" << "number of iterations" << std::endl;
+    
+    if (spectral.getLogging()) {
+        std::cout << "/error" << "\t\t" << "quantization error on each iteration" << std::endl;
+        std::cout << "/log<0 to number of iteration-1>/protosos" << "\t\t" << "prototypes on each iteration" << std::endl;
+    }
+    
+    
+    
     return EXIT_SUCCESS;
 }

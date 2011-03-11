@@ -281,15 +281,12 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
         // run neural gas       
         const T l_multi = 0.01/p_lambda;
-        T l_lambda      = 0;
-        T l_norm        = 0;
         ublas::matrix<T> l_adaptmatrix( m_prototypes.size1(), p_data.size1() );
-        ublas::vector<T> l_rank;
         
         for(std::size_t i=0; (i < p_iterations); ++i) {
             
             // create adapt values
-            l_lambda = p_lambda * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(p_iterations));
+            const T l_lambda = p_lambda * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(p_iterations));
             
             
             // calculate for every prototype the distance
@@ -301,7 +298,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             // use the value of the ranking for calculate the 
             // adapt value
             for(std::size_t n=0; n < l_adaptmatrix.size2(); ++n) {
-                l_rank = ublas::column(l_adaptmatrix, n);
+                ublas::vector<T> l_rank = ublas::column(l_adaptmatrix, n);
                 l_rank = tools::vector::rank( l_rank );
                 
                 // calculate adapt value
@@ -318,7 +315,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             
             // normalize prototypes
             for(std::size_t n=0; n < m_prototypes.size1(); ++n) {
-                l_norm = ublas::sum( ublas::row(l_adaptmatrix, n) );
+                const T l_norm = ublas::sum( ublas::row(l_adaptmatrix, n) );
                 
                 if (!tools::function::isNumericalZero(l_norm))
                     ublas::row(m_prototypes, n) /= l_norm;
@@ -439,7 +436,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         // run neural gas       
         const T l_multi = 0.01/p_lambda;
         ublas::matrix<T> l_adaptmatrix( m_prototypes.size1(), l_data.size1() );
-        ublas::vector<T> l_rank;
                 
         for(std::size_t i=0; (i < p_iterations); ++i) {
             
@@ -456,7 +452,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             // use the value of the ranking for calculate the 
             // adapt value
             for(std::size_t n=0; n < l_adaptmatrix.size2(); ++n) {
-                l_rank = ublas::column(l_adaptmatrix, n);
+                ublas::vector<T> l_rank = ublas::column(l_adaptmatrix, n);
                 l_rank = tools::vector::rank( l_rank );
                 
                 // calculate adapt value
@@ -991,7 +987,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         const std::size_t l_numPrototypes = getNumberPrototypes(p_mpi);
         ublas::vector<T> l_normvec( l_numPrototypes, 0 );
         ublas::matrix<T> l_adaptmatrix( l_numPrototypes, l_data.size1() );
-        ublas::vector<T> l_rank;
         
         for(std::size_t i=0; (i < l_iterationsMPI); ++i) {
             
@@ -1010,7 +1005,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             // use the value of the ranking for calculate the 
             // adapt value
             for(std::size_t n=0; n < l_adaptmatrix.size2(); ++n) {
-                l_rank = ublas::column(l_adaptmatrix, n);
+                ublas::vector<T> l_rank = ublas::column(l_adaptmatrix, n);
                 l_rank = tools::vector::rank( l_rank );
                 
                 // calculate adapt value
