@@ -149,7 +149,7 @@ int main(int argc, char* argv[]) {
            ))
             throw std::runtime_error("number of files or number of path must be equal to CPU rank");
         
-        if (boost::any_cast< std::vector<std::size_t> >(l_args["prototype"]).size() != loMPICom.size())
+        if (boost::any_cast< std::vector<std::size_t> >(l_args["prototype"]).size() != static_cast<std::size_t>(loMPICom.size()))
             throw std::runtime_error("number of prototypes must be equal to CPU rank");
     #endif
         
