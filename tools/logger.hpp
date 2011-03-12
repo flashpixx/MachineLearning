@@ -63,7 +63,7 @@ namespace machinelearning { namespace tools {
         MPI::Finalize())
      * @endcode
      * The MPI libraries must be compiled with multithread support
-     * @todo tmpnam(NULL) change to a safe variante (posix mkstemp(), but this isn't standard)
+     * @todo tmpnam(NULL) change to a safe variante (posix mkstemp(), but this isn't standard), switch to boost::filesystem::path temp_directory_path and unique_path
      **/
     class logger {
         
