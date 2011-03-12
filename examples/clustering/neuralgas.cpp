@@ -144,8 +144,8 @@ int main(int argc, char* argv[]) {
         mpi::environment loMPIenv(argc, argv);
         mpi::communicator loMPICom;
     
-        if (!( ((boost::any_cast< std::vector<std::string> >(l_args["inputfile"]).size() == loMPICom.size()) && (boost::any_cast< std::vector<std::string> >(l_args["inputpath"]).size() == 1)) ||
-               ((boost::any_cast< std::vector<std::string> >(l_args["inputpath"]).size() == loMPICom.size()) && (boost::any_cast< std::vector<std::string> >(l_args["inputfile"]).size() == 1))
+        if (!( ((boost::any_cast< std::vector<std::string> >(l_args["inputfile"]).size() == static_cast<std::size_t>(loMPICom.size())) && (boost::any_cast< std::vector<std::string> >(l_args["inputpath"]).size() == 1)) ||
+               ((boost::any_cast< std::vector<std::string> >(l_args["inputpath"]).size() == static_cast<std::size_t>(loMPICom.size())) && (boost::any_cast< std::vector<std::string> >(l_args["inputfile"]).size() == 1))
            ))
             throw std::runtime_error("number of files or number of path must be equal to CPU rank");
         
