@@ -138,7 +138,9 @@ namespace machinelearning { namespace tools {
     logger::logger* logger::m_instance  = NULL;
     
     
-    /** constructor **/
+    /** constructor
+     * @todo move create_directory to write method
+     **/
     inline logger::logger( void ) :
         m_filename(),
         m_logstate(none),
