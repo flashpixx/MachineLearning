@@ -24,6 +24,8 @@
 
 #ifndef MACHINELEARNING_TOOLS_LOGGER_HPP
 #define MACHINELEARNING_TOOLS_LOGGER_HPP
+#define MACHINELEARNING_LOGGER_PATHSUFFIX "machinelearning_%%%%%"
+#define MACHINELEARNING_LOGGER_FILENAME "log.txt"
 
 #include <string>
 #include <iostream>
@@ -32,6 +34,7 @@
 #include <ctime>
 
 #include <boost/thread.hpp>
+#include <boost/filesystem.hpp>
 
 #ifdef MACHINELEARNING_MPI
 #define MACHINELEARNING_LOGGER_MPI_TAG  999
@@ -46,6 +49,7 @@
 
 namespace machinelearning { namespace tools { 
     
+    namespace fsys  = boost::filesystem;
     #ifdef MACHINELEARNING_MPI
     namespace mpi   = boost::mpi;
     #endif
@@ -53,6 +57,8 @@ namespace machinelearning { namespace tools {
 
     /** logger class for writing log information 
      * $LastChangedDate$
+     * @note there are two defines for setting the logger directory (MACHINELEARNING_LOGGER_PATHSUFFIX) and logger file (MACHINELEARNING_LOGGER_FILENAME). Within the path suffix the % characters will be
+     * substitute to a random hexadecimal value and the directory is created under the temporary path. The value of the filename is append to this directory for writing the log items
      * @note for MPI using every process must call startListener and shutdownListener for synchronize the CPUs and the tag for logtargets is set with a preprocessor flag (MACHINELEARNING_LOGGER_MPI_TAG).
      * The singletone object works only "between" the calls start- and shutdownListener because the MPI object must exists. The connection is closed in the shutdown call and use a message
      * that is defined with the preprocessor flog MACHINELEARNING_LOGGER_MPI_EOT.
@@ -63,7 +69,6 @@ namespace machinelearning { namespace tools {
         MPI::Finalize())
      * @endcode
      * The MPI libraries must be compiled with multithread support
-     * @todo tmpnam(NULL) change to a safe variante (posix mkstemp(), but this isn't standard), switch to boost::filesystem::path temp_directory_path and unique_path
      **/
     class logger {
         
@@ -96,7 +101,7 @@ namespace machinelearning { namespace tools {
             /** local instance **/
             static logger* m_instance;
             /** filename for logging output **/
-            static std::string m_filename;
+            std::string m_filename;
             /** logstate for writing data **/
             logstate m_logstate;
             /** file handle **/
@@ -131,11 +136,11 @@ namespace machinelearning { namespace tools {
     
     
     logger::logger* logger::m_instance  = NULL;
-    std::string logger::m_filename      = tmpnam(NULL);
     
     
     /** constructor **/
     inline logger::logger( void ) :
+        m_filename(),
         m_logstate(none),
         m_muxwriter()
         #ifdef MACHINELEARNING_MPI
@@ -143,11 +148,19 @@ namespace machinelearning { namespace tools {
         m_muxfinalize(),
         m_listenerrunnging(false)
         #endif
-    {};
-    
-    
-    /** copy constructor **/
-    inline logger::logger( const logger& ) {}
+    {
+        // create temporary path for logging
+        fsys::path temppath(fsys::temp_directory_path());
+        temppath /= MACHINELEARNING_LOGGER_PATHSUFFIX;
+        temppath = fsys::unique_path(temppath);
+        
+        // create temporary directory
+        fsys::create_directory( temppath );
+        
+        // create filename with path
+        temppath /= MACHINELEARNING_LOGGER_FILENAME;
+        m_filename = temppath.string();
+    };
 
     
     /** destructor **/
