@@ -24,8 +24,9 @@
 
 #ifndef MACHINELEARNING_TOOLS_LOGGER_HPP
 #define MACHINELEARNING_TOOLS_LOGGER_HPP
+
 #define MACHINELEARNING_LOGGER_PATHSUFFIX "machinelearning_%%%%%"
-#define MACHINELEARNING_LOGGER_FILENAME "log.txt"
+#define MACHINELEARNING_LOGGER_FILENAME   "log.txt"
 
 #include <string>
 #include <iostream>
@@ -37,10 +38,12 @@
 #include <boost/filesystem.hpp>
 
 #ifdef MACHINELEARNING_MPI
+
 #define MACHINELEARNING_LOGGER_MPI_TAG  999
 #define MACHINELEARNING_LOGGER_MPI_EOT  "$EOT$"
 #include <boost/mpi.hpp>
 #include <boost/bind.hpp>
+
 #endif
 
 #include "../exception/exception.h"
@@ -138,9 +141,7 @@ namespace machinelearning { namespace tools {
     logger::logger* logger::m_instance  = NULL;
     
     
-    /** constructor
-     * @todo move create_directory to write method
-     **/
+    /** constructor **/
     inline logger::logger( void ) :
         m_filename(),
         m_logstate(none),
@@ -155,9 +156,6 @@ namespace machinelearning { namespace tools {
         fsys::path temppath(fsys::temp_directory_path());
         temppath /= MACHINELEARNING_LOGGER_PATHSUFFIX;
         temppath = fsys::unique_path(temppath);
-        
-        // create temporary directory
-        fsys::create_directory( temppath );
         
         // create filename with path
         temppath /= MACHINELEARNING_LOGGER_FILENAME;
@@ -264,9 +262,16 @@ namespace machinelearning { namespace tools {
         // lock will remove with the destructor call
         boost::lock_guard<boost::mutex> l_lock(m_muxwriter);         
         
-        if (!m_file.is_open())
+        if (!m_file.is_open()) {
+            fsys::path logpath( m_filename );
+            logpath = logpath.remove_filename();
+            
+            if (!fsys::is_directory(logpath))
+                fsys::create_directories( logpath );
+                
             m_file.open( m_filename.c_str(), std::ios_base::app );
-        
+        }
+            
         m_file << p_data.str() << "\n";
         m_file.flush();
     }
