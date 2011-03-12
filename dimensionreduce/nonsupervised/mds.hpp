@@ -91,11 +91,11 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
      * @param p_type project type
      **/
     template<typename T> inline mds<T>::mds( const std::size_t& p_dim, const project& p_type ) :
-    m_iteration( 150 ),
-    m_step( 20 ),
-    m_rate( 1 ),
-    m_dim( p_dim ),
-    m_type( p_type )
+        m_iteration( 150 ),
+        m_step( 20 ),
+        m_rate( 1 ),
+        m_dim( p_dim ),
+        m_type( p_type )
     {
         if (p_dim == 0)
             throw exception::runtime(_("dimension must be greater than zero"));
