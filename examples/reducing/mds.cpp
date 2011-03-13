@@ -44,6 +44,9 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
         std::cout << "--outpath" << "\t" << "output path within the HDF5 file" << std::endl;
         std::cout << "--dimension" << "\t" << "number of project dimensions" << std::endl;
         std::cout << "--mapping" << "\t" << "mapping type (values: metric [default], sammon, hit)" << std::endl;
+        std::cout << "--iteration" << "\t" << "number of iterations for sammon / hit (default 150)" << std::endl;
+        std::cout << "--step" << "\t" << "number of iteration steps for sammon / hit (default: 20)" << std::endl;
+        std::cout << "--rate" << "\t" << "iteration rate for sammon / hit (default 1)" << std::endl;
         
         return false;
     }
@@ -57,6 +60,9 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
     l_argmap["outpath"]   = std::vector<std::string>();
     l_argmap["dimension"] = std::vector<std::string>();
     l_argmap["mapping"]   = std::vector<std::string>();
+    l_argmap["iteration"] = std::vector<std::string>();
+    l_argmap["step"]      = std::vector<std::string>();
+    l_argmap["rate"]      = std::vector<std::string>();
     
     
     // read all arguments
@@ -112,9 +118,22 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
     p_args["outfile"]       = l_argmap["outfile"][0];
     p_args["outpath"]       = l_argmap["outpath"][0];   
     
+    p_args["iteration"]     = std::size_t(150);
+    p_args["step"]          = std::size_t(20);
+    p_args["rate"]          = double(1);
     
     try {
         p_args["dimension"]  = boost::lexical_cast<std::size_t>( l_argmap["dimension"][0] );
+        
+        if (l_argmap["iteration"].size() == 1)
+            p_args["iteration"] = boost::lexical_cast<std::size_t>(l_argmap["iteration"][0]);
+        
+        if (l_argmap["step"].size() == 1)
+            p_args["step"] = boost::lexical_cast<std::size_t>(l_argmap["step"][0]);
+        
+        if (l_argmap["rate"].size() == 1)
+            p_args["rate"] = boost::lexical_cast<double>(l_argmap["rate"][0]);
+        
     } catch (...) {
         throw std::runtime_error("numerical data can not extracted");
     }  
@@ -136,6 +155,11 @@ int main(int argc, char* argv[]) {
     
     // create mds object and map the data
     dim::mds<double> mds( boost::any_cast<std::size_t>(l_args["dimension"]), boost::any_cast<dim::mds<double>::project>(l_args["mapping"]) );
+    
+    mds.setIteration( boost::any_cast<std::size_t>(l_args["iteration"]) );
+    mds.setStep( boost::any_cast<std::size_t>(l_args["step"]) );
+    mds.setRate( boost::any_cast<double>(l_args["rate"]) );
+    
     ublas::matrix<double> project = mds.map( source.readMatrix<double>(boost::any_cast<std::string>(l_args["inputpath"]), H5::PredType::NATIVE_DOUBLE) );
     
     // create file and write data to hdf
