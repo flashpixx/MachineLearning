@@ -253,6 +253,7 @@ namespace machinelearning { namespace tools {
      * first element is the smallest, second the next grater element and so on
      * @param p_vec vector with elements
      * @return index array
+     * @todo move return value to indirect_array<>
      **/
     template<typename T> inline ublas::indirect_array< std::vector<std::size_t> > vector::rankIndex( ublas::vector<T>& p_vec )
     {
