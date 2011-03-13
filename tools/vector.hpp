@@ -233,6 +233,7 @@ namespace machinelearning { namespace tools {
      * first element is the smallest, second the next greater element and so on
      * @param p_vec vector with elements
      * @return index vector
+     * @deprecated remove if a new knn structure will be created
      **/
     template<typename T> inline ublas::vector<std::size_t> vector::rankIndexVector( ublas::vector<T>& p_vec )
     {

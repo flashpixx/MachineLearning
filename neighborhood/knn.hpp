@@ -81,6 +81,7 @@ namespace machinelearning { namespace neighborhood {
     /** contructor for initialization the knn
      * @param p_distance distance object
      * @param p_knn number of neighborhood
+     * @deprecated removed if class will be redesigned
      **/
     template<typename T> inline knn<T>::knn( const distances::distance<T>& p_distance, const std::size_t& p_knn ) :
         m_knn(p_knn),    
@@ -93,6 +94,7 @@ namespace machinelearning { namespace neighborhood {
     
     /** returns the number of neighbors
      * @return number
+     * @deprecated removed if class will be redesigned
      **/
     template<typename T> inline std::size_t knn<T>::getNeighborCount( void ) const
     {
@@ -103,6 +105,7 @@ namespace machinelearning { namespace neighborhood {
     /** returns the k-nearest-index-points (row index) to every data point
      * @param p_data input data matrix
      * @return N x kNN matrix, with N rows (data points) and k index points
+     * @deprecated removed if class will be redesigned
     **/
     template<typename T> inline ublas::matrix<std::size_t> knn<T>::get( const ublas::matrix<T>& p_data ) const
     {
@@ -134,6 +137,7 @@ namespace machinelearning { namespace neighborhood {
      * @param p_fix for every row row in the second parameter will be calculated the distance to this rows
      * @param p_data input data matrix
      * @return N x kNN matrix, with N rows (data points) and k index fix points
+     * @deprecated removed if class will be redesigned
      **/
     template<typename T> inline ublas::matrix<std::size_t> knn<T>::get( const ublas::matrix<T>& p_fix, const ublas::matrix<T>& p_data  ) const
     {
@@ -164,6 +168,7 @@ namespace machinelearning { namespace neighborhood {
      * @param p_first first vector
      * @param p_second second vector
      * @return distance
+     * @deprecated removed if class will be redesigned
      **/
     template<typename T> inline T knn<T>::calculateDistance( const ublas::vector<T>& p_first, const ublas::vector<T>& p_second ) const
     {
@@ -174,6 +179,7 @@ namespace machinelearning { namespace neighborhood {
     /** invert a value with using the distance object
      * @param p_val value
      * @return inverted value
+     * @deprecated removed if class will be redesigned
      **/
     template<typename T> inline T knn<T>::invert( const T& p_val ) const
     {
@@ -184,6 +190,7 @@ namespace machinelearning { namespace neighborhood {
     /** calculate for every point the distance
      * @param p_data input data matrix (row orientated)
      * @return symmetric matrix with distance values
+     * @deprecated removed if class will be redesigned
     **/
     template<typename T> inline ublas::symmetric_matrix<T, ublas::upper> knn<T>::calculate( const ublas::matrix<T>& p_data ) const
     {
