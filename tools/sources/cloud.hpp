@@ -50,7 +50,7 @@ namespace machinelearning { namespace tools { namespace sources {
         
         public :
         
-            enum cloudecreate {
+            enum cloudcreate {
                 all         = 0,
                 alternate   = 1,
                 random      = 2
@@ -59,7 +59,7 @@ namespace machinelearning { namespace tools { namespace sources {
         
             
             cloud( const std::size_t& );
-            ublas::matrix<T> generate( const cloudecreate& = all, const T& = 0.5, const bool& = false ) const;
+            ublas::matrix<T> generate( const cloudcreate& = all, const T& = 0.5, const bool& = false ) const;
             void setVariance( const T&, const T& );
             void setVarianceRandom( const bool& );
             void setPoints( const std::size_t&, const std::size_t& );
@@ -190,7 +190,7 @@ namespace machinelearning { namespace tools { namespace sources {
      * @param p_random random value for random-cloud-generation
      * @param p_shuffle shuffel the datapoints
      **/
-    template<typename T> inline ublas::matrix<T> cloud<T>::generate( const cloudecreate& p_build, const T& p_random, const bool& p_shuffle ) const
+    template<typename T> inline ublas::matrix<T> cloud<T>::generate( const cloudcreate& p_build, const T& p_random, const bool& p_shuffle ) const
     {
         if ( (p_build == random) && ((p_random < 0) || (p_random > 1)) )
             throw exception::runtime(_("random value must be between [0,1]"));
@@ -198,12 +198,12 @@ namespace machinelearning { namespace tools { namespace sources {
         // create sampling adaption
         ublas::vector<T> l_sampleadaption(m_dimension, 1);
         for(std::size_t i=0; i < l_sampleadaption.size(); ++i)
-            l_sampleadaption(i) = (m_range[i].second - m_range[i].first) / m_sampling(i);
+            l_sampleadaption(i) = (m_range[i].second - m_range[i].first) / (m_sampling(i)+1);
         
         // samples for each dimension (begin / end values are not used)
         std::vector< ublas::vector<T> > l_samples;
         for(std::size_t i=0; i < m_dimension; ++i) {
-            ublas::vector<T> l_val( m_sampling(i)-1 );
+            ublas::vector<T> l_val( m_sampling(i) );
             for(std::size_t j=0; j < l_val.size(); ++j)
                 l_val(j) = m_range[i].first + (j+1)*l_sampleadaption(i);
             
@@ -214,6 +214,7 @@ namespace machinelearning { namespace tools { namespace sources {
         ublas::vector<T> l_vec(l_samples.size(), 0);
         ublas::matrix<T> l_center;
         createCenter( l_samples, 0, l_vec, l_center );
+        
         
         // create the cloud values
         ublas::matrix<T> l_cloud;
@@ -245,7 +246,7 @@ namespace machinelearning { namespace tools { namespace sources {
             
             // create one cloud
             ublas::matrix<T> l_points = tools::matrix::random<T>( l_numpoints, l_center.size2(), tools::random::normal, 0, l_variance );
-
+            
             
             // translation to center
             for(std::size_t j=0; j < l_points.size1(); ++j)
@@ -261,7 +262,6 @@ namespace machinelearning { namespace tools { namespace sources {
             l_range.assign(l_points);
             
         }
-        
         
         // we shuffel all rows
         if (p_shuffle) {

@@ -28,7 +28,7 @@
 #include <boost/lexical_cast.hpp>
 
 using namespace machinelearning;
-
+namespace ublas = boost::numeric::ublas;
 
 
 bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_args ) {
@@ -37,13 +37,16 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
         std::cout << "--outfile" << "\t" << "output HDF5 file" << std::endl;
         std::cout << "--outpath" << "\t" << "output path within the HDF5 file" << std::endl;
         std::cout << "--dimension" << "\t" << "number of dimension (default: 2)" << std::endl;
-        std::cout << "--sampling" << "\t" << "sampling within the intervall (default: 10)" << std::endl;
+        std::cout << "--sampling" << "\t" << "sampling of the intervall (default: 10)" << std::endl;
         std::cout << "--pointsmin" << "\t" << "minimal number of points (default: 50)" << std::endl;
         std::cout << "--pointsmax" << "\t" << "maximal number of points (default: 500)" << std::endl;
         std::cout << "--rangemin" << "\t" << "minimal range value (default: 0)" << std::endl;
-        std::cout << "--rangemax" << "\t" << "maximal range value (default: 1)" << std::endl;
+        std::cout << "--rangemax" << "\t" << "maximal range value (default: 100)" << std::endl;
         std::cout << "--variancemin" << "\t" << "minimal variance value (default: 0.1)" << std::endl;
         std::cout << "--variancemax" << "\t" << "maximal variance value (default: 0.8)" << std::endl;
+        std::cout << "--create" << "\t" << "type for creating clouds (values are: all [default], alternate, random)" << std::endl;
+        std::cout << "--probability" << "\t" << "probability for the random create option (default: 0.5)" << std::endl;
+        std::cout << "--shuffle" << "\t" << "shuffle the vectors of the clouds (default: off)" << std::endl;
         
         return false;
     }
@@ -60,6 +63,9 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
     l_argmap["rangemax"]    = std::vector<std::string>();
     l_argmap["variancemin"] = std::vector<std::string>();
     l_argmap["variancemax"] = std::vector<std::string>();
+    l_argmap["create"]      = std::vector<std::string>();
+    l_argmap["probability"] = std::vector<std::string>();
+    l_argmap["shuffle"]     = std::vector<std::string>();
     
     
     // read all arguments
@@ -93,8 +99,8 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
     
     //check map values and convert them
     if ( (l_argmap["outfile"].size() != 1) ||
-         (l_argmap["outpath"].size() != 1)
-       )
+        (l_argmap["outpath"].size() != 1)
+        )
         throw std::runtime_error("number of arguments are incorrect");
     
     p_args["outfile"]       = l_argmap["outfile"][0];
@@ -107,12 +113,29 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
     p_args["pointsmax"]     = std::size_t(500);
     
     p_args["rangemin"]      = double(0);
-    p_args["rangemax"]      = double(1.0);
+    p_args["rangemax"]      = double(100.0);
     p_args["variancemin"]   = double(0.1);
     p_args["variancemax"]   = double(0.8);
     
+    p_args["probability"]   = double(0.5);
+    
+    p_args["create"]        = tools::sources::cloud<double>::all;
+    if (l_argmap["create"].size() == 1) {
+        boost::to_lower(l_argmap["create"][0]);
+        if (l_argmap["create"][0] == "random")
+            p_args["create"]        = tools::sources::cloud<double>::random;
+        if (l_argmap["create"][0] == "alternate")
+            p_args["create"]        = tools::sources::cloud<double>::alternate;
+    }
+    
+    p_args["shuffle"] = false;
+    if (l_argmap["shuffle"].size() == 1) {
+        boost::to_lower(l_argmap["shuffle"][0]);
+        p_args["shuffle"] = l_argmap["shuffle"][0] == "on";
+    }
+    
     try {
-
+        
         if (l_argmap["dimension"].size() == 1)
             p_args["dimension"] = boost::lexical_cast<std::size_t>(l_argmap["dimension"][0]);
         
@@ -133,8 +156,11 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
             p_args["variancemin"] = boost::lexical_cast<double>(l_argmap["variancemin"][0]);
         if (l_argmap["variancemax"].size() == 1)
             p_args["variancemax"] = boost::lexical_cast<double>(l_argmap["variancemax"][0]);
-       
+        
+        if (l_argmap["probability"].size() == 1)
+            p_args["probability"] = boost::lexical_cast<double>(l_argmap["probability"][0]);
 
+        
     } catch (...) {
         throw std::runtime_error("numerical data can not extracted");
     }  
@@ -160,11 +186,11 @@ int main(int argc, char* argv[]) {
     // set variance, range and samples
     cloud.setVariance( boost::any_cast<double>(l_args["variancemin"]), boost::any_cast<double>(l_args["variancemax"]) );
     for(std::size_t i=0; i < boost::any_cast<std::size_t>(l_args["dimension"]); ++i)
-        cloud.setRange(i, boost::any_cast<double>(l_args["rangemin"]), boost::any_cast<double>(l_args["rangemax"]), boost::any_cast<std::size_t>(l_args["sampling"]));
+        cloud.setRange(i, boost::any_cast<double>(l_args["rangemin"]), boost::any_cast<double>(l_args["rangemax"]), boost::any_cast<std::size_t>(l_args["sampling"]));   
     
     // create file and write data to hdf
     tools::files::hdf target(boost::any_cast<std::string>(l_args["outfile"]), true);
-    target.write<double>( boost::any_cast<std::string>(l_args["outpath"]),  cloud.generate(), H5::PredType::NATIVE_DOUBLE );
-
+    target.write<double>( boost::any_cast<std::string>(l_args["outpath"]),  cloud.generate( boost::any_cast< tools::sources::cloud<double>::cloudcreate >(l_args["create"]), boost::any_cast<double>(l_args["probability"]), boost::any_cast<bool>(l_args["shuffle"]) ), H5::PredType::NATIVE_DOUBLE );
+    
     return EXIT_SUCCESS;
 }
