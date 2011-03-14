@@ -56,7 +56,8 @@ namespace boost { namespace lambda {
     
     template<class T, class Allocator, class B>
     
-    struct plain_return_type_2<other_action<subscript_action>, ublas::vector<T, Allocator>, B> {
+    struct plain_return_type_2<other_action<subscript_action>, ublas::vector<T, Allocator>, B>
+    {
         typedef typename ublas::vector<T, Allocator>::reference type;
     };
     
