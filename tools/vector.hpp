@@ -251,6 +251,7 @@ namespace machinelearning { namespace tools {
     /** ranks the element of the vector and
      * returns a index array for using ublas::project
      * first element is the smallest, second the next grater element and so on
+     * @note lambda call of the ublas type is implementated above
      * @param p_vec vector with elements
      * @return index array
      * @todo move return value to indirect_array<>
