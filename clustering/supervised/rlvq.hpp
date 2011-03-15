@@ -236,8 +236,8 @@ namespace machinelearning { namespace clustering { namespace supervised {
             for (std::size_t j=0; j < p_data.size1(); ++j) {
                 
                 // calculate weighted distance and rank vector elements, the first element is the index of the winner prototype
-                ublas::vector<T> l_distance                                     = m_distance.getWeightedDistance( m_prototypes, ublas::row(p_data, j), l_lambda );
-                const ublas::indirect_array< std::vector<std::size_t>  > l_rank = tools::vector::rankIndex( l_distance );
+                ublas::vector<T> l_distance          = m_distance.getWeightedDistance( m_prototypes, ublas::row(p_data, j), l_lambda );
+                const ublas::indirect_array<> l_rank = tools::vector::rankIndex( l_distance );
                 
                 // calculate adapt values
                 const ublas::vector<T> l_winnerdelta    = ublas::row(p_data, j) - ublas::row(m_prototypes, l_rank(0) );
@@ -295,8 +295,8 @@ namespace machinelearning { namespace clustering { namespace supervised {
         for(std::size_t i=0; i < p_data.size1(); ++i) {
             
             // calculate distance from datapoint to all prototyps and rank position
-            ublas::vector<T> l_distance                                 = m_distance.getDistance( m_prototypes, ublas::row(p_data, i)  );
-            ublas::indirect_array< std::vector<std::size_t> > l_rank    = tools::vector::rankIndex( l_distance );
+            ublas::vector<T> l_distance       = m_distance.getDistance( m_prototypes, ublas::row(p_data, i)  );
+            ublas::indirect_array<> l_rank    = tools::vector::rankIndex( l_distance );
             
             // add index
             l_idx[i] = l_rank(0);

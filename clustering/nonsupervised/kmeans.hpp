@@ -265,8 +265,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
         // determine nearest prototype
         for(std::size_t i=0; i < l_distance.size2(); ++i) {
-            ublas::vector<T> l_col                                          = ublas::column(l_distance, i);
-            const ublas::indirect_array< std::vector<std::size_t> > l_rank  = tools::vector::rankIndex( l_col );
+            ublas::vector<T> l_col                = ublas::column(l_distance, i);
+            const ublas::indirect_array<> l_rank  = tools::vector::rankIndex( l_col );
             l_idx[i] = l_rank(0);
         }
         

@@ -181,7 +181,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         tools::lapack::eigen( l_laplacian, l_eigenvalue, l_eigenvector );
          
         // ranking eigenvalues and get the k smallest for the eigenvectors
-        const ublas::indirect_array< std::vector<std::size_t> > l_rank = tools::vector::rankIndex<T>(l_eigenvalue);
+        const ublas::indirect_array<> l_rank = tools::vector::rankIndex<T>(l_eigenvalue);
         
         // extrakt the k eigenvectors, change the normalized laplacian back and normalize
         ublas::matrix<T> l_eigenmatrix(m_kmeans.getPrototypeCount(), l_laplacian.size1());

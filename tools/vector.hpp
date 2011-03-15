@@ -89,7 +89,7 @@ namespace machinelearning { namespace tools {
             template<typename T> static std::vector<T> unique( const std::vector<T>& p_vec );
             template<typename T> static ublas::vector<std::size_t> rank( ublas::vector<T>& );
             template<typename T> static ublas::vector<std::size_t> rankIndexVector( ublas::vector<T>& );
-            template<typename T> static ublas::indirect_array< std::vector<std::size_t> > rankIndex( ublas::vector<T>& );
+            template<typename T> static ublas::indirect_array<> rankIndex( ublas::vector<T>& );
             template<typename T> static ublas::vector<T> setNumericalZero( const ublas::vector<T>&, const T& = 0 );
     };
     
@@ -255,14 +255,20 @@ namespace machinelearning { namespace tools {
      * @note lambda call of the ublas type is implementated above
      * @param p_vec vector with elements
      * @return index array
-     * @todo move return value to indirect_array<>
      **/
-    template<typename T> inline ublas::indirect_array< std::vector<std::size_t> > vector::rankIndex( ublas::vector<T>& p_vec )
+    template<typename T> inline ublas::indirect_array<> vector::rankIndex( ublas::vector<T>& p_vec )
     {
         std::vector<std::size_t> l_temp(boost::counting_iterator<std::size_t>(0), boost::counting_iterator<std::size_t>(p_vec.size()));
         std::sort( l_temp.begin(), l_temp.end(), lam::var(p_vec)[lam::_1] < lam::var(p_vec)[lam::_2]);
         
-        return ublas::indirect_array< std::vector<std::size_t> >(p_vec.size(), l_temp);
+        ublas::indirect_array<> l_idx( p_vec.size() );
+        
+        // we can't use l_idx.begin() on the third argument, because there is e design error within
+        // the indirect_array: begin() returns a const reference iterator
+        // @see http://answerpot.com/showthread.php?726979-submatrix+with+indexvector
+        std::copy( l_temp.begin(), l_temp.end(), &l_idx(0) );
+        
+        return l_idx;
     }
     
     

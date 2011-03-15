@@ -145,7 +145,7 @@ namespace machinelearning { namespace dimensionreduce { namespace supervised {
         tools::lapack::eigen<T>(l_sdiff, l_sw, l_eigenvalues, l_eigenvectors);
        
         // rank the eigenvalues
-        const ublas::indirect_array< std::vector<std::size_t> > l_rank = tools::vector::rankIndex( l_eigenvalues );
+        const ublas::indirect_array<> l_rank = tools::vector::rankIndex( l_eigenvalues );
         
         // create projection (largest eigenvectors correspondends with the largest eigenvalues -> last values in rank)
         m_project = ublas::matrix<T>( l_eigenvectors.size2(), m_dim );

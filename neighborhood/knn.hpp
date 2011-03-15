@@ -46,11 +46,18 @@ namespace machinelearning { namespace neighborhood {
     
     /** implementation for the k-nearest-neighbor
      * $LastChangedDate$
-     * @todo recreate the data structur with kd-trees for optimizing
+     * @todo recreate the data structur with kdtree (http://en.wikipedia.org/wiki/Kd-tree) or r-tree (http://en.wikipedia.org/wiki/R-tree) for optimizing
      **/
     template<typename T> class knn : public neighborhood<T> {
         
         public :
+        
+            enum dataspace
+            {
+                kdtree  = 0,
+                rtree   = 2
+            };
+        
         
             knn( const distances::distance<T>&, const std::size_t& );
             std::size_t getNeighborCount( void ) const;
