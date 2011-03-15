@@ -162,6 +162,9 @@ namespace machinelearning { namespace tools {
         m_filename = temppath.string();
     };
 
+    /** copy constructor **/
+    inline logger::logger( const logger& ) {}; 
+    
     
     /** destructor **/
     inline logger::~logger( void )
