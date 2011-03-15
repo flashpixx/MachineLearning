@@ -115,7 +115,7 @@ namespace machinelearning { namespace tools {
         
             logger( void );  
             ~logger( void ); 
-            logger( const logger& );
+            logger( const logger& ) {};
             logger& operator=( const logger& );
         
             template<typename T> void logformat( const logstate&, const T&, std::ostringstream& ) const;
@@ -138,7 +138,7 @@ namespace machinelearning { namespace tools {
     };
     
     
-    logger::logger* logger::m_instance  = NULL;
+    logger* logger::m_instance  = NULL;
     
     
     /** constructor **/
@@ -162,9 +162,6 @@ namespace machinelearning { namespace tools {
         m_filename = temppath.string();
     };
 
-    /** copy constructor **/
-    inline logger::logger( const logger& ) {}; 
-    
     
     /** destructor **/
     inline logger::~logger( void )
