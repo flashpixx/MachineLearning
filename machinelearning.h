@@ -163,6 +163,9 @@
  * @section png patch neural gas
  * @include examples/clustering/patch_neuralgas.cpp
  *
+ * @section rng relational neural gas
+ * @include examples/clustering/relational_neuralgas.cpp
+ *
  * @section rlvq relevance learning vector quantization (RLVQ)
  * @include examples/clustering/rlvq.cpp
  *
@@ -342,6 +345,7 @@
  * @file examples/distance/ncd.cpp testprogram for the normalized compression distance
  * @file examples/clustering/neuralgas.cpp testprogram for the neural gas algorithm
  * @file examples/clustering/patch_neuralgas.cpp testprogram for the patch neural gas algorithm
+ * @file examples/clustering/relational_neuralgas.cpp testprogram for the relational neural gas algorithm
  * @file examples/clustering/kmeans.cpp testprogram for the k-means algorithm
  * @file examples/clustering/spectral.cpp testprogram for spectral clustering
  * @file examples/clustering/rlvq.cpp testprogram for the rlvq algorithm
@@ -361,6 +365,7 @@
  * @file clustering/clustering.hpp header for abstract clustering classes
  * @file clustering/nonsupervised/kmeans.hpp k-means implementation
  * @file clustering/nonsupervised/neuralgas.hpp neuralgas implemention for real vector space
+ * @file clustering/nonsupervised/relational_neuralgas.hpp neuralgas implemention for distance / relational data
  * @file clustering/nonsupervised/spectralclustering.hpp implementation of the spectral clustering
  * @file clustering/supervised/rlvq.hpp implementation of relevance vector quantization
  *
