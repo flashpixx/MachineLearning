@@ -93,6 +93,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             /** bool for check initialized patch **/
             bool m_firstpatch;
         
+            T calculateQuantizationError( const ublas::matrix<T>& ) const;
+        
         
     };
 
@@ -251,7 +253,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
         // run neural gas       
         const T l_multi = 0.01/p_lambda;
-        ublas::matrix<T> l_adaptmatrix( m_prototypes.size1(), p_data.size1() );
         
         for(std::size_t i=0; (i < p_iterations); ++i) {
             
@@ -261,12 +262,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             // calculate for every prototype the distance
             // relational: (D * alpha_i)_j - 0.5 * alpha_i^t * D * alpha_i = || x^j - w^i || 
             // D = distance, alpha = weight of the prototype for the konvex combination
-            const ublas::matrix<T> l_temp1 = ublas::prod(m_prototypes, p_data);
-            
-            ublas::vector<T> l_temp2(l_temp1.size1());
-            for(std::size_t n=0; n < l_temp1.size1(); ++n)
-                l_temp2(i) = 0.5 * ublas::prod( ublas::row(m_prototypes, i), ublas::row(l_temp1, i) );
-            
+            ublas::matrix<T> l_adaptmatrix = ublas::prod(m_prototypes, p_data);
+            for(std::size_t n=0; n < l_adaptmatrix.size1(); ++n)
+                ublas::row(l_adaptmatrix, n) -= ublas::scalar_vector<T>(l_adaptmatrix.size2(), 0.5 * ublas::inner_prod( ublas::row(m_prototypes, n), ublas::row(l_adaptmatrix, n) ));
             
             
             // for every column ranks values and create adapts
@@ -296,9 +294,19 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             // determine quantization error for logging
             if (m_logging) {
                 m_logprototypes.push_back( m_prototypes );
-                m_quantizationerror.push_back( calculateQuantizationError(p_data, m_prototypes) );
+                m_quantizationerror.push_back( calculateQuantizationError(l_adaptmatrix) );
             }
         }
+    }
+    
+    
+    /** calculate the quantization error
+     * @param p_distance distance matrix (adaption matrix)
+     * @return quantization error
+     **/    
+    template<typename T> inline T relational_neuralgas<T>::calculateQuantizationError( const ublas::matrix<T>& p_distance ) const
+    {
+        return ublas::sum( tools::matrix::min( p_distance, tools::matrix::column ) );
     }
 
     //======= MPI ==================================================================================================================================
