@@ -72,6 +72,16 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             std::vector<T> getLoggedQuantizationError( void ) const;
             ublas::indirect_array<> use( const ublas::matrix<T>& ) const;
         
+            #ifdef MACHINELEARNING_MPI
+            void train( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t& );
+            void train( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t&, const T& );
+            //ublas::matrix<T> getPrototypes( const mpi::communicator& ) const;
+            //std::vector< ublas::matrix<T> > getLoggedPrototypes( const mpi::communicator& ) const;
+            //std::vector<T> getLoggedQuantizationError( const mpi::communicator& ) const;
+            //ublas::indirect_array<> use( const mpi::communicator&, const ublas::matrix<T>& ) const;
+            //void use( const mpi::communicator& ) const;
+            #endif
+        
         
         private:
         
@@ -92,6 +102,10 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
             T calculateQuantizationError( const ublas::matrix<T>& ) const;
             void normalize( ublas::matrix<T>& ) const;
+        
+            #ifdef MACHINELEARNING_MPI
+            std::size_t getNumberPrototypes( const mpi::communicator& ) const;
+            #endif
         
     };
 
@@ -390,7 +404,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     
     /** normalize method for distance data
      * @param p_data reference to a data matrix which is normalizes row by row
-     * @todo thinking about relation calculating to a own distance class
+     * @todo thinking about relation calculating transform to a own distance class
     **/
     template<typename T> inline void relational_neuralgas<T>::normalize( ublas::matrix<T>& p_data ) const
     {
@@ -429,6 +443,41 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     
     //======= MPI ==================================================================================================================================
     #ifdef MACHINELEARNING_MPI
+    
+    /** returns the number of all prototypes
+     * @param p_mpi MPI object for communication
+     * @return number of prototypes
+     **/
+    template<typename T> inline std::size_t relational_neuralgas<T>::getNumberPrototypes( const mpi::communicator& p_mpi ) const
+    {
+        std::size_t l_count = 0;
+        mpi::all_reduce(p_mpi, m_prototypes.size1(), l_count, std::plus<std::size_t>());
+        return l_count;
+    }
+    
+    
+    /** train the data on the cluster
+     * @param p_mpi MPI object for communication
+     * @param p_data datapoints
+     * @param p_iterations iterations
+     **/
+    template<typename T> inline void relational_neuralgas<T>::train( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data, const std::size_t& p_iterations )
+    {
+        // if the process has no prototypes, than lambda need not be zero, so we set it to a minimal numerical value, so the exception is not thrown
+        train(p_mpi, p_data, p_iterations, ((m_prototypes.size1() == 0) ? std::numeric_limits<T>::epsilon() :  m_prototypes.size1() * 0.5) );
+    }
+    
+    
+    /** train the data on the cluster
+     * @param p_mpi MPI object for communication
+     * @param p_data datapoints
+     * @param p_iterations iterations
+     * @param p_lambda max adapet size
+     **/
+    template<typename T> inline void relational_neuralgas<T>::train( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data, const std::size_t& p_iterations, const T& p_lambda )
+    {
+    }
+    
     #endif
 
 };};};

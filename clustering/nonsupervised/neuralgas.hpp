@@ -225,8 +225,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     }    
     
     
-    /** 
-     * train the prototypes
+    /** train the prototypes
      * @param p_data data matrix
      * @param p_iterations number of iterations
      **/
@@ -393,7 +392,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> inline void neuralgas<T>::trainpatch( const ublas::matrix<T>& p_data, const std::size_t& p_iterations, const T& p_lambda )
     {
-        //xxx
         if (m_prototypes.size1() == 0)
             throw exception::runtime(_("number of prototypes must be greater than zero"));
         if (p_data.size1() < m_prototypes.size1())
@@ -634,7 +632,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> inline void neuralgas<T>::train( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data, const std::size_t& p_iterations, const T& p_lambda )
     {
-        //ddd
         if (p_data.size1() < m_prototypes.size1())
             throw exception::runtime(_("number of datapoints are less than prototypes"));
         if (p_iterations == 0)
