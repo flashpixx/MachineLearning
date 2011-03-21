@@ -70,7 +70,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             std::size_t getPrototypeSize( void ) const;
             std::size_t getPrototypeCount( void ) const;
             std::vector<T> getLoggedQuantizationError( void ) const;
-        
+            ublas::indirect_array<> use( const ublas::matrix<T>& ) const;
         
         
         private:
@@ -402,6 +402,30 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         }
     }
     
+    
+    /** calulates distance between datapoints and prototypes and returns a std::vector
+     * with index of the nearest prototype
+     * @param p_data matrix
+     * @return index array of prototype indices
+     **/
+    template<typename T> inline ublas::indirect_array<> relational_neuralgas<T>::use( const ublas::matrix<T>& p_data ) const
+    {
+        if (m_prototypes.size1() == 0)
+            throw exception::runtime(_("number of prototypes must be greater than zero"));
+        if (p_data.size2() != m_prototypes.size2())
+            throw exception::runtime(_("data and prototype dimension are not equal"));
+        
+        ublas::indirect_array<> l_idx(p_data.size1());
+        const ublas::matrix<T> l_distance = ublas::prod( p_data, ublas::trans(m_prototypes) );
+        
+        for(std::size_t i=0; i < l_distance.size1(); ++i) {
+            ublas::vector<T> l_row                = ublas::row(l_distance, i);
+            const ublas::indirect_array<> l_rank  = tools::vector::rankIndex( l_row );
+            l_idx[i] = l_rank(0);
+        }
+        
+        return l_idx;
+    }
     
     //======= MPI ==================================================================================================================================
     #ifdef MACHINELEARNING_MPI
