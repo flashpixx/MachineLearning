@@ -53,6 +53,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * data, so it is the task of the developer to use the correct ranges. Also the MPI
      * methods must be called in the correct order, so the MPI calls must be run
      * on each process.
+     * @todo thinking about relation calculating transform to a own distance class
      **/
     template<typename T> class relational_neuralgas : public clustering<T>, public patch<T> {
         BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
@@ -101,7 +102,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             bool m_firstpatch;
         
             T calculateQuantizationError( const ublas::matrix<T>& ) const;
-            void normalize( ublas::matrix<T>& ) const;
         
             #ifdef MACHINELEARNING_MPI
             std::size_t getNumberPrototypes( const mpi::communicator& ) const;
@@ -206,7 +206,12 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         m_prototypes(4,14)  = 0.0151324;
 
         // normalize the prototypes
-        normalize(m_prototypes);
+        for(std::size_t i=0; i <  m_prototypes.size1(); ++i) {
+            const T l_sum = ublas::sum( ublas::row( m_prototypes, i) );
+            
+            if (!tools::function::isNumericalZero(l_sum))
+                ublas::row( m_prototypes, i) /= l_sum;
+        }
     }
     
     
@@ -383,7 +388,12 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
  
             // adapt values are the new prototypes (and run normalization)
             m_prototypes = l_adaptmatrix;
-            normalize(m_prototypes);
+            for(std::size_t i=0; i <  m_prototypes.size1(); ++i) {
+                const T l_sum = ublas::sum( ublas::row( m_prototypes, i) );
+                
+                if (!tools::function::isNumericalZero(l_sum))
+                    ublas::row( m_prototypes, i) /= l_sum;
+            }
             
             // log updated prototypes
             if (m_logging)
@@ -401,21 +411,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         return 0.5 * ublas::sum( tools::matrix::min( p_distance, tools::matrix::column ) );
     }
 
-    
-    /** normalize method for distance data
-     * @param p_data reference to a data matrix which is normalizes row by row
-     * @todo thinking about relation calculating transform to a own distance class
-    **/
-    template<typename T> inline void relational_neuralgas<T>::normalize( ublas::matrix<T>& p_data ) const
-    {
-        for(std::size_t i=0; i < p_data.size1(); ++i) {
-            const T l_sum = ublas::sum( ublas::row(p_data, i) );
-            
-            if (!tools::function::isNumericalZero(l_sum))
-                ublas::row(p_data, i) /= l_sum;
-        }
-    }
-    
     
     /** calulates distance between datapoints and prototypes and returns a std::vector
      * with index of the nearest prototype
