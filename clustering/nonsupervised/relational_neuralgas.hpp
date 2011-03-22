@@ -125,85 +125,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         if (p_prototypesize == 0)
             throw exception::runtime(_("prototype size must be greater than zero"));
         
-        m_prototypes(0,0)   = 0.976024;
-        m_prototypes(0,1)   = 0.203997;
-        m_prototypes(0,2)   = 0.279866;
-        m_prototypes(0,3)   = 0.960214;
-        m_prototypes(0,4)   = 0.0668164;
-        m_prototypes(0,5)   = 0.0988914;
-        m_prototypes(0,6)   = 0.0766492;
-        m_prototypes(0,7)   = 0.0147422;
-        m_prototypes(0,8)   = 0.268427;
-        m_prototypes(0,9)   = 0.460813;
-        m_prototypes(0,10)  = 0.829244;
-        m_prototypes(0,11)  = 0.964393;
-        m_prototypes(0,12)  = 0.149139;
-        m_prototypes(0,13)  = 0.237332;
-        m_prototypes(0,14)  = 0.0630006;
-        
-        m_prototypes(1,0)   = 0.127511;
-        m_prototypes(1,1)   = 0.597428;
-        m_prototypes(1,2)   = 0.492379;
-        m_prototypes(1,3)   = 0.778946;
-        m_prototypes(1,4)   = 0.0793255;
-        m_prototypes(1,5)   = 0.0678794;
-        m_prototypes(1,6)   = 0.137267;
-        m_prototypes(1,7)   = 0.852746;
-        m_prototypes(1,8)   = 0.699646;
-        m_prototypes(1,9)   = 0.0201398;
-        m_prototypes(1,10)  = 0.0948574;
-        m_prototypes(1,11)  = 0.950609;
-        m_prototypes(1,12)  = 0.864742;
-        m_prototypes(1,13)  = 0.207351;
-        m_prototypes(1,14)  = 0.673759;
-        
-        m_prototypes(2,0)   = 0.289066;
-        m_prototypes(2,1)   = 0.835669;
-        m_prototypes(2,2)   = 0.742236;
-        m_prototypes(2,3)   = 0.470236;
-        m_prototypes(2,4)   = 0.16656;
-        m_prototypes(2,5)   = 0.163863;
-        m_prototypes(2,6)   = 0.9525;
-        m_prototypes(2,7)   = 0.811062;
-        m_prototypes(2,8)   = 0.735685;
-        m_prototypes(2,9)   = 0.315933;
-        m_prototypes(2,10)  = 0.141634;
-        m_prototypes(2,11)  = 0.137527;
-        m_prototypes(2,12)  = 0.697985;
-        m_prototypes(2,13)  = 0.602801;
-        m_prototypes(2,14)  = 0.3386;
-        
-        m_prototypes(3,0)   = 0.059364;
-        m_prototypes(3,1)   = 0.353544;
-        m_prototypes(3,2)   = 0.427312;
-        m_prototypes(3,3)   = 0.550321;
-        m_prototypes(3,4)   = 0.549215;
-        m_prototypes(3,5)   = 0.345377;
-        m_prototypes(3,6)   = 0.189815;
-        m_prototypes(3,7)   = 0.612611;
-        m_prototypes(3,8)   = 0.72368;
-        m_prototypes(3,9)   = 0.8087;
-        m_prototypes(3,10)  = 0.250617;
-        m_prototypes(3,11)  = 0.700953;
-        m_prototypes(3,12)  = 0.791018;
-        m_prototypes(3,13)  = 0.0963041;
-        m_prototypes(3,14)  = 0.203741;
-        
-        m_prototypes(4,0)   = 0.649119;
-        m_prototypes(4,1)   = 0.5629;
-        m_prototypes(4,2)   = 0.91603;
-        m_prototypes(4,3)   = 0.660497;
-        m_prototypes(4,4)   = 0.00329911;
-        m_prototypes(4,5)   = 0.497649;
-        m_prototypes(4,6)   = 0.939492;
-        m_prototypes(4,7)   = 0.177361;
-        m_prototypes(4,8)   = 0.325363;
-        m_prototypes(4,9)   = 0.692254;
-        m_prototypes(4,10)  = 0.986238;
-        m_prototypes(4,11)  = 0.581765;
-        m_prototypes(4,12)  = 0.352968;
-        m_prototypes(4,13)  = 0.279174;
-        m_prototypes(4,14)  = 0.0151324;
+
 
         // normalize the prototypes
         for(std::size_t i=0; i <  m_prototypes.size1(); ++i) {
@@ -388,7 +310,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
  
             // adapt values are the new prototypes (and run normalization)
             m_prototypes = l_adaptmatrix;
-            for(std::size_t i=0; i <  m_prototypes.size1(); ++i) {
+            for(std::size_t i=0; i < m_prototypes.size1(); ++i) {
                 const T l_sum = ublas::sum( ublas::row( m_prototypes, i) );
                 
                 if (!tools::function::isNumericalZero(l_sum))
