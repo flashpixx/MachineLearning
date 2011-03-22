@@ -61,7 +61,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         public:
         
             relational_neuralgas( const std::size_t&, const std::size_t& );
-            relational_neuralgas( const std::size_t&, const std::size_t&, const neighborhood::kapproximation<T>& );
+            //relational_neuralgas( const std::size_t&, const std::size_t&, const neighborhood::kapproximation<T>& );
             void train( const ublas::matrix<T>&, const std::size_t& );
             void train( const ublas::matrix<T>&, const std::size_t&, const T& );
             ublas::matrix<T> getPrototypes( void ) const;
@@ -124,9 +124,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     {
         if (p_prototypesize == 0)
             throw exception::runtime(_("prototype size must be greater than zero"));
-        
-
-
+ 
         // normalize the prototypes
         for(std::size_t i=0; i <  m_prototypes.size1(); ++i) {
             const T l_sum = ublas::sum( ublas::row( m_prototypes, i) );
@@ -142,7 +140,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * @param p_prototypes number of prototypes
      * @param p_prototypesize size of each prototype (data dimension)
      * @param p_kapprox k-approximation object
-     **/
+     **
     template<typename T> inline relational_neuralgas<T>::relational_neuralgas( const std::size_t& p_prototypes, const std::size_t& p_prototypesize, const neighborhood::kapproximation<T>& p_kapprox ) :
         m_prototypes( tools::matrix::random<T>(p_prototypes, p_prototypesize) ),
         m_kapprox( &p_kapprox ),
@@ -155,8 +153,13 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             throw exception::runtime(_("prototype size must be greater than zero"));
         
         // normalize the prototypes
-        normalize( m_prototypes );
-    }
+        for(std::size_t i=0; i <  m_prototypes.size1(); ++i) {
+            const T l_sum = ublas::sum( ublas::row( m_prototypes, i) );
+            
+            if (!tools::function::isNumericalZero(l_sum))
+                ublas::row( m_prototypes, i) /= l_sum;
+        }
+    }*/
     
 
     
