@@ -104,7 +104,11 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             T calculateQuantizationError( const ublas::matrix<T>& ) const;
         
             #ifdef MACHINELEARNING_MPI
+            /** map with information to every process and prototype**/
+            std::map<int, std::pair<std::size_t,std::size_t> > m_processdatainfo;        
+        
             std::size_t getNumberPrototypes( const mpi::communicator& ) const;
+            void setProcessDataInfo( const mpi::communicator&, const std::size_t& );
             #endif
         
     };
@@ -121,6 +125,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         m_logprototypes( std::vector< ublas::matrix<T> >() ),
         m_quantizationerror( std::vector<T>() ),
         m_firstpatch(true)
+        #ifdef MACHINELEARNING_MPI
+        , m_processdatainfo()
+        #endif
     {
         if (p_prototypesize == 0)
             throw exception::runtime(_("prototype size must be greater than zero"));
@@ -376,6 +383,28 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     }
     
     
+    /** resize the prototype matrix, so each CPU holds the same number of prototypes
+     * with the definied size
+     * @param p_mpi MPI object for communication
+     * @param p_datacol number of columns of the data matrix
+    **/
+    template<typename T> inline void relational_neuralgas<T>::setProcessDataInfo( const mpi::communicator& p_mpi, const std::size_t& p_datacol )
+    {
+        // create process prototype info
+        m_processdatainfo.clear();
+        // gathering the number of prototypes
+        std::vector< std::size_t > l_processdata;
+        mpi::all_gather(p_mpi, p_datacol, p_datacol);
+        
+        // create map
+        std::size_t l_sum = 0;
+        for(std::size_t i=0; i < l_processdata.size(); ++i) {
+            m_processdatainfo[static_cast<int>(i)]  = std::pair<std::size_t,std::size_t>(l_sum, l_processdata[i]);
+            l_sum += l_processdata[i];
+        }
+    }
+    
+    
     /** train the data on the cluster
      * @param p_mpi MPI object for communication
      * @param p_data datapoints
@@ -396,6 +425,107 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> inline void relational_neuralgas<T>::train( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data, const std::size_t& p_iterations, const T& p_lambda )
     {
+        if (p_data.size1() < m_prototypes.size1())
+            throw exception::runtime(_("number of datapoints are less than prototypes"));
+        if (p_iterations == 0)
+            throw exception::runtime(_("iterations must be greater than zero"));
+        if (p_lambda <= 0)
+            throw exception::runtime(_("lambda must be greater than zero")); 
+        
+        // we check data dimension (data matrix over all CPUs must be squared and the column size of
+        // the prototype matrix must be equal to the data size)
+        std::size_t l_col      = 0;
+        mpi::all_reduce(p_mpi, p_data.size2(), l_col, std::plus<std::size_t>());
+        
+        if (l_col != p_data.size1())
+            throw exception::runtime(_("matrix must be square"));
+        if (l_col != m_prototypes.size2())
+            throw exception::runtime(_("data and prototype dimension are not equal"));
+        
+        
+        // we use the max. of all values of each process
+        const std::size_t l_iterationsMPI = mpi::all_reduce(p_mpi, p_iterations, mpi::maximum<std::size_t>());
+        const T l_lambdaMPI               = mpi::all_reduce(p_mpi, p_lambda, mpi::maximum<T>());
+        m_logging                         = mpi::all_reduce(p_mpi, m_logging, std::multiplies<bool>());
+        setProcessDataInfo(p_mpi, p_data.size2());
+        
+        // creates logging
+        if (m_logging) {
+            m_logprototypes     = std::vector< ublas::matrix<T> >();
+            m_quantizationerror = std::vector< T >();
+            m_logprototypes.reserve(l_iterationsMPI);
+            m_quantizationerror.reserve(l_iterationsMPI);
+        }
+        
+        
+        // run neural gas 
+        const T l_multi = 0.01/l_lambdaMPI;
+        
+        for(std::size_t i=0; (i < l_iterationsMPI); ++i) {
+            
+            // create adapt values
+            const T l_lambda = l_lambdaMPI * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(p_iterations));
+        
+            // calculate for every prototype the distance (only the parts of the data matrix)
+            // relational: (D * alpha_i)_j - 0.5 * alpha_i^t * D * alpha_i = || x^j - w^i || 
+            // D = distance, alpha = weight of the prototype for the konvex combination
+            ublas::matrix<T> l_adaptmatrix = ublas::prod(m_prototypes, p_data);
+            
+            // the adapt matrix holds all values on the block of the current CPU, so CPU 0 holds the values 0..k, CPU 1 k+1..n and so on.
+            // In the next step we must calculate the inner product of each prototyp and each row of the adapt matrix, but we can't because
+            // we have only party of the rows on each CPU, so we split the prototype matrix (with the information of the processdata) in
+            // the correct party, create the "local" inner product and sums over all CPUs. Each CPU gets so the correct value for subtract
+            // it from their local adapt matrix
+            ublas::matrix_range< ublas::matrix<T> > l_protorange( m_prototypes, 
+                                                                  ublas::range(0, m_prototypes.size1()), 
+                                                                  ublas::range( m_processdatainfo[p_mpi.rank()].first, m_processdatainfo[p_mpi.rank()].second ) 
+                                                                );
+            
+            for(std::size_t n=0; n < l_protorange.size1(); ++n) {
+                const T l_val = 0.5 * mpi::all_reduce( p_mpi, 
+                                                       ublas::inner_prod( ublas::row(l_protorange, n), ublas::row(l_adaptmatrix, n) ), 
+                                                       std::plus<T>()
+                                                     );
+                
+                for(std::size_t j=0; j < l_adaptmatrix.size2(); ++j)
+                    l_adaptmatrix(n, j) -= l_val;
+            }
+            
+            
+            // determine quantization error for logging (adaption matrix)
+            if (m_logging)
+                m_quantizationerror.push_back( calculateQuantizationError(l_adaptmatrix) );
+            
+            
+            // for every column ranks values and create adapts
+            // we need rank and not randIndex, because we 
+            // use the value of the ranking for calculate the 
+            // adapt value
+            for(std::size_t n=0; n < l_adaptmatrix.size2(); ++n) {
+                ublas::vector<T> l_rank = ublas::column(l_adaptmatrix, n);
+                l_rank = tools::vector::rank( l_rank );
+                
+                // calculate adapt value
+                BOOST_FOREACH( T& p, l_rank)
+                    p = std::exp( -p / l_lambda );
+                
+                // return value to matrix
+                ublas::column(l_adaptmatrix, n) = l_rank;
+            }
+            
+            // adapt values are the new prototypes (and run normalization)
+            m_prototypes = l_adaptmatrix;
+            for(std::size_t i=0; i < m_prototypes.size1(); ++i) {
+                const T l_sum = ublas::sum( ublas::row( m_prototypes, i) );
+                
+                if (!tools::function::isNumericalZero(l_sum))
+                    ublas::row( m_prototypes, i) /= l_sum;
+            }
+            
+            // log updated prototypes
+            if (m_logging)
+                m_logprototypes.push_back( m_prototypes );
+        }
     }
     
     #endif
