@@ -345,7 +345,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     }
     
     
-    /** calulates distance between datapoints and prototypes and returns a std::vector
+    /** calulates distance between datapoints and prototypes and returns a indirect array
      * with index of the nearest prototype
      * @param p_data matrix
      * @return index array of prototype indices
@@ -785,7 +785,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     }
     
     
-    /** calulates distance between datapoints and prototypes and returns a std::vector
+    /** calulates distance between datapoints and prototypes and returns a indirect array
      * with index of the nearest prototype
      * @param p_mpi MPI object for communication     
      * @param p_data matrix
