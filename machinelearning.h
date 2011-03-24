@@ -414,6 +414,8 @@
  *
  *
  * @todo thinking about a SSE support in the framework http://en.wikipedia.org/wiki/SSE3
+ * @todo adding genetic algorithms
+ * @todo adding simulated annealing
 **/
 
 #ifndef MACHINELEARNING_H
