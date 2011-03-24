@@ -77,7 +77,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             void train( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t& );
             void train( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t&, const T& );
             ublas::matrix<T> getPrototypes( const mpi::communicator& ) const;
-            //std::vector< ublas::matrix<T> > getLoggedPrototypes( const mpi::communicator& ) const;
+            std::vector< ublas::matrix<T> > getLoggedPrototypes( const mpi::communicator& ) const;
             std::vector<T> getLoggedQuantizationError( const mpi::communicator& ) const;
             ublas::indirect_array<> use( const mpi::communicator&, const ublas::matrix<T>& ) const;
             void use( const mpi::communicator& ) const;
@@ -661,6 +661,16 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     }
     
     
+    /** return all prototypes of the cluster
+     * @param p_mpi MPI object for communication
+     * @return matrix (rows = prototypes)
+     **/
+    template<typename T> inline ublas::matrix<T> relational_neuralgas<T>::getPrototypes( const mpi::communicator& p_mpi ) const
+    {
+        return gatherAllPrototypes( p_mpi );
+    }
+    
+    
     /** returns the logged quantisation error
      * @param p_mpi MPI object for communication
      * @return std::vector with quantization error
@@ -683,6 +693,41 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         }
         
         return l_error;
+    }
+    
+    
+    /** returns all logged prototypes in all processes
+     * @param p_mpi MPI object for communication
+     * @return std::vector with all logged prototypes
+     **/
+    template<typename T> inline std::vector< ublas::matrix<T> > relational_neuralgas<T>::getLoggedPrototypes( const mpi::communicator& p_mpi ) const
+    {
+        // we must gather every logged prototype and create the full prototype matrix
+        std::vector< std::vector< ublas::matrix<T> > > l_gatherProto;
+        mpi::all_gather(p_mpi, m_logprototypes, l_gatherProto);
+        
+        // now we create the full prototype matrix for every log
+        std::vector< ublas::matrix<T> > l_logProto = l_gatherProto[0];
+        for(std::size_t i=1; i < l_gatherProto.size(); ++i)
+            for(std::size_t n=0; n < l_gatherProto[i].size(); ++n) {
+                
+                // resizing must be in the correct way, so we check the dimensions (the condition 
+                // must check if the prototypes are empty)
+                if (l_gatherProto[i][n].size2() < l_logProto[n].size2())
+                    l_logProto[n].resize( l_logProto[n].size1()+l_gatherProto[i][n].size1(), l_logProto[n].size2());
+                else
+                    l_logProto[n].resize( l_logProto[n].size1()+l_gatherProto[i][n].size1(), l_gatherProto[i][n].size2());
+                
+                
+                ublas::matrix_range< ublas::matrix<T> > l_range(l_logProto[n], 
+                                                                ublas::range( l_logProto[n].size1()-l_gatherProto[i][n].size1(), l_logProto[n].size1() ), 
+                                                                ublas::range( 0, l_logProto[n].size2() )
+                                                                );
+                l_range.assign(l_gatherProto[i][n]);
+            }
+        
+        
+        return l_logProto;
     }
     
     #endif

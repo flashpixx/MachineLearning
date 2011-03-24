@@ -411,6 +411,9 @@
  * @file tools/files/files.h main header for file structurs
  * @file tools/files/csv.hpp implementation for reading and writing csv files
  * @file tools/files/hdf.hpp implementation for reading and writing hdf files
+ *
+ *
+ * @todo thinking about a SSE support in the framework http://en.wikipedia.org/wiki/SSE3
 **/
 
 #ifndef MACHINELEARNING_H
