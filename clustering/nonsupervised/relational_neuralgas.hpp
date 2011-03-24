@@ -78,7 +78,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             void train( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t&, const T& );
             ublas::matrix<T> getPrototypes( const mpi::communicator& ) const;
             //std::vector< ublas::matrix<T> > getLoggedPrototypes( const mpi::communicator& ) const;
-            //std::vector<T> getLoggedQuantizationError( const mpi::communicator& ) const;
+            std::vector<T> getLoggedQuantizationError( const mpi::communicator& ) const;
             ublas::indirect_array<> use( const mpi::communicator&, const ublas::matrix<T>& ) const;
             void use( const mpi::communicator& ) const;
             #endif
@@ -658,6 +658,31 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     template<typename T> inline void relational_neuralgas<T>::use( const mpi::communicator& p_mpi ) const
     {
         gatherAllPrototypes( p_mpi );
+    }
+    
+    
+    /** returns the logged quantisation error
+     * @param p_mpi MPI object for communication
+     * @return std::vector with quantization error
+     **/
+    template<typename T> inline std::vector<T> relational_neuralgas<T>::getLoggedQuantizationError( const mpi::communicator& p_mpi ) const
+    {
+        // we must call the quantization error of every process and sum all values for the main error
+        std::vector< std::vector<T> > l_gatherError;
+        mpi::all_gather(p_mpi, m_quantizationerror, l_gatherError);
+        
+        // we get every quantization error (if the prototypes are empty on the process, the quantization error exists for all other prototypes)
+        std::vector<T> l_error = l_gatherError[0];
+        for(std::size_t i=0; i < l_gatherError.size(); ++i) {
+            T l_min = l_error[i];
+
+            for(std::size_t n=1; n < l_gatherError.size(); ++n)
+                l_min = std::min( l_min, l_gatherError[n][i]);
+            
+            l_error[i] = l_min;
+        }
+        
+        return l_error;
     }
     
     #endif
