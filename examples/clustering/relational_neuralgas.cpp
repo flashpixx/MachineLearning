@@ -196,7 +196,7 @@ int main(int argc, char* argv[]) {
         if (loMPICom.rank() == 0) {
             tools::files::hdf target(boost::any_cast<std::string>(l_args["outfile"]), true);
 
-            target.write<double>( "/protos",  protos, H5::PredType::NATIVE_DOUBLE );
+            target.write<double>( "/protos",  tools::matrix::setNumericalZero(protos), H5::PredType::NATIVE_DOUBLE );
             target.write<double>( "/numprotos",  protos.size1(), H5::PredType::NATIVE_DOUBLE );
             target.write<std::size_t>( "/iteration", boost::any_cast<std::size_t>(l_args["iteration"]), H5::PredType::NATIVE_ULONG );
             
@@ -217,7 +217,7 @@ int main(int argc, char* argv[]) {
         // create target file
         tools::files::hdf target(boost::any_cast<std::string>(l_args["outfile"]), true);
         target.write<double>( "/numprotos",  boost::any_cast<std::size_t>(l_args["prototype"]), H5::PredType::NATIVE_DOUBLE );
-        target.write<double>( "/protos",  ng.getPrototypes(), H5::PredType::NATIVE_DOUBLE );    
+        target.write<double>( "/protos",  tools::matrix::setNumericalZero(ng.getPrototypes()), H5::PredType::NATIVE_DOUBLE );    
         target.write<std::size_t>( "/iteration",  boost::any_cast<std::size_t>(l_args["iteration"]), H5::PredType::NATIVE_ULONG );
         
         if (ng.getLogging()) {
