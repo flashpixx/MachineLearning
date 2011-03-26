@@ -73,6 +73,12 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             std::vector<T> getLoggedQuantizationError( void ) const;
             ublas::indirect_array<> use( const ublas::matrix<T>& ) const;
         
+            // derived from patch clustering
+            ublas::vector<T> getPrototypeWeights( void ) const;
+            void trainpatch( const ublas::matrix<T>&, const std::size_t& );
+            void trainpatch( const ublas::matrix<T>&, const std::size_t&, const T& );
+            std::vector< ublas::vector<T> > getLoggedPrototypeWeights( void ) const;
+        
             #ifdef MACHINELEARNING_MPI
             void train( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t& );
             void train( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t&, const T& );
@@ -98,6 +104,10 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             std::vector< ublas::matrix<T> > m_logprototypes;
             /** std::vector for quantisation error in each iteration **/
             std::vector<T> m_quantizationerror;
+            /** prototype weights for patch clustering **/
+            ublas::vector<T> m_prototypeWeights;
+            /** std::vector for logging the prototype weights **/
+            std::vector< ublas::vector<T> > m_logprototypeWeights;
             /** bool for check initialized patch **/
             bool m_firstpatch;
         
@@ -129,6 +139,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         m_logging( false ),
         m_logprototypes( std::vector< ublas::matrix<T> >() ),
         m_quantizationerror( std::vector<T>() ),
+        m_prototypeWeights( p_prototypes, 0 ),
+        m_logprototypeWeights(),
         m_firstpatch(true)
         #ifdef MACHINELEARNING_MPI
         , m_processdatainfo(),
@@ -192,6 +204,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     template<typename T> inline void relational_neuralgas<T>::setLogging( const bool& p )
     {
         m_logging = p;
+        m_logprototypeWeights.clear();
     }
     
     
@@ -240,6 +253,24 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     {
         return m_quantizationerror;
     }    
+    
+    
+    /** returns the weights of prototypes on patch clustering
+     * @return weights vector
+     **/
+    template<typename T> inline ublas::vector<T> relational_neuralgas<T>::getPrototypeWeights( void ) const
+    {
+        return m_prototypeWeights;
+    }
+    
+    
+    /** returns the log of the prototype weights
+     * @return std::vector with weight vector
+     **/
+    template<typename T> inline std::vector< ublas::vector<T> > relational_neuralgas<T>::getLoggedPrototypeWeights( void ) const
+    {
+        return m_logprototypeWeights;
+    }
     
     
     /** 
@@ -372,6 +403,25 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         }
         
         return l_idx;
+    }
+    
+    
+    /** train a patch (input data) with the data (include the weights)
+     * @param p_data datapoints
+     * @param p_iterations iterations
+     **/
+    template<typename T> inline void relational_neuralgas<T>::trainpatch( const ublas::matrix<T>& p_data, const std::size_t& p_iterations )
+    {
+        trainpatch(p_data, p_iterations, m_prototypes.size1() * 0.5);
+    }
+    
+    /** train a patch (input data) with the data (include the weights)
+     * @param p_data datapoints
+     * @param p_iterations iterations
+     * @param p_lambda max adapet size
+     **/
+    template<typename T> inline void relational_neuralgas<T>::trainpatch( const ublas::matrix<T>& p_data, const std::size_t& p_iterations, const T& p_lambda )
+    {
     }
     
     //======= MPI ==================================================================================================================================

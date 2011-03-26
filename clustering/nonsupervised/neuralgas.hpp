@@ -171,10 +171,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     template<typename T> inline void neuralgas<T>::setLogging( const bool& p )
     {
         m_logging = p;
-        
-        //remove temporary datastructures
-        if (m_logging)
-            m_logprototypeWeights.clear();
+        m_logprototypeWeights.clear();
     }
     
     
@@ -242,6 +239,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     {
         return m_prototypeWeights;
     }
+    
     
     /** returns the log of the prototype weights
      * @return std::vector with weight vector
