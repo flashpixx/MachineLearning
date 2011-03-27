@@ -422,6 +422,94 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> inline void relational_neuralgas<T>::trainpatch( const ublas::matrix<T>& p_data, const std::size_t& p_iterations, const T& p_lambda )
     {
+        if (m_prototypes.size1() == 0)
+            throw exception::runtime(_("number of prototypes must be greater than zero"));
+        if (p_data.size1() < m_prototypes.size1())
+            throw exception::runtime(_("number of datapoints are less than prototypes"));
+        if (p_iterations == 0)
+            throw exception::runtime(_("iterations must be greater than zero"));
+        if (p_data.size2() != m_prototypes.size2())
+            throw exception::runtime(_("data and prototype dimension are not equal"));
+        if (p_lambda <= 0)
+            throw exception::runtime(_("lambda must be greater than zero"));
+        if (p_data.size1() != p_data.size2())
+            throw exception::runtime(_("matrix must be square"));
+        
+        
+        // creates logging
+        if (m_logging) {
+            m_logprototypes.clear();
+            m_quantizationerror.clear();
+            m_logprototypes.reserve(p_iterations);
+            m_quantizationerror.reserve(p_iterations);
+        }
+        
+        
+        // create patch neurons
+        if (!m_firstpatch) {
+        }
+        
+        // run neural gas       
+        const T l_multi = 0.01/p_lambda;
+        
+        for(std::size_t i=0; (i < p_iterations); ++i) {
+            
+            // create adapt values
+            const T l_lambda = p_lambda * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(p_iterations));
+            
+            // calculate for every prototype the distance
+            // relational: (D * alpha_i)_j - 0.5 * alpha_i^t * D * alpha_i = || x^j - w^i || 
+            // D = distance, alpha = weight of the prototype for the konvex combination
+            ublas::matrix<T> l_adaptmatrix = ublas::prod(m_prototypes, p_data);
+            
+            for(std::size_t n=0; n < l_adaptmatrix.size1(); ++n) {
+                const T l_val = 0.5 * ublas::inner_prod( ublas::row(m_prototypes, n), ublas::row(l_adaptmatrix, n) );
+                
+                for(std::size_t j=0; j < l_adaptmatrix.size2(); ++j)
+                    l_adaptmatrix(n, j) -= l_val;
+            }
+            
+            // determine quantization error for logging (adaption matrix)
+            if (m_logging)
+                m_quantizationerror.push_back( calculateQuantizationError(l_adaptmatrix) );
+            
+            
+            // for every column ranks values and create adapts
+            // we need rank and not randIndex, because we 
+            // use the value of the ranking for calculate the 
+            // adapt value
+            for(std::size_t n=0; n < l_adaptmatrix.size2(); ++n) {
+                ublas::vector<T> l_rank = ublas::column(l_adaptmatrix, n);
+                l_rank = tools::vector::rank( l_rank );
+                
+                // calculate adapt value
+                BOOST_FOREACH( T& p, l_rank)
+                p = std::exp( -p / l_lambda );
+                
+                // return value to matrix
+                ublas::column(l_adaptmatrix, n) = l_rank;
+            }
+            
+            // adapt values are the new prototypes (and run normalization)
+            m_prototypes = l_adaptmatrix;
+            for(std::size_t i=0; i < m_prototypes.size1(); ++i) {
+                const T l_sum = ublas::sum( ublas::row( m_prototypes, i) );
+                
+                if (!tools::function::isNumericalZero(l_sum))
+                    ublas::row( m_prototypes, i) /= l_sum;
+            }
+            
+            // log updated prototypes
+            if (m_logging)
+                m_logprototypes.push_back( m_prototypes );
+        }        
+        
+        // determine size of receptive fields, but we use only the data points
+        const ublas::indirect_array<> l_winner = use(p_data);
+        for(std::size_t i=0; i < l_winner.size(); ++i)
+            m_prototypeWeights( l_winner(i) )++;
+        
+        // do k-approximation
     }
     
     //======= MPI ==================================================================================================================================
