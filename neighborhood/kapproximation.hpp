@@ -42,6 +42,7 @@ namespace machinelearning { namespace neighborhood {
     
     /** class for k-approximation
      * $LastChangedDate$
+     * @todo switch code to using distance classes / objects
      **/
     template<typename T> class kapproximation {
         BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
@@ -52,11 +53,43 @@ namespace machinelearning { namespace neighborhood {
             {
                 knn         = 0,
                 spread      = 1,
-                random      = 2
+                randompart  = 2,
+                random      = 3
             };
         
         
+            kapproximation( const approximation&, const std::size_t& );
+            ublas::indirect_array<> approximate( const ublas::vector<T>, const ublas::matrix<T> ) const;
+        
+        
+        private:
+            
+            /** type of approximation **/
+            const kapproximation m_approx;
+            /** number of approximate datasets **/
+            const std::size_t m_number;
+        
+        
     };
+    
+    
+    /** constructor
+     * @param p_approx type of approximation
+     * @param p_num number of datasets
+    **/
+    template<typename T> inline kapproximation<T>::kapproximation( const approximation& p_approx, const std::size_t& p_num ) :
+        m_approx(p_approx),
+        m_number(p_num)
+    {
+        if (p_num == 0)
+            throw exception::runtime(_("number of approximate data must be greater than zero"));
+    }
+    
+    
+    template<typename T> inline ublas::indirect_array<> kapproximation<T>::approximate( const ublas::vector<T>, const ublas::matrix<T> ) const
+    {
+        return ublas::indirect_array<>();
+    }
     
     
     
