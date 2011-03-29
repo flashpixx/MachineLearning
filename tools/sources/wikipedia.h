@@ -31,11 +31,13 @@
 #include <algorithm>
 #include <boost/asio.hpp>
 #include <boost/regex.hpp>
+
+extern "C" {
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 #include <libxml/xpathInternals.h>
-
+}
 
 #include "../../exception/exception.h"
 #include "../language/language.h"
