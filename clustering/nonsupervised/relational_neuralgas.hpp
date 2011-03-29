@@ -26,6 +26,7 @@
 #define MACHINELEARNING_CLUSTERING_NONSUPERVISED_RNG_HPP
 
 #include <numeric>
+#include <boost/shared_ptr.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 
@@ -94,10 +95,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
             /** prototypes **/
             ublas::matrix<T> m_prototypes;
-            /** k-approximation object
-             * @todo swap pointer to reference and initialize it with default object
-             **/
-            const neighborhood::kapproximation<T>* m_kapprox;
+            /** k-approximation object **/
+            const boost::shared_ptr< neighborhood::kapproximation<T> > m_kapprox;
             /** bool for logging prototypes **/
             bool m_logging;
             /** std::vector for prototypes for each iteration **/
@@ -135,7 +134,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> inline relational_neuralgas<T>::relational_neuralgas( const std::size_t& p_prototypes, const std::size_t& p_prototypesize ) :
         m_prototypes( tools::matrix::random<T>(p_prototypes, p_prototypesize) ),
-        m_kapprox( NULL ),
+        m_kapprox(),
         m_logging( false ),
         m_logprototypes( std::vector< ublas::matrix<T> >() ),
         m_quantizationerror( std::vector<T>() ),
@@ -184,8 +183,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             if (!tools::function::isNumericalZero(l_sum))
                 ublas::row( m_prototypes, i) /= l_sum;
         }
-    }*/
-    
+    }
+    */
 
     
     /** returns the prototype matrix
