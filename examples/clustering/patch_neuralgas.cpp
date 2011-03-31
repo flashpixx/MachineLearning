@@ -193,8 +193,10 @@ int main(int argc, char* argv[]) {
 						   boost::any_cast<std::size_t>(l_args["iteration"])
 					     );
 					
-            ublas::vector<double> weights               = ng.getPrototypeWeights(loMPICom);
-            ublas::matrix<double> protos                = ng.getPrototypes(loMPICom);
+            ublas::vector<double> weights                  = ng.getPrototypeWeights(loMPICom);
+            ublas::matrix<double> protos                   = ng.getPrototypes(loMPICom);
+            ublas::vector<double> qerror                   = tools::vector::copy(ng.getLoggedQuantizationError(loMPICom));
+            std::vector< ublas::matrix<double> > logproto  = ng.getLoggedPrototypes(loMPICom);
             
             if (target) {
                 std::string patchpath = "/patch" + boost::lexical_cast<std::string>(i);
@@ -203,9 +205,6 @@ int main(int argc, char* argv[]) {
                 target->write<double>( patchpath+"/protos",  protos, H5::PredType::NATIVE_DOUBLE );    
 
                 if (ng.getLogging()) {
-                    ublas::vector<double> qerror                   = tools::vector::copy(ng.getLoggedQuantizationError(loMPICom));
-                    std::vector< ublas::matrix<double> > logproto  = ng.getLoggedPrototypes(loMPICom);
-                    
                     target->write<double>( patchpath+"/error", qerror, H5::PredType::NATIVE_DOUBLE );
                     
                     for(std::size_t j=0; j < logproto.size(); ++j)
