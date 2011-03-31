@@ -36,6 +36,10 @@
 #include <boost/nondet_random.hpp>
 #endif
 
+#ifdef MACHINELEARNING_MPI
+#include <boost/mpi.hpp>
+#endif
+
 #include <boost/math/distributions/beta.hpp>
 #include <boost/math/distributions/students_t.hpp>
 #include <boost/math/distributions/weibull.hpp>
@@ -52,6 +56,10 @@
 
 namespace machinelearning { namespace tools {
     
+    #ifdef MACHINELEARNING_MPI
+    namespace mpi   = boost::mpi;
+    #endif
+
     
     /** class for using some thread-safe random structures. Pseudo generator (Mersenne Twister) and
      * system-random-generator can be used. The class holds different distribution that
@@ -128,12 +136,19 @@ namespace machinelearning { namespace tools {
     
     /** constructor with creating a own number generator
      * for multithrading. Read thread-id and create xor
-     * with time
+     * with time (and add MPI support, for creating different start values)
      **/
     #ifndef MACHINELEARNING_RANDOMDEVICE
-    inline random::random( void ) :
-        m_random(  boost::mt19937(getThreadID() ^ time(NULL))  )
-    {}
+    inline random::random( void )
+        #ifndef MACHINELEARNING_MPI
+        : m_random(  boost::mt19937(getThreadID() ^ time(NULL))  )
+        #endif
+    {
+        #ifdef MACHINELEARNING_MPI
+        mpi::communicator l_mpi;
+        m_random = boost::mt19937( (getThreadID() ^ time(NULL)) * (l_mpi.rank()+1) );
+        #endif
+    }
    
     
     /** reads the thread object id and converts it to numeric value **/
