@@ -133,16 +133,14 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
 
 
 int main(int argc, char* argv[]) {
-    mpi::environment loMPIenv(argc, argv);
-    std::cout << tools::vector::random<double>(4) << std::endl;
-    
+
     std::map<std::string, boost::any> l_args;
     if (!cliArguments(argc, argv, l_args))
         return EXIT_FAILURE;
 
     
     #ifdef MACHINELEARNING_MPI
-        //mpi::environment loMPIenv(argc, argv);
+        mpi::environment loMPIenv(argc, argv);
         mpi::communicator loMPICom;
     
         if (!( ((boost::any_cast< std::vector<std::string> >(l_args["inputfile"]).size() == static_cast<std::size_t>(loMPICom.size())) && (boost::any_cast< std::vector<std::string> >(l_args["inputpath"]).size() == 1)) ||

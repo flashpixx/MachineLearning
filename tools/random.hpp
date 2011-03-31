@@ -61,9 +61,9 @@ namespace machinelearning { namespace tools {
     #endif
 
     
-    /** class for using some thread-safe random structures. Pseudo generator (Mersenne Twister) and
+    /** class for using some thread-safe & MPI-safe random structures. Pseudo generator (Mersenne Twister) and
      * system-random-generator can be used. The class holds different distribution that
-     * can be used. The system-random-generator musst be set with the compileflag 
+     * can be used. The system-random-generator must be set with the compileflag 
      * $LastChangedDate$
      **/
     class random {
