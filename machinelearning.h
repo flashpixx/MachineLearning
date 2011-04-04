@@ -265,7 +265,7 @@
  
     // shows the filename of each CPU (only CPU 0 collectes all messages with MPI support)
     std::cout << tools::logger::getInstance()->getFilename() << std::endl;
-    MPI::Finalize()
+    MPI::Finalize();
  * @endcode
  *
  *
