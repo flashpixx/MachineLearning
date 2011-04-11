@@ -411,7 +411,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
         // if not the first patch add prototypes to data at the end and set the multiplier
         ublas::matrix<T> l_data(p_data);
-        ublas::vector<std::size_t> l_multiplier(p_data.size1(), 1);
+        ublas::vector<std::size_t> l_multiplier(l_data.size1(), 1);
         if (!m_firstpatch) {
             
             // resize data matrix
