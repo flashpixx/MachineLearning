@@ -46,11 +46,17 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         
         public :
         
-        enum project {
-            metric          = 0,
-            sammon          = 1,
-            hit             = 2
-        };
+            enum project {
+                metric              = 0,
+                sammon              = 1,
+                hit                 = 2
+            };
+            
+            enum centeroption {
+                none             = 0,
+                singlecenter     = 1,
+                doublecenter     = 2
+            };
         
         
         mds( const std::size_t&, const project& = metric );
@@ -59,6 +65,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         void setIteration( const std::size_t& );
         void setStep( const std::size_t& );
         void setRate( const T& );
+        void setCentering( const centeroption& );
         
         
         private :
@@ -73,6 +80,8 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         const std::size_t m_dim;
         /** project type **/
         const project m_type;
+        /** centering **/
+        centeroption m_centering;
         
         
         ublas::matrix<T> project_metric( const ublas::matrix<T>& );
@@ -81,6 +90,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         
         ublas::matrix<T> distance( const ublas::matrix<T>& ) const;
         ublas::matrix<T> doublecentering( const ublas::matrix<T>& ) const;
+        ublas::matrix<T> centering( const ublas::matrix<T>& ) const;
         T calculateQuantizationError( const ublas::matrix<T>&, const ublas::matrix<T>& ) const;
         
     };
@@ -95,7 +105,8 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         m_step( 20 ),
         m_rate( 1 ),
         m_dim( p_dim ),
-        m_type( p_type )
+        m_type( p_type ),
+        m_centering( singlecenter )
     {
         if (p_dim == 0)
             throw exception::runtime(_("dimension must be greater than zero"));
@@ -135,6 +146,14 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         m_step = p_step;
     }
     
+    /** enables / disables centering before mapping
+     * @param p_en bool
+     **/
+    template<typename T> inline void mds<T>::setCentering( const centeroption& p_center )
+    {
+        m_centering = p_center;
+    }
+    
     
     /** caluate and project the input data
      * @param p_data input datamatrix (similarity matrix)
@@ -147,20 +166,39 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         if (p_data.size1() != p_data.size2())
             throw exception::runtime( _("matrix must be square") );
         
+        // do centering
+        ublas::matrix<T> l_data = p_data;
+        switch (m_centering) {
+                
+            case singlecenter :
+                l_data = centering(l_data);
+                break;
+                
+            case doublecenter :
+                l_data = doublecentering(l_data);
+                break;
+                
+            default : break;
+        };
+        
+        // do project
         switch (m_type) {
                 
             case metric:
-                return project_metric(p_data);
+                // we use a stable matrix for eigendecompsition
+                return project_metric( 1.0/l_data.size1() * ublas::prod(l_data, ublas::trans(l_data)) );
+            
                 
             case sammon:
                 return project_sammon(p_data);
                 
+                
             case hit :
                 return project_hit(p_data);
-                
-                
+                       
             default :
                 throw exception::runtime(_("project option is unkown"));
+
         };
     }
     
@@ -176,7 +214,6 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         ublas::vector<T> l_eigenvalues;
         ublas::matrix<T> l_eigenvectors;
         tools::lapack::eigen<T>(p_data, l_eigenvalues, l_eigenvectors);
-        
         
         // rank the eigenvalues
         const ublas::indirect_array<> l_rank = tools::vector::rankIndex( l_eigenvalues );
@@ -318,6 +355,21 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         return l_center;
     }
     
+
+    /** create a double centering matrix
+     * @param p_data input matrix
+     * @return centered matrix
+     **/
+    template<typename T> inline ublas::matrix<T> mds<T>::centering( const ublas::matrix<T>& p_data ) const
+    {
+        ublas::matrix<T> l_data = p_data;
+        ublas::vector<T> l_mean = tools::matrix::mean( l_data );
+        for(std::size_t i=0; i < l_data.size1(); ++i)
+            for(std::size_t j=0; j < l_data.size2(); ++j)
+                l_data(i, j) = l_data(i, j) - l_mean(j);
+        
+        return l_data;
+    }
     
     /** caluate the High-Throughput Dimensional Scaling (HIT-MDS)
      * @bug incomlete
