@@ -90,7 +90,6 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             
             ublas::matrix<T> distance( const ublas::matrix<T>& ) const;
             ublas::matrix<T> doublecentering( const ublas::matrix<T>& ) const;
-            ublas::matrix<T> centering( const ublas::matrix<T>& ) const;
             T calculateQuantizationError( const ublas::matrix<T>&, const ublas::matrix<T>& ) const;
         
     };
@@ -106,11 +105,24 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         m_rate( 1 ),
         m_dim( p_dim ),
         m_type( p_type ),
-        m_centering( (p_type != metric) ? singlecenter : doublecenter )
+        m_centering( none )
     {
         if (p_dim == 0)
             throw exception::runtime(_("dimension must be greater than zero"));
 
+        // set default values for centering
+        switch (m_type) {
+                
+            case metric :
+                m_centering = doublecenter;
+                break;
+                
+            case sammon :
+                m_centering = singlecenter;
+                break;
+                
+            default : break;
+        }
     }
     
     
@@ -121,6 +133,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     {
         return m_dim;
     }
+    
     
     /** sets the rate value for hit mds
      * @param p_rate
@@ -147,6 +160,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         m_step = p_step;
     }
     
+    
     /** enables / disables centering before mapping
      * @param p_en bool
      **/
@@ -158,7 +172,6 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     
     /** caluate and project the input data
      * @param p_data input datamatrix (dissimilarity matrix)
-     * @todo check which algorithm need a similarity and which a dissimilarity matrix
      **/
     template<typename T> inline ublas::matrix<T> mds<T>::map( const ublas::matrix<T>& p_data )
     {
@@ -166,14 +179,13 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             throw exception::runtime( _("matrix must be square") );
         if (p_data.size2() <= m_dim)
             throw exception::runtime(_("datapoint dimension are less than target dimension"));
-
-        
+                
         // do centering
         ublas::matrix<T> l_data = p_data;
         switch (m_centering) {
                 
             case singlecenter :
-                l_data = centering(l_data);
+                l_data = tools::matrix::centering(l_data);
                 break;
                 
             case doublecenter :
@@ -182,6 +194,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                 
             default : break;
         };
+        
         
         // do project
         switch (m_type) {
@@ -353,21 +366,6 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     }
     
 
-    /** create a double centering matrix
-     * @param p_data input matrix
-     * @return centered matrix
-     **/
-    template<typename T> inline ublas::matrix<T> mds<T>::centering( const ublas::matrix<T>& p_data ) const
-    {
-        ublas::matrix<T> l_data = p_data;
-        ublas::vector<T> l_mean = tools::matrix::mean( l_data );
-        for(std::size_t i=0; i < l_data.size1(); ++i)
-            for(std::size_t j=0; j < l_data.size2(); ++j)
-                l_data(i, j) = l_data(i, j) - l_mean(j);
-        
-        return l_data;
-    }
-    
     /** caluate the High-Throughput Dimensional Scaling (HIT-MDS)
      * @bug incomlete
      * @see http://dig.ipk-gatersleben.de/hitmds/hitmds.html
@@ -376,22 +374,66 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
      **/
     template<typename T> inline ublas::matrix<T> mds<T>::project_hit( const ublas::matrix<T>& p_data )
     {
-        ublas::matrix<T> l_target                   = tools::matrix::random<T>( p_data.size1(), m_dim );
-        ublas::matrix<T> l_data                     = p_data;
-                
-        // check zeros in the data
+        ublas::matrix<T> l_target(p_data.size1(), m_dim); //                   = tools::matrix::random<T>( p_data.size1(), m_dim );
+        std::size_t n = 1;
+        for(std::size_t i=0; i < l_target.size1(); ++i) {
+            l_target(i,0) = n++;
+            l_target(i,1) = n++;
+        }
+        
+        // count zero elements
+        std::size_t zeros=0;
+        for(std::size_t i=0; i < p_data.size1(); ++i)
+            for(std::size_t j=0; j < p_data.size2(); ++j)
+                if (tools::function::isNumericalZero(p_data(i,j)))
+                    zeros++;
+        
+        // create init matrix and values
+        if (zeros == p_data.size1() * p_data.size2())
+            throw exception::runtime(_("data matrix has only zero entries"));
+        
+        ublas::matrix<T> l_data = p_data;
+        const T l_mnD = ublas::sum( tools::matrix::sum(l_data) ) / ( l_data.size1() * l_data.size2() - zeros );
+        
         for(std::size_t i=0; i < l_data.size1(); ++i)
             for(std::size_t j=0; j < l_data.size2(); ++j)
-                if (tools::function::isNumericalZero<T>(l_data(i,j))) {
-                    l_data(i,j) = 0;
-                }
-        
-        //const T l_datainvs = 1 / (l_data.size1() * l_data.size2() - length(zeros));
-        
+                if (i != j)
+                    l_data(i,j) -= l_mnD;
+
+        const ublas::matrix<T> l_elprod = ublas::element_prod(l_data, l_data);
+        const T l_moD = ublas::sum (tools::matrix::sum( l_elprod ));
         
         
         // optimize
         for(std::size_t i=0; i < m_iteration; ++i) {
+            
+            // create pairs of differences between optimized points and data
+            ublas::matrix<T> l_tmp;
+            for(std::size_t j=0; j < m_dim; ++j) {
+                
+                // create a matrix with rows of the j-th column
+                ublas::matrix<T> l_row(l_target.size1(), l_target.size1());
+                for(std::size_t n=0; n < l_target.size1(); ++n)
+                    ublas::row(l_row, n) = ublas::column(l_target, j);
+                
+                // create a matrix with columns of the j-th column
+                ublas::matrix<T> l_col(l_target.size1(), l_target.size1());
+                for(std::size_t n=0; n < l_target.size1(); ++n)
+                    ublas::column(l_col, n) = ublas::column(l_target, j);
+              
+                l_col -= l_row;
+                l_col  = ublas::element_prod(l_col, l_col);
+                
+                if (j == 0)
+                    l_tmp = l_col;
+                else
+                    l_tmp += l_col;
+            }
+            
+            // optimize function
+            for(std::size_t j=0; j < l_tmp.size1(); ++j)
+                for(std::size_t j=0; j < l_tmp.size2(); ++n)
+                    l_tmp(j,n) = std::sqrt( l_tmp(j,n) );
         }
         
         return l_target;
