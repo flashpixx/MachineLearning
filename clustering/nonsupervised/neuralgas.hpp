@@ -578,8 +578,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     
     
     
-    /** set the std::map with the begin position and size of the prototypes matrix. Is needed for extracting the prototypes
-     * of the full matrix for every process
+    /** sets the std::map with the begin position and size of the prototypes matrix. Is required for the extraction of prototypes
+     * of the full matrix for each process
      * @param p_mpi MPI object for communication
      **/
     template<typename T> inline void neuralgas<T>::setProcessPrototypeInfo( const mpi::communicator& p_mpi )
@@ -1019,7 +1019,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             // create local prototypes
             l_prototypes = ublas::prod( l_adaptmatrix, l_data );
             
-            // normalize prototypes and synch them on each process
+            // normalize prototypes and sync them on each process
             for(std::size_t n=0; n < l_prototypes.size1(); ++n)
                 l_normvec(n) = ublas::sum( ublas::row(l_adaptmatrix, n) );
             synchronizePrototypes(p_mpi, l_prototypes, l_normvec);
