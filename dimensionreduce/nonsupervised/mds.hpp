@@ -59,39 +59,39 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             };
         
         
-        mds( const std::size_t&, const project& = metric );
-        ublas::matrix<T> map( const ublas::matrix<T>& );
-        std::size_t getDimension( void ) const;
-        void setIteration( const std::size_t& );
-        void setStep( const std::size_t& );
-        void setRate( const T& );
-        void setCentering( const centeroption& );
+            mds( const std::size_t&, const project& = metric );
+            ublas::matrix<T> map( const ublas::matrix<T>& );
+            std::size_t getDimension( void ) const;
+            void setIteration( const std::size_t& );
+            void setStep( const std::size_t& );
+            void setRate( const T& );
+            void setCentering( const centeroption& );
         
         
         private :
         
-        /** number of iterations for sammon and hit **/
-        std::size_t m_iteration;
-        /** stepsize for sammon **/
-        std::size_t m_step;
-        /** rate value for hit **/
-        T m_rate;
-        /** target dimension **/
-        const std::size_t m_dim;
-        /** project type **/
-        const project m_type;
-        /** centering **/
-        centeroption m_centering;
-        
-        
-        ublas::matrix<T> project_metric( const ublas::matrix<T>& );
-        ublas::matrix<T> project_sammon( const ublas::matrix<T>& );
-        ublas::matrix<T> project_hit( const ublas::matrix<T>& );
-        
-        ublas::matrix<T> distance( const ublas::matrix<T>& ) const;
-        ublas::matrix<T> doublecentering( const ublas::matrix<T>& ) const;
-        ublas::matrix<T> centering( const ublas::matrix<T>& ) const;
-        T calculateQuantizationError( const ublas::matrix<T>&, const ublas::matrix<T>& ) const;
+            /** number of iterations for sammon and hit **/
+            std::size_t m_iteration;
+            /** stepsize for sammon **/
+            std::size_t m_step;
+            /** rate value for hit **/
+            T m_rate;
+            /** target dimension **/
+            const std::size_t m_dim;
+            /** project type **/
+            const project m_type;
+            /** centering **/
+            centeroption m_centering;
+            
+            
+            ublas::matrix<T> project_metric( const ublas::matrix<T>& );
+            ublas::matrix<T> project_sammon( const ublas::matrix<T>& );
+            ublas::matrix<T> project_hit( const ublas::matrix<T>& );
+            
+            ublas::matrix<T> distance( const ublas::matrix<T>& ) const;
+            ublas::matrix<T> doublecentering( const ublas::matrix<T>& ) const;
+            ublas::matrix<T> centering( const ublas::matrix<T>& ) const;
+            T calculateQuantizationError( const ublas::matrix<T>&, const ublas::matrix<T>& ) const;
         
     };
     
@@ -101,15 +101,16 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
      * @param p_type project type
      **/
     template<typename T> inline mds<T>::mds( const std::size_t& p_dim, const project& p_type ) :
-        m_iteration( 150 ),
+        m_iteration( 500 ),
         m_step( 20 ),
         m_rate( 1 ),
         m_dim( p_dim ),
         m_type( p_type ),
-        m_centering( singlecenter )
+        m_centering( (p_type != metric) ? singlecenter : doublecenter )
     {
         if (p_dim == 0)
             throw exception::runtime(_("dimension must be greater than zero"));
+
     }
     
     
@@ -156,15 +157,16 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     
     
     /** caluate and project the input data
-     * @param p_data input datamatrix (similarity matrix)
+     * @param p_data input datamatrix (dissimilarity matrix)
      * @todo check which algorithm need a similarity and which a dissimilarity matrix
      **/
     template<typename T> inline ublas::matrix<T> mds<T>::map( const ublas::matrix<T>& p_data )
     {
-        if (p_data.size2() <= m_dim)
-            throw exception::runtime(_("datapoint dimension are less than target dimension"));
         if (p_data.size1() != p_data.size2())
             throw exception::runtime( _("matrix must be square") );
+        if (p_data.size2() <= m_dim)
+            throw exception::runtime(_("datapoint dimension are less than target dimension"));
+
         
         // do centering
         ublas::matrix<T> l_data = p_data;
@@ -188,10 +190,8 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                 // we use a stable matrix for eigendecompsition
                 return project_metric( 1.0/l_data.size1() * ublas::prod(l_data, ublas::trans(l_data)) );
             
-                
             case sammon:
                 return project_sammon(p_data);
-                
                 
             case hit :
                 return project_hit(p_data);
@@ -205,7 +205,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     
     
     /** caluate the metric MDS (for metric we use eigenvalues)
-     * @param p_data input datamatrix (similarity matrix)
+     * @param p_data input datamatrix (dissimilarity matrix)
      * @return mapped data
      **/
     template<typename T> inline ublas::matrix<T> mds<T>::project_metric( const ublas::matrix<T>& p_data )
@@ -230,9 +230,9 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     }
     
     
-    /** caluate the sammon mapping on MDS (with pseudo-newton method for optimization)
+    /** calculate the sammon mapping on MDS (with pseudo-newton method for optimization)
      * @note uses code idea of http://ticc.uvt.nl/~lvdrmaaten (in the Matlab code there are duplicated variables)
-     * @param p_data input datamatrix (similarity matrix)
+     * @param p_data input datamatrix (dissimilarity matrix)
      * @return mapped data
      **/
     template<typename T> inline ublas::matrix<T> mds<T>::project_sammon( const ublas::matrix<T>& p_data )
@@ -241,9 +241,6 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             throw exception::runtime(_("iterations must be greater than zero"));
         if (m_step == 0)
             throw exception::runtime(_("steps must be greater than zero"));
-        
-        // the similarity matrix must be double-centered
-        const ublas::matrix<T> l_center = doublecentering( p_data );
         
         
         // create the distance for each row/colum (create distance matrix) of the matrix and sets the diagonal elements to one
@@ -319,7 +316,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     }
     
     
-    /** calculate the distance between a every row of the matrix and the other rows
+    /** calculate the distance between every row of the matrix and the other rows
      * @param p_matrix input matrix
      * @return distance matrix
      **/

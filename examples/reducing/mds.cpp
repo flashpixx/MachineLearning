@@ -47,6 +47,7 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
         std::cout << "--iteration" << "\t" << "number of iterations for sammon / hit (default 150)" << std::endl;
         std::cout << "--step" << "\t" << "number of iteration steps for sammon / hit (default: 20)" << std::endl;
         std::cout << "--rate" << "\t" << "iteration rate for sammon / hit (default 1)" << std::endl;
+        std::cout << "--centering" << "\t" << "centering the data (values: none, single [default], double)" << std::endl;
         
         return false;
     }
@@ -63,6 +64,7 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
     l_argmap["iteration"] = std::vector<std::string>();
     l_argmap["step"]      = std::vector<std::string>();
     l_argmap["rate"]      = std::vector<std::string>();
+    l_argmap["centering"] = std::vector<std::string>();
     
     
     // read all arguments
@@ -112,6 +114,17 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
         if (l_argmap["mapping"][0] == "hit")
             p_args["mapping"]   = dim::mds<double>::hit;
     }
+
+    // check centering argument
+    p_args["centering"]     = dim::mds<double>::singlecenter;
+    if (l_argmap["centering"].size() == 1) {
+        boost::to_lower(l_argmap["centering"][0]);
+        if (l_argmap["centering"][0] == "none")
+            p_args["centering"]   = dim::mds<double>::none;
+        if (l_argmap["centering"][0] == "double")
+            p_args["centering"]   = dim::mds<double>::doublecenter;
+    }
+    
     
     p_args["inputfile"]     = l_argmap["inputfile"][0];
     p_args["inputpath"]     = l_argmap["inputpath"][0];
@@ -159,6 +172,7 @@ int main(int argc, char* argv[]) {
     mds.setIteration( boost::any_cast<std::size_t>(l_args["iteration"]) );
     mds.setStep( boost::any_cast<std::size_t>(l_args["step"]) );
     mds.setRate( boost::any_cast<double>(l_args["rate"]) );
+    mds.setCentering( boost::any_cast<dim::mds<double>::centeroption>(l_args["centering"]) );
     
     ublas::matrix<double> project = mds.map( source.readMatrix<double>(boost::any_cast<std::string>(l_args["inputpath"]), H5::PredType::NATIVE_DOUBLE) );
     
