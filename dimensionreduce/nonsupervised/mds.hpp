@@ -350,7 +350,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     
 
     /** caluate the High-Throughput Dimensional Scaling (HIT-MDS)
-     * @bug incomlete
+     * @bug numerical problems
      * @todo optimize matrix with temporary assignment
      * @see http://dig.ipk-gatersleben.de/hitmds/hitmds.html
      * @param p_data input datamatrix (dissimilarity matrix)
@@ -384,13 +384,12 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             for(std::size_t j=0; j < l_data.size2(); ++j)
                 if (i != j)
                     l_data(i,j) -= l_mnD;
-
-        const ublas::matrix<T> l_elprod = ublas::element_prod(l_data, l_data);
-        const T l_moD = ublas::sum (tools::matrix::sum( l_elprod ));
         
         
         // optimize
         for(std::size_t i=0; i < m_iteration; ++i) {
+            
+            std::cout << l_target << std::endl << std::endl;
             
             // create pairs of differences between optimized points and data
             ublas::matrix<T> l_tmp;
@@ -425,13 +424,13 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             
             
             // create adaption values
-            const ublas::matrix<T> l_el1 = ublas::element_prod(l_tmp, p_data);
+            const ublas::matrix<T> l_el1 = ublas::element_prod(l_tmp, l_data);
             const ublas::matrix<T> l_el2 = ublas::element_prod(l_tmp, l_tmp);
             
             T l_miT = ublas::sum( tools::matrix::sum( l_el1 ) ); 
             T l_moT = ublas::sum( tools::matrix::sum( l_el2 ) );
             
-            T l_F   = 2.0 / (std::fabs(l_miT) +  std::fabs(l_moT));
+            const T l_F   = 2.0 / (std::fabs(l_miT) +  std::fabs(l_moT));
             l_miT *= l_F;
             l_moT *= l_F;
             
