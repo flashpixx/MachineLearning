@@ -68,6 +68,7 @@ namespace machinelearning { namespace tools {
             template<typename T> static ublas::mapped_matrix<T> diag( const ublas::vector<T>& );
             template<typename T> static ublas::vector<T> diag( const ublas::matrix<T>& );
             template<typename T> static T trace( const ublas::matrix<T>& );
+            template<typename T> static ublas::matrix<T> doublecentering( const ublas::matrix<T>& );
             template<typename T> static ublas::matrix<T> centering( const ublas::matrix<T>&, const rowtype& = column );
             template<typename T> static ublas::matrix<T> sort( const ublas::matrix<T>&, const ublas::vector<std::size_t>&, const rowtype& p_which = row);
             template<typename T> static ublas::matrix<T> cov( const ublas::matrix<T>& );
@@ -229,6 +230,25 @@ namespace machinelearning { namespace tools {
                 break;
         }
         
+        return l_center;
+    }
+    
+    
+    /** centering the matrix data (row or column orientated)
+     * @param p_data input matrix
+     * @return doublecentered matrix
+     **/
+    template<typename T> inline ublas::matrix<T> matrix::doublecentering( const ublas::matrix<T>& p_data )
+    {
+        if (p_data.size1() != p_data.size2())
+            throw exception::runtime( _("matrix must be square") );
+        
+        ublas::matrix<T> l_center(p_data.size1(), p_data.size2());
+
+        for(std::size_t i=0; i < p_data.size1(); ++i)
+            for(std::size_t j=0; j < p_data.size2(); ++j)
+                l_center(i,j) = p_data(i,i) + p_data(j,j) - (p_data(i,j)+p_data(j,i));
+                
         return l_center;
     }
     

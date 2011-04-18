@@ -88,9 +88,8 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             ublas::matrix<T> project_sammon( const ublas::matrix<T>& );
             ublas::matrix<T> project_hit( const ublas::matrix<T>& );
             
-            ublas::matrix<T> distance( const ublas::matrix<T>& ) const;
-            ublas::matrix<T> doublecentering( const ublas::matrix<T>& ) const;
-            T calculateQuantizationError( const ublas::matrix<T>&, const ublas::matrix<T>& ) const;
+            ublas::matrix<T> sammon_distance( const ublas::matrix<T>& ) const;
+            T sammon_calculateQuantizationError( const ublas::matrix<T>&, const ublas::matrix<T>& ) const;
         
     };
     
@@ -189,7 +188,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                 break;
                 
             case doublecenter :
-                l_data = doublecentering(l_data);
+                l_data = tools::matrix::doublecentering(l_data);
                 break;
                 
             default : break;
@@ -268,7 +267,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         
         // optimize
         for(std::size_t i=0; i < m_iteration; ++i) {
-            const ublas::matrix<T> l_Distance        = distance(l_target) + l_DataOnes;           
+            const ublas::matrix<T> l_Distance        = sammon_distance(l_target) + l_DataOnes;           
             const ublas::matrix<T> l_DistanceInv     = tools::matrix::invert(l_Distance);
             const ublas::matrix<T> l_DistanceInv3    = tools::matrix::pow(l_DistanceInv, static_cast<T>(3));
             const ublas::matrix<T> l_target2         = tools::matrix::pow(l_target, static_cast<T>(2));
@@ -290,14 +289,14 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             
             
             // get quantization error & try to optimize in half-steps
-            const T l_error                          = calculateQuantizationError( l_delta, l_dataInv );
+            const T l_error                          = sammon_calculateQuantizationError( l_delta, l_dataInv );
             T l_errornew                             = l_error;
             const ublas::matrix<T> l_targetTmp       = l_target;
 
             
             for(std::size_t n=1; n <= m_step; ++n) {
                 l_target                     = l_targetTmp + l_adapt;
-                l_errornew                   = calculateQuantizationError( l_data - (distance(l_target) + l_DataOnes), l_dataInv );
+                l_errornew                   = sammon_calculateQuantizationError( l_data - (sammon_distance(l_target) + l_DataOnes), l_dataInv );
                 
                 if (l_errornew < l_error)
                     break;
@@ -317,12 +316,12 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     }
 
     
-    /** creates the error value
+    /** creates the error value of sammon optimizing
      * @param p_delta delta values (differnce between original and target points)
      * @param p_invert inverted data values
      * @return error value
      **/
-    template<typename T> inline T mds<T>::calculateQuantizationError( const ublas::matrix<T>& p_delta, const ublas::matrix<T>& p_invert ) const
+    template<typename T> inline T mds<T>::sammon_calculateQuantizationError( const ublas::matrix<T>& p_delta, const ublas::matrix<T>& p_invert ) const
     {
         ublas::matrix<T> l_mat = ublas::element_prod( tools::matrix::pow(p_delta, static_cast<T>(2)), p_invert);
         return ublas::sum( tools::matrix::sum( l_mat ) );
@@ -333,7 +332,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
      * @param p_matrix input matrix
      * @return distance matrix
      **/
-    template<typename T> inline ublas::matrix<T> mds<T>::distance( const ublas::matrix<T>& p_matrix ) const
+    template<typename T> inline ublas::matrix<T> mds<T>::sammon_distance( const ublas::matrix<T>& p_matrix ) const
     {
         ublas::matrix<T> l_sse( p_matrix.size1(), p_matrix.size1(), 0 );
         if ( p_matrix.size1() == p_matrix.size2() ) {
@@ -349,25 +348,10 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         return l_sse;
     }
     
-    
-    /** create a double centering matrix
-     * @param p_data input matrix
-     * @return double centered matrix
-     **/
-    template<typename T> inline ublas::matrix<T> mds<T>::doublecentering( const ublas::matrix<T>& p_data ) const
-    {
-        ublas::matrix<T> l_center(p_data.size1(), p_data.size2());
-        
-        for(std::size_t i=0; i < p_data.size1(); ++i)
-            for(std::size_t j=0; j < p_data.size2(); ++j)
-                l_center(i,j) = p_data(i,i) + p_data(j,j) - (p_data(i,j)+p_data(j,i));
-        
-        return l_center;
-    }
-    
 
     /** caluate the High-Throughput Dimensional Scaling (HIT-MDS)
      * @bug incomlete
+     * @todo optimize matrix with temporary assignment
      * @see http://dig.ipk-gatersleben.de/hitmds/hitmds.html
      * @param p_data input datamatrix (dissimilarity matrix)
      * @return mapped data
@@ -393,7 +377,8 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             throw exception::runtime(_("data matrix has only zero entries"));
         
         ublas::matrix<T> l_data = p_data;
-        const T l_mnD = ublas::sum( tools::matrix::sum(l_data) ) / ( l_data.size1() * l_data.size2() - zeros );
+        const T l_datainv   = 1.0 / (l_data.size1() * l_data.size2() - zeros);
+        const T l_mnD       = l_datainv * ublas::sum( tools::matrix::sum(l_data) );
         
         for(std::size_t i=0; i < l_data.size1(); ++i)
             for(std::size_t j=0; j < l_data.size2(); ++j)
@@ -430,10 +415,19 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                     l_tmp += l_col;
             }
             
-            // optimize function
+            // optimize cost function
             for(std::size_t j=0; j < l_tmp.size1(); ++j)
-                for(std::size_t j=0; j < l_tmp.size2(); ++n)
+                for(std::size_t n=0; n < l_tmp.size2(); ++n)
                     l_tmp(j,n) = std::sqrt( l_tmp(j,n) );
+            
+            const T l_mnT = l_datainv * ublas::sum( tools::matrix::sum(l_tmp) );
+            
+            for(std::size_t j=0; j < l_tmp.size1(); ++j)
+                for(std::size_t n=0; n < l_tmp.size2(); ++n)
+                    l_tmp(j,n) -= l_mnT;
+            
+        
+            break;
         }
         
         return l_target;
