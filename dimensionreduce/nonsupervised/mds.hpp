@@ -465,15 +465,11 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             }
             
             // create new target points
-            const T l_rate = m_rate * (m_iteration-i) * 0.25;
+            const T l_rate = m_rate * (m_iteration-i) * 0.25 * (1.0 + (m_iteration-i)%2) / m_iteration;
             
             for(std::size_t j=0; j < l_target.size1(); ++j)
                 for(std::size_t n=0; n < l_target.size2(); ++n)
-                    l_target(j,n) += l_rate * l_update(j,n) / std::sqrt(std::fabs(l_update(j,n))+0.001)
-            
-                    std::cout << l_target << std::endl;
-                    
-            break;
+                    l_target(j,n) += l_rate * l_update(j,n) / std::sqrt(std::fabs(l_update(j,n))+0.001);
         }
         
         return l_target;
