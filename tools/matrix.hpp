@@ -73,7 +73,8 @@ namespace machinelearning { namespace tools {
             template<typename T> static ublas::matrix<T> sort( const ublas::matrix<T>&, const ublas::vector<std::size_t>&, const rowtype& p_which = row);
             template<typename T> static ublas::matrix<T> cov( const ublas::matrix<T>& );
             template<typename T> static ublas::matrix<T> setNumericalZero( const ublas::matrix<T>&, const T& = 0);
-            template<typename T> static ublas::matrix<T> invert( const ublas::matrix<T>& p_matrix );
+            template<typename T> static ublas::matrix<T> invert( const ublas::matrix<T>&);
+            template<typename T> static ublas::matrix<T> repeat( const ublas::vector<T>&, const rowtype& p_which = row);
     };
     
     
@@ -406,6 +407,30 @@ namespace machinelearning { namespace tools {
         return l_mat;
     }
     
+    
+    /** repeats a column / row with a vector
+     * @param p_vec input vector
+     * @param p_which row / column option (default row)
+     * @return squared matrix
+    **/
+    template<typename T> inline ublas::matrix<T> matrix::repeat( const ublas::vector<T>& p_vec, const rowtype& p_which )
+    {
+        ublas::matrix<T> l_mat( p_vec.size(), p_vec.size() );
+        
+        switch (p_which) {                
+            case row :
+                for(std::size_t i=0; i < p_vec.size(); ++i)
+                    ublas::row(l_mat, i) = p_vec;
+                break;
+                
+            case column :
+                for(std::size_t i=0; i < p_vec.size(); ++i)
+                    ublas::column(l_mat, i) = p_vec;
+                break;                
+        }
+        
+        return l_mat;
+    }
         
 };};
 

@@ -90,7 +90,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             
             ublas::matrix<T> sammon_distance( const ublas::matrix<T>& ) const;
             T sammon_calculateQuantizationError( const ublas::matrix<T>&, const ublas::matrix<T>& ) const;
-        
+            void hit_setZeros(const std::vector< std::pair<std::size_t, std::size_t> >&, ublas::matrix<T>& ) const;
     };
     
     
@@ -366,18 +366,18 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         }
         
         // count zero elements
-        std::size_t zeros=0;
+        std::vector< std::pair<std::size_t, std::size_t> > l_zeros;
         for(std::size_t i=0; i < p_data.size1(); ++i)
             for(std::size_t j=0; j < p_data.size2(); ++j)
                 if (tools::function::isNumericalZero(p_data(i,j)))
-                    zeros++;
+                    l_zeros.push_back( std::pair<std::size_t, std::size_t>(i,j) );
         
         // create init matrix and values
-        if (zeros == p_data.size1() * p_data.size2())
+        if (l_zeros.size() == p_data.size1() * p_data.size2())
             throw exception::runtime(_("data matrix has only zero entries"));
         
         ublas::matrix<T> l_data = p_data;
-        const T l_datainv   = 1.0 / (l_data.size1() * l_data.size2() - zeros);
+        const T l_datainv   = 1.0 / (l_data.size1() * l_data.size2() - l_zeros.size());
         const T l_mnD       = l_datainv * ublas::sum( tools::matrix::sum(l_data) );
         
         for(std::size_t i=0; i < l_data.size1(); ++i)
@@ -397,14 +397,9 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             for(std::size_t j=0; j < m_dim; ++j) {
                 
                 // create a matrix with rows of the j-th column
-                ublas::matrix<T> l_row(l_target.size1(), l_target.size1());
-                for(std::size_t n=0; n < l_target.size1(); ++n)
-                    ublas::row(l_row, n) = ublas::column(l_target, j);
-                
+                ublas::matrix<T> l_row = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, j)), tools::matrix::row );
                 // create a matrix with columns of the j-th column
-                ublas::matrix<T> l_col(l_target.size1(), l_target.size1());
-                for(std::size_t n=0; n < l_target.size1(); ++n)
-                    ublas::column(l_col, n) = ublas::column(l_target, j);
+                ublas::matrix<T> l_col = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, j)), tools::matrix::column );
               
                 l_col -= l_row;
                 l_col  = ublas::element_prod(l_col, l_col);
@@ -416,6 +411,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             }
             
             // optimize cost function
+            hit_setZeros(l_zeros, l_tmp);
             for(std::size_t j=0; j < l_tmp.size1(); ++j)
                 for(std::size_t n=0; n < l_tmp.size2(); ++n)
                     l_tmp(j,n) = std::sqrt( l_tmp(j,n) );
@@ -425,15 +421,73 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             for(std::size_t j=0; j < l_tmp.size1(); ++j)
                 for(std::size_t n=0; n < l_tmp.size2(); ++n)
                     l_tmp(j,n) -= l_mnT;
+            hit_setZeros(l_zeros, l_tmp);
             
-        
+            
+            // create adaption values
+            const ublas::matrix<T> l_el1 = ublas::element_prod(l_tmp, p_data);
+            const ublas::matrix<T> l_el2 = ublas::element_prod(l_tmp, l_tmp);
+            
+            T l_miT = ublas::sum( tools::matrix::sum( l_el1 ) ); 
+            T l_moT = ublas::sum( tools::matrix::sum( l_el2 ) );
+            
+            T l_F   = 2.0 / (std::fabs(l_miT) +  std::fabs(l_moT));
+            l_miT *= l_F;
+            l_moT *= l_F;
+            
+            // calculate update strength parts
+            ublas::matrix<T> l_strength = l_tmp * l_miT - l_data * l_moT;
+            
+            for(std::size_t j=0; j < l_tmp.size1(); ++j)
+                for(std::size_t n=0; n < l_tmp.size2(); ++n)
+                    l_tmp(j,n) += 0.1 + l_mnT;
+            
+            l_strength = ublas::element_div(l_strength, l_tmp);
+            
+
+            // calculate update strength of the points
+            ublas::matrix<T> l_adapt = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, m_dim-1)), tools::matrix::column ) - tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, m_dim-1)), tools::matrix::row );;
+            l_adapt = ublas::element_prod(l_adapt, l_strength);
+
+            ublas::matrix<T> l_update(l_target.size1(), l_target.size2());
+            ublas::column(l_update, m_dim-1) = tools::matrix::sum(l_adapt, tools::matrix::column);
+            
+            for(std::size_t j=0; j < m_dim-1; ++j) {
+                // create a matrix with rows of the j-th column
+                ublas::matrix<T> l_row = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, j)), tools::matrix::row );
+                // create a matrix with columns of the j-th column
+                ublas::matrix<T> l_col = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, j)), tools::matrix::column );
+                
+                l_col -= l_row;
+                l_col  = ublas::element_prod(l_col, l_strength);
+                
+                ublas::column(l_update, j) = tools::matrix::sum(l_col, tools::matrix::column);
+            }
+            
+            // create new target points
+            const T l_rate = m_rate * (m_iteration-i) * 0.25;
+            
+            for(std::size_t j=0; j < l_target.size1(); ++j)
+                for(std::size_t n=0; n < l_target.size2(); ++n)
+                    l_target(j,n) += l_rate * l_update(j,n) / std::sqrt(std::fabs(l_update(j,n))+0.001)
+            
+                    std::cout << l_target << std::endl;
+                    
             break;
         }
         
         return l_target;
     }
     
-    
+    /** sets all elements which are in the vector to zero values
+     * @param pair vector with indices
+     * @param referenz of a matrix
+    **/
+    template<typename T> inline void mds<T>::hit_setZeros(const std::vector< std::pair<std::size_t, std::size_t> >& p_zeros, ublas::matrix<T>& p_matrix ) const
+    {
+        for(std::size_t i=0; i < p_zeros.size(); ++i)
+            p_matrix( p_zeros[i].first, p_zeros[i].second ) = 0;
+    }
     
     
 };};};
