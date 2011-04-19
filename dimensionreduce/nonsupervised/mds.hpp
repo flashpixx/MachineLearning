@@ -263,12 +263,6 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         
         // target point matrix und one matrix
         ublas::matrix<T> l_target                   = tools::matrix::random( l_data.size1(), m_dim, tools::random::uniform, static_cast<T>(-1), static_cast<T>(1) );
-        std::size_t n = 1;
-        for(std::size_t i=0; i < l_target.size1(); ++i) {
-            l_target(i,0) = n++;
-            l_target(i,1) = n++;
-        }
-        
         const ublas::mapped_matrix<T> l_TargetOnes  = ublas::scalar_matrix<T>( l_target.size1(), l_target.size2(), static_cast<T>(1) );
         T l_error                                   = sammon_calculateQuantizationError( l_data - sammon_distance(l_target) + l_DataEye, l_dataInv );
         
