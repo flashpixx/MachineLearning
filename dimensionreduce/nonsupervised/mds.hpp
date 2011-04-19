@@ -350,8 +350,8 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     
 
     /** caluate the High-Throughput Dimensional Scaling (HIT-MDS)
-     * @bug numerical problems
      * @todo optimize matrix with temporary assignment
+     * @note the actual position of data points is dependent on the template type of the class, because the accuracy of the type of influence on the optimization
      * @see http://dig.ipk-gatersleben.de/hitmds/hitmds.html
      * @param p_data input datamatrix (dissimilarity matrix)
      * @return mapped data
