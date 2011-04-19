@@ -358,13 +358,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
      **/
     template<typename T> inline ublas::matrix<T> mds<T>::project_hit( const ublas::matrix<T>& p_data )
     {
-        ublas::matrix<T> l_target(p_data.size1(), m_dim); //                   = tools::matrix::random<T>( p_data.size1(), m_dim );
-        std::size_t n = 1;
-        for(std::size_t i=0; i < l_target.size1(); ++i) {
-            l_target(i,0) = n;
-            l_target(i,1) = n+1;
-            n += 2;
-        }
+        ublas::matrix<T> l_target = tools::matrix::random( l_data.size1(), m_dim, tools::random::uniform, static_cast<T>(-1), static_cast<T>(1) );
         
         // count zero elements
         std::vector< std::pair<std::size_t, std::size_t> > l_zeros;
