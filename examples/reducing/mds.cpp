@@ -131,7 +131,7 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
     p_args["outfile"]       = l_argmap["outfile"][0];
     p_args["outpath"]       = l_argmap["outpath"][0];   
     
-    p_args["iteration"]     = std::size_t(150);
+    p_args["iteration"]     = std::size_t(500);
     p_args["step"]          = std::size_t(20);
     p_args["rate"]          = double(1);
     

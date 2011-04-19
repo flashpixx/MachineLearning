@@ -243,8 +243,8 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     
     
     /** calculate the sammon mapping on MDS (with pseudo-newton method for optimization)
-     * @todo check target points (they are not similiar to the Matlab targets)
-     * @note uses code idea of http://ticc.uvt.nl/~lvdrmaaten (in the Matlab code there are duplicated variables)
+     * @note uses code idea of http://ticc.uvt.nl/~lvdrmaaten (in the Matlab code there are duplicated variables). The Matlab code does
+     * not return the same points like the function code. The break during the optimization is set by the numerical limits of the data types.
      * @param p_data input datamatrix (dissimilarity matrix)
      * @return mapped data
      **/
@@ -257,8 +257,8 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         
         
         // create the distance for each row/colum (create distance matrix) of the matrix and sets the diagonal elements to one
-        const ublas::mapped_matrix<T> l_DataOnes    = tools::matrix::eye<T>( p_data.size1() );   
-        const ublas::matrix<T> l_data               = p_data + l_DataOnes;
+        const ublas::mapped_matrix<T> l_DataEye     = tools::matrix::eye<T>( p_data.size1() );   
+        const ublas::matrix<T> l_data               = p_data + l_DataEye;
         const ublas::matrix<T> l_dataInv            = tools::matrix::invert(l_data);
         
         // target point matrix und one matrix
@@ -270,11 +270,11 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         }
         
         const ublas::mapped_matrix<T> l_TargetOnes  = ublas::scalar_matrix<T>( l_target.size1(), l_target.size2(), static_cast<T>(1) );
-        
+        T l_error                                   = sammon_calculateQuantizationError( l_data - sammon_distance(l_target) + l_DataEye, l_dataInv );
         
         // optimize
         for(std::size_t i=0; i < m_iteration; ++i) {
-            const ublas::matrix<T> l_Distance        = sammon_distance(l_target) + l_DataOnes;           
+            const ublas::matrix<T> l_Distance        = sammon_distance(l_target) + l_DataEye;           
             const ublas::matrix<T> l_DistanceInv     = tools::matrix::invert(l_Distance);
             const ublas::matrix<T> l_DistanceInv3    = tools::matrix::pow(l_DistanceInv, static_cast<T>(3));
             const ublas::matrix<T> l_target2         = tools::matrix::pow(l_target, static_cast<T>(2));
@@ -285,25 +285,22 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             
             // calculating gradient & hesse-matrix values
             const ublas::matrix<T> l_gradient        = ublas::prod( l_deltaInv, l_target ) - ublas::element_prod( l_target, l_deltaOne );
-            const ublas::matrix<T> l_hesse           = ublas::prod( l_DistanceInv3, l_target2 ) -  l_deltaOne - 2 * ublas::element_prod(l_target, ublas::prod(l_DistanceInv3, l_target)) + ublas::element_prod(l_target2, ublas::prod(l_DistanceInv3, l_TargetOnes)); 
+            const ublas::matrix<T> l_hesse           = ublas::prod( l_DistanceInv3, l_target2 ) -  l_deltaOne - static_cast<T>(2) * ublas::element_prod(l_target, ublas::prod(l_DistanceInv3, l_target)) + ublas::element_prod(l_target2, ublas::prod(l_DistanceInv3, l_TargetOnes)); 
             
             // create adaption
-            ublas::matrix<T> l_adapt(l_target.size1(), l_target.size2(), 0);
+            ublas::matrix<T> l_adapt(l_target.size1(), l_target.size2(), static_cast<T>(0));
             for(std::size_t n=0; n < l_adapt.size1(); ++n)
                 for(std::size_t j=0; j < l_adapt.size2(); ++j)
                     if (!tools::function::isNumericalZero(l_hesse(n,j)))
                         l_adapt(n,j) = -l_gradient(n,j) / std::fabs( l_hesse(n,j) );
             
-            
             // get quantization error & try to optimize in half-steps
-            const T l_error                          = sammon_calculateQuantizationError( l_delta, l_dataInv );
-            T l_errornew                             = l_error;
-            const ublas::matrix<T> l_targetTmp       = l_target;
-
+            T l_errornew                         = 0;
+            const ublas::matrix<T> l_targetTmp   = l_target;
             
             for(std::size_t n=1; n <= m_step; ++n) {
-                l_target                     = l_targetTmp + l_adapt;
-                l_errornew                   = sammon_calculateQuantizationError( l_data - (sammon_distance(l_target) + l_DataOnes), l_dataInv );
+                l_target             = l_targetTmp + l_adapt;
+                l_errornew           = sammon_calculateQuantizationError( l_data - (sammon_distance(l_target) + l_DataEye), l_dataInv );
                 
                 if (l_errornew < l_error)
                     break;
@@ -311,12 +308,14 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                 if (n == m_step)
                     throw exception::runtime(_("sammon mapping may not converge"));
                 
-                l_adapt                     *= 0.5;
+                l_adapt                     *= static_cast<T>(0.5);
             }
             
             // if the error "numerical zero" we stop
             if (tools::function::isNumericalZero( (l_error - l_errornew) / l_error ) )
                 break;
+
+            l_error = l_errornew;
         }
         
         return l_target;
@@ -384,7 +383,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             throw exception::runtime(_("data matrix has only zero entries"));
         
         ublas::matrix<T> l_data = p_data;
-        const T l_datainv   = 1.0 / (l_data.size1() * l_data.size2() - l_zeros.size());
+        const T l_datainv   = static_cast<T>(1) / (l_data.size1() * l_data.size2() - l_zeros.size());
         const T l_mnD       = l_datainv * ublas::sum( tools::matrix::sum(l_data) );
         
         for(std::size_t i=0; i < l_data.size1(); ++i)
@@ -437,7 +436,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             T l_miT = ublas::sum( tools::matrix::sum( l_el1 ) ); 
             T l_moT = ublas::sum( tools::matrix::sum( l_el2 ) );
             
-            const T l_F   = 2.0 / (std::fabs(l_miT) +  std::fabs(l_moT));
+            const T l_F   = static_cast<T>(2) / (std::fabs(l_miT) +  std::fabs(l_moT));
             l_miT *= l_F;
             l_moT *= l_F;
             
@@ -446,7 +445,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             
             for(std::size_t j=0; j < l_tmp.size1(); ++j)
                 for(std::size_t n=0; n < l_tmp.size2(); ++n)
-                    l_tmp(j,n) += 0.1 + l_mnT;
+                    l_tmp(j,n) += static_cast<T>(0.1) + l_mnT;
             
             l_strength = ublas::element_div(l_strength, l_tmp);
             
@@ -471,11 +470,11 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             }
             
             // create new target points
-            const T l_rate = m_rate * (m_iteration-i) * 0.25 * (1.0 + (m_iteration-i)%2) / m_iteration;
+            const T l_rate = m_rate * (m_iteration-i) * static_cast<T>(0.25) * (static_cast<T>(1) + (m_iteration-i)%2) / m_iteration;
             
             for(std::size_t j=0; j < l_target.size1(); ++j)
                 for(std::size_t n=0; n < l_target.size2(); ++n)
-                    l_target(j,n) += l_rate * l_update(j,n) / std::sqrt(std::fabs(l_update(j,n))+0.001);
+                    l_target(j,n) += l_rate * l_update(j,n) / std::sqrt(std::fabs(l_update(j,n))+static_cast<T>(0.001));
         }
         
         return l_target;
