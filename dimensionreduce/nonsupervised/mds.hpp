@@ -361,8 +361,9 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         ublas::matrix<T> l_target(p_data.size1(), m_dim); //                   = tools::matrix::random<T>( p_data.size1(), m_dim );
         std::size_t n = 1;
         for(std::size_t i=0; i < l_target.size1(); ++i) {
-            l_target(i,0) = n++;
-            l_target(i,1) = n++;
+            l_target(i,0) = n;
+            l_target(i,1) = n+1;
+            n += 2;
         }
         
         // count zero elements
@@ -384,29 +385,22 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             for(std::size_t j=0; j < l_data.size2(); ++j)
                 if (i != j)
                     l_data(i,j) -= l_mnD;
-        
+        hit_setZeros(l_zeros, l_data);
         
         // optimize
         for(std::size_t i=0; i < m_iteration; ++i) {
             
-            std::cout << l_target << std::endl << std::endl;
-            
             // create pairs of differences between optimized points and data
-            ublas::matrix<T> l_tmp;
+            ublas::matrix<T> l_tmp(l_data.size1(), l_data.size2(), static_cast<T>(0));
             for(std::size_t j=0; j < m_dim; ++j) {
                 
                 // create a matrix with rows of the j-th column
                 ublas::matrix<T> l_row = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, j)), tools::matrix::row );
                 // create a matrix with columns of the j-th column
                 ublas::matrix<T> l_col = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, j)), tools::matrix::column );
-              
-                l_col -= l_row;
-                l_col  = ublas::element_prod(l_col, l_col);
                 
-                if (j == 0)
-                    l_tmp = l_col;
-                else
-                    l_tmp += l_col;
+                l_col -= l_row;
+                l_tmp += ublas::element_prod(l_col, l_col);
             }
             
             // optimize cost function
@@ -448,7 +442,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             ublas::matrix<T> l_adapt = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, m_dim-1)), tools::matrix::column ) - tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, m_dim-1)), tools::matrix::row );;
             l_adapt = ublas::element_prod(l_adapt, l_strength);
 
-            ublas::matrix<T> l_update(l_target.size1(), l_target.size2());
+            ublas::matrix<T> l_update(l_target.size1(), l_target.size2(), static_cast<T>(0));
             ublas::column(l_update, m_dim-1) = tools::matrix::sum(l_adapt, tools::matrix::column);
             
             for(std::size_t j=0; j < m_dim-1; ++j) {
@@ -474,6 +468,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         return l_target;
     }
     
+    
     /** sets all elements which are in the vector to zero values
      * @param pair vector with indices
      * @param referenz of a matrix
@@ -481,7 +476,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     template<typename T> inline void mds<T>::hit_setZeros(const std::vector< std::pair<std::size_t, std::size_t> >& p_zeros, ublas::matrix<T>& p_matrix ) const
     {
         for(std::size_t i=0; i < p_zeros.size(); ++i)
-            p_matrix( p_zeros[i].first, p_zeros[i].second ) = 0;
+            p_matrix( p_zeros[i].first, p_zeros[i].second ) = static_cast<T>(0);
     }
     
     
