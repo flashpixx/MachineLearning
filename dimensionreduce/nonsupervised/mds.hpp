@@ -243,6 +243,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     
     
     /** calculate the sammon mapping on MDS (with pseudo-newton method for optimization)
+     * @todo check target points (they are not similiar to the Matlab targets)
      * @note uses code idea of http://ticc.uvt.nl/~lvdrmaaten (in the Matlab code there are duplicated variables)
      * @param p_data input datamatrix (dissimilarity matrix)
      * @return mapped data
@@ -262,6 +263,12 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         
         // target point matrix und one matrix
         ublas::matrix<T> l_target                   = tools::matrix::random( l_data.size1(), m_dim, tools::random::uniform, static_cast<T>(-1), static_cast<T>(1) );
+        std::size_t n = 1;
+        for(std::size_t i=0; i < l_target.size1(); ++i) {
+            l_target(i,0) = n++;
+            l_target(i,1) = n++;
+        }
+        
         const ublas::mapped_matrix<T> l_TargetOnes  = ublas::scalar_matrix<T>( l_target.size1(), l_target.size2(), static_cast<T>(1) );
         
         
