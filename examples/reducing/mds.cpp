@@ -44,9 +44,9 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
         std::cout << "--outpath" << "\t" << "output path within the HDF5 file" << std::endl;
         std::cout << "--dimension" << "\t" << "number of project dimensions" << std::endl;
         std::cout << "--mapping" << "\t" << "mapping type (values: metric [default], sammon, hit)" << std::endl;
-        std::cout << "--iteration" << "\t" << "number of iterations for sammon / hit (default 150)" << std::endl;
-        std::cout << "--step" << "\t" << "number of iteration steps for sammon / hit (default: 20)" << std::endl;
-        std::cout << "--rate" << "\t" << "iteration rate for sammon / hit (default 1)" << std::endl;
+        std::cout << "--iteration" << "\t" << "number of iterations for sammon / hit (default 500)" << std::endl;
+        std::cout << "--step" << "\t" << "number of iteration steps for sammon (default: 20)" << std::endl;
+        std::cout << "--rate" << "\t" << "iteration rate for hit (default 1)" << std::endl;
         std::cout << "--centering" << "\t" << "centering the data (values: none, single [default], double)" << std::endl;
         
         return false;
