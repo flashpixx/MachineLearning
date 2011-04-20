@@ -92,34 +92,34 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
 
     if (l_argmap["outfile"].size() > 0)
         p_args["outfile"]     = l_argmap["outfile"][0];
-    
-    if (l_argmap["algorithm"].size() != 1);
-        l_argmap["algorithm"].push_back("bzip");
-    
-    if (l_argmap["compress"].size() != 1)
-        l_argmap["compress"].push_back("default");
-    
-    if (l_argmap["matrix"].size() != 1)
-        l_argmap["matrix"].push_back("unsymmetric");
 
     // check input arguments and convert them
-    boost::to_lower(l_argmap["algorithm"][0]);
-    if (l_argmap["algorithm"][0] == "gzip")
-        p_args["algorithm"]   = distances::ncd<double>::gzip;
-    if (l_argmap["algorithm"][0] == "bzip")
-        p_args["algorithm"]   = distances::ncd<double>::bzip2;
+    p_args["algorithm"] = distances::ncd<double>::bzip2;
+    if (l_argmap["algorithm"].size() > 0) {
+        boost::to_lower(l_argmap["algorithm"][0]);
+        if (l_argmap["algorithm"][0] == "gzip")
+            p_args["algorithm"]   = distances::ncd<double>::gzip;
+        if ((l_argmap["algorithm"].size() > 0) && (l_argmap["algorithm"][0] == "bzip"))
+            p_args["algorithm"]   = distances::ncd<double>::bzip2;
+    }
 
-    boost::to_lower(l_argmap["compress"][0]);
-    if (l_argmap["compress"][0] == "default")
-        p_args["compress"]    = distances::ncd<double>::defaultcompression;
-    if (l_argmap["compress"][0] == "bestspeed")
-        p_args["compress"]    = distances::ncd<double>::bestspeed;
-    if (l_argmap["compress"][0] == "bestcompression")
-        p_args["compress"]    = distances::ncd<double>::bestcompression;
+    p_args["compress"] = distances::ncd<double>::defaultcompression;
+    if (l_argmap["compress"].size() > 0) {
+        boost::to_lower(l_argmap["compress"][0]);
+        if (l_argmap["compress"][0] == "default")
+            p_args["compress"]    = distances::ncd<double>::defaultcompression;
+        if (l_argmap["compress"][0] == "bestspeed")
+            p_args["compress"]    = distances::ncd<double>::bestspeed;
+        if (l_argmap["compress"][0] == "bestcompression")
+            p_args["compress"]    = distances::ncd<double>::bestcompression;
+    }
 
-    boost::to_lower(l_argmap["matrix"][0]);
-    if ( (l_argmap["matrix"][0] == "symmetric") || (l_argmap["matrix"][0] == "unsymmetric"))
-        p_args["matrix"] = l_argmap["matrix"][0];
+    p_args["matrix"] = std::string("unsymmetric");
+    if (l_argmap["matrix"].size() > 0) {
+        boost::to_lower(l_argmap["matrix"][0]);
+        if ( (l_argmap["matrix"][0] == "symmetric") || (l_argmap["matrix"][0] == "unsymmetric"))
+            p_args["matrix"] = l_argmap["matrix"][0];
+    }
     
     return true;
 }
