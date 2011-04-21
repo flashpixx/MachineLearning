@@ -190,28 +190,29 @@ namespace machinelearning { namespace tools { namespace files {
             throw exception::runtime(_("dataset must be one-dimensional"));
         if (!l_dataspace.isSimple())
             throw exception::runtime(_("dataset must be a simple datatype"));
-        
-        // get array size
-        hsize_t l_size[1];
-        l_dataspace.getSimpleExtentDims( l_size );      
-        //hsize_t l_strlength = l_dataset.getStorageSize(); 
-        
-        // get data (we need the datatype of the data itself)
-        std::vector<std::string> l_vec;
+
+        // the storage size is the whole string array data
         char l_data[l_dataset.getStorageSize()];
         l_dataset.read( l_data, l_dataset.getDataType() );
 
-        //std::cout << l_strlength << std::endl;
-        std::cout << l_data << std::endl;
-        /*for(std::size_t i=0; i < l_size[0]; ++i)
-            std::cout << l_data[i] << std::endl;
-            //l_vec.push_back( l_data[i] );
-        */
-        
+        // seperated char array at the null terminators (the last char can be ignored)
+        // each string element in the array is terminated with \0, after the last \0 
+        // the char array has a non-used char, so the loop runs length-1
+        std::vector<std::string> l_vec;
+        std::string l_str;
+        for(std::size_t i=0; i < l_dataset.getStorageSize()-1; ++i)
+            if (l_data[i] != '\0')
+                l_str += l_data[i];
+            else 
+                if (!l_str.empty()) {
+                    l_vec.push_back(l_str);
+                    l_str.clear();
+                }
+    
+
         l_dataspace.close();
         l_dataset.close();
 
-        
         return l_vec;
     }
     
