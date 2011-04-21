@@ -65,7 +65,8 @@ namespace machinelearning { namespace tools { namespace sources {
         
             wikipedia( const language& = de_DE );
             void getArticle( const std::string&, const language& = de_DE );
-            void getRandomArticle( const language& = de_DE );
+            void getRandomArticle( const language& );
+            void getRandomArticle();
         
             std::string getArticleContent( void ) const;
             std::string getArticleTitle( void ) const;
@@ -274,16 +275,20 @@ namespace machinelearning { namespace tools { namespace sources {
     }
     
     
+    /** reads an random article with default language **/
+    inline void wikipedia::getRandomArticle()
+    {
+        getRandomArticle( m_defaultproperties.lang );
+    }
+    
+    
     /** reads an random article
      * @param p_lang optional language
      **/
     inline void wikipedia::getRandomArticle( const language& p_lang )
     {
-        m_articlefound = false;
-        
-        wikiproperties l_prop = m_defaultproperties;
-        if (l_prop.lang != p_lang)
-            l_prop = getProperties( p_lang );
+        m_articlefound              = false;
+        const wikiproperties l_prop = getProperties( p_lang );
         
         std::string l_header;
         unsigned int l_status = sendRequest( l_prop.randomurl.host, l_prop.randomurl.path, l_header, false );
