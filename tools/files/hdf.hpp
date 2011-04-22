@@ -80,7 +80,7 @@ namespace machinelearning { namespace tools { namespace files {
             template<typename T> void write( const std::string&, const ublas::vector<T>&, const H5::PredType& ) const;
             template<typename T> void write( const std::string&, const T&, const H5::PredType& ) const;
             
-            void write( const std::string&, const std::string&, const H5::PredType& ) const;
+            void write( const std::string&, const std::string& ) const;
 
         
         private :
@@ -209,7 +209,6 @@ namespace machinelearning { namespace tools { namespace files {
                     l_str.clear();
                 }
     
-
         l_dataspace.close();
         l_dataset.close();
 
@@ -265,7 +264,7 @@ namespace machinelearning { namespace tools { namespace files {
      * @param p_datatype HDF% datatype
      * @warning incomplete
      **/
-    inline void hdf::write( const std::string& p_path, const std::string& p_value, const H5::PredType& p_datatype ) const
+    inline void hdf::write( const std::string& p_path, const std::string& p_value ) const
     {
         hsize_t l_size[1];
         l_size[0] = p_value.size();
@@ -274,7 +273,7 @@ namespace machinelearning { namespace tools { namespace files {
         
         // create Dataspace in path        
         H5::DataSet l_dataset;
-        createPathWithDataset( p_path,  p_datatype, l_dataspace, l_groups, l_dataset ); 
+        //createPathWithDataset( p_path,  p_datatype, l_dataspace, l_groups, l_dataset ); 
         
         // close groups
         for(std::vector<H5::Group>::reverse_iterator it = l_groups.rbegin(); it != l_groups.rend(); ++it)
@@ -484,7 +483,7 @@ namespace machinelearning { namespace tools { namespace files {
 
         closeDataSpace(l_groups, l_dataspace);
      }
-    
+
     
     /** close the dataspace and the groups in the right order
      * @param p_groups vector with group information
