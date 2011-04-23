@@ -92,7 +92,7 @@ namespace machinelearning { namespace tools { namespace files {
             
             void createPathWithDataset( const std::string&, const H5::PredType&, const H5::DataSpace&, std::vector<H5::Group>&, H5::DataSet& ) const;
             void createDataSpace( const std::string&, const H5::PredType&, const ublas::vector<std::size_t>&, H5::DataSpace&, H5::DataSet&, std::vector<H5::Group>& ) const;
-            void closeDataSpace( std::vector<H5::Group>&, H5::DataSpace& ) const;
+            void closeDataSpace( std::vector<H5::Group>&, H5::DataSet&, H5::DataSpace& ) const;
         
     };
     
@@ -280,12 +280,8 @@ namespace machinelearning { namespace tools { namespace files {
         // write string
         l_dataset.write( p_value.c_str(), H5::PredType::NATIVE_CHAR, l_dataspace  );
         
-        // close groups
-        for(std::vector<H5::Group>::reverse_iterator it = l_groups.rbegin(); it != l_groups.rend(); ++it)
-            (*it).close();
         
-        l_dataspace.close();
-        l_dataset.close();
+        closeDataSpace(l_groups, l_dataset, l_dataspace);
     }
     
     
@@ -441,7 +437,7 @@ namespace machinelearning { namespace tools { namespace files {
                 l_data[j][i] = p_dataset(i,j);
         l_dataset.write( l_data, p_datatype, l_dataspace  );
         
-        closeDataSpace(l_groups, l_dataspace);
+        closeDataSpace(l_groups, l_dataset, l_dataspace);
     }
     
     
@@ -464,7 +460,7 @@ namespace machinelearning { namespace tools { namespace files {
             l_data[i] = p_dataset(i);
         l_dataset.write( l_data, p_datatype, l_dataspace  );
         
-        closeDataSpace(l_groups, l_dataspace);
+        closeDataSpace(l_groups, l_dataset, l_dataspace);
     }
     
     
@@ -486,17 +482,19 @@ namespace machinelearning { namespace tools { namespace files {
         l_data[0] = p_dataset;
         l_dataset.write( l_data, p_datatype, l_dataspace  );
 
-        closeDataSpace(l_groups, l_dataspace);
+        closeDataSpace(l_groups, l_dataset, l_dataspace);
      }
 
     
     /** close the dataspace and the groups in the right order
      * @param p_groups vector with group information
      * @param p_dataset dataset
+     * @param p_dataspace dataspace
      **/
-    inline void hdf::closeDataSpace( std::vector<H5::Group>& p_groups, H5::DataSpace& p_dataset ) const
+    inline void hdf::closeDataSpace( std::vector<H5::Group>& p_groups, H5::DataSet& p_dataset, H5::DataSpace& p_dataspace ) const
     {
         p_dataset.close();
+        p_dataspace.close();
         
         // close groups
         for(std::vector<H5::Group>::reverse_iterator it = p_groups.rbegin(); it != p_groups.rend(); ++it)
