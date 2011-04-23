@@ -73,8 +73,8 @@ int main(int argc, char* argv[]) {
     
     // read source hdf file and data
     tools::files::hdf source( argv[1] );
-    ublas::matrix<double> data        = source.readMatrix<double>( argv[3], H5::PredType::NATIVE_DOUBLE);
-    ublas::matrix<double> unknowndata = source.readMatrix<double>( argv[5], H5::PredType::NATIVE_DOUBLE);
+    ublas::matrix<double> data        = source.readBlasMatrix<double>( argv[3], H5::PredType::NATIVE_DOUBLE);
+    ublas::matrix<double> unknowndata = source.readBlasMatrix<double>( argv[5], H5::PredType::NATIVE_DOUBLE);
 
     
     // read label type
@@ -106,16 +106,16 @@ int main(int argc, char* argv[]) {
         
         // set data and read new labels for unkown data
         lazy.setLogging(log);
-        lazy.setDatabase( data, tools::vector::copy( source.readVector<int>(argv[4], H5::PredType::NATIVE_INT) ) );
+        lazy.setDatabase( data, tools::vector::copy( source.readBlasVector<int>(argv[4], H5::PredType::NATIVE_INT) ) );
         std::vector<int> labels = lazy.use(unknowndata);
         
         
         // write data to hdf
-        target.write<int>( "/unkwonlabel", tools::vector::copy(labels), H5::PredType::NATIVE_INT );
+        target.writeBlasVector<int>( "/unkwonlabel", tools::vector::copy(labels), H5::PredType::NATIVE_INT );
         
         // if logging exists write data to file
         if (lazy.getLogging())
-            target.write<double>( "/error",  tools::vector::copy(lazy.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
+            target.writeBlasVector<double>( "/error",  tools::vector::copy(lazy.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
     }
 
     if (labeltype == "uint") {
@@ -133,16 +133,16 @@ int main(int argc, char* argv[]) {
         
         // set data and read new labels for unkown data
         lazy.setLogging(log);
-        lazy.setDatabase( data, tools::vector::copy( source.readVector<unsigned int>(argv[4], H5::PredType::NATIVE_UINT) ) );
+        lazy.setDatabase( data, tools::vector::copy( source.readBlasVector<unsigned int>(argv[4], H5::PredType::NATIVE_UINT) ) );
         std::vector<unsigned int> labels = lazy.use(unknowndata);
         
         
         // write data to hdf
-        target.write<unsigned int>( "/unkwonlabel", tools::vector::copy(labels), H5::PredType::NATIVE_UINT );
+        target.writeBlasVector<unsigned int>( "/unkwonlabel", tools::vector::copy(labels), H5::PredType::NATIVE_UINT );
         
         // if logging exists write data to file
         if (lazy.getLogging())
-            target.write<double>( "/error",  tools::vector::copy(lazy.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
+            target.writeBlasVector<double>( "/error",  tools::vector::copy(lazy.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
     }
     
     if (labeltype == "double") {
@@ -160,16 +160,16 @@ int main(int argc, char* argv[]) {
         
         // set data and read new labels for unkown data
         lazy.setLogging(log);
-        lazy.setDatabase( data, tools::vector::copy( source.readVector<double>(argv[4], H5::PredType::NATIVE_DOUBLE) ) );
+        lazy.setDatabase( data, tools::vector::copy( source.readBlasVector<double>(argv[4], H5::PredType::NATIVE_DOUBLE) ) );
         std::vector<double> labels = lazy.use(unknowndata);
         
         
         // write data to hdf
-        target.write<double>( "/unkwonlabel", tools::vector::copy(labels), H5::PredType::NATIVE_DOUBLE );
+        target.writeBlasVector<double>( "/unkwonlabel", tools::vector::copy(labels), H5::PredType::NATIVE_DOUBLE );
         
         // if logging exists write data to file
         if (lazy.getLogging())
-            target.write<double>( "/error",  tools::vector::copy(lazy.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
+            target.writeBlasVector<double>( "/error",  tools::vector::copy(lazy.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
     }
     
     /*

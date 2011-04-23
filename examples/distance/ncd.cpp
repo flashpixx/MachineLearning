@@ -150,7 +150,7 @@ int main(int argc, char* argv[]) {
     else {
         // create hdf file and write data
         tools::files::hdf file(boost::any_cast<std::string>(l_args["outfile"]), true);
-        file.write<double>( "/ncd",  distancematrix, H5::PredType::NATIVE_DOUBLE );
+        file.writeBlasMatrix<double>( "/ncd",  distancematrix, H5::PredType::NATIVE_DOUBLE );
         std::cout << "structure of the output file" << std::endl;
         std::cout << "/ncd" << "\t\t" << "distance matrix" << std::endl;
     }

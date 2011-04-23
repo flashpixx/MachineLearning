@@ -122,12 +122,12 @@ int main(int argc, char* argv[]) {
     
     // create pca object and map the data
     dim::pca<double> pca( boost::any_cast<std::size_t>(l_args["dimension"]) );
-    ublas::matrix<double> project = pca.map( source.readMatrix<double>(boost::any_cast<std::string>(l_args["inputpath"]), H5::PredType::NATIVE_DOUBLE) );
+    ublas::matrix<double> project = pca.map( source.readBlasMatrix<double>(boost::any_cast<std::string>(l_args["inputpath"]), H5::PredType::NATIVE_DOUBLE) );
 
     
     // create file and write data to hdf
     tools::files::hdf target(boost::any_cast<std::string>(l_args["outfile"]), true);
-    target.write<double>( boost::any_cast<std::string>(l_args["outpath"]),  project, H5::PredType::NATIVE_DOUBLE );
+    target.writeBlasMatrix<double>( boost::any_cast<std::string>(l_args["outpath"]),  project, H5::PredType::NATIVE_DOUBLE );
     
     return EXIT_SUCCESS;
 }

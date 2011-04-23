@@ -190,7 +190,7 @@ int main(int argc, char* argv[]) {
     
     // create file and write data to hdf
     tools::files::hdf target(boost::any_cast<std::string>(l_args["outfile"]), true);
-    target.write<double>( boost::any_cast<std::string>(l_args["outpath"]),  cloud.generate( boost::any_cast< tools::sources::cloud<double>::cloudcreate >(l_args["create"]), boost::any_cast<double>(l_args["probability"]), boost::any_cast<bool>(l_args["shuffle"]) ), H5::PredType::NATIVE_DOUBLE );
+    target.writeBlasMatrix<double>( boost::any_cast<std::string>(l_args["outpath"]),  cloud.generate( boost::any_cast< tools::sources::cloud<double>::cloudcreate >(l_args["create"]), boost::any_cast<double>(l_args["probability"]), boost::any_cast<bool>(l_args["shuffle"]) ), H5::PredType::NATIVE_DOUBLE );
     
     return EXIT_SUCCESS;
 }

@@ -71,16 +71,16 @@ namespace machinelearning { namespace tools { namespace files {
             bool pathexists( const std::string& ) const;
 
         
-            template<typename T> ublas::matrix<T> readMatrix( const std::string&, const H5::PredType& ) const;
-            template<typename T> ublas::vector<T> readVector( const std::string&, const H5::PredType& ) const;
+            template<typename T> ublas::matrix<T> readBlasMatrix( const std::string&, const H5::PredType& ) const;
+            template<typename T> ublas::vector<T> readBlasVector( const std::string&, const H5::PredType& ) const;
         
             std::string readString( const std::string& ) const;
             std::vector<std::string> readStringVector( const std::string& ) const;
 
             
-            template<typename T> void write( const std::string&, const ublas::matrix<T>&, const H5::PredType& ) const;
-            template<typename T> void write( const std::string&, const ublas::vector<T>&, const H5::PredType& ) const;
-            template<typename T> void write( const std::string&, const T&, const H5::PredType& ) const;
+            template<typename T> void writeBlasMatrix( const std::string&, const ublas::matrix<T>&, const H5::PredType& ) const;
+            template<typename T> void writeBlasVector( const std::string&, const ublas::vector<T>&, const H5::PredType& ) const;
+            template<typename T> void writeValue( const std::string&, const T&, const H5::PredType& ) const;
             
             void writeString( const std::string&, const std::string&, const H5::PredType& ) const;
 
@@ -273,10 +273,10 @@ namespace machinelearning { namespace tools { namespace files {
         H5::DataSpace l_dataspace;
         std::vector<H5::Group> l_groups;
         
-        createDataSpace(p_path,  p_datatype, ublas::vector<std::size_t>(1, p_value.size()), l_dataspace, l_dataset, l_groups);
+        createDataSpace(p_path, p_datatype, ublas::vector<std::size_t>(1, p_value.size()), l_dataspace, l_dataset, l_groups);
         
         // write string
-        l_dataset.write( p_value.c_str(), p_datatype, l_dataspace  );
+        l_dataset.write( p_value.c_str(), H5::StrType(l_dataset), l_dataspace  );
         
         closeDataSpace(l_groups, l_dataset, l_dataspace);
     }
@@ -341,7 +341,7 @@ namespace machinelearning { namespace tools { namespace files {
      * @param p_datatype datatype for reading data (see http://www.hdfgroup.org/HDF5/doc/cpplus_RM/classH5_1_1PredType.html )
      * @return ublas matrix
     **/ 
-    template<typename T> inline ublas::matrix<T> hdf::readMatrix( const std::string& p_path, const H5::PredType& p_datatype ) const
+    template<typename T> inline ublas::matrix<T> hdf::readBlasMatrix( const std::string& p_path, const H5::PredType& p_datatype ) const
     {
         H5::DataSet   l_dataset   = m_file.openDataSet( p_path.c_str() );
         H5::DataSpace l_dataspace = l_dataset.getSpace();
@@ -374,12 +374,12 @@ namespace machinelearning { namespace tools { namespace files {
     
     
     
-    /** reads a vector with convert to blas matrix
+    /** reads a vector with convert to blas vector
      * @param p_path dataset path & name
      * @param p_datatype datatype for reading data
      * @return ublas matrix
     **/ 
-    template<typename T> inline ublas::vector<T> hdf::readVector( const std::string& p_path, const H5::PredType& p_datatype ) const
+    template<typename T> inline ublas::vector<T> hdf::readBlasVector( const std::string& p_path, const H5::PredType& p_datatype ) const
     {
         H5::DataSet   l_dataset   = m_file.openDataSet( p_path.c_str() );
         H5::DataSpace l_dataspace = l_dataset.getSpace();
@@ -415,7 +415,7 @@ namespace machinelearning { namespace tools { namespace files {
      * @param p_dataset matrixdata
      * @param p_datatype datatype for writing data (see http://www.hdfgroup.org/HDF5/doc/cpplus_RM/classH5_1_1PredType.html )
     **/
-    template<typename T> inline void hdf::write( const std::string& p_path, const ublas::matrix<T>& p_dataset, const H5::PredType& p_datatype ) const
+    template<typename T> inline void hdf::writeBlasMatrix( const std::string& p_path, const ublas::matrix<T>& p_dataset, const H5::PredType& p_datatype ) const
     {        
         H5::DataSet l_dataset;
         H5::DataSpace l_dataspace;
@@ -443,7 +443,7 @@ namespace machinelearning { namespace tools { namespace files {
      * @param p_dataset vectordata
      * @param p_datatype datatype for writing data (see http://www.hdfgroup.org/HDF5/doc/cpplus_RM/classH5_1_1PredType.html )
     **/
-    template<typename T> inline void hdf::write( const std::string& p_path, const ublas::vector<T>& p_dataset, const H5::PredType& p_datatype ) const
+    template<typename T> inline void hdf::writeBlasVector( const std::string& p_path, const ublas::vector<T>& p_dataset, const H5::PredType& p_datatype ) const
     {     
         H5::DataSet l_dataset;
         H5::DataSpace l_dataspace;
@@ -466,7 +466,7 @@ namespace machinelearning { namespace tools { namespace files {
      * @param p_dataset value
      * @param p_datatype datatype for writing data (see http://www.hdfgroup.org/HDF5/doc/cpplus_RM/classH5_1_1PredType.html )
      **/
-    template<typename T> inline void hdf::write( const std::string& p_path, const T& p_dataset, const H5::PredType& p_datatype ) const
+    template<typename T> inline void hdf::writeValue( const std::string& p_path, const T& p_dataset, const H5::PredType& p_datatype ) const
     {        
         H5::DataSet l_dataset;
         H5::DataSpace l_dataspace;

@@ -167,11 +167,11 @@ int main(int argc, char* argv[]) {
         if (boost::any_cast< std::vector<std::string> >(l_args["inputpath"]).size() > 1)
             pathpos = static_cast<std::size_t>(loMPICom.rank());
     
-        ublas::matrix<double> data = source.readMatrix<double>(boost::any_cast<std::vector<std::string> >(l_args["inputpath"])[pathpos], H5::PredType::NATIVE_DOUBLE);
+        ublas::matrix<double> data = source.readBlasMatrix<double>(boost::any_cast<std::vector<std::string> >(l_args["inputpath"])[pathpos], H5::PredType::NATIVE_DOUBLE);
 
     #else
         tools::files::hdf source( boost::any_cast<std::string>(l_args["inputfile"]) );
-        ublas::matrix<double> data = source.readMatrix<double>(boost::any_cast<std::string>(l_args["inputpath"]), H5::PredType::NATIVE_DOUBLE);
+        ublas::matrix<double> data = source.readBlasMatrix<double>(boost::any_cast<std::string>(l_args["inputpath"]), H5::PredType::NATIVE_DOUBLE);
     #endif
     
     // create distance object
@@ -199,14 +199,14 @@ int main(int argc, char* argv[]) {
         if (loMPICom.rank() == 0) {
             tools::files::hdf target(boost::any_cast<std::string>(l_args["outfile"]), true);
 
-            target.write<double>( "/protos",  protos, H5::PredType::NATIVE_DOUBLE );
-            target.write<double>( "/numprotos",  protos.size1(), H5::PredType::NATIVE_DOUBLE );
-            target.write<std::size_t>( "/iteration", boost::any_cast<std::size_t>(l_args["iteration"]), H5::PredType::NATIVE_ULONG );
+            target.writeBlasMatrix<double>( "/protos",  protos, H5::PredType::NATIVE_DOUBLE );
+            target.writeValue<double>( "/numprotos",  protos.size1(), H5::PredType::NATIVE_DOUBLE );
+            target.writeValue<std::size_t>( "/iteration", boost::any_cast<std::size_t>(l_args["iteration"]), H5::PredType::NATIVE_ULONG );
             
             if (ng.getLogging()) {
-                target.write<double>( "/error", qerror, H5::PredType::NATIVE_DOUBLE );
+                target.writeBlasVector<double>( "/error", qerror, H5::PredType::NATIVE_DOUBLE );
                 for(std::size_t i=0; i < logproto.size(); ++i)
-                    target.write<double>("/log" + boost::lexical_cast<std::string>( i )+"/protos", logproto[i], H5::PredType::NATIVE_DOUBLE );
+                    target.writeBlasMatrix<double>("/log" + boost::lexical_cast<std::string>( i )+"/protos", logproto[i], H5::PredType::NATIVE_DOUBLE );
             }
         }
     
@@ -219,15 +219,15 @@ int main(int argc, char* argv[]) {
         
         // create target file
         tools::files::hdf target(boost::any_cast<std::string>(l_args["outfile"]), true);
-        target.write<double>( "/numprotos",  boost::any_cast<std::size_t>(l_args["prototype"]), H5::PredType::NATIVE_DOUBLE );
-        target.write<double>( "/protos",  ng.getPrototypes(), H5::PredType::NATIVE_DOUBLE );    
-        target.write<std::size_t>( "/iteration",  boost::any_cast<std::size_t>(l_args["iteration"]), H5::PredType::NATIVE_ULONG );
+        target.writeValue<double>( "/numprotos",  boost::any_cast<std::size_t>(l_args["prototype"]), H5::PredType::NATIVE_DOUBLE );
+        target.writeBlasMatrix<double>( "/protos",  ng.getPrototypes(), H5::PredType::NATIVE_DOUBLE );    
+        target.writeValue<std::size_t>( "/iteration",  boost::any_cast<std::size_t>(l_args["iteration"]), H5::PredType::NATIVE_ULONG );
         
         if (ng.getLogging()) {
-            target.write<double>( "/error",  tools::vector::copy(ng.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
+            target.writeBlasVector<double>( "/error",  tools::vector::copy(ng.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
             std::vector< ublas::matrix<double> > logproto =  ng.getLoggedPrototypes();
             for(std::size_t i=0; i < logproto.size(); ++i)
-                target.write<double>("/log" + boost::lexical_cast<std::string>( i )+"/protos", logproto[i], H5::PredType::NATIVE_DOUBLE );
+                target.writeBlasMatrix<double>("/log" + boost::lexical_cast<std::string>( i )+"/protos", logproto[i], H5::PredType::NATIVE_DOUBLE );
         }
     
     #endif

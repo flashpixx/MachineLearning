@@ -124,7 +124,7 @@ int main(int argc, char* argv[]) {
     
     // read source hdf file and data
     tools::files::hdf source( boost::any_cast<std::string>(l_args["inputfile"]) );
-    ublas::matrix<double> data = source.readMatrix<double>(boost::any_cast<std::string>(l_args["inputpath"]), H5::PredType::NATIVE_DOUBLE);
+    ublas::matrix<double> data = source.readBlasMatrix<double>(boost::any_cast<std::string>(l_args["inputpath"]), H5::PredType::NATIVE_DOUBLE);
 
     
     // create distance object, k-means object and enable logging
@@ -139,16 +139,16 @@ int main(int argc, char* argv[]) {
     // create file and write data to hdf
     tools::files::hdf target(boost::any_cast<std::string>(l_args["outfile"]), true);
     
-    target.write<double>( "/protos",  kmeans.getPrototypes(), H5::PredType::NATIVE_DOUBLE );
-    target.write<double>( "/numprotos",  boost::any_cast<std::size_t>(l_args["prototype"]), H5::PredType::NATIVE_DOUBLE );
-    target.write<std::size_t>( "/iteration",  boost::any_cast<std::size_t>(l_args["iteration"]), H5::PredType::NATIVE_ULONG );
+    target.writeBlasMatrix<double>( "/protos",  kmeans.getPrototypes(), H5::PredType::NATIVE_DOUBLE );
+    target.writeValue<double>( "/numprotos",  boost::any_cast<std::size_t>(l_args["prototype"]), H5::PredType::NATIVE_DOUBLE );
+    target.writeValue<std::size_t>( "/iteration",  boost::any_cast<std::size_t>(l_args["iteration"]), H5::PredType::NATIVE_ULONG );
     
     // if logging exists write data to file
     if (kmeans.getLogging()) {
-        target.write<double>( "/error",  tools::vector::copy(kmeans.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
+        target.writeBlasVector<double>( "/error",  tools::vector::copy(kmeans.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
         std::vector< ublas::matrix<double> > p = kmeans.getLoggedPrototypes();
         for(std::size_t i=0; i < p.size(); ++i)
-            target.write<double>("/log" + boost::lexical_cast<std::string>( i )+"/protos", p[i], H5::PredType::NATIVE_DOUBLE );
+            target.writeBlasMatrix<double>("/log" + boost::lexical_cast<std::string>( i )+"/protos", p[i], H5::PredType::NATIVE_DOUBLE );
     }
     
     

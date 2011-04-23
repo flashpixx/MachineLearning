@@ -165,7 +165,7 @@ int main(int argc, char* argv[]) {
     #else
         tools::files::hdf source( lafiles[0] );
     #endif
-    ublas::matrix<double> data = source.readMatrix<double>(lapath[0], H5::PredType::NATIVE_DOUBLE);
+    ublas::matrix<double> data = source.readBlasMatrix<double>(lapath[0], H5::PredType::NATIVE_DOUBLE);
 
     
     // create ng objects
@@ -189,7 +189,7 @@ int main(int argc, char* argv[]) {
         for (std::size_t i=0; i < lapath.size(); ++i) {
 
             ng.trainpatch( loMPICom, 
-						   source.readMatrix<double>( lapath[i], H5::PredType::NATIVE_DOUBLE), 
+						   source.readBlasMatrix<double>( lapath[i], H5::PredType::NATIVE_DOUBLE), 
 						   boost::any_cast<std::size_t>(l_args["iteration"])
 					     );
 					
@@ -201,14 +201,14 @@ int main(int argc, char* argv[]) {
             if (target) {
                 std::string patchpath = "/patch" + boost::lexical_cast<std::string>(i);
                 
-                target->write<double>( patchpath+"/weights",  weights, H5::PredType::NATIVE_DOUBLE );
-                target->write<double>( patchpath+"/protos",  protos, H5::PredType::NATIVE_DOUBLE );    
+                target->writeBlasVector<double>( patchpath+"/weights",  weights, H5::PredType::NATIVE_DOUBLE );
+                target->writeBlasMatrix<double>( patchpath+"/protos",  protos, H5::PredType::NATIVE_DOUBLE );    
 
                 if (ng.getLogging()) {
-                    target->write<double>( patchpath+"/error", qerror, H5::PredType::NATIVE_DOUBLE );
+                    target->writeBlasVector<double>( patchpath+"/error", qerror, H5::PredType::NATIVE_DOUBLE );
                     
                     for(std::size_t j=0; j < logproto.size(); ++j)
-                        target->write<double>( patchpath+"/log" + boost::lexical_cast<std::string>( j )+"/protos", logproto[j], H5::PredType::NATIVE_DOUBLE );
+                        target->writeBlasMatrix<double>( patchpath+"/log" + boost::lexical_cast<std::string>( j )+"/protos", logproto[j], H5::PredType::NATIVE_DOUBLE );
                 }
             }
         }
@@ -217,10 +217,10 @@ int main(int argc, char* argv[]) {
         ublas::vector<double> weights    = ng.getPrototypeWeights(loMPICom);
         ublas::matrix<double> protos     = ng.getPrototypes(loMPICom);
         if (target) {
-            target->write<double>( "/numprotos",  protos.size1(), H5::PredType::NATIVE_DOUBLE );
-            target->write<double>( "/protos",  protos, H5::PredType::NATIVE_DOUBLE );    
-            target->write<double>( "/weights",  weights, H5::PredType::NATIVE_DOUBLE );    
-            target->write<std::size_t>( "/iteration",   boost::any_cast<std::size_t>(l_args["iteration"]), H5::PredType::NATIVE_ULONG );
+            target->writeValue<double>( "/numprotos",  protos.size1(), H5::PredType::NATIVE_DOUBLE );
+            target->writeBlasMatrix<double>( "/protos",  protos, H5::PredType::NATIVE_DOUBLE );    
+            target->writeBlasVector<double>( "/weights",  weights, H5::PredType::NATIVE_DOUBLE );    
+            target->writeValue<std::size_t>( "/iteration",   boost::any_cast<std::size_t>(l_args["iteration"]), H5::PredType::NATIVE_ULONG );
         }
         
         
@@ -237,27 +237,27 @@ int main(int argc, char* argv[]) {
         for (std::size_t i=0; i < std::max(lafiles.size(), lapath.size()); ++i) {
             source.open( (lafiles.size() == 1) ? lafiles[0] : lafiles[i] );
             ng.trainpatch(  
-						   source.readMatrix<double>( lapath[i], H5::PredType::NATIVE_DOUBLE), 
+						   source.readBlasMatrix<double>( lapath[i], H5::PredType::NATIVE_DOUBLE), 
 						   boost::any_cast<std::size_t>(l_args["iteration"])
 					     );
 
             std::string patchpath = "/patch" + boost::lexical_cast<std::string>(i);
-            target.write<double>( patchpath+"/weights",  ng.getPrototypeWeights(), H5::PredType::NATIVE_DOUBLE );
-            target.write<double>( patchpath+"/protos",  ng.getPrototypes(), H5::PredType::NATIVE_DOUBLE );    
+            target.writeBlasVector<double>( patchpath+"/weights",  ng.getPrototypeWeights(), H5::PredType::NATIVE_DOUBLE );
+            target.writeBlasMatrix<double>( patchpath+"/protos",  ng.getPrototypes(), H5::PredType::NATIVE_DOUBLE );    
             
             if (ng.getLogging()) {
-                target.write<double>( patchpath+"/error",  tools::vector::copy(ng.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
+                target.writeBlasVector<double>( patchpath+"/error",  tools::vector::copy(ng.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
                 
                 std::vector< ublas::matrix<double> > logproto =  ng.getLoggedPrototypes();
                 for(std::size_t j=0; j < logproto.size(); ++j)
-                    target.write<double>( patchpath+"/log"+boost::lexical_cast<std::string>(j)+"/protos", logproto[j], H5::PredType::NATIVE_DOUBLE );
+                    target.writeBlasMatrix<double>( patchpath+"/log"+boost::lexical_cast<std::string>(j)+"/protos", logproto[j], H5::PredType::NATIVE_DOUBLE );
             }
         }
 
-        target.write<double>( "/numprotos",   boost::any_cast<std::size_t>(l_args["prototype"]), H5::PredType::NATIVE_DOUBLE );
-        target.write<double>( "/protos",  ng.getPrototypes(), H5::PredType::NATIVE_DOUBLE );    
-        target.write<double>( "/weights",  ng.getPrototypeWeights(), H5::PredType::NATIVE_DOUBLE );    
-        target.write<std::size_t>( "/iteration",   boost::any_cast<std::size_t>(l_args["iteration"]), H5::PredType::NATIVE_ULONG );
+        target.writeValue<double>( "/numprotos",   boost::any_cast<std::size_t>(l_args["prototype"]), H5::PredType::NATIVE_DOUBLE );
+        target.writeBlasMatrix<double>( "/protos",  ng.getPrototypes(), H5::PredType::NATIVE_DOUBLE );    
+        target.writeBlasVector<double>( "/weights",  ng.getPrototypeWeights(), H5::PredType::NATIVE_DOUBLE );    
+        target.writeValue<std::size_t>( "/iteration",   boost::any_cast<std::size_t>(l_args["iteration"]), H5::PredType::NATIVE_ULONG );
         
     #endif
     

@@ -64,7 +64,7 @@ int main(int argc, char* argv[]) {
     
     // read source hdf file and data
     tools::files::hdf source( argv[1] );
-    ublas::matrix<double> data = source.readMatrix<double>( argv[3], H5::PredType::NATIVE_DOUBLE);
+    ublas::matrix<double> data = source.readBlasMatrix<double>( argv[3], H5::PredType::NATIVE_DOUBLE);
     ublas::matrix<double> prototypes;
     
     // read label type
@@ -79,7 +79,7 @@ int main(int argc, char* argv[]) {
     distance::euclid<double> d;
     
     if (labeltype == "int") {
-        std::vector<int> labels = tools::vector::copy( source.readVector<int>(argv[4], H5::PredType::NATIVE_INT) );
+        std::vector<int> labels = tools::vector::copy( source.readBlasVector<int>(argv[4], H5::PredType::NATIVE_INT) );
         std::vector<int> unique = tools::vector::unique(labels);
         
         // create rlvq object with double for data and int for labels
@@ -91,20 +91,20 @@ int main(int argc, char* argv[]) {
         prototypes = rlvq.getPrototypes();
         
         // write data to hdf
-        target.write<double>( "/numprotos",  unique.size(), H5::PredType::NATIVE_DOUBLE );
-        target.write<int>( "/protolabel", tools::vector::copy(unique), H5::PredType::NATIVE_INT );
+        target.writeValue<double>( "/numprotos",  unique.size(), H5::PredType::NATIVE_DOUBLE );
+        target.writeBlasVector<int>( "/protolabel", tools::vector::copy(unique), H5::PredType::NATIVE_INT );
         
         // if logging exists write data to file
         if (rlvq.getLogging()) {
-            target.write<double>( "/error",  tools::vector::copy(rlvq.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
+            target.writeBlasVector<double>( "/error",  tools::vector::copy(rlvq.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
             std::vector< ublas::matrix<double> > p = rlvq.getLoggedPrototypes();
             for(std::size_t i=0; i < p.size(); ++i)
-                target.write<double>("/log" + boost::lexical_cast<std::string>( i ), p[i], H5::PredType::NATIVE_DOUBLE );
+                target.writeBlasMatrix<double>("/log" + boost::lexical_cast<std::string>( i ), p[i], H5::PredType::NATIVE_DOUBLE );
         }
     }
     
     if (labeltype == "uint") {
-        std::vector<unsigned int> labels = tools::vector::copy( source.readVector<unsigned int>(argv[4], H5::PredType::NATIVE_UINT) );
+        std::vector<unsigned int> labels = tools::vector::copy( source.readBlasVector<unsigned int>(argv[4], H5::PredType::NATIVE_UINT) );
         std::vector<unsigned int> unique = tools::vector::unique(labels);
         
         // create rlvq object with double for data and uint for labels
@@ -116,20 +116,20 @@ int main(int argc, char* argv[]) {
         prototypes = rlvq.getPrototypes();
         
         // write data to hdf
-        target.write<double>( "/numprotos",  unique.size(), H5::PredType::NATIVE_DOUBLE );
-        target.write<unsigned int>( "/protolabel", tools::vector::copy(unique), H5::PredType::NATIVE_UINT );
+        target.writeValue<double>( "/numprotos",  unique.size(), H5::PredType::NATIVE_DOUBLE );
+        target.writeBlasVector<unsigned int>( "/protolabel", tools::vector::copy(unique), H5::PredType::NATIVE_UINT );
         
         // if logging exists write data to file
         if (rlvq.getLogging()) {
-            target.write<double>( "/error",  tools::vector::copy(rlvq.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
+            target.writeBlasVector<double>( "/error",  tools::vector::copy(rlvq.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
             std::vector< ublas::matrix<double> > p = rlvq.getLoggedPrototypes();
             for(std::size_t i=0; i < p.size(); ++i)
-                target.write<double>("/log" + boost::lexical_cast<std::string>( i ), p[i], H5::PredType::NATIVE_DOUBLE );
+                target.writeBlasMatrix<double>("/log" + boost::lexical_cast<std::string>( i ), p[i], H5::PredType::NATIVE_DOUBLE );
         }
     }
     
     if (labeltype == "double") {
-        std::vector<double> labels = tools::vector::copy( source.readVector<double>(argv[4], H5::PredType::NATIVE_DOUBLE) );
+        std::vector<double> labels = tools::vector::copy( source.readBlasVector<double>(argv[4], H5::PredType::NATIVE_DOUBLE) );
         std::vector<double> unique = tools::vector::unique(labels);
         
         // create rlvq object with double for data and double for labels
@@ -141,15 +141,15 @@ int main(int argc, char* argv[]) {
         prototypes = rlvq.getPrototypes();
         
         // write data to hdf
-        target.write<double>( "/numprotos",  unique.size(), H5::PredType::NATIVE_DOUBLE );
-        target.write<double>( "/protolabel", tools::vector::copy(unique), H5::PredType::NATIVE_DOUBLE );
+        target.writeValue<double>( "/numprotos",  unique.size(), H5::PredType::NATIVE_DOUBLE );
+        target.writeBlasVector<double>( "/protolabel", tools::vector::copy(unique), H5::PredType::NATIVE_DOUBLE );
         
         // if logging exists write data to file
         if (rlvq.getLogging()) {
-            target.write<double>( "/error",  tools::vector::copy(rlvq.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
+            target.writeBlasVector<double>( "/error",  tools::vector::copy(rlvq.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
             std::vector< ublas::matrix<double> > p = rlvq.getLoggedPrototypes();
             for(std::size_t i=0; i < p.size(); ++i)
-                target.write<double>("/log" + boost::lexical_cast<std::string>( i ), p[i], H5::PredType::NATIVE_DOUBLE );
+                target.writeBlasMatrix<double>("/log" + boost::lexical_cast<std::string>( i ), p[i], H5::PredType::NATIVE_DOUBLE );
         }
     }
 
@@ -161,8 +161,8 @@ int main(int argc, char* argv[]) {
     if ((prototypes.size1() == 0) || (prototypes.size2() == 0))
         throw std::runtime_error("label type is unkown");    
     
-    target.write<std::size_t>( "/iteration",  iteration, H5::PredType::NATIVE_ULONG );
-    target.write<double>( "/protos",  prototypes, H5::PredType::NATIVE_DOUBLE );
+    target.writeValue<std::size_t>( "/iteration",  iteration, H5::PredType::NATIVE_ULONG );
+    target.writeBlasMatrix<double>( "/protos",  prototypes, H5::PredType::NATIVE_DOUBLE );
 
     
     std::cout << "create HDF file \"rlvq.hdf5\" with dataset \"/protos \", \"/protolabel\" label of prototypes, \"/iteration\" number of iteration, \"numprotos\" number of prototypes and if logging is enabled \"/error\" with quantization error and \"/log<0 to iterations-1>\" logged prototypes" << std::endl;

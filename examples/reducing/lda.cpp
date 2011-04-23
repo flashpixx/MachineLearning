@@ -47,7 +47,7 @@ int main(int argc, char* argv[]) {
     
     // read source hdf file and data
     tools::files::hdf source( argv[1] );
-    ublas::matrix<double> data = source.readMatrix<double>( argv[4], H5::PredType::NATIVE_DOUBLE);
+    ublas::matrix<double> data = source.readBlasMatrix<double>( argv[4], H5::PredType::NATIVE_DOUBLE);
     ublas::matrix<double> project;
 
     // read label type
@@ -57,21 +57,21 @@ int main(int argc, char* argv[]) {
     // create projection
     if (labeltype == "int") {
         dim::lda<double, int> lda(targetdim);
-        std::vector<int> labels = tools::vector::copy( source.readVector<int>(argv[5], H5::PredType::NATIVE_INT) );
+        std::vector<int> labels = tools::vector::copy( source.readBlasVector<int>(argv[5], H5::PredType::NATIVE_INT) );
         
         project = lda.map(data, labels);
     }
         
     if (labeltype == "uint") {
         dim::lda<double, unsigned int> lda(targetdim);
-        std::vector<unsigned int> labels = tools::vector::copy( source.readVector<unsigned int>(argv[5], H5::PredType::NATIVE_UINT) );
+        std::vector<unsigned int> labels = tools::vector::copy( source.readBlasVector<unsigned int>(argv[5], H5::PredType::NATIVE_UINT) );
         
         project = lda.map(data, labels);
     }
         
     if (labeltype == "double") {
         dim::lda<double, double> lda(targetdim);
-        std::vector<double> labels = tools::vector::copy( source.readVector<double>(argv[5], H5::PredType::NATIVE_DOUBLE) );
+        std::vector<double> labels = tools::vector::copy( source.readBlasVector<double>(argv[5], H5::PredType::NATIVE_DOUBLE) );
         
         project = lda.map(data, labels);
     }
@@ -88,7 +88,7 @@ int main(int argc, char* argv[]) {
     
     // create file and write data to hdf
     tools::files::hdf target("lda.hdf5", true);
-    target.write<double>( "/data",  project, H5::PredType::NATIVE_DOUBLE );
+    target.writeBlasMatrix<double>( "/data",  project, H5::PredType::NATIVE_DOUBLE );
     
     std::cout << "create HDF file \"lda.hdf5\" with dataset \"/data\"" << std::endl;
     return EXIT_SUCCESS;
