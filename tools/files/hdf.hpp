@@ -90,9 +90,9 @@ namespace machinelearning { namespace tools { namespace files {
             /** file handler **/
             H5::H5File m_file;
             
-            void createPathWithDataset( const std::string&, const H5::PredType&, const H5::DataSpace&, std::vector<H5::Group>&, H5::DataSet& ) const;
-            void createDataSpace( const std::string&, const H5::PredType&, const ublas::vector<std::size_t>&, H5::DataSpace&, H5::DataSet&, std::vector<H5::Group>& ) const;
-            void closeDataSpace( std::vector<H5::Group>&, H5::DataSet&, H5::DataSpace& ) const;
+            template<class T> void createPathWithDataset( const std::string&, const H5::PredType&, const H5::DataSpace&, std::vector<H5::Group>&, T& ) const;
+            template<class T> void createDataSpace( const std::string&, const H5::PredType&, const ublas::vector<std::size_t>&, H5::DataSpace&, T&, std::vector<H5::Group>& ) const;
+            template<class T> void closeDataSpace( std::vector<H5::Group>&, T&, H5::DataSpace& ) const;
         
     };
     
@@ -294,7 +294,7 @@ namespace machinelearning { namespace tools { namespace files {
      * @param p_dataset data
      * @return HDF dataset
      **/
-    inline void hdf::createPathWithDataset( const std::string& p_path, const H5::PredType& p_datatype, const H5::DataSpace& p_dataspace, std::vector<H5::Group>& p_groups, H5::DataSet& p_dataset ) const
+    template<class T> inline void hdf::createPathWithDataset( const std::string& p_path, const H5::PredType& p_datatype, const H5::DataSpace& p_dataspace, std::vector<H5::Group>& p_groups, T& p_dataset ) const
     {
         // split string and remove first element if empty
         std::vector<std::string> l_path;
@@ -491,7 +491,7 @@ namespace machinelearning { namespace tools { namespace files {
      * @param p_dataset dataset
      * @param p_dataspace dataspace
      **/
-    inline void hdf::closeDataSpace( std::vector<H5::Group>& p_groups, H5::DataSet& p_dataset, H5::DataSpace& p_dataspace ) const
+    template<class T> inline void hdf::closeDataSpace( std::vector<H5::Group>& p_groups, T& p_dataset, H5::DataSpace& p_dataspace ) const
     {
         p_dataset.close();
         p_dataspace.close();
@@ -512,7 +512,7 @@ namespace machinelearning { namespace tools { namespace files {
      * @param p_dataset refernce for the dataset
      * @param p_groups groups for closing
      **/
-    inline void hdf::createDataSpace( const std::string& p_path, const H5::PredType& p_datatype, const ublas::vector<std::size_t>& p_dim, H5::DataSpace& p_dataspace, H5::DataSet& p_dataset, std::vector<H5::Group>& p_groups ) const
+    template<class T> inline void hdf::createDataSpace( const std::string& p_path, const H5::PredType& p_datatype, const ublas::vector<std::size_t>& p_dim, H5::DataSpace& p_dataspace, T& p_dataset, std::vector<H5::Group>& p_groups ) const
     {
         // define Structurs
         H5::DSetCreatPropList l_defaultvalue;
@@ -525,7 +525,7 @@ namespace machinelearning { namespace tools { namespace files {
         p_groups    = std::vector<H5::Group>();
         
         // create Dataspace in path
-        p_dataset   = H5::DataSet();
+        p_dataset   = T();
         createPathWithDataset( p_path,  p_datatype, p_dataspace, p_groups, p_dataset );
     }
     
