@@ -52,6 +52,8 @@ namespace machinelearning { namespace tools { namespace files {
      * @todo implement array functions
      * @todo implement string functions (C sources)
      * @todo add ndim cube support
+     * @todo iterate over groups
+     * @todo adding moving objects
      **/
     class hdf {
         
@@ -273,7 +275,10 @@ namespace machinelearning { namespace tools { namespace files {
         
         // create Dataspace in path        
         H5::DataSet l_dataset;
-        //createPathWithDataset( p_path,  p_datatype, l_dataspace, l_groups, l_dataset ); 
+        createPathWithDataset( p_path,  H5::PredType::NATIVE_CHAR, l_dataspace, l_groups, l_dataset ); 
+        
+        // write string
+        l_dataset.write( p_value.c_str(), H5::PredType::NATIVE_CHAR, l_dataspace  );
         
         // close groups
         for(std::vector<H5::Group>::reverse_iterator it = l_groups.rbegin(); it != l_groups.rend(); ++it)
