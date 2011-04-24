@@ -49,8 +49,6 @@ namespace machinelearning { namespace tools { namespace files {
      * $LastChangedDate$
      * @see http://www.hdfgroup.org
      * @note hdf uses their own datatypes http://www.hdfgroup.org/HDF5/doc/cpplus_RM/classH5_1_1PredType.html 
-     * @todo implement array functions
-     * @todo implement string functions (C sources)
      * @todo add ndim cube support
      * @todo iterate over groups
      * @todo adding moving objects
@@ -268,6 +266,7 @@ namespace machinelearning { namespace tools { namespace files {
      * @param p_path path to element
      * @return std::vector with std::string elements
      * @todo use StrType for extracting data / iterating over vector data
+     * @bug does not work correctly
      **/
     inline std::vector<std::string> hdf::readStringVector( const std::string& p_path ) const
     {
@@ -368,21 +367,18 @@ namespace machinelearning { namespace tools { namespace files {
         std::vector<H5::Group> l_groups;
         
         // at first we need the max length of the string for creating data string object
-        std::size_t l_maxstrlen = p_value[0].size();
-        std::size_t l_length    = l_maxstrlen+1;
-        for(std::size_t i=1; i < p_value.size(); ++i) {
+        std::size_t l_maxstrlen = 0;
+        for(std::size_t i=0; i < p_value.size(); ++i)
             l_maxstrlen  = std::max( l_maxstrlen, p_value[i].size() );
-            l_length    += p_value[i].size()+1;
-        }
         
         // create char array for the string data, each vector element ist seperated with \0
-        char l_data[l_length];
+        char l_data[(l_maxstrlen+1)*p_value.size()];
         std::size_t l_start = 0;
         for(std::size_t i=0; i < p_value.size(); ++i) {
             memcpy( &l_data[l_start], p_value[i].c_str(), (p_value[i].size()+1) * sizeof(char) );
-            l_start += (p_value[i].size()+1) * sizeof(char);
+            l_start += (l_maxstrlen+1) * sizeof(char);
         }
-
+       
         // create string vector data and write it
         createStringSpace(p_path, ublas::vector<std::size_t>(1, p_value.size()), l_maxstrlen, l_dataspace, l_dataset, l_str, l_groups);
         l_dataset.write( l_data, l_str, l_dataspace  );
