@@ -458,9 +458,6 @@ namespace machinelearning { namespace tools { namespace files {
      **/
     inline void hdf::createDataSpace( const std::string& p_path, const H5::PredType& p_datatype, const ublas::vector<std::size_t>& p_dim, H5::DataSpace& p_dataspace, H5::DataSet& p_dataset, std::vector<H5::Group>& p_groups ) const
     {
-        // define Structurs
-        //H5::DSetCreatPropList l_defaultvalue;
-        //l_defaultvalue.setFillValue( p_datatype, 0 );   
         if (p_dim.size() == 0)
             throw exception::runtime(_("it is at least one dimension requires"));
         
