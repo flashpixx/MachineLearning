@@ -85,7 +85,7 @@ namespace machinelearning { namespace tools { namespace files {
         template<typename T> void writeBlasVector( const std::string&, const ublas::vector<T>&, const H5::PredType& ) const;
         template<typename T> void writeValue( const std::string&, const T&, const H5::PredType& ) const;
         
-        void writeString( const std::string&, const std::string&, const H5::PredType& ) const;
+        void writeString( const std::string&, const std::string& ) const;
         
         
         private :
@@ -93,9 +93,10 @@ namespace machinelearning { namespace tools { namespace files {
         /** file handler **/
         H5::H5File m_file;
         
-        void createPathWithDataset( const std::string&, const H5::PredType&, const H5::DataSpace&, std::vector<H5::Group>&, H5::DataSet& ) const;
+        std::string createPath( const std::string&, std::vector<H5::Group>& ) const;
         void createDataSpace( const std::string&, const H5::PredType&, const ublas::vector<std::size_t>&, H5::DataSpace&, H5::DataSet&, std::vector<H5::Group>& ) const;
-        void closeDataSpace( std::vector<H5::Group>&, H5::DataSet&, H5::DataSpace& ) const;
+        void createStringSpace( const std::string&, const ublas::vector<std::size_t>&, const std::size_t&, H5::DataSpace&, H5::DataSet&, H5::StrType&, std::vector<H5::Group>& ) const;
+        void closeSpace( std::vector<H5::Group>&, H5::DataSet&, H5::DataSpace& ) const;
         
     };
     
@@ -106,11 +107,11 @@ namespace machinelearning { namespace tools { namespace files {
      * @param p_file filename
      **/
     inline hdf::hdf( const std::string& p_file ) :
-    m_file( p_file.c_str(), H5F_ACC_RDWR )
+        m_file( p_file.c_str(), H5F_ACC_RDWR )
     {
-#ifdef NDEBUG
+        #ifdef NDEBUG
         H5::Exception::dontPrint();
-#endif
+        #endif
     }
     
     
@@ -119,11 +120,11 @@ namespace machinelearning { namespace tools { namespace files {
      * @param p_write bool for clear/create file
      **/
     inline hdf::hdf( const std::string& p_file, const bool& p_write ) :
-    m_file( p_file.c_str(), (p_write ? H5F_ACC_TRUNC : H5F_ACC_RDWR) )
+        m_file( p_file.c_str(), (p_write ? H5F_ACC_TRUNC : H5F_ACC_RDWR) )
     {
-#ifdef NDEBUG
+        #ifdef NDEBUG
         H5::Exception::dontPrint();
-#endif
+        #endif
     }
     
     
@@ -189,59 +190,6 @@ namespace machinelearning { namespace tools { namespace files {
     inline bool hdf::pathexists( const std::string& p_path ) const
     {
         return H5Lexists( m_file.getId(), p_path.c_str(), H5P_DEFAULT );
-    }
-    
-    
-    /** create a path with dataset (path separator is "/")
-     * @param p_path full path (last element dataset name)
-     * @param p_datatype HDF datatype for dataset
-     * @param p_dataspace space for dataset
-     * @param p_groups std::vector with opened/created groups for closing
-     * @param p_dataset data
-     * @return HDF dataset
-     **/
-    inline void hdf::createPathWithDataset( const std::string& p_path, const H5::PredType& p_datatype, const H5::DataSpace& p_dataspace, std::vector<H5::Group>& p_groups, H5::DataSet& p_dataset ) const
-    {
-        // split string and remove first element if empty
-        std::vector<std::string> l_path;
-        boost::split( l_path, p_path, boost::is_any_of("/") );
-        
-        // clear empty elements
-        for(std::vector<std::string>::iterator it = l_path.begin(); it != l_path.end(); ++it)
-            if ((*it).empty())
-                l_path.erase( it );
-        
-        
-        // path must have more than zero elements
-        if (l_path.size() == 0)
-            throw exception::runtime(_("empty path is forbidden"));
-        
-        // if only one element then create dataset directly
-        if (l_path.size() == 1) {
-            p_dataset = m_file.createDataSet( l_path[0].c_str(), p_datatype, p_dataspace );
-        } else {
-            
-            // more elements exists, check every group and clear emtpy elements
-            H5::Group l_group;
-            try {
-                l_group = m_file.openGroup( l_path[0].c_str() );
-            } catch ( H5::FileIException e ) {
-                l_group = m_file.createGroup( l_path[0].c_str() );
-            }        
-            p_groups.push_back( l_group );
-            
-            // create path structure
-            for(std::vector<std::string>::iterator it = l_path.begin()+1; it != l_path.end()-1; ++it) {
-                try {
-                    l_group = l_group.openGroup( (*it).c_str() );
-                } catch ( H5::GroupIException e ) {
-                    l_group = l_group.createGroup( (*it).c_str() );
-                }
-                p_groups.push_back( l_group );
-            }
-            
-            p_dataset = l_group.createDataSet( (*l_path.end()).c_str(), p_datatype, p_dataspace );
-        }
     }
     
     
@@ -390,46 +338,22 @@ namespace machinelearning { namespace tools { namespace files {
     /** writes a simple string to hdf
      * @param p_path path to dataset
      * @param p_value string value
-     * @param p_datatype datatype for reading data (see http://www.hdfgroup.org/HDF5/doc/cpplus_RM/classH5_1_1PredType.html )
-     * @warning incomplete
      **/
-    inline void hdf::writeString( const std::string& p_path, const std::string& p_value, const H5::PredType& p_datatype ) const
+    inline void hdf::writeString( const std::string& p_path, const std::string& p_value ) const
     {
         //http://www.hdfgroup.org/HDF5/doc/cpplus_RM/classH5_1_1DataType.html
         
-        hsize_t l_size[1];
-        l_size[0] = 1;
+        H5::DataSpace l_dataspace;
+        H5::DataSet l_dataset;
+        H5::StrType l_str;
+        std::vector<H5::Group> l_groups;
         
-        H5::DataSpace l_dataspace = H5::DataSpace( 1, l_size );
-        H5::StrType l_str(0, p_value.size()+1);
-        H5::DataSet l_dataset = m_file.createDataSet( p_path.c_str(), l_str, l_dataspace );
-        //std::vector<H5::Group> l_groups;
-        
-        //createDataSpace(p_path, p_datatype, ublas::vector<std::size_t>(1,1), l_dataspace, l_dataset, l_groups);
-        
-        /*
-         DATASET "single" {
-         DATATYPE  H5T_STRING {
-         STRSIZE 7;
-         STRPAD H5T_STR_NULLTERM;
-         CSET H5T_CSET_ASCII;
-         CTYPE H5T_C_S1;
-         }
-         DATASPACE  SIMPLE { ( 1 ) / ( 1 ) }
-         DATA {
-         (0): "single"
-         }
-         }
-         */
-        
-        // set data for the C-string support
-        
-        //l_str.setStrpad( H5T_STR_NULLTERM );
-        
+        createStringSpace(p_path, ublas::vector<std::size_t>(1,1), p_value.size(), l_dataspace, l_dataset, l_str, l_groups);
+ 
         // write string
         l_dataset.write( p_value.c_str(), l_str, l_dataspace  );
         
-        //closeDataSpace(l_groups, l_dataset, l_dataspace);
+        closeSpace(l_groups, l_dataset, l_dataspace);
     }
     
     
@@ -457,7 +381,7 @@ namespace machinelearning { namespace tools { namespace files {
                 l_data[j][i] = p_dataset(i,j);
         l_dataset.write( l_data, p_datatype, l_dataspace  );
         
-        closeDataSpace(l_groups, l_dataset, l_dataspace);
+        closeSpace(l_groups, l_dataset, l_dataspace);
     }
     
     
@@ -480,7 +404,7 @@ namespace machinelearning { namespace tools { namespace files {
             l_data[i] = p_dataset(i);
         l_dataset.write( l_data, p_datatype, l_dataspace  );
         
-        closeDataSpace(l_groups, l_dataset, l_dataspace);
+        closeSpace(l_groups, l_dataset, l_dataspace);
     }
     
     
@@ -502,7 +426,7 @@ namespace machinelearning { namespace tools { namespace files {
         l_data[0] = p_dataset;
         l_dataset.write( l_data, p_datatype, l_dataspace  );
         
-        closeDataSpace(l_groups, l_dataset, l_dataspace);
+        closeSpace(l_groups, l_dataset, l_dataspace);
     }
     
     
@@ -511,7 +435,7 @@ namespace machinelearning { namespace tools { namespace files {
      * @param p_dataset dataset
      * @param p_dataspace dataspace
      **/
-    inline void hdf::closeDataSpace( std::vector<H5::Group>& p_groups, H5::DataSet& p_dataset, H5::DataSpace& p_dataspace ) const
+    inline void hdf::closeSpace( std::vector<H5::Group>& p_groups, H5::DataSet& p_dataset, H5::DataSpace& p_dataspace ) const
     {
         p_dataset.close();
         p_dataspace.close();
@@ -535,18 +459,107 @@ namespace machinelearning { namespace tools { namespace files {
     inline void hdf::createDataSpace( const std::string& p_path, const H5::PredType& p_datatype, const ublas::vector<std::size_t>& p_dim, H5::DataSpace& p_dataspace, H5::DataSet& p_dataset, std::vector<H5::Group>& p_groups ) const
     {
         // define Structurs
-        H5::DSetCreatPropList l_defaultvalue;
-        l_defaultvalue.setFillValue( p_datatype, 0 );        
+        //H5::DSetCreatPropList l_defaultvalue;
+        //l_defaultvalue.setFillValue( p_datatype, 0 );   
+        if (p_dim.size() == 0)
+            throw exception::runtime(_("it is at least one dimension requires"));
+        
         hsize_t l_size[p_dim.size()];
         for(std::size_t i=0; i < p_dim.size(); ++i)
             l_size[i] = p_dim(i);
         
-        p_dataspace = H5::DataSpace( p_dim.size(), l_size );
-        p_groups    = std::vector<H5::Group>();
+        p_dataspace              = H5::DataSpace( p_dim.size(), l_size );
+        p_groups                 = std::vector<H5::Group>();
+        const std::string l_path = createPath( p_path, p_groups );
         
-        // create Dataspace in path
-        p_dataset   = H5::DataSet();
-        createPathWithDataset( p_path,  p_datatype, p_dataspace, p_groups, p_dataset );
+        if (l_path.empty())
+            throw exception::runtime(_("empty path is forbidden"));
+        
+        p_dataset = m_file.createDataSet( l_path.c_str(), p_datatype, p_dataspace );
+    }
+    
+    
+    /** create a dataspace in the file content for string types
+     * @param p_path path for dataspace
+     * @param p_dim dimension for dataspace and every dimension
+     * @param p_strlen max. string length
+     * @param p_dataspace refernce of the dataspace
+     * @param p_dataset refernce for the dataset
+     * @param p_str string type (@see http://www.hdfgroup.org/HDF5/doc/cpplus_RM/classH5_1_1DataType.html)
+     * @param p_groups groups for closing
+     **/
+    void hdf::createStringSpace( const std::string& p_path, const ublas::vector<std::size_t>& p_dim, const std::size_t& p_strlen, H5::DataSpace& p_dataspace, H5::DataSet& p_dataset, H5::StrType& p_str, std::vector<H5::Group>& p_groups ) const
+    {
+        if (p_dim.size() == 0)
+            throw exception::runtime(_("it is at least one dimension requires"));
+        
+        hsize_t l_size[p_dim.size()];
+        for(std::size_t i=0; i < p_dim.size(); ++i)
+            l_size[i] = p_dim(i);
+        
+        p_dataspace              = H5::DataSpace( p_dim.size(), l_size );
+        p_groups                 = std::vector<H5::Group>();
+        const std::string l_path = createPath( p_path, p_groups );
+        
+        if (l_path.empty())
+            throw exception::runtime(_("empty path is forbidden"));
+        
+        p_str     = H5::StrType(0, p_strlen+1);
+        p_dataset = m_file.createDataSet( l_path.c_str(), p_str, p_dataspace );
+    }
+    
+    
+    /** create a path with dataset (path separator is "/")
+     * @param p_path full path (last element dataset name)
+     * @param p_datatype HDF datatype for dataset
+     * @param p_dataspace space for dataset
+     * @param p_groups std::vector with opened/created groups for closing
+     * @param p_dataset data
+     * @return string with last path entry
+     **/
+    inline std::string hdf::createPath( const std::string& p_path, std::vector<H5::Group>& p_groups ) const
+    {
+        // split string and remove first element if empty
+        std::vector<std::string> l_path;
+        boost::split( l_path, p_path, boost::is_any_of("/") );
+        
+        // clear empty elements
+        for(std::vector<std::string>::iterator it = l_path.begin(); it != l_path.end(); ++it)
+            if ((*it).empty())
+                l_path.erase( it );
+        
+        
+        // path must have more than zero elements
+        if (l_path.size() == 0)
+            throw exception::runtime(_("empty path is forbidden"));
+        
+        // if only one element then create dataset directly
+        if (l_path.size() == 1)
+            return l_path[0];
+        else {
+            
+            // more elements exists, check every group and clear emtpy elements
+            H5::Group l_group;
+            try {
+                l_group = m_file.openGroup( l_path[0].c_str() );
+            } catch ( H5::FileIException e ) {
+                l_group = m_file.createGroup( l_path[0].c_str() );
+            }        
+            p_groups.push_back( l_group );
+            
+            // create path structure
+            for(std::vector<std::string>::iterator it = l_path.begin()+1; it != l_path.end()-1; ++it) {
+                try {
+                    l_group = l_group.openGroup( (*it).c_str() );
+                } catch ( H5::GroupIException e ) {
+                    l_group = l_group.createGroup( (*it).c_str() );
+                }
+                p_groups.push_back( l_group );
+            }
+            return *l_path.end();
+        }
+        
+        throw exception::runtime(_("cannot create path structure"));
     }
     
     
