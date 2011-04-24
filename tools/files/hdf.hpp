@@ -86,6 +86,7 @@ namespace machinelearning { namespace tools { namespace files {
         template<typename T> void writeValue( const std::string&, const T&, const H5::PredType& ) const;
         
         void writeString( const std::string&, const std::string& ) const;
+        void writeStringVector( const std::string&, const std::vector<std::string>& ) const;
         
         
         private :
@@ -341,8 +342,6 @@ namespace machinelearning { namespace tools { namespace files {
      **/
     inline void hdf::writeString( const std::string& p_path, const std::string& p_value ) const
     {
-        //http://www.hdfgroup.org/HDF5/doc/cpplus_RM/classH5_1_1DataType.html
-        
         H5::DataSpace l_dataspace;
         H5::DataSet l_dataset;
         H5::StrType l_str;
@@ -352,6 +351,24 @@ namespace machinelearning { namespace tools { namespace files {
  
         // write string
         l_dataset.write( p_value.c_str(), l_str, l_dataspace  );
+        
+        closeSpace(l_groups, l_dataset, l_dataspace);
+    }
+    
+
+    /** writes a string vector to hdf
+     * @param p_path path to dataset
+     * @param p_value string vector
+     **/
+    inline void hdf::writeStringVector( const std::string& p_path, const std::vector<std::string>& p_value ) const
+    {
+        H5::DataSpace l_dataspace;
+        H5::DataSet l_dataset;
+        H5::StrType l_str;
+        std::vector<H5::Group> l_groups;
+        
+        createStringSpace(p_path, ublas::vector<std::size_t>(1,1), p_value.size(), l_dataspace, l_dataset, l_str, l_groups);
+        
         
         closeSpace(l_groups, l_dataset, l_dataspace);
     }
@@ -472,7 +489,10 @@ namespace machinelearning { namespace tools { namespace files {
         if (l_path.empty())
             throw exception::runtime(_("empty path is forbidden"));
         
-        p_dataset = m_file.createDataSet( l_path.c_str(), p_datatype, p_dataspace );
+        if (p_groups.size() == 0)
+            p_dataset = m_file.createDataSet( l_path.c_str(), p_datatype, p_dataspace );
+        else
+            p_dataset = p_groups[p_groups.size()-1].createDataSet( l_path.c_str(), p_datatype, p_dataspace );
     }
     
     
@@ -502,7 +522,10 @@ namespace machinelearning { namespace tools { namespace files {
             throw exception::runtime(_("empty path is forbidden"));
         
         p_str     = H5::StrType(0, p_strlen+1);
-        p_dataset = m_file.createDataSet( l_path.c_str(), p_str, p_dataspace );
+        if (p_groups.size() == 0)
+            p_dataset = m_file.createDataSet( l_path.c_str(), p_str, p_dataspace );
+        else
+            p_dataset = p_groups[p_groups.size()-1].createDataSet( l_path.c_str(), p_str, p_dataspace );
     }
     
     
