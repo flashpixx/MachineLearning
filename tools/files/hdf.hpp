@@ -31,9 +31,6 @@
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/algorithm/string.hpp> 
 #include <H5Cpp.h>
-//extern "C" {
-//#include <H5Tpublic.h>
-//}
 
 #include <iostream>
 #include <boost/numeric/ublas/io.hpp>
@@ -362,14 +359,33 @@ namespace machinelearning { namespace tools { namespace files {
      **/
     inline void hdf::writeStringVector( const std::string& p_path, const std::vector<std::string>& p_value ) const
     {
+        if (p_value.size() == 0)
+            throw exception::runtime(_("can note write empty data"));
+            
         H5::DataSpace l_dataspace;
         H5::DataSet l_dataset;
         H5::StrType l_str;
         std::vector<H5::Group> l_groups;
         
-        createStringSpace(p_path, ublas::vector<std::size_t>(1,1), p_value.size(), l_dataspace, l_dataset, l_str, l_groups);
+        // at first we need the max length of the string for creating data string object
+        std::size_t l_maxstrlen = p_value[0].size();
+        std::size_t l_length    = l_maxstrlen+1;
+        for(std::size_t i=1; i < p_value.size(); ++i) {
+            l_maxstrlen  = std::max( l_maxstrlen, p_value[i].size() );
+            l_length    += p_value[i].size()+1;
+        }
         
-        
+        // create char array for the string data, each vector element ist seperated with \0
+        char l_data[l_length];
+        std::size_t l_start = 0;
+        for(std::size_t i=0; i < p_value.size(); ++i) {
+            memcpy( &l_data[l_start], p_value[i].c_str(), (p_value[i].size()+1) * sizeof(char) );
+            l_start += (p_value[i].size()+1) * sizeof(char);
+        }
+
+        // create string vector data and write it
+        createStringSpace(p_path, ublas::vector<std::size_t>(1, p_value.size()), l_maxstrlen, l_dataspace, l_dataset, l_str, l_groups);
+        l_dataset.write( l_data, l_str, l_dataspace  );
         closeSpace(l_groups, l_dataset, l_dataspace);
     }
     
@@ -381,6 +397,9 @@ namespace machinelearning { namespace tools { namespace files {
      **/
     template<typename T> inline void hdf::writeBlasMatrix( const std::string& p_path, const ublas::matrix<T>& p_dataset, const H5::PredType& p_datatype ) const
     {        
+        if ((p_dataset.size1() == 0) || (p_dataset.size2() == 0))
+            throw exception::runtime(_("can note write empty data"));
+        
         H5::DataSet l_dataset;
         H5::DataSpace l_dataspace;
         std::vector<H5::Group> l_groups;
@@ -409,6 +428,9 @@ namespace machinelearning { namespace tools { namespace files {
      **/
     template<typename T> inline void hdf::writeBlasVector( const std::string& p_path, const ublas::vector<T>& p_dataset, const H5::PredType& p_datatype ) const
     {     
+        if (p_dataset.size() == 0)
+            throw exception::runtime(_("can note write empty data"));
+        
         H5::DataSet l_dataset;
         H5::DataSpace l_dataspace;
         std::vector<H5::Group> l_groups;
