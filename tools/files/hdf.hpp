@@ -31,6 +31,9 @@
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/algorithm/string.hpp> 
 #include <H5Cpp.h>
+//extern "C" {
+//#include <H5Tpublic.h>
+//}
 
 #include <iostream>
 #include <boost/numeric/ublas/io.hpp>
@@ -43,7 +46,7 @@ namespace machinelearning { namespace tools { namespace files {
     
     namespace ublas  = boost::numeric::ublas;
     
-
+    
     
     /** class for reading and writing the HDF data
      * $LastChangedDate$
@@ -59,40 +62,40 @@ namespace machinelearning { namespace tools { namespace files {
         
         public :
         
-            hdf( const std::string& );
-            hdf( const std::string&, const bool& );
-            ~hdf( void );
+        hdf( const std::string& );
+        hdf( const std::string&, const bool& );
+        ~hdf( void );
         
-            void open( const std::string&, const bool& = false );
-            void flush( void ) const;
-            std::string getFilename( void ) const;
-            std::size_t getFilesize( void ) const;
-            void remove( const std::string& ) const;
-            bool pathexists( const std::string& ) const;
-
+        void open( const std::string&, const bool& = false );
+        void flush( void ) const;
+        std::string getFilename( void ) const;
+        std::size_t getFilesize( void ) const;
+        void remove( const std::string& ) const;
+        bool pathexists( const std::string& ) const;
         
-            template<typename T> ublas::matrix<T> readBlasMatrix( const std::string&, const H5::PredType& ) const;
-            template<typename T> ublas::vector<T> readBlasVector( const std::string&, const H5::PredType& ) const;
         
-            std::string readString( const std::string& ) const;
-            std::vector<std::string> readStringVector( const std::string& ) const;
-
-            
-            template<typename T> void writeBlasMatrix( const std::string&, const ublas::matrix<T>&, const H5::PredType& ) const;
-            template<typename T> void writeBlasVector( const std::string&, const ublas::vector<T>&, const H5::PredType& ) const;
-            template<typename T> void writeValue( const std::string&, const T&, const H5::PredType& ) const;
-            
-            void writeString( const std::string&, const std::string&, const H5::PredType& ) const;
-
+        template<typename T> ublas::matrix<T> readBlasMatrix( const std::string&, const H5::PredType& ) const;
+        template<typename T> ublas::vector<T> readBlasVector( const std::string&, const H5::PredType& ) const;
+        
+        std::string readString( const std::string& ) const;
+        std::vector<std::string> readStringVector( const std::string& ) const;
+        
+        
+        template<typename T> void writeBlasMatrix( const std::string&, const ublas::matrix<T>&, const H5::PredType& ) const;
+        template<typename T> void writeBlasVector( const std::string&, const ublas::vector<T>&, const H5::PredType& ) const;
+        template<typename T> void writeValue( const std::string&, const T&, const H5::PredType& ) const;
+        
+        void writeString( const std::string&, const std::string&, const H5::PredType& ) const;
+        
         
         private :
-
-            /** file handler **/
-            H5::H5File m_file;
-            
-            void createPathWithDataset( const std::string&, const H5::PredType&, const H5::DataSpace&, std::vector<H5::Group>&, H5::DataSet& ) const;
-            void createDataSpace( const std::string&, const H5::PredType&, const ublas::vector<std::size_t>&, H5::DataSpace&, H5::DataSet&, std::vector<H5::Group>& ) const;
-            void closeDataSpace( std::vector<H5::Group>&, H5::DataSet&, H5::DataSpace& ) const;
+        
+        /** file handler **/
+        H5::H5File m_file;
+        
+        void createPathWithDataset( const std::string&, const H5::PredType&, const H5::DataSpace&, std::vector<H5::Group>&, H5::DataSet& ) const;
+        void createDataSpace( const std::string&, const H5::PredType&, const ublas::vector<std::size_t>&, H5::DataSpace&, H5::DataSet&, std::vector<H5::Group>& ) const;
+        void closeDataSpace( std::vector<H5::Group>&, H5::DataSet&, H5::DataSpace& ) const;
         
     };
     
@@ -103,11 +106,11 @@ namespace machinelearning { namespace tools { namespace files {
      * @param p_file filename
      **/
     inline hdf::hdf( const std::string& p_file ) :
-        m_file( p_file.c_str(), H5F_ACC_RDWR )
+    m_file( p_file.c_str(), H5F_ACC_RDWR )
     {
-        #ifdef NDEBUG
+#ifdef NDEBUG
         H5::Exception::dontPrint();
-        #endif
+#endif
     }
     
     
@@ -116,11 +119,11 @@ namespace machinelearning { namespace tools { namespace files {
      * @param p_write bool for clear/create file
      **/
     inline hdf::hdf( const std::string& p_file, const bool& p_write ) :
-        m_file( p_file.c_str(), (p_write ? H5F_ACC_TRUNC : H5F_ACC_RDWR) )
+    m_file( p_file.c_str(), (p_write ? H5F_ACC_TRUNC : H5F_ACC_RDWR) )
     {
-        #ifdef NDEBUG
+#ifdef NDEBUG
         H5::Exception::dontPrint();
-        #endif
+#endif
     }
     
     
@@ -135,7 +138,7 @@ namespace machinelearning { namespace tools { namespace files {
     /** open a file
      * @param p_file filename
      * @param p_write bool for clear/create file
-    **/
+     **/
     inline void hdf::open( const std::string& p_file, const bool& p_write )
     {
         flush();
@@ -143,7 +146,7 @@ namespace machinelearning { namespace tools { namespace files {
         
         m_file = H5::H5File( p_file.c_str(), (p_write ? H5F_ACC_TRUNC : H5F_ACC_RDWR) );
     }
-
+    
     
     /** flushs all data for the file **/
     inline void hdf::flush( void ) const
@@ -178,46 +181,6 @@ namespace machinelearning { namespace tools { namespace files {
     }
     
     
-    /** reads a string array from HDF file into a std::vector
-     * @param p_path path to element
-     * @return std::vector with std::string elements
-     **/
-    inline std::vector<std::string> hdf::readStringVector( const std::string& p_path ) const
-    {
-        H5::DataSet   l_dataset   = m_file.openDataSet( p_path.c_str() );
-        H5::DataSpace l_dataspace = l_dataset.getSpace();
-        
-        // check datasetdimension
-        if (l_dataspace.getSimpleExtentNdims() != 1)
-            throw exception::runtime(_("dataset must be one-dimensional"));
-        if (!l_dataspace.isSimple())
-            throw exception::runtime(_("dataset must be a simple datatype"));
-
-        // the storage size is the whole string array data
-        char l_data[l_dataset.getStorageSize()];
-        l_dataset.read( l_data, l_dataset.getDataType() );
-
-        // seperated char array at the null terminators (the last char can be ignored)
-        // each string element in the array is terminated with \0, after the last \0 
-        // the char array has a non-used char, so the loop runs length-1
-        std::vector<std::string> l_vec;
-        std::string l_str;
-        for(std::size_t i=0; i < l_dataset.getStorageSize()-1; ++i)
-            if (l_data[i] != '\0')
-                l_str += l_data[i];
-            else 
-                if (!l_str.empty()) {
-                    l_vec.push_back(l_str);
-                    l_str.clear();
-                }
-    
-        l_dataspace.close();
-        l_dataset.close();
-
-        return l_vec;
-    }
-    
-    
     /** returns the bool if path exists
      * @note we use the C function, because this is not portet to C++
      * @param p_path path
@@ -227,60 +190,6 @@ namespace machinelearning { namespace tools { namespace files {
     {
         return H5Lexists( m_file.getId(), p_path.c_str(), H5P_DEFAULT );
     }
-    
-    
-    /** read a simple string from file
-     * @param p_path path to dataset
-     * @return string with data
-     * @todo check H5::StrType
-     **/
-    inline std::string hdf::readString( const std::string& p_path ) const
-    {
-        H5::DataSet   l_dataset   = m_file.openDataSet( p_path.c_str() );
-        H5::DataSpace l_dataspace = l_dataset.getSpace();
-        
-        // check datasetdimension
-        if (l_dataspace.getSimpleExtentNdims() != 1)
-            throw exception::runtime(_("dataset must be one-dimensional"));
-        if (!l_dataspace.isSimple())
-            throw exception::runtime(_("dataset must be a simple datatype"));       
-        
-        // read size of chars
-        hsize_t l_strlength = l_dataset.getStorageSize(); 
-        
-        // creates strcutures and read data
-        H5::StrType l_temp(0, l_strlength);
-        char l_chars[l_strlength];
-        l_dataset.read(l_chars, l_temp );
-        
-        l_dataspace.close();
-        l_dataset.close();
-        
-        return std::string(l_chars);
-    }
-    
-    
-    
-    /** writes a simple string to hdf
-     * @param p_path path to dataset
-     * @param p_value string value
-     * @param p_datatype datatype for reading data (see http://www.hdfgroup.org/HDF5/doc/cpplus_RM/classH5_1_1PredType.html )
-     * @warning incomplete
-     **/
-    inline void hdf::writeString( const std::string& p_path, const std::string& p_value, const H5::PredType& p_datatype ) const
-    {
-        H5::DataSet l_dataset;
-        H5::DataSpace l_dataspace;
-        std::vector<H5::Group> l_groups;
-        
-        createDataSpace(p_path, p_datatype, ublas::vector<std::size_t>(1, p_value.size()), l_dataspace, l_dataset, l_groups);
-        
-        // write string
-        l_dataset.write( p_value.c_str(), H5::StrType(l_dataset), l_dataspace  );
-        
-        closeDataSpace(l_groups, l_dataset, l_dataspace);
-    }
-    
     
     
     /** create a path with dataset (path separator is "/")
@@ -340,12 +249,12 @@ namespace machinelearning { namespace tools { namespace files {
      * @param p_path dataset name
      * @param p_datatype datatype for reading data (see http://www.hdfgroup.org/HDF5/doc/cpplus_RM/classH5_1_1PredType.html )
      * @return ublas matrix
-    **/ 
+     **/ 
     template<typename T> inline ublas::matrix<T> hdf::readBlasMatrix( const std::string& p_path, const H5::PredType& p_datatype ) const
     {
         H5::DataSet   l_dataset   = m_file.openDataSet( p_path.c_str() );
         H5::DataSpace l_dataspace = l_dataset.getSpace();
-
+        
         // check datasetdimension
         if (l_dataspace.getSimpleExtentNdims() != 2)
             throw exception::runtime(_("dataset must be two-dimensional"));
@@ -356,7 +265,7 @@ namespace machinelearning { namespace tools { namespace files {
         // (first element is column size, second row size)
         hsize_t l_size[2];
         l_dataspace.getSimpleExtentDims( l_size );
-
+        
         // create temp structur for reading data
         ublas::matrix<T> l_mat(l_size[1],l_size[0]);
         T l_data[l_size[0]][l_size[1]];
@@ -366,7 +275,7 @@ namespace machinelearning { namespace tools { namespace files {
         for(std::size_t i=0; i < l_mat.size1(); ++i)
             for(std::size_t j=0; j < l_mat.size2(); ++j)
                 l_mat(i,j) = l_data[j][i];
-         
+        
         l_dataspace.close();
         l_dataset.close();
         return l_mat;
@@ -378,7 +287,7 @@ namespace machinelearning { namespace tools { namespace files {
      * @param p_path dataset path & name
      * @param p_datatype datatype for reading data
      * @return ublas matrix
-    **/ 
+     **/ 
     template<typename T> inline ublas::vector<T> hdf::readBlasVector( const std::string& p_path, const H5::PredType& p_datatype ) const
     {
         H5::DataSet   l_dataset   = m_file.openDataSet( p_path.c_str() );
@@ -409,12 +318,126 @@ namespace machinelearning { namespace tools { namespace files {
     }
     
     
+    /** reads a string array from HDF file into a std::vector
+     * @param p_path path to element
+     * @return std::vector with std::string elements
+     * @todo use StrType for extracting data / iterating over vector data
+     **/
+    inline std::vector<std::string> hdf::readStringVector( const std::string& p_path ) const
+    {
+        H5::DataSet   l_dataset   = m_file.openDataSet( p_path.c_str() );
+        H5::DataSpace l_dataspace = l_dataset.getSpace();
+        
+        // check datasetdimension
+        if (l_dataspace.getSimpleExtentNdims() != 1)
+            throw exception::runtime(_("dataset must be one-dimensional"));
+        if (!l_dataspace.isSimple())
+            throw exception::runtime(_("dataset must be a simple datatype"));
+        
+        // the storage size is the whole string array data
+        char l_data[l_dataset.getStorageSize()];
+        //l_dataset.read(l_data, H5::StrType(0, l_dataset.getStorageSize()) ); <= check if that works
+        l_dataset.read(l_data, l_dataset.getDataType());
+        
+        // seperated char array at the null terminators (the last char can be ignored)
+        // each string element in the array is terminated with \0, after the last \0 
+        // the char array has a non-used char, so the loop runs length-1
+        std::vector<std::string> l_vec;
+        std::string l_str;
+        for(std::size_t i=0; i < l_dataset.getStorageSize()-1; ++i)            
+            if (l_data[i] != '\0')
+                l_str += l_data[i];
+            else 
+                if (!l_str.empty()) {
+                    l_vec.push_back(l_str);
+                    l_str.clear();
+                }
+        
+        l_dataspace.close();
+        l_dataset.close();
+        
+        return l_vec;
+    }
+    
+    
+    /** read a simple string from file
+     * @param p_path path to dataset
+     * @return string with data
+     **/
+    inline std::string hdf::readString( const std::string& p_path ) const
+    {
+        H5::DataSet   l_dataset   = m_file.openDataSet( p_path.c_str() );
+        H5::DataSpace l_dataspace = l_dataset.getSpace();
+        
+        // check datasetdimension
+        if (l_dataspace.getSimpleExtentNdims() != 1)
+            throw exception::runtime(_("dataset must be one-dimensional"));
+        if (!l_dataspace.isSimple())
+            throw exception::runtime(_("dataset must be a simple datatype"));       
+        
+        // read size of chars and create dataspace
+        char l_chars[l_dataset.getStorageSize()];
+        l_dataset.read(l_chars, H5::StrType(l_dataset) );
+        
+        l_dataspace.close();
+        l_dataset.close();
+        
+        return std::string(l_chars);
+    }
+    
+    
+    
+    /** writes a simple string to hdf
+     * @param p_path path to dataset
+     * @param p_value string value
+     * @param p_datatype datatype for reading data (see http://www.hdfgroup.org/HDF5/doc/cpplus_RM/classH5_1_1PredType.html )
+     * @warning incomplete
+     **/
+    inline void hdf::writeString( const std::string& p_path, const std::string& p_value, const H5::PredType& p_datatype ) const
+    {
+        //http://www.hdfgroup.org/HDF5/doc/cpplus_RM/classH5_1_1DataType.html
+        
+        hsize_t l_size[1];
+        l_size[0] = 1;
+        
+        H5::DataSpace l_dataspace = H5::DataSpace( 1, l_size );
+        H5::StrType l_str(0, p_value.size()+1);
+        H5::DataSet l_dataset = m_file.createDataSet( p_path.c_str(), l_str, l_dataspace );
+        //std::vector<H5::Group> l_groups;
+        
+        //createDataSpace(p_path, p_datatype, ublas::vector<std::size_t>(1,1), l_dataspace, l_dataset, l_groups);
+        
+        /*
+         DATASET "single" {
+         DATATYPE  H5T_STRING {
+         STRSIZE 7;
+         STRPAD H5T_STR_NULLTERM;
+         CSET H5T_CSET_ASCII;
+         CTYPE H5T_C_S1;
+         }
+         DATASPACE  SIMPLE { ( 1 ) / ( 1 ) }
+         DATA {
+         (0): "single"
+         }
+         }
+         */
+        
+        // set data for the C-string support
+        
+        //l_str.setStrpad( H5T_STR_NULLTERM );
+        
+        // write string
+        l_dataset.write( p_value.c_str(), l_str, l_dataspace  );
+        
+        //closeDataSpace(l_groups, l_dataset, l_dataspace);
+    }
+    
     
     /** write a blas matrix to hdf file
      * @param p_path dataset path & name
      * @param p_dataset matrixdata
      * @param p_datatype datatype for writing data (see http://www.hdfgroup.org/HDF5/doc/cpplus_RM/classH5_1_1PredType.html )
-    **/
+     **/
     template<typename T> inline void hdf::writeBlasMatrix( const std::string& p_path, const ublas::matrix<T>& p_dataset, const H5::PredType& p_datatype ) const
     {        
         H5::DataSet l_dataset;
@@ -442,7 +465,7 @@ namespace machinelearning { namespace tools { namespace files {
      * @param p_path dataset path & name
      * @param p_dataset vectordata
      * @param p_datatype datatype for writing data (see http://www.hdfgroup.org/HDF5/doc/cpplus_RM/classH5_1_1PredType.html )
-    **/
+     **/
     template<typename T> inline void hdf::writeBlasVector( const std::string& p_path, const ublas::vector<T>& p_dataset, const H5::PredType& p_datatype ) const
     {     
         H5::DataSet l_dataset;
@@ -478,10 +501,10 @@ namespace machinelearning { namespace tools { namespace files {
         T l_data[1];
         l_data[0] = p_dataset;
         l_dataset.write( l_data, p_datatype, l_dataspace  );
-
+        
         closeDataSpace(l_groups, l_dataset, l_dataspace);
-     }
-
+    }
+    
     
     /** close the dataspace and the groups in the right order
      * @param p_groups vector with group information
