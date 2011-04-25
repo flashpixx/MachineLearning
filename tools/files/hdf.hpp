@@ -265,8 +265,6 @@ namespace machinelearning { namespace tools { namespace files {
     /** reads a string array from HDF file into a std::vector
      * @param p_path path to element
      * @return std::vector with std::string elements
-     * @todo use StrType for extracting data / iterating over vector data
-     * @bug does not work correctly
      **/
     inline std::vector<std::string> hdf::readStringVector( const std::string& p_path ) const
     {
@@ -278,26 +276,24 @@ namespace machinelearning { namespace tools { namespace files {
             throw exception::runtime(_("dataset must be one-dimensional"));
         if (!l_dataspace.isSimple())
             throw exception::runtime(_("dataset must be a simple datatype"));
-        
+          
         // the storage size is the whole string array data
         char l_data[l_dataset.getStorageSize()];
-        //l_dataset.read(l_data, H5::StrType(0, l_dataset.getStorageSize()) ); <= check if that works
-        l_dataset.read(l_data, l_dataset.getDataType());
         
-        // seperated char array at the null terminators (the last char can be ignored)
-        // each string element in the array is terminated with \0, after the last \0 
-        // the char array has a non-used char, so the loop runs length-1
+        // create a string type of dataset for getting string length of each vector element
+        H5::StrType l_str(l_dataset);
+        l_dataset.read(l_data, l_str);
+        
+        // each element has max l_str.getSize() chars (with \0), so the array will be cut on
+        // each l_str.getSize()-th element ( l_dataset.getStorageSize() = l_str.getSize * number of elements)
         std::vector<std::string> l_vec;
-        std::string l_str;
-        for(std::size_t i=0; i < l_dataset.getStorageSize()-1; ++i)            
-            if (l_data[i] != '\0')
-                l_str += l_data[i];
-            else 
-                if (!l_str.empty()) {
-                    l_vec.push_back(l_str);
-                    l_str.clear();
-                }
-        
+        for(std::size_t i=0; i < l_dataset.getStorageSize(); i += l_str.getSize()) {
+            char l_cut[l_str.getSize()];
+            memcpy( l_cut, &l_data[i], l_str.getSize() * sizeof(char) );
+            
+            l_vec.push_back( l_cut );
+        }
+
         l_dataspace.close();
         l_dataset.close();
         
