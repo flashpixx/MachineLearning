@@ -284,6 +284,10 @@ namespace machinelearning { namespace tools { namespace files {
         H5::StrType l_str(l_dataset);
         l_dataset.read(l_data, l_str);
         
+        // check correct size for avoid wrong memcopy
+        if (l_dataset.getStorageSize() % l_str.getSize() != 0)
+            throw exception::runtime(_("block size can not seperated by the string length"));
+        
         // each element has max l_str.getSize() chars (with \0), so the array will be cut on
         // each l_str.getSize()-th element ( l_dataset.getStorageSize() = l_str.getSize * number of elements)
         std::vector<std::string> l_vec;
