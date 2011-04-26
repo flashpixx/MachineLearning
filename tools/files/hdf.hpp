@@ -32,6 +32,7 @@
 #include <boost/algorithm/string.hpp> 
 #include <H5Cpp.h>
 
+
 #include <iostream>
 #include <boost/numeric/ublas/io.hpp>
 
@@ -80,8 +81,8 @@ namespace machinelearning { namespace tools { namespace files {
         template<typename T> void writeBlasVector( const std::string&, const ublas::vector<T>&, const H5::PredType& ) const;
         template<typename T> void writeValue( const std::string&, const T&, const H5::PredType& ) const;
         
-        void writeString( const std::string&, const std::string& ) const;
-        void writeStringVector( const std::string&, const std::vector<std::string>& ) const;
+        void writeString( const std::string&, const std::string&, const bool& = true ) const;
+        void writeStringVector( const std::string&, const std::vector<std::string>&, const bool& = true ) const;
         
         
         private :
@@ -335,8 +336,9 @@ namespace machinelearning { namespace tools { namespace files {
     /** writes a simple string to hdf
      * @param p_path path to dataset
      * @param p_value string value
+     * @param p_utf8 write the string value with UTF-8 encoding
      **/
-    inline void hdf::writeString( const std::string& p_path, const std::string& p_value ) const
+    inline void hdf::writeString( const std::string& p_path, const std::string& p_value, const bool& p_utf8 ) const
     {
         H5::DataSpace l_dataspace;
         H5::DataSet l_dataset;
@@ -344,7 +346,10 @@ namespace machinelearning { namespace tools { namespace files {
         std::vector<H5::Group> l_groups;
         
         createStringSpace(p_path, ublas::vector<std::size_t>(1,1), p_value.size(), l_dataspace, l_dataset, l_str, l_groups);
- 
+
+        if (p_utf8)
+            l_str.setCset( H5T_CSET_UTF8 );
+        
         // write string
         l_dataset.write( p_value.c_str(), l_str, l_dataspace  );
         
@@ -355,8 +360,9 @@ namespace machinelearning { namespace tools { namespace files {
     /** writes a string vector to hdf
      * @param p_path path to dataset
      * @param p_value string vector
+     * @param p_utf8 write the string value with UTF-8 encoding
      **/
-    inline void hdf::writeStringVector( const std::string& p_path, const std::vector<std::string>& p_value ) const
+    inline void hdf::writeStringVector( const std::string& p_path, const std::vector<std::string>& p_value, const bool& p_utf8 ) const
     {
         if (p_value.size() == 0)
             throw exception::runtime(_("can note write empty data"));
@@ -381,6 +387,10 @@ namespace machinelearning { namespace tools { namespace files {
        
         // create string vector data and write it
         createStringSpace(p_path, ublas::vector<std::size_t>(1, p_value.size()), l_maxstrlen, l_dataspace, l_dataset, l_str, l_groups);
+        
+        if (p_utf8)
+            l_str.setCset( H5T_CSET_UTF8 );
+        
         l_dataset.write( l_data, l_str, l_dataspace  );
         closeSpace(l_groups, l_dataset, l_dataspace);
     }
