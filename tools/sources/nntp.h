@@ -62,7 +62,7 @@ namespace machinelearning { namespace tools { namespace sources {
             };
                 
             nntp( const std::string&, const std::string& = "nntp" );
-            std::map<std::string, std::size_t> getGroupList( void );
+            std::map<std::string, std::size_t> getGroupList( const std::string& = "" );
             std::vector<std::string> getArticleIDs( const std::string& );
             void setGroup( const std::string& );
             void setContent( const content& );
@@ -123,6 +123,7 @@ namespace machinelearning { namespace tools { namespace sources {
             unsigned int send( const std::string&, const bool& = true );
             void throwNNTPError( const unsigned int& ) const;
             std::string getResponseData( const std::string& = "\r\n.\r\n" );
+            std::map<std::string, std::size_t> extractGroupList( const std::string& );
         
     };
 
@@ -231,7 +232,6 @@ namespace machinelearning { namespace tools { namespace sources {
         l_send << p_cmd << "\r\n" ;
         boost::asio::write(m_socket, l_request);
  
-        
         // read the headerline
         m_header = getResponseData("\r\n");
 
@@ -268,26 +268,34 @@ namespace machinelearning { namespace tools { namespace sources {
     }
     
     
-    /** fetchs the active group list
-     * @return map with group names and article count
-     **/
-    inline std::map<std::string, std::size_t> nntp::getGroupList( void )
+    /** read the number of articles within a group
+     * @param p_group name of the group (wildcat allowed)
+     * @return number of articles
+    **/
+    inline std::map<std::string, std::size_t> nntp::getGroupList( const std::string& p_group )
     {
-        send("list active");
-        const std::string l_data = getResponseData();
+        send("list active "+p_group);
+        std::string l_data;
+        if (p_group.empty())
+            l_data = getResponseData();
+        else
+            l_data = m_header;
         
         // seperates the string data (remove fist and last element)
         std::vector<std::string> l_list;
         boost::split( l_list, l_data, boost::is_any_of("\n") );
         l_list.erase( l_list.begin(), l_list.begin()+1 );
-        l_list.erase( l_list.end()-2, l_list.end() );
+        
+        if (p_group.empty())
+            l_list.erase( l_list.end()-2, l_list.end() );
+        else
+            l_list.erase( l_list.end()-1, l_list.end() );
         
         // create group list with number of articles
         std::map<std::string, std::size_t> l_groups;
         for(std::size_t i=0; i < l_list.size(); ++i) {
             std::vector<std::string> l_data;
             boost::split( l_data, l_list[i], boost::is_any_of(" ") );
-            
             
             if (l_data.size() > 1) {
                 std::size_t l_num = 0;
@@ -299,9 +307,9 @@ namespace machinelearning { namespace tools { namespace sources {
             }
         }
         
-        return l_groups;
+        return l_groups;        
     }
-    
+
     
     /** return the number of articles within a group
      * @param p_group group name
