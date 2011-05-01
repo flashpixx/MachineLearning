@@ -53,6 +53,7 @@ namespace machinelearning { namespace tools { namespace sources {
      * There are no simple C++ interfaces for XML data, so we use the C source within the class. 
      * $LastChangedDate$
      * @see http://tools.ietf.org/html/rfc2616 [old http://tools.ietf.org/html/rfc1945]
+     * @todo add proxy support
      **/
     class wikipedia {
         
