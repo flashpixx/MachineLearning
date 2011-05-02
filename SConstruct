@@ -15,7 +15,7 @@ AddOption("--with-files", dest="withfiles", type="string", nargs=0, action="stor
 AddOption("--create-language", dest="createlang", type="string", nargs=0, action="store", help="reads the data for translation and add them to the different language files")
 AddOption("--compile-language", dest="compilelang", type="string", nargs=0, action="store", help="compiles the language files")
 AddOption("--create-documentation", dest="createdocu", type="string", nargs=0, action="store", help="creates the doxygen documentation (doxygen must be within the path)")
-
+AddOption("--with-debug", dest="withdebug", type="string", nargs=0, action="store", help="compile with debug information")
 
 #=== function for os configuration ===================================================================================================
 # configuration for OSX build
@@ -31,8 +31,13 @@ def configuration_macosx(config, version, architecture) :
     config["linkerflags"]       = ""
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["LIBRARY_PATH"]
-    config["compileflags"]      = "-O3 -pipe -Wall -pthread -finline-functions -arch "+arch+" -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
+    config["compileflags"]      = "-O3 -pipe -Wall -pthread -finline-functions -arch "+arch+" -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
     config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "boost_filesystem", "ginac", "atlas", "lapack", "ptcblas"]
+
+    if optionExist("withdebug") :
+        config["compileflags"]      += " +g"
+    else :
+        config["compileflags"]      += " -D NDEBUG -D BOOST_UBLAS_NDEBUG"
     
     
     if optionExist("withmpi") :
@@ -65,9 +70,13 @@ def configuration_posix(config, version, architecture) :
     config["linkerflags"]       = ""
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["LIBRARY_PATH"]
-    config["compileflags"]      = "-O3 -pipe -Wall -pthread -finline-functions -D NDEBUG -D BOOST_UBLAS_NDEBUG -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
+    config["compileflags"]      = "-O3 -pipe -Wall -pthread -finline-functions -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
     config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "boost_filesystem", "ginac", "atlas", "lapack", "ptcblas", "ptf77blas"]
     
+    if optionExist("withdebug") :
+        config["compileflags"]      += " +g"
+    else :
+        config["compileflags"]      += " -D NDEBUG -D BOOST_UBLAS_NDEBUG"
     
     if optionExist("withmpi") :
         config["compiler"]          = "mpic++"
