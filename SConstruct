@@ -35,7 +35,7 @@ def configuration_macosx(config, version, architecture) :
     config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "boost_filesystem", "ginac", "atlas", "lapack", "ptcblas"]
 
     if optionExist("withdebug") :
-        config["compileflags"]      += " +g"
+        config["compileflags"]      += " -g"
     else :
         config["compileflags"]      += " -D NDEBUG -D BOOST_UBLAS_NDEBUG"
     
@@ -74,7 +74,7 @@ def configuration_posix(config, version, architecture) :
     config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "boost_filesystem", "ginac", "atlas", "lapack", "ptcblas", "ptf77blas"]
     
     if optionExist("withdebug") :
-        config["compileflags"]      += " +g"
+        config["compileflags"]      += " -g"
     else :
         config["compileflags"]      += " -D NDEBUG -D BOOST_UBLAS_NDEBUG"
     
