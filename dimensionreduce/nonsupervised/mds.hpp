@@ -27,7 +27,10 @@
 
 #include <limits>
 #include <boost/numeric/ublas/matrix.hpp>
-#include <boost/numeric/ublas/matrix_sparse.hpp>
+
+#ifdef MACHINELEARNING_MPI
+#include <boost/mpi.hpp>
+#endif
 
 #include "../dimensionreduce.hpp"
 #include "../../exception/exception.h"
@@ -37,6 +40,9 @@
 namespace machinelearning { namespace dimensionreduce { namespace nonsupervised {
     
     namespace ublas  = boost::numeric::ublas;
+    #ifdef MACHINELEARNING_MPI
+    namespace mpi   = boost::mpi;
+    #endif
     
     
     /** create the multidimensional scaling (MDS) with different algorithms
@@ -66,6 +72,10 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             void setStep( const std::size_t& );
             void setRate( const T& );
             void setCentering( const centeroption& );
+        
+            #ifdef MACHINELEARNING_MPI
+            ublas::matrix<T> map( const mpi::communicator&, const ublas::matrix<T>& );
+            #endif
         
         
         private :
@@ -472,6 +482,17 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         for(std::size_t i=0; i < p_zeros.size(); ++i)
             p_matrix( p_zeros[i].first, p_zeros[i].second ) = static_cast<T>(0);
     }
+    
+    
+    //======= MPI ==================================================================================================================================
+    #ifdef MACHINELEARNING_MPI
+    
+    
+    template<typename T> inline ublas::matrix<T> mds<T>::map( const mpi::communicator&, const ublas::matrix<T>& )
+    {
+    }
+    
+    #endif
     
     
 };};};

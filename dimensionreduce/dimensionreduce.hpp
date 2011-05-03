@@ -111,6 +111,13 @@ namespace machinelearning {
                     /** returns the mapped dimension **/
                     virtual std::size_t getDimension( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
                 
+                    #ifdef MACHINELEARNING_MPI
+                
+                    /** maps data to target dimension **/
+                    virtual ublas::matrix<T> map( const mpi::communicator&, const ublas::matrix<T>&, const std::vector<L>& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
+                
+                    #endif
+                
                 protected :
                 
                     /** destructor **/
