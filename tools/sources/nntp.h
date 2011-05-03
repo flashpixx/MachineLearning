@@ -164,7 +164,10 @@ namespace machinelearning { namespace tools { namespace sources {
     /** destructor for closing the connection **/
     inline nntp::~nntp( void )
     {
-        send("quit");
+        // we send the quit command, but no exception should be thrown,
+        // because we don't know the connection status of the server
+        // (the server can close the connection before)
+        send("quit", false);
         m_socket.close();
     }
     
@@ -213,7 +216,7 @@ namespace machinelearning { namespace tools { namespace sources {
             case 500 : throw exception::runtime(_("command not recognized"));               
             case 501 : throw exception::runtime(_("command syntax error"));                 
             case 502 : throw exception::runtime(_("access restriction or permission denied")); 
-            case 503 : throw exception::runtime(_("program fault"));                           
+            case 503 : throw exception::runtime(_("service is not available"));                           
         }
     }
     
