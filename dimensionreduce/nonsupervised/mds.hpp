@@ -97,10 +97,15 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             ublas::matrix<T> project_metric( const ublas::matrix<T>& );
             ublas::matrix<T> project_sammon( const ublas::matrix<T>& );
             ublas::matrix<T> project_hit( const ublas::matrix<T>& );
-            
+        
             ublas::matrix<T> sammon_distance( const ublas::matrix<T>& ) const;
             T sammon_calculateQuantizationError( const ublas::matrix<T>&, const ublas::matrix<T>& ) const;
             void hit_setZeros(const std::vector< std::pair<std::size_t, std::size_t> >&, ublas::matrix<T>& ) const;
+        
+            #ifdef MACHINELEARNING_MPI
+            ublas::matrix<T> project_hit( const mpi::communicator&, const ublas::matrix<T>& );
+            #endif
+        
     };
     
     
@@ -118,20 +123,6 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     {
         if (p_dim == 0)
             throw exception::runtime(_("dimension must be greater than zero"));
-
-        // set default values for centering
-        switch (m_type) {
-                
-            case metric :
-                m_centering = doublecenter;
-                break;
-                
-            case sammon :
-                m_centering = singlecenter;
-                break;
-                
-            default : break;
-        }
     }
     
     
@@ -213,10 +204,10 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                 return project_metric( 1.0/l_data.size1() * ublas::prod(l_data, ublas::trans(l_data)) );
             
             case sammon:
-                return project_sammon(p_data);
+                return project_sammon(l_data);
                 
             case hit :
-                return project_hit(p_data);
+                return project_hit(l_data);
                        
             default :
                 throw exception::runtime(_("project option is unkown"));
@@ -488,8 +479,44 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     #ifdef MACHINELEARNING_MPI
     
     
-    template<typename T> inline ublas::matrix<T> mds<T>::map( const mpi::communicator&, const ublas::matrix<T>& )
+    /** caluate and project the input data
+     * @param p_mpi MPI object for communication
+     * @param p_data input datamatrix (dissimilarity matrix)
+     **/
+    template<typename T> inline ublas::matrix<T> mds<T>::map( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data )
     {
+        // centering works only on non-mpi-use because we 
+        if ( (m_centering == singlecenter) || (m_centering == doublecenter) )
+            throw exception::runtime(_("centering can not be used with MPI"));
+        
+        // check matrix dimension over all cores
+        
+        // do project
+        switch (m_type) {
+                
+            case hit :
+                return project_hit(p_mpi, p_data);
+                
+            default :
+                throw exception::runtime(_("MPI project option is unkown"));
+                
+        };
+    }
+    
+    
+    /** caluate the High-Throughput Dimensional Scaling (HIT-MDS) with MPI
+     * @todo optimize matrix with temporary assignment
+     * @note the actual position of data points is dependent on the template type of the class, because the accuracy of the type of influence on the optimization
+     * @see http://dig.ipk-gatersleben.de/hitmds/hitmds.html
+     * @param p_data input datamatrix (dissimilarity matrix)
+     * @return mapped data
+     **/
+    template<typename T> inline ublas::matrix<T> mds<T>::project_hit( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data )
+    {
+        ublas::matrix<T> l_target = tools::matrix::random( p_data.size1(), m_dim, tools::random::uniform, static_cast<T>(-1), static_cast<T>(1) );
+    
+    
+        return l_target;
     }
     
     #endif
