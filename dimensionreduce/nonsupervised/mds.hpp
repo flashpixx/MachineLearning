@@ -373,8 +373,8 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             throw exception::runtime(_("data matrix has only zero entries"));
         
         ublas::matrix<T> l_data = p_data;
-        const T l_datainv   = static_cast<T>(1) / (l_data.size1() * l_data.size2() - l_zeros.size());
-        const T l_mnD       = l_datainv * ublas::sum( tools::matrix::sum(l_data) );
+        const T l_datainv       = static_cast<T>(1) / (l_data.size1() * l_data.size2() - l_zeros.size());
+        const T l_mnD           = l_datainv * ublas::sum( tools::matrix::sum(l_data) );
         
         for(std::size_t i=0; i < l_data.size1(); ++i)
             for(std::size_t j=0; j < l_data.size2(); ++j)
@@ -419,7 +419,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             T l_miT = ublas::sum( tools::matrix::sum( l_el1 ) ); 
             T l_moT = ublas::sum( tools::matrix::sum( l_el2 ) );
             
-            const T l_F   = static_cast<T>(2) / (std::fabs(l_miT) +  std::fabs(l_moT));
+            const T l_F   = static_cast<T>(2) / (std::fabs(l_miT) + std::fabs(l_moT));
             l_miT *= l_F;
             l_moT *= l_F;
             
@@ -481,7 +481,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     
     /** caluate and project the input data
      * @param p_mpi MPI object for communication
-     * @param p_data input datamatrix (dissimilarity matrix)
+     * @param p_data input datamatrix (dissimilarity matrix), over all cores the matrix must be square (the matrix is cutted in column parts)
      **/
     template<typename T> inline ublas::matrix<T> mds<T>::map( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data )
     {
@@ -489,7 +489,14 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         if ( (m_centering == singlecenter) || (m_centering == doublecenter) )
             throw exception::runtime(_("centering can not be used with MPI"));
         
-        // check matrix dimension over all cores
+        // we check data dimension (data matrix over all CPUs must be squared and the column size of
+        // the prototype matrix must be equal to the data size)
+        std::size_t l_col      = 0;
+        mpi::all_reduce(p_mpi, p_data.size2(), l_col, std::plus<std::size_t>());
+        
+        if (l_col != p_data.size1())
+            throw exception::runtime(_("matrix must be square"));
+
         
         // do project
         switch (m_type) {
@@ -513,7 +520,93 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
      **/
     template<typename T> inline ublas::matrix<T> mds<T>::project_hit( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data )
     {
-        ublas::matrix<T> l_target = tools::matrix::random( p_data.size1(), m_dim, tools::random::uniform, static_cast<T>(-1), static_cast<T>(1) );
+        // sync global data
+        const std::size_t l_iterationsMPI = mpi::all_reduce(p_mpi, m_iteration, mpi::maximum<std::size_t>());
+        const std::size_t l_dimensionMPI  = mpi::all_reduce(p_mpi, m_dim, mpi::maximum<std::size_t>());
+        const T l_rateMPI                 = mpi::all_reduce(p_mpi, m_rate, mpi::maximum<T>());
+        
+        
+        ublas::matrix<T> l_target = tools::matrix::random( p_data.size2(), l_dimensionMPI, tools::random::uniform, static_cast<T>(-1), static_cast<T>(1) );
+        
+        // count zero elements
+        std::vector< std::pair<std::size_t, std::size_t> > l_zeros;
+        for(std::size_t i=0; i < p_data.size1(); ++i)
+            for(std::size_t j=0; j < p_data.size2(); ++j)
+                if (tools::function::isNumericalZero(p_data(i,j)))
+                    l_zeros.push_back( std::pair<std::size_t, std::size_t>(i,j) );
+        
+        // create init matrix and values
+        std::size_t l_numzeros = 0;
+        mpi::all_reduce(p_mpi, l_zeros.size(), l_numzeros, std::plus<std::size_t>());
+        if (l_numzeros == p_data.size1() * p_data.size2())
+            throw exception::runtime(_("data matrix has only zero entries"));
+        
+        T l_help                = static_cast<T>(0);
+        ublas::matrix<T> l_data = p_data;
+        mpi::all_reduce(p_mpi, ublas::sum( tools::matrix::sum(l_data) ), l_help, std::plus<T>());
+        const T l_datainv       = static_cast<T>(1) / (l_data.size1() * l_data.size1() - l_numzeros);
+        const T l_mnD           = l_datainv * l_help;
+        
+        for(std::size_t i=0; i < l_data.size1(); ++i)
+            for(std::size_t j=0; j < l_data.size2(); ++j)
+                if (i != j)
+                    l_data(i,j) -= l_mnD;
+        hit_setZeros(l_zeros, l_data);
+        
+        // optimize
+        for(std::size_t i=0; i < l_iterationsMPI; ++i) {
+            
+            // create pairs of differences between optimized points and data
+            ublas::matrix<T> l_tmp(l_data.size1(), l_data.size2(), static_cast<T>(0));
+            for(std::size_t j=0; j < l_dimensionMPI; ++j) {
+                
+                // create a matrix with rows of the j-th column
+                ublas::matrix<T> l_row = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, j)), tools::matrix::row );
+                // create a matrix with columns of the j-th column
+                ublas::matrix<T> l_col = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, j)), tools::matrix::column );
+                
+                l_col -= l_row;
+                l_tmp += ublas::element_prod(l_col, l_col);
+            }
+            
+            // optimize cost function
+            hit_setZeros(l_zeros, l_tmp);
+            for(std::size_t j=0; j < l_tmp.size1(); ++j)
+                for(std::size_t n=0; n < l_tmp.size2(); ++n)
+                    l_tmp(j,n) = std::sqrt( l_tmp(j,n) );
+            
+            l_help = static_cast<T>(0);
+            mpi::all_reduce(p_mpi, ublas::sum( tools::matrix::sum(l_tmp) ), l_help, std::plus<T>());
+            const T l_mnT = l_datainv * l_help;
+            
+            for(std::size_t j=0; j < l_tmp.size1(); ++j)
+                for(std::size_t n=0; n < l_tmp.size2(); ++n)
+                    l_tmp(j,n) -= l_mnT;
+            hit_setZeros(l_zeros, l_tmp);
+            
+            
+            // create adaption values
+            const ublas::matrix<T> l_el1 = ublas::element_prod(l_tmp, l_data);
+            const ublas::matrix<T> l_el2 = ublas::element_prod(l_tmp, l_tmp);
+            
+            T l_miT = static_cast<T>(0);
+            T l_moT = static_cast<T>(0);
+            mpi::all_reduce(p_mpi, ublas::sum( tools::matrix::sum( l_el1 ) ), l_miT, std::plus<T>());
+            mpi::all_reduce(p_mpi, ublas::sum( tools::matrix::sum( l_el2 ) ), l_miT, std::plus<T>());
+            
+            const T l_F   = static_cast<T>(2) / (std::fabs(l_miT) + std::fabs(l_moT));
+            l_miT *= l_F;
+            l_moT *= l_F;
+            
+            // calculate update strength parts
+            ublas::matrix<T> l_strength = l_tmp * l_miT - l_data * l_moT;
+            
+            for(std::size_t j=0; j < l_tmp.size1(); ++j)
+                for(std::size_t n=0; n < l_tmp.size2(); ++n)
+                    l_tmp(j,n) += static_cast<T>(0.1) + l_mnT;
+            
+            l_strength = ublas::element_div(l_strength, l_tmp);
+        }
     
     
         return l_target;
