@@ -419,9 +419,9 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             T l_miT = ublas::sum( tools::matrix::sum( l_el1 ) ); 
             T l_moT = ublas::sum( tools::matrix::sum( l_el2 ) );
             
-            const T l_F   = static_cast<T>(2) / (std::fabs(l_miT) + std::fabs(l_moT));
-            l_miT *= l_F;
-            l_moT *= l_F;
+            const T l_F  = static_cast<T>(2) / (std::fabs(l_miT) + std::fabs(l_moT));
+            l_miT       *= l_F;
+            l_moT       *= l_F;
             
             // calculate update strength parts
             ublas::matrix<T> l_strength = l_tmp * l_miT - l_data * l_moT;
@@ -434,7 +434,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             
 
             // calculate update strength of the points
-            ublas::matrix<T> l_adapt = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, m_dim-1)), tools::matrix::column ) - tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, m_dim-1)), tools::matrix::row );;
+            ublas::matrix<T> l_adapt = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, m_dim-1)), tools::matrix::column ) - tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, m_dim-1)), tools::matrix::row );
             l_adapt = ublas::element_prod(l_adapt, l_strength);
 
             ublas::matrix<T> l_update(l_target.size1(), l_target.size2(), static_cast<T>(0));
@@ -594,9 +594,9 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             mpi::all_reduce(p_mpi, ublas::sum( tools::matrix::sum( l_el1 ) ), l_miT, std::plus<T>());
             mpi::all_reduce(p_mpi, ublas::sum( tools::matrix::sum( l_el2 ) ), l_miT, std::plus<T>());
             
-            const T l_F   = static_cast<T>(2) / (std::fabs(l_miT) + std::fabs(l_moT));
-            l_miT *= l_F;
-            l_moT *= l_F;
+            const T l_F  = static_cast<T>(2) / (std::fabs(l_miT) + std::fabs(l_moT));
+            l_miT       *= l_F;
+            l_moT       *= l_F;
             
             // calculate update strength parts
             ublas::matrix<T> l_strength = l_tmp * l_miT - l_data * l_moT;
@@ -606,6 +606,33 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                     l_tmp(j,n) += static_cast<T>(0.1) + l_mnT;
             
             l_strength = ublas::element_div(l_strength, l_tmp);
+            
+            
+            // calculate update strength of the points
+            ublas::matrix<T> l_adapt = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, m_dim-1)), tools::matrix::column ) - tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, m_dim-1)), tools::matrix::row );
+            l_adapt = ublas::element_prod(l_adapt, l_strength);
+            
+            ublas::matrix<T> l_update(l_target.size1(), l_target.size2(), static_cast<T>(0));
+            ublas::column(l_update, m_dim-1) = tools::matrix::sum(l_adapt, tools::matrix::column);
+            
+            for(std::size_t j=0; j < m_dim-1; ++j) {
+                // create a matrix with rows of the j-th column
+                ublas::matrix<T> l_row = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, j)), tools::matrix::row );
+                // create a matrix with columns of the j-th column
+                ublas::matrix<T> l_col = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, j)), tools::matrix::column );
+                
+                l_col -= l_row;
+                l_col  = ublas::element_prod(l_col, l_strength);
+                
+                ublas::column(l_update, j) = tools::matrix::sum(l_col, tools::matrix::column);
+            }
+            
+            // create new target points
+            const T l_rate = m_rate * (m_iteration-i) * static_cast<T>(0.25) * (static_cast<T>(1) + (m_iteration-i)%2) / m_iteration;
+            
+            for(std::size_t j=0; j < l_target.size1(); ++j)
+                for(std::size_t n=0; n < l_target.size2(); ++n)
+                    l_target(j,n) += l_rate * l_update(j,n) / std::sqrt(std::fabs(l_update(j,n))+static_cast<T>(0.001));
         }
     
     
