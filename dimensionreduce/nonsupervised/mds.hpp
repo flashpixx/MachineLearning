@@ -601,7 +601,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             T l_miT = static_cast<T>(0);
             T l_moT = static_cast<T>(0);
             mpi::all_reduce(p_mpi, ublas::sum( tools::matrix::sum( l_el1 ) ), l_miT, std::plus<T>());
-            mpi::all_reduce(p_mpi, ublas::sum( tools::matrix::sum( l_el2 ) ), l_miT, std::plus<T>());
+            mpi::all_reduce(p_mpi, ublas::sum( tools::matrix::sum( l_el2 ) ), l_moT, std::plus<T>());
             
             const T l_F  = static_cast<T>(2) / (std::fabs(l_miT) + std::fabs(l_moT));
             l_miT       *= l_F;
