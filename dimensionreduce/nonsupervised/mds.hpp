@@ -538,18 +538,27 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         // create init matrix and values
         std::size_t l_numzeros = 0;
         mpi::all_reduce(p_mpi, l_zeros.size(), l_numzeros, std::plus<std::size_t>());
-        if (l_numzeros == p_data.size1() * p_data.size2())
+        if (l_numzeros == p_data.size1() * p_data.size1())
             throw exception::runtime(_("data matrix has only zero entries"));
-        
-        T l_help                = static_cast<T>(0);
+    
         ublas::matrix<T> l_data = p_data;
-        mpi::all_reduce(p_mpi, ublas::sum( tools::matrix::sum(l_data) ), l_help, std::plus<T>());
         const T l_datainv       = static_cast<T>(1) / (l_data.size1() * l_data.size1() - l_numzeros);
+    
+        T l_help                = static_cast<T>(0);
+        mpi::all_reduce(p_mpi, ublas::sum( tools::matrix::sum(l_data) ), l_help, std::plus<T>());
         const T l_mnD           = l_datainv * l_help;
+        
+        // detect start position within the full matrix, for setting diagonal values
+        std::vector<std::size_t> l_matrixposition;
+        mpi::all_gather(p_mpi, l_data.size2(), l_matrixposition);
+        std::size_t l_matrixstart = 0;
+        for(std::size_t i=0; i < static_cast<std::size_t>(p_mpi.rank()); ++i)
+            l_matrixstart += l_matrixposition[i];
+                
         
         for(std::size_t i=0; i < l_data.size1(); ++i)
             for(std::size_t j=0; j < l_data.size2(); ++j)
-                if (i != j)
+                if (i != j+l_matrixstart)
                     l_data(i,j) -= l_mnD;
         hit_setZeros(l_zeros, l_data);
         
