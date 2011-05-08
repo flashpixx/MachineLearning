@@ -388,7 +388,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             // create pairs of differences between optimized points and data
             ublas::matrix<T> l_tmp(l_data.size1(), l_data.size2(), static_cast<T>(0));
             for(std::size_t j=0; j < m_dim; ++j) {
-                // create a matrix with rows of the j-th column
+                // create a matrix with columns of the j-th column
                 ublas::matrix<T> l_col = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, j)), tools::matrix::column );
                 
                 l_col -= ublas::trans(l_col);
@@ -565,7 +565,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             // create pairs of differences between optimized points and data (the temp matrix has the size of the input matrix columns)
             ublas::matrix<T> l_tmp(l_data.size2(), l_data.size2(), static_cast<T>(0));
             for(std::size_t j=0; j < l_dimensionMPI; ++j) {
-                // create a matrix with rows of the j-th column
+                // create a matrix with columns of the j-th column
                 ublas::matrix<T> l_col = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, j)), tools::matrix::column );
                 
                 l_col -= ublas::trans(l_col);
