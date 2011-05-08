@@ -565,13 +565,10 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             // create pairs of differences between optimized points and data (the temp matrix has the size of the input matrix columns)
             ublas::matrix<T> l_tmp(l_data.size2(), l_data.size2(), static_cast<T>(0));
             for(std::size_t j=0; j < l_dimensionMPI; ++j) {
-                
                 // create a matrix with rows of the j-th column
-                ublas::matrix<T> l_row = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, j)), tools::matrix::row );
-                // create a matrix with columns of the j-th column
                 ublas::matrix<T> l_col = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, j)), tools::matrix::column );
                 
-                l_col -= l_row;
+                l_col -= ublas::trans(l_col);
                 l_tmp += ublas::element_prod(l_col, l_col);
             }
             
@@ -616,19 +613,17 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             
             
             // calculate update strength of the points
-            ublas::matrix<T> l_adapt = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, l_dimensionMPI-1)), tools::matrix::column ) - tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, l_dimensionMPI-1)), tools::matrix::row );
-            l_adapt = ublas::element_prod(l_adapt, l_strength);
+            ublas::matrix<T> l_adapt = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, m_dim-1)), tools::matrix::column );
+            l_adapt = ublas::element_prod( l_adapt-ublas::trans(l_adapt), l_strength);
             
             ublas::matrix<T> l_update(l_target.size1(), l_target.size2(), static_cast<T>(0));
             ublas::column(l_update, l_dimensionMPI-1) = tools::matrix::sum(l_adapt, tools::matrix::column);
             
             for(std::size_t j=0; j < l_dimensionMPI-1; ++j) {
-                // create a matrix with rows of the j-th column
-                ublas::matrix<T> l_row = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, j)), tools::matrix::row );
                 // create a matrix with columns of the j-th column
                 ublas::matrix<T> l_col = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, j)), tools::matrix::column );
                 
-                l_col -= l_row;
+                l_col -= ublas::trans(l_col);
                 l_col  = ublas::element_prod(l_col, l_strength);
                 
                 ublas::column(l_update, j) = tools::matrix::sum(l_col, tools::matrix::column);
