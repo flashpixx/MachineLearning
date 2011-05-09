@@ -75,6 +75,7 @@ namespace machinelearning { namespace tools {
             template<typename T> static ublas::matrix<T> setNumericalZero( const ublas::matrix<T>&, const T& = 0);
             template<typename T> static ublas::matrix<T> invert( const ublas::matrix<T>&);
             template<typename T> static ublas::matrix<T> repeat( const ublas::vector<T>&, const rowtype& p_which = row);
+            template<typename T> static ublas::matrix<T> repeat( const ublas::vector<T>&, const std::size_t&, const rowtype& p_which = row);
     };
     
     
@@ -425,6 +426,32 @@ namespace machinelearning { namespace tools {
                 
             case column :
                 for(std::size_t i=0; i < p_vec.size(); ++i)
+                    ublas::column(l_mat, i) = p_vec;
+                break;                
+        }
+        
+        return l_mat;
+    }
+    
+    
+    /** repeats a column / row with a vector
+     * @param p_vec input vector
+     * @param p_num number of repeats
+     * @param p_which row / column option (default row)
+     * @return matrix with repeated vector (p_num times)
+     **/
+    template<typename T> inline ublas::matrix<T> matrix::repeat( const ublas::vector<T>& p_vec, const std::size_t& p_num, const rowtype& p_which )
+    {
+        ublas::matrix<T> l_mat( ((p_which == row) ? p_num : p_vec.size()) , ((p_which == column) ? p_num : p_vec.size()) );
+        
+        switch (p_which) {                
+            case row :
+                for(std::size_t i=0; i < p_num; ++i)
+                    ublas::row(l_mat, i) = p_vec;
+                break;
+                
+            case column :
+                for(std::size_t i=0; i < p_num; ++i)
                     ublas::column(l_mat, i) = p_vec;
                 break;                
         }

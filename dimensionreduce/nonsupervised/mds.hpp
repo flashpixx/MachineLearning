@@ -94,16 +94,17 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             centeroption m_centering;
             
             
-            ublas::matrix<T> project_metric( const ublas::matrix<T>& );
-            ublas::matrix<T> project_sammon( const ublas::matrix<T>& );
-            ublas::matrix<T> project_hit( const ublas::matrix<T>& );
+            ublas::matrix<T> project_metric( const ublas::matrix<T>& ) const;
+            ublas::matrix<T> project_sammon( const ublas::matrix<T>& ) const;
+            ublas::matrix<T> project_hit( const ublas::matrix<T>& ) const;
         
             ublas::matrix<T> sammon_distance( const ublas::matrix<T>& ) const;
             T sammon_calculateQuantizationError( const ublas::matrix<T>&, const ublas::matrix<T>& ) const;
             void hit_setZeros(const std::vector< std::pair<std::size_t, std::size_t> >&, ublas::matrix<T>& ) const;
         
             #ifdef MACHINELEARNING_MPI
-            ublas::matrix<T> project_hit( const mpi::communicator&, const ublas::matrix<T>& );
+            ublas::matrix<T> project_hit( const mpi::communicator&, const ublas::matrix<T>& ) const;
+            ublas::vector<T> hit_connectVector( const mpi::communicator&, const ublas::vector<T>& ) const;
             #endif
         
     };
@@ -221,7 +222,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
      * @param p_data input datamatrix (dissimilarity matrix)
      * @return mapped data
      **/
-    template<typename T> inline ublas::matrix<T> mds<T>::project_metric( const ublas::matrix<T>& p_data )
+    template<typename T> inline ublas::matrix<T> mds<T>::project_metric( const ublas::matrix<T>& p_data ) const
     {
         // calculate the eigenvalues & -vectors
         ublas::vector<T> l_eigenvalues;
@@ -249,7 +250,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
      * @param p_data input datamatrix (dissimilarity matrix)
      * @return mapped data
      **/
-    template<typename T> inline ublas::matrix<T> mds<T>::project_sammon( const ublas::matrix<T>& p_data )
+    template<typename T> inline ublas::matrix<T> mds<T>::project_sammon( const ublas::matrix<T>& p_data ) const
     {
         if (m_iteration == 0)
             throw exception::runtime(_("iterations must be greater than zero"));
@@ -357,7 +358,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
      * @param p_data input datamatrix (dissimilarity matrix)
      * @return mapped data
      **/
-    template<typename T> inline ublas::matrix<T> mds<T>::project_hit( const ublas::matrix<T>& p_data )
+    template<typename T> inline ublas::matrix<T> mds<T>::project_hit( const ublas::matrix<T>& p_data ) const
     {
         ublas::matrix<T> l_target = tools::matrix::random( p_data.size1(), m_dim, tools::random::uniform, static_cast<T>(-1), static_cast<T>(1) );
         
@@ -510,10 +511,11 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
      * @todo optimize matrix with temporary assignment
      * @note the actual position of data points is dependent on the template type of the class, because the accuracy of the type of influence on the optimization
      * @see http://dig.ipk-gatersleben.de/hitmds/hitmds.html
+     * @param p_mpi MPI object for communication
      * @param p_data input datamatrix (dissimilarity matrix)
      * @return mapped data
      **/
-    template<typename T> inline ublas::matrix<T> mds<T>::project_hit( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data )
+    template<typename T> inline ublas::matrix<T> mds<T>::project_hit( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data ) const
     {
         // sync global data
         const std::size_t l_iterationsMPI = mpi::all_reduce(p_mpi, m_iteration, mpi::maximum<std::size_t>());
@@ -563,12 +565,19 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         for(std::size_t i=0; i < l_iterationsMPI; ++i) {
             
             // create pairs of differences between optimized points and data (the temp matrix has the size of the input matrix columns)
-            ublas::matrix<T> l_tmp(l_data.size2(), l_data.size2(), static_cast<T>(0));
+            ublas::matrix<T> l_tmp(l_data.size2(), l_data.size1(), static_cast<T>(0));
             for(std::size_t j=0; j < l_dimensionMPI; ++j) {
-                // create a matrix with columns of the j-th column
-                ublas::matrix<T> l_col = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, j)), tools::matrix::column );
                 
-                l_col -= ublas::trans(l_col);
+                // reads over all processes the column of the target matrix
+                const ublas::vector<T> l_row = hit_connectVector( p_mpi, static_cast< ublas::vector<T> >(ublas::column(l_target, j)) );
+                
+                // create a matrix with columns of the j-th column
+                ublas::matrix<T> l_col      = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, j)), l_row.size(), tools::matrix::column );
+                
+                // do subtract (equiv the subtract with transpose)
+                for(std::size_t n=0; n < l_col.size1(); ++n)
+                    ublas::row(l_col, n) -= l_row;
+                
                 l_tmp += ublas::element_prod(l_col, l_col);
             }
             
@@ -654,6 +663,29 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         }
     
         return l_fulltarget;
+    }
+    
+    
+    /** connects a vector over all processes and return the full vector
+     * @param p_mpi MPI object for communication
+     * @param p_vec input vector
+     * @return full vecotr
+     **/
+    template<typename T> inline ublas::vector<T> mds<T>::hit_connectVector( const mpi::communicator& p_mpi, const ublas::vector<T>& p_vec ) const
+    {
+        // gathering vector data
+        std::vector< ublas::vector<T> > l_data;
+        mpi::all_gather(p_mpi, p_vec, l_data);
+        
+        ublas::vector<T> l_vec = l_data[0];
+        for(std::size_t i=1; i < l_data.size(); ++i) {
+            l_vec.resize( l_vec.size() + l_data[i].size() );
+            
+            ublas::vector_range< ublas::vector<T> > l_range( l_vec, ublas::range( l_vec.size()-l_data[i].size(), l_vec.size() ) );
+            l_range.assign( l_data[i] );
+        }    
+        
+        return l_vec;
     }
     
     #endif
