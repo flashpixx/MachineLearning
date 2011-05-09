@@ -105,6 +105,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             #ifdef MACHINELEARNING_MPI
             ublas::matrix<T> project_hit( const mpi::communicator&, const ublas::matrix<T>& ) const;
             ublas::vector<T> hit_connectVector( const mpi::communicator&, const ublas::vector<T>& ) const;
+            std::size_t hit_matrixPosition( const mpi::communicator&, const std::size_t& ) const;
             #endif
         
     };
@@ -548,16 +549,11 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         const T l_mnD           = l_datainv * l_help;
         
         // detect start position within the full matrix, for setting diagonal values
-        std::vector<std::size_t> l_matrixposition;
-        mpi::all_gather(p_mpi, l_data.size2(), l_matrixposition);
-        std::size_t l_matrixstart = 0;
-        for(std::size_t i=0; i < static_cast<std::size_t>(p_mpi.rank()); ++i)
-            l_matrixstart += l_matrixposition[i];
+        const std::size_t l_columnstart = hit_matrixPosition( p_mpi, l_data.size2() );
                 
-        
         for(std::size_t i=0; i < l_data.size1(); ++i)
             for(std::size_t j=0; j < l_data.size2(); ++j)
-                if (i != j+l_matrixstart)
+                if (i != j+l_columnstart)
                     l_data(i,j) -= l_mnD;
         hit_setZeros(l_zeros, l_data);
         
@@ -581,6 +577,9 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                 l_tmp += ublas::element_prod(l_col, l_col);
             }
             
+            // transpose l_temp because we need the same oriantation like l_data (input matrix)
+            l_tmp = ublas::trans(l_tmp);
+            
             // optimize cost function
             hit_setZeros(l_zeros, l_tmp);
             for(std::size_t j=0; j < l_tmp.size1(); ++j)
@@ -589,7 +588,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             
             // the sum must be weighted with the full data size, because the square matrix l_tmp is only the part of the matrix.
             l_help = static_cast<T>(0);
-            mpi::all_reduce(p_mpi, static_cast<T>(l_data.size1()) / static_cast<T>(l_tmp.size1()) * ublas::sum( tools::matrix::sum(l_tmp) ), l_help, std::plus<T>());
+            mpi::all_reduce(p_mpi, ublas::sum( tools::matrix::sum(l_tmp) ), l_help, std::plus<T>());
             const T l_mnT = l_datainv * l_help;
             
             for(std::size_t j=0; j < l_tmp.size1(); ++j)
@@ -686,6 +685,26 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         }    
         
         return l_vec;
+    }
+    
+    
+    /** returns the position within the matrix (over all processes)
+     * @param p_mpi MPI object for communication
+     * @return colum position of the local matrix
+     **/
+    template<typename T> inline std::size_t mds<T>::hit_matrixPosition( const mpi::communicator& p_mpi, const std::size_t& p_col ) const
+    {
+        if (p_mpi.rank() == 0)
+            return 0;
+        
+        std::size_t l_col = 0;
+        std::vector<std::size_t> l_columndata;
+        mpi::all_gather(p_mpi, p_col, l_columndata);
+
+        for(std::size_t i=0; i < static_cast<std::size_t>(p_mpi.rank()); ++i)
+            l_col += l_columndata[i];
+        
+        return l_col;
     }
     
     #endif
