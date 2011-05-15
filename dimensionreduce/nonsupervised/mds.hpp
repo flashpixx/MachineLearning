@@ -564,8 +564,9 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             ublas::matrix<T> l_tmp(l_data.size2(), l_data.size1(), static_cast<T>(0));
             for(std::size_t j=0; j < l_dimensionMPI; ++j) {
                 
-                // reads over all processes the column of the target matrix
-                const ublas::vector<T> l_row = hit_connectVector( p_mpi, static_cast< ublas::vector<T> >(ublas::column(l_target, j)) );
+                // reads over all processes the column of the target matrix and extract the relevant elements
+                ublas::vector<T> l_fullrow = hit_connectVector( p_mpi, static_cast< ublas::vector<T> >(ublas::column(l_target, j)) );
+                const ublas::vector_range< ublas::vector<T> > l_row( l_fullrow, ublas::range( l_columnstart, l_columnstart+l_data.size2() ) );
                 
                 // create a matrix with columns of the j-th column
                 ublas::matrix<T> l_col      = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, j)), l_row.size(), tools::matrix::column );
@@ -634,7 +635,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             l_adapt = ublas::trans(l_adapt);
             l_adapt += ublas::element_prod(l_adapt, l_strength);
             
-            -------
+            //-------
             ublas::matrix<T> l_update(l_target.size1(), l_target.size2(), static_cast<T>(0));
             ublas::column(l_update, l_dimensionMPI-1) = tools::matrix::sum(l_adapt, tools::matrix::column);
             
@@ -649,7 +650,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             }
             
             // create new target points
-            const T l_rate = l_rateMPI * (m_iteration-i) * static_cast<T>(0.25) * (static_cast<T>(1) + (m_iteration-i)%2) / m_iteration;
+            const T l_rate = l_rateMPI * (l_iterationsMPI-i) * static_cast<T>(0.25) * (static_cast<T>(1) + (l_iterationsMPI-i)%2) / l_iterationsMPI;
             
             for(std::size_t j=0; j < l_target.size1(); ++j)
                 for(std::size_t n=0; n < l_target.size2(); ++n)
