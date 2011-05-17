@@ -718,9 +718,6 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
      **/
     template<typename T> inline std::size_t mds<T>::hit_matrixPosition( const mpi::communicator& p_mpi, const std::size_t& p_col ) const
     {
-        if (p_mpi.rank() == 0)
-            return 0;
-        
         std::size_t l_col = 0;
         std::vector<std::size_t> l_columndata;
         mpi::all_gather(p_mpi, p_col, l_columndata);
