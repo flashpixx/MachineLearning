@@ -590,6 +590,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                     ublas::row(l_col, n) -= l_row;
                 
                 std::cout << "CPU " << p_mpi.rank() << "\n" << l_col << std::endl;
+                return l_col;
                 
                 l_tmp += ublas::element_prod(l_col, l_col);
             }
