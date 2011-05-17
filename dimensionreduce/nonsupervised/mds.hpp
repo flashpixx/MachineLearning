@@ -362,6 +362,10 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     template<typename T> inline ublas::matrix<T> mds<T>::project_hit( const ublas::matrix<T>& p_data ) const
     {
         ublas::matrix<T> l_target = tools::matrix::random( p_data.size1(), m_dim, tools::random::uniform, static_cast<T>(-1), static_cast<T>(1) );
+        std::size_t n=0;
+        for(std::size_t i=0; i < l_target.size1(); ++i)
+            for(std::size_t j=0; j < l_target.size2(); ++j)
+                l_target(i,j) = n++;
         
         // count zero elements
         std::vector< std::pair<std::size_t, std::size_t> > l_zeros;
@@ -396,6 +400,9 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                 l_col -= ublas::trans(l_col);
                 l_tmp += ublas::element_prod(l_col, l_col);
             }
+            std::cout << l_tmp << std::endl;
+            return l_tmp;
+            
             
             // optimize cost function
             hit_setZeros(l_zeros, l_tmp);
@@ -523,9 +530,14 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         const std::size_t l_dimensionMPI  = mpi::all_reduce(p_mpi, m_dim, mpi::maximum<std::size_t>());
         const T l_rateMPI                 = mpi::all_reduce(p_mpi, m_rate, mpi::maximum<T>());
         
+        // detect start position within the full matrix, for setting diagonal values
+        const std::size_t l_columnstart = hit_matrixPosition( p_mpi, p_data.size2() );
         
         ublas::matrix<T> l_target = tools::matrix::random( p_data.size2(), l_dimensionMPI, tools::random::uniform, static_cast<T>(-1), static_cast<T>(1) );
-        
+        std::size_t n=0;
+        for(std::size_t i=0; i < l_target.size1(); ++i)
+            for(std::size_t j=0; j < l_target.size2(); ++j)
+                l_target(i,j) = n++;
         
         
         // count zero elements
@@ -548,9 +560,6 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         mpi::all_reduce(p_mpi, ublas::sum( tools::matrix::sum(l_data) ), l_help, std::plus<T>());
         const T l_mnD           = l_datainv * l_help;
         
-        // detect start position within the full matrix, for setting diagonal values
-        const std::size_t l_columnstart = hit_matrixPosition( p_mpi, l_data.size2() );
-                
         for(std::size_t i=0; i < l_data.size1(); ++i)
             for(std::size_t j=0; j < l_data.size2(); ++j)
                 if (i != j+l_columnstart)
@@ -577,6 +586,8 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                 
                 l_tmp += ublas::element_prod(l_col, l_col);
             }
+            std::cout << "CPU " << p_mpi.rank() << "\n" << l_tmp << std::endl;
+            return l_tmp;
             
             // transpose l_temp because we need the same oriantation like l_data (input matrix)
             l_tmp = ublas::trans(l_tmp);
