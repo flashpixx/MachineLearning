@@ -539,7 +539,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         std::size_t n=0;
         for(std::size_t i=0; i < l_target.size1(); ++i)
             for(std::size_t j=0; j < l_target.size2(); ++j)
-                l_target(i,j) = l_columnstart+n++;
+                l_target(i,j) = l_columnstart*l_dimensionMPI+n++;
         std::cout << "CPU " << p_mpi.rank() << "\n" << l_target << std::endl;
         return l_target;
         
