@@ -366,7 +366,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         for(std::size_t i=0; i < l_target.size1(); ++i)
             for(std::size_t j=0; j < l_target.size2(); ++j)
                 l_target(i,j) = n++;
-        std::cout << "single\n" l_target << std::endl;
+        std::cout << "single\n" << l_target << std::endl;
         return l_target;
         
         // count zero elements
