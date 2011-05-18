@@ -400,10 +400,6 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                 ublas::matrix<T> l_col = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, j)), tools::matrix::column );
                 
                 l_col -= ublas::trans(l_col);
-                std::cout << l_col << std::endl;
-                return l_col;
-                
-                
                 l_tmp += ublas::element_prod(l_col, l_col);
             }
             std::cout << l_tmp << std::endl;
@@ -581,8 +577,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             for(std::size_t j=0; j < l_dimensionMPI; ++j) {
                 
                 // reads over all processes the column of the target matrix and extract the relevant elements
-                ublas::vector<T> l_fullrow = hit_connectVector( p_mpi, static_cast< ublas::vector<T> >(ublas::column(l_target, j)) );
-                //const ublas::vector_range< ublas::vector<T> > l_row( l_fullrow, ublas::range( l_columnstart, l_columnstart+l_data.size2() ) );
+                const ublas::vector<T> l_fullrow = hit_connectVector( p_mpi, static_cast< ublas::vector<T> >(ublas::column(l_target, j)) );
                 
                 // create a matrix with columns of the j-th column
                 ublas::matrix<T> l_col      = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, j)), l_data.size1(), tools::matrix::column );
@@ -591,9 +586,6 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                 for(std::size_t n=0; n < l_col.size1(); ++n)
                     ublas::row(l_col, n) -= l_fullrow;
 
-                std::cout << "CPU " << p_mpi.rank() << "\n" << l_col << std::endl;
-                return l_col;
-                
                 l_tmp += ublas::element_prod(l_col, l_col);
             }
             std::cout << "CPU " << p_mpi.rank() << "\n" << l_tmp << std::endl;
