@@ -440,8 +440,8 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
 
             // calculate update strength of the points
             ublas::matrix<T> l_adapt = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, m_dim-1)), tools::matrix::column );
-            //l_adapt = ublas::element_prod( l_adapt-ublas::trans(l_adapt), l_strength);
-            l_adapt -= ublas::trans(l_adapt);
+            l_adapt = ublas::element_prod( l_adapt-ublas::trans(l_adapt), l_strength);
+          
             std::cout << l_adapt << std::endl;
             return l_adapt;  
 
@@ -642,11 +642,10 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             for(std::size_t n=0; n < l_adapt.size1(); ++n)
                 ublas::row(l_adapt, n) -= l_fullrow;
             
-            std::cout << "CPU " << p_mpi.rank() << "\n" << l_adapt << std::endl;
-            
             // transpose l_temp because we need the same oriantation like l_data (input matrix)
-            l_adapt += ublas::element_prod(l_adapt, ublas::trans(l_strength));
+            l_adapt = ublas::element_prod(l_adapt, ublas::trans(l_strength));
             
+             std::cout << "CPU " << p_mpi.rank() << "\n" << l_adapt << std::endl;
             
             return l_adapt;
             
