@@ -400,7 +400,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                 ublas::matrix<T> l_col = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, j)), tools::matrix::column );
                 
                 //l_col -= ublas::trans(l_col);
-                //std::cout << l_col << std::endl;
+                std::cout << l_col << std::endl;
                 return l_col;
                 
                 
@@ -587,7 +587,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                 // create a matrix with columns of the j-th column
                 ublas::matrix<T> l_col      = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, j)), l_row.size(), tools::matrix::column );
                 
-                //std::cout << "CPU " << p_mpi.rank() << "\n" << l_col << std::endl;
+                std::cout << "CPU " << p_mpi.rank() << "\n" << l_col << std::endl;
                 return l_col;
                 
                 // do subtract (equiv the subtract with transpose)
