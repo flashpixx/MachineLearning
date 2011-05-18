@@ -422,7 +422,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             
             T l_miT = ublas::sum( tools::matrix::sum( l_el1 ) ); 
             T l_moT = ublas::sum( tools::matrix::sum( l_el2 ) );
-            std::cout << l_miT << "\n" << l_moT << std::endl;
+ 
             const T l_F  = static_cast<T>(2) / (std::fabs(l_miT) + std::fabs(l_moT));
             l_miT       *= l_F;
             l_moT       *= l_F;
@@ -430,7 +430,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             // calculate update strength parts
             ublas::matrix<T> l_strength = l_tmp * l_miT - l_data * l_moT;
             
-            //std::cout << l_tmp << std::endl;
+            std::cout << l_tmp << std::endl;
             return l_tmp;
             
             for(std::size_t j=0; j < l_tmp.size1(); ++j)
@@ -617,8 +617,6 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             mpi::all_reduce(p_mpi, ublas::sum( tools::matrix::sum( l_el1 ) ), l_miT, std::plus<T>());
             mpi::all_reduce(p_mpi, ublas::sum( tools::matrix::sum( l_el2 ) ), l_moT, std::plus<T>());
             
-            std::cout << "CPU " << p_mpi.rank() << "\n" << l_miT << "\n" << l_moT << std::endl;
-            
             const T l_F  = static_cast<T>(2) / (std::fabs(l_miT) + std::fabs(l_moT));
             l_miT       *= l_F;
             l_moT       *= l_F;
@@ -626,7 +624,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             // calculate update strength parts
             ublas::matrix<T> l_strength = l_tmp * l_miT - l_data * l_moT;
             
-            //std::cout << "CPU " << p_mpi.rank() << "\n" << l_strength << std::endl;
+            std::cout << "CPU " << p_mpi.rank() << "\n" << l_strength << std::endl;
             return l_tmp;
             
             for(std::size_t j=0; j < l_tmp.size1(); ++j)
