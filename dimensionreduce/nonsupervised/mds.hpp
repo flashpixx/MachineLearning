@@ -427,14 +427,9 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             l_miT       *= l_F;
             l_moT       *= l_F;
             
-            //std::cout << "tmp: " << l_tmp << std::endl;
-            //std::cout << "\n\ndata: " << l_data << std::endl;
             
             // calculate update strength parts
             ublas::matrix<T> l_strength = l_tmp * l_miT - l_data * l_moT;
-            
-            std::cout << l_strength << std::endl;
-            return l_tmp;
             
             for(std::size_t j=0; j < l_tmp.size1(); ++j)
                 for(std::size_t n=0; n < l_tmp.size2(); ++n)
@@ -442,6 +437,9 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             
             l_strength = ublas::element_div(l_strength, l_tmp);
             
+            
+            std::cout << l_strength << std::endl;
+            return l_tmp;            
 
             // calculate update strength of the points
             ublas::matrix<T> l_adapt = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, m_dim-1)), tools::matrix::column );
@@ -624,20 +622,17 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             l_miT       *= l_F;
             l_moT       *= l_F;
             
-            //std::cout << "CPU " << p_mpi.rank() << "tmp: " << l_tmp << std::endl;
-            //std::cout << "CPU " << p_mpi.rank() << "\n\ndata: " << l_data << std::endl;
-            
             // calculate update strength parts
             ublas::matrix<T> l_strength = l_tmp * l_miT - l_data * l_moT;
-            
-            std::cout << "CPU " << p_mpi.rank() << "\n" << l_strength << std::endl;
-            return l_tmp;
             
             for(std::size_t j=0; j < l_tmp.size1(); ++j)
                 for(std::size_t n=0; n < l_tmp.size2(); ++n)
                     l_tmp(j,n) += static_cast<T>(0.1) + l_mnT;
             
             l_strength = ublas::element_div(l_strength, l_tmp);
+
+            std::cout << "CPU " << p_mpi.rank() << "\n" << l_strength << std::endl;
+            return l_tmp;
             
     
             // calculate update strength of the points - reads over all processes the column of the target matrix
