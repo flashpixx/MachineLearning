@@ -388,8 +388,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                 if (i != j)
                     l_data(i,j) -= l_mnD;
         hit_setZeros(l_zeros, l_data);
-        
-        std::cout << l_target << std::endl;
+
         
         // optimize
         for(std::size_t i=0; i < m_iteration; ++i) {
@@ -573,7 +572,6 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                     l_data(i,j) -= l_mnD;
         hit_setZeros(l_zeros, l_data);
         
-        std::cout << "CPU " << p_mpi.rank() << " ->\n" << l_target << "\n\n" << std::endl;
         
         // optimize
         for(std::size_t i=0; i < l_iterationsMPI; ++i) {
