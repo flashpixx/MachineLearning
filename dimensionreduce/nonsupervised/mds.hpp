@@ -402,9 +402,6 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                 l_col -= ublas::trans(l_col);
                 l_tmp += ublas::element_prod(l_col, l_col);
             }
-            std::cout << l_tmp << std::endl;
-            return l_tmp;
-            
             
             // optimize cost function
             hit_setZeros(l_zeros, l_tmp);
@@ -419,6 +416,8 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                     l_tmp(j,n) -= l_mnT;
             hit_setZeros(l_zeros, l_tmp);
             
+            std::cout << l_tmp << std::endl;
+            return l_tmp;
             
             // create adaption values
             const ublas::matrix<T> l_el1 = ublas::element_prod(l_tmp, l_data);
@@ -588,8 +587,6 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
 
                 l_tmp += ublas::element_prod(l_col, l_col);
             }
-            std::cout << "CPU " << p_mpi.rank() << "\n" << l_tmp << std::endl;
-            return l_tmp;
             
             // transpose l_temp because we need the same oriantation like l_data (input matrix)
             l_tmp = ublas::trans(l_tmp);
@@ -610,6 +607,8 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                     l_tmp(j,n) -= l_mnT;
             hit_setZeros(l_zeros, l_tmp);
             
+            std::cout << "CPU " << p_mpi.rank() << "\n" << l_tmp << std::endl;
+            return l_tmp;
             
             // create adaption values
             const ublas::matrix<T> l_el1 = ublas::element_prod(l_tmp, l_data);
