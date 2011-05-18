@@ -596,7 +596,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                 
                 l_tmp += ublas::element_prod(l_col, l_col);
             }
-            std::cout << "CPU " << p_mpi.rank() << "\n" << l_fullrow << std::endl;
+            std::cout << "CPU " << p_mpi.rank() << "\n" << l_tmp << std::endl;
             return l_tmp;
             
             // transpose l_temp because we need the same oriantation like l_data (input matrix)
