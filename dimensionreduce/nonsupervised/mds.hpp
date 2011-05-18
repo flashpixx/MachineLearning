@@ -427,8 +427,8 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             l_miT       *= l_F;
             l_moT       *= l_F;
             
-            std::cout << << "tmp: " << l_tmp << std::endl
-            std::cout << "\n\ndata: " << l_data << std::endl
+            std::cout << << "tmp: " << l_tmp << std::endl;
+            std::cout << "\n\ndata: " << l_data << std::endl;
             
             // calculate update strength parts
             ublas::matrix<T> l_strength = l_tmp * l_miT - l_data * l_moT;
@@ -624,8 +624,8 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             l_miT       *= l_F;
             l_moT       *= l_F;
             
-            std::cout << "CPU " << p_mpi.rank() << "tmp: " << l_tmp << std::endl
-            std::cout << "CPU " << p_mpi.rank() << "\n\ndata: " << l_data << std::endl
+            std::cout << "CPU " << p_mpi.rank() << "tmp: " << l_tmp << std::endl;
+            std::cout << "CPU " << p_mpi.rank() << "\n\ndata: " << l_data << std::endl;
             
             // calculate update strength parts
             ublas::matrix<T> l_strength = l_tmp * l_miT - l_data * l_moT;
