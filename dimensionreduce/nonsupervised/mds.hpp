@@ -419,7 +419,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             // create adaption values
             const ublas::matrix<T> l_el1 = ublas::element_prod(l_tmp, l_data);
             const ublas::matrix<T> l_el2 = ublas::element_prod(l_tmp, l_tmp);
-            std::cout << l_el1 << std::endl;
+            std::cout << l_el2 << std::endl;
             T l_miT = ublas::sum( tools::matrix::sum( l_el1 ) ); 
             T l_moT = ublas::sum( tools::matrix::sum( l_el2 ) );
             
@@ -612,7 +612,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             const ublas::matrix<T> l_el1 = ublas::element_prod(l_tmp, l_data);
             const ublas::matrix<T> l_el2 = ublas::element_prod(l_tmp, l_tmp);
             
-            std::cout << "CPU " << p_mpi.rank() << "\n" << l_el1 << std::endl;
+            std::cout << "CPU " << p_mpi.rank() << "\n" << l_el2 << std::endl;
             
             T l_miT = static_cast<T>(0);
             T l_moT = static_cast<T>(0);
