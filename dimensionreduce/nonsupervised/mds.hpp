@@ -441,7 +441,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             // calculate update strength of the points
             ublas::matrix<T> l_adapt = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, m_dim-1)), tools::matrix::column );
             //l_adapt = ublas::element_prod( l_adapt-ublas::trans(l_adapt), l_strength);
-            l_adapt -= ublas::trans(l_adapt)
+            l_adapt -= ublas::trans(l_adapt);
             std::cout << l_adapt << std::endl;
             return l_adapt;  
 
