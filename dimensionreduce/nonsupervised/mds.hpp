@@ -585,7 +585,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                 const ublas::vector_range< ublas::vector<T> > l_row( l_fullrow, ublas::range( l_columnstart, l_columnstart+l_data.size2() ) );
                 
                 // create a matrix with columns of the j-th column
-                ublas::matrix<T> l_col      = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, j)), l_row.size(), tools::matrix::column );
+                ublas::matrix<T> l_col      = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, j)), l_data.size1(), tools::matrix::column );
                 
                 std::cout << "CPU " << p_mpi.rank() << "\n" << l_col << std::endl;
                 return l_col;
