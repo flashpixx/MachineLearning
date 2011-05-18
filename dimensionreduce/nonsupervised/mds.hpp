@@ -640,7 +640,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             
             // do subtract (equiv the subtract with transpose)
             for(std::size_t n=0; n < l_adapt.size1(); ++n)
-                ublas::row(l_adapt, n) -= l_row;
+                ublas::row(l_adapt, n) -= l_fullrow;
             
             // transpose l_temp because we need the same oriantation like l_data (input matrix)
             l_adapt = ublas::trans(l_adapt);
