@@ -400,7 +400,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                 ublas::matrix<T> l_col = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, j)), tools::matrix::column );
                 
                 l_col -= ublas::trans(l_col);
-                std::cout << l_col << std::endl;
+                std::cout << ublas::column(l_target, j) << std::endl;
                 return l_col;
                 
                 
@@ -596,7 +596,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                 
                 l_tmp += ublas::element_prod(l_col, l_col);
             }
-            std::cout << "CPU " << p_mpi.rank() << "\n" << l_tmp << std::endl;
+            std::cout << "CPU " << p_mpi.rank() << "\n" << l_fullrow << std::endl;
             return l_tmp;
             
             // transpose l_temp because we need the same oriantation like l_data (input matrix)
