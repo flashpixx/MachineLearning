@@ -442,11 +442,11 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             ublas::matrix<T> l_adapt = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, m_dim-1)), tools::matrix::column );
             l_adapt = ublas::element_prod( l_adapt-ublas::trans(l_adapt), l_strength);
           
-            std::cout << l_adapt << std::endl;
-            return l_adapt;  
-
             ublas::matrix<T> l_update(l_target.size1(), l_target.size2(), static_cast<T>(0));
             ublas::column(l_update, m_dim-1) = tools::matrix::sum(l_adapt, tools::matrix::column);
+
+            std::cout << l_update << std::endl;
+            return l_adapt;  
             
             for(std::size_t j=0; j < m_dim-1; ++j) {
                 // create a matrix with columns of the j-th column
@@ -642,16 +642,14 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             for(std::size_t n=0; n < l_adapt.size1(); ++n)
                 ublas::row(l_adapt, n) -= l_fullrow;
             
-            // transpose l_temp because we need the same oriantation like l_data (input matrix)
+            // transpose l_temp because we need the same oriantation like l_adapt
             l_adapt = ublas::element_prod(l_adapt, ublas::trans(l_strength));
             
-             std::cout << "CPU " << p_mpi.rank() << "\n" << l_adapt << std::endl;
-            
-            return l_adapt;
-            
-            //-------
             ublas::matrix<T> l_update(l_target.size1(), l_target.size2(), static_cast<T>(0));
             ublas::column(l_update, l_dimensionMPI-1) = tools::matrix::sum(l_adapt, tools::matrix::column);
+
+            std::cout << "CPU " << p_mpi.rank() << "\n" << l_update << std::endl;
+            return l_adapt;
             
             for(std::size_t j=0; j < l_dimensionMPI-1; ++j) {
                 // create a matrix with columns of the j-th column
