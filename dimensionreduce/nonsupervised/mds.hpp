@@ -442,6 +442,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             ublas::matrix<T> l_adapt = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, m_dim-1)), tools::matrix::column );
             l_adapt = ublas::element_prod( l_adapt-ublas::trans(l_adapt), l_strength);
           
+            // create update matrix
             ublas::matrix<T> l_update(l_target.size1(), l_target.size2(), static_cast<T>(0));
             ublas::column(l_update, m_dim-1) = tools::matrix::sum(l_adapt, tools::matrix::column);
 
@@ -645,8 +646,16 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             // transpose l_temp because we need the same oriantation like l_adapt
             l_adapt = ublas::element_prod(l_adapt, ublas::trans(l_strength));
             
+            
+            // we sum over all columns of the adapt matrix and sum over each element
+            // and cut the elements, which are needed for the local matrix
+            ublas::vector<T> l_lastcolumn( l_data.size1(), static_cast<T>(0) );
+            mpi::all_reduce(p_mpi, tools::matrix::sum(l_adapt, tools::matrix::column), std::plus< ublas::vector<T> >());
+            ublas::vector_range< ublas::vector<T> > l_updaterange( l_lastcolumn, ublas::range( l_columnstart, l_columnstart+l_target.size1() ) );
+            
+            // create update matrix
             ublas::matrix<T> l_update(l_target.size1(), l_target.size2(), static_cast<T>(0));
-            ublas::column(l_update, l_dimensionMPI-1) = tools::matrix::sum(l_adapt, tools::matrix::column);
+            ublas::column(l_update, l_dimensionMPI-1) = l_updaterange;
 
             std::cout << "CPU " << p_mpi.rank() << "\n" << l_update << std::endl;
             return l_adapt;
@@ -670,23 +679,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         }
         
         
-        // collect all target points and return them all
-        std::vector< ublas::matrix<T> > l_points;
-        mpi::all_gather(p_mpi, l_target, l_points);
-        
-        // create full matrix with points
-        ublas::matrix<T> l_fulltarget = l_points[0];
-        for(std::size_t i=1; i < l_points.size(); ++i) {
-            l_fulltarget.resize( l_fulltarget.size1()+l_points[i].size1(), l_fulltarget.size2());
-            
-            ublas::matrix_range< ublas::matrix<T> > l_range(l_fulltarget, 
-                                                            ublas::range( l_fulltarget.size1()-l_points[i].size1(), l_fulltarget.size1() ), 
-                                                            ublas::range( 0, l_fulltarget.size2() )
-                                                            );
-            l_range.assign(l_points[i]);
-        }
-    
-        return l_fulltarget;
+         return l_target;
     }
     
     
