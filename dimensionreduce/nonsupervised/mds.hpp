@@ -446,9 +446,6 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             ublas::matrix<T> l_update(l_target.size1(), l_target.size2(), static_cast<T>(0));
             ublas::column(l_update, m_dim-1) = tools::matrix::sum(l_adapt, tools::matrix::column);
 
-            std::cout << l_update << std::endl;
-            return l_adapt;  
-            
             for(std::size_t j=0; j < m_dim-1; ++j) {
                 // create a matrix with columns of the j-th column
                 ublas::matrix<T> l_col = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, j)), tools::matrix::column );
@@ -458,6 +455,9 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                 
                 ublas::column(l_update, j) = tools::matrix::sum(l_col, tools::matrix::column);
             }
+            
+            std::cout << l_update << std::endl;
+            return l_update; 
             
             // create new target points
             const T l_rate = m_rate * (m_iteration-i) * static_cast<T>(0.25) * (static_cast<T>(1) + (m_iteration-i)%2) / m_iteration;
@@ -634,14 +634,14 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
 
     
             // calculate update strength of the points - reads over all processes the column of the target matrix
-            const ublas::vector<T> l_fullrow = hit_connectVector( p_mpi, static_cast< ublas::vector<T> >(ublas::column(l_target, l_dimensionMPI-1)) );
+            const ublas::vector<T> l_fulllastrow = hit_connectVector( p_mpi, static_cast< ublas::vector<T> >(ublas::column(l_target, l_dimensionMPI-1)) );
             
             // create a matrix with columns of the j-th column
             ublas::matrix<T> l_adapt         = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, l_dimensionMPI-1)), l_data.size1(), tools::matrix::column );
             
             // do subtract (equiv the subtract with transpose)
             for(std::size_t n=0; n < l_adapt.size1(); ++n)
-                ublas::row(l_adapt, n) -= l_fullrow;
+                ublas::row(l_adapt, n) -= l_fulllastrow;
             
             // transpose l_temp because we need the same oriantation like l_adapt
             l_adapt = ublas::element_prod(l_adapt, ublas::trans(l_strength));
@@ -651,24 +651,34 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             // and cut the elements, which are needed for the local matrix
             ublas::vector<T> l_lastcolumn( l_data.size1(), static_cast<T>(0) );
             mpi::all_reduce(p_mpi, tools::matrix::sum(l_adapt, tools::matrix::column), l_lastcolumn, std::plus< ublas::vector<T> >());
-            ublas::vector_range< ublas::vector<T> > l_updaterange( l_lastcolumn, ublas::range( l_columnstart, l_columnstart+l_data.size2() ) );
+            ublas::vector_range< ublas::vector<T> > l_updatelastcolumn( l_lastcolumn, ublas::range( l_columnstart, l_columnstart+l_data.size2() ) );
             
             // create update matrix
             ublas::matrix<T> l_update(l_target.size1(), l_target.size2(), static_cast<T>(0));
-            ublas::column(l_update, l_dimensionMPI-1) = l_updaterange;
+            ublas::column(l_update, l_dimensionMPI-1) =  l_updatelastcolumn;
 
-            std::cout << "CPU " << p_mpi.rank() << "\n" << l_update << std::endl;
-            return l_adapt;
-            
             for(std::size_t j=0; j < l_dimensionMPI-1; ++j) {
-                // create a matrix with columns of the j-th column
-                ublas::matrix<T> l_col = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, j)), tools::matrix::column );
+                const ublas::vector<T> l_fullrow = hit_connectVector( p_mpi, static_cast< ublas::vector<T> >(ublas::column(l_target, j)) );
                 
-                l_col -= ublas::trans(l_col);
+                // create a matrix with columns of the j-th column
+                ublas::matrix<T> l_col = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, j)), l_data.size1(), tools::matrix::column );
+                
+                // do subtract (equiv the subtract with transpose)
+                for(std::size_t n=0; n < l_col.size1(); ++n)
+                    ublas::row(l_col, n) -= l_fullrow;
+    
                 l_col  = ublas::element_prod(l_col, l_strength);
                 
-                ublas::column(l_update, j) = tools::matrix::sum(l_col, tools::matrix::column);
+                // we create the column data of the update matrix over all processes
+                ublas::vector<T> l_columnvector( l_data.size1(), static_cast<T>(0) );
+                mpi::all_reduce(p_mpi, tools::matrix::sum(l_col, tools::matrix::column), l_columnvector, std::plus< ublas::vector<T> >());
+                ublas::vector_range< ublas::vector<T> > l_updatecol( l_columnvector, ublas::range( l_columnstart, l_columnstart+l_data.size2() ) );
+                
+                ublas::column(l_update, j) = l_updatecol;
             }
+            
+            std::cout << "CPU " << p_mpi.rank() << "\n" << l_update << std::endl;
+            return l_update;
             
             // create new target points
             const T l_rate = l_rateMPI * (l_iterationsMPI-i) * static_cast<T>(0.25) * (static_cast<T>(1) + (l_iterationsMPI-i)%2) / l_iterationsMPI;
