@@ -651,7 +651,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             // and cut the elements, which are needed for the local matrix
             ublas::vector<T> l_lastcolumn( l_data.size1(), static_cast<T>(0) );
             mpi::all_reduce(p_mpi, tools::matrix::sum(l_adapt, tools::matrix::column), std::plus< ublas::vector<T> >());
-            ublas::vector_range< ublas::vector<T> > l_updaterange( l_lastcolumn, ublas::range( l_columnstart, l_columnstart+l_target.size1() ) );
+            ublas::vector_range< ublas::vector<T> > l_updaterange( l_lastcolumn, ublas::range( l_columnstart, l_columnstart+l_target.size2() ) );
             
             // create update matrix
             ublas::matrix<T> l_update(l_target.size1(), l_target.size2(), static_cast<T>(0));
