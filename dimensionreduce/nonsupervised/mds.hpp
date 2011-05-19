@@ -650,14 +650,14 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             // we sum over all columns of the adapt matrix and sum over each element
             // and cut the elements, which are needed for the local matrix
             ublas::vector<T> l_lastcolumn( l_data.size1(), static_cast<T>(0) );
-            mpi::all_reduce(p_mpi, tools::matrix::sum(l_adapt, tools::matrix::column), std::plus< ublas::vector<T> >());
+            mpi::all_reduce(p_mpi, tools::matrix::sum(l_adapt, tools::matrix::column), l_lastcolumn, std::plus< ublas::vector<T> >());
             ublas::vector_range< ublas::vector<T> > l_updaterange( l_lastcolumn, ublas::range( l_columnstart, l_columnstart+l_target.size2() ) );
             
             // create update matrix
             ublas::matrix<T> l_update(l_target.size1(), l_target.size2(), static_cast<T>(0));
             ublas::column(l_update, l_dimensionMPI-1) = l_updaterange;
 
-            std::cout << "CPU " << p_mpi.rank() << "\n" << tools::matrix::sum(l_adapt, tools::matrix::column) << std::endl;
+            std::cout << "CPU " << p_mpi.rank() << "\n" << l_lastcolumn << std::endl;
             return l_adapt;
             
             for(std::size_t j=0; j < l_dimensionMPI-1; ++j) {
