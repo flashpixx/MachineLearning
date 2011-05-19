@@ -657,7 +657,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             ublas::matrix<T> l_update(l_target.size1(), l_target.size2(), static_cast<T>(0));
             ublas::column(l_update, l_dimensionMPI-1) = l_updaterange;
 
-            std::cout << "CPU " << p_mpi.rank() << "\n" << l_update << std::endl;
+            std::cout << "CPU " << p_mpi.rank() << "\n" << l_updaterange << std::endl;
             return l_adapt;
             
             for(std::size_t j=0; j < l_dimensionMPI-1; ++j) {
