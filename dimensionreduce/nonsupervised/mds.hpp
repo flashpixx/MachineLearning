@@ -450,12 +450,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                 // create a matrix with columns of the j-th column
                 ublas::matrix<T> l_col = tools::matrix::repeat( static_cast< ublas::vector<T> >(ublas::column(l_target, j)), tools::matrix::column );
                 
-                l_col -= ublas::trans(l_col);
-                std::cout << l_col << std::endl;
-                return l_col;
-                
-                l_col  = ublas::element_prod(l_col, l_strength);
-                
+                l_col  = ublas::element_prod(l_col-ublas::trans(l_col), l_strength);
                 ublas::column(l_update, j) = tools::matrix::sum(l_col, tools::matrix::column);
             }
             
@@ -659,6 +654,9 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             // create update matrix
             ublas::matrix<T> l_update(l_target.size1(), l_target.size2(), static_cast<T>(0));
             ublas::column(l_update, l_dimensionMPI-1) =  l_updatelastcolumn;
+            
+            // strength matrix must be rotate
+            l_strength = ublas::trans(l_strength);
 
             for(std::size_t j=0; j < l_dimensionMPI-1; ++j) {
                 const ublas::vector<T> l_fullrow = hit_connectVector( p_mpi, static_cast< ublas::vector<T> >(ublas::column(l_target, j)) );
@@ -670,9 +668,6 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                 for(std::size_t n=0; n < l_col.size1(); ++n)
                     ublas::row(l_col, n) -= l_fullrow;
     
-                std::cout << "CPU " << p_mpi.rank() << "\n" << l_strength << std::endl;
-                return l_col;
-                
                 l_col  = ublas::element_prod(l_col, l_strength);
                 
                 // we create the column data of the update matrix over all processes
