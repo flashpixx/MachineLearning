@@ -462,8 +462,6 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                     l_target(j,n) += l_rate * l_update(j,n) / std::sqrt(std::fabs(l_update(j,n))+static_cast<T>(0.001));
         }
         
-        std::cout << l_target << std::endl;
-        
         return l_target;
     }
     
@@ -684,8 +682,6 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                 for(std::size_t n=0; n < l_target.size2(); ++n)
                     l_target(j,n) += l_rate * l_update(j,n) / std::sqrt(std::fabs(l_update(j,n))+static_cast<T>(0.001));
         }
-        
-        std::cout << "CPU " << p_mpi.rank() << "\n" << l_target << std::endl;
         
         return l_target;
     }
