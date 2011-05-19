@@ -641,8 +641,11 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             for(std::size_t n=0; n < l_adapt.size1(); ++n)
                 ublas::row(l_adapt, n) -= l_fulllastrow;
             
+            // strength matrix must be rotate
+            l_strength = ublas::trans(l_strength);
+            
             // transpose l_temp because we need the same oriantation like l_adapt
-            l_adapt = ublas::element_prod(l_adapt, ublas::trans(l_strength));
+            l_adapt = ublas::element_prod(l_adapt, l_strength);
             
             
             // we sum over all columns of the adapt matrix and sum over each element
@@ -654,9 +657,6 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             // create update matrix
             ublas::matrix<T> l_update(l_target.size1(), l_target.size2(), static_cast<T>(0));
             ublas::column(l_update, l_dimensionMPI-1) =  l_updatelastcolumn;
-            
-            // strength matrix must be rotate
-            l_strength = ublas::trans(l_strength);
 
             for(std::size_t j=0; j < l_dimensionMPI-1; ++j) {
                 const ublas::vector<T> l_fullrow = hit_connectVector( p_mpi, static_cast< ublas::vector<T> >(ublas::column(l_target, j)) );
