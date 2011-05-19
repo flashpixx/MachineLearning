@@ -454,9 +454,6 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                 ublas::column(l_update, j) = tools::matrix::sum(l_col, tools::matrix::column);
             }
             
-            std::cout << l_update << std::endl;
-            return l_update; 
-            
             // create new target points
             const T l_rate = m_rate * (m_iteration-i) * static_cast<T>(0.25) * (static_cast<T>(1) + (m_iteration-i)%2) / m_iteration;
             
@@ -464,6 +461,8 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                 for(std::size_t n=0; n < l_target.size2(); ++n)
                     l_target(j,n) += l_rate * l_update(j,n) / std::sqrt(std::fabs(l_update(j,n))+static_cast<T>(0.001));
         }
+        
+        std::cout << l_target << std::endl;
         
         return l_target;
     }
@@ -678,9 +677,6 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                 ublas::column(l_update, j) = l_updatecol;
             }
             
-            std::cout << "CPU " << p_mpi.rank() << "\n" << l_update << std::endl;
-            return l_update;
-            
             // create new target points
             const T l_rate = l_rateMPI * (l_iterationsMPI-i) * static_cast<T>(0.25) * (static_cast<T>(1) + (l_iterationsMPI-i)%2) / l_iterationsMPI;
             
@@ -689,8 +685,9 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                     l_target(j,n) += l_rate * l_update(j,n) / std::sqrt(std::fabs(l_update(j,n))+static_cast<T>(0.001));
         }
         
+        std::cout << "CPU " << p_mpi.rank() << "\n" << l_target << std::endl;
         
-         return l_target;
+        return l_target;
     }
     
     
