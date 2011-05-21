@@ -98,6 +98,9 @@ namespace machinelearning { namespace tools { namespace files {
      **/
     template<typename T> inline ublas::matrix<T> csv::readBlasMatrix( const std::string& p_file, const std::string& p_separator ) const
     {
+        if (p_separator.empty())
+            throw exception::runtime(_("separator can not be empty"));
+        
         // open stream and read first line with matrix dimensions (rows cols)
         std::string l_line;
         std::ifstream l_stream( p_file.c_str(), std::ifstream::in ); 
