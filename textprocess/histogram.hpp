@@ -54,10 +54,10 @@ namespace machinelearning { namespace textprocess {
             };
         
         
-            histogram( const std::string& = ",;.:!?- ", const bool& = false );
+            histogram( const std::string& = ",;.:!?- ", const bool& = true );
             void add( const std::string&, const std::size_t& = 0 );
             void add( const std::vector<std::string>&, const std::size_t& = 0 );
-            bool getCaseSensitivity( void ) const;
+            bool iscaseinsensitivity( void ) const;
             std::size_t getWordCount( void ) const;
             std::vector<std::string> getWords( const float&, const float&, const comparison& = lessequal, const comparison& = greaterequal );
             std::vector<std::string> getWords( const float&, const comparison& = lessequal );
@@ -70,7 +70,7 @@ namespace machinelearning { namespace textprocess {
             /** seperators **/
             const std::string m_seperators;        
             /** bool for case-sensitive / case-insensitive wordlist **/
-            const bool m_casesensitive;
+            const bool m_caseinsensitive;
             /** map with words and their counts **/
             std::map<std::string, std::size_t> m_map;
             /** sum over all words **/
@@ -83,11 +83,11 @@ namespace machinelearning { namespace textprocess {
     
     /** constructor
      * @param p_separator characters for seperate words within the text
-     * @param p_casesensitive words should be case-sensitive / case-insensitive
+     * @param p_caseinsensitive words should be case-insensitive
      **/
-    inline histogram::histogram( const std::string& p_separator, const bool& p_casesensitive ) :
+    inline histogram::histogram( const std::string& p_separator, const bool& p_caseinsensitive ) :
         m_seperators( p_separator ),
-        m_casesensitive( p_casesensitive ),
+        m_caseinsensitive( p_caseinsensitive ),
         m_map(),
         m_wordcount( 0 )
     {
@@ -97,11 +97,11 @@ namespace machinelearning { namespace textprocess {
     
     
     /** returns the value for case-sensitive words
-     * @return bool of case-sensitive status
+     * @return bool for case-insensitive
      **/
-    inline bool histogram::getCaseSensitivity( void ) const
+    inline bool histogram::iscaseinsensitivity( void ) const
     {
-        return m_casesensitive;
+        return m_caseinsensitive;
     }
     
     
@@ -140,7 +140,7 @@ namespace machinelearning { namespace textprocess {
                 continue;
                 
             m_wordcount++;
-            if (m_casesensitive)
+            if (m_caseinsensitive)
                 boost::to_lower(lc);
             
             std::map<std::string, std::size_t>::iterator it = m_map.find(lc);
@@ -238,7 +238,7 @@ namespace machinelearning { namespace textprocess {
     inline void histogram::erase( const std::string& p_word )
     {
         std::string lc = p_word;
-        if (m_casesensitive)
+        if (m_caseinsensitive)
             boost::to_lower(lc);
         
         std::map<std::string, std::size_t>::iterator it = m_map.find(lc);
