@@ -55,7 +55,7 @@ namespace machinelearning { namespace textprocess {
             };
         
         
-            histogram( const std::string& = ",;.:!?- \n\t|=", const std::string& = "_()[]{}%$*'/\\\"=|<>\r", const bool& = true );
+            histogram( const std::string& = ",;.:!?- \n\t|=", const std::string& = "#_()[]{}%$*'/\\\"=|<>\r", const bool& = true );
             void add( const std::string&, const std::size_t& = 0 );
             void add( const std::vector<std::string>&, const std::size_t& = 2 );
             bool iscaseinsensitivity( void ) const;
