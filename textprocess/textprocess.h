@@ -29,7 +29,7 @@
 namespace machinelearning { 
     
     /** namespace for all textprocessing algorithm
-     * $LastChangedDate$
+     * $LastChangedDate: 2011-05-21 16:16:04 +0200 (Sa, 21 Mai 2011) $
      **/
     namespace textprocess {};
     
