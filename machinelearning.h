@@ -436,5 +436,6 @@ namespace machinelearning {};
 #include "distances/distances.h"
 #include "tools/tools.h"
 #include "functionoptimization/functionoptimization.h"
+#include "textprocess/textprocess.h"
 
 #endif
