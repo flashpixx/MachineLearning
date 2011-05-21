@@ -59,7 +59,9 @@ namespace machinelearning { namespace textprocess {
             void add( const std::vector<std::string>&, const std::size_t& = 0 );
             bool getCaseSensitivity( void ) const;
             std::size_t getWordCount( void ) const;
-            std::vector<std::string> getWords( const float&, const float&, const comparison& = lessequal, const comparison& = greaterequal ) const;
+            std::vector<std::string> getWords( const float&, const float&, const comparison& = lessequal, const comparison& = greaterequal );
+            std::vector<std::string> getWords( const float&, const comparison& = lessequal );
+        
         
         private:
             
@@ -72,7 +74,7 @@ namespace machinelearning { namespace textprocess {
             /** sum over all words **/
             std::size_t m_wordcount;
         
-        
+            bool compare( const float&, const float&, const comparison& ) const;
     };
     
     
@@ -148,12 +150,72 @@ namespace machinelearning { namespace textprocess {
     }
     
     
-    /** returns a list of words, that are **/
-    inline std::vector<std::string> histogram::getWords( const float& p_val1, const float& p_val2, const comparison& p_comp1, const comparison& p_comp2 ) const
+    /** returns a list of words, that between the ranges
+     * @param p_val1 first value in range [0,1]
+     * @param p_val2 second value in range [0,1]
+     * @param p_comp1 comparasion operator of the first value
+     * @param p_comp2 comparasion operator of the second value
+     **/
+    inline std::vector<std::string> histogram::getWords( const float& p_val1, const float& p_val2, const comparison& p_comp1, const comparison& p_comp2 )
     {
+        if ( (p_val1 < 0) || (p_val1 > 1) || (p_val2 < 0) || (p_val2 > 1) )
+            throw exception::runtime(_("ranges must be between [0,1]"));
+        
+        
         std::vector<std::string> l_list;
         
+        for(std::map<std::string, std::size_t>::iterator it = m_map.begin(); it != m_map.end(); it++) {
+            const float l_val = static_cast<float>(it->second) / m_wordcount;
+            
+            if ( (compare(l_val, p_val1, p_comp1)) || (compare(l_val, p_val2, p_comp2)) )
+                  l_list.push_back( it->first );
+        }
+        
         return l_list;
+    }
+    
+    
+    /** returns a list of words, that in the range
+     * @param p_val value in range [0,1]
+     * @param p_comp comparasion operator of the value
+     **/
+    inline std::vector<std::string> histogram::getWords( const float& p_val, const comparison& p_comp )
+    {
+        if ( (p_val < 0) || (p_val > 1) )
+            throw exception::runtime(_("ranges must be between [0,1]"));
+        
+        
+        std::vector<std::string> l_list;
+        
+        for(std::map<std::string, std::size_t>::iterator it = m_map.begin(); it != m_map.end(); it++) {
+            const float l_val = static_cast<float>(it->second) / m_wordcount;
+            
+            if (compare(l_val, p_val, p_comp))
+                l_list.push_back( it->first );
+        }
+        
+        return l_list;
+    }
+    
+    
+    /** compares two values with the operator
+     * @param p_val1 value
+     * @param p_val2 value
+     * @param p_comp comparasion
+     * @return bool
+     **/
+    inline bool histogram::compare( const float& p_val1, const float& p_val2, const comparison& p_comp ) const
+    {
+        bool ll = false;
+        
+        switch (p_comp) {
+            case lessequal      : ll = p_val1 <= p_val2; break;
+            case greaterequal   : ll = p_val1 >= p_val2; break;
+            case less           : ll = p_val1 < p_val2;  break;
+            case greater        : ll = p_val1 > p_val2;  break;
+        }
+        
+        return ll;
     }
 
     
