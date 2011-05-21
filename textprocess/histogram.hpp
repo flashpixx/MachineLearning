@@ -61,6 +61,8 @@ namespace machinelearning { namespace textprocess {
             std::size_t getWordCount( void ) const;
             std::vector<std::string> getWords( const float&, const float&, const comparison& = lessequal, const comparison& = greaterequal );
             std::vector<std::string> getWords( const float&, const comparison& = lessequal );
+            void clear( void );
+            void erase( const std::string& );
         
         
         private:
@@ -160,6 +162,8 @@ namespace machinelearning { namespace textprocess {
     {
         if ( (p_val1 < 0) || (p_val1 > 1) || (p_val2 < 0) || (p_val2 > 1) )
             throw exception::runtime(_("ranges must be between [0,1]"));
+        if (m_wordcount == 0)
+            throw exception::runtime(_("no words within the map"));
         
         
         std::vector<std::string> l_list;
@@ -183,7 +187,8 @@ namespace machinelearning { namespace textprocess {
     {
         if ( (p_val < 0) || (p_val > 1) )
             throw exception::runtime(_("ranges must be between [0,1]"));
-        
+        if (m_wordcount == 0)
+            throw exception::runtime(_("no words within the map"));
         
         std::vector<std::string> l_list;
         
@@ -218,6 +223,30 @@ namespace machinelearning { namespace textprocess {
         return ll;
     }
 
+    
+    /** removes all elements within the map **/
+    inline void histogram::clear( void ) 
+    {
+        m_map.clear();
+        m_wordcount = 0;
+    }
+    
+    
+    /** remove a word on the map
+     * @param p_word word
+     **/
+    inline void histogram::erase( const std::string& p_word )
+    {
+        std::string lc = p_word;
+        if (m_casesensitive)
+            boost::to_lower(lc);
+        
+        std::map<std::string, std::size_t>::iterator it = m_map.find(lc);
+        if (it != m_map.end()) {
+            m_wordcount -= it->second;
+            m_map.erase( it );
+        }
+    }
     
 };};
 
