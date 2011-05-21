@@ -29,6 +29,7 @@
 #include <map>
 #include <string>
 #include <boost/algorithm/string.hpp> 
+#include <boost/algorithm/string/erase.hpp>
 
 #include "../exception/exception.h"
 
@@ -54,9 +55,9 @@ namespace machinelearning { namespace textprocess {
             };
         
         
-            histogram( const std::string& = ",;.:!?- ", const bool& = true );
+            histogram( const std::string& = ",;.:!?- \n\t|=", const std::string& = ",;.:!?- ()[]{}%$*'\"=`|<>\n\t\r", const bool& = true );
             void add( const std::string&, const std::size_t& = 0 );
-            void add( const std::vector<std::string>&, const std::size_t& = 0 );
+            void add( const std::vector<std::string>&, const std::size_t& = 2 );
             bool iscaseinsensitivity( void ) const;
             std::size_t getWordCount( void ) const;
             std::vector<std::string> getWords( const float&, const float&, const comparison& = lessequal, const comparison& = greaterequal );
@@ -68,7 +69,9 @@ namespace machinelearning { namespace textprocess {
         private:
             
             /** seperators **/
-            const std::string m_seperators;        
+            const std::string m_seperators;   
+            /** chars that will be removed **/
+            const std::string m_remove;
             /** bool for case-sensitive / case-insensitive wordlist **/
             const bool m_caseinsensitive;
             /** map with words and their counts **/
@@ -83,10 +86,12 @@ namespace machinelearning { namespace textprocess {
     
     /** constructor
      * @param p_separator characters for seperate words within the text
+     * @param p_remove string with characters that will be removed
      * @param p_caseinsensitive words should be case-insensitive
      **/
-    inline histogram::histogram( const std::string& p_separator, const bool& p_caseinsensitive ) :
+    inline histogram::histogram( const std::string& p_separator, const std::string& p_remove, const bool& p_caseinsensitive ) :
         m_seperators( p_separator ),
+        m_remove( p_remove ),
         m_caseinsensitive( p_caseinsensitive ),
         m_map(),
         m_wordcount( 0 )
@@ -136,7 +141,11 @@ namespace machinelearning { namespace textprocess {
         
         for(std::size_t i=0; i < l_data.size(); ++i) {
             std::string lc = l_data[i];
-            if (lc.length() < p_minlen)
+            if (!m_remove.empty())
+                boost::erase_all(lc, m_remove);
+            boost::trim(lc);
+            
+            if ( (lc.length() < p_minlen) || (lc.empty()) )
                 continue;
                 
             m_wordcount++;
