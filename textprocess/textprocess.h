@@ -37,6 +37,6 @@ namespace machinelearning {
 
 
 
-#include "histogram.hpp"
+#include "histogram.h"
 
 #endif
