@@ -59,7 +59,7 @@ namespace machinelearning { namespace textprocess {
             void add( const std::vector<std::string>&, const std::size_t& = 2 );
             bool iscaseinsensitivity( void ) const;
             std::size_t getWordCount( void ) const;
-            std::string getWordSeparator( void) const;
+            std::string getWordSeparator( void ) const;
             std::vector<std::string> getWords( const float&, const float&, const comparison& = lessequal, const comparison& = greaterequal );
             std::vector<std::string> getWords( const float&, const comparison& = lessequal );
             void clear( void );
