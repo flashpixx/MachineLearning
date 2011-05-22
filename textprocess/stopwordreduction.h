@@ -27,6 +27,9 @@
 #define MACHINELEARNING_TEXTPROCESS_STOPWORDREDUCTION_H
 
 #include <string>
+#include <sstream>
+#include <iostream>
+#include <boost/regex.hpp> 
 
 #include "../exception/exception.h"
 
@@ -35,26 +38,75 @@
 namespace machinelearning { namespace textprocess {
     
     
+    /** class for stop-word-reduction **/
     class stopwordreduction {
         
-        /**
-         **/
         public:
         
-            stopwordreduction( const std::vector<std::string>&, const bool& );
+            stopwordreduction( const std::vector<std::string>&, const bool& = true );
         
-            remove( std::string& ) const;
-            remove( std::vector<std::string>& ) const;
+            std::string remove( const std::string& ) const;
+            bool iscaseinsensitivity( void ) const;
         
         
         private:
         
             /** vector with stop word **/
-            const std::vector<std::string> m_stopwords;
+            boost::regex m_stopwordsexpr;
             /** bool for case-sensitive / case-insensitive wordlist **/
             const bool m_caseinsensitive;
         
     };
+    
+    
+    
+    /** constructor
+     * @param p_list list with stopwords
+     * @param p_caseinsensitive words should be case-insensitive
+     **/
+    inline stopwordreduction::stopwordreduction( const std::vector<std::string>& p_list, const bool& p_caseinsensitive ) :
+        m_stopwordsexpr(),
+        m_caseinsensitive( p_caseinsensitive )
+    {
+        if (p_list.size() == 0)
+            throw exception::runtime(_("stopwordlist can not be empty"));
+        
+        // create regular expression  for removing
+        std::string l_stopwordsexpr = "\\<(?:";
+        for(std::size_t i=0; i < p_list.size()-1; ++i)
+            l_stopwordsexpr += p_list[i]+"|";
+        l_stopwordsexpr += p_list[p_list.size()-1]+")\\>";
+        
+        m_stopwordsexpr.assign( l_stopwordsexpr );
+        
+        std::cout << l_stopwordsexpr << std::endl << std::endl;
+    }
+    
+    
+    
+    /** returns the value for case-sensitive words
+     * @return bool for case-insensitive
+     **/
+    inline bool stopwordreduction::iscaseinsensitivity( void ) const
+    {
+        return m_caseinsensitive;
+    }
+    
+        
+    /** removes the stopword on the text
+     * @param p_text input text
+     * @return text with removed words
+     **/
+    inline std::string stopwordreduction::remove( const std::string& p_text ) const
+    {
+        std::stringstream l_out(std::ios::out | std::ios::binary);
+        std::ostream_iterator<char, char> it(l_out);
 
+        boost::regex_replace(it, p_text.begin(), p_text.end(), m_stopwordsexpr, "", boost::match_default | boost::format_all);
+        
+        return l_out.str();
+    }
 
 };};
+
+#endif

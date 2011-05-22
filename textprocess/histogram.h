@@ -59,6 +59,7 @@ namespace machinelearning { namespace textprocess {
             void add( const std::vector<std::string>&, const std::size_t& = 2 );
             bool iscaseinsensitivity( void ) const;
             std::size_t getWordCount( void ) const;
+            std::string getWordSeparator( void) const;
             std::vector<std::string> getWords( const float&, const float&, const comparison& = lessequal, const comparison& = greaterequal );
             std::vector<std::string> getWords( const float&, const comparison& = lessequal );
             void clear( void );
@@ -117,7 +118,16 @@ namespace machinelearning { namespace textprocess {
         return m_wordcount;
     }
     
+    
+    /** returns a string with character that are used for seperating the words
+     * @return string with separators
+     **/
+    inline std::string histogram::getWordSeparator( void) const
+    {
+        return m_seperators;
+    }
 
+    
     /** adds a string vector to the map
      * @param p_vec string vector with data
      * @param p_minlen only word equal or greater will be added

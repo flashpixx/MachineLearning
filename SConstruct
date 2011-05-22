@@ -32,7 +32,7 @@ def configuration_macosx(config, version, architecture) :
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["LIBRARY_PATH"]
     config["compileflags"]      = "-O3 -pipe -Wall -pthread -finline-functions -arch "+arch+" -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
-    config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "boost_filesystem", "ginac", "atlas", "lapack", "ptcblas"]
+    config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "boost_filesystem", "ginac", "atlas", "lapack", "ptcblas", "boost_regex"]
 
     if optionExist("withdebug") :
         config["compileflags"]      += " -g"
@@ -58,7 +58,7 @@ def configuration_macosx(config, version, architecture) :
         
     if optionExist("withsources") :
         config["compileflags"]      += " -D MACHINELEARNING_SOURCES"
-        config["linkto"].extend( ["xml2", "boost_regex"] )
+        config["linkto"].extend( ["xml2"] )
         
     if optionExist("withfiles") :
         config["compileflags"]      += " -D MACHINELEARNING_FILES"
@@ -71,7 +71,7 @@ def configuration_posix(config, version, architecture) :
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["LIBRARY_PATH"]
     config["compileflags"]      = "-O3 -pipe -Wall -pthread -finline-functions -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
-    config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "boost_filesystem", "ginac", "atlas", "lapack", "ptcblas", "ptf77blas"]
+    config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "boost_filesystem", "ginac", "atlas", "lapack", "ptcblas", "ptf77blas", "boost_regex"]
     
     if optionExist("withdebug") :
         config["compileflags"]      += " -g"
@@ -95,7 +95,7 @@ def configuration_posix(config, version, architecture) :
         
     if optionExist("withsources") :
         config["compileflags"]      += " -D MACHINELEARNING_SOURCES"
-        config["linkto"].extend( ["xml2", "boost_regex"] )
+        config["linkto"].extend( ["xml2"] )
         
     if optionExist("withfiles") :
         config["compileflags"]      += " -D MACHINELEARNING_FILES"
