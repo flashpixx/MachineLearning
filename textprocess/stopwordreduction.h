@@ -23,21 +23,38 @@
 
 
 
-#ifndef MACHINELEARNING_TEXTPROCESS_H
-#define MACHINELEARNING_TEXTPROCESS_H
+#ifndef MACHINELEARNING_TEXTPROCESS_STOPWORDREDUCTION_H
+#define MACHINELEARNING_TEXTPROCESS_STOPWORDREDUCTION_H
 
-namespace machinelearning { 
+#include <string>
+
+#include "../exception/exception.h"
+
+
+
+namespace machinelearning { namespace textprocess {
     
-    /** namespace for all textprocessing algorithm
-     * $LastChangedDate$
-     **/
-    namespace textprocess {};
     
-};
+    class stopwordreduction {
+        
+        /**
+         **/
+        public:
+        
+            stopwordreduction( const std::vector<std::string>&, const bool& );
+        
+            remove( std::string& ) const;
+            remove( std::vector<std::string>& ) const;
+        
+        
+        private:
+        
+            /** vector with stop word **/
+            const std::vector<std::string> m_stopwords;
+            /** bool for case-sensitive / case-insensitive wordlist **/
+            const bool m_caseinsensitive;
+        
+    };
 
 
-
-#include "histogram.h"
-#include "stopwordreduction.h"
-
-#endif
+};};
