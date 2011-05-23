@@ -71,13 +71,22 @@ namespace machinelearning { namespace textprocess {
         if (p_list.size() == 0)
             throw exception::runtime(_("stopwordlist can not be empty"));
         
-        // create regular expression  for removing
-        std::string l_stopwordsexpr = "\\<(?:";
+        // create regular expression part with words
+        std::string l_stopwordsexpr;
         for(std::size_t i=0; i < p_list.size()-1; ++i)
             l_stopwordsexpr += p_list[i]+"|";
-        l_stopwordsexpr += p_list[p_list.size()-1]+")\\>";
+        l_stopwordsexpr += p_list[p_list.size()-1];
         
-        m_stopwordsexpr.assign( l_stopwordsexpr );
+        // we create a regular expression with posix syntax, so we muss mask this characters .[\*^$ after that we concat the complete expression
+        
+        
+        l_stopwordsexpr = "\\<(?:" + l_stopwordsexpr + +")\\>";
+        
+        // create regular expression case-sensitive / case-insensitive with posix syntax
+        if (p_caseinsensitive)
+            m_stopwordsexpr = boost::regex( l_stopwordsexpr, boost::regex::basic | boost::regex_constants::icase );
+        else
+            m_stopwordsexpr = boost::regex( l_stopwordsexpr, boost::regex::basic );
         
         std::cout << l_stopwordsexpr << std::endl << std::endl;
     }
@@ -99,12 +108,7 @@ namespace machinelearning { namespace textprocess {
      **/
     inline std::string stopwordreduction::remove( const std::string& p_text ) const
     {
-        std::stringstream l_out(std::ios::out | std::ios::binary);
-        std::ostream_iterator<char, char> it(l_out);
-
-        boost::regex_replace(it, p_text.begin(), p_text.end(), m_stopwordsexpr, "", boost::match_default | boost::format_all);
-        
-        return l_out.str();
+        return boost::regex_replace(p_text, m_stopwordsexpr, "", boost::match_default | boost::format_all);
     }
 
 };};
