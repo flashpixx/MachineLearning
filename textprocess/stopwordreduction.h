@@ -53,7 +53,7 @@ namespace machinelearning { namespace textprocess {
         
         private:
         
-            /** vector with stop word **/
+            /** expression stop word **/
             boost::regex m_stopwordsexpr;
             /** bool for case-sensitive / case-insensitive wordlist **/
             const bool m_caseinsensitive;
