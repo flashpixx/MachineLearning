@@ -64,6 +64,7 @@ namespace machinelearning { namespace textprocess {
             std::vector<std::string> getWords( const float&, const comparison& = lessequal );
             void clear( void );
             void erase( const std::string& );
+            std::map<std::string, std::size_t> getMap( void ) const;
         
         
         private:
@@ -127,6 +128,15 @@ namespace machinelearning { namespace textprocess {
         return m_seperators;
     }
 
+    
+    /** returns the internal map. Each key is the word and the value the number of counts
+     * @return word map
+     **/
+    inline std::map<std::string, std::size_t> histogram::getMap( void ) const
+    {
+        return m_map;
+    }
+    
     
     /** adds a string vector to the map
      * @param p_vec string vector with data
