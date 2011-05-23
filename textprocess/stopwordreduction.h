@@ -71,24 +71,28 @@ namespace machinelearning { namespace textprocess {
         if (p_list.size() == 0)
             throw exception::runtime(_("stopwordlist can not be empty"));
         
+        // we create a regular expression with perl syntax (default) for masking chars within the words,
+        // that are also used for regular expressions
+        const boost::regex l_mask("\\.|\\[|\\]|\\{|\\}|\\(|\\)|\\\\|\\*|\\+|\\?|\\||\\^|\\$|<|>");
+        const std::string l_replace("\\\\$&");
+        
+        
         // create regular expression part with words
         std::string l_stopwordsexpr;
         for(std::size_t i=0; i < p_list.size()-1; ++i)
-            l_stopwordsexpr += p_list[i]+"|";
-        l_stopwordsexpr += p_list[p_list.size()-1];
+            l_stopwordsexpr += boost::regex_replace(p_list[i], l_mask, l_replace)+"|";
+        l_stopwordsexpr += boost::regex_replace(p_list[p_list.size()-1], l_mask, l_replace);
         
-        // we create a regular expression with posix syntax, so we muss mask this characters .[\*^$ after that we concat the complete expression
+        if (l_stopwordsexpr.empty())
+            throw exception::runtime(_("stopwordlist can not be empty"));
         
         
-        l_stopwordsexpr = "\\<(?:" + l_stopwordsexpr + +")\\>";
-        
-        // create regular expression case-sensitive / case-insensitive with posix syntax
+        // create regular expression case-sensitive / case-insensitive with perl syntax (default)
+        l_stopwordsexpr = "\\<(?:" + l_stopwordsexpr + ")\\>";
         if (p_caseinsensitive)
-            m_stopwordsexpr = boost::regex( l_stopwordsexpr, boost::regex::basic | boost::regex_constants::icase );
+            m_stopwordsexpr = boost::regex( l_stopwordsexpr, boost::regex_constants::icase );
         else
-            m_stopwordsexpr = boost::regex( l_stopwordsexpr, boost::regex::basic );
-        
-        std::cout << l_stopwordsexpr << std::endl << std::endl;
+            m_stopwordsexpr = boost::regex( l_stopwordsexpr );
     }
     
     
