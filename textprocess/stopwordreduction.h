@@ -38,7 +38,9 @@
 namespace machinelearning { namespace textprocess {
     
     
-    /** class for stop-word-reduction **/
+    /** class for stop-word-reduction
+     * @todo adding state machine support for long expressions
+     **/
     class stopwordreduction {
         
         public:
