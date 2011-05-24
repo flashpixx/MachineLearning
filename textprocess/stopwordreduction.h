@@ -30,6 +30,7 @@
 #include <sstream>
 #include <iostream>
 #include <boost/regex.hpp> 
+#include <boost/xpressive/xpressive.hpp>
 
 #include "../exception/exception.h"
 
@@ -37,9 +38,11 @@
 
 namespace machinelearning { namespace textprocess {
     
+    namespace xps = boost::xpressive;
+    
     
     /** class for stop-word-reduction
-     * @todo adding state machine support for long expressions
+     * @todo optimize with http://en.wikipedia.org/wiki/Radix_tree or http://en.wikipedia.org/wiki/Radix_tree
      **/
     class stopwordreduction {
         
@@ -54,7 +57,7 @@ namespace machinelearning { namespace textprocess {
         private:
         
             /** expression stop word **/
-            boost::regex m_stopwordsexpr;
+            xps::sregex m_stopwordsexpr;
             /** bool for case-sensitive / case-insensitive wordlist **/
             const bool m_caseinsensitive;
         
@@ -92,9 +95,9 @@ namespace machinelearning { namespace textprocess {
         // create regular expression case-sensitive / case-insensitive with perl syntax (default)
         l_stopwordsexpr = "\\<(?:" + l_stopwordsexpr + ")\\>";
         if (p_caseinsensitive)
-            m_stopwordsexpr = boost::regex( l_stopwordsexpr, boost::regex_constants::icase );
+            m_stopwordsexpr = xps::sregex::compile( l_stopwordsexpr, xps::regex_constants::icase );
         else
-            m_stopwordsexpr = boost::regex( l_stopwordsexpr );
+            m_stopwordsexpr = xps::sregex::compile( l_stopwordsexpr );
     }
     
     
@@ -114,7 +117,7 @@ namespace machinelearning { namespace textprocess {
      **/
     inline std::string stopwordreduction::remove( const std::string& p_text ) const
     {
-        return boost::regex_replace(p_text, m_stopwordsexpr, "", boost::match_default | boost::format_all);
+        return xps::regex_replace(p_text, m_stopwordsexpr, ""); //, boost::match_default | boost::format_all);
     }
 
 };};
