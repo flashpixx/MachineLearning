@@ -42,7 +42,7 @@ namespace machinelearning { namespace textprocess {
     
     
     /** class for stop-word-reduction
-     * @todo optimize with http://en.wikipedia.org/wiki/Radix_tree or http://en.wikipedia.org/wiki/Radix_tree
+     * @todo try to optimize with http://en.wikipedia.org/wiki/Ukkonen%27s_algorithm / http://en.wikipedia.org/wiki/Radix_tree
      **/
     class stopwordreduction {
         
@@ -56,7 +56,9 @@ namespace machinelearning { namespace textprocess {
         
         private:
         
-            /** expression stop word **/
+            /** expression stop word - use xpressive interface for big expressions
+             * because the default interface does not work with the expression 
+             **/
             xps::sregex m_stopwordsexpr;
             /** bool for case-sensitive / case-insensitive wordlist **/
             const bool m_caseinsensitive;

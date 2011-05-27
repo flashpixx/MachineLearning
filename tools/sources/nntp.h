@@ -30,6 +30,7 @@
 #include <iostream>
 #include <iterator>
 #include <boost/asio.hpp>
+#include <boost/regex.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp> 
 
@@ -72,6 +73,7 @@ namespace machinelearning { namespace tools { namespace sources {
             std::string getArticle( const std::string&, const std::string& );
             std::vector<std::string> getArticle( const std::string&, const std::vector<std::string>& );
             std::vector<std::string> getArticle( const std::vector<std::string>& );
+            bool isArticleCanceled( void ) const;
             bool existArticle( const std::string& );
             bool existArticle( const std::string&, const std::string& );
             bool nextArticle( void );
@@ -119,11 +121,16 @@ namespace machinelearning { namespace tools { namespace sources {
             content m_content;
             /** string data for saving the last returned header for iterators **/
             std::string m_header;
+            /** bool for a message that is canceld **/
+            bool m_canceled;
+            /** regular expression for detecting canceled messages **/
+            const boost::regex m_cancelpattern;
         
             unsigned int send( const std::string&, const bool& = true );
             void throwNNTPError( const unsigned int& ) const;
             std::string getResponseData( const std::string& = "\r\n.\r\n" );
             std::map<std::string, std::size_t> extractGroupList( const std::string& );
+            std::string getArticleData( void );
         
     };
 
@@ -138,7 +145,9 @@ namespace machinelearning { namespace tools { namespace sources {
         m_io(),
         m_socket(m_io),
         m_content( body ),
-        m_header()
+        m_header(),
+        m_canceled( false ),
+        m_cancelpattern( "Control: cancel", boost::regex_constants::icase )
     {
         // create resolver for server
         bip::tcp::resolver l_resolver(m_io);
@@ -171,6 +180,14 @@ namespace machinelearning { namespace tools { namespace sources {
         m_socket.close();
     }
     
+    
+    /** returns the canceld status of an article
+     * @return bool for canceld message
+     **/
+    inline bool nntp::isArticleCanceled( void ) const
+    {
+        return m_canceled;
+    }
     
     /** sets the content option
      * @param p_content content option
@@ -228,6 +245,8 @@ namespace machinelearning { namespace tools { namespace sources {
      **/
     inline unsigned int nntp::send( const std::string& p_cmd, const bool& p_throw )
     {
+        m_canceled = false;
+        
         // send the command
         boost::asio::streambuf l_request;
         std::ostream l_send( &l_request );
@@ -266,7 +285,7 @@ namespace machinelearning { namespace tools { namespace sources {
         std::istream l_response_stream( &l_response );
         std::string l_data( (std::istreambuf_iterator<char>(l_response_stream)), std::istreambuf_iterator<char>());
         l_data.erase( l_data.end()-p_separator.size(), l_data.end() );
-        
+                
         return l_data;
     }
     
@@ -333,6 +352,32 @@ namespace machinelearning { namespace tools { namespace sources {
     }
 
     
+    /** seperate article data and set internal status falgs
+     * @return std::String with article data
+     **/
+    inline std::string nntp::getArticleData( void )
+    {
+        // read full article and seperate header and body
+        std::string l_header, l_body;
+        const std::string l_full = getResponseData();
+        
+        nntp::separateHeaderBody( l_full, l_header, l_body );
+        
+        // check if the article is canceled
+        boost::match_results<std::string::const_iterator> l_what; 
+        m_canceled = boost::regex_search(l_header, l_what, m_cancelpattern);
+
+        // return the content
+        switch (m_content) {
+            case full   :   return l_full;
+            case body   :   return l_body;
+            case header :   return l_header;
+        }
+        
+        return std::string("");
+    }
+    
+    
     /** returns an article
      * @param p_group newsgroup
      * @param p_articleid article ID (not message id)
@@ -341,14 +386,9 @@ namespace machinelearning { namespace tools { namespace sources {
     inline std::string nntp::getArticle( const std::string& p_group, const std::string& p_articleid )
     {
         send("group "+p_group);
-        
-        switch (m_content) {
-            case full   :   send("article "+p_articleid);   break;
-            case body   :   send("body "+p_articleid);      break;
-            case header :   send("head "+p_articleid);      break;
-        }
-        
-        return getResponseData();
+        send("article "+p_articleid);
+
+        return getArticleData();
     }
     
     
@@ -357,13 +397,8 @@ namespace machinelearning { namespace tools { namespace sources {
      **/
     inline std::string nntp::getArticle( void )
     {
-        switch (m_content) {
-            case full   :   send("article");   break;
-            case body   :   send("body");      break;
-            case header :   send("head");      break;
-        }
-        
-        return getResponseData();
+        send("article");
+        return getArticleData();
     }
     
     
@@ -399,13 +434,8 @@ namespace machinelearning { namespace tools { namespace sources {
      **/
     inline std::string nntp::getArticle( const std::string& p_messageid )
     {
-        switch (m_content) {
-            case full   :   send("article "+ p_messageid);   break;
-            case body   :   send("body "+ p_messageid);      break;
-            case header :   send("head "+ p_messageid);      break;
-        }
-
-        return getResponseData();
+        send("article "+ p_messageid); 
+        return getArticleData();
     }    
     
     
