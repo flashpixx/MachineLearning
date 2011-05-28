@@ -31,7 +31,17 @@
  * @section requirements requirements
  * <ul>
  * <li>Automatically Tuned Linear Algebra Software ( http://math-atlas.sourceforge.net/ )</li>
- * <li>Boost ( http://www.boost.org/ ) (iostreams with gzip and bzip2 support and thread support musst be compiled within, random device and MPI support are optional)</li>
+ * <li>Boost ( http://www.boost.org/ ) with following components
+ *     <ul>
+ *         <li>IOStreams with GZip and BZip2 support</li>
+ *         <li>Thread support</li>
+ *         <li>Regular Expression support</li>
+ *         <li>Filesystem support</li>
+ *         <li>System support</li>
+ *         <li><i>optional Random Device support</i></li>
+ *         <li><i>optional MPI support</i></li>
+ *     </ul>
+ * </li>
  * <li>Boost Bindings (SVN http://svn.boost.org/svn/boost/sandbox/numeric_bindings )</li>
  * <li>GiNaC ( http://www.ginac.de/ )</li>
  * <li>Linear Algebra PACKage ( http://www.netlib.org/lapack/ )</li>
@@ -42,6 +52,7 @@
  *          <li>MPICH2 ( http://www.mcs.anl.gov/research/projects/mpich2/ )</li>
  *          <li>Microsoft High Performance Computing Pack 2008 R2 SDK ( http://www.microsoft.com/downloads/en/details.aspx?FamilyID=bc671b22-f158-4a5f-828b-7a374b881172 )</li>
  *      </ul>
+ * </li>
  * <li><i>optional GetText</i> ( http://www.gnu.org/software/gettext ) for including multilanguage support</li>
  * <li><i>optional LibXML2</i> ( http://xmlsoft.org/ ) (used by wikipedia support)</li>
  * <li><i>optional Scons</i> ( http://www.scons.org/ )</li>

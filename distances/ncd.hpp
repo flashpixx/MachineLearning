@@ -347,6 +347,29 @@ namespace machinelearning { namespace distances {
     {
         for(std::multimap<std::size_t, std::pair<std::size_t,std::size_t> >::iterator it=p_map.lower_bound(p_id); it != p_map.upper_bound(p_id); ++it) {
             
+            // read cache data
+            std::size_t l_first=0, l_second=0;
+            getCache( p_cache, it->second.first, p_sources1.size()+it->second.second, l_first, l_second );
+            
+            // check for both index positions the cache and adds the data
+            if (l_first == 0) {
+                l_first = deflate(p_isfile, p_sources1[it->second.first]);
+                setCache( p_cache, it->second.first, l_first );
+            }
+            
+            if (l_second == 0) {
+                l_second = deflate(p_isfile, p_sources2[it->second.second]);
+                setCache( p_cache, p_sources1.size()+it->second.second, l_second );
+            }
+            
+            
+            // determin min and max
+            const std::size_t l_min = std::min(l_first, l_second);
+            const std::size_t l_max = std::max(l_first, l_second);
+            
+            setUnsquare( p_matrix, it->second.first, it->second.second,
+                         static_cast<T>(deflate(p_isfile, p_sources1[it->second.first], p_sources2[it->second.second]) - l_min) / l_max
+                        );
         }
     }
     
