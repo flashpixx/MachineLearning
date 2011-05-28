@@ -109,11 +109,13 @@ namespace machinelearning { namespace distances {
         std::multimap<std::size_t, std::pair<std::size_t,std::size_t> > getWavefrontIndex( const std::size_t&, const std::size_t& );
         void multithread_deflate_symmetric( std::multimap<std::size_t, std::pair<std::size_t,std::size_t> >&, const std::vector<std::string>&, const std::size_t&, const bool&, ublas::symmetric_matrix<T, ublas::upper>&, ublas::vector<std::size_t>& );
         void multithread_deflate_unsymmetric( std::multimap<std::size_t, std::pair<std::size_t,std::size_t> >&, const std::vector<std::string>&, const std::size_t&, const bool&, ublas::matrix<T>&, ublas::vector<std::size_t>& );
+        void multithread_deflate_unsquare( std::multimap<std::size_t, std::pair<std::size_t,std::size_t> >&, const std::vector<std::string>&, const std::vector<std::string>&, const std::size_t&, const bool&, ublas::matrix<T>&, ublas::vector<std::size_t>& );
         
         void setCache( ublas::vector<std::size_t>&, const std::size_t&, const std::size_t& );
         void getCache( const ublas::vector<std::size_t>&, const std::size_t&, const std::size_t&, std::size_t&, std::size_t& );
         void setUnsymmetric( ublas::matrix<T>&, const std::size_t&, const std::size_t&, const T&, const T& );
         void setSymmetric( ublas::symmetric_matrix<T, ublas::upper>&, const std::size_t&, const std::size_t&, const T& );
+        void setUnsquare( ublas::matrix<T>&, const std::size_t&, const std::size_t&, const T& );
     };
     
     
@@ -198,6 +200,21 @@ namespace machinelearning { namespace distances {
         p_second = p_cache(p_idsecond);
     }
     
+    
+    /** write method for unsquare matrix data
+     * @param p_matrix matrix with data
+     * @param p_row row index
+     * @param p_col col index
+     * @param p_val value
+     **/
+    template<typename T> inline void ncd<T>::setUnsquare( ublas::matrix<T>& p_matrix, const std::size_t& p_row, const std::size_t& p_col, const T& p_val )
+    {
+        // upgrade lock for writing
+        boost::unique_lock<boost::shared_mutex> l_lock( m_matrixlock ); 
+        
+        // because of deflate algorithms there can be values greater than 1, so we check and set it to 1
+        p_matrix(p_row, p_col) = std::min( static_cast<T>(1), p_val );
+    }
     
     
     /** write method for unsymmetric matrix data, which sets two values into the positions 
@@ -315,6 +332,24 @@ namespace machinelearning { namespace distances {
                           );
         }
     }
+    
+    
+    /** creates the thread and calculates the NCD unsymmetric 
+     * @param p_map map with indices
+     * @param p_sources1 vector with row data
+     * @param p_sources2 vector with column data
+     * @param p_id thread id for reading pairs in the map
+     * @πaram p_isfile bool if data is interpretated as filenames
+     * @param p_matrix result matrix
+     * @param p_cache cache vector
+     **/
+    template<typename T> inline void ncd<T>::multithread_deflate_unsquare( std::multimap<std::size_t, std::pair<std::size_t,std::size_t> >& p_map, const std::vector<std::string>& p_sources1, const std::vector<std::string>& p_sources2, const std::size_t& p_id, const bool& p_isfile, ublas::matrix<T>& p_matrix, ublas::vector<std::size_t>& p_cache )
+    {
+        for(std::multimap<std::size_t, std::pair<std::size_t,std::size_t> >::iterator it=p_map.lower_bound(p_id); it != p_map.upper_bound(p_id); ++it) {
+            
+        }
+    }
+    
     
     //---------------------------------------------------------------------------------------------------------------------------------------------------------
     
@@ -493,7 +528,7 @@ namespace machinelearning { namespace distances {
      * @param p_strvec1 string vector
      * @param p_strvec2 string vector
      * @param p_isfile parameter for interpreting the string as a file with path
-     * @return dissimilarity matrix with std::vector1 x std::vector2 elements
+     * @return dissimilarity matrix with std::vector1 x std::vector2 elements (deflating order: element first vector concat with element second vector )
      **/
     template<typename T> inline ublas::matrix<T> ncd<T>::unsquare ( const std::vector<std::string>& p_strvec1, const std::vector<std::string>& p_strvec2, const bool& p_isfile )
     {
@@ -506,8 +541,49 @@ namespace machinelearning { namespace distances {
         
         // if we can use multithreads 
         if (boost::thread::hardware_concurrency() > 1) {
+            
+            // we set a lock during calculation, because the object can't handle different local states
+            boost::unique_lock<boost::mutex> l_lock( m_running );
+            
+            // we create the map for threads (on the contrary to wavefront we cut patches for each thread, because we must calculate each element without any topographical order)
+            // The map element has in the std::pair within the first position the index of the first vector
+            std::multimap<std::size_t, std::pair<std::size_t,std::size_t> > l_map;
+            
+            if (p_strvec1.size() < p_strvec2.size())
+                for(std::size_t j=0; j < p_strvec1.size(); ++j)
+                    for(std::size_t i=0; i < p_strvec2.size(); ++i)
+                        l_map.insert(  std::pair<std::size_t, std::pair<std::size_t,std::size_t> >(i % boost::thread::hardware_concurrency(), std::pair<std::size_t,std::size_t>(j,i))  );
+                
+            else
+                for(std::size_t j=0; j < p_strvec2.size(); ++j)
+                    for(std::size_t i=0; i < p_strvec1.size(); ++i)
+                        l_map.insert(  std::pair<std::size_t, std::pair<std::size_t,std::size_t> >(i % boost::thread::hardware_concurrency(), std::pair<std::size_t,std::size_t>(i,j))  );
+
+            // create threads
+            boost::thread_group l_threadgroup;
+            for(std::size_t i=0; i < boost::thread::hardware_concurrency(); ++i)
+                l_threadgroup.create_thread(  boost::bind( &ncd<T>::multithread_deflate_unsquare, this, boost::ref(l_map), boost::ref(p_strvec1), boost::ref(p_strvec2), i, p_isfile, boost::ref(l_result), boost::ref(l_cache) )  );
+            
+            // run threads and wait during all finished
+            l_threadgroup.join_all();
+            
+            
+            
+            
         } else // otherwise (we can't use threads)
-            ;        
+            for (std::size_t i = 0; i < p_strvec1.size(); ++i) {
+                l_cache(i) = deflate(p_isfile, p_strvec1[i]);
+                
+                for (std::size_t j = 0; j < p_strvec2.size(); ++j) {
+                    if (i == 0)
+                        l_cache(p_strvec1.size()+j) = deflate(p_isfile, p_strvec2[j]);
+                    
+                    const std::size_t l_min = std::min(l_cache(i), l_cache(p_strvec1.size()+j));
+                    const std::size_t l_max = std::max(l_cache(i), l_cache(p_strvec1.size()+j));
+                    
+                    setUnsquare( l_result, i, j, static_cast<T>(deflate(p_isfile, p_strvec1[i], p_strvec2[j]) - l_min) / l_max );
+                }
+            }
         
         return l_result;
     }
