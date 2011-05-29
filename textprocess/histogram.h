@@ -123,7 +123,7 @@ namespace machinelearning { namespace textprocess {
     /** returns a string with character that are used for seperating the words
      * @return string with separators
      **/
-    inline std::string histogram::getWordSeparator( void) const
+    inline std::string histogram::getWordSeparator( void ) const
     {
         return m_seperators;
     }
