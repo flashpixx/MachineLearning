@@ -132,7 +132,7 @@
  * <li><dfn>classifier</dfn> this target build all classifier algorithms, but the <dfn>--with-files</dfn> parameter must be set</li>
  * <li><dfn>reducing</dfn> this target build all dimension reduce algorithms, but the <dfn>--with-files</dfn> parameter must be set</li>
  * <li><dfn>distance</dfn> this target build all distance algorithms, but the <dfn>--with-files</dfn> parameter must be set</li>
- * <li><dfn>other</dfn> this target build all other examples</li>
+ * <li><dfn>other</dfn> this target build all other examples, following options must be set: <dfn>--with-files</dfn>, <dfn>--with-sources</dfn> (optional <dfn>--with-mpi</dfn>) </li>
  * </ul>
  *
  * @section ex advanced documentation
@@ -355,12 +355,15 @@
  *
  * @page other other examples
  *
+ * @section toc Table of contents
  * <ul>
  * <li>@ref mdsnntp</li>
  * <li>@ref mdsnntpmatlab</li>
+ * <li>@ref mdswiki</li>
+ * <li>@ref mdswikimatlab</li>
  * </ul>
  *
- * @section mdsnntp distance analyse of newsgroups articles and visualization with MDS
+ * @section mdsnntp Distance analyse of newsgroups articles and visualization with MDS
  * The program collects some newsgroup articles (of the groups, that are set with --groups or --groups rand n, read n groups randomaly or the n biggest groups with --groups n). The articles are
  * filtered with the term frequency option and the filtered articles are used for creating a distance matrix with is projected via MDS and written to a HDF file. The program can compiled also
  * with MPI support, so each process get their own articles and matrix data. 
@@ -441,6 +444,46 @@
         legend(phandle);
  * @endcode
  *
+ * @section mdswiki Distance analyse of Wikipedia articles and visualization with MDS
+ * @include examples/other/mds_wikipedia.cpp
+ *
+ * @subsection mdswikimatlab Matlab code for plotting Wikipedia distance data
+ * @code
+    function plotwiki( pcfile, ptext)
+ 
+        if nargin < 2 || isempty(ptext)
+            ptext = true;
+        end
+        pmarkersize=5;
+ 
+        % get data
+        data  = hdf5read( pcfile, '/project');
+        if (size(data,2) ~= 2) && (size(data,2) ~= 3)
+            error('plot only with 2D or 3D');
+        end
+        label = hdf5read( pcfile, '/label');
+ 
+        % create plot
+        figure;
+        grid on;
+        hold on;
+ 
+        if size(data,2) == 2
+            plot(data(:,1), data(:,2), '.', 'MarkerSize',pmarkersize);
+        else
+            plot3(data(:,1), data(:,2), data(:,3), '.', 'MarkerSize',pmarkersize);
+        end
+  
+        for i=1:size(data,1)
+            if ptext
+                if size(data,2) == 2
+                    text( data(i,1)+0.005, data(i,2), char(label(i).data), 'FontSize', 8);
+                else
+                    text( data(i,1)+0.005, data(i,2), data(i,3), char(label(i).data), 'FontSize', 8);
+                end
+            end
+        end
+ * @endcode
  * 
  *
  *
@@ -462,6 +505,7 @@
  * @file examples/sources/wikipedia.cpp testprogram for using Wikipedia
  * @file examples/sources/cloud.cpp testprogram for create n-dimensional normal distribution
  * @file examples/other/mds_nntp.cpp program for reading newsgroup articles, stopword reduction, distance calculating and MDS plotting
+ * @file examples/other/mds_wikipedia.cpp program for reading Wikipedia articles, stopword reduction, distance calculating and MDS plotting
  *
  * @file classifier/classifier.h main header for all classifier structurs
  * @file classifier/classifier.hpp header for the abstract class implementation of the classifiers
