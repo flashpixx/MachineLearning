@@ -33,6 +33,10 @@ namespace neighbor   = machinelearning::neighborhood;
 namespace tools      = machinelearning::tools;
 
 
+/** main program
+ * @param argc number of arguments
+ * @param argv arguments
+ **/
 int main(int argc, char* argv[]) {
 
     if (argc < 7)
