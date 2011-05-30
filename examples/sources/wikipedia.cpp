@@ -25,7 +25,10 @@
 
 using namespace machinelearning;
 
-
+/** main program
+ * @param argc number of arguments
+ * @param argv arguments
+ **/
 int main(int argc, char* argv[]) {
 
     // create wikipedia object

@@ -124,7 +124,10 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
     return true;
 }
 
-
+/** main program
+ * @param argc number of arguments
+ * @param argv arguments
+ **/
 int main(int argc, char* argv[]) {
 
     std::map<std::string, boost::any> l_args;

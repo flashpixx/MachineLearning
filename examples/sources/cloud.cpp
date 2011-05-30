@@ -31,6 +31,12 @@ using namespace machinelearning;
 namespace ublas = boost::numeric::ublas;
 
 
+/** read all input arguments 
+ * @param argc number of arguments of "main"
+ * @param argv arguments of "main"
+ * @param p_args map with argument values (default values)
+ * @return bool if all is correct
+ **/
 bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_args ) {
     
     if (argc < 2) {
@@ -169,7 +175,10 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
 }
 
 
-
+/** main program
+ * @param argc number of arguments
+ * @param argv arguments
+ **/
 int main(int argc, char* argv[]) {
     
     std::map<std::string, boost::any> l_args;

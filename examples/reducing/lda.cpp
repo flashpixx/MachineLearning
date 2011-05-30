@@ -30,7 +30,10 @@ namespace ublas = boost::numeric::ublas;
 namespace dim   = machinelearning::dimensionreduce::supervised;
 namespace tools = machinelearning::tools;
 
-
+/** main program
+ * @param argc number of arguments
+ * @param argv arguments
+ **/
 int main(int argc, char* argv[]) {
     
     if (argc < 6)
