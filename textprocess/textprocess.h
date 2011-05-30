@@ -37,7 +37,7 @@ namespace machinelearning {
 
 
 
-#include "histogram.h"
+#include "termfrequency.h"
 #include "stopwordreduction.h"
 
 #endif

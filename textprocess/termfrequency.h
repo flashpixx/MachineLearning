@@ -23,8 +23,8 @@
 
 
 
-#ifndef MACHINELEARNING_TEXTPROCESS_HISTOGRAM_H
-#define MACHINELEARNING_TEXTPROCESS_HISTOGRAM_H
+#ifndef MACHINELEARNING_TEXTPROCESS_TERMFREQUENCY_H
+#define MACHINELEARNING_TEXTPROCESS_TERMFREQUENCY_H
 
 #include <map>
 #include <string>
@@ -38,11 +38,11 @@
 namespace machinelearning { namespace textprocess {
 
     
-    /** class for text histogram. The class analyses texts and create a map with word counts,
+    /** class for term frequency. The class analyses texts and create a map with word counts,
      * that can be used for stop-word-reduction
      * $LastChangedDate$
      **/
-    class histogram {
+    class termfrequency {
         
         public:
         
@@ -54,7 +54,7 @@ namespace machinelearning { namespace textprocess {
             };
         
         
-            histogram( const std::string& = ",;.:!?- \n\t|=", const std::string& = "#_()[]{}%$*/\\\"=|<>\r", const bool& = true );
+            termfrequency( const std::string& = ",;.:!?- \n\t|=", const std::string& = "#_()[]{}%$*/\\\"=|<>\r", const bool& = true );
             void add( const std::string&, const std::size_t& = 0 );
             void add( const std::vector<std::string>&, const std::size_t& = 2 );
             bool iscaseinsensitivity( void ) const;
@@ -90,7 +90,7 @@ namespace machinelearning { namespace textprocess {
      * @param p_remove string with characters that will be removed
      * @param p_caseinsensitive words should be case-insensitive
      **/
-    inline histogram::histogram( const std::string& p_separator, const std::string& p_remove, const bool& p_caseinsensitive ) :
+    inline termfrequency::termfrequency( const std::string& p_separator, const std::string& p_remove, const bool& p_caseinsensitive ) :
         m_seperators( p_separator ),
         m_remove( p_remove ),
         m_caseinsensitive( p_caseinsensitive ),
@@ -105,7 +105,7 @@ namespace machinelearning { namespace textprocess {
     /** returns the value for case-sensitive words
      * @return bool for case-insensitive
      **/
-    inline bool histogram::iscaseinsensitivity( void ) const
+    inline bool termfrequency::iscaseinsensitivity( void ) const
     {
         return m_caseinsensitive;
     }
@@ -114,7 +114,7 @@ namespace machinelearning { namespace textprocess {
     /** returns the number of words
      * @return number of words
      **/
-    inline std::size_t histogram::getWordCount( void ) const
+    inline std::size_t termfrequency::getWordCount( void ) const
     {
         return m_wordcount;
     }
@@ -123,7 +123,7 @@ namespace machinelearning { namespace textprocess {
     /** returns a string with character that are used for seperating the words
      * @return string with separators
      **/
-    inline std::string histogram::getWordSeparator( void ) const
+    inline std::string termfrequency::getWordSeparator( void ) const
     {
         return m_seperators;
     }
@@ -132,7 +132,7 @@ namespace machinelearning { namespace textprocess {
     /** returns the internal map. Each key is the word and the value the number of counts
      * @return word map
      **/
-    inline std::map<std::string, std::size_t> histogram::getMap( void ) const
+    inline std::map<std::string, std::size_t> termfrequency::getMap( void ) const
     {
         return m_map;
     }
@@ -142,18 +142,18 @@ namespace machinelearning { namespace textprocess {
      * @param p_vec string vector with data
      * @param p_minlen only word equal or greater will be added
      **/
-    inline void histogram::add( const std::vector<std::string>& p_vec, const std::size_t& p_minlen )
+    inline void termfrequency::add( const std::vector<std::string>& p_vec, const std::size_t& p_minlen )
     {
         for(std::size_t i=0; i < p_vec.size(); ++i)
             add( p_vec[i], p_minlen );
     }
     
     
-    /** adds textdata to the histogram
+    /** adds textdata to the term frequency
      * @param p_text input text
      * @param p_minlen only word equal or greater will be added
      **/
-    inline void histogram::add( const std::string& p_text, const std::size_t& p_minlen )
+    inline void termfrequency::add( const std::string& p_text, const std::size_t& p_minlen )
     {
         std::vector<std::string> l_data;
         boost::split( l_data, p_text, boost::is_any_of(m_seperators) );
@@ -186,7 +186,7 @@ namespace machinelearning { namespace textprocess {
      * @param p_comp1 comparasion operator of the first value
      * @param p_comp2 comparasion operator of the second value
      **/
-    inline std::vector<std::string> histogram::getWords( const float& p_val1, const float& p_val2, const comparison& p_comp1, const comparison& p_comp2 )
+    inline std::vector<std::string> termfrequency::getWords( const float& p_val1, const float& p_val2, const comparison& p_comp1, const comparison& p_comp2 )
     {
         if ( (p_val1 < 0) || (p_val1 > 1) || (p_val2 < 0) || (p_val2 > 1) )
             throw exception::runtime(_("ranges must be between [0,1]"));
@@ -211,7 +211,7 @@ namespace machinelearning { namespace textprocess {
      * @param p_val value in range [0,1]
      * @param p_comp comparasion operator of the value
      **/
-    inline std::vector<std::string> histogram::getWords( const float& p_val, const comparison& p_comp )
+    inline std::vector<std::string> termfrequency::getWords( const float& p_val, const comparison& p_comp )
     {
         if ( (p_val < 0) || (p_val > 1) )
             throw exception::runtime(_("ranges must be between [0,1]"));
@@ -237,7 +237,7 @@ namespace machinelearning { namespace textprocess {
      * @param p_comp comparasion
      * @return bool
      **/
-    inline bool histogram::compare( const float& p_val1, const float& p_val2, const comparison& p_comp ) const
+    inline bool termfrequency::compare( const float& p_val1, const float& p_val2, const comparison& p_comp ) const
     {
         bool ll = false;
         
@@ -253,7 +253,7 @@ namespace machinelearning { namespace textprocess {
 
     
     /** removes all elements within the map **/
-    inline void histogram::clear( void ) 
+    inline void termfrequency::clear( void ) 
     {
         m_map.clear();
         m_wordcount = 0;
@@ -263,7 +263,7 @@ namespace machinelearning { namespace textprocess {
     /** remove a word on the map
      * @param p_word word
      **/
-    inline void histogram::erase( const std::string& p_word )
+    inline void termfrequency::erase( const std::string& p_word )
     {
         std::string lc = p_word;
         if (m_caseinsensitive)
