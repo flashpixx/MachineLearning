@@ -93,11 +93,11 @@
  * @section compileroptions compiler option
  * toolbox compilerflags
  * <ul>
- * <li><dfn>MACHINELEARNING_RANDOMDEVICE</dfn> for using the Boost Device Random support (required Boost Random Device Support), otherwise a Mersenne Twister is used</li>
+ * <li><dfn>MACHINELEARNING_RANDOMDEVICE</dfn> for using the Boost Device Random support (requires Boost Random Device Support), otherwise a Mersenne Twister is used</li>
  * <li><dfn>MACHINELEARNING_MULTILANGUAGE</dfn> option for compiling the framework with multilanguage support (uses gettext)</li>
  * <li><dfn>MACHINELEARNING_FILES</dfn> adds the support for HDF & CSV file reading and writing</li>
  * <li><dfn>MACHINELEARNING_SOURCES</dfn> compiles sources in that way, that e.g. NNTP / Wikipedia data can be read directly</li>
- * <li><dfn>MACHINELEARNING_MPI</dfn> enable MPI Support for the toolbox (required Boost MPI support)</li>
+ * <li><dfn>MACHINELEARNING_MPI</dfn> enable MPI Support for the toolbox (requires Boost MPI support)</li>
  * </ul>
  * The following compiler commands should / must be set
  * <ul>
