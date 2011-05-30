@@ -58,10 +58,10 @@ namespace machinelearning { namespace textprocess {
             void add( const std::string&, const std::size_t& = 0 );
             void add( const std::vector<std::string>&, const std::size_t& = 2 );
             bool iscaseinsensitivity( void ) const;
-            std::size_t getWordCount( void ) const;
-            std::string getWordSeparator( void ) const;
-            std::vector<std::string> getWords( const float&, const float&, const comparison& = lessequal, const comparison& = greaterequal );
-            std::vector<std::string> getWords( const float&, const comparison& = lessequal );
+            std::size_t getTermCount( void ) const;
+            std::string getTermSeparator( void ) const;
+            std::vector<std::string> getTerms( const float&, const float&, const comparison& = lessequal, const comparison& = greaterequal );
+            std::vector<std::string> getTerms( const float&, const comparison& = lessequal );
             void clear( void );
             void erase( const std::string& );
             std::map<std::string, std::size_t> getMap( void ) const;
@@ -114,7 +114,7 @@ namespace machinelearning { namespace textprocess {
     /** returns the number of words
      * @return number of words
      **/
-    inline std::size_t termfrequency::getWordCount( void ) const
+    inline std::size_t termfrequency::getTermCount( void ) const
     {
         return m_wordcount;
     }
@@ -123,7 +123,7 @@ namespace machinelearning { namespace textprocess {
     /** returns a string with character that are used for seperating the words
      * @return string with separators
      **/
-    inline std::string termfrequency::getWordSeparator( void ) const
+    inline std::string termfrequency::getTermSeparator( void ) const
     {
         return m_seperators;
     }
@@ -186,7 +186,7 @@ namespace machinelearning { namespace textprocess {
      * @param p_comp1 comparasion operator of the first value
      * @param p_comp2 comparasion operator of the second value
      **/
-    inline std::vector<std::string> termfrequency::getWords( const float& p_val1, const float& p_val2, const comparison& p_comp1, const comparison& p_comp2 )
+    inline std::vector<std::string> termfrequency::getTerms( const float& p_val1, const float& p_val2, const comparison& p_comp1, const comparison& p_comp2 )
     {
         if ( (p_val1 < 0) || (p_val1 > 1) || (p_val2 < 0) || (p_val2 > 1) )
             throw exception::runtime(_("ranges must be between [0,1]"));
@@ -211,7 +211,7 @@ namespace machinelearning { namespace textprocess {
      * @param p_val value in range [0,1]
      * @param p_comp comparasion operator of the value
      **/
-    inline std::vector<std::string> termfrequency::getWords( const float& p_val, const comparison& p_comp )
+    inline std::vector<std::string> termfrequency::getTerms( const float& p_val, const comparison& p_comp )
     {
         if ( (p_val < 0) || (p_val > 1) )
             throw exception::runtime(_("ranges must be between [0,1]"));
