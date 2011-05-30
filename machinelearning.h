@@ -132,6 +132,7 @@
  * <li><dfn>classifier</dfn> this target build all classifier algorithms, but the <dfn>--with-files</dfn> parameter must be set</li>
  * <li><dfn>reducing</dfn> this target build all dimension reduce algorithms, but the <dfn>--with-files</dfn> parameter must be set</li>
  * <li><dfn>distance</dfn> this target build all distance algorithms, but the <dfn>--with-files</dfn> parameter must be set</li>
+ * <li><dfn>other</dfn> this target build all other examples</li>
  * </ul>
  *
  * @section ex advanced documentation
@@ -144,6 +145,7 @@
  * <li>@subpage files</li>
  * <li>@subpage logger</li>
  * <li>@subpage lang</li>
+ * <li>@subpage other</li>
  * </ul>
  *
  *
@@ -351,6 +353,98 @@
  *
  *
  *
+ * @page other other examples
+ *
+ * <ul>
+ * <li>@ref mdsnntp</li>
+ * <li>@ref mdsnntpmatlab</li>
+ * </ul>
+ *
+ * @section mdsnntp distance analyse of newsgroups articles and visualization with MDS
+ * The program collects some newsgroup articles (of the groups, that are set with --groups or --groups rand n, read n groups randomaly or the n biggest groups with --groups n). The articles are
+ * filtered with the term frequency option and the filtered articles are used for creating a distance matrix with is projected via MDS and written to a HDF file. The program can compiled also
+ * with MPI support, so each process get their own articles and matrix data. 
+ * @include examples/other/mds_nntp.cpp
+ *
+ * @subsection mdsnntpmatlab Matlab code for plotting NNTP distance data
+ * The Matlab code on the bottom can be used for reading the HDF file and create a colored plot with all data.
+ * @code
+    function plotnntp( pcfile )
+        pmarkersize=5;
+ 
+        % create colors
+        textlabel  = hdf5read( pcfile, '/uniquegroup');
+        label      = cell(size(textlabel,1),1);
+        labelcolor = cell(size(textlabel,1),1);
+ 
+        col        = jet(size(textlabel,1));
+        %col       = hsv(size(textlabel,1));
+        for i=1:size(labelcolor,1)
+            label{i}      = char(textlabel(i).data);
+            labelcolor{i} = col(i, :);
+        end
+ 
+        % we create for each label group a data matrix
+        data       = hdf5read( pcfile, '/project');
+        if (size(data,2) ~= 2) && (size(data,2) ~= 3)
+            error('plot only with 2D or 3D');
+        end
+ 
+        datalabel  = hdf5read( pcfile, '/group');
+ 
+        datacell   = cell(size(label,1),1);
+        maxcount   = zeros(size(label,1),1);
+ 
+        for i=1:size(textlabel,1)
+            datacell{i} = zeros( size(data,1), size(data,2) );
+        end
+ 
+        for i=1:size(data,1)
+            pos   = strmatch(char(datalabel(i).data), label, 'exact');
+            point = datacell{pos};
+ 
+            point(maxcount(pos)+1,:) = data(i,:);
+ 
+            datacell{pos} = point;
+            maxcount(pos) = maxcount(pos) + 1;
+        end
+ 
+        % remove non-existing datasets
+        emptycell = maxcount == 0;
+        for i=1:numel(emptycell)
+            if emptycell(i)
+                datacell(i)	  = [];
+                labelcolor(i) = [];
+                label(i)	  = [];
+                maxcount(i)	  = [];
+            end
+        end
+ 
+        % create plot
+        figure;
+        grid on;
+        hold on;
+ 
+        phandle = zeros(numel(datacell),1);
+        for i=1:numel(datacell)
+ 
+            point = datacell{i};
+            point = point(1:maxcount(i), :);
+ 
+            if size(point,2) == 2
+                phandle(i) = plot(point(:,1), point(:,2), '.', 'Color', labelcolor{i}, 'DisplayName', label{i}, MarkerSize',pmarkersize);
+            else
+                phandle(i) = plot3(point(:,1), point(:,2), point(:,3), '.', 'Color', labelcolor{i}, 'DisplayName', label{i}, 'MarkerSize',pmarkersize);
+            end
+        end
+ 
+        legend(phandle);
+ * @endcode
+ *
+ * 
+ *
+ *
+ *
  * @file machinelearning.h main header for including in a project
  *
  * @file examples/distance/ncd.cpp testprogram for the normalized compression distance
@@ -367,6 +461,7 @@
  * @file examples/sources/newsgroup.cpp testprogram for NNTP using
  * @file examples/sources/wikipedia.cpp testprogram for using Wikipedia
  * @file examples/sources/cloud.cpp testprogram for create n-dimensional normal distribution
+ * @file examples/other/mds_nntp.cpp program for reading newsgroup articles, stopword reduction, distance calculating and MDS plotting
  *
  * @file classifier/classifier.h main header for all classifier structurs
  * @file classifier/classifier.hpp header for the abstract class implementation of the classifiers
@@ -422,6 +517,10 @@
  * @file tools/files/files.h main header for file structurs
  * @file tools/files/csv.hpp implementation for reading and writing csv files
  * @file tools/files/hdf.hpp implementation for reading and writing hdf files
+ 
+ * @file textprocess/textprocess.h main header for text processing algorithms
+ * @file textprocess/termfrequency.h class for creating a term frequency structur of input text
+ * @file textprocess/stopwordreduction.h class for stopword reduction
  *
  *
  * @todo thinking about a SSE support in the framework http://en.wikipedia.org/wiki/SSE3

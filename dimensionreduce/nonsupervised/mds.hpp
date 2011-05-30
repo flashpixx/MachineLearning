@@ -164,7 +164,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     
     
     /** enables / disables centering before mapping
-     * @param p_en bool
+     * @param p_center centering option
      **/
     template<typename T> inline void mds<T>::setCentering( const centeroption& p_center )
     {
@@ -462,8 +462,8 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     
     
     /** sets all elements which are in the vector to zero values
-     * @param pair vector with indices
-     * @param referenz of a matrix
+     * @param p_zeros pair vector with indices
+     * @param p_matrix referenz of a matrix
     **/
     template<typename T> inline void mds<T>::hit_setZeros(const std::vector< std::pair<std::size_t, std::size_t> >& p_zeros, ublas::matrix<T>& p_matrix ) const
     {
@@ -702,6 +702,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     
     /** returns the position within the matrix (over all processes)
      * @param p_mpi MPI object for communication
+     * @param p_col column position if the matrix part on the local process
      * @return colum position of the local matrix
      **/
     template<typename T> inline std::size_t mds<T>::hit_matrixPosition( const mpi::communicator& p_mpi, const std::size_t& p_col ) const

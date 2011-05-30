@@ -256,7 +256,7 @@ namespace machinelearning { namespace distances {
      * @param p_wavefront map with indices
      * @param p_sources vector with source data
      * @param p_id thread id for reading pairs in wavefront
-     * @πaram p_isfile bool if data is interpretated as filenames
+     * @param p_isfile bool if data is interpretated as filenames
      * @param p_matrix result matrix
      * @param p_cache cache vector
      **/
@@ -297,7 +297,7 @@ namespace machinelearning { namespace distances {
      * @param p_wavefront map with indices
      * @param p_sources vector with source data
      * @param p_id thread id for reading pairs in wavefront
-     * @πaram p_isfile bool if data is interpretated as filenames
+     * @param p_isfile bool if data is interpretated as filenames
      * @param p_matrix result matrix
      * @param p_cache cache vector
      **/
@@ -339,7 +339,7 @@ namespace machinelearning { namespace distances {
      * @param p_sources1 vector with row data
      * @param p_sources2 vector with column data
      * @param p_id thread id for reading pairs in the map
-     * @πaram p_isfile bool if data is interpretated as filenames
+     * @param p_isfile bool if data is interpretated as filenames
      * @param p_matrix result matrix
      * @param p_cache cache vector
      **/
@@ -613,7 +613,7 @@ namespace machinelearning { namespace distances {
     
     
     /** deflate a string or file with the algorithm
-     * @param p_file bool for interpret input string like filenames
+     * @param p_isfile bool for interpret input string like filenames
      * @param p_str1 first string to compress
      * @param p_str2 optional second string to compress
      * @return number of bytes 

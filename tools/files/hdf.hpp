@@ -559,10 +559,7 @@ namespace machinelearning { namespace tools { namespace files {
     
     /** create a path with dataset (path separator is "/")
      * @param p_path full path (last element dataset name)
-     * @param p_datatype HDF datatype for dataset
-     * @param p_dataspace space for dataset
      * @param p_groups std::vector with opened/created groups for closing
-     * @param p_dataset data
      * @return string with last path entry
      **/
     inline std::string hdf::createPath( const std::string& p_path, std::vector<H5::Group>& p_groups ) const

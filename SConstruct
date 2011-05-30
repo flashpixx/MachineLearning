@@ -318,6 +318,16 @@ def target_classifier(env, framework) :
         sources.extend( ["lazy.cpp"] )
 
     createTarget(env, "classifier", path, sources, framework)
+    
+    
+def target_other(env, framework) :
+    path = os.path.join(".", "examples", "other")
+    sources = []
+
+    if optionExist("withfiles") and optionExist("withsources") :
+        sources.extend( ["mds_nntp.cpp"] )
+
+    createTarget(env, "other", path, sources, framework)
 #=======================================================================================================================================
 
 
@@ -351,5 +361,6 @@ else :
     target_reducing( env, framework )
     target_distance(env, framework )
     target_classifier(env, framework )
+    target_other(env, framework )
 
     
