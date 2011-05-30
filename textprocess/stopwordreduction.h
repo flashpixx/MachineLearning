@@ -42,6 +42,7 @@ namespace machinelearning { namespace textprocess {
     
     
     /** class for stop-word-reduction
+     * $LastChangedDate$
      * @todo try to optimize with http://en.wikipedia.org/wiki/Ukkonen%27s_algorithm / http://en.wikipedia.org/wiki/Radix_tree
      **/
     class stopwordreduction {
