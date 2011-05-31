@@ -37,6 +37,12 @@ namespace mpi       = boost::mpi;
 #endif
 
 
+/** read all input arguments 
+ * @param argc number of arguments of "main"
+ * @param argv arguments of "main"
+ * @param p_args map with argument values (default values)
+ * @return bool if all is correct
+ **/
 bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_args ) {
     
     if (argc < 2) {
