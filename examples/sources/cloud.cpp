@@ -40,19 +40,19 @@ namespace ublas = boost::numeric::ublas;
 bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_args ) {
     
     if (argc < 2) {
-        std::cout << "--outfile" << "\t" << "output HDF5 file" << std::endl;
-        std::cout << "--outpath" << "\t" << "output path within the HDF5 file" << std::endl;
-        std::cout << "--dimension" << "\t" << "number of dimension (default: 2)" << std::endl;
-        std::cout << "--sampling" << "\t" << "sampling of the intervall (default: 10)" << std::endl;
-        std::cout << "--pointsmin" << "\t" << "minimal number of points (default: 50)" << std::endl;
-        std::cout << "--pointsmax" << "\t" << "maximal number of points (default: 500)" << std::endl;
-        std::cout << "--rangemin" << "\t" << "minimal range value (default: 0)" << std::endl;
-        std::cout << "--rangemax" << "\t" << "maximal range value (default: 100)" << std::endl;
-        std::cout << "--variancemin" << "\t" << "minimal variance value (default: 0.1)" << std::endl;
-        std::cout << "--variancemax" << "\t" << "maximal variance value (default: 0.8)" << std::endl;
-        std::cout << "--create" << "\t" << "type for creating clouds (values are: all [default], alternate, random)" << std::endl;
-        std::cout << "--probability" << "\t" << "probability for the random create option (default: 0.5)" << std::endl;
-        std::cout << "--shuffle" << "\t" << "shuffle the vectors of the clouds (default: off)" << std::endl;
+        std::cout << "--outfile \t\t output HDF5 file" << std::endl;
+        std::cout << "--outpath \t\t output path within the HDF5 file" << std::endl;
+        std::cout << "--dimension \t\t number of dimension (default: 2)" << std::endl;
+        std::cout << "--sampling \t\t sampling of the intervall (default: 10)" << std::endl;
+        std::cout << "--pointsmin \t\t minimal number of points (default: 50)" << std::endl;
+        std::cout << "--pointsmax \t\t maximal number of points (default: 500)" << std::endl;
+        std::cout << "--rangemin \t\t minimal range value (default: 0)" << std::endl;
+        std::cout << "--rangemax \t\t maximal range value (default: 100)" << std::endl;
+        std::cout << "--variancemin \t\t minimal variance value (default: 0.1)" << std::endl;
+        std::cout << "--variancemax \t\t maximal variance value (default: 0.8)" << std::endl;
+        std::cout << "--create \t\t type for creating clouds (values are: all [default], alternate, random)" << std::endl;
+        std::cout << "--probability \t\t probability for the random create option (default: 0.5)" << std::endl;
+        std::cout << "--shuffle \t\t shuffle the vectors of the clouds (default: off)" << std::endl;
         
         return false;
     }

@@ -322,10 +322,10 @@ void getArticles( tools::sources::nntp& p_nntp, const std::size_t& p_numarticles
 		
             std::size_t n=0;
             p_nntp.setGroup( (*it).first );
-            while ((n < (*it).second) && p_nntp.nextArticle() && (!p_nntp.isArticleCanceled())) {
+            while ((n < (*it).second) && p_nntp.nextArticle()) {
                 const std::string l_text = p_nntp.getArticle();
                 
-                if ( (l_rand.get<double>(tools::random::uniform) < 0.5) && (!l_text.empty()) ) {
+                if ( (!p_nntp.isArticleCanceled()) && (l_rand.get<double>(tools::random::uniform) < 0.5) && (!l_text.empty()) ) {
                     p_article.push_back( l_text );
                     p_articlegroup.push_back( (*it).first );
                     n++;

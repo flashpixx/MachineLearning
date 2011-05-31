@@ -91,8 +91,8 @@ namespace machinelearning { namespace tools { namespace sources {
                     bool operator!=( const iterator& ) const;
                     iterator& operator++( int );
                     iterator& operator++( void );
-                    std::string operator*( void );
-
+                    nntp& operator*( void );
+                    nntp* operator->( void );
                 
                 private :
                 
@@ -591,14 +591,20 @@ namespace machinelearning { namespace tools { namespace sources {
     
     
     /** dereference operator
-     * @return std::string or null with article content
+     * @return object
      **/
-    inline std::string nntp::iterator::operator*( void )
+    inline nntp& nntp::iterator::operator*( void )
     {
-        if (m_nntp)
-            return m_nntp->getArticle();
-        
-        return NULL;
+        return *m_nntp;
+    }
+    
+    
+    /** pointer operator
+     * @return pointer
+     **/
+    inline nntp* nntp::iterator::operator->( void )
+    {
+        return m_nntp;
     }
     
     

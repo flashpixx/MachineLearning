@@ -353,7 +353,8 @@ elif optionExist("createdocu") :
 else :
         
     # catch all cpps within the framework directories and compile them to objectfiles into the builddir
-    framework = getRekusivFiles(os.curdir, ".cpp", ["examples"])  
+    #framework = getRekusivFiles(os.curdir, ".cpp", ["examples"])  
+    framework = []
 
     # create building targets
     target_sources( env, framework )
