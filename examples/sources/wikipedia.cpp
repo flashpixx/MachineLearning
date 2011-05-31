@@ -40,7 +40,7 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
     
     if (argc < 2) {
         std::cout << "--lang \t\t language (values: en, de [default])" << std::endl;
-        std::cout << "--search \t\t returns the artice of the keyword / returns list of articles / if is not set, you will get a random article" << std::endl;
+        std::cout << "--search \t\t returns the artice of the keyword / returns list of articles / if empty, you will get a random article" << std::endl;
         return false;
     }
     
