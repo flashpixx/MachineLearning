@@ -43,12 +43,12 @@ namespace tools     = machinelearning::tools;
 bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_args ) {
     
     if (argc < 2) {
-        std::cout << "--inputfile" << "\t" << "input HDF5 file" << std::endl;
-        std::cout << "--inputpath" << "\t" << "path to dataset" << std::endl;
-        std::cout << "--outfile" << "\t" << "output HDF5 file" << std::endl;
-        std::cout << "--iteration" << "\t" << "number of iteration" << std::endl;
-        std::cout << "--prototype" << "\t" << "number of prototypes" << std::endl;
-        std::cout << "--log" << "\t" << "'on' for enable logging" << std::endl;
+        std::cout << "--inputfile \t\t input HDF5 file" << std::endl;
+        std::cout << "--inputpath \t\t path to dataset" << std::endl;
+        std::cout << "--outfile \t\t output HDF5 file" << std::endl;
+        std::cout << "--iteration \t\t number of iteration" << std::endl;
+        std::cout << "--prototype \t\t number of prototypes" << std::endl;
+        std::cout << "--log \t\t\t 'on' for enable logging" << std::endl;
         
         return false;
     }
@@ -158,13 +158,13 @@ int main(int argc, char* argv[]) {
     
     
     std::cout << "structure of the output file" << std::endl;
-    std::cout << "/numprotos" << "\t\t" << "number of prototypes" << std::endl;
-    std::cout << "/protos" << "\t\t" << "prototype matrix (row orientated)" << std::endl;
-    std::cout << "/iteration" << "\t\t" << "number of iterations" << std::endl;
+    std::cout << "/numprotos \t\t number of prototypes" << std::endl;
+    std::cout << "/protos \t\t prototype matrix (row orientated)" << std::endl;
+    std::cout << "/iteration \t\t number of iterations" << std::endl;
     
     if (spectral.getLogging()) {
-        std::cout << "/error" << "\t\t" << "quantization error on each iteration" << std::endl;
-        std::cout << "/log<0 to number of iteration-1>/protosos" << "\t\t" << "prototypes on each iteration" << std::endl;
+        std::cout << "/error \t\t quantization error on each iteration" << std::endl;
+        std::cout << "/log<0 to number of iteration-1>/protosos \t\t prototypes on each iteration" << std::endl;
     }
     
     
