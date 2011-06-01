@@ -22,6 +22,7 @@
  **/
 
 #include <machinelearning.h>
+#include <boost/any.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
@@ -31,71 +32,149 @@ namespace cluster   = machinelearning::clustering::supervised;
 namespace distance  = machinelearning::distances;
 namespace tools     = machinelearning::tools;
 
+
+/** read all input arguments 
+ * @param argc number of arguments of "main"
+ * @param argv arguments of "main"
+ * @param p_args map with argument values (default values)
+ * @return bool if all is correct
+ **/
+bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_args ) {
+    
+    if (argc < 2) {
+        std::cout << "--outfile \t\t output HDF5 file" << std::endl;
+        std::cout << "--iteration \t\t number of iteration" << std::endl;
+        std::cout << "--inputfile \t\t input HDF5 file" << std::endl;
+        std::cout << "--inputpath \t\t path to dataset" << std::endl;
+        std::cout << "--labelpath \t\t path to the data labels" << std::endl;
+        std::cout << "--labeltype \t\t datatype of labels (values: string, uint, int)" << std::endl;
+        std::cout << "--log \t\t\t 'on' for enable logging" << std::endl;
+        
+        return false;
+    }
+    
+    
+    // set default arguments
+    std::map<std::string, std::vector<std::string> > l_argmap;
+    l_argmap["inputfile"] = std::vector<std::string>();
+    l_argmap["inputpath"] = std::vector<std::string>();
+    l_argmap["outfile"]   = std::vector<std::string>();
+    l_argmap["iteration"] = std::vector<std::string>();
+    l_argmap["labelpath"] = std::vector<std::string>();
+    l_argmap["labeltype"] = std::vector<std::string>();
+    l_argmap["log"]       = std::vector<std::string>();
+    
+    
+    // read all arguments
+    std::size_t n=1;
+    for(int i=1; i < argc; i+=n) {
+        n = 1;
+        std::string lc(argv[i]);
+        if (lc.length() < 2)
+            continue;
+        
+        lc = lc.substr(2);
+        boost::to_lower( lc );
+        
+        if (l_argmap.find(lc) != l_argmap.end()) {
+            std::vector<std::string> lv;
+            
+            for(int l=i+1; l < argc; ++l) {
+                std::string lc2(argv[l]);
+                if ( (lc2.length() >= 2) && (lc2.substr(0,2) == "--") )
+                    break;
+                
+                lv.push_back(lc2);
+                n++;
+            }
+            
+            l_argmap[lc] = lv;
+        }
+        
+    }
+    
+    
+    //check map values and convert them
+    if ( (l_argmap["iteration"].size() != 1) || 
+        (l_argmap["prototype"].size() != 1) || 
+        (l_argmap["outfile"].size() != 1) || 
+        (l_argmap["inputfile"].size() != 1) || 
+        (l_argmap["inputpath"].size() != 1) ||
+        (l_argmap["labelpath"].size() != 1) ||
+        (l_argmap["labeltype"].size() != 1)
+        )
+        throw std::runtime_error("number of arguments are incorrect");
+    
+    p_args["log"]           = l_argmap["log"].size() > 0;
+    p_args["inputfile"]     = l_argmap["inputfile"][0];
+    p_args["inputpath"]     = l_argmap["inputpath"][0];
+    p_args["outfile"]       = l_argmap["outfile"][0];
+    p_args["labelpath"]     = l_argmap["labelpath"][0];
+    
+    p_args["labeltype"]     = std::string("");
+    if (l_argmap["labeltype"].size()) {
+        std::string lc      = l_argmap["labeltype"][0];
+        boost::to_lower(lc);
+    
+        if ((lc == "string") || (lc == "int") || (lc == "uint"))
+            p_args["labeltype"] = lc;
+    }
+    if ((boost::any_cast<std::string>(p_args["labelpath"])).empty())
+        throw std::runtime_error("label data unkown");
+    
+    
+    try {
+        p_args["iteration"] = boost::lexical_cast<std::size_t>( l_argmap["iteration"][0] );
+    } catch (...) {
+        throw std::runtime_error("numerical data can not extracted");
+    }  
+    
+    return true;
+}
+
+
+
 /** main program
  * @param argc number of arguments
  * @param argv arguments
  **/
 int main(int argc, char* argv[]) {
     
-    if (argc < 5)
-        throw std::runtime_error("you need at least five parameter as input. first HDF file, second type of labels (string, int, uint, double), third path to dataset, forth path to labels, optional fifth number of iterations or/and (sixth) \"log\" for logging");
-    
-    // convert iteration or logging if exists
-    std::size_t iteration = 15;
-    bool log = false;
-    try {
-        std::string fifth(  (argc > 5) ? argv[5] : ""  );
-        std::string sixth(  (argc > 6) ? argv[6] : ""  );
-        
-        if (!sixth.empty())
-            boost::to_lower( sixth );
-        if (!fifth.empty())
-            boost::to_lower( fifth );
-        
-        if (fifth == "log")
-            log = true;
-        else
-            if (!fifth.empty())
-                iteration = boost::lexical_cast<std::size_t>(fifth);
-        
-        if (sixth == "log")
-            log = true;
-    } catch (...) {
-        throw std::runtime_error("numerical data can not be read");
-    }
+    std::map<std::string, boost::any> l_args;
+    if (!cliArguments(argc, argv, l_args))
+        return EXIT_FAILURE;
     
     
     // read source hdf file and data
-    tools::files::hdf source( argv[1] );
-    ublas::matrix<double> data = source.readBlasMatrix<double>( argv[3], H5::PredType::NATIVE_DOUBLE);
-    ublas::matrix<double> prototypes;
-    
-    // read label type
-    std::string labeltype( argv[2] );
-    boost::to_lower(labeltype);
+    tools::files::hdf source( boost::any_cast<std::string>(l_args["inputfile"]) );
+    ublas::matrix<double> data = source.readBlasMatrix<double>(boost::any_cast<std::string>(l_args["inputpath"]), H5::PredType::NATIVE_DOUBLE);
     
     // create target file
-    tools::files::hdf target("rlvq.hdf5", true);
-    
+    tools::files::hdf target(boost::any_cast<std::string>(l_args["outfile"]), true);
+    target.writeValue<std::size_t>( "/iteration",  boost::any_cast<std::size_t>(l_args["iteration"]), H5::PredType::NATIVE_ULONG );
     
     // create data
-    distance::euclid<double> d;
+    distance::euclid<double> dist;
     
-    if (labeltype == "int") {
-        std::vector<int> labels = tools::vector::copy( source.readBlasVector<int>(argv[4], H5::PredType::NATIVE_INT) );
-        std::vector<int> unique = tools::vector::unique(labels);
+    
+    
+    // rlvq with uint labels
+    if (boost::any_cast<std::string>(l_args["labeltype"]) == "uint") {
+        std::vector<std::size_t> labels = tools::vector::copy( source.readBlasVector<std::size_t>(boost::any_cast<std::string>(l_args["labelpath"]), H5::PredType::NATIVE_ULONG) );
+        std::vector<std::size_t> unique = tools::vector::unique(labels);
         
-        // create rlvq object with double for data and int for labels
-        cluster::rlvq<double, int> rlvq(d, unique, data.size2());
-        rlvq.setLogging(log);
+        // create rlvq object
+        cluster::rlvq<double, std::size_t> rlvq(dist, unique, data.size2());
+        rlvq.setLogging( boost::any_cast<bool>(l_args["log"]) );
         
         // train data
-        rlvq.train( data, labels, iteration );
-        prototypes = rlvq.getPrototypes();
+        rlvq.train( data, labels, boost::any_cast<std::size_t>(l_args["iteration"]) );
         
-        // write data to hdf
-        target.writeValue<double>( "/numprotos",  unique.size(), H5::PredType::NATIVE_DOUBLE );
-        target.writeBlasVector<int>( "/protolabel", tools::vector::copy(unique), H5::PredType::NATIVE_INT );
+        
+        // write target data
+        target.writeValue<std::size_t>( "/numprotos",  unique.size(), H5::PredType::NATIVE_ULONG );
+        target.writeBlasVector<std::size_t>( "/protolabel", tools::vector::copy(unique), H5::PredType::NATIVE_ULONG );
+        target.writeBlasMatrix<double>( "/protos",  rlvq.getPrototypes(), H5::PredType::NATIVE_DOUBLE );
         
         // if logging exists write data to file
         if (rlvq.getLogging()) {
@@ -106,21 +185,24 @@ int main(int argc, char* argv[]) {
         }
     }
     
-    if (labeltype == "uint") {
-        std::vector<unsigned int> labels = tools::vector::copy( source.readBlasVector<unsigned int>(argv[4], H5::PredType::NATIVE_UINT) );
-        std::vector<unsigned int> unique = tools::vector::unique(labels);
+    
+    // rlvq with int labels
+    if (boost::any_cast<std::string>(l_args["labeltype"]) == "int") {
+        std::vector<std::ptrdiff_t> labels = tools::vector::copy( source.readBlasVector<std::ptrdiff_t>(boost::any_cast<std::string>(l_args["labelpath"]), H5::PredType::NATIVE_LONG) );
+        std::vector<std::ptrdiff_t> unique = tools::vector::unique(labels);
         
-        // create rlvq object with double for data and uint for labels
-        cluster::rlvq<double, unsigned int> rlvq(d, unique, data.size2());
-        rlvq.setLogging(log);
+        // create rlvq object
+        cluster::rlvq<double, std::ptrdiff_t> rlvq(dist, unique, data.size2());
+        rlvq.setLogging( boost::any_cast<bool>(l_args["log"]) );
         
         // train data
-        rlvq.train( data, labels, iteration );
-        prototypes = rlvq.getPrototypes();
+        rlvq.train( data, labels, boost::any_cast<std::size_t>(l_args["iteration"]) );
         
-        // write data to hdf
-        target.writeValue<double>( "/numprotos",  unique.size(), H5::PredType::NATIVE_DOUBLE );
-        target.writeBlasVector<unsigned int>( "/protolabel", tools::vector::copy(unique), H5::PredType::NATIVE_UINT );
+        
+        // write target data
+        target.writeValue<std::size_t>( "/numprotos",  unique.size(), H5::PredType::NATIVE_ULONG );
+        target.writeBlasVector<std::ptrdiff_t>( "/protolabel", tools::vector::copy(unique), H5::PredType::NATIVE_LONG );
+        target.writeBlasMatrix<double>( "/protos",  rlvq.getPrototypes(), H5::PredType::NATIVE_DOUBLE );
         
         // if logging exists write data to file
         if (rlvq.getLogging()) {
@@ -131,21 +213,24 @@ int main(int argc, char* argv[]) {
         }
     }
     
-    if (labeltype == "double") {
-        std::vector<double> labels = tools::vector::copy( source.readBlasVector<double>(argv[4], H5::PredType::NATIVE_DOUBLE) );
-        std::vector<double> unique = tools::vector::unique(labels);
+    
+    // rlvq with string labels
+    if (boost::any_cast<std::string>(l_args["labeltype"]) == "string") {
+        std::vector<std::string> labels = source.readStringVector(boost::any_cast<std::string>(l_args["labelpath"]));
+        std::vector<std::string> unique = tools::vector::unique(labels);
         
-        // create rlvq object with double for data and double for labels
-        cluster::rlvq<double, double> rlvq(d, unique, data.size2());
-        rlvq.setLogging(log);
+        // create rlvq object
+        cluster::rlvq<double, std::string> rlvq(dist, unique, data.size2());
+        rlvq.setLogging( boost::any_cast<bool>(l_args["log"]) );
         
         // train data
-        rlvq.train( data, labels, iteration );
-        prototypes = rlvq.getPrototypes();
+        rlvq.train( data, labels, boost::any_cast<std::size_t>(l_args["iteration"]) );
         
-        // write data to hdf
-        target.writeValue<double>( "/numprotos",  unique.size(), H5::PredType::NATIVE_DOUBLE );
-        target.writeBlasVector<double>( "/protolabel", tools::vector::copy(unique), H5::PredType::NATIVE_DOUBLE );
+        
+        // write target data
+        target.writeValue<std::size_t>( "/numprotos",  unique.size(), H5::PredType::NATIVE_ULONG );
+        target.writeStringVector( "/protolabel", unique );
+        target.writeBlasMatrix<double>( "/protos",  rlvq.getPrototypes(), H5::PredType::NATIVE_DOUBLE );
         
         // if logging exists write data to file
         if (rlvq.getLogging()) {
@@ -155,20 +240,19 @@ int main(int argc, char* argv[]) {
                 target.writeBlasMatrix<double>("/log" + boost::lexical_cast<std::string>( i ), p[i], H5::PredType::NATIVE_DOUBLE );
         }
     }
-
-    /*
-    if (labeltype == "string") {
+    
+    
+    
+    std::cout << "structure of the output file" << std::endl;
+    std::cout << "/numprotos" << "\t\t" << "number of prototypes" << std::endl;
+    std::cout << "/protolabel" << "\t\t" << "label of prototypes" << std::endl;
+    std::cout << "/protos" << "\t\t" << "prototype matrix (row orientated)" << std::endl;
+    std::cout << "/iteration" << "\t\t" << "number of iterations" << std::endl;
+    
+    if (boost::any_cast<bool>(l_args["log"])) {
+        std::cout << "/error" << "\t\t" << "quantization error on each iteration" << std::endl;
+        std::cout << "/log<0 to number of iteration-1>/protosos" << "\t\t" << "prototypes on each iteration" << std::endl;
     }
-    */
-     
-    if ((prototypes.size1() == 0) || (prototypes.size2() == 0))
-        throw std::runtime_error("label type is unkown");    
-    
-    target.writeValue<std::size_t>( "/iteration",  iteration, H5::PredType::NATIVE_ULONG );
-    target.writeBlasMatrix<double>( "/protos",  prototypes, H5::PredType::NATIVE_DOUBLE );
-
-    
-    std::cout << "create HDF file \"rlvq.hdf5\" with dataset \"/protos \", \"/protolabel\" label of prototypes, \"/iteration\" number of iteration, \"numprotos\" number of prototypes and if logging is enabled \"/error\" with quantization error and \"/log<0 to iterations-1>\" logged prototypes" << std::endl;
     
     return EXIT_SUCCESS;
 }

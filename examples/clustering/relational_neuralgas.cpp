@@ -205,7 +205,7 @@ int main(int argc, char* argv[]) {
         tools::files::hdf target(boost::any_cast<std::string>(l_args["outfile"]), true);
 
         target.writeBlasMatrix<double>( "/protos",  tools::matrix::setNumericalZero(protos), H5::PredType::NATIVE_DOUBLE );
-        target.writeValue<double>( "/numprotos",  protos.size1(), H5::PredType::NATIVE_DOUBLE );
+        target.writeValue<std::size_t>( "/numprotos",  protos.size1(), H5::PredType::NATIVE_ULONG );
         target.writeValue<std::size_t>( "/iteration", boost::any_cast<std::size_t>(l_args["iteration"]), H5::PredType::NATIVE_ULONG );
             
         if (ng.getLogging()) {
@@ -224,7 +224,7 @@ int main(int argc, char* argv[]) {
         
     // create target file
     tools::files::hdf target(boost::any_cast<std::string>(l_args["outfile"]), true);
-    target.writeValue<double>( "/numprotos",  boost::any_cast<std::size_t>(l_args["prototype"]), H5::PredType::NATIVE_DOUBLE );
+    target.writeValue<std::size_t>( "/numprotos",  boost::any_cast<std::size_t>(l_args["prototype"]), H5::PredType::NATIVE_ULONG );
     target.writeBlasMatrix<double>( "/protos",  tools::matrix::setNumericalZero(ng.getPrototypes()), H5::PredType::NATIVE_DOUBLE );    
     target.writeValue<std::size_t>( "/iteration",  boost::any_cast<std::size_t>(l_args["iteration"]), H5::PredType::NATIVE_ULONG );
         

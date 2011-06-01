@@ -227,7 +227,7 @@ int main(int argc, char* argv[]) {
     ublas::vector<double> weights    = ng.getPrototypeWeights(loMPICom);
     ublas::matrix<double> protos     = ng.getPrototypes(loMPICom);
     if (target) {
-        target->writeValue<double>( "/numprotos",  protos.size1(), H5::PredType::NATIVE_DOUBLE );
+        target->writeValue<std::size_t>( "/numprotos",  protos.size1(), H5::PredType::NATIVE_ULONG );
         target->writeBlasMatrix<double>( "/protos",  protos, H5::PredType::NATIVE_DOUBLE );    
         target->writeBlasVector<double>( "/weights",  weights, H5::PredType::NATIVE_DOUBLE );    
         target->writeValue<std::size_t>( "/iteration",   boost::any_cast<std::size_t>(l_args["iteration"]), H5::PredType::NATIVE_ULONG );
@@ -261,7 +261,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    target.writeValue<double>( "/numprotos",   boost::any_cast<std::size_t>(l_args["prototype"]), H5::PredType::NATIVE_DOUBLE );
+    target.writeValue<std::size_t>( "/numprotos",   boost::any_cast<std::size_t>(l_args["prototype"]), H5::PredType::NATIVE_ULONG );
     target.writeBlasMatrix<double>( "/protos",  ng.getPrototypes(), H5::PredType::NATIVE_DOUBLE );    
     target.writeBlasVector<double>( "/weights",  ng.getPrototypeWeights(), H5::PredType::NATIVE_DOUBLE );    
     target.writeValue<std::size_t>( "/iteration",   boost::any_cast<std::size_t>(l_args["iteration"]), H5::PredType::NATIVE_ULONG );
