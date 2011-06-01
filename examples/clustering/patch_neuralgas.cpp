@@ -277,16 +277,16 @@ int main(int argc, char* argv[]) {
     #endif
     
     std::cout << "structure of the output file" << std::endl;
-    std::cout << "/numprotos" << "\t\t" << "number of prototypes" << std::endl;
-    std::cout << "/protos" << "\t\t" << "prototype matrix (row orientated)" << std::endl;
-    std::cout << "/weight" << "\t\t" << "prototype weight" << std::endl;
-    std::cout << "/iteration" << "\t\t" << "number of iterations" << std::endl;
+    std::cout << "/numprotos \t\t number of prototypes" << std::endl;
+    std::cout << "/protos \t\t prototype matrix (row orientated)" << std::endl;
+    std::cout << "/weight \t\t prototype weight" << std::endl;
+    std::cout << "/iteration \t\t number of iterations" << std::endl;
     
     if (ng.getLogging()) {
-        std::cout << "/patch<0 to number of patches-1>/weights" << "\t\t" << "prototype weights after calculating patch" << std::endl;
-        std::cout << "/patch<0 to number of patches-1>/protos" << "\t\t" << "prototypes after calculating patch" << std::endl;
-        std::cout << "/patch<0 to number of patches-1>/error" << "\t\t" << "quantization error on each patch iteration" << std::endl;
-        std::cout << "/patch<0 to number of patches-1>/log<0 to number of iteration-1>/protos" << "\t\t" << "prototypes on each patch iteration" << std::endl;
+        std::cout << "/patch<0 to number of patches-1>/weights \t\t prototype weights after calculating patch" << std::endl;
+        std::cout << "/patch<0 to number of patches-1>/protos \t\t prototypes after calculating patch" << std::endl;
+        std::cout << "/patch<0 to number of patches-1>/error \t\t quantization error on each patch iteration" << std::endl;
+        std::cout << "/patch<0 to number of patches-1>/log<0 to number of iteration-1>/protos \t\t prototypes on each patch iteration" << std::endl;
     }
     
     #ifdef MACHINELEARNING_MPI

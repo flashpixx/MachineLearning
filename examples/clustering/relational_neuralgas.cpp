@@ -243,13 +243,13 @@ int main(int argc, char* argv[]) {
     #endif
 
     std::cout << "structure of the output file" << std::endl;
-    std::cout << "/numprotos" << "\t\t" << "number of prototypes" << std::endl;
-    std::cout << "/protos" << "\t\t" << "prototype matrix (row orientated)" << std::endl;
-    std::cout << "/iteration" << "\t\t" << "number of iterations" << std::endl;
+    std::cout << "/numprotos \t\t number of prototypes" << std::endl;
+    std::cout << "/protos \t\t prototype matrix (row orientated)" << std::endl;
+    std::cout << "/iteration \t\t number of iterations" << std::endl;
     
     if (ng.getLogging()) {
-        std::cout << "/error" << "\t\t" << "quantization error on each iteration" << std::endl;
-        std::cout << "/log<0 to number of iteration-1>/protosos" << "\t\t" << "prototypes on each iteration" << std::endl;
+        std::cout << "/error \t\t quantization error on each iteration" << std::endl;
+        std::cout << "/log<0 to number of iteration-1>/protosos \t\t prototypes on each iteration" << std::endl;
     }
             
     #ifdef MACHINELEARNING_MPI
