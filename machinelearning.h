@@ -95,7 +95,9 @@
  * <ul>
  * <li><dfn>MACHINELEARNING_RANDOMDEVICE</dfn> for using the Boost Device Random support (requires Boost Random Device Support), otherwise a Mersenne Twister is used</li>
  * <li><dfn>MACHINELEARNING_MULTILANGUAGE</dfn> option for compiling the framework with multilanguage support (uses gettext)</li>
- * <li><dfn>MACHINELEARNING_FILES</dfn> adds the support for HDF & CSV file reading and writing</li>
+ * <li><dfn>MACHINELEARNING_FILES</dfn> adds the support for file reading and writing (default CSV). Special file support can be set with the following flags<ul>
+ * <li><dfn>MACHINELEARNING_FILES_HDF</dfn> Hierarchical Data Format support</li>
+ * </ul></li>
  * <li><dfn>MACHINELEARNING_SOURCES</dfn> compiles sources in that way, that e.g. NNTP / Wikipedia data can be read directly</li>
  * <li><dfn>MACHINELEARNING_MPI</dfn> enable MPI Support for the toolbox (requires Boost MPI support)</li>
  * </ul>
@@ -114,7 +116,7 @@
  * <li><dfn>--create-language</dfn> creates the language files / adds new messages to the existing files (xgettext must be called, so it should be within the path)</li>
  * <li><dfn>--compile-language</dfn> compiles all language files (msgfmt must be called, so it should be within the path)</li>
  * </ul>
- * For compiling the test cpp files in the test directory the following option can be set
+ * For compiling the test cpp files in the test directory the following option can be set (Hierarchical Data Format is needed)
  * <ul>
  * <li><dfn>--with-randomdevice</dfn> adds the compilerflag for random device support</li>
  * <li><dfn>--with-mpi</dfn> adds the compilerflag for cluster / MPI support</li>

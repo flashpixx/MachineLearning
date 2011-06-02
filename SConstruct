@@ -61,7 +61,7 @@ def configuration_macosx(config, version, architecture) :
         config["linkto"].extend( ["xml2"] )
         
     if optionExist("withfiles") :
-        config["compileflags"]      += " -D MACHINELEARNING_FILES"
+        config["compileflags"]      += " -D MACHINELEARNING_FILES -D MACHINELEARNING_FILES_HDF"
         config["linkto"].extend( ["hdf5_cpp", "hdf5"] )
     
 
@@ -98,7 +98,7 @@ def configuration_posix(config, version, architecture) :
         config["linkto"].extend( ["xml2"] )
         
     if optionExist("withfiles") :
-        config["compileflags"]      += " -D MACHINELEARNING_FILES"
+        config["compileflags"]      += " -D MACHINELEARNING_FILES -D MACHINELEARNING_FILES_HDF"
         config["linkto"].extend( ["hdf5_cpp", "hdf5"] )
         
         
