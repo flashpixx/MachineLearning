@@ -21,6 +21,9 @@
  @endcond
  **/
 
+
+#include <map>
+
 #include <machinelearning.h>
 #include <boost/any.hpp>
 #include <boost/lexical_cast.hpp>
