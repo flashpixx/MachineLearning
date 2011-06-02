@@ -34,20 +34,25 @@ namespace dim   = machinelearning::dimensionreduce::nonsupervised;
 namespace tools = machinelearning::tools;
 
 
-
+/** read all input arguments 
+ * @param argc number of arguments of "main"
+ * @param argv arguments of "main"
+ * @param p_args map with argument values (default values)
+ * @return bool if all is correct
+ **/
 bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_args ) {
     
     if (argc < 2) {
-        std::cout << "--inputfile" << "\t" << "input HDF5 file" << std::endl;
-        std::cout << "--inputpath" << "\t" << "path to dataset" << std::endl;
-        std::cout << "--outfile" << "\t" << "output HDF5 file" << std::endl;
-        std::cout << "--outpath" << "\t" << "output path within the HDF5 file" << std::endl;
-        std::cout << "--dimension" << "\t" << "number of project dimensions" << std::endl;
-        std::cout << "--mapping" << "\t" << "mapping type (values: metric [default], sammon, hit)" << std::endl;
-        std::cout << "--iteration" << "\t" << "number of iterations for sammon / hit (default 500)" << std::endl;
-        std::cout << "--step" << "\t" << "number of iteration steps for sammon (default: 20)" << std::endl;
-        std::cout << "--rate" << "\t" << "iteration rate for hit (default 1)" << std::endl;
-        std::cout << "--centering" << "\t" << "centering the data (values: none, single [default], double)" << std::endl;
+        std::cout << "--inputfile \t\t input HDF5 file" << std::endl;
+        std::cout << "--inputpath \t\t path to dataset" << std::endl;
+        std::cout << "--outfile \t\t output HDF5 file" << std::endl;
+        std::cout << "--outpath \t\t output path within the HDF5 file" << std::endl;
+        std::cout << "--dimension \t\t number of project dimensions" << std::endl;
+        std::cout << "--mapping \t\t mapping type (values: metric [default], sammon, hit)" << std::endl;
+        std::cout << "--iteration \t\t number of iterations for sammon / hit (default 500)" << std::endl;
+        std::cout << "--step \t\t number of iteration steps for sammon (default: 20)" << std::endl;
+        std::cout << "--rate \t\t iteration rate for hit (default 1)" << std::endl;
+        std::cout << "--centering \t\t centering the data (values: none, single [default], double)" << std::endl;
         
         return false;
     }
