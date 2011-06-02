@@ -21,14 +21,117 @@
  @endcond
  **/
 
+#include <map>
+
 #include <machinelearning.h>
+#include <boost/any.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 
+
 namespace ublas = boost::numeric::ublas;
 namespace dim   = machinelearning::dimensionreduce::supervised;
 namespace tools = machinelearning::tools;
+
+
+
+/** read all input arguments 
+ * @param argc number of arguments of "main"
+ * @param argv arguments of "main"
+ * @param p_args map with argument values (default values)
+ * @return bool if all is correct
+ **/
+bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_args ) {
+    
+    if (argc < 2) {
+        std::cout << "--outfile \t\t output HDF5 file" << std::endl;
+        std::cout << "--dimension \t\t number of project dimensions" << std::endl;
+        std::cout << "--inputfile \t\t input HDF5 file" << std::endl;
+        std::cout << "--inputpath \t\t path to dataset" << std::endl;
+        std::cout << "--labelpath \t\t path to the data labels" << std::endl;
+        std::cout << "--labeltype \t\t datatype of labels (values: string, uint, int)" << std::endl;
+        
+        return false;
+    }
+    
+    
+    // set default arguments
+    std::map<std::string, std::vector<std::string> > l_argmap;
+    l_argmap["inputfile"] = std::vector<std::string>();
+    l_argmap["inputpath"] = std::vector<std::string>();
+    l_argmap["outfile"]   = std::vector<std::string>();
+    l_argmap["dimension"] = std::vector<std::string>();
+    l_argmap["labelpath"] = std::vector<std::string>();
+    l_argmap["labeltype"] = std::vector<std::string>();
+    
+    
+    // read all arguments
+    std::size_t n=1;
+    for(int i=1; i < argc; i+=n) {
+        n = 1;
+        std::string lc(argv[i]);
+        if (lc.length() < 2)
+            continue;
+        
+        lc = lc.substr(2);
+        boost::to_lower( lc );
+        
+        if (l_argmap.find(lc) != l_argmap.end()) {
+            std::vector<std::string> lv;
+            
+            for(int l=i+1; l < argc; ++l) {
+                std::string lc2(argv[l]);
+                if ( (lc2.length() >= 2) && (lc2.substr(0,2) == "--") )
+                    break;
+                
+                lv.push_back(lc2);
+                n++;
+            }
+            
+            l_argmap[lc] = lv;
+        }
+        
+    }
+    
+    
+    //check map values and convert them
+    if ( (l_argmap["dimension"].size() != 1) || 
+        (l_argmap["outfile"].size() != 1) || 
+        (l_argmap["inputfile"].size() != 1) || 
+        (l_argmap["inputpath"].size() != 1) ||
+        (l_argmap["labelpath"].size() != 1) ||
+        (l_argmap["labeltype"].size() != 1)
+        )
+        throw std::runtime_error("number of arguments are incorrect");
+    
+    p_args["inputfile"]     = l_argmap["inputfile"][0];
+    p_args["inputpath"]     = l_argmap["inputpath"][0];
+    p_args["outfile"]       = l_argmap["outfile"][0];
+    p_args["labelpath"]     = l_argmap["labelpath"][0];
+    
+    p_args["labeltype"]     = std::string("");
+    if (l_argmap["labeltype"].size()) {
+        std::string lc      = l_argmap["labeltype"][0];
+        boost::to_lower(lc);
+        
+        if ((lc == "string") || (lc == "int") || (lc == "uint"))
+            p_args["labeltype"] = lc;
+    }
+    if ((boost::any_cast<std::string>(p_args["labelpath"])).empty())
+        throw std::runtime_error("label data unkown");
+    
+    
+    try {
+        p_args["dimension"] = boost::lexical_cast<std::size_t>( l_argmap["dimension"][0] );
+    } catch (...) {
+        throw std::runtime_error("numerical data can not extracted");
+    }  
+    
+    return true;
+}
+
+
 
 /** main program
  * @param argc number of arguments
@@ -36,63 +139,50 @@ namespace tools = machinelearning::tools;
  **/
 int main(int argc, char* argv[]) {
     
-    if (argc < 6)
-        throw std::runtime_error("you need at least five parameter as input. first HDF file, second number of projected dimensions, third type of labels (string, int, uint, double), forth path to dataset, fifth path to labels");
+    std::map<std::string, boost::any> l_args;
+    if (!cliArguments(argc, argv, l_args))
+        return EXIT_FAILURE;
+    
+    
+    // read source hdf file and data / create target file
+    tools::files::hdf target(boost::any_cast<std::string>(l_args["outfile"]), true);
+    tools::files::hdf source( boost::any_cast<std::string>(l_args["inputfile"]) );
+    ublas::matrix<double> data = source.readBlasMatrix<double>(boost::any_cast<std::string>(l_args["inputpath"]), H5::PredType::NATIVE_DOUBLE);
+    
+    
+    
+    // lda with uint labels
+    if (boost::any_cast<std::string>(l_args["labeltype"]) == "uint") {
+        dim::lda<double, std::size_t> lda( boost::any_cast<std::size_t>(l_args["dimension"]) );
 
-    // convert string parameter to numerical data
-    std::size_t targetdim = 0;
-    try {
-        targetdim = boost::lexical_cast<std::size_t>(argv[2]);
-    } catch (...) {
-        throw std::runtime_error("target dimension can not be read");
+        std::vector<std::size_t> labels = tools::vector::copy( source.readBlasVector<std::size_t>(boost::any_cast<std::string>(l_args["labelpath"]), H5::PredType::NATIVE_ULONG) );    
+        target.writeBlasMatrix<double>( "/project",  lda.map(data, labels), H5::PredType::NATIVE_DOUBLE );
     }
     
     
-    // read source hdf file and data
-    tools::files::hdf source( argv[1] );
-    ublas::matrix<double> data = source.readBlasMatrix<double>( argv[4], H5::PredType::NATIVE_DOUBLE);
-    ublas::matrix<double> project;
-
-    // read label type
-    std::string labeltype( argv[3] );
-    boost::to_lower(labeltype);
     
-    // create projection
-    if (labeltype == "int") {
-        dim::lda<double, int> lda(targetdim);
-        std::vector<int> labels = tools::vector::copy( source.readBlasVector<int>(argv[5], H5::PredType::NATIVE_INT) );
+    // lda with int labels
+    if (boost::any_cast<std::string>(l_args["labeltype"]) == "int") {
+        dim::lda<double, std::ptrdiff_t> lda( boost::any_cast<std::size_t>(l_args["dimension"]) );
         
-        project = lda.map(data, labels);
+        std::vector<std::ptrdiff_t> labels = tools::vector::copy( source.readBlasVector<std::ptrdiff_t>(boost::any_cast<std::string>(l_args["labelpath"]), H5::PredType::NATIVE_LONG) );    
+        target.writeBlasMatrix<double>( "/project",  lda.map(data, labels), H5::PredType::NATIVE_DOUBLE );
     }
-        
-    if (labeltype == "uint") {
-        dim::lda<double, unsigned int> lda(targetdim);
-        std::vector<unsigned int> labels = tools::vector::copy( source.readBlasVector<unsigned int>(argv[5], H5::PredType::NATIVE_UINT) );
-        
-        project = lda.map(data, labels);
-    }
-        
-    if (labeltype == "double") {
-        dim::lda<double, double> lda(targetdim);
-        std::vector<double> labels = tools::vector::copy( source.readBlasVector<double>(argv[5], H5::PredType::NATIVE_DOUBLE) );
-        
-        project = lda.map(data, labels);
-    }
-
-    /*
-    if (labeltype == "string") {
-    }
-    */
-     
-    if ((project.size1() == 0) || (project.size2() == 0))
-        throw std::runtime_error("label type is unkown");
     
     
     
-    // create file and write data to hdf
-    tools::files::hdf target("lda.hdf5", true);
-    target.writeBlasMatrix<double>( "/data",  project, H5::PredType::NATIVE_DOUBLE );
+    // lda with string labels
+    if (boost::any_cast<std::string>(l_args["labeltype"]) == "string") {
+        dim::lda<double, std::string> lda( boost::any_cast<std::size_t>(l_args["dimension"]) );
+        
+        std::vector<std::string> labels = source.readStringVector(boost::any_cast<std::string>(l_args["labelpath"])); 
+        target.writeBlasMatrix<double>( "/project",  lda.map(data, labels), H5::PredType::NATIVE_DOUBLE );
+    }    
     
-    std::cout << "create HDF file \"lda.hdf5\" with dataset \"/data\"" << std::endl;
+       
+    
+    std::cout << "structure of the output file" << std::endl;
+    std::cout << "/project \t\t project data" << std::endl;
+    
     return EXIT_SUCCESS;
 }
