@@ -113,10 +113,10 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             T calculateQuantizationError( const ublas::matrix<T>& ) const;
         
             #ifdef MACHINELEARNING_MPI
-            /** map with information to every process and weight of the prototype / data matrix **/
+            /** vector with information to every process and width of the prototype / data matrix **/
             std::vector< std::pair<std::size_t,std::size_t> > m_processdatainfo;        
-            /** map with information to every process and prototype**/
-            std::map<int, std::pair<std::size_t,std::size_t> > m_processprototypinfo;
+            /** vector with information to every process and prototype**/
+            std::vector< std::pair<std::size_t,std::size_t> > m_processprototypinfo;
         
             ublas::matrix<T> gatherAllPrototypes( const mpi::communicator& ) const;
             std::size_t getNumberPrototypes( const mpi::communicator& ) const;
@@ -567,7 +567,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         // create map
         std::size_t l_sum = 0;
         for(std::size_t i=0; i < l_processdata.size(); ++i) {
-            m_processdatainfo[static_cast<int>(i)]  = std::pair<std::size_t,std::size_t>(l_sum, l_processdata[i]);
+            m_processdatainfo.push_back( std::pair<std::size_t,std::size_t>(l_sum, l_processdata[i]) );
             l_sum += l_processdata[i];
         }
         
