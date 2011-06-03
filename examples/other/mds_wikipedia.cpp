@@ -252,7 +252,7 @@ int main(int argc, char* argv[]) {
     std::cout << "read wikipedia articles..." << std::endl;
     
     std::vector<std::string> l_wikidata;
-	std::vector<std::string> l_wikilabel;
+    std::vector<std::string> l_wikilabel;
     tools::sources::wikipedia wiki( boost::any_cast< tools::sources::wikipedia::language >(l_args["lang"]) );
     
     std::size_t i=0;
