@@ -117,7 +117,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             
             #ifdef MACHINELEARNING_MPI
             /** map with information to every process and prototype**/
-            std::map<int, std::pair<std::size_t,std::size_t> > m_processprototypinfo;
+            std::vector< std::pair<std::size_t,std::size_t> > m_processprototypinfo;
             
             void synchronizePrototypes( const mpi::communicator&, ublas::matrix<T>&, ublas::vector<T>& );
             void synchronizePrototypeWeights( const mpi::communicator&, ublas::vector<T>& );
@@ -578,7 +578,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     
     
     
-    /** sets the std::map with the begin position and size of the prototypes matrix. Is required for the extraction of prototypes
+    /** sets the std::vector with the begin position and size of the prototypes matrix. Is required for the extraction of prototypes
      * of the full matrix for each process
      * @param p_mpi MPI object for communication
      **/
@@ -592,7 +592,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         // create map
         std::size_t l_sum = 0;
         for(std::size_t i=0; i < l_processdata.size(); ++i) {
-            m_processprototypinfo[static_cast<int>(i)]  = std::pair<std::size_t,std::size_t>(l_sum, l_processdata[i]);
+            m_processprototypinfo.push_back( std::pair<std::size_t,std::size_t>(l_sum, l_processdata[i]) );
             l_sum += l_processdata[i];
         }
     }

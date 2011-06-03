@@ -114,7 +114,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
             #ifdef MACHINELEARNING_MPI
             /** map with information to every process and weight of the prototype / data matrix **/
-            std::map<int, std::pair<std::size_t,std::size_t> > m_processdatainfo;        
+            std::vector< std::pair<std::size_t,std::size_t> > m_processdatainfo;        
             /** map with information to every process and prototype**/
             std::map<int, std::pair<std::size_t,std::size_t> > m_processprototypinfo;
         
@@ -581,7 +581,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         // create map
         l_sum = 0;
         for(std::size_t i=0; i < l_processdata.size(); ++i) {
-            m_processprototypinfo[static_cast<int>(i)]  = std::pair<std::size_t,std::size_t>(l_sum, l_processdata[i]);
+            m_processprototypinfo.push_back( std::pair<std::size_t,std::size_t>(l_sum, l_processdata[i]) );
             l_sum += l_processdata[i];
         }
     }
@@ -701,7 +701,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             
             // the adapt matrix holds all values on the block of the current CPU, so CPU 0 holds the values 0..k, CPU 1 k+1..n and so on.
             // In the next step we must calculate the inner product of each prototyp and each row of the adapt matrix, but we can't because
-            // we have only party of the rows on each CPU, so we split the prototype matrix (with the information of the processdata) in
+            // we have only parts of the rows on each CPU, so we split the prototype matrix (with the information of the processdata) in
             // the correct party, create the "local" inner product and sums over all CPUs. Each CPU gets so the correct value for subtract
             // it from their local adapt matrix
             ublas::matrix_range< ublas::matrix<T> > l_protorange( m_prototypes, 
