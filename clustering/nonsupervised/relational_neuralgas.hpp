@@ -48,7 +48,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     namespace mpi   = boost::mpi;
     #endif
     
-    /** class for calculate (batch) relational neural gas
+    /** class for calculate (batch) relational neural gas with pseudo-euclidian data space
      * $LastChangedDate$
      * @note The MPI methods do not check the correct ranges / dimension of the prototype
      * data, so it is the task of the developer to use the correct ranges. Also the MPI
