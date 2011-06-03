@@ -77,7 +77,6 @@
  *          <li><dfn>l_</dfn> local variable / scope within a methode</li>
  *          <li><dfn>m_</dfn> member variable / scope within an object</li>
  *          <li><dfn>p_</dfn> parameter variable within a method / function declaration</li>
- *          <li><dfn>g_</dfn> globale variable / scope within the global code / namespace</li>
  *      </ul>
  *      The excepts are counting variables eg. <dfn>i</dfn>, <dfn>j</dfn>, <dfn>n</dfn> or iterator variables <dfn>it</dfn>
  * </li>
