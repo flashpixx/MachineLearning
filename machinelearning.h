@@ -569,6 +569,7 @@
  *
  *
  * @todo thinking about a SSE support in the framework http://en.wikipedia.org/wiki/SSE3
+ * @todo thinking about CILK support http://supertech.csail.mit.edu/cilk/
  * @todo adding genetic algorithms
  * @todo adding simulated annealing
 **/
