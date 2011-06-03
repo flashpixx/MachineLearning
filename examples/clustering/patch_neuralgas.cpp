@@ -48,16 +48,25 @@ namespace mpi       = boost::mpi;
  * @param p_args map with argument values (default values)
  * @return bool if all is correct
  **/
+#ifdef MACHINELEARNING_MPI
+bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_args, mpi::communicator& p_mpi ) {
+#else
 bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_args ) {
+#endif    
     
     if (argc < 2) {
+        #ifdef MACHINELEARNING_MPI
+        if (p_mpi.rank() == 0) {
+        #endif
         std::cout << "--inputfile \t\t one or many input HDF5 file(s)" << std::endl;
         std::cout << "--inputpath \t\t one path (read in each file) or same number of pathes like input files" << std::endl;
         std::cout << "--outfile \t\t output HDF5 file" << std::endl;
         std::cout << "--iteration \t\t number of iteration" << std::endl;
         std::cout << "--prototype \t\t number of prototypes" << std::endl;
         std::cout << "--log \t\t\t 'on' for enable logging" << std::endl;
-        
+        #ifdef MACHINELEARNING_MPI
+        }
+        #endif
         return false;
     }
     
@@ -148,14 +157,18 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
  **/
 int main(int argc, char* argv[]) {
     
-    std::map<std::string, boost::any> l_args;
-    if (!cliArguments(argc, argv, l_args))
-        return EXIT_FAILURE;
-    
     #ifdef MACHINELEARNING_MPI
     mpi::environment loMPIenv(argc, argv);
     mpi::communicator loMPICom;
-        
+    
+    if (!cliArguments(argc, argv, l_args, loMPICom))
+    #else
+    if (!cliArguments(argc, argv, l_args))
+    #endif
+        return EXIT_FAILURE;
+    
+    
+    #ifdef MACHINELEARNING_MPI
     // we check CPU size and number of files
     if ( static_cast<std::size_t>(loMPICom.size()) != boost::any_cast< std::vector<std::string> >(l_args["inputfile"]).size())
         throw std::runtime_error("number of process and number of source files must be equal");

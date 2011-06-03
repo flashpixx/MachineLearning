@@ -43,16 +43,25 @@ namespace mpi       = boost::mpi;
  * @param p_args map with argument values (default values)
  * @return bool if all is correct
  **/
+#ifdef MACHINELEARNING_MPI
+bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_args, mpi::communicator& p_mpi ) {
+#else
 bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_args ) {
+#endif
     
     if (argc < 2) {
+        #ifdef MACHINELEARNING_MPI
+        if (p_mpi.rank() == 0) {
+        #endif
         std::cout << "--inputfile" << "\t" << "input HDF5 file" << std::endl;
         std::cout << "--inputpath" << "\t" << "path to dataset" << std::endl;
         std::cout << "--outfile" << "\t" << "output HDF5 file" << std::endl;
         std::cout << "--iteration" << "\t" << "number of iteration" << std::endl;
         std::cout << "--prototype" << "\t" << "number of prototypes" << std::endl;
         std::cout << "--log" << "\t" << "'on' for enable logging" << std::endl;
-        
+        #ifdef MACHINELEARNING_MPI
+        }
+        #endif
         return false;
     }
     
@@ -144,14 +153,19 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
 int main(int argc, char* argv[]) {
     
     std::map<std::string, boost::any> l_args;
-    if (!cliArguments(argc, argv, l_args))
-        return EXIT_FAILURE;
-
     
     #ifdef MACHINELEARNING_MPI
     mpi::environment loMPIenv(argc, argv);
     mpi::communicator loMPICom;
     
+    if (!cliArguments(argc, argv, l_args, loMPICom))
+    #else
+    if (!cliArguments(argc, argv, l_args))
+    #endif
+        return EXIT_FAILURE;
+
+    
+    #ifdef MACHINELEARNING_MPI
     if (!( ((boost::any_cast< std::vector<std::string> >(l_args["inputfile"]).size() == static_cast<std::size_t>(loMPICom.size())) && (boost::any_cast< std::vector<std::string> >(l_args["inputpath"]).size() == 1)) || ((boost::any_cast< std::vector<std::string> >(l_args["inputpath"]).size() == static_cast<std::size_t>(loMPICom.size())) && (boost::any_cast< std::vector<std::string> >(l_args["inputfile"]).size() == 1)) ))
         throw std::runtime_error("number of files or number of path must be equal to CPU rank");
         
