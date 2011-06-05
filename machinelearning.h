@@ -33,8 +33,9 @@
  * <li>Automatically Tuned Linear Algebra Software ( http://math-atlas.sourceforge.net/ )</li>
  * <li>Boost ( http://www.boost.org/ ) with following components
  *     <ul>
- *         <li>IOStreams with GZip and BZip2 support</li>
+ *         <li>IOStreams with ZLib and BZip2 support</li>
  *         <li>Thread support</li>
+ *         <li>Math support</li>
  *         <li>Regular Expression support</li>
  *         <li>Filesystem support</li>
  *         <li>System support</li>
@@ -43,7 +44,7 @@
  *     </ul>
  * </li>
  * <li>Boost Bindings (SVN http://svn.boost.org/svn/boost/sandbox/numeric_bindings )</li>
- * <li>GiNaC ( http://www.ginac.de/ )</li>
+ * <li>GiNaC ( http://www.ginac.de/ ) with CLN ( http://www.ginac.de/CLN/ )</li>
  * <li>Linear Algebra PACKage ( http://www.netlib.org/lapack/ )</li>
  * <li><i>optional Hierarchical Data Format (HDF)</i> ( http://www.hdfgroup.org/ )</li>
  * <li><i>optional Message-Passing-Interface-Support</i>
@@ -58,6 +59,7 @@
  * <li><i>optional Scons</i> ( http://www.scons.org/ )</li>
  * <li><i>optional Doxygen</i> ( http://www.doxygen.org/ )</li>
  * </ul>
+ * For manual installation of the library you can follow the short @subpage installationnotes
  *
  * @section def definition / style guide
  * <ul>
@@ -148,6 +150,118 @@
  * <li>@subpage lang</li>
  * <li>@subpage other</li>
  * </ul>
+ *
+ *
+ *
+ * @page installationnotes Installation Notes
+ * @section nix Linux / Mac OS X
+ * @section windows Microsoft Windows
+ * Windows does not supported all depending libraries. In this steps are some information about the installation depending libraries. The framework is tested with
+ * <a href="http://www.microsoft.com/express/">Microsoft Visual Studio (Express)</a>. You need <a href="http://www.python.org">Python for Windows (MSI installer)</a>
+ * for using Scons. The sequence of the build process should be carried out as indicated here.
+ *
+ * @subsection winzip BZip2 and Zip support
+ * Boost IOStream and HDF require BZip2 and ZLib support. Information for IOStream is found on <dfn>www.boost.org/doc/libs/-release number-/libs/iostreams/doc/installation.html</dfn>.
+ * <a href="http://www.bzip.org/">BZip2 sources</a> can compiled with Visual Studio (see readme). After extracting the source BZip2 can compiled on the Visual Studio Command Line
+ * with (it is recommend to use an <dfn>include</dfn> directory for the header files and a <dfn>lib</dfn> directory for the libraries)
+ * @code nmake -f makefile.msc @endcode 
+ * After compiling all files in the directory can be deleted except
+ * <ul>
+ * <li><dfn>bzip2.exe</dfn></li>
+ * <li><dfn>bzip2.exe.manifest</dfn></li>
+ * <li><dfn>bzip2recover.exe</dfn></li>
+ * <li><dfn>bzip2recover.exe.manifest</dfn></li>
+ * <li><dfn>bzlib.h</dfn></li>
+ * <li><dfn>libbz2.lib</dfn></li>
+ * <li><dfn>msvcr90.dll</dfn></li>
+ * <li><dfn>msvcr90d.dll</dfn></li>
+ * </ul>
+ * <a href="http://zlib.net/">ZLib sources</a> can be compiled also with
+ * @code nmake -f win32/Makefile.msc @endcode 
+ * The following files are needed
+ * <ul>
+ * <li><dfn>crc32.h</dfn></li>
+ * <li><dfn>deflate.h</dfn></li>
+ * <li><dfn>inftrees.h</dfn></li>
+ * <li><dfn>trees.h</dfn></li>
+ * <li><dfn>gzguts.h</dfn></li>
+ * <li><dfn>zconf.h</dfn></li>
+ * <li><dfn>inffast.h</dfn></li>
+ * <li><dfn>zlib.h</dfn></li>
+ * <li><dfn>inffixed.h</dfn></li>
+ * <li><dfn>zutil.h</dfn></li>
+ * <li><dfn>inflate.h</dfn></li>
+ * <li><dfn>zdll.lib</dfn></li>
+ * <li><dfn>zlib.lib</dfn></li>
+ * <li><dfn>zlib1.dll.manifest</dfn></li>
+ * </ul>
+ * The Boost IOStream can be compiled only with the environmental variables for BZip2 and ZLib:
+ * <ul>
+ * <li><dfn>BZIP2_BINARY = libbz2</dfn></li>
+ * <li><dfn>BZIP2_INCLUDE = installation directory</dfn></li>
+ * <li><dfn>BZIP2_LIBPATH = library directory</dfn></li>
+ * <li><dfn>ZLIB_BINARY = zdll</dfn></li>
+ * <li><dfn>ZLIB_INCLUDE = installation directory</dfn></li>
+ * <li><dfn>ZLIB_LIBPATH = library directory</dfn></li>
+ * </ul>
+ *
+ * @subsection winboost Boost
+ * First bJam must be build in the Visual Studio Command Line, so in the extracted source path the command
+ * @code bootstrap.bat @endcode
+ * must be run. After that Boost can be build with (The MPI support can be enabled with <dfn>--with-mpi</dfn>, but it requires MPI sources and libraries. The configuration for MPI use can be found on
+ * <dfn>www.boost.org/doc/libs/-release number-/doc/html/mpi.html</dfn>)
+ * @code bjam --with-filesystem --with-math --with-random --with-regex --with-thread --with-system --with-serialization --with-iostreams threading=multi runtime-link=shared variant=release toolset=msvc install @endcode
+ *
+ * @subsection winhdf HDF
+ * It is recommand to use <a href="http://www.cmake.org">CMake</a> to perfom the building and installing. After extracting the files in the sources directory the following command must be
+ * called within the Visual Studio Command Line (for using ZLib or SLib support see HDF install instructions):
+ * @code cmake-gui . @endcode
+ * Generate the compiler option and set the following option
+ * <ul>
+ * <li><dfn>BUILD_SHARED_LIBS</dfn> enabled</li>
+ * <li><dfn>HDF5-BUILD_CPP_LIB</dfn> enabled</li>
+ * <li><dfn>CMAKE_ARCHIVE_OUTPUT_DIRECTORY</dfn> set to a build directory</li>
+ * <li><dfn>CMAKE_LIBRARY_OUTPUT_DIRECTORY</dfn> set to a build directory</li>
+ * <li><dfn>CMAKE_RUNTIME_OUTPUT_DIRECTORY</dfn> set to a build directory</li>
+ * <li><dfn>CMAKE_INSTALL_PREFIX</dfn> set to the installation / target directory</li>
+ * </ul>
+ * After generating the configuration files, the <dfn>ALL_BUILD.vcproj</dfn> must be opened. Set the build type to <dfn>Release</dfn> and create the <dfn>ALL_BUILD</dfn> target, after compiling
+ * the <dfn>INSTALL</dfn> target must be run.
+ *
+ * @subsection winatlas Atlas with LAPack
+ * Atlas and LAPack can be compiled with <a href="http://www.cygwin.com/">Cygwin</a>. Cygwin must first installed with Gcc and G++. It is recommend that you take a look into the Atlas errata for more
+ * information about installing Atlas under Windows.
+ * To compile both libraries with Visual Studio the Cygwin compiler must be changed
+ * with the following steps:
+ * <ol>
+ * <li>get the path to Visual Studio (eg. <dfn>C:\\Program Files\\Microsoft Visual Studio 9.0\\VC</dfn>)</li>
+ * <li>open the <dfn>Cygwin.bat</dfn> in the Cygwin installation directory and on top the lines:
+ * @code
+   chdir #path to Visual Studio#
+   call vcvarsall.bat
+ * @endcode</li>
+ * <li>On starting Cygwin a message like <dfn>Setting environment for using Microsoft Visual Studio 2008 x86 tools</dfn> is shown in the command line window</li>
+ * </ol>
+ * It is recommend to move the Atlas source and the <dfn>lapack.tgz</dfn> into the Cygwin users home directory (eg. sources are in <dfn>~/ATLAS</dfn> and lapack in <dfn>~/lapack.tgz</dfn>).
+ * After that create a new directory in the home (eg. <dfn>mkdir ~/tmp</dfn>) and step into. Than call the configure script with
+ * @code ~/ATLAS/configure --dylibs --nof77 --with-netlib-lapack-tarfile=~/lapack.tgz -C ic cl --prefix=-path to install (eg. /cygdrive/c/mylapack)-  @endcode
+ *
+ * @subsection winginac GiNac with CLN
+ * Both libraries must be compiled with Cygwin (see @ref winatlas). Extract the CLN source first, switch in the Cygwin command line into the source directory and run the command
+ * @code ./configure @endcode
+ * If you would like to set the installation directory use eg. <dfn>--prefix=/cygdrive/c/mycln</dfn>. After configure run
+ * @code make @endcode 
+ * and
+ * @code make install @endcode 
+ * GiNaC requires the CLN, which can be accessed with <a href="http://www.freedesktop.org/wiki/Software/pkg-config">PKG-Config</a> or environmental variables can be set with:
+ * @code 
+    export CLN_LIBS="-L-path to CLN-/lib -lcln"
+    export CLN_CFLAGS="-I-path to CLN-/include"
+ * @endcode
+ * After setting the variables GiNaC can be build with the same commands like CLN.
+ *
+ * @subsection winxml LibXML2
+ * The XML2 library can be build with the same steps like GiNaC. The webpage references binary packages too.
  *
  *
  *
