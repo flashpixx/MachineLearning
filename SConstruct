@@ -71,7 +71,7 @@ def configuration_posix(config, version, architecture) :
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["LIBRARY_PATH"]
     config["compileflags"]      = "-O3 -pipe -Wall -pthread -finline-functions -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
-    config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "boost_filesystem", "ginac", "atlas", "lapack", "ptcblas", "ptf77blas", "boost_regex"]
+    config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "boost_filesystem", "ginac", "tatlas", "lapack", "ptcblas", "ptf77blas", "boost_regex"]
     
     if optionExist("withdebug") :
         config["compileflags"]      += " -g"
