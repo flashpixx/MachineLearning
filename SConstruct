@@ -16,7 +16,6 @@ AddOption("--create-language", dest="createlang", type="string", nargs=0, action
 AddOption("--compile-language", dest="compilelang", type="string", nargs=0, action="store", help="compiles the language files")
 AddOption("--create-documentation", dest="createdocu", type="string", nargs=0, action="store", help="creates the doxygen documentation (doxygen must be within the path)")
 AddOption("--with-debug", dest="withdebug", type="string", nargs=0, action="store", help="compile with debug information")
-AddOption("--with-fortran-lapack", dest="withfortranlapack", type="string", nargs=0, action="store", help="LAPack is build with fortran compiler (flag --nof77 is not set during ATLAS build)")
 
 
 #=== function for os configuration ===================================================================================================
@@ -34,13 +33,7 @@ def configuration_macosx(config, version, architecture) :
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["LIBRARY_PATH"]
     config["compileflags"]      = "-O3 -pipe -Wall -pthread -finline-functions -arch "+arch+" -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
-    config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "boost_filesystem", "ginac", "boost_regex"]
-
-
-    if optionExist("withfortranlapack") :
-        config["linkto"].extend( ["tatlas", "lapack", "ptcblas", "ptf77blas"] )
-    else :
-        config["linkto"].extend( ["tatlas", "lapack", "ptcblas"] )
+    config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "boost_filesystem", "boost_regex", "ginac", "tatlas"]
 
     if optionExist("withdebug") :
         config["compileflags"]      += " -g"
@@ -79,12 +72,7 @@ def configuration_posix(config, version, architecture) :
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["LIBRARY_PATH"]
     config["compileflags"]      = "-O3 -pipe -Wall -pthread -finline-functions -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
-    config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "boost_filesystem", "ginac", "boost_regex"]
-    
-    if optionExist("withfortranlapack") :
-        config["linkto"].extend( ["tatlas", "lapack", "ptcblas", "ptf77blas"] )
-    else :
-        config["linkto"].extend( ["tatlas", "lapack", "ptcblas"] )
+    config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "boost_filesystem", "boost_regex", "ginac", "tatlas"]
     
     if optionExist("withdebug") :
         config["compileflags"]      += " -g"
