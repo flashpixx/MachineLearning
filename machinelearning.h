@@ -30,7 +30,7 @@
  * 
  * @section requirements requirements
  * <ul>
- * <li>Automatically Tuned Linear Algebra Software ( http://math-atlas.sourceforge.net/ )</li>
+ * <li>Automatically Tuned Linear Algebra Software ( http://math-atlas.sourceforge.net/ ) [version newer than 3.9.40]</li>
  * <li>Boost ( http://www.boost.org/ ) with following components
  *     <ul>
  *         <li>IOStreams with ZLib and BZip2 support</li>
@@ -44,9 +44,9 @@
  *     </ul>
  * </li>
  * <li>Boost Bindings (SVN http://svn.boost.org/svn/boost/sandbox/numeric_bindings )</li>
- * <li>GiNaC ( http://www.ginac.de/ ) with CLN ( http://www.ginac.de/CLN/ )</li>
- * <li>Linear Algebra PACKage ( http://www.netlib.org/lapack/ )</li>
- * <li><i>optional Hierarchical Data Format (HDF)</i> ( http://www.hdfgroup.org/ )</li>
+ * <li>GiNaC ( http://www.ginac.de/ ) with CLN ( http://www.ginac.de/CLN/ ) [version newer or equal 1.6]</li>
+ * <li>Linear Algebra PACKage ( http://www.netlib.org/lapack/ ) [Version newer 3.3]</li>
+ * <li><i>optional Hierarchical Data Format (HDF)</i> ( http://www.hdfgroup.org/ ) [version newer or equal 5.1.8.4]</li>
  * <li><i>optional Message-Passing-Interface-Support</i>
  *      <ul>
  *          <li>Open MPI ( http://www.open-mpi.org/ )</li>
@@ -154,13 +154,48 @@
  *
  *
  * @page installationnotes Installation Notes
+ * All configure scripts have a <dfn>--prefix=</dfn> option for setting a target installation directory. It is recommand to use this option for seperating the manually installation
+ * in opinion to the system libraries.
+ *
  * @section nix Linux / Mac OS X
+ * In both OS (Linux & Mac OS X) the libraries can be build with the following steps within the extracted source directory:
+ * @code
+    ./configure
+    make
+    make install
+   @endcode
+   For the single packages are some notes:
+ *
+ * @subsection nixzip BZip2 and ZLib support 
+ * Within the most systems <a href="http://www.bzip.org/">BZip2 sources</a> and <a href="http://zlib.net/">ZLib sources</a> are installed. Sources can be installed from the package
+ * tree or manually from the source packages.
+ *
+ * @subsection nixboost Boost
+ * First bJam must be build in the command line (terminal), so in the extracted source path the command
+ * @code bootstrap.sh @endcode
+ * must be run. After that Boost can be build with (The MPI support can be enabled with <dfn>--with-mpi</dfn>, but it requires MPI sources and libraries. The configuration for MPI use can be found on
+ * <dfn>www.boost.org/doc/libs/-release number-/doc/html/mpi.html</dfn>)
+ * @code bjam --with-filesystem --with-math --with-random --with-regex --with-thread --with-system --with-serialization --with-iostreams threading=multi runtime-link=shared variant=release toolset=gcc|darwin install @endcode
+ * The <dfn>toolset</dfn> option must be:
+ * <ul>
+ * <li><dfn>gcc</dfn> for unix systems</li>
+ * <li><dfn>darwin</dfn> for Mac OS X</li>
+ * </ul>
+ *
+ * @subsection nixhdf HDF
+ * The HDF libraray must be build with C++ support, so the configure call must be:
+ * @code configure --enable-cxx @endcode
+ *
+ * @subsection nixatlas Atlas with full LAPack
+ * The framework need a full LAPack support, so a GFortran compiler is needed. The fortran compiler can be downloaded on http://gcc.gnu.org/wiki/GFortranBinaries
+ *
+ *
  * @section windows Microsoft Windows
  * Windows does not supported all depending libraries. In this steps are some information about the installation depending libraries. The framework is tested with
  * <a href="http://www.microsoft.com/express/">Microsoft Visual Studio (Express)</a>. You need <a href="http://www.python.org">Python for Windows (MSI installer)</a>
  * for using Scons. The sequence of the build process should be carried out as indicated here.
  *
- * @subsection winzip BZip2 and Zip support
+ * @subsection winzip BZip2 and ZLib support
  * Boost IOStream and HDF require BZip2 and ZLib support. Information for IOStream is found on <dfn>www.boost.org/doc/libs/-release number-/libs/iostreams/doc/installation.html</dfn>.
  * <a href="http://www.bzip.org/">BZip2 sources</a> can compiled with Visual Studio (see readme). After extracting the source BZip2 can compiled on the Visual Studio Command Line
  * with (it is recommend to use an <dfn>include</dfn> directory for the header files and a <dfn>lib</dfn> directory for the libraries)
@@ -228,28 +263,17 @@
  * After generating the configuration files, the <dfn>ALL_BUILD.vcproj</dfn> must be opened. Set the build type to <dfn>Release</dfn> and create the <dfn>ALL_BUILD</dfn> target, after compiling
  * the <dfn>INSTALL</dfn> target must be run.
  *
- * @subsection winatlas Atlas with LAPack
- * Atlas and LAPack can be compiled with <a href="http://www.cygwin.com/">Cygwin</a>. Cygwin must first installed with Gcc and G++. It is recommend that you take a look into the Atlas errata for more
- * information about installing Atlas under Windows.
- * To compile both libraries with Visual Studio the Cygwin compiler must be changed
- * with the following steps:
- * <ol>
- * <li>get the path to Visual Studio (eg. <dfn>C:\\Program Files\\Microsoft Visual Studio 9.0\\VC</dfn>)</li>
- * <li>open the <dfn>Cygwin.bat</dfn> in the Cygwin installation directory and on top the lines:
- * @code
-   chdir #path to Visual Studio#
-   call vcvarsall.bat
- * @endcode</li>
- * <li>On starting Cygwin a message like <dfn>Setting environment for using Microsoft Visual Studio 2008 x86 tools</dfn> is shown in the command line window</li>
- * </ol>
- * It is recommend to move the Atlas source and the <dfn>lapack.tgz</dfn> into the Cygwin users home directory (eg. sources are in <dfn>~/ATLAS</dfn> and lapack in <dfn>~/lapack.tgz</dfn>).
- * After that create a new directory in the home (eg. <dfn>mkdir ~/tmp</dfn>) and step into. Than call the configure script with
- * @code ~/ATLAS/configure --dylibs --nof77 --with-netlib-lapack-tarfile=~/lapack.tgz -C ic cl --prefix=-path to install (eg. /cygdrive/c/mylapack)-  @endcode
+ * @subsection winatlas Atlas with full LAPack
+ * Atlas and LAPack can be compiled with <a href="http://www.cygwin.com/">Cygwin</a>. Cygwin must first installed with Gcc, G++ and GFortran. It is recommend that you take a look into the Atlas
+ * errata for more information about installing Atlas under Windows. It is recommend to move the Atlas source and the <dfn>lapack.tgz</dfn> into the Cygwin users home directory (eg. sources are
+ * in <dfn>~/ATLAS</dfn> and lapack in <dfn>~/lapack.tgz</dfn>).
+ * After that create a new directory in the home (eg. <dfn>mkdir ~/tmp</dfn>) and step into. Than call the configure script with (take a look to the flags <dfn>-b 32|64</dfn> for using 32 or 64 bit)
+ * @code ~/ATLAS/configure --dylibs -C ic cl --with-netlib-lapack-tarfile=~/lapack.tgz  @endcode
  *
  * @subsection winginac GiNac with CLN
  * Both libraries must be compiled with Cygwin (see @ref winatlas). Extract the CLN source first, switch in the Cygwin command line into the source directory and run the command
  * @code ./configure @endcode
- * If you would like to set the installation directory use eg. <dfn>--prefix=/cygdrive/c/mycln</dfn>. After configure run
+ * If you would like to set the installation directory use. After configure run
  * @code make @endcode 
  * and
  * @code make install @endcode 
