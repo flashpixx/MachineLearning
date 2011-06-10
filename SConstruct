@@ -33,7 +33,7 @@ def configuration_macosx(config, version, architecture) :
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["LIBRARY_PATH"]
     config["compileflags"]      = "-O3 -pipe -Wall -pthread -finline-functions -arch "+arch+" -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
-    config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "boost_filesystem", "boost_regex", "ginac", "tatlas"]
+    config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "boost_regex", "ginac", "tatlas"]
 
     if optionExist("withdebug") :
         config["compileflags"]      += " -g"
@@ -72,7 +72,7 @@ def configuration_posix(config, version, architecture) :
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["LIBRARY_PATH"]
     config["compileflags"]      = "-O3 -pipe -Wall -pthread -finline-functions -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
-    config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "boost_filesystem", "boost_regex", "ginac", "tatlas"]
+    config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "boost_regex", "ginac", "tatlas"]
     
     if optionExist("withdebug") :
         config["compileflags"]      += " -g"
