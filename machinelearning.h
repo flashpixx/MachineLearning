@@ -187,7 +187,10 @@
  * @code configure --enable-cxx @endcode
  *
  * @subsection nixatlas Atlas with full LAPack
- * The framework need a full LAPack support, so a GFortran compiler is needed. The fortran compiler can be downloaded on http://gcc.gnu.org/wiki/GFortranBinaries
+ * The framework need a full LAPack support, so a GFortran compiler is needed. The fortran compiler can be downloaded on http://gcc.gnu.org/wiki/GFortranBinaries . The configure call should be
+ * @code configure --dylibs --with-netlib-lapack-tarfile=-path to lapack.tgz- @endcode
+ * In some cases the pointer bitwidth (<dfn>-b</dfn>) must be set. The flag <dfn>--nof77</dfn> should not be set, because some LAPack routines are not built. The configure call must be run into
+ * a temporary directory, so in the first step the temporary directory must be created.
  *
  *
  * @section windows Microsoft Windows
