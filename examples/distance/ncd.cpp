@@ -21,9 +21,11 @@
  @endcond
  **/
 
-#include <machinelearning.h>
-#include <string>
 #include <map>
+#include <string>
+#include <cstdlib>
+
+#include <machinelearning.h>
 #include <boost/any.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/symmetric.hpp>

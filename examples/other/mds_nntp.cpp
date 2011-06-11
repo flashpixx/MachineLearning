@@ -21,8 +21,8 @@
  @endcond
  **/
 
-
 #include <map>
+#include <cstdlib>
 
 #include <machinelearning.h>
 #include <boost/any.hpp>
