@@ -29,6 +29,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <algorithm>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/algorithm/string.hpp> 
@@ -51,7 +52,7 @@ namespace machinelearning { namespace tools { namespace files {
         public :
             
             template<typename T> ublas::vector<T> readBlasVector( const std::string&, const bool& = false ) const;
-            template<typename T> ublas::matrix<T> readBlasMatrix( const std::string&, const std::string& = ",; \t" ) const;
+            template<typename T> ublas::matrix<T> readBlasMatrix( const std::string&, const std::string& = ",; \t", const bool& = false ) const;
             template<typename T> std::vector<std::string> readVector( const std::string& ) const;
             template<typename T> void write( const std::string&, const ublas::vector<T>&, const bool& = false ) const;
             template<typename T> void write( const std::string&, const ublas::matrix<T>&, const char& = ' ', const bool& = false ) const;
@@ -106,53 +107,66 @@ namespace machinelearning { namespace tools { namespace files {
     /** read a matrix structure from csv file 
      * @param p_file filename as string
      * @param p_separator characters for sperator (default , ; \\t blank)
+     * @param p_header first element in the input file is the size of the input matrix
      * @return ublas vector with data
      **/
-    template<typename T> inline ublas::matrix<T> csv::readBlasMatrix( const std::string& p_file, const std::string& p_separator ) const
+    template<typename T> inline ublas::matrix<T> csv::readBlasMatrix( const std::string& p_file, const std::string& p_separator, const bool& p_header ) const
     {
         if (p_separator.empty())
             throw exception::runtime(_("separator can not be empty"));
-        
-        // open stream and read first line with matrix dimensions (rows cols)
-        std::string l_line;
+
         std::ifstream l_stream( p_file.c_str(), std::ifstream::in ); 
         l_stream.seekg( std::ios_base::beg );        
-        std::getline(l_stream, l_line);
-        
-        
-        // seperate dimensions and creates matrix
-        std::vector<std::string> l_data;
-        boost::split( l_data, l_line, boost::is_any_of(p_separator) );
-        
-        if (l_data.size() == 0)
-            throw exception::runtime(_("can not separate size"));
 
+        std::vector< std::vector<std::string> > l_data;
         std::size_t l_row = 0;
-        if (l_data.size() > 0)
-            l_row = boost::lexical_cast<std::size_t>( l_data[0] );
+        std::size_t l_col = 0;
         
-        std::size_t l_col = l_row;
-        if (l_data.size() > 1)
-            l_col = boost::lexical_cast<std::size_t>( l_data[1] );  
-        
-        if (l_col > 0)
-            throw exception::runtime(_("column size must be greater than zero"));
-        if (l_row > 0)
-            throw exception::runtime(_("row size must be greater than zero"));
-        
-        ublas::matrix<T> l_mat( l_row, l_col ); 
-        
-        
-        // read lines and seperate elements
-        l_data.reserve(l_col);
-        for(std::size_t i=0; (i < l_mat.size1()) && (std::getline(l_stream, l_line)); ++i) {
-            l_data.erase(l_data.begin(), l_data.end());
-            boost::split( l_data, l_line, boost::is_any_of(p_separator) );
+        if (p_header) {
+            std::string l_line;   
+            std::vector<std::string> l_splitline;
             
-            for(std::size_t j=0; (j < l_mat.size2()) && (j < l_data.size()); ++j)
-                l_mat(i,j) =  boost::lexical_cast<T>( l_data[j] );
+            std::getline(l_stream, l_line);
+        
+            // seperate dimensions
+            boost::split( l_splitline, l_line, boost::is_any_of(p_separator) );
+            if (l_splitline.size() < 2)
+                throw exception::runtime(_("can not separate size"));
+
+            l_row = boost::lexical_cast<std::size_t>( l_splitline[0] );
+            l_col = boost::lexical_cast<std::size_t>( l_splitline[1] );  
+        
+            while (std::getline(l_stream, l_line)) {
+                l_splitline.clear();
+                boost::split( l_splitline, l_line, boost::is_any_of(p_separator) );
+                
+                l_data.push_back(l_splitline);
+            }
+        } else {
+            std::string l_line;
+            std::vector<std::string> l_splitline;
+            while (std::getline(l_stream, l_line)) {
+                l_splitline.clear();
+                boost::split( l_splitline, l_line, boost::is_any_of(p_separator) );
+                
+                l_data.push_back(l_splitline);
+                l_col = std::max(l_col, l_splitline.size());
+            }
+            l_row = l_data.size();
         }
         l_stream.close();
+                    
+        
+        if (l_col == 0)
+            throw exception::runtime(_("column size must be greater than zero"));
+        if (l_row == 0)
+            throw exception::runtime(_("row size must be greater than zero"));
+
+        
+        ublas::matrix<T> l_mat( l_row, l_col ); 
+        for(std::size_t i=0; l_mat.size1(); ++i)             
+            for(std::size_t j=0; (j < l_mat.size2()) && (j < l_data[i].size()); ++j)
+                l_mat(i,j) =  boost::lexical_cast<T>( l_data[i][j] );
         
         return l_mat;
     }
