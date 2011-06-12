@@ -50,12 +50,12 @@ namespace machinelearning { namespace tools { namespace files {
         
         public :
             
-            template<typename T> ublas::vector<T> readBlasVector( const std::string& ) const;
-            template<typename T> ublas::matrix<T> readBlasMatrix( const std::string&, const std::string& = ",; " ) const;
-            template<typename T> std::vector<T> readVector( const std::string&, const std::size_t& = 100 ) const;
-            template<typename T> void write( const std::string&, const ublas::vector<T>& ) const;
-            template<typename T> void write( const std::string&, const ublas::matrix<T>&, const char& = ' ' ) const;
-            template<typename T> void write( const std::string&, const std::vector<T>& ) const;
+            template<typename T> ublas::vector<T> readBlasVector( const std::string&, const bool& = false ) const;
+            template<typename T> ublas::matrix<T> readBlasMatrix( const std::string&, const std::string& = ",; \t" ) const;
+            template<typename T> std::vector<std::string> readVector( const std::string& ) const;
+            template<typename T> void write( const std::string&, const ublas::vector<T>&, const bool& = false ) const;
+            template<typename T> void write( const std::string&, const ublas::matrix<T>&, const char& = ' ', const bool& = false ) const;
+            template<typename T> void write( const std::string&, const std::vector<T>&, const bool& = false ) const;
         
     };
     
@@ -64,28 +64,40 @@ namespace machinelearning { namespace tools { namespace files {
         
     /** read a vector structure from csv file 
      * @param p_file filename as string
+     * @param p_header bool so the first element is set to the length of the vector
      * @return ublas vector with data
      **/
-    template<typename T> inline ublas::vector<T> csv::readBlasVector( const std::string& p_file ) const
+    template<typename T> inline ublas::vector<T> csv::readBlasVector( const std::string& p_file, const bool& p_header ) const
     {
-        
-        std::string l_line;
         std::ifstream l_stream( p_file.c_str(), std::ifstream::in ); 
-        
         l_stream.seekg( std::ios_base::beg ); 
         
-        //first line => length of vector
-        std::getline(l_stream, l_line);
-        std::size_t l_vecsize = boost::lexical_cast<std::size_t>(l_line);
-        if (l_vecsize == 0)
-            throw exception::runtime(_("vector dimension must be greater than zero"));
-        ublas::vector<T> l_vec( l_vecsize );        
+        std::vector<std::string> l_data;
         
-        // read other lines
-        for(std::size_t i=0; (i < l_vec.size()) && (std::getline(l_stream, l_line)); ++i)
-            l_vec(i) = boost::lexical_cast<T>(l_line);
+        if (p_header) {
+            std::string l_line;
+            
+            //first line => length of vector
+            std::getline(l_stream, l_line);
+            std::size_t l_vecsize = boost::lexical_cast<std::size_t>(l_line);
+            if (l_vecsize == 0)
+                throw exception::runtime(_("vector dimension must be greater than zero"));
+        
+            for(std::size_t i=0; (i < l_vecsize) && (std::getline(l_stream, l_line)); ++i)
+                l_data.push_back(l_line);
+        } else {
+            std::string l_line;
+            while (std::getline(l_stream, l_line))
+                l_data.push_back(l_line);
+        }
         
         l_stream.close();
+        
+        
+        // convert string data
+        ublas::vector<T> l_vec( l_data.size() );        
+        for(std::size_t i=0; i < l_data.size(); ++i)
+            l_vec(i) = boost::lexical_cast<T>( l_data[i] );
         
         return l_vec;
     }
@@ -93,7 +105,7 @@ namespace machinelearning { namespace tools { namespace files {
     
     /** read a matrix structure from csv file 
      * @param p_file filename as string
-     * @param p_separator characters for sperator (default , ; blank)
+     * @param p_separator characters for sperator (default , ; \\t blank)
      * @return ublas vector with data
      **/
     template<typename T> inline ublas::matrix<T> csv::readBlasMatrix( const std::string& p_file, const std::string& p_separator ) const
@@ -148,23 +160,18 @@ namespace machinelearning { namespace tools { namespace files {
     
     /** read all lines from csv file to a std::vector
      * @param p_file filename as string
-     * @param p_vecreserve reserve capacity for std::vector (default 100)
      * @return std::vector
      **/    
-    template<typename T> inline std::vector<T> csv::readVector( const std::string& p_file, const std::size_t& p_vecreserve ) const
+    template<typename T> inline std::vector<std::string> csv::readVector( const std::string& p_file ) const
     {
-        if (p_vecreserve == 0)
-            throw exception::runtime(_("vector reserve must be greater than zero"));
-        
-        std::vector<std::string> l_vec();
-        l_vec.reserve(p_vecreserve);
+        std::vector<std::string> l_vec;
+
+        std::ifstream l_stream( p_file.c_str(), std::ifstream::in | std::ifstream::binary ); 
+        l_stream.seekg( std::ios_base::beg );
         
         std::string l_line;
-        std::ifstream l_stream( p_file.c_str(), std::ifstream::in | std::ifstream::binary ); 
-        
-        l_stream.seekg( std::ios_base::beg );
         while (std::getline(l_stream, l_line))
-            l_vec.push_back( boost::lexical_cast<T>(l_line) );
+            l_vec.push_back( l_line );
         
         return l_vec;
     }
@@ -172,9 +179,10 @@ namespace machinelearning { namespace tools { namespace files {
     
     /** write a blas vector to file
      * @param p_file filename
+     * @param p_header first element in the output file is the size of the input vector
      * @param p_vec blas vector
      **/
-    template<typename T> inline void csv::write( const std::string& p_file, const ublas::vector<T>& p_vec ) const
+    template<typename T> inline void csv::write( const std::string& p_file, const ublas::vector<T>& p_vec, const bool& p_header ) const
     {
         if (p_vec.size() == 0)
             return;
@@ -182,7 +190,9 @@ namespace machinelearning { namespace tools { namespace files {
         std::fstream l_stream;
         l_stream.open( p_file.c_str(), std::ios::out);
         
-        l_stream << p_vec.size() << "\n";
+        if (p_header)
+            l_stream << p_vec.size() << "\n";
+        
         for(std::size_t i=0; i < p_vec.size(); ++i) 
             l_stream << p_vec(i) << "\n";
         
@@ -195,8 +205,9 @@ namespace machinelearning { namespace tools { namespace files {
      * @param p_file filename
      * @param p_mat blas matrix
      * @param p_separator separator 
+     * @param p_header first element in the output file is the size of the input matrix
      **/    
-    template<typename T> inline void csv::write( const std::string& p_file, const ublas::matrix<T>& p_mat, const char& p_separator ) const
+    template<typename T> inline void csv::write( const std::string& p_file, const ublas::matrix<T>& p_mat, const char& p_separator, const bool& p_header ) const
     {
         if ( (p_mat.size1() == 0) || (p_mat.size2() == 0) )
             return;
@@ -204,7 +215,9 @@ namespace machinelearning { namespace tools { namespace files {
         std::fstream l_stream;
         l_stream.open( p_file.c_str(), std::ios::out);
         
-        l_stream << p_mat.size1() << p_separator << p_mat.size2() << "\n";
+        if (p_header)
+            l_stream << p_mat.size1() << p_separator << p_mat.size2() << "\n";
+        
         for(std::size_t i=0; i < p_mat.size1(); ++i) {
             for(std::size_t j=0; j < p_mat.size2(); ++j) 
                 l_stream << p_mat(i, j) << p_separator;
@@ -219,8 +232,9 @@ namespace machinelearning { namespace tools { namespace files {
     /** write a std vector to file
      * @param p_file filename
      * @param p_vec std vector
+     * @param p_header first element in the output file is the size of the input vector
      **/
-    template<typename T> inline void csv::write( const std::string& p_file, const std::vector<T>& p_vec ) const
+    template<typename T> inline void csv::write( const std::string& p_file, const std::vector<T>& p_vec, const bool& p_header ) const
     {
         if (p_vec.size() == 0)
             return;
@@ -228,7 +242,9 @@ namespace machinelearning { namespace tools { namespace files {
         std::fstream l_stream;
         l_stream.open( p_file.c_str(), std::ios::out);
         
-        l_stream << p_vec.size() << "\n";
+        if (p_header)
+            l_stream << p_vec.size() << "\n";
+        
         for(std::size_t i=0; i < p_vec.size(); ++i) 
             l_stream << p_vec[i] << "\n";
         

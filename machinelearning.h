@@ -181,6 +181,7 @@
  * <li><dfn>gcc</dfn> for unix systems</li>
  * <li><dfn>darwin</dfn> for Mac OS X</li>
  * </ul>
+ * The numerical bindings for LAPack are needed, so the SVN must be checked out.
  *
  * @subsection nixhdf HDF
  * The HDF libraray must be build with C++ support, so the configure call must be:
@@ -190,9 +191,10 @@
  * The framework need a full LAPack support, so a GFortran compiler is needed. The fortran compiler can be downloaded on http://gcc.gnu.org/wiki/GFortranBinaries . The configure call should be
  * @code configure --dylibs --with-netlib-lapack-tarfile=-path to lapack.tgz- @endcode
  * In some cases the pointer bitwidth (<dfn>-b</dfn>) must be set. The flag <dfn>--nof77</dfn> should not be set, because some LAPack routines are not built. The configure call must be run into
- * a temporary directory, so in the first step the temporary directory must be created.
+ * a temporary directory, so in the first step the temporary directory must be created (information within the Atlas errata)
  *
  *
+ * <hr>
  * @section windows Microsoft Windows
  * Windows does not supported all depending libraries. In this steps are some information about the installation depending libraries. The framework is tested with
  * <a href="http://www.microsoft.com/express/">Microsoft Visual Studio (Express)</a>. You need <a href="http://www.python.org">Python for Windows (MSI installer)</a>
@@ -249,6 +251,7 @@
  * must be run. After that Boost can be build with (The MPI support can be enabled with <dfn>--with-mpi</dfn>, but it requires MPI sources and libraries. The configuration for MPI use can be found on
  * <dfn>www.boost.org/doc/libs/-release number-/doc/html/mpi.html</dfn>)
  * @code bjam --with-filesystem --with-math --with-random --with-regex --with-thread --with-system --with-serialization --with-iostreams threading=multi runtime-link=shared variant=release toolset=msvc install @endcode
+ * The numerical bindings for LAPack are needed, so the SVN must be checked out.
  *
  * @subsection winhdf HDF
  * It is recommand to use <a href="http://www.cmake.org">CMake</a> to perfom the building and installing. After extracting the files in the sources directory the following command must be
