@@ -48,6 +48,7 @@ namespace mpi       = boost::mpi;
  * @param argc number of arguments of "main"
  * @param argv arguments of "main"
  * @param p_args map with argument values (default values)
+ * @param p_mpi MPI object
  * @return bool if all is correct
 **/
 #ifdef MACHINELEARNING_MPI

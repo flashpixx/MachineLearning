@@ -509,6 +509,35 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             m_prototypeWeights( l_winner(i) )++;
         
         // do k-approximation
+        /**
+         
+         k-nearest:
+         1. determine relational spanning set
+            1a. k = 1 / neurons.size2()
+            1b. std::vector ret
+            1b. for(i in neurons.size1()) {
+                    std::vector pos
+                    for(j in neurons.size2())
+                        if neurons(i,j) >= k)
+                            ret.push_back(j)
+                    ret.push_back(pos);
+         
+         2. sorting spanning set
+            2a. calculate distance data between data and neurons (matrix with neurons x data)
+            2b. std::vector newret;
+            2c. for(i in ret.size()) {
+                    ublas::vector dist( ret(i).size() )
+                    for(j in 0..dist.size()-1)
+                        dist(j) = distance(i, j)
+                    std::vector idx = rankIndex(dist);
+         
+                    std::vector pos;
+                    std::vector line = ret(i);
+                    for(j in 0..ret(i).size()-1)
+                        pos.push_back( line(idx(j)) );
+                    newret.push_back(pos);
+                }
+        **/
     }
     
     //======= MPI ==================================================================================================================================

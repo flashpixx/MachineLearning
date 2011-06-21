@@ -53,8 +53,8 @@ namespace machinelearning { namespace neighborhood {
             {
                 knn         = 0,
                 spread      = 1,
-                randompart  = 2,
-                random      = 3
+                random      = 2,
+                purerandom  = 3
             };
         
         
