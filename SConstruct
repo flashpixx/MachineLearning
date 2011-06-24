@@ -175,7 +175,8 @@ def getConfig():
     env.Replace(LIBPATH     = config["librarypath"])
     env.Replace(CPPSUFFIXES = [".hpp", ".h", ".cpp"])
            
-    env.BuildDir("build", ".", duplicate=0)
+    # Scons < 2: env.BuildDir("build", ".", duplicate=0)
+    env.VariantDir("build", ".", duplicate=0)
     env.Append(CPPPATH=["."])
            
     #dict = env.Dictionary()

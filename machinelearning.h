@@ -196,9 +196,8 @@
  *
  * <hr>
  * @section windows Microsoft Windows
- * Windows does not supported all depending libraries. In this steps are some information about the installation depending libraries. The framework is tested with
- * <a href="http://www.microsoft.com/express/">Microsoft Visual Studio (Express)</a>. You need <a href="http://www.python.org">Python for Windows (MSI installer)</a>
- * for using Scons. The sequence of the build process should be carried out as indicated here.
+ * Windows does not supported all depending libraries. In this steps are some information about the installation depending libraries. All compiler tools are used under <a href="http://www.cygwin.com/">
+ * Cygwin</a>. You need <a href="http://www.python.org">Python for Windows (MSI installer)</a> for using Scons. The sequence of the build process should be carried out as indicated here.
  *
  * @subsection winzip BZip2 and ZLib support
  * Boost IOStream and HDF require BZip2 and ZLib support. Information for IOStream is found on <dfn>www.boost.org/doc/libs/-release number-/libs/iostreams/doc/installation.html</dfn>.
@@ -270,11 +269,10 @@
  * the <dfn>INSTALL</dfn> target must be run.
  *
  * @subsection winatlas Atlas with full LAPack
- * Atlas and LAPack can be compiled with <a href="http://www.cygwin.com/">Cygwin</a>. Cygwin must first installed with Gcc, G++ and GFortran. It is recommend that you take a look into the Atlas
- * errata for more information about installing Atlas under Windows. It is recommend to move the Atlas source and the <dfn>lapack.tgz</dfn> into the Cygwin users home directory (eg. sources are
- * in <dfn>~/ATLAS</dfn> and lapack in <dfn>~/lapack.tgz</dfn>).
+ * Cygwin must first installed with Gcc, G++ and GFortran. It is recommend that you take a look into the Atlas errata for more information about installing Atlas under Windows. It is recommend to move the 
+ * Atlas source and the <dfn>lapack.tgz</dfn> into the Cygwin users home directory (eg. sources are in <dfn>~/ATLAS</dfn> and lapack in <dfn>~/lapack.tgz</dfn>).
  * After that create a new directory in the home (eg. <dfn>mkdir ~/tmp</dfn>) and step into. Than call the configure script with (take a look to the flags <dfn>-b 32|64</dfn> for using 32 or 64 bit)
- * @code ~/ATLAS/configure --dylibs -C ic cl --with-netlib-lapack-tarfile=~/lapack.tgz  @endcode
+ * @code ~/ATLAS/configure --dylibs -b 32 --with-netlib-lapack-tarfile=~/lapack.tgz  @endcode
  *
  * @subsection winginac GiNac with CLN
  * Both libraries must be compiled with Cygwin (see @ref winatlas). Extract the CLN source first, switch in the Cygwin command line into the source directory and run the command
