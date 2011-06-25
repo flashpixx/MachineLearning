@@ -212,10 +212,6 @@ int main(int argc, char* argv[]) {
     }
 
     
-    for(std::size_t i=0; i < l_content.size(); ++i)
-        std::cout << l_content[i] << "\n===================================================================================================\n" << std::endl;
-    return 0;
-    
     
     // run stop word reduction
     std::cout << "stopword reduction..." << std::endl;
