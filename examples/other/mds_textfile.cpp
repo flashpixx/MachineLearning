@@ -200,14 +200,15 @@ int main(int argc, char* argv[]) {
     std::vector<std::string> l_content;
     const std::vector<std::string> l_files = boost::any_cast< std::vector<std::string> >(l_args["files"]);
     for(std::size_t i=0; i < l_files.size(); ++i) {
-        std::fstream l_file(l_files[i].c_str(), std::ios_base::out);
-        l_file << std::noskipws; 
-        
+        std::ifstream l_file(l_files[i].c_str(), std::ifstream::in);
+               
         if (l_file.bad())
-            throw std::runtime_error( "file [" << l_files[i] << "] can not be read");
-        
-        std::istream_iterator<char> begin(l_file), end;
-        l_content.push_back( std::string(begin, end) );
+            throw std::runtime_error( "file [" + l_files[i] + "] can not be read");
+       
+        std::stringbuf l_str;
+        l_file >> &l_str;
+
+        l_content.push_back( l_str.str() );
     }
 
     
