@@ -334,6 +334,9 @@ def target_other(env, framework) :
 
     if optionExist("withfiles") and optionExist("withsources") :
         sources.extend( ["mds_nntp.cpp", "mds_wikipedia.cpp"] )
+        
+    if optionExist("withfiles") :
+        sources.append("mds_textfile.cpp")
 
     createTarget(env, "other", path, sources, framework)
 #=======================================================================================================================================

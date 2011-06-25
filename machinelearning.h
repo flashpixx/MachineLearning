@@ -135,7 +135,8 @@
  * <li><dfn>classifier</dfn> this target build all classifier algorithms, but the <dfn>--with-files</dfn> parameter must be set</li>
  * <li><dfn>reducing</dfn> this target build all dimension reduce algorithms, but the <dfn>--with-files</dfn> parameter must be set</li>
  * <li><dfn>distance</dfn> this target build all distance algorithms, but the <dfn>--with-files</dfn> parameter must be set</li>
- * <li><dfn>other</dfn> this target build all other examples, following options must be set: <dfn>--with-files</dfn>, <dfn>--with-sources</dfn> (optional <dfn>--with-mpi</dfn>) </li>
+ * <li><dfn>other</dfn> this target build all other examples, <dfn>--with-files</dfn> options must be set, <dfn>--with-sources</dfn> can be set (includes nntp and wikipedia examples) and optional 
+ * <dfn>--with-mpi</dfn> </li>
  * </ul>
  *
  * @section ex advanced documentation
@@ -649,6 +650,7 @@
  * @file examples/sources/cloud.cpp testprogram for create n-dimensional normal distribution
  * @file examples/other/mds_nntp.cpp program for reading newsgroup articles, stopword reduction, distance calculating and MDS plotting
  * @file examples/other/mds_wikipedia.cpp program for reading Wikipedia articles, stopword reduction, distance calculating and MDS plotting
+ * @file examples/other/mds_textfile.cpp program for reading text files, stopword reduction, distance calculating and MDS plotting
  *
  * @file classifier/classifier.h main header for all classifier structurs
  * @file classifier/classifier.hpp header for the abstract class implementation of the classifiers
