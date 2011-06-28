@@ -71,7 +71,7 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
         std::cout << "--algorithm \t\t compression algorithm (allowed values are: gzip, bzip)" << std::endl;
         std::cout << "--mapping \t\t mapping type (values: metric, sammon, hit [default])" << std::endl;
         std::cout << "--iteration \t\t number of iterations (detected automatically)" << std::endl;
-        std::cout << "--stopword \t\t ranges of stopword reduction (defaults: 0.33 & 0.66 [word out of the range will be removed])" << std::endl;
+        std::cout << "--stopword \t\t ranges of stopword reduction (defaults: 0.33 & 0.66 [word out of the range will be removed] or 'off' for disable)" << std::endl;
         #ifdef MACHINELEARNING_MPI
         }
         #endif
@@ -194,6 +194,12 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
     }  
     
     p_args["stopword"] = l_stopwords;
+    p_args["stopwordsoff"]  = bool(false);
+    if (l_argmap["stopword"].size() >= 1) {
+        std::string l_onoff = l_argmap["stopword"][0];
+        boost::to_lower(l_onoff);
+        p_args["stopwordsoff"] = l_onoff == "off";
+    }
     
     // we convert the groups parameter: if numeric => use the biggest groups, if strings => use as groupnames, if 
     boost::to_lower(l_argmap["groups"][0]);
@@ -398,17 +404,6 @@ int main(int argc, char* argv[]) {
         throw std::runtime_error("no articles are readed");
     
     
-    
-    
-    // do stopword reduction
-    #ifdef MACHINELEARNING_MPI 
-    loMPICom.barrier();
-    std::cout << "CPU " << loMPICom.rank() << ": ";
-    #endif
-    std::cout << "stopword reduction..." << std::endl;
-    
-    text::termfrequency tfc;
-    
     #ifdef MACHINELEARNING_MPI
     // each process must get the article data
     std::vector< std::vector<std::string> > l_processarticles;
@@ -422,27 +417,39 @@ int main(int argc, char* argv[]) {
     for(std::size_t i=0; i < l_processarticles.size(); ++i) {
         if (i < static_cast<std::size_t>(loMPICom.rank()))
             startcol += l_processarticles[i].size();
-		
+        
         for(std::size_t n=0; n < l_processarticles[i].size(); ++n) {
             l_allarticles.push_back( l_processarticles[i][n] );
             l_allarticlegroups.push_back( l_processarticlegroups[i][n] );
         }
     }
-    
-    tfc.add(l_allarticles);
-    text::stopwordreduction stopword( tfc.getTerms(boost::any_cast< std::vector<float> >(l_args["stopword"])[0], boost::any_cast< std::vector<float> >(l_args["stopword"])[1]), tfc.iscaseinsensitivity() );
-    for(std::size_t i=0; i < l_allarticles.size(); ++i)
-        l_allarticles[i] = stopword.remove( l_allarticles[i] );
-    
-    #else
-    tfc.add(l_article);
-    text::stopwordreduction stopword( tfc.getTerms(boost::any_cast< std::vector<float> >(l_args["stopword"])[0], boost::any_cast< std::vector<float> >(l_args["stopword"])[1]), tfc.iscaseinsensitivity() );
-    
-    #endif    
-    for(std::size_t i=0; i < l_article.size(); ++i)
-        l_article[i] = stopword.remove( l_article[i] );
+    #endif
     
     
+    // do stopword reduction
+    if (!boost::any_cast<bool>(l_args["stopwordsoff"])) {
+        #ifdef MACHINELEARNING_MPI 
+        loMPICom.barrier();
+        std::cout << "CPU " << loMPICom.rank() << ": ";
+        #endif
+        std::cout << "stopword reduction..." << std::endl;
+        
+        text::termfrequency tfc;
+        
+        #ifdef MACHINELEARNING_MPI
+        tfc.add(l_allarticles);
+        text::stopwordreduction stopword( tfc.getTerms(boost::any_cast< std::vector<float> >(l_args["stopword"])[0], boost::any_cast< std::vector<float> >(l_args["stopword"])[1]), tfc.iscaseinsensitivity() );
+        for(std::size_t i=0; i < l_allarticles.size(); ++i)
+            l_allarticles[i] = stopword.remove( l_allarticles[i] );
+        
+        #else
+        tfc.add(l_article);
+        text::stopwordreduction stopword( tfc.getTerms(boost::any_cast< std::vector<float> >(l_args["stopword"])[0], boost::any_cast< std::vector<float> >(l_args["stopword"])[1]), tfc.iscaseinsensitivity() );
+        
+        #endif    
+        for(std::size_t i=0; i < l_article.size(); ++i)
+            l_article[i] = stopword.remove( l_article[i] );
+    }
     
     
     // create ncd object and calculate the distances
