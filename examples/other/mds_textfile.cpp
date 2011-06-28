@@ -29,6 +29,7 @@
 
 #include <machinelearning.h>
 #include <boost/any.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
@@ -53,12 +54,12 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
         std::cout << "--outfile \t\t output HDF5 file" << std::endl;
         std::cout << "--dimension \t\t number of project dimensions (default 3)" << std::endl;
         std::cout << "--rate \t\t\t iteration rate for sammon / hit (default 1)" << std::endl;
-        std::cout << "--files \t\t list of text files" << std::endl;
+        std::cout << "--sources \t\t list of text files or directories with text files (all files in the directory will be read and subdirectories will be ignored)" << std::endl;
         std::cout << "--compress \t\t compression level (allowed values are: default, bestspeed or bestcompression)" << std::endl;
         std::cout << "--algorithm \t\t compression algorithm (allowed values are: gzip, bzip)" << std::endl;
         std::cout << "--mapping \t\t mapping type (values: metric, sammon, hit [default])" << std::endl;
         std::cout << "--iteration \t\t number of iterations (detected automatically)" << std::endl;
-        std::cout << "--stopword \t\t ranges of stopword reduction (defaults: 0.33 & 0.66 [word out of the range will be removed])" << std::endl;
+        std::cout << "--stopword \t\t ranges of stopword reduction (defaults: 0.33 & 0.66 [word out of the range will be removed] or 'off' for disable)" << std::endl;
         return false;
     }
     
@@ -71,7 +72,7 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
     l_argmap["rate"]      = std::vector<std::string>();
     l_argmap["compress"]  = std::vector<std::string>();
     l_argmap["algorithm"] = std::vector<std::string>();
-    l_argmap["files"]     = std::vector<std::string>(); 
+    l_argmap["sources"]   = std::vector<std::string>(); 
     l_argmap["mapping"]   = std::vector<std::string>(); 
     l_argmap["stopword"]  = std::vector<std::string>();
     
@@ -107,7 +108,7 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
     
     //check map values and convert them
     if ((l_argmap["outfile"].size() != 1) ||
-        (l_argmap["files"].size() < 2)
+        (l_argmap["sources"].size() == 0)
         )
         throw std::runtime_error("number of arguments are incorrect");
     
@@ -115,7 +116,7 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
     p_args["outfile"]       = l_argmap["outfile"][0];
     p_args["rate"]          = double(1);
     p_args["dimension"]     = std::size_t(3);
-    p_args["files"]         = l_argmap["files"];
+    p_args["sources"]       = l_argmap["sources"];
     
     std::vector<float> l_stopwords;
     l_stopwords.push_back(0.33);
@@ -169,7 +170,13 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
         throw std::runtime_error("numerical data can not extracted");
     }  
     
-    p_args["stopword"] = l_stopwords;
+    p_args["stopword"]      = l_stopwords;
+    p_args["stopwordsoff"]  = bool(false);
+    if (l_argmap["stopword"].size() >= 1) {
+        std::string l_onoff = l_argmap["stopword"][0];
+        boost::to_lower(l_onoff);
+        p_args["stopwordsoff"] = l_onoff == "off";
+    }
     
     // set iteration
     p_args["iteration"] = l_argmap["files"].size();
@@ -198,31 +205,74 @@ int main(int argc, char* argv[]) {
     // read all file content into a vector
     std::cout << "read files..." << std::endl;
     std::vector<std::string> l_content;
-    const std::vector<std::string> l_files = boost::any_cast< std::vector<std::string> >(l_args["files"]);
-    for(std::size_t i=0; i < l_files.size(); ++i) {
-        std::ifstream l_file(l_files[i].c_str(), std::ifstream::in);
-               
-        if (l_file.bad())
-            throw std::runtime_error( "file [" + l_files[i] + "] can not be read");
+    std::vector<std::string> l_files;
+    const std::vector<std::string> l_sources = boost::any_cast< std::vector<std::string> >(l_args["sources"]);
+    for(std::size_t i=0; i < l_sources.size(); ++i) {
+        
+        boost::filesystem::path data(l_sources[i]);
+        if (!boost::filesystem::exists(data))
+            throw std::runtime_error( "data [" + l_sources[i] + "] does not exist");
+        
+        // if data is a file
+        if (boost::filesystem::is_regular_file(data)) {
+            std::ifstream l_file(l_sources[i].c_str(), std::ifstream::in);
+            if (l_file.bad())
+                throw std::runtime_error( "file [" + l_files[i] + "] can not be read");
        
-        std::stringbuf l_str;
-        l_file >> &l_str;
+            std::stringbuf l_str;
+            l_file >> &l_str;
 
-        l_content.push_back( l_str.str() );
+            if (!l_str.str().empty()) {
+                l_content.push_back( l_str.str() );
+                l_files.push_back(l_sources[i]);
+            }
+        }
+        
+        // if data is a directory
+        if (boost::filesystem::is_directory(data)) {
+            std::vector<boost::filesystem::path> l_subdata;
+            std::copy(boost::filesystem::directory_iterator(data), boost::filesystem::directory_iterator(), back_inserter(l_subdata));
+            for(std::size_t j=0; j < l_subdata.size(); ++j) {
+                if (!boost::filesystem::is_regular_file(l_subdata[j]))
+                    continue;
+                
+                std::ifstream l_file(l_subdata[j].generic_string().c_str(), std::ifstream::in);
+                if (l_file.bad())
+                    throw std::runtime_error( "file [" + l_subdata[j].generic_string() + "] can not be read");
+                
+                std::stringbuf l_str;
+                l_file >> &l_str;
+                
+                if (!l_str.str().empty()) {
+                    l_content.push_back( l_str.str() );
+                    l_files.push_back(l_subdata[j].generic_string());
+                }
+            }
+        }
+        
     }
+    
+    if (l_content.size() < 2)
+        throw std::runtime_error( "at least two files are needed");
 
+    // create file and write data to hdf
+    tools::files::hdf target(boost::any_cast<std::string>(l_args["outfile"]), true);
+    
     
     
     // run stop word reduction
-    std::cout << "stopword reduction..." << std::endl;
-    text::termfrequency tfc;
-    tfc.add(l_content);
+    if (!boost::any_cast<bool>(l_args["stopwordsoff"])) {
+        std::cout << "stopword reduction..." << std::endl;
+        text::termfrequency tfc;
+        tfc.add(l_content);
     
-    const std::vector<std::string> l_stopwords = tfc.getTerms( boost::any_cast< std::vector<float> >(l_args["stopword"])[0], boost::any_cast< std::vector<float> >(l_args["stopword"])[1] );
-    text::stopwordreduction stopword( l_stopwords, tfc.iscaseinsensitivity() );
-    for(std::size_t i=0; i < l_content.size(); ++i)
-        l_content[i] = stopword.remove( l_content[i] );
-    
+        const std::vector<std::string> l_stopwords = tfc.getTerms( boost::any_cast< std::vector<float> >(l_args["stopword"])[0], boost::any_cast< std::vector<float> >(l_args["stopword"])[1] );
+        text::stopwordreduction stopword( l_stopwords, tfc.iscaseinsensitivity() );
+        for(std::size_t i=0; i < l_content.size(); ++i)
+            l_content[i] = stopword.remove( l_content[i] );
+        
+        target.writeStringVector("/stopwords", l_stopwords);
+    }
     
             
     // run NCD
@@ -244,14 +294,11 @@ int main(int argc, char* argv[]) {
     ublas::matrix<double> project = mds.map( distancematrix );
         
     
-    
-    // create file and write data to hdf
-    tools::files::hdf target(boost::any_cast<std::string>(l_args["outfile"]), true);
+    // write data
     target.writeBlasMatrix<double>( "/project",  project, H5::PredType::NATIVE_DOUBLE );
     target.writeBlasMatrix<double>( "/distances",  distancematrix, H5::PredType::NATIVE_DOUBLE );
-    target.writeStringVector("/stopwords", l_stopwords);
     target.writeStringVector("/files", l_files);
            
-    std::cout << "within the target file there are four datasets: /project = projected data (first row = first input file ...), /files = filename list, /stopwords = list with stopwords, /distances = distance matrix" << std::endl;
+    std::cout << "within the target file there are four datasets: /project = projected data (first row = first input file ...), /files = filename list, /stopwords = list with stopwords (if enable), /distances = distance matrix" << std::endl;
     return EXIT_SUCCESS;
 }
