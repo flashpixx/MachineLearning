@@ -204,7 +204,8 @@ int main(int argc, char* argv[]) {
         
     // read all file content into a vector
     std::cout << "read files..." << std::endl;
-    std::vector<std::string> l_content;
+    
+    // first read all files
     std::vector<std::string> l_files;
     const std::vector<std::string> l_sources = boost::any_cast< std::vector<std::string> >(l_args["sources"]);
     for(std::size_t i=0; i < l_sources.size(); ++i) {
@@ -214,54 +215,42 @@ int main(int argc, char* argv[]) {
             throw std::runtime_error( "data [" + l_sources[i] + "] does not exist");
         
         // if data is a file
-        if (boost::filesystem::is_regular_file(data)) {
-            std::ifstream l_file(l_sources[i].c_str(), std::ifstream::in);
-            if (l_file.bad())
-                throw std::runtime_error( "file [" + l_files[i] + "] can not be read");
-       
-            std::stringbuf l_str;
-            l_file >> &l_str;
-
-            if (!l_str.str().empty()) {
-                l_content.push_back( l_str.str() );
-                l_files.push_back(l_sources[i]);
-            }
-        }
-        
+        if (boost::filesystem::is_regular_file(data))
+            l_files.push_back(l_sources[i]);
+            
         // if data is a directory
         if (boost::filesystem::is_directory(data)) {
             std::vector<boost::filesystem::path> l_subdata;
             std::copy(boost::filesystem::directory_iterator(data), boost::filesystem::directory_iterator(), back_inserter(l_subdata));
-            for(std::size_t j=0; j < l_subdata.size(); ++j) {
-                if (!boost::filesystem::is_regular_file(l_subdata[j]))
-                    continue;
-                
-                std::ifstream l_file(l_subdata[j].generic_string().c_str(), std::ifstream::in);
-                if (l_file.bad())
-                    throw std::runtime_error( "file [" + l_subdata[j].generic_string() + "] can not be read");
-                
-                std::stringbuf l_str;
-                l_file >> &l_str;
-                
-                if (!l_str.str().empty()) {
-                    l_content.push_back( l_str.str() );
+            for(std::size_t j=0; j < l_subdata.size(); ++j)
+                if (boost::filesystem::is_regular_file(l_subdata[j]))
                     l_files.push_back(l_subdata[j].generic_string());
-                }
-            }
+            
         }
-        
     }
-    
-    if (l_content.size() < 2)
+
+    if (l_files.size() < 2)
         throw std::runtime_error( "at least two files are needed");
 
     // create file and write data to hdf
-    tools::files::hdf target(boost::any_cast<std::string>(l_args["outfile"]), true);
+    tools::files::hdf target(boost::any_cast<std::string>(l_args["outfile"]), true);    
     
     
     
-    // run stop word reduction
+    // if stopword reduction enabled, we read the file content
+    std::vector<std::string> l_content;
     if (!boost::any_cast<bool>(l_args["stopwordsoff"])) {
+        for(std::size_t i=0; i < l_files.size(); ++i) {
+            std::ifstream l_file(l_files[i].c_str(), std::ifstream::in);
+            if (l_file.bad())
+                throw std::runtime_error( "file [" + l_files[i] + "] can not be read");
+                    
+            std::stringbuf l_str;
+            l_file >> &l_str;
+                    
+            l_content.push_back( l_str.str() );
+        }
+        
         std::cout << "stopword reduction..." << std::endl;
         text::termfrequency tfc;
         tfc.add(l_content);
@@ -279,9 +268,13 @@ int main(int argc, char* argv[]) {
     std::cout << "calculate normalized compression distance..." << std::endl;
     distances::ncd<double> ncd( boost::any_cast< distances::ncd<double>::compresstype >(l_args["algorithm"]) );
     ncd.setCompressionLevel( boost::any_cast< distances::ncd<double>::compresslevel >(l_args["compress"]) );
-        
-    ublas::matrix<double> distancematrix = ncd.unsymmetric( l_content );
-      
+    
+    ublas::matrix<double> distancematrix;
+    if (!boost::any_cast<bool>(l_args["stopwordsoff"]))
+         distancematrix = ncd.unsymmetric( l_content );
+    else
+        distancematrix = ncd.unsymmetric( l_files, true );
+
         
         
     // run hit mds over the distance matrix
