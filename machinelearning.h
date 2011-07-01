@@ -44,7 +44,6 @@
  *     </ul>
  * </li>
  * <li>Boost Bindings (SVN http://svn.boost.org/svn/boost/sandbox/numeric_bindings )</li>
- * <li>GiNaC ( http://www.ginac.de/ ) with CLN ( http://www.ginac.de/CLN/ ) [version newer or equal 1.6]</li>
  * <li>Linear Algebra PACKage ( http://www.netlib.org/lapack/ ) [Version newer 3.3]</li>
  * <li><i>optional Hierarchical Data Format (HDF)</i> ( http://www.hdfgroup.org/ ) [version newer or equal 5.1.8.4]</li>
  * <li><i>optional Message-Passing-Interface-Support</i>
@@ -54,6 +53,7 @@
  *          <li>Microsoft High Performance Computing Pack 2008 R2 SDK ( http://www.microsoft.com/downloads/en/details.aspx?FamilyID=bc671b22-f158-4a5f-828b-7a374b881172 )</li>
  *      </ul>
  * </li>
+ * <li><i>optional GiNaC</i> ( http://www.ginac.de/ ) with CLN ( http://www.ginac.de/CLN/ ) [version newer or equal 1.6]</li>
  * <li><i>optional GetText</i> ( http://www.gnu.org/software/gettext ) for including multilanguage support</li>
  * <li><i>optional LibXML2</i> ( http://xmlsoft.org/ ) (used by wikipedia support)</li>
  * <li><i>optional Scons</i> ( http://www.scons.org/ )</li>
@@ -99,6 +99,7 @@
  * <li><dfn>MACHINELEARNING_FILES</dfn> adds the support for file reading and writing (default CSV). Special file support can be set with the following flags<ul>
  * <li><dfn>MACHINELEARNING_FILES_HDF</dfn> Hierarchical Data Format support</li>
  * </ul></li>
+ * <li><dfn>MACHINELEARNING_SYMBOLICMATH</dfn> flag for using GiNaC library for creating symbolic expression (eg. gradient descent)</li>
  * <li><dfn>MACHINELEARNING_SOURCES</dfn> compiles sources in that way, that e.g. NNTP / Wikipedia data can be read directly</li>
  * <li><dfn>MACHINELEARNING_MPI</dfn> enable MPI Support for the toolbox (requires Boost MPI support)</li>
  * </ul>
@@ -208,13 +209,13 @@
  * After compiling all files in the directory can be deleted except
  * <ul>
  * <li><dfn>bzip2.exe</dfn></li>
- * <li><dfn>bzip2.exe.manifest</dfn></li>
+ * <li><dfn>bzip2.exe.manifest ????</dfn></li>
  * <li><dfn>bzip2recover.exe</dfn></li>
- * <li><dfn>bzip2recover.exe.manifest</dfn></li>
+ * <li><dfn>bzip2recover.exe.manifest ???</dfn></li>
  * <li><dfn>bzlib.h</dfn></li>
  * <li><dfn>libbz2.lib</dfn></li>
- * <li><dfn>msvcr90.dll</dfn></li>
- * <li><dfn>msvcr90d.dll</dfn></li>
+ * <li><dfn>msvcr90.dll</dfn> ????</li>
+ * <li><dfn>msvcr90d.dll</dfn> ????</li>
  * </ul>
  * <a href="http://zlib.net/">ZLib sources</a> can be compiled also with
  * @code nmake -f win32/Makefile.msc @endcode 
@@ -233,7 +234,7 @@
  * <li><dfn>inflate.h</dfn></li>
  * <li><dfn>zdll.lib</dfn></li>
  * <li><dfn>zlib.lib</dfn></li>
- * <li><dfn>zlib1.dll.manifest</dfn></li>
+ * <li><dfn>zlib1.dll.manifest ???</dfn></li>
  * </ul>
  * The Boost IOStream can be compiled only with the environmental variables for BZip2 and ZLib:
  * <ul>

@@ -21,6 +21,8 @@
  @endcond
  **/
 
+#ifdef MACHINELEARNING_SYMBOLICMATH
+
 #ifndef MACHINELEARNING_FUNCTIONALOPTIMIZATION_GRADIENTDESCENT_HPP
 #define MACHINELEARNING_FUNCTIONALOPTIMIZATION_GRADIENTDESCENT_HPP
 
@@ -419,4 +421,5 @@ namespace machinelearning { namespace functionaloptimization {
     
 };};
 
+#endif
 #endif

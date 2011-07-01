@@ -16,6 +16,7 @@ AddOption("--create-language", dest="createlang", type="string", nargs=0, action
 AddOption("--compile-language", dest="compilelang", type="string", nargs=0, action="store", help="compiles the language files")
 AddOption("--create-documentation", dest="createdocu", type="string", nargs=0, action="store", help="creates the doxygen documentation (doxygen must be within the path)")
 AddOption("--with-debug", dest="withdebug", type="string", nargs=0, action="store", help="compile with debug information")
+AddOption("--with-symbolicmath", dest="withsymbolicmath", type="string", nargs=0, action="store", help="compile for using symbolic math expression (needed by gradient descent)")
 
 
 #=== function for os configuration ===================================================================================================
@@ -33,7 +34,7 @@ def configuration_macosx(config, version, architecture) :
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["LIBRARY_PATH"]
     config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -arch "+arch+" -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
-    config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "boost_filesystem", "boost_regex", "ginac"]
+    config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "boost_filesystem", "boost_regex"]
     
     if ver[0] == "10" and ver[1] == "6" :
         config["linkto"].append("tatlas")
@@ -70,6 +71,10 @@ def configuration_macosx(config, version, architecture) :
     if optionExist("withfiles") :
         config["compileflags"]      += " -D MACHINELEARNING_FILES -D MACHINELEARNING_FILES_HDF"
         config["linkto"].extend( ["hdf5_cpp", "hdf5"] )
+        
+    if optionExist("withsymbolicmath") :
+        config["compileflags"]      += " -D MACHINELEARNING_SYMBOLICMATH"
+        config["linkto"].append("ginac")
     
 
 # configuration for Posix (Linux) build
@@ -78,7 +83,7 @@ def configuration_posix(config, version, architecture) :
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["LIBRARY_PATH"]
     config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
-    config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "boost_filesystem", "boost_regex", "ginac", "tatlas"]
+    config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "boost_filesystem", "boost_regex", "tatlas"]
     
     if optionExist("withdebug") :
         config["compileflags"]      += " -g"
@@ -107,7 +112,10 @@ def configuration_posix(config, version, architecture) :
     if optionExist("withfiles") :
         config["compileflags"]      += " -D MACHINELEARNING_FILES -D MACHINELEARNING_FILES_HDF"
         config["linkto"].extend( ["hdf5_cpp", "hdf5"] )
-        
+
+    if optionExist("withsymbolicmath") :
+        config["compileflags"]      += " -D MACHINELEARNING_SYMBOLICMATH"
+        config["linkto"].append("ginac")
         
 
 # configuration for Windows build
