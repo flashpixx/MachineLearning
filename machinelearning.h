@@ -125,6 +125,7 @@
  * <li><dfn>--with-multilanguage</dfn> adds the multilanguage support with gettext</li>
  * <li><dfn>--with-sources</dfn> support for the namespace machinelearning::tools::sources</li>
  * <li><dfn>--with-files</dfn> support for the namespace machinelearning::tools::files</li>
+ * <li><dfn>--with-symbolicmath<dfn> support for symbolic math (eg: gradient descent)</li>
  * </ul>
  *
  * @subsection targets build targets
