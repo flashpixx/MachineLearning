@@ -187,36 +187,39 @@
  * The numerical bindings for LAPack are needed, so the SVN must be checked out.
  *
  * @subsection nixhdf HDF
- * The HDF libraray must be build with C++ support, so the configure call must be:
+ * The HDF libraray must be build with C++ support:
  * @code configure --enable-cxx @endcode
  *
  * @subsection nixatlas Atlas with full LAPack
  * The framework need a full LAPack support, so a GFortran compiler is needed. The fortran compiler can be downloaded on http://gcc.gnu.org/wiki/GFortranBinaries . The configure call should be
  * @code configure --dylibs --with-netlib-lapack-tarfile=-path to lapack.tgz- @endcode
- * In some cases the pointer bitwidth (<dfn>-b</dfn>) must be set. The flag <dfn>--nof77</dfn> should not be set, because some LAPack routines are not built. The configure call must be run into
- * a temporary directory, so in the first step the temporary directory must be created (information within the Atlas errata)
+ * In some cases the pointer bitwidth (<dfn>-b</dfn>) must be set. The flag <dfn>--nof77</dfn> should not be set, because some LAPack routines are not built (a full LAPack support is required).
+ * The configure call must be run into a temporary directory, so in the first step the temporary directory must be created (information within the Atlas errata)
+ *
  *
  *
  * <hr>
  * @section windows Microsoft Windows
- * Windows does not supported all depending libraries. In this steps are some information about the installation depending libraries. All compiler tools are used under <a href="http://www.cygwin.com/">
- * Cygwin</a>. You need <a href="http://www.python.org">Python for Windows (MSI installer)</a> for using Scons. The sequence of the build process should be carried out as indicated here.
+ * You need <a href="http://www.python.org">Python for Windows (MSI installer)</a> for using the Scons script. Atlas need <a href="http://www.cygwin.com/">Cygwin</a> for the building process, so
+ * Cygqin must be installed with the <dfn>devel/gcc4-core</dfn>, <dfn>devel/gcc4-g++</dfn>, <dfn>devel/gcc4-fortran</dfn> and the <dfn>devel/make</dfn> packages. This installation notes are based on
+ * Windows 7 Professional Edition and Visual Studio 2010 Premium Edition (x86). After the Cygwin installation the <dfn>Cygwin.bat</dfn> must be setup with the Visual Studio environmet, so into the batch file
+ * the two lines must be added after the first echo line (changes depend on the installed version of Visual Studio and Windows):
+ * @code
+    chdir C:\Program Files\Microsoft Visual Studio 10.0\VC
+    call vcvarsall.bat
+ * @endcode
  *
  * @subsection winzip BZip2 and ZLib support
  * Boost IOStream and HDF require BZip2 and ZLib support. Information for IOStream is found on <dfn>www.boost.org/doc/libs/-release number-/libs/iostreams/doc/installation.html</dfn>.
- * <a href="http://www.bzip.org/">BZip2 sources</a> can compiled with Visual Studio (see readme). After extracting the source BZip2 can compiled on the Visual Studio Command Line
+ * <a href="http://www.bzip.org/">BZip2 sources</a> can be compiled with Visual Studio (see readme). After extracting the source BZip2 can compiled on the Visual Studio Command Line
  * with (it is recommend to use an <dfn>include</dfn> directory for the header files and a <dfn>lib</dfn> directory for the libraries)
  * @code nmake -f makefile.msc @endcode 
  * After compiling all files in the directory can be deleted except
  * <ul>
  * <li><dfn>bzip2.exe</dfn></li>
- * <li><dfn>bzip2.exe.manifest ????</dfn></li>
  * <li><dfn>bzip2recover.exe</dfn></li>
- * <li><dfn>bzip2recover.exe.manifest ???</dfn></li>
  * <li><dfn>bzlib.h</dfn></li>
  * <li><dfn>libbz2.lib</dfn></li>
- * <li><dfn>msvcr90.dll</dfn> ????</li>
- * <li><dfn>msvcr90d.dll</dfn> ????</li>
  * </ul>
  * <a href="http://zlib.net/">ZLib sources</a> can be compiled also with
  * @code nmake -f win32/Makefile.msc @endcode 
@@ -235,7 +238,6 @@
  * <li><dfn>inflate.h</dfn></li>
  * <li><dfn>zdll.lib</dfn></li>
  * <li><dfn>zlib.lib</dfn></li>
- * <li><dfn>zlib1.dll.manifest ???</dfn></li>
  * </ul>
  * The Boost IOStream can be compiled only with the environmental variables for BZip2 and ZLib:
  * <ul>
@@ -272,24 +274,10 @@
  * the <dfn>INSTALL</dfn> target must be run.
  *
  * @subsection winatlas Atlas with full LAPack
- * Cygwin must first installed with Gcc, G++ and GFortran. It is recommend that you take a look into the Atlas errata for more information about installing Atlas under Windows. It is recommend to move the 
+ * It is recommend that you take a look into the Atlas errata for more information about installing Atlas under Windows. It is recommend to move the 
  * Atlas source and the <dfn>lapack.tgz</dfn> into the Cygwin users home directory (eg. sources are in <dfn>~/ATLAS</dfn> and lapack in <dfn>~/lapack.tgz</dfn>).
  * After that create a new directory in the home (eg. <dfn>mkdir ~/tmp</dfn>) and step into. Than call the configure script with (take a look to the flags <dfn>-b 32|64</dfn> for using 32 or 64 bit)
  * @code ~/ATLAS/configure --dylibs -b 32 --with-netlib-lapack-tarfile=~/lapack.tgz  @endcode
- *
- * @subsection winginac GiNac with CLN
- * Both libraries must be compiled with Cygwin (see @ref winatlas). Extract the CLN source first, switch in the Cygwin command line into the source directory and run the command
- * @code ./configure @endcode
- * If you would like to set the installation directory use. After configure run
- * @code make @endcode 
- * and
- * @code make install @endcode 
- * GiNaC requires the CLN, which can be accessed with <a href="http://www.freedesktop.org/wiki/Software/pkg-config">PKG-Config</a> or environmental variables can be set with:
- * @code 
-    export CLN_LIBS="-L-path to CLN-/lib -lcln"
-    export CLN_CFLAGS="-I-path to CLN-/include"
- * @endcode
- * After setting the variables GiNaC can be build with the same commands like CLN.
  *
  * @subsection winxml LibXML2
  * The XML2 library can be build with the same steps like GiNaC. The webpage references binary packages too.
