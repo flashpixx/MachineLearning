@@ -50,7 +50,7 @@
  *      <ul>
  *          <li>Open MPI ( http://www.open-mpi.org/ )</li>
  *          <li>MPICH2 ( http://www.mcs.anl.gov/research/projects/mpich2/ )</li>
- *          <li>Microsoft High Performance Computing Pack 2008 R2 SDK ( http://www.microsoft.com/downloads/en/details.aspx?FamilyID=bc671b22-f158-4a5f-828b-7a374b881172 )</li>
+ *          <li>Microsoft High Performance Computing Pack SDK ( http://www.microsoft.com/download/en/search.aspx?q=HPC%20Pack%20SDK )</li>
  *      </ul>
  * </li>
  * <li><i>optional GiNaC</i> ( http://www.ginac.de/ ) with CLN ( http://www.ginac.de/CLN/ ) [version newer or equal 1.6]</li>
@@ -65,7 +65,8 @@
  * <ul>
  * <li>the framework is only header-based so you don't need compile any files</li>
  * <li>data points should be matrix data and the matrix is row-orientated, so for K data points with every point dimension P, we have a K x P matrix (prototype matrices are equal)</li>
- * <li>all template classes / algorithms must have a floating point datatype on instantiation, because the datastructurs need this types for correct value calculating. The (base) classes use a static assertion for checking the value type</li>
+ * <li>all template classes / algorithms must have a floating point datatype on instantiation, because the datastructurs need this types for correct value calculating. The (base) classes use a static 
+ * assertion for checking the value type</li>
  * <li>all compiler flags start with <dfn>MACHINELEARNING_</dfn></li>
  * <li>all include defines for header files are set in this way <dfn>MACHINELEARNING_DIRECTORY_FILE_H/HPP</dfn>
  * <li>all structures are in the namespace <dfn>machinelearning</dfn></li>
@@ -74,7 +75,7 @@
  *
  * The source code uses some style guides options:
  * <ul>
- * <li>all variables use a prefix for their scope (derivated from <a href="http://en.wikipedia.org/wiki/Hungarian_notation">hungarian notation</a>): 
+ * <li>all variables use a prefix for their scope (inspired by <a href="http://en.wikipedia.org/wiki/Hungarian_notation">hungarian notation</a>): 
  *      <ul>
  *          <li><dfn>l_</dfn> local variable / scope within a methode</li>
  *          <li><dfn>m_</dfn> member variable / scope within an object</li>
@@ -268,12 +269,6 @@
  * After generating the configuration files, the <dfn>ALL_BUILD.vcproj</dfn> must be opened. Set the build type to <dfn>Release</dfn> and create the <dfn>ALL_BUILD</dfn> target, after compiling
  * the <dfn>INSTALL</dfn> target must be run.
  *
- * @subsection winatlas Atlas with full LAPack
- * It is recommend that you take a look into the Atlas errata for more information about installing Atlas under Windows. It is recommend to move the 
- * Atlas source and the <dfn>lapack.tgz</dfn> into the Cygwin users home directory (eg. sources are in <dfn>~/ATLAS</dfn> and lapack in <dfn>~/lapack.tgz</dfn>).
- * After that create a new directory in the home (eg. <dfn>mkdir ~/tmp</dfn>) and step into. Than call the configure script with (take a look to the flags <dfn>-b 32|64</dfn> for using 32 or 64 bit)
- * @code ~/ATLAS/configure --dylibs -b 32 --with-netlib-lapack-tarfile=~/lapack.tgz  @endcode
- *
  * @subsection winxml LibXML2
  * The libXML2 library can found on the project page, but libXML need the <a href="http://www.gnu.org/software/libiconv/">libIconv</a> as basic library
  * (on http://www.zlatkovic.com/libxml.en.html are prebuild binaries). Both libraries can be build straight forward with MSYS. Run the MSYS Environment within the programm folder, copy the sources to
@@ -286,10 +281,16 @@
  * The build of the libXML runs the same way. First you can copy the installed ZLib directory into your MSYS home directory, so the libXML can be build with zlib support (also add a prefix), but thread
  * support is a little bit difficult, so the build should be without threading:
  * @code
-    ./configure --with-iconv=-path to libconv (see previous step)- --with-zlib=-path to zlib --witout-threads-
+    ./configure --with-iconv=-path to libconv (see previous step)- --with-zlib=-path to zlib --witout-threads
     make
     make install
  @endcode
+ *
+ * @subsection winatlas Atlas with full LAPack
+ * It is recommend that you take a look into the Atlas errata for more information about installing Atlas under Windows. It is recommend to move the 
+ * Atlas source and the <dfn>lapack.tgz</dfn> into the Cygwin users home directory (eg. sources are in <dfn>~/ATLAS</dfn> and lapack in <dfn>~/lapack.tgz</dfn>).
+ * After that create a new directory in the home (eg. <dfn>mkdir ~/tmp</dfn>) and step into. Than call the configure script with (take a look to the flags <dfn>-b 32|64</dfn> for using 32 or 64 bit)
+ * @code ~/ATLAS/configure --dylibs -b 32 --with-netlib-lapack-tarfile=~/lapack.tgz  @endcode
  *
  *
  *
