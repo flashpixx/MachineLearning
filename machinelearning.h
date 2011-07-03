@@ -167,7 +167,7 @@
     make
     make install
    @endcode
-   For the single packages are some notes:
+ * For the single packages are some notes:
  *
  * @subsection nixzip BZip2 and ZLib support 
  * Within the most systems <a href="http://www.bzip.org/">BZip2 sources</a> and <a href="http://zlib.net/">ZLib sources</a> are installed. Sources can be installed from the package
@@ -200,20 +200,16 @@
  *
  * <hr>
  * @section windows Microsoft Windows
- * You need <a href="http://www.python.org">Python for Windows (MSI installer)</a> for using the Scons script. Atlas need <a href="http://www.cygwin.com/">Cygwin</a> for the building process, so
- * Cygqin must be installed with the <dfn>devel/gcc4-core</dfn>, <dfn>devel/gcc4-g++</dfn>, <dfn>devel/gcc4-fortran</dfn> and the <dfn>devel/make</dfn> packages. This installation notes are based on
- * Windows 7 Professional Edition and Visual Studio 2010 Premium Edition (x86). After the Cygwin installation the <dfn>Cygwin.bat</dfn> must be setup with the Visual Studio environmet, so into the batch file
- * the two lines must be added after the first echo line (changes depend on the installed version of Visual Studio and Windows):
- * @code
-    chdir C:\Program Files\Microsoft Visual Studio 10.0\VC
-    call vcvarsall.bat
- * @endcode
+ * You need <a href="http://www.python.org">Python for Windows (MSI installer)</a> for using the Scons script. The building process with Windows is difficult, because not all libraries support 
+ * Visual Studio building scripts. Three tools <a href="http://www.cmake.org">CMake</a>, <a href="http://www.cygwin.com/">Cygwin</a> and <a href="http://www.mingw.org">MinGW</a> are needed.
+ * First installing the GCC, G++, GFortran and MSYS Environment of the MinGW install packages. After that run the Cygwin installation and install only the make toolkit under <dfn>devel/make</dfn>. 
+ * Cygwin  detects that the MinGW  compiler is used (check it with the <dfn>env</dfn> command, the MinGW-bin-path must be found in the path variable, if not add them). At last install CMake.
  *
  * @subsection winzip BZip2 and ZLib support
  * Boost IOStream and HDF require BZip2 and ZLib support. Information for IOStream is found on <dfn>www.boost.org/doc/libs/-release number-/libs/iostreams/doc/installation.html</dfn>.
  * <a href="http://www.bzip.org/">BZip2 sources</a> can be compiled with Visual Studio (see readme). After extracting the source BZip2 can compiled on the Visual Studio Command Line
  * with (it is recommend to use an <dfn>include</dfn> directory for the header files and a <dfn>lib</dfn> directory for the libraries)
- * @code nmake -f makefile.msc @endcode 
+ * @code nmake /f makefile.msc @endcode 
  * After compiling all files in the directory can be deleted except
  * <ul>
  * <li><dfn>bzip2.exe</dfn></li>
@@ -222,7 +218,7 @@
  * <li><dfn>libbz2.lib</dfn></li>
  * </ul>
  * <a href="http://zlib.net/">ZLib sources</a> can be compiled also with
- * @code nmake -f win32/Makefile.msc @endcode 
+ * @code nmake /f win32/Makefile.msc @endcode 
  * The following files are needed
  * <ul>
  * <li><dfn>crc32.h</dfn></li>
@@ -258,8 +254,7 @@
  * The numerical bindings for LAPack are needed, so the SVN must be checked out.
  *
  * @subsection winhdf HDF
- * It is recommand to use <a href="http://www.cmake.org">CMake</a> to perfom the building and installing. After extracting the files in the sources directory the following command must be
- * called within the Visual Studio Command Line (for using ZLib or SLib support see HDF install instructions):
+ * After extracting the files in the sources directory the following command must be called within the Visual Studio Command Line (for using ZLib or SLib support see HDF install instructions):
  * @code cmake-gui . @endcode
  * Generate the compiler option and set the following option
  * <ul>
@@ -280,7 +275,21 @@
  * @code ~/ATLAS/configure --dylibs -b 32 --with-netlib-lapack-tarfile=~/lapack.tgz  @endcode
  *
  * @subsection winxml LibXML2
- * The XML2 library can be build with the same steps like GiNaC. The webpage references binary packages too.
+ * The libXML2 library can found on the project page, but libXML need the <a href="http://www.gnu.org/software/libiconv/">libIconv</a> as basic library
+ * (on http://www.zlatkovic.com/libxml.en.html are prebuild binaries). Both libraries can be build straight forward with MSYS. Run the MSYS Environment within the programm folder, copy the sources to
+ * <dfn>-PATH MINGW-/msys/-Version-/home/-username-/</dfn> and for libiconv run the following command within the source directory (add a prefix eg <dfn>/home/-username-/iconv</dfn>)
+ * @code
+    ./configure
+    make
+    make install
+ @endcode
+ * The build of the libXML runs the same way. First you can copy the installed ZLib directory into your MSYS home directory, so the libXML can be build with zlib support (also add a prefix), but thread
+ * support is a little bit difficult, so the build should be without threading:
+ * @code
+    ./configure --with-iconv=-path to libconv (see previous step)- --with-zlib=-path to zlib --witout-threads-
+    make
+    make install
+ @endcode
  *
  *
  *
