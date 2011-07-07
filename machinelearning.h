@@ -226,11 +226,11 @@
  * @endcode
  * For Boost.Iostreams in the Cygwin install directory in the file <dfn>etc/profile</dfn> the following variables must be set:
  * @code
-    export BZIP2_BINARY=libbz2
+    export BZIP2_BINARY=bz2
     export BZIP2_INCLUDE=/cygdrive/c/opt/library/bzip2/1.0.6/include
     export BZIP2_LIBPATH=/cygdrive/c/opt/library/bzip2/1.0.6/lib
  
-    export ZLIB_BINARY=libz
+    export ZLIB_BINARY=z
     export ZLIB_INCLUDE=/cygdrive/c/opt/library/zlib/1.2.5/include
     export ZLIB_LIBPATH=/cygdrive/c/opt/library/zlib/1.2.5/lib
  * @endcode
