@@ -55,6 +55,7 @@ namespace machinelearning { namespace tools {
      * @see http://svn.boost.org/svn/boost/sandbox/numerical_bindings
      * @todo try to change the matrix copy in eigen / svd to static casts
      * @todo add matrix exponential via Pade approximation (shown in Matlab with expmdemo)
+     * @todo portage this class to the Intel Math Kernel Library http://software.intel.com/en-us/articles/intel-mkl/
      **/
     class lapack {
         

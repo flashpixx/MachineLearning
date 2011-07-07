@@ -117,11 +117,17 @@ def configuration_posix(config, version, architecture) :
         config["compileflags"]      += " -D MACHINELEARNING_SYMBOLICMATH"
         config["linkto"].append("ginac")
         
-
-# configuration for Windows build
+# configuration for Windows Cygwin build
 def configuration_win32(config, version, architecture) :
     config = []
-    print "Windows builds not yet available. Sorry"
+    print "Cygwin"
+    sys.exit();
+    
+    
+# configuration for Windows Visual Studio build
+def configuration_win32(config, version, architecture) :
+    config = []
+    print "Visual Studio native build not exists yet. Sorry"
     sys.exit();
 #=======================================================================================================================================
 
@@ -143,6 +149,8 @@ def getConfig():
         configuration_macosx(config, platform.mac_ver()[0], platform.machine())
     elif env['PLATFORM'].lower() == "win32" :
         configuration_win32(config, "", platform.machine())
+    elif env['PLATFORM'].lower() == "cygwin" :
+        configuration_cygwin(config, "", platform.machine())
     elif env['PLATFORM'].lower() == "posix" :
         configuration_posix(config, "", platform.machine())
     else :

@@ -159,7 +159,7 @@
  *
  * @page installationnotes Installation Notes
  * All configure scripts have a <dfn>--prefix=</dfn> option for setting a target installation directory. It is recommand to use this option for seperating the manually installation
- * in opinion to the system libraries.
+ * in contrast to the system libraries. This steps discribe the manually compilation of each library, but you can use the devel packages of your distribution (and precompiled libraries).
  *
  * @section nix Linux / Mac OS X
  * In both OS (Linux & Mac OS X) the libraries can be build with the following steps within the extracted source directory:
@@ -185,26 +185,33 @@
  * <li><dfn>gcc</dfn> for unix systems</li>
  * <li><dfn>darwin</dfn> for Mac OS X</li>
  * </ul>
- * The numerical bindings for LAPack are needed, so the SVN must be checked out.
+ * The numerical bindings for LAPack are needed, so the SVN direcotry http://svn.boost.org/svn/boost/sandbox/numeric_bindings must be checked out.
  *
  * @subsection nixhdf HDF
  * The HDF libraray must be build with C++ support:
  * @code configure --enable-cxx @endcode
  *
  * @subsection nixatlas Atlas with full LAPack
- * The framework need a full LAPack support, so a GFortran compiler is needed. The fortran compiler can be downloaded on http://gcc.gnu.org/wiki/GFortranBinaries . The configure call should be
+ * The framework need a full LAPack support, so a GFortran compiler is needed. The fortran compiler can be downloaded on http://gcc.gnu.org/wiki/GFortranBinaries or use the compiler within the distribution.
+ * The configure call should be
  * @code configure --dylibs --with-netlib-lapack-tarfile=-path to lapack.tgz- @endcode
  * In some cases the pointer bitwidth (<dfn>-b</dfn>) must be set. The flag <dfn>--nof77</dfn> should not be set, because some LAPack routines are not built (a full LAPack support is required).
- * The configure call must be run into a temporary directory, so in the first step the temporary directory must be created (information within the Atlas errata)
+ * The configure call must be run into a temporary directory, so in the first step the temporary directory must be created. It is recommend that you take a look into the Atlas errata for more
+ * information about installing Atlas under Windows (see http://math-atlas.sourceforge.net/errata.html ).
  *
  *
  *
  * <hr>
  * @section windows Microsoft Windows
  * You need <a href="http://www.python.org">Python for Windows (MSI installer)</a> for using the Scons script. The building process with Windows is difficult, because not all libraries support 
- * Visual Studio building scripts. Three tools <a href="http://www.cmake.org">CMake</a>, <a href="http://www.cygwin.com/">Cygwin</a> and <a href="http://www.mingw.org">MinGW</a> are needed.
+ * native Windows building scripts. It is recommand to use <a href="http://www.cygwin.com/">Cygwin</a> for building. Install Cygwin with gcc, g++ and gfortran Version 4 and run the configuration
+ * steps like Linux. After compiling and installing the packages, all subdirectories <dfn>lib</dfn> within the package directories must be added to the <dfn>PATH</dfn> environmental variable. 
+ 
+ and <a href="http://www.mingw.org">MinGW</a> are needed.
  * First installing the GCC, G++, GFortran and MSYS Environment of the MinGW install packages. After that run the Cygwin installation and install only the make toolkit under <dfn>devel/make</dfn>. 
  * Cygwin  detects that the MinGW  compiler is used (check it with the <dfn>env</dfn> command, the MinGW-bin-path must be found in the path variable, if not add them). At last install CMake.
+ * All libraries will be compiled for using Visual Studio (tested with Premium 2010 x86), but you can use another developing toolset like Cygwin or MinGW. In this case the installation and compilation
+ * process will be changed. Take a look to the Scons script that your toolset is supported (section <dfn>configuration_win32</dfn>).
  *
  * @subsection winzip BZip2 and ZLib support
  * Boost IOStream and HDF require BZip2 and ZLib support. Information for IOStream is found on <dfn>www.boost.org/doc/libs/-release number-/libs/iostreams/doc/installation.html</dfn>.
@@ -287,10 +294,9 @@
  @endcode
  *
  * @subsection winatlas Atlas with full LAPack
- * It is recommend that you take a look into the Atlas errata for more information about installing Atlas under Windows. It is recommend to move the 
- * Atlas source and the <dfn>lapack.tgz</dfn> into the Cygwin users home directory (eg. sources are in <dfn>~/ATLAS</dfn> and lapack in <dfn>~/lapack.tgz</dfn>).
- * After that create a new directory in the home (eg. <dfn>mkdir ~/tmp</dfn>) and step into. Than call the configure script with (take a look to the flags <dfn>-b 32|64</dfn> for using 32 or 64 bit)
- * @code ~/ATLAS/configure --dylibs -b 32 --with-netlib-lapack-tarfile=~/lapack.tgz  @endcode
+ * It is recommend that you take a look into the Atlas errata for more information about installing Atlas under Windows (see http://math-atlas.sourceforge.net/errata.html#WinComp ).
+ * After extracting the Atlas sources, call the configure script within a temporary directory:
+ * @code ../ATLAS/configure --dylibs -b 32 --with-netlib-lapack-tarfile=lapack.tgz  @endcode
  *
  *
  *
