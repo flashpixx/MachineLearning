@@ -159,8 +159,6 @@ def configuration_cygwin(config, version, architecture) :
 		sys.exit()
 
     
-    
-    
 # configuration for Windows Visual Studio build
 def configuration_win32(config, version, architecture) :
     config = []
