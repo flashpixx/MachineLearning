@@ -123,8 +123,8 @@ def configuration_cygwin(config, version, architecture) :
     config["linkerflags"]       = ""
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["PATH"]
-    config["compileflags"]      = "-O2 -pipe -Wall -finline-functions -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
-    config["linkto"]            = ["cygboost_system", "cygboost_thread", "cygboost_iostreams", "cygboost_filesystem", "cygboost_regex", "atlas", "cblas", "f77blas",  "lapack"]
+    config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
+    config["linkto"]            = ["cyboost_system", "cyboost_thread", "cyboost_iostreams", "cyboost_filesystem", "cyboost_regex", "atlas", "cblas", "f77blas", "lapack"]
     
     if optionExist("withdebug") :
         config["compileflags"]      += " -g"
@@ -140,7 +140,7 @@ def configuration_cygwin(config, version, architecture) :
                 
     if optionExist("withrandom") :   
         config["compileflags"]      += " -D MACHINELEARNING_RANDOMDEVICE"
-        config["linkto"].append("cygboost_random");
+        config["linkto"].append("cyboost_random");
             
     if optionExist("withmultilanguage") :
 		print "Multilanguage support builds are not existing under Cygwin"
@@ -148,11 +148,11 @@ def configuration_cygwin(config, version, architecture) :
         
     if optionExist("withsources") :
         config["compileflags"]      += " -D MACHINELEARNING_SOURCES"
-        config["linkto"].extend( ["cygxml2-2"] )
+        config["linkto"].extend( ["cyxml2-2"] )
         
     if optionExist("withfiles") :
         config["compileflags"]      += " -D MACHINELEARNING_FILES -D MACHINELEARNING_FILES_HDF"
-        config["linkto"].extend( ["libhdf5_cpp", "libhdf5"] )
+        config["linkto"].extend( ["hdf5_cpp", "hdf5"] )
 
     if optionExist("withsymbolicmath") :
 		print "Symbolic math library builds are not existing under Cygwin"
