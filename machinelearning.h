@@ -234,12 +234,11 @@
     export ZLIB_INCLUDE=/cygdrive/c/opt/library/zlib/1.2.5/include
     export ZLIB_LIBPATH=/cygdrive/c/opt/library/zlib/1.2.5/lib
  * @endcode
- 
- 
- The libraries can be installed with the same steps as in Linux.
- * The system path variable <dfn>PATH</dfn> is set after installing all libraries to
+ *
+ * The libraries can be installed with the same steps as in Linux.
+ * The path to the libraries directories must be set / added to the system or user path variable <dfn>PATH</dfn>
  * @code
-    ;C:\opt\cygwin\bin;C:\opt\library\atlas\3.9.44\lib;C:\opt\library\hdf\1.8.7\lib;C:\opt\library\xml2\2.7.8\lib;C:\opt\library\boost\1.46\bin
+    C:\opt\library\atlas\3.9.44\lib;C:\opt\library\hdf\1.8.7\lib;C:\opt\library\xml2\2.7.8\lib;C:\opt\library\boost\1.46\bin
  * @endcode
  * Scons can be installed under Cygwin with the command within the extracted source:
  * @code
@@ -250,6 +249,31 @@
     PATH=$PATH:/cygdrive/c/opt/scons/bin
     export CPPPATH=/cygdrive/c/opt/library/atlas/3.9.44/include:/cygdrive/c/opt/library/boost/1.46/include:/cygdrive/c/opt/library/boost/sandbox/numeric_bindings:/cygdrive/c/opt/library/hdf/1.8.7/include:/cygdrive/c/opt/library/xml2/2.7.8/include/libxml2
  * @endcode
+ * 
+ * @subsection winscons Error with Scons
+ * In some cases if Scons is running, the python would be create a memory error like:
+ * @code
+    6976514 [main] python 3456 C:\opt\cygwin\bin\python.exe: *** fatal error - unable to remap \\?\C:\opt\cygwin\lib\python2.6\lib-dynload\time.dll to same address as parent: 0x260000 != 0x2C0000
+    Stack trace:
+    Frame     Function  Args
+    00228748  6102796B  (00228748, 00000000, 00000000, 00000000)
+    00228A38  6102796B  (6117EC60, 00008000, 00000000, 61180977)
+    00229A68  61004F1B  (611A7FAC, 61243BA4, 00260000, 002C0000)
+    End of stack trace
+ * @endcode
+ * Following steps are solving the problem
+ * <ol>
+ * <li>close all Cygwin windows and Cygwin programs</li>
+ * <li>open the <dfn>dash.exe</dfn> within the <dfn>bin</dfn> directory of the Cygwin installation</li>
+ * <li>run the command @code /bin/rebaseall -v @endcode</li>
+ * </ol>
+ * If you get an error that the temporary directory is not writable, run first in a Cygwin shell the command
+ * @code
+    cd -to your Windows Home directory eg /cygdrive/c/Users/username-
+    cd AppData/Local
+    chmod 777 Temp
+ * @endcode
+ *
  *
  *
  * @page license GNU Lesser General Public License
