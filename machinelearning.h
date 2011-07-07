@@ -203,101 +203,29 @@
  *
  * <hr>
  * @section windows Microsoft Windows
- * You need <a href="http://www.python.org">Python for Windows (MSI installer)</a> for using the Scons script. The building process with Windows is difficult, because not all libraries support 
- * native Windows building scripts. It is recommand to use <a href="http://www.cygwin.com/">Cygwin</a> for building. Install Cygwin with gcc, g++ and gfortran Version 4 and run the configuration
- * steps like Linux. After compiling and installing the packages, all subdirectories <dfn>lib</dfn> within the package directories must be added to the <dfn>PATH</dfn> environmental variable. 
- 
- and <a href="http://www.mingw.org">MinGW</a> are needed.
- * First installing the GCC, G++, GFortran and MSYS Environment of the MinGW install packages. After that run the Cygwin installation and install only the make toolkit under <dfn>devel/make</dfn>. 
- * Cygwin  detects that the MinGW  compiler is used (check it with the <dfn>env</dfn> command, the MinGW-bin-path must be found in the path variable, if not add them). At last install CMake.
- * All libraries will be compiled for using Visual Studio (tested with Premium 2010 x86), but you can use another developing toolset like Cygwin or MinGW. In this case the installation and compilation
- * process will be changed. Take a look to the Scons script that your toolset is supported (section <dfn>configuration_win32</dfn>).
- *
- * @subsection winzip BZip2 and ZLib support
- * Boost IOStream and HDF require BZip2 and ZLib support. Information for IOStream is found on <dfn>www.boost.org/doc/libs/-release number-/libs/iostreams/doc/installation.html</dfn>.
- * <a href="http://www.bzip.org/">BZip2 sources</a> can be compiled with Visual Studio (see readme). After extracting the source BZip2 can compiled on the Visual Studio Command Line
- * with (it is recommend to use an <dfn>include</dfn> directory for the header files and a <dfn>lib</dfn> directory for the libraries)
- * @code nmake /f makefile.msc @endcode 
- * After compiling all files in the directory can be deleted except
+ * The building process with Windows is very difficult, because not all libraries support native Windows building scripts. It is recommand to use <a href="http://www.cygwin.com/">Cygwin</a> for building.  
+ * Install Cygwin with the tools:
  * <ul>
- * <li><dfn>bzip2.exe</dfn></li>
- * <li><dfn>bzip2recover.exe</dfn></li>
- * <li><dfn>bzlib.h</dfn></li>
- * <li><dfn>libbz2.lib</dfn></li>
+ * <li><dfn>devel/make</dfn></li>
+ * <li><dfn>devel/gcc4-core</dfn></li>
+ * <li><dfn>devel/gcc4-g++</dfn></li>
+ * <li><dfn>devel/gcc4-gfortran</dfn></li>
+ * <li><dfn>python/python</dfn></li>
  * </ul>
- * <a href="http://zlib.net/">ZLib sources</a> can be compiled also with
- * @code nmake /f win32/Makefile.msc @endcode 
- * The following files are needed
- * <ul>
- * <li><dfn>crc32.h</dfn></li>
- * <li><dfn>deflate.h</dfn></li>
- * <li><dfn>inftrees.h</dfn></li>
- * <li><dfn>trees.h</dfn></li>
- * <li><dfn>gzguts.h</dfn></li>
- * <li><dfn>zconf.h</dfn></li>
- * <li><dfn>inffast.h</dfn></li>
- * <li><dfn>zlib.h</dfn></li>
- * <li><dfn>inffixed.h</dfn></li>
- * <li><dfn>zutil.h</dfn></li>
- * <li><dfn>inflate.h</dfn></li>
- * <li><dfn>zdll.lib</dfn></li>
- * <li><dfn>zlib.lib</dfn></li>
- * </ul>
- * The Boost IOStream can be compiled only with the environmental variables for BZip2 and ZLib:
- * <ul>
- * <li><dfn>BZIP2_BINARY = libbz2</dfn></li>
- * <li><dfn>BZIP2_INCLUDE = installation directory</dfn></li>
- * <li><dfn>BZIP2_LIBPATH = library directory</dfn></li>
- * <li><dfn>ZLIB_BINARY = zdll</dfn></li>
- * <li><dfn>ZLIB_INCLUDE = installation directory</dfn></li>
- * <li><dfn>ZLIB_LIBPATH = library directory</dfn></li>
- * </ul>
- *
- * @subsection winboost Boost
- * First bJam must be build in the Visual Studio Command Line, so in the extracted source path the command
- * @code bootstrap.bat @endcode
- * must be run. After that Boost can be build with (The MPI support can be enabled with <dfn>--with-mpi</dfn>, but it requires MPI sources and libraries. The configuration for MPI use can be found on
- * <dfn>www.boost.org/doc/libs/-release number-/doc/html/mpi.html</dfn>)
- * @code bjam --with-filesystem --with-math --with-random --with-regex --with-thread --with-system --with-serialization --with-iostreams threading=multi runtime-link=shared variant=release toolset=msvc install @endcode
- * The numerical bindings for LAPack are needed, so the SVN must be checked out.
- *
- * @subsection winhdf HDF
- * After extracting the files in the sources directory the following command must be called within the Visual Studio Command Line (for using ZLib or SLib support see HDF install instructions):
- * @code cmake-gui . @endcode
- * Generate the compiler option and set the following option
- * <ul>
- * <li><dfn>BUILD_SHARED_LIBS</dfn> enabled</li>
- * <li><dfn>HDF5-BUILD_CPP_LIB</dfn> enabled</li>
- * <li><dfn>CMAKE_ARCHIVE_OUTPUT_DIRECTORY</dfn> set to a build directory</li>
- * <li><dfn>CMAKE_LIBRARY_OUTPUT_DIRECTORY</dfn> set to a build directory</li>
- * <li><dfn>CMAKE_RUNTIME_OUTPUT_DIRECTORY</dfn> set to a build directory</li>
- * <li><dfn>CMAKE_INSTALL_PREFIX</dfn> set to the installation / target directory</li>
- * </ul>
- * After generating the configuration files, the <dfn>ALL_BUILD.vcproj</dfn> must be opened. Set the build type to <dfn>Release</dfn> and create the <dfn>ALL_BUILD</dfn> target, after compiling
- * the <dfn>INSTALL</dfn> target must be run.
- *
- * @subsection winxml LibXML2
- * The libXML2 library can found on the project page, but libXML need the <a href="http://www.gnu.org/software/libiconv/">libIconv</a> as basic library
- * (on http://www.zlatkovic.com/libxml.en.html are prebuild binaries). Both libraries can be build straight forward with MSYS. Run the MSYS Environment within the programm folder, copy the sources to
- * <dfn>-PATH MINGW-/msys/-Version-/home/-username-/</dfn> and for libiconv run the following command within the source directory (add a prefix eg <dfn>/home/-username-/iconv</dfn>)
+ * The libraries can be installed with the same steps as in Linux. Here all libraries are installed under <dfn>C:\\opt\\library</dfn> and the tools under <dfn>C:\\opt</dfn> and the version number of the
+ * library is set to a subdirectory. The system path variable <dfn>PATH</dfn> is set after installing all libraries to
  * @code
-    ./configure
-    make
-    make install
- @endcode
- * The build of the libXML runs the same way. First you can copy the installed ZLib directory into your MSYS home directory, so the libXML can be build with zlib support (also add a prefix), but thread
- * support is a little bit difficult, so the build should be without threading:
+    ;C:\opt\cygwin\bin;C:\opt\library\atlas\3.9.44\lib;C:\opt\library\hdf\1.8.7\lib;C:\opt\library\xml2\2.7.8\lib;C:\opt\library\boost\1.46\bin
+ * @endcode
+ * Scons can be installed under Cygwin with the command within the extracted source:
  * @code
-    ./configure --with-iconv=-path to libconv (see previous step)- --with-zlib=-path to zlib --witout-threads
-    make
-    make install
- @endcode
- *
- * @subsection winatlas Atlas with full LAPack
- * It is recommend that you take a look into the Atlas errata for more information about installing Atlas under Windows (see http://math-atlas.sourceforge.net/errata.html#WinComp ).
- * After extracting the Atlas sources, call the configure script within a temporary directory:
- * @code ../ATLAS/configure --dylibs -b 32 --with-netlib-lapack-tarfile=lapack.tgz  @endcode
- *
+    python setup.py install --prefix=/cygdrive/c/opt/scons
+ * @endcode
+ * The variable <dfn>CPPPATH</dfn> of the include directories is set in the Cygwin install directory <dfn>etc/profile</dfn> with (and to the path variable is added the scons directory)
+ * @code
+    PATH=$PATH:/cygdrive/c/opt/scons/bin
+    export CPPPATH=/cygdrive/c/opt/library/atlas/3.9.44/include:/cygdrive/c/opt/library/boost/1.46/include:/cygdrive/c/opt/library/boost/sandbox/numeric_bindings:/cygdrive/c/opt/library/hdf/1.8.7/include:/cygdrive/c/opt/library/xml2/2.7.8/include/libxml2
+ * @endcode
  *
  *
  * @page license GNU Lesser General Public License
