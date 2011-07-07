@@ -117,18 +117,55 @@ def configuration_posix(config, version, architecture) :
         config["compileflags"]      += " -D MACHINELEARNING_SYMBOLICMATH"
         config["linkto"].append("ginac")
         
+		
 # configuration for Windows Cygwin build
-def configuration_win32(config, version, architecture) :
-    config = []
-    print "Cygwin"
-    sys.exit();
+def configuration_cygwin(config, version, architecture) :
+    config["linkerflags"]       = ""
+    config["include"]           = os.environ["CPPPATH"]
+    config["librarypath"]       = os.environ["PATH"]
+    config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
+    config["linkto"]            = ["cyboost_system", "cyboost_thread", "cyboost_iostreams", "cyboost_filesystem", "cyboost_regex", "atlas"]
+    
+    if optionExist("withdebug") :
+        config["compileflags"]      += " -g"
+    else :
+        config["compileflags"]      += " -D NDEBUG -D BOOST_UBLAS_NDEBUG"
+    
+    if optionExist("withmpi") :
+		print "MPI builds are not existing under Cygwin"
+		sys.exit()
+    else :
+        config["compiler"]          =  "g++"
+
+                
+    if optionExist("withrandom") :   
+        config["compileflags"]      += " -D MACHINELEARNING_RANDOMDEVICE"
+        config["linkto"].append("cyboost_random");
+            
+    if optionExist("withmultilanguage") :
+		print "Multilanguage support builds are not existing under Cygwin"
+		sys.exit()
+        
+    if optionExist("withsources") :
+        config["compileflags"]      += " -D MACHINELEARNING_SOURCES"
+        config["linkto"].extend( ["cyxml2-2"] )
+        
+    if optionExist("withfiles") :
+        config["compileflags"]      += " -D MACHINELEARNING_FILES -D MACHINELEARNING_FILES_HDF"
+        config["linkto"].extend( ["libhdf5_cpp", "libhdf5"] )
+
+    if optionExist("withsymbolicmath") :
+		print "Symbolic math library builds are not existing under Cygwin"
+		sys.exit()
+
+    
     
     
 # configuration for Windows Visual Studio build
 def configuration_win32(config, version, architecture) :
     config = []
     print "Visual Studio native build not exists yet. Sorry"
-    sys.exit();
+    sys.exit()
 #=======================================================================================================================================
 
 
