@@ -212,8 +212,32 @@
  * <li><dfn>devel/gcc4-gfortran</dfn></li>
  * <li><dfn>python/python</dfn></li>
  * </ul>
- * The libraries can be installed with the same steps as in Linux. Here all libraries are installed under <dfn>C:\\opt\\library</dfn> and the tools under <dfn>C:\\opt</dfn> and the version number of the
- * library is set to a subdirectory. The system path variable <dfn>PATH</dfn> is set after installing all libraries to
+ * Here all libraries are installed under <dfn>C:\\opt\\library</dfn> and the tools under <dfn>C:\\opt</dfn> and the version number of the library is set to a subdirectory. On Windows the 
+ * <a href="http://www.bzip.org/">BZip2</a> and <a href="http://www.zlib.net/">ZLib</a> must be installed for using in the Boost.Iostreams. BZip2 sources must be extracted and run the commands
+ * @code
+    make
+    make install PREFIX=/cygdrive/c/opt/library/bzip2/1.0.6
+ * @endcode
+ * The ZLib library is installed with
+ * @code
+    configure --prefix=/cygdrive/c/opt/library/zlib/1.2.5
+    make
+    make install
+ * @endcode
+ * For Boost.Iostreams in the Cygwin install directory in the file <dfn>etc/profile</dfn> the following variables must be set:
+ * @code
+    export BZIP2_BINARY=libbz2
+    export BZIP2_INCLUDE=/cygdrive/c/opt/library/bzip2/1.0.6/include
+    export BZIP2_LIBPATH=/cygdrive/c/opt/library/bzip2/1.0.6/lib
+ 
+    export ZLIB_BINARY=libz
+    export ZLIB_INCLUDE=/cygdrive/c/opt/library/zlib/1.2.5/include
+    export ZLIB_LIBPATH=/cygdrive/c/opt/library/zlib/1.2.5/lib
+ * @endcode
+ 
+ 
+ The libraries can be installed with the same steps as in Linux.
+ * The system path variable <dfn>PATH</dfn> is set after installing all libraries to
  * @code
     ;C:\opt\cygwin\bin;C:\opt\library\atlas\3.9.44\lib;C:\opt\library\hdf\1.8.7\lib;C:\opt\library\xml2\2.7.8\lib;C:\opt\library\boost\1.46\bin
  * @endcode
@@ -221,7 +245,7 @@
  * @code
     python setup.py install --prefix=/cygdrive/c/opt/scons
  * @endcode
- * The variable <dfn>CPPPATH</dfn> of the include directories is set in the Cygwin install directory <dfn>etc/profile</dfn> with (and to the path variable is added the scons directory)
+ * The variable <dfn>CPPPATH</dfn> of the include directories is set in the file within the Cygwin install directory <dfn>etc/profile</dfn> (and to the path variable is added the scons directory)
  * @code
     PATH=$PATH:/cygdrive/c/opt/scons/bin
     export CPPPATH=/cygdrive/c/opt/library/atlas/3.9.44/include:/cygdrive/c/opt/library/boost/1.46/include:/cygdrive/c/opt/library/boost/sandbox/numeric_bindings:/cygdrive/c/opt/library/hdf/1.8.7/include:/cygdrive/c/opt/library/xml2/2.7.8/include/libxml2
