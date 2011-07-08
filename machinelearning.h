@@ -250,6 +250,10 @@
     export CPPPATH=/cygdrive/c/opt/library/atlas/3.9.43/include:/cygdrive/c/opt/library/boost/1.46/include:/cygdrive/c/opt/library/boost/sandbox/numeric_bindings:/cygdrive/c/opt/library/hdf/1.8.7/include:/cygdrive/c/opt/library/xml2/2.7.8/include/libxml2
  * @endcode
  * 
+ * @subsection winversion Windows Version
+ * The Windows version must be set in the scons script (see comment under <dfn>configuration_cygwin</dfn>). You find the value of the version under
+ * http://msdn.microsoft.com/en-us/library/aa383745%28v=vs.85%29.aspx . The default version is set for Windows 7.
+ *
  * @subsection winscons Error with Scons
  * In some cases if Scons is running, the python would be create a memory error like:
  * @code
