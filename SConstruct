@@ -155,15 +155,8 @@ def configuration_cygwin(config, version, architecture) :
         config["linkto"].extend( ["hdf5_cpp", "hdf5"] )
 
     if optionExist("withsymbolicmath") :
-		print "Symbolic math library builds are not existing under Cygwin"
-		sys.exit()
-
-    
-# configuration for Windows Visual Studio build
-def configuration_win32(config, version, architecture) :
-    config = []
-    print "Visual Studio native build not exists yet. Sorry"
-    sys.exit()
+        config["compileflags"]      += " -D MACHINELEARNING_SYMBOLICMATH"
+        config["linkto"].append("ginac")
 #=======================================================================================================================================
 
 
@@ -182,8 +175,6 @@ def getConfig():
     
     if env['PLATFORM'].lower() == "darwin" :
         configuration_macosx(config, platform.mac_ver()[0], platform.machine())
-    elif env['PLATFORM'].lower() == "win32" :
-        configuration_win32(config, "", platform.machine())
     elif env['PLATFORM'].lower() == "cygwin" :
         configuration_cygwin(config, "", platform.machine())
     elif env['PLATFORM'].lower() == "posix" :
