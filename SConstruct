@@ -120,12 +120,15 @@ def configuration_posix(config, version, architecture) :
 		
 # configuration for Windows Cygwin build
 def configuration_cygwin(config, version, architecture) :
-    config["linkerflags"]       = ""
+    config["linkerflags"]       = "-enable-stdcall-fixup"
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["PATH"]
     config["compileflags"]      = "-O2 -pipe -Wall -finline-functions -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
-    config["linkto"]            = ["cygboost_system", "cygboost_thread", "cygboost_iostreams", "cygboost_filesystem", "cygboost_regex", "atlas", "cblas", "f77blas", "lapack"]
+    config["linkto"]            = ["cygboost_system", "cygboost_thread", "cygboost_iostreams", "cygboost_filesystem", "cygboost_regex", "lapack", "cblas", "f77blas", "atlas", "gfortran"]
     
+    #Windows Version options see http://msdn.microsoft.com/en-us/library/aa383745%28v=vs.85%29.aspx
+    config["compileflags"] += " -D _WIN32_WINNT=0x0601"
+	
     if optionExist("withdebug") :
         config["compileflags"]      += " -g"
     else :
@@ -140,15 +143,15 @@ def configuration_cygwin(config, version, architecture) :
                 
     if optionExist("withrandom") :   
         config["compileflags"]      += " -D MACHINELEARNING_RANDOMDEVICE"
-        config["linkto"].append("cyboost_random");
+        config["linkto"].append("cygboost_random");
             
     if optionExist("withmultilanguage") :
 		print "Multilanguage support builds are not existing under Cygwin"
 		sys.exit()
-        
+   
     if optionExist("withsources") :
-        config["compileflags"]      += " -D MACHINELEARNING_SOURCES"
-        config["linkto"].extend( ["cyxml2-2"] )
+        config["compileflags"]      += " -D MACHINELEARNING_SOURCES -D __USE_W32_SOCKETS"
+        config["linkto"].extend( ["cygxml2-2"] )
         
     if optionExist("withfiles") :
         config["compileflags"]      += " -D MACHINELEARNING_FILES -D MACHINELEARNING_FILES_HDF"
