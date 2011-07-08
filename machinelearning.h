@@ -238,7 +238,7 @@
  * The libraries can be installed with the same steps as in Linux.
  * The path to the libraries directories must be set / added to the system or user path variable <dfn>PATH</dfn>
  * @code
-    C:\opt\library\atlas\3.9.44\lib;C:\opt\library\hdf\1.8.7\lib;C:\opt\library\xml2\2.7.8\lib;C:\opt\library\boost\1.46\bin
+    C:\opt\cygwin\bin;C:\opt\library\atlas\3.9.43\lib;C:\opt\library\hdf\1.8.7\lib;C:\opt\library\xml2\2.7.8\lib;C:\opt\library\boost\1.46\bin
  * @endcode
  * Scons can be installed under Cygwin with the command within the extracted source:
  * @code
@@ -247,7 +247,7 @@
  * The variable <dfn>CPPPATH</dfn> of the include directories is set in the file within the Cygwin install directory <dfn>etc/profile</dfn> (and to the path variable is added the scons directory)
  * @code
     PATH=$PATH:/cygdrive/c/opt/scons/bin
-    export CPPPATH=/cygdrive/c/opt/library/atlas/3.9.44/include:/cygdrive/c/opt/library/boost/1.46/include:/cygdrive/c/opt/library/boost/sandbox/numeric_bindings:/cygdrive/c/opt/library/hdf/1.8.7/include:/cygdrive/c/opt/library/xml2/2.7.8/include/libxml2
+    export CPPPATH=/cygdrive/c/opt/library/atlas/3.9.43/include:/cygdrive/c/opt/library/boost/1.46/include:/cygdrive/c/opt/library/boost/sandbox/numeric_bindings:/cygdrive/c/opt/library/hdf/1.8.7/include:/cygdrive/c/opt/library/xml2/2.7.8/include/libxml2
  * @endcode
  * 
  * @subsection winscons Error with Scons
