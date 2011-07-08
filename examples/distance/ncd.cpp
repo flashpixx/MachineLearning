@@ -43,7 +43,7 @@ using namespace machinelearning;
 bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_args ) {
     
     if (argc < 2) {
-        std::cout << "--inputfile" << "\t" << "input HDF5 file" << std::endl;
+        std::cout << "--inputfile" << "\t" << "input files" << std::endl;
         std::cout << "--outfile" << "\t" << "optional output HDF5 file" << std::endl;
         std::cout << "--compress" << "\t" << "compression level (allowed values are: default, bestspeed or bestcompression)" << std::endl;
         std::cout << "--algorithm" << "\t" << "compression algorithm (allowed values are: gzip, bzip)" << std::endl;
