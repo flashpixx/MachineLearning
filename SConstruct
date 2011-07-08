@@ -123,8 +123,8 @@ def configuration_cygwin(config, version, architecture) :
     config["linkerflags"]       = ""
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["PATH"]
-    config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
-    config["linkto"]            = ["cyboost_system", "cyboost_thread", "cyboost_iostreams", "cyboost_filesystem", "cyboost_regex", "atlas", "cblas", "f77blas", "lapack"]
+    config["compileflags"]      = "-O2 -pipe -Wall -finline-functions -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
+    config["linkto"]            = ["cygboost_system", "cygboost_thread", "cygboost_iostreams", "cygboost_filesystem", "cygboost_regex", "atlas", "cblas", "f77blas", "lapack"]
     
     if optionExist("withdebug") :
         config["compileflags"]      += " -g"
