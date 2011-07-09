@@ -199,6 +199,26 @@
  * The configure call must be run into a temporary directory, so in the first step the temporary directory must be created. It is recommend that you take a look into the Atlas errata for more
  * information about installing Atlas under Windows (see http://math-atlas.sourceforge.net/errata.html ).
  *
+ * @subsection nixpath path under Linux
+ * Under Linux some environmantal variables must be set, if the libraries are installed into a non-default directory. The variable <dfn>CPATH</dfn> and <dfn>CPPPATH</dfn> must be set to the include
+ * directories and <dfn>LD_LIBRARY_PATH</dfn> and <dfn>LIBRARY_PATH</dfn> must be pointed to the library path. The variables can be set within the <dfn>/etc/profile</dfn> or <dfn>~/.profile</dfn> with
+ * @code
+    export CPPPATH=first_path:second_path
+    export CPATH=$CPPPATH
+    export LIBRARY_PATH=first_path:second_path
+    export LD_LIBRARY_PATH=$LIBRARY_PATH
+ * @endcode
+ *
+ * @subsection macpath path under Mac OS X
+ * The path data should be set in the same way as in Linux, but OS X needs a own configuration file to use the variables in all OSX programs. Create a blank file in the hidden directory <dfn>~/.MacOSX</dfn>
+ * with the name <dfn>environment.plist</dfn> and set the variables with data. If you run a program a variable <dfn>DYLD_LIBRARY_PATH</dfn> is also needed, but it can't set with the environmental file so
+ * it is recommand that the following line is added to the <dfn>/etc/profile</dfn>:
+ * @code
+    export DYLD_LIBRARY_PATH=$LIBRARY_PATH
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$LIBRARY_PATH
+    export CPATH=$CPATH:$CPPPATH
+ * @endcode
+ * The last two lines are optional, because so only the values <dfn>LIBRARY_PATH</dfn> and <dfn>CPPPATH</dfn> must be set in the file.
  *
  *
  * <hr>

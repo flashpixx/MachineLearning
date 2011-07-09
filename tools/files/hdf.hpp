@@ -604,7 +604,7 @@ namespace machinelearning { namespace tools { namespace files {
             return *l_path.end();
         }
         
-        throw exception::runtime(_("cannot create path structure"));
+        throw exception::runtime(_("can not create path structure"));
     }
     
     
