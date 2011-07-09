@@ -251,8 +251,18 @@
  * @endcode
  * 
  * @subsection winversion Windows Version
- * The Windows version must be set in the scons script (see comment under <dfn>configuration_cygwin</dfn>). You find the value of the version under
- * http://msdn.microsoft.com/en-us/library/aa383745%28v=vs.85%29.aspx . The default version is set for Windows 7.
+ * The Windows version must be set with the scons parameter <dfn>--winver</dfn>. The values are:
+ * <ul>
+ * <li><dfn>win7</dfn> Windows 7</li>
+ * <li><dfn>srv2008</dfn> Windows Server 2008</li>
+ * <li><dfn>vista</dfn> Windows Vista</li>
+ * <li><dfn>srv2003sp1</dfn> Windows Server 2003 with SP1</li>
+ * <li><dfn>xpsp2</dfn> Windows XP with SP2</li>
+ * <li><dfn>srv2003</dfn> Windows Server 2003</li>
+ * <li><dfn>xp</dfn> Windows XP</li>
+ * <li><dfn>w2000</dfn> Windows 2000</li>
+ * </ul>
+ * The description and hexdecimal values can be found on http://msdn.microsoft.com/en-us/library/aa383745%28v=vs.85%29.aspx
  *
  * @subsection winscons Error with Scons
  * In some cases if Scons is running, the python would be create a memory error like:
