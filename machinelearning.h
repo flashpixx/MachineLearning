@@ -160,6 +160,7 @@
  * @page installationnotes Installation Notes
  * All configure scripts have a <dfn>--prefix=</dfn> option for setting a target installation directory. It is recommand to use this option for seperating the manually installation
  * in contrast to the system libraries. This steps discribe the manually compilation of each library, but you can use the devel packages of your distribution (and precompiled libraries).
+ * This tutorial is a short excerpt for the install process only, so it is recommand, that you know the system details for installing. 
  *
  * @section nix Linux / Mac OS X
  * In both OS (Linux & Mac OS X) the libraries can be build with the following steps within the extracted source directory:
@@ -182,7 +183,7 @@
  * @code bjam --with-filesystem --with-math --with-random --with-regex --with-thread --with-system --with-serialization --with-iostreams threading=multi runtime-link=shared variant=release toolset=gcc|darwin install @endcode
  * The <dfn>toolset</dfn> option must be:
  * <ul>
- * <li><dfn>gcc</dfn> for unix systems</li>
+ * <li><dfn>gcc</dfn> for unix systems (Cygwin too)</li>
  * <li><dfn>darwin</dfn> for Mac OS X</li>
  * </ul>
  * The numerical bindings for LAPack are needed, so the SVN direcotry http://svn.boost.org/svn/boost/sandbox/numeric_bindings must be checked out.
@@ -256,7 +257,8 @@
  * @endcode
  *
  * The libraries can be installed with the same steps as in Linux.
- * The path to the libraries directories must be set / added to the system or user path variable <dfn>PATH</dfn>
+ * The path to the libraries directories must be set / added to the system or user path variable <dfn>PATH</dfn> (the Cygwin <dfn>bin</dfn> directory must be added, because all libraries are linked to the
+ * <dfn>cygwin.dll</dfn>, which is stored in the <dfn>bin</dfn> directory)
  * @code
     C:\opt\cygwin\bin;C:\opt\library\atlas\3.9.43\lib;C:\opt\library\hdf\1.8.7\lib;C:\opt\library\xml2\2.7.8\lib;C:\opt\library\boost\1.46\bin
  * @endcode
