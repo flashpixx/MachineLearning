@@ -17,6 +17,7 @@ AddOption("--compile-language", dest="compilelang", type="string", nargs=0, acti
 AddOption("--create-documentation", dest="createdocu", type="string", nargs=0, action="store", help="creates the doxygen documentation (doxygen must be within the path)")
 AddOption("--with-debug", dest="withdebug", type="string", nargs=0, action="store", help="compile with debug information")
 AddOption("--with-symbolicmath", dest="withsymbolicmath", type="string", nargs=0, action="store", help="compile for using symbolic math expression (needed by gradient descent)")
+AddOption("--winver", dest="winver", type="string", nargs=1, action="store", help="value of the Windows version: win7, srv2008, vista, srv2003sp1, xpsp2, srv2003, xp, w2000")
 
 
 #=== function for os configuration ===================================================================================================
@@ -127,7 +128,29 @@ def configuration_cygwin(config, version, architecture) :
     config["linkto"]            = ["cygboost_system", "cygboost_thread", "cygboost_iostreams", "cygboost_filesystem", "cygboost_regex", "lapack", "cblas", "f77blas", "atlas", "gfortran"]
     
     #Windows Version options see http://msdn.microsoft.com/en-us/library/aa383745%28v=vs.85%29.aspx
-    config["compileflags"] += " -D _WIN32_WINNT=0x0601"
+    win = ""
+    if optionExist("winver") :	
+        win = GetOption("winver").lower()
+    
+	if win == "win7" :
+		config["compileflags"] += " -D _WIN32_WINNT=0x0601"
+	elif win == "srv2008" :
+		config["compileflags"] += " -D _WIN32_WINNT=0x0600"
+	elif win == "vista" :
+		config["compileflags"] += " -D _WIN32_WINNT=0x0600"
+	elif win == "srv2003sp1" :
+		config["compileflags"] += " -D _WIN32_WINNT=0x0502"
+	elif win == "xpsp2" :
+		config["compileflags"] += " -D _WIN32_WINNT=0x0502"
+	elif win == "srv2003" :
+		config["compileflags"] += " -D _WIN32_WINNT=0x0501"
+	elif win == "xp" :
+		config["compileflags"] += " -D _WIN32_WINNT=0x0501"
+	elif win == "w2000" :
+		config["compileflags"] += " -D _WIN32_WINNT=0x0500"
+	else :
+		print "Windows version is not known"
+		sys.exit()
 	
     if optionExist("withdebug") :
         config["compileflags"]      += " -g"
