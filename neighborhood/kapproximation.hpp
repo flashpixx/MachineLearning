@@ -59,7 +59,7 @@ namespace machinelearning { namespace neighborhood {
         
         
             kapproximation( const approximation&, const std::size_t& );
-            ublas::indirect_array<> approximate( const ublas::matrix<T>, const ublas::vector<T> ) const;
+            ublas::indirect_array<> approximate( const ublas::matrix<T>&, const ublas::vector<T>&, const ublas::matrix<T>& ) const;
         
         
         private:
@@ -70,7 +70,7 @@ namespace machinelearning { namespace neighborhood {
             const std::size_t m_number;
         
         
-            ublas::indirect_array<> approx_knn( const ublas::matrix<T>, const ublas::vector<T> ) const;
+            ublas::indirect_array<> approx_knn( const ublas::matrix<T>&, const ublas::vector<T>&, const ublas::matrix<T>& ) const;
         
         
     };
@@ -94,13 +94,13 @@ namespace machinelearning { namespace neighborhood {
      * @param p_multiplier multiplier vector
      * @return index array
      **/
-    template<typename T> inline ublas::indirect_array<> kapproximation<T>::approximate( const ublas::matrix<T> p_prototypes, const ublas::vector<T> p_multiplier ) const
+    template<typename T> inline ublas::indirect_array<> kapproximation<T>::approximate( const ublas::matrix<T>& p_prototypes, const ublas::vector<T>& p_multiplier, const ublas::matrix<T>& p_distance ) const
     {
         
         switch (m_approx) {
                 
             case knn :
-                return approx_knn( p_prototypes, p_multiplier );
+                return approx_knn( p_prototypes, p_multiplier, p_distance );
         
             default :
                 throw exception::runtime(_("project option is unkown"));
@@ -113,11 +113,13 @@ namespace machinelearning { namespace neighborhood {
      * @param p_multiplier multiplier vector
      * @return index array
      **/
-    template<typename T> inline ublas::indirect_array<> kapproximation<T>::approx_knn( const ublas::matrix<T> p_prototypes, const ublas::vector<T> p_multiplier ) const
+    template<typename T> inline ublas::indirect_array<> kapproximation<T>::approx_knn( const ublas::matrix<T>& p_prototypes, const ublas::vector<T>& p_multiplier, const ublas::matrix<T>& p_distance ) const
     {
-        // first we create a structure in which the prototype values interpretated as probalistic values
+        // the dimension of the prototype is interpretated as probability
         const T l_boundery = static_cast<T>(1) / p_prototypes.size2();
         
+        // iterate over each prototyp so the we create a array with dimensions
+        // that are greater and equal than the probalisitc value
         std::vector< ublas::indirect_array<> > l_idx;
         for(std::size_t i=0; i < p_prototypes.size1(); ++i) {
             
