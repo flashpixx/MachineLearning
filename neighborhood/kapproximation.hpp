@@ -114,21 +114,27 @@ namespace machinelearning { namespace neighborhood {
      * @return index array
      **/
     template<typename T> inline ublas::indirect_array<> kapproximation<T>::approx_knn( const ublas::matrix<T>& p_prototypes, const ublas::vector<T>& p_multiplier, const ublas::matrix<T>& p_distance ) const
-    {
+    {       
         // the dimension of the prototype is interpretated as probability
-        const T l_boundery = static_cast<T>(1) / p_prototypes.size2();
+        const T l_boundery      = static_cast<T>(1) / p_prototypes.size2();
         
         // iterate over each prototyp so the we create a array with dimensions
         // that are greater and equal than the probalisitc value
-        std::vector< ublas::indirect_array<> > l_idx;
         for(std::size_t i=0; i < p_prototypes.size1(); ++i) {
             
             std::vector<std::size_t> l_tmp;
             for(std::size_t j=0; j < p_prototypes.size2(); ++j)
                 if (p_prototypes(i,j) >= l_boundery)
                     l_tmp.push_back(j);
+
+            if (l_tmp.size() == 0)
+                continue;
             
-            l_idx.push_back( tools::vector::toIndirectArray(l_tmp) );
+            // we read the distance data and sort them
+            const ublas::vector<T> l_row = p_distance(i, tools::vector::toIndirectArray(l_tmp));
+            tools::vector::rankIndex(l_row);
+            
+            //l_row(tools::vector::toIndirectArray(l_tmp));
         }
         
         

@@ -111,6 +111,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             bool m_firstpatch;
         
             T calculateQuantizationError( const ublas::matrix<T>& ) const;
+            ublas::matrix<T> calcDistance( const ublas::matrix<T>&, const ublas::matrix<T>& ) const;
         
             #ifdef MACHINELEARNING_MPI
             /** vector with information to every process and width of the prototype / data matrix **/
@@ -319,19 +320,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         for(std::size_t i=0; (i < p_iterations); ++i) {
             
             // create adapt values
-            const T l_lambda = p_lambda * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(p_iterations));
-            
-            // calculate for every prototype the distance
-            // relational: (D * alpha_i)_j - 0.5 * alpha_i^t * D * alpha_i = || x^j - w^i || 
-            // D = distance, alpha = weight of the prototype for the konvex combination
-            ublas::matrix<T> l_adaptmatrix = ublas::prod(m_prototypes, p_data);
-            
-            for(std::size_t n=0; n < l_adaptmatrix.size1(); ++n) {
-                const T l_val = 0.5 * ublas::inner_prod( ublas::row(m_prototypes, n), ublas::row(l_adaptmatrix, n) );
-                
-                for(std::size_t j=0; j < l_adaptmatrix.size2(); ++j)
-                    l_adaptmatrix(n, j) -= l_val;
-            }
+            const T l_lambda                = p_lambda * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(p_iterations));
+            ublas::matrix<T> l_adaptmatrix  = calcDistance( m_prototypes, p_data );
             
             // determine quantization error for logging (adaption matrix)
             if (m_logging)
@@ -454,19 +444,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         for(std::size_t i=0; (i < p_iterations); ++i) {
             
             // create adapt values
-            const T l_lambda = p_lambda * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(p_iterations));
-            
-            // calculate for every prototype the distance
-            // relational: (D * alpha_i)_j - 0.5 * alpha_i^t * D * alpha_i = || x^j - w^i || 
-            // D = distance, alpha = weight of the prototype for the konvex combination
-            ublas::matrix<T> l_adaptmatrix = ublas::prod(m_prototypes, p_data);
-            
-            for(std::size_t n=0; n < l_adaptmatrix.size1(); ++n) {
-                const T l_val = 0.5 * ublas::inner_prod( ublas::row(m_prototypes, n), ublas::row(l_adaptmatrix, n) );
-                
-                for(std::size_t j=0; j < l_adaptmatrix.size2(); ++j)
-                    l_adaptmatrix(n, j) -= l_val;
-            }
+            const T l_lambda                = p_lambda * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(p_iterations));
+            ublas::matrix<T> l_adaptmatrix  = calcDistance( m_prototypes, p_data );
             
             // determine quantization error for logging (adaption matrix)
             if (m_logging)
@@ -483,7 +462,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
                 
                 // calculate adapt value
                 BOOST_FOREACH( T& p, l_rank)
-                p = std::exp( -p / l_lambda );
+                    p = std::exp( -p / l_lambda );
                 
                 // return value to matrix
                 ublas::column(l_adaptmatrix, n) = l_rank;
@@ -507,6 +486,11 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         const ublas::indirect_array<> l_winner = use(p_data);
         for(std::size_t i=0; i < l_winner.size(); ++i)
             m_prototypeWeights( l_winner(i) )++;
+        
+        // create distance between neurons and data
+        ublas::matrix<T> l_adaptmatrix  = calcDistance( m_prototypes, p_data );
+        
+        
         
         // do k-approximation
         /**
@@ -538,6 +522,30 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
                     newret.push_back(pos);
                 }
         **/
+    }
+    
+    
+    /** calculates the distance values between neurons and data.
+     * @todo thinking for own distance class
+     * @param p_prototypes prototype matrix
+     * @param p_data data matrix
+     * @return matrix with distance values (number of prototypes X data dimension)
+     **/
+    template<typename T> inline ublas::matrix<T> relational_neuralgas<T>::calcDistance( const ublas::matrix<T>& p_prototypes, const ublas::matrix<T>& p_data ) const
+    {
+        // calculate for every prototype the distance
+        // relational: (D * alpha_i)_j - 0.5 * alpha_i^t * D * alpha_i = || x^j - w^i || 
+        // D = distance, alpha = weight of the prototype for the konvex combination
+        ublas::matrix<T> l_adaptmatrix = ublas::prod(p_prototypes, p_data);
+        
+        for(std::size_t n=0; n < l_adaptmatrix.size1(); ++n) {
+            const T l_val = 0.5 * ublas::inner_prod( ublas::row(m_prototypes, n), ublas::row(l_adaptmatrix, n) );
+            
+            for(std::size_t j=0; j < l_adaptmatrix.size2(); ++j)
+                l_adaptmatrix(n, j) -= l_val;
+        }        
+    
+        return l_adaptmatrix;
     }
     
     //======= MPI ==================================================================================================================================
