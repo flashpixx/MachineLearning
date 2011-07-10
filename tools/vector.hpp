@@ -91,6 +91,7 @@ namespace machinelearning { namespace tools {
             template<typename T> static ublas::vector<std::size_t> rankIndexVector( ublas::vector<T>& );
             template<typename T> static ublas::indirect_array<> rankIndex( ublas::vector<T>& );
             template<typename T> static ublas::vector<T> setNumericalZero( const ublas::vector<T>&, const T& = 0 );
+            static ublas::indirect_array<> toIndirectArray( const std::vector<std::size_t>& );
     };
     
     
@@ -260,15 +261,7 @@ namespace machinelearning { namespace tools {
     {
         std::vector<std::size_t> l_temp(boost::counting_iterator<std::size_t>(0), boost::counting_iterator<std::size_t>(p_vec.size()));
         std::sort( l_temp.begin(), l_temp.end(), lam::var(p_vec)[lam::_1] < lam::var(p_vec)[lam::_2]);
-        
-        ublas::indirect_array<> l_idx( p_vec.size() );
-        
-        // we can't use l_idx.begin() on the third argument, because there is e design error within
-        // the indirect_array: begin() returns a const reference iterator
-        // @see http://answerpot.com/showthread.php?726979-submatrix+with+indexvector
-        std::copy( l_temp.begin(), l_temp.end(), &l_idx(0) );
-        
-        return l_idx;
+        return toIndirectArray(l_temp);
     }
     
     
@@ -289,6 +282,21 @@ namespace machinelearning { namespace tools {
     }    
     
     
+    /** copy a std::vector to an indirect array
+     * @param p_vec input vector
+     * @return indirect array
+     **/
+    inline ublas::indirect_array<> vector::toIndirectArray( const std::vector<std::size_t>& p_vec )
+    {
+        ublas::indirect_array<> l_idx( p_vec.size() );
+        
+        // we can't use l_idx.begin() on the third argument, because there is e design error within
+        // the indirect_array: begin() returns a const reference iterator
+        // @see http://answerpot.com/showthread.php?726979-submatrix+with+indexvector
+        std::copy( p_vec.begin(), p_vec.end(), &l_idx(0) );
+        
+        return l_idx;
+    }
     
 };};
 

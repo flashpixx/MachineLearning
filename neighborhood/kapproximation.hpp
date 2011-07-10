@@ -32,7 +32,7 @@
 #include <boost/numeric/bindings/blas.hpp>
 
 #include "../exception/exception.h"
-
+#include "../tools/tools.h"
 
 
 namespace machinelearning { namespace neighborhood {  
@@ -59,7 +59,7 @@ namespace machinelearning { namespace neighborhood {
         
         
             kapproximation( const approximation&, const std::size_t& );
-            ublas::indirect_array<> approximate( const ublas::vector<T>, const ublas::matrix<T> ) const;
+            ublas::indirect_array<> approximate( const ublas::matrix<T>, const ublas::vector<T> ) const;
         
         
         private:
@@ -68,6 +68,9 @@ namespace machinelearning { namespace neighborhood {
             const kapproximation m_approx;
             /** number of approximate datasets **/
             const std::size_t m_number;
+        
+        
+            ublas::indirect_array<> approx_knn( const ublas::matrix<T>, const ublas::vector<T> ) const;
         
         
     };
@@ -86,8 +89,48 @@ namespace machinelearning { namespace neighborhood {
     }
     
     
-    template<typename T> inline ublas::indirect_array<> kapproximation<T>::approximate( const ublas::vector<T>, const ublas::matrix<T> ) const
+    /** run approximation
+     * @param p_prototypes prototype matrix
+     * @param p_multiplier multiplier vector
+     * @return index array
+     **/
+    template<typename T> inline ublas::indirect_array<> kapproximation<T>::approximate( const ublas::matrix<T> p_prototypes, const ublas::vector<T> p_multiplier ) const
     {
+        
+        switch (m_approx) {
+                
+            case knn :
+                return approx_knn( p_prototypes, p_multiplier );
+        
+            default :
+                throw exception::runtime(_("project option is unkown"));
+        }
+    }
+    
+    
+    /** create k-nearest-neighbour approximation
+     * @param p_prototypes prototype matrix
+     * @param p_multiplier multiplier vector
+     * @return index array
+     **/
+    template<typename T> inline ublas::indirect_array<> kapproximation<T>::approx_knn( const ublas::matrix<T> p_prototypes, const ublas::vector<T> p_multiplier ) const
+    {
+        // first we create a structure in which the prototype values interpretated as probalistic values
+        const T l_boundery = static_cast<T>(1) / p_prototypes.size2();
+        
+        std::vector< ublas::indirect_array<> > l_idx;
+        for(std::size_t i=0; i < p_prototypes.size1(); ++i) {
+            
+            std::vector<std::size_t> l_tmp;
+            for(std::size_t j=0; j < p_prototypes.size2(); ++j)
+                if (p_prototypes(i,j) >= l_boundery)
+                    l_tmp.push_back(j);
+            
+            l_idx.push_back( tools::vector::toIndirectArray(l_tmp) );
+        }
+        
+        
+        
         return ublas::indirect_array<>();
     }
     
