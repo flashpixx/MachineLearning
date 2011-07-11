@@ -147,10 +147,18 @@ namespace machinelearning { namespace neighborhood {
             l_idx.push_back(l_tmpidx);
         }
 
-        // determine multiplier for each approximate dataset
-        ublas::vector<T> l_multiplier(l_idx.size());
+        // determine multiplier for each approximate dataset and determine "lonely neurons"
+        std::vector<std::size_t> l_lonely;
+        ublas::vector<T> l_multiplier(l_idx.size(), 0);
         for(std::size_t i=0; i < l_idx.size(); ++i)
-            l_multiplier(i) = static_cast<T>(p_multiplier(i)) / l_idx[i].size();
+            if (l_idx[i].size() > 0)
+                l_multiplier(i) = static_cast<T>(p_multiplier(i)) / l_idx[i].size();
+            else
+                l_lonely.push_back(i);
+        
+        // remove multiplier of the lonely neurons
+        for(std::size_t i=0; i < l_lonely.size(); ++i)
+            l_multiplier.erase_element(l_lonely[i]);
             
         // create return dataset       
         approximateddata l_ret;
