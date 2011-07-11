@@ -26,6 +26,7 @@
 #ifndef MACHINELEARNING_NEIGHBORHOOD_KAPPROXIMATION_HPP
 #define MACHINELEARNING_NEIGHBORHOOD_KAPPROXIMATION_HPP
 
+#include <boost/variant.hpp> 
 #include <boost/static_assert.hpp>  
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
@@ -57,9 +58,11 @@ namespace machinelearning { namespace neighborhood {
                 purerandom  = 3
             };
         
+            typedef boost::variant< std::vector< ublas::indirect_array<> >, ublas::vector<T> > approximateddata;
+        
         
             kapproximation( const approximation&, const std::size_t& );
-            ublas::indirect_array<> approximate( const ublas::matrix<T>&, const ublas::vector<T>&, const ublas::matrix<T>& ) const;
+            approximateddata approximate( const ublas::matrix<T>&, const ublas::vector<T>&, const ublas::matrix<T>& ) const;
         
         
         private:
@@ -69,9 +72,7 @@ namespace machinelearning { namespace neighborhood {
             /** number of approximate datasets **/
             const std::size_t m_number;
         
-        
-            ublas::indirect_array<> approx_knn( const ublas::matrix<T>&, const ublas::vector<T>&, const ublas::matrix<T>& ) const;
-        
+            approximateddata approx_knn( const ublas::matrix<T>&, const ublas::vector<T>&, const ublas::matrix<T>& ) const;
         
     };
     
@@ -94,9 +95,8 @@ namespace machinelearning { namespace neighborhood {
      * @param p_multiplier multiplier vector
      * @return index array
      **/
-    template<typename T> inline ublas::indirect_array<> kapproximation<T>::approximate( const ublas::matrix<T>& p_prototypes, const ublas::vector<T>& p_multiplier, const ublas::matrix<T>& p_distance ) const
+    template<typename T> inline typename kapproximation<T>::approximateddata kapproximation<T>::approximate( const ublas::matrix<T>& p_prototypes, const ublas::vector<T>& p_multiplier, const ublas::matrix<T>& p_distance ) const
     {
-        
         switch (m_approx) {
                 
             case knn :
@@ -113,13 +113,14 @@ namespace machinelearning { namespace neighborhood {
      * @param p_multiplier multiplier vector
      * @return index array
      **/
-    template<typename T> inline ublas::indirect_array<> kapproximation<T>::approx_knn( const ublas::matrix<T>& p_prototypes, const ublas::vector<T>& p_multiplier, const ublas::matrix<T>& p_distance ) const
+    template<typename T> inline typename kapproximation<T>::approximateddata kapproximation<T>::approx_knn( const ublas::matrix<T>& p_prototypes, const ublas::vector<T>& p_multiplier, const ublas::matrix<T>& p_distance ) const
     {       
         // the dimension of the prototype is interpretated as probability
         const T l_boundery      = static_cast<T>(1) / p_prototypes.size2();
         
         // iterate over each prototyp so the we create a array with dimensions
         // that are greater and equal than the probalisitc value
+        std::vector< ublas::indirect_array<> > l_idx;
         for(std::size_t i=0; i < p_prototypes.size1(); ++i) {
             
             std::vector<std::size_t> l_tmp;
@@ -127,19 +128,34 @@ namespace machinelearning { namespace neighborhood {
                 if (p_prototypes(i,j) >= l_boundery)
                     l_tmp.push_back(j);
 
-            if (l_tmp.size() == 0)
-                continue;
+            // add an empty data set if no boundary data is found
+            // ===> lonely neuron ??????? <=====
+            if (l_tmp.size() == 0) {
+                l_idx.push_back( ublas::indirect_array<>(0) );
+                continue;   
+            }
             
-            // we read the distance data and sort them
-            const ublas::vector<T> l_row = p_distance(i, tools::vector::toIndirectArray(l_tmp));
-            tools::vector::rankIndex(l_row);
+            // we read the distance data and sort them to get the nearest data vectors
+            const ublas::vector<T> l_row      = p_distance(i, tools::vector::toIndirectArray(l_tmp));
+            ublas::indirect_array<> l_sortidx = tools::vector::rankIndex(l_row);
             
-            //l_row(tools::vector::toIndirectArray(l_tmp));
+            // create a index array with <= k-max number of indices and fill it with the smallest indices (we can't use a std::copy, because we need the original index values, so we use the numerical index)
+            ublas::indirect_array<> l_tmpidx( ((l_sortidx.size() <= m_number) ? l_sortidx.size() : m_number) );
+            for(std::size_t j=0; j < l_tmpidx.size(); ++j)
+                l_tmpidx[j] = l_tmp[ l_sortidx(j) ];
+            
+            l_idx.push_back(l_tmpidx);
+            
+            // determine for each index the rec
+            
         }
         
+        approximateddata l_ret;
+        l_ret = l_idx;
+        l_ret = ublas::vector<T>(0);
         
         
-        return ublas::indirect_array<>();
+        return l_ret;
     }
     
     
