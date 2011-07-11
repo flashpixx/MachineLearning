@@ -129,7 +129,6 @@ namespace machinelearning { namespace neighborhood {
                     l_tmp.push_back(j);
 
             // add an empty data set if no boundary data is found
-            // ===> lonely neuron ??????? <=====
             if (l_tmp.size() == 0) {
                 l_idx.push_back( ublas::indirect_array<>(0) );
                 continue;   
@@ -139,21 +138,24 @@ namespace machinelearning { namespace neighborhood {
             const ublas::vector<T> l_row      = p_distance(i, tools::vector::toIndirectArray(l_tmp));
             ublas::indirect_array<> l_sortidx = tools::vector::rankIndex(l_row);
             
-            // create a index array with <= k-max number of indices and fill it with the smallest indices (we can't use a std::copy, because we need the original index values, so we use the numerical index)
+            // create a index array with <= k-max number of indices and fill it with the smallest indices
+            // (we can't use a std::copy, because we need the original index values, so we use the numerical index)
             ublas::indirect_array<> l_tmpidx( ((l_sortidx.size() <= m_number) ? l_sortidx.size() : m_number) );
             for(std::size_t j=0; j < l_tmpidx.size(); ++j)
                 l_tmpidx[j] = l_tmp[ l_sortidx(j) ];
             
             l_idx.push_back(l_tmpidx);
-            
-            // determine for each index the rec
-            
         }
-        
+
+        // determine multiplier for each approximate dataset
+        ublas::vector<T> l_multiplier(l_idx.size());
+        for(std::size_t i=0; i < l_idx.size(); ++i)
+            l_multiplier(i) = static_cast<T>(p_multiplier(i)) / l_idx[i].size();
+            
+        // create return dataset       
         approximateddata l_ret;
         l_ret = l_idx;
-        l_ret = ublas::vector<T>(0);
-        
+        l_ret = l_multiplier;
         
         return l_ret;
     }
