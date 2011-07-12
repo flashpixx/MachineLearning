@@ -181,7 +181,7 @@
  * must be run. After that Boost can be build with (The MPI support can be enabled with <dfn>--with-mpi</dfn>, but it requires MPI sources and libraries. The configuration for MPI use can be found on
  * <dfn>www.boost.org/doc/libs/-release number-/doc/html/mpi.html</dfn>)
  * @code bjam --with-filesystem --with-math --with-random --with-regex --with-thread --with-system --with-serialization --with-iostreams threading=multi runtime-link=shared variant=release toolset=gcc|darwin install @endcode
- * The <dfn>toolset</dfn> option must be:
+ * In newer Boost version (since 1.47.0) the <dfn>bjam</dfn> command is replaced with <dfn>b2</dfn>. The <dfn>toolset</dfn> option must be:
  * <ul>
  * <li><dfn>gcc</dfn> for unix systems (Cygwin too)</li>
  * <li><dfn>darwin</dfn> for Mac OS X</li>
