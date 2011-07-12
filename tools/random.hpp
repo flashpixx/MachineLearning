@@ -74,19 +74,19 @@ namespace machinelearning { namespace tools {
             enum distribution
             {
                 uniform     = 0,
-                binomial    = 1,
-                bernoulli   = 2,
-                cauchy      = 3,
-                gamma       = 4,
-                poisson     = 5,
-                exponential = 6,
-                normal      = 7,
-                student     = 9,
-                weibull     = 10,
-                rayleigh    = 11,
-                chisquared  = 12,
-                pareto      = 13,
-                triangular  = 14
+                bernoulli   = 1,
+                cauchy      = 2,
+                gamma       = 3,
+                poisson     = 4,
+                exponential = 5,
+                normal      = 6,
+                student     = 7,
+                weibull     = 8,
+                rayleigh    = 9,
+                chisquared  = 10,
+                pareto      = 11,
+                triangular  = 12
+                //binomial    = 13
             };
             
             
@@ -107,7 +107,7 @@ namespace machinelearning { namespace tools {
             #endif
             
             template<typename T> T getUniform( const T&, const T& );
-            template<typename T> T getBinomial( const T&, const T& );
+            //template<typename T> T getBinomial( const T&, const T& );
             template<typename T> T getBernoulli( const T& );
             template<typename T> T getCauchy( const T&, const T& );
             template<typename T> T getGamma( const T& );
@@ -181,7 +181,7 @@ namespace machinelearning { namespace tools {
         {
             case uniform     :       return getUniform(    (function::isNumericalZero<T>(p_first) ? 0 : p_first),   (function::isNumericalZero<T>(p_second) ? 1 : p_second)  );
             case bernoulli   :       return getBernoulli(  (function::isNumericalZero<T>(p_first) ? static_cast<T>(0.5) : p_first)  );
-            case binomial    :       return getBinomial(   (function::isNumericalZero<T>(p_first) ? 1 : p_first),   (function::isNumericalZero<T>(p_second) ? static_cast<T>(0.5) : p_second)  );
+            //case binomial    :       return getBinomial(   (function::isNumericalZero<T>(p_first) ? 1 : p_first),   (function::isNumericalZero<T>(p_second) ? static_cast<T>(0.5) : p_second)  );
             case cauchy      :       return getCauchy(     (function::isNumericalZero<T>(p_first) ? 0 : p_first),   (function::isNumericalZero<T>(p_second) ? 1 : p_second));
             case gamma       :       return getGamma(      (function::isNumericalZero<T>(p_first) ? 1 : p_first)  );
             case poisson     :       return getPoisson<T>( (function::isNumericalZero<T>(p_first) ? 1 : static_cast<std::size_t>(p_first))  );
@@ -240,7 +240,7 @@ namespace machinelearning { namespace tools {
      * @param p_n n value
      * @param p_p p value
      * @return binomial random number
-     **/
+     ** disabled because T must be integral type and does not work in Boost 1.47.0
     template<typename T> inline T random::getBinomial( const T& p_n, const T& p_p )
     {
         boost::binomial_distribution<T> l_range(p_n, p_p);
@@ -252,7 +252,7 @@ namespace machinelearning { namespace tools {
         #endif
         
         return l_noise();
-    }
+    }*/
     
     
     /** returns a cauchy distribution value 
