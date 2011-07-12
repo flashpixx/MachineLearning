@@ -174,7 +174,7 @@ def configuration_cygwin(config, version, architecture) :
    
     if optionExist("withsources") :
         config["compileflags"]      += " -D MACHINELEARNING_SOURCES -D __USE_W32_SOCKETS"
-        config["linkto"].extend( ["cygxml2-2"] )
+        config["linkto"].extend( ["cygxml2-2", "ws2_32"] )
         
     if optionExist("withfiles") :
         config["compileflags"]      += " -D MACHINELEARNING_FILES -D MACHINELEARNING_FILES_HDF"
