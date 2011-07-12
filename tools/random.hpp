@@ -66,6 +66,7 @@ namespace machinelearning { namespace tools {
      * can be used. The system-random-generator must be set with the compileflag 
      * $LastChangedDate$
      * @todo think about pseudo generator random seed
+     * @todo reactivate binomial distribution with correct type casting
      **/
     class random {
         
