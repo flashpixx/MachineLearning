@@ -236,11 +236,13 @@ namespace machinelearning { namespace tools {
     }
     
     
-    /** returns a binomial distribution value 
+    /** returns a binomial distribution value
+     * disabled because T must be integral type and does not work in Boost 1.47.0
      * @param p_n n value
      * @param p_p p value
      * @return binomial random number
-     ** disabled because T must be integral type and does not work in Boost 1.47.0
+     **/ 
+    /*
     template<typename T> inline T random::getBinomial( const T& p_n, const T& p_p )
     {
         boost::binomial_distribution<T> l_range(p_n, p_p);
