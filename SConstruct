@@ -132,25 +132,25 @@ def configuration_cygwin(config, version, architecture) :
     if optionExist("winver") :	
         win = GetOption("winver").lower()
     
-	if win == "win7" :
-		config["compileflags"] += " -D _WIN32_WINNT=0x0601"
-	elif win == "srv2008" :
-		config["compileflags"] += " -D _WIN32_WINNT=0x0600"
-	elif win == "vista" :
-		config["compileflags"] += " -D _WIN32_WINNT=0x0600"
-	elif win == "srv2003sp1" :
-		config["compileflags"] += " -D _WIN32_WINNT=0x0502"
-	elif win == "xpsp2" :
-		config["compileflags"] += " -D _WIN32_WINNT=0x0502"
-	elif win == "srv2003" :
-		config["compileflags"] += " -D _WIN32_WINNT=0x0501"
-	elif win == "xp" :
-		config["compileflags"] += " -D _WIN32_WINNT=0x0501"
-	elif win == "w2000" :
-		config["compileflags"] += " -D _WIN32_WINNT=0x0500"
-	else :
-		print "Windows version is not known"
-		sys.exit()
+    if win == "win7" :
+        config["compileflags"] += " -D _WIN32_WINNT=0x0601"
+    elif win == "srv2008" :
+        config["compileflags"] += " -D _WIN32_WINNT=0x0600"
+    elif win == "vista" :
+        config["compileflags"] += " -D _WIN32_WINNT=0x0600"
+    elif win == "srv2003sp1" :
+        config["compileflags"] += " -D _WIN32_WINNT=0x0502"
+    elif win == "xpsp2" :
+        config["compileflags"] += " -D _WIN32_WINNT=0x0502"
+    elif win == "srv2003" :
+        config["compileflags"] += " -D _WIN32_WINNT=0x0501"
+    elif win == "xp" :
+        config["compileflags"] += " -D _WIN32_WINNT=0x0501"
+    elif win == "w2000" :
+        config["compileflags"] += " -D _WIN32_WINNT=0x0500"
+    else :
+        print "Windows version is not known"
+        sys.exit(1)
 	
     if optionExist("withdebug") :
         config["compileflags"]      += " -g"
@@ -158,8 +158,8 @@ def configuration_cygwin(config, version, architecture) :
         config["compileflags"]      += " -D NDEBUG -D BOOST_UBLAS_NDEBUG"
     
     if optionExist("withmpi") :
-		print "MPI builds are not existing under Cygwin"
-		sys.exit()
+        print "MPI builds are not existing under Cygwin"
+        sys.exit(1)
     else :
         config["compiler"]          =  "g++"
 
@@ -169,8 +169,8 @@ def configuration_cygwin(config, version, architecture) :
         config["linkto"].append("cygboost_random");
             
     if optionExist("withmultilanguage") :
-		print "Multilanguage support builds are not existing under Cygwin"
-		sys.exit()
+        print "Multilanguage support builds are not existing under Cygwin"
+        sys.exit(1)
    
     if optionExist("withsources") :
         config["compileflags"]      += " -D MACHINELEARNING_SOURCES -D __USE_W32_SOCKETS"
