@@ -140,7 +140,7 @@ namespace machinelearning { namespace tools { namespace sources {
             void throwHTTPError( const unsigned int& ) const;   
             wikiarticle parseXML( const std::string& ) const;
         
-            #ifndef NDEBUG
+            #ifdef NDEBUG
             static void XMLErrorFunction(void*, const char*, ...) {};
             #endif
     };
@@ -418,7 +418,7 @@ namespace machinelearning { namespace tools { namespace sources {
         wikiarticle l_data;
         bool l_error = false;
         
-        #ifndef NDEBUG
+        #ifdef NDEBUG
         // set for XML parsing a empty static member function, so no messages will be shown
         initGenericErrorDefaultFunc( (xmlGenericErrorFunc*)(&wikipedia::XMLErrorFunction) );
         #endif
