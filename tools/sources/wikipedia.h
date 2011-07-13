@@ -28,6 +28,7 @@
 
 #define MACHINELEARNING_WIKIPEDIA_HTTPAGENT  "Machine Learning Framework"
 
+#include <stdarg.h>
 #include <algorithm>
 #include <boost/asio.hpp>
 #include <boost/regex.hpp>
@@ -54,6 +55,7 @@ namespace machinelearning { namespace tools { namespace sources {
      * $LastChangedDate$
      * @see http://tools.ietf.org/html/rfc2616 [old http://tools.ietf.org/html/rfc1945]
      * @todo add proxy support
+     * @todo class is not thread-safe, so create mutex for thread-safe calls
      **/
     class wikipedia {
         
@@ -80,7 +82,6 @@ namespace machinelearning { namespace tools { namespace sources {
             void setHTTPAgent( const std::string& );
         
             ~wikipedia( void );
-        
         
         private :
         
@@ -139,6 +140,9 @@ namespace machinelearning { namespace tools { namespace sources {
             void throwHTTPError( const unsigned int& ) const;   
             wikiarticle parseXML( const std::string& ) const;
         
+            #ifndef NDEBUG
+            static void XMLErrorFunction(void*, const char*, ...) {};
+            #endif
     };
     
     
@@ -405,7 +409,6 @@ namespace machinelearning { namespace tools { namespace sources {
         return m_articlefound;
     }
     
-    
     /** method for parsing the XML data with libxml
      * @param p_xml string with XML data
      * @return struct with article native data
@@ -415,11 +418,19 @@ namespace machinelearning { namespace tools { namespace sources {
         wikiarticle l_data;
         bool l_error = false;
         
+        #ifndef NDEBUG
+        // set for XML parsing a empty static member function, so no messages will be shown
+        initGenericErrorDefaultFunc( (xmlGenericErrorFunc*)(&wikipedia::XMLErrorFunction) );
+        #endif
+        
         // convert std::string into char array for memory parsing
         const char* l_xmlcontent = p_xml.c_str();
-        xmlDocPtr l_xml           = xmlParseMemory( l_xmlcontent, strlen(l_xmlcontent) );
-        if (l_xml == NULL)
+        xmlDocPtr l_xml          = xmlParseMemory( l_xmlcontent, strlen(l_xmlcontent) );
+        if ((!l_xml) || (xmlGetLastError())) {
+            xmlFreeDoc( l_xml );
+            xmlCleanupParser();
             throw exception::runtime(_("XML data can not be parsed"));
+        }
         
         // extract the namespace 
         xmlNodePtr l_node = xmlDocGetRootElement( l_xml );
@@ -432,13 +443,11 @@ namespace machinelearning { namespace tools { namespace sources {
             throw exception::runtime(_("can not detect namespace"));
         }
         l_namespace = l_namespace.substr(0, l_found );
-  
-        
+
         
         // create XPath context and namespace (create a prefix "wiki" for searching the XML tree)
         xmlXPathContextPtr l_tree = xmlXPathNewContext( l_xml );
         xmlXPathRegisterNs(l_tree, (xmlChar*)"wiki", (xmlChar*)l_namespace.c_str());
-        xmlXPathObjectPtr l_result;
 
         // extract the content data, search with XPath the node and extract the content
         
@@ -447,44 +456,49 @@ namespace machinelearning { namespace tools { namespace sources {
         // /mediawiki/page/revision/text      => article data
         // /mediawiki/page/revision/id        => revision id
 
-        l_result = xmlXPathEvalExpression( (xmlChar*)"/wiki:mediawiki/wiki:page/wiki:title", l_tree );
-        if ( (!l_error) && (!xmlXPathNodeSetIsEmpty(l_result->nodesetval)) && (l_result->nodesetval->nodeNr == 1) )
-            l_data.title = std::string(  (char*)xmlNodeListGetString(l_xml, l_result->nodesetval->nodeTab[0]->xmlChildrenNode, 1)  );
-        else
-            l_error = true;
-        xmlXPathFreeObject(l_result);
-        
-        
-        l_result = xmlXPathEvalExpression( (xmlChar*)"/wiki:mediawiki/wiki:page/wiki:id", l_tree );
-        if ( (!l_error) && (!xmlXPathNodeSetIsEmpty(l_result->nodesetval)) && (l_result->nodesetval->nodeNr == 1) )
-            try {
-                l_data.articleid = boost::lexical_cast<std::size_t>( (char*)xmlNodeListGetString(l_xml, l_result->nodesetval->nodeTab[0]->xmlChildrenNode, 1) );
-            } catch (...) {
+        if (!l_error) {
+            xmlXPathObjectPtr l_result = xmlXPathEvalExpression( (xmlChar*)"/wiki:mediawiki/wiki:page/wiki:title", l_tree );
+            if ( (!xmlXPathNodeSetIsEmpty(l_result->nodesetval)) && (l_result->nodesetval->nodeNr == 1) )
+                l_data.title = std::string(  (char*)xmlNodeListGetString(l_xml, l_result->nodesetval->nodeTab[0]->xmlChildrenNode, 1)  );
+            else
                 l_error = true;
-            }
-        else
-            l_error = true;
-        xmlXPathFreeObject(l_result);
+            xmlXPathFreeObject(l_result);
+        }
         
-        
-        l_result = xmlXPathEvalExpression( (xmlChar*)"/wiki:mediawiki/wiki:page/wiki:revision/wiki:text", l_tree );
-        if ( (!l_error) && (!xmlXPathNodeSetIsEmpty(l_result->nodesetval)) && (l_result->nodesetval->nodeNr == 1) )
-            l_data.content = std::string(  (char*)xmlNodeListGetString(l_xml, l_result->nodesetval->nodeTab[0]->xmlChildrenNode, 1)  );
-        else
-            l_error = true;
-        xmlXPathFreeObject(l_result);
-
-        
-        l_result = xmlXPathEvalExpression( (xmlChar*)"/wiki:mediawiki/wiki:page/wiki:revision/wiki:id", l_tree );
-        if ( (!l_error) && (!xmlXPathNodeSetIsEmpty(l_result->nodesetval)) && (l_result->nodesetval->nodeNr == 1) )
-            try {
-                l_data.revisionid = boost::lexical_cast<std::size_t>( (char*)xmlNodeListGetString(l_xml, l_result->nodesetval->nodeTab[0]->xmlChildrenNode, 1) );
-            } catch (...) {
+        if (!l_error) {
+            xmlXPathObjectPtr l_result = xmlXPathEvalExpression( (xmlChar*)"/wiki:mediawiki/wiki:page/wiki:id", l_tree );
+            if ( (!xmlXPathNodeSetIsEmpty(l_result->nodesetval)) && (l_result->nodesetval->nodeNr == 1) )
+                try {
+                    l_data.articleid = boost::lexical_cast<std::size_t>( (char*)xmlNodeListGetString(l_xml, l_result->nodesetval->nodeTab[0]->xmlChildrenNode, 1) );
+                } catch (...) {
+                    l_error = true;
+                }
+            else
                 l_error = true;
-            }
-        else
-            l_error = true;
-        xmlXPathFreeObject(l_result);
+            xmlXPathFreeObject(l_result);
+        }
+        
+        if (!l_error) {
+            xmlXPathObjectPtr l_result = xmlXPathEvalExpression( (xmlChar*)"/wiki:mediawiki/wiki:page/wiki:revision/wiki:text", l_tree );
+            if ( (!xmlXPathNodeSetIsEmpty(l_result->nodesetval)) && (l_result->nodesetval->nodeNr == 1) )
+                l_data.content = std::string(  (char*)xmlNodeListGetString(l_xml, l_result->nodesetval->nodeTab[0]->xmlChildrenNode, 1)  );
+            else
+                l_error = true;
+            xmlXPathFreeObject(l_result);
+        }
+        
+        if (!l_error) {
+            xmlXPathObjectPtr l_result = xmlXPathEvalExpression( (xmlChar*)"/wiki:mediawiki/wiki:page/wiki:revision/wiki:id", l_tree );
+            if ( (!xmlXPathNodeSetIsEmpty(l_result->nodesetval)) && (l_result->nodesetval->nodeNr == 1) )
+                try {
+                    l_data.revisionid = boost::lexical_cast<std::size_t>( (char*)xmlNodeListGetString(l_xml, l_result->nodesetval->nodeTab[0]->xmlChildrenNode, 1) );
+                } catch (...) {
+                    l_error = true;
+                }
+            else
+                l_error = true;
+            xmlXPathFreeObject(l_result);
+        }
         
         // clear libxml structure
         xmlXPathFreeContext( l_tree );
