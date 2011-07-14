@@ -262,7 +262,6 @@ int main(int argc, char* argv[]) {
     std::vector<std::string> l_wikilabel;
     tools::sources::wikipedia wiki( boost::any_cast< tools::sources::wikipedia::language >(l_args["lang"]) );
     
-    std::size_t i=0;
     #ifdef MACHINELEARNING_MPI 
     for(std::size_t i=0; i < l_artnum[loMPICom.rank()]; )
     #else
