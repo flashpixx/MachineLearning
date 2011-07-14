@@ -17,12 +17,16 @@ AddOption("--compile-language", dest="compilelang", type="string", nargs=0, acti
 AddOption("--create-documentation", dest="createdocu", type="string", nargs=0, action="store", help="creates the doxygen documentation (doxygen must be within the path)")
 AddOption("--with-debug", dest="withdebug", type="string", nargs=0, action="store", help="compile with debug information")
 AddOption("--with-symbolicmath", dest="withsymbolicmath", type="string", nargs=0, action="store", help="compile for using symbolic math expression (needed by gradient descent)")
-AddOption("--winver", dest="winver", type="string", nargs=1, action="store", help="value of the Windows version: win7, srv2008, vista, srv2003sp1, xpsp2, srv2003, xp, w2000")
+#AddOption("--winver", dest="winver", type="string", nargs=1, action="store", help="value of the Windows version: win7, srv2008, vista, srv2003sp1, xpsp2, srv2003, xp, w2000")
 
 
+def createVariables(vars) :
+    vars.Add(BoolVariable("--with-debuga", "compile with debug information", False))
+    vars.Add(EnumVariable("--winver", "value of the Windows version", "win7", allowed_values=("win7", "srv2008", "vista", "srv2003sp1", "xpsp2", "srv2003", "xp", "w2000")))
+	
 #=== function for os configuration ===================================================================================================
 # configuration for OSX build
-def configuration_macosx(config, version, architecture) :
+def configuration_macosx(config, vars, version, architecture) :
     # check the OSX build for set the correct architecture
     arch = architecture
     ver  = version.split(".")
@@ -79,7 +83,7 @@ def configuration_macosx(config, version, architecture) :
     
 
 # configuration for Posix (Linux) build
-def configuration_posix(config, version, architecture) :
+def configuration_posix(config, vars, version, architecture) :
     config["linkerflags"]       = ""
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["LIBRARY_PATH"]
@@ -120,7 +124,7 @@ def configuration_posix(config, version, architecture) :
         
 		
 # configuration for Windows Cygwin build
-def configuration_cygwin(config, version, architecture) :
+def configuration_cygwin(config, vars, version, architecture) :
     config["linkerflags"]       = "-enable-stdcall-fixup"
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["PATH"]
@@ -129,8 +133,8 @@ def configuration_cygwin(config, version, architecture) :
     
     #Windows Version options see http://msdn.microsoft.com/en-us/library/aa383745%28v=vs.85%29.aspx
     win = ""
-    if optionExist("winver") :	
-        win = GetOption("winver").lower()
+    #if optionExist("winver") :	
+    #    win = GetOption("winver").lower()
     
     if win == "win7" :
         config["compileflags"] += " -D _WIN32_WINNT=0x0601"
@@ -149,8 +153,8 @@ def configuration_cygwin(config, version, architecture) :
     elif win == "w2000" :
         config["compileflags"] += " -D _WIN32_WINNT=0x0500"
     else :
-        print "Windows version is not known"
-        sys.exit(1)
+        print "Windows version is not known "+ARGUMENTS.get("--with-debuga", "")
+        #sys.exit(1)
 	
     if optionExist("withdebug") :
         config["compileflags"]      += " -g"
@@ -195,16 +199,16 @@ def optionExist(name) :
 
 # function for reading os configuration
 # and setting environment
-def getConfig():
+def getConfig(vars):
     env = Environment()
     config = {}
     
     if env['PLATFORM'].lower() == "darwin" :
-        configuration_macosx(config, platform.mac_ver()[0], platform.machine())
+        configuration_macosx(config, vars, platform.mac_ver()[0], platform.machine())
     elif env['PLATFORM'].lower() == "cygwin" :
-        configuration_cygwin(config, "", platform.machine())
+        configuration_cygwin(config, vars, "", platform.machine())
     elif env['PLATFORM'].lower() == "posix" :
-        configuration_posix(config, "", platform.machine())
+        configuration_posix(config, vars, "", platform.machine())
     else :
         print "configuration for ["+env['PLATFORM']+"] not exists"
         exit(1) 
@@ -414,7 +418,10 @@ def target_other(env, framework) :
 
 
 #=== create environment and compiling ==================================================================================================
-env = getConfig()
+vars = Variables()
+createVariables(vars) 
+env = getConfig(vars)
+Help(vars.GenerateHelpText(env))
 
 # add files for deleting
 files = []
