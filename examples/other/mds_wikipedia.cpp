@@ -264,11 +264,10 @@ int main(int argc, char* argv[]) {
     
     std::size_t i=0;
     #ifdef MACHINELEARNING_MPI 
-    while (i < l_artnum[loMPICom.rank()]) {
+    for(std::size_t i=0; i < l_artnum[loMPICom.rank()]; )
     #else
-    while (i < l_artnum[0]) {
+    for(std::size_t i=0; i < l_artnum[0]; )
     #endif
-    
         try {
             wiki.getRandomArticle();
             if (wiki.isArticle()) {
@@ -279,14 +278,8 @@ int main(int argc, char* argv[]) {
                     
                 l_wikidata.push_back( wiki.getArticleContent() );
                 l_wikilabel.push_back( wiki.getArticleTitle() );
-                    
-                i++;
             }
         } catch (...) {}
-    }
-        
-    if (l_wikidata.size() == 0)
-        throw std::runtime_error("no articles are readed");
         
         
     #ifdef MACHINELEARNING_MPI 
