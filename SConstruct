@@ -6,24 +6,25 @@ import string
 import platform
 import sys
 
-
-AddOption("--with-randomdevice", dest="withrandom", type="string", nargs=0, action="store", help="installation with random device support")
-AddOption("--with-mpi", dest="withmpi", type="string", nargs=0, action="store", help="installation with MPI support")
-AddOption("--with-multilanguage", dest="withmultilanguage", type="string", nargs=0, action="store", help="installation with multilanguage support")
-AddOption("--with-sources", dest="withsources", type="string", nargs=0, action="store", help="installation with source like nntp or something else")
-AddOption("--with-files", dest="withfiles", type="string", nargs=0, action="store", help="installation with file reading support for CSV & HDF")
 AddOption("--create-language", dest="createlang", type="string", nargs=0, action="store", help="reads the data for translation and add them to the different language files")
 AddOption("--compile-language", dest="compilelang", type="string", nargs=0, action="store", help="compiles the language files")
 AddOption("--create-documentation", dest="createdocu", type="string", nargs=0, action="store", help="creates the doxygen documentation (doxygen must be within the path)")
-AddOption("--with-debug", dest="withdebug", type="string", nargs=0, action="store", help="compile with debug information")
-AddOption("--with-symbolicmath", dest="withsymbolicmath", type="string", nargs=0, action="store", help="compile for using symbolic math expression (needed by gradient descent)")
-#AddOption("--winver", dest="winver", type="string", nargs=1, action="store", help="value of the Windows version: win7, srv2008, vista, srv2003sp1, xpsp2, srv2003, xp, w2000")
 
 
+#=== CLI parameters ===================================================================================================
 def createVariables(vars) :
-    vars.Add(BoolVariable("--with-debuga", "compile with debug information", False))
-    vars.Add(EnumVariable("--winver", "value of the Windows version", "win7", allowed_values=("win7", "srv2008", "vista", "srv2003sp1", "xpsp2", "srv2003", "xp", "w2000")))
+    vars.Add(BoolVariable("withrandomdevice", "installation with random device support", False))
+    vars.Add(BoolVariable("withmpi", "installation with MPI support", False))
+    vars.Add(BoolVariable("withmultilanguage", "installation with multilanguage support", False))
+    vars.Add(BoolVariable("withsources", "installation with source like nntp or something else", False))
+    vars.Add(BoolVariable("withfiles", "installation with file reading support for CSV & HDF", True))
+    vars.Add(BoolVariable("withsymbolicmath", "compile for using symbolic math expression (needed by gradient descent)", False))
+    
+    vars.Add(BoolVariable("withdebug", "compile with debug information", False))
+    
+    vars.Add(EnumVariable("winver", "value of the Windows version", "win7", allowed_values=("win7", "srv2008", "vista", "srv2003sp1", "xpsp2", "srv2003", "xp", "w2000")))
 	
+    
 #=== function for os configuration ===================================================================================================
 # configuration for OSX build
 def configuration_macosx(config, vars, version, architecture) :
@@ -33,8 +34,7 @@ def configuration_macosx(config, vars, version, architecture) :
     
     if ver[0] == "10" and ver[1] == "6" :
         arch = "x86_64"
-    
-    
+
     config["linkerflags"]       = ""
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["LIBRARY_PATH"]
@@ -46,41 +46,39 @@ def configuration_macosx(config, vars, version, architecture) :
     else :
         config["linkto"].extend( ["atlas", "lapack"] )
     
-
-    if optionExist("withdebug") :
+    
+    if vars["withdebug"] :
         config["compileflags"]      += " -g"
     else :
         config["compileflags"]      += " -D NDEBUG -D BOOST_UBLAS_NDEBUG"
     
-    
-    if optionExist("withmpi") :
+    if vars["withmpi"] :
         config["compiler"]          = "mpic++"
         config["compileflags"]      += " -D MACHINELEARNING_MPI"
         config["linkto"].extend( ["boost_mpi", "boost_serialization"] )
     else :
         config["compiler"]          =  "g++"
 
-                
-    if optionExist("withrandom") :   
+    if vars["withrandomdevice"] :   
         config["compileflags"]      += " -D MACHINELEARNING_RANDOMDEVICE"
         config["linkto"].append("boost_random");
             
-    if optionExist("withmultilanguage") :
+    if vars["withmultilanguage"] :
         config["compileflags"]      += " -D MACHINELEARNING_MULTILANGUAGE"
         config["linkto"].append("intl");
         
-    if optionExist("withsources") :
+    if vars["withsources"] :
         config["compileflags"]      += " -D MACHINELEARNING_SOURCES"
         config["linkto"].extend( ["xml2"] )
         
-    if optionExist("withfiles") :
+    if vars["withfiles"] :
         config["compileflags"]      += " -D MACHINELEARNING_FILES -D MACHINELEARNING_FILES_HDF"
         config["linkto"].extend( ["hdf5_cpp", "hdf5"] )
         
-    if optionExist("withsymbolicmath") :
+    if vars["withsymbolicmath"] :
         config["compileflags"]      += " -D MACHINELEARNING_SYMBOLICMATH"
         config["linkto"].append("ginac")
-    
+  
 
 # configuration for Posix (Linux) build
 def configuration_posix(config, vars, version, architecture) :
@@ -90,35 +88,34 @@ def configuration_posix(config, vars, version, architecture) :
     config["compileflags"]      = "-O2 -pipe -Wall -pthread -finline-functions -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
     config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "boost_filesystem", "boost_regex", "tatlas"]
     
-    if optionExist("withdebug") :
+    if vars["withdebug"] :
         config["compileflags"]      += " -g"
     else :
         config["compileflags"]      += " -D NDEBUG -D BOOST_UBLAS_NDEBUG"
     
-    if optionExist("withmpi") :
+    if vars["withmpi"] :
         config["compiler"]          = "mpic++"
         config["compileflags"]      += " -D MACHINELEARNING_MPI"
         config["linkto"].extend( ["boost_mpi", "boost_serialization"] )
     else :
         config["compiler"]          =  "g++"
-
                 
-    if optionExist("withrandom") :   
+    if vars["withrandomdevice"] :   
         config["compileflags"]      += " -D MACHINELEARNING_RANDOMDEVICE"
         config["linkto"].append("boost_random");
             
-    if optionExist("withmultilanguage") :
+    if vars["withmultilanguage"] :
         config["compileflags"]      += " -D MACHINELEARNING_MULTILANGUAGE"
         
-    if optionExist("withsources") :
+    if vars["withsources"] :
         config["compileflags"]      += " -D MACHINELEARNING_SOURCES"
         config["linkto"].extend( ["xml2"] )
         
-    if optionExist("withfiles") :
+    if vars["withfiles"] :
         config["compileflags"]      += " -D MACHINELEARNING_FILES -D MACHINELEARNING_FILES_HDF"
         config["linkto"].extend( ["hdf5_cpp", "hdf5"] )
 
-    if optionExist("withsymbolicmath") :
+    if vars["withsymbolicmath"] :
         config["compileflags"]      += " -D MACHINELEARNING_SYMBOLICMATH"
         config["linkto"].append("ginac")
         
@@ -132,59 +129,51 @@ def configuration_cygwin(config, vars, version, architecture) :
     config["linkto"]            = ["cygboost_system", "cygboost_thread", "cygboost_iostreams", "cygboost_filesystem", "cygboost_regex", "lapack", "cblas", "f77blas", "atlas", "gfortran"]
     
     #Windows Version options see http://msdn.microsoft.com/en-us/library/aa383745%28v=vs.85%29.aspx
-    win = ""
-    #if optionExist("winver") :	
-    #    win = GetOption("winver").lower()
-    
-    if win == "win7" :
+    if vars["winver"] == "win7" :
         config["compileflags"] += " -D _WIN32_WINNT=0x0601"
-    elif win == "srv2008" :
+    elif vars["winver"] == "srv2008" :
         config["compileflags"] += " -D _WIN32_WINNT=0x0600"
-    elif win == "vista" :
+    elif vars["winver"] == "vista" :
         config["compileflags"] += " -D _WIN32_WINNT=0x0600"
-    elif win == "srv2003sp1" :
+    elif vars["winver"] == "srv2003sp1" :
         config["compileflags"] += " -D _WIN32_WINNT=0x0502"
-    elif win == "xpsp2" :
+    elif vars["winver"] == "xpsp2" :
         config["compileflags"] += " -D _WIN32_WINNT=0x0502"
-    elif win == "srv2003" :
+    elif vars["winver"] == "srv2003" :
         config["compileflags"] += " -D _WIN32_WINNT=0x0501"
-    elif win == "xp" :
+    elif vars["winver"] == "xp" :
         config["compileflags"] += " -D _WIN32_WINNT=0x0501"
-    elif win == "w2000" :
+    elif vars["winver"] == "w2000" :
         config["compileflags"] += " -D _WIN32_WINNT=0x0500"
-    else :
-        print "Windows version is not known "+ARGUMENTS.get("--with-debuga", "")
-        #sys.exit(1)
-	
-    if optionExist("withdebug") :
+
+    if vars["withdebug"] :
         config["compileflags"]      += " -g"
     else :
         config["compileflags"]      += " -D NDEBUG -D BOOST_UBLAS_NDEBUG"
     
-    if optionExist("withmpi") :
+    if vars["withmpi"] :
         print "MPI builds are not existing under Cygwin"
         sys.exit(1)
     else :
         config["compiler"]          =  "g++"
 
-                
-    if optionExist("withrandom") :   
+    if vars["withrandomdevice"] :   
         config["compileflags"]      += " -D MACHINELEARNING_RANDOMDEVICE"
         config["linkto"].append("cygboost_random");
             
-    if optionExist("withmultilanguage") :
+    if vars["withmultilanguage"] :
         print "Multilanguage support builds are not existing under Cygwin"
         sys.exit(1)
    
-    if optionExist("withsources") :
+    if vars["withsources"] :
         config["compileflags"]      += " -D MACHINELEARNING_SOURCES -D __USE_W32_SOCKETS"
         config["linkto"].extend( ["cygxml2-2", "ws2_32"] )
         
-    if optionExist("withfiles") :
+    if vars["withfiles"] :
         config["compileflags"]      += " -D MACHINELEARNING_FILES -D MACHINELEARNING_FILES_HDF"
         config["linkto"].extend( ["hdf5_cpp", "hdf5"] )
 
-    if optionExist("withsymbolicmath") :
+    if vars["withsymbolicmath"] :
         config["compileflags"]      += " -D MACHINELEARNING_SYMBOLICMATH"
         config["linkto"].append("ginac")
 #=======================================================================================================================================
@@ -200,15 +189,15 @@ def optionExist(name) :
 # function for reading os configuration
 # and setting environment
 def getConfig(vars):
-    env = Environment()
+    env = Environment(variables=vars)
     config = {}
     
     if env['PLATFORM'].lower() == "darwin" :
-        configuration_macosx(config, vars, platform.mac_ver()[0], platform.machine())
+        configuration_macosx(config, env, platform.mac_ver()[0], platform.machine())
     elif env['PLATFORM'].lower() == "cygwin" :
-        configuration_cygwin(config, vars, "", platform.machine())
+        configuration_cygwin(config, env, "", platform.machine())
     elif env['PLATFORM'].lower() == "posix" :
-        configuration_posix(config, vars, "", platform.machine())
+        configuration_posix(config, env, "", platform.machine())
     else :
         print "configuration for ["+env['PLATFORM']+"] not exists"
         exit(1) 
@@ -348,13 +337,10 @@ def createTarget(env, alias, path, sources, framework) :
 
 
 def target_sources(env, framework) :
-    if not optionExist("withsources") :
-        return
-
     path = os.path.join(".", "examples", "sources")
     sources = ["newsgroup.cpp", "wikipedia.cpp"]
     
-    if optionExist("withfiles") :
+    if env["withfiles"] :
         sources.append( "cloud.cpp" )
 
     createTarget(env, "sources", path, sources, framework)
@@ -364,7 +350,7 @@ def target_clustering(env, framework) :
     path = os.path.join(".", "examples", "clustering")
     sources = []
     
-    if optionExist("withfiles") :
+    if env["withfiles"] :
         sources.extend( ["rlvq.cpp", "kmeans.cpp", "neuralgas.cpp", "patch_neuralgas.cpp", "relational_neuralgas.cpp", "spectral.cpp"] )
 
     createTarget(env, "clustering", path, sources, framework)
@@ -374,7 +360,7 @@ def target_reducing(env, framework) :
     path = os.path.join(".", "examples", "reducing")
     sources = []
     
-    if optionExist("withfiles") :
+    if env["withfiles"] :
         sources.extend( ["lda.cpp", "mds.cpp", "pca.cpp"] )
 
     createTarget(env, "reducing", path, sources, framework)
@@ -384,7 +370,7 @@ def target_distance(env, framework) :
     path = os.path.join(".", "examples", "distance")
     sources = []
 
-    if optionExist("withfiles") :
+    if env["withfiles"] :
         sources.extend( ["ncd.cpp"] )
 
     createTarget(env, "distance", path, sources, framework)
@@ -394,7 +380,7 @@ def target_classifier(env, framework) :
     path = os.path.join(".", "examples", "classifier")
     sources = []
 
-    if optionExist("withfiles") :
+    if env["withfiles"] :
         sources.extend( ["lazy.cpp"] )
 
     createTarget(env, "classifier", path, sources, framework)
@@ -404,10 +390,10 @@ def target_other(env, framework) :
     path = os.path.join(".", "examples", "other")
     sources = []
 
-    if optionExist("withfiles") and optionExist("withsources") :
+    if env["withfiles"] and env["withsources"] :
         sources.extend( ["mds_nntp.cpp", "mds_wikipedia.cpp"] )
         
-    if optionExist("withfiles") :
+    if env["withfiles"] :
         sources.append("mds_file.cpp")
 
     createTarget(env, "other", path, sources, framework)
@@ -429,13 +415,15 @@ files.extend( getRekusivFiles(os.curdir, env["OBJSUFFIX"]) )
 files.extend( getRekusivFiles(os.curdir, ".po~") )
 env.Clean("clean", files)
 
-# get all cpp-files and compile and create language file
-if optionExist("createlang") :
-    createLanguage(env)
-elif optionExist("compilelang") :
-    createLanguage(env, True)
-elif optionExist("createdocu") :
+#default target
+Default(None)
+
+if "documentation" in COMMAND_LINE_TARGETS :
     os.system("doxygen documentation.doxyfile")
+elif "createlanguage" in COMMAND_LINE_TARGETS :
+    createLanguage(env, True)
+elif "compilelanguage" in COMMAND_LINE_TARGETS :
+    createLanguage(env)
 else :
         
     # catch all cpps within the framework directories and compile them to objectfiles into the builddir

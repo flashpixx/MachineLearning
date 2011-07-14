@@ -113,33 +113,31 @@
  *
  * @subsection scons compiling with scons
  * The framework supports Scons for compiling. The script reads the environment (Linux, OS X & Microsoft) and uses the
- * plattform specified options for compiling the sources. The Scons script supports some different parameters:
+ * plattform specified options for compiling the sources. For compiling the test cpp files in the test directory the following option can
+ * be set (Hierarchical Data Format is needed) [see options and default values with <dfn>scons -Q -h</dfn>]
  * <ul>
- * <li><dfn>--create-documentation</dfn> creates the Doxygen documentation (Doxygen must be called, so it should be within the path)</li>
- * <li><dfn>--create-language</dfn> creates the language files / adds new messages to the existing files (xgettext must be called, so it should be within the path)</li>
- * <li><dfn>--compile-language</dfn> compiles all language files (msgfmt must be called, so it should be within the path)</li>
- * </ul>
- * For compiling the test cpp files in the test directory the following option can be set (Hierarchical Data Format is needed)
- * <ul>
- * <li><dfn>--with-randomdevice</dfn> adds the compilerflag for random device support</li>
- * <li><dfn>--with-mpi</dfn> adds the compilerflag for cluster / MPI support</li>
- * <li><dfn>--with-multilanguage</dfn> adds the multilanguage support with gettext</li>
- * <li><dfn>--with-sources</dfn> support for the namespace machinelearning::tools::sources</li>
- * <li><dfn>--with-files</dfn> support for the namespace machinelearning::tools::files</li>
- * <li><dfn>--with-symbolicmath<dfn> support for symbolic math (eg: gradient descent)</li>
+ * <li><dfn>withrandomdevice</dfn> adds the compilerflag for random device support</li>
+ * <li><dfn>withmpi</dfn> adds the compilerflag for cluster / MPI support</li>
+ * <li><dfn>withmultilanguage</dfn> adds the multilanguage support with gettext</li>
+ * <li><dfn>withsources</dfn> support for the namespace machinelearning::tools::sources</li>
+ * <li><dfn>withfiles</dfn> support for the namespace machinelearning::tools::files</li>
+ * <li><dfn>withsymbolicmath<dfn> support for symbolic math (eg: gradient descent)</li>
  * </ul>
  *
  * @subsection targets build targets
  * The scons script supports different targets for building the examples. The call can be supplemented with the parameters above. Each subdirectory within the example directory
  * show a build target, but some targets will be build first if different parameters are set
  * <ul>
- * <li><dfn>source</dfn> sources are eg. Wikipedia, NNTP, but the parameter <dfn>--with-sources</dfn> must be set for compiling and for the cloud example the files parameter must be set additionally</li>
- * <li><dfn>clustering</dfn> this target build all clustering algorithms, but the <dfn>--with-files</dfn> parameter must be set</li>
- * <li><dfn>classifier</dfn> this target build all classifier algorithms, but the <dfn>--with-files</dfn> parameter must be set</li>
- * <li><dfn>reducing</dfn> this target build all dimension reduce algorithms, but the <dfn>--with-files</dfn> parameter must be set</li>
- * <li><dfn>distance</dfn> this target build all distance algorithms, but the <dfn>--with-files</dfn> parameter must be set</li>
- * <li><dfn>other</dfn> this target build all other examples, <dfn>--with-files</dfn> options must be set, <dfn>--with-sources</dfn> can be set (includes nntp and wikipedia examples) and optional 
- * <dfn>--with-mpi</dfn> </li>
+ * <li><dfn>documentation</dfn> create the documentation with Doxygen (Doxygen must be installed and be reached within the path)</li>
+ * <li><dfn>createlanguage</dfn> creates the language files / adds new messages to the existing files (xgettext must be called, so it should be within the path)</li>
+ * <li><dfn>compilelanguage</dfn> compiles all language files (msgfmt must be called, so it should be within the path)</li>
+ * <li><dfn>source</dfn> sources are eg. Wikipedia, NNTP, but the parameter <dfn>withsources</dfn> must be set for compiling and for the cloud example the files parameter must be set additionally</li>
+ * <li><dfn>clustering</dfn> this target build all clustering algorithms, but the <dfn>withfiles</dfn> parameter must be set</li>
+ * <li><dfn>classifier</dfn> this target build all classifier algorithms, but the <dfn>withfiles</dfn> parameter must be set</li>
+ * <li><dfn>reducing</dfn> this target build all dimension reduce algorithms, but the <dfn>withfiles</dfn> parameter must be set</li>
+ * <li><dfn>distance</dfn> this target build all distance algorithms, but the <dfn>withfiles</dfn> parameter must be set</li>
+ * <li><dfn>other</dfn> this target build all other examples, <dfn>withfiles</dfn> options must be set, <dfn>withsources</dfn> can be set (includes nntp and wikipedia examples) and optional 
+ * <dfn>withmpi</dfn> </li>
  * </ul>
  *
  * @section ex advanced documentation
@@ -178,7 +176,7 @@
  * @subsection nixboost Boost
  * First bJam must be build in the command line (terminal), so in the extracted source path the command
  * @code bootstrap.sh @endcode
- * must be run. After that Boost can be build with (The MPI support can be enabled with <dfn>--with-mpi</dfn>, but it requires MPI sources and libraries. The configuration for MPI use can be found on
+ * must be run. After that Boost can be build with (The MPI support can be enabled with <dfn>withmpi</dfn>, but it requires MPI sources and libraries. The configuration for MPI use can be found on
  * <dfn>www.boost.org/doc/libs/-release number-/doc/html/mpi.html</dfn>)
  * @code bjam --with-filesystem --with-math --with-random --with-regex --with-thread --with-system --with-serialization --with-iostreams threading=multi runtime-link=shared variant=release toolset=gcc|darwin install @endcode
  * In newer Boost version (since 1.47.0) the <dfn>bjam</dfn> command is replaced with <dfn>b2</dfn>. The <dfn>toolset</dfn> option must be:
@@ -273,7 +271,7 @@
  * @endcode
  * 
  * @subsection winversion Windows Version
- * The Windows version must be set with the scons parameter <dfn>--winver</dfn>. The values are:
+ * The Windows version must be set with the scons parameter <dfn>winver</dfn>. The values are:
  * <ul>
  * <li><dfn>win7</dfn> Windows 7</li>
  * <li><dfn>srv2008</dfn> Windows Server 2008</li>
