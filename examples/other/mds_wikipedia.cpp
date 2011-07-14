@@ -277,6 +277,7 @@ int main(int argc, char* argv[]) {
                     
                 l_wikidata.push_back( wiki.getArticleContent() );
                 l_wikilabel.push_back( wiki.getArticleTitle() );
+                i++;
             }
         } catch (...) {}
         
