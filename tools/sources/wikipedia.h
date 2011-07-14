@@ -421,7 +421,12 @@ namespace machinelearning { namespace tools { namespace sources {
         
         #ifdef NDEBUG
         // set for XML parsing a empty static member function, so no messages will be shown
-        initGenericErrorDefaultFunc( (xmlGenericErrorFunc*)(&wikipedia::XMLErrorFunction) );
+        
+        // note: we need a "void(**)" see http://xmlsoft.org/html/libxml-xmlerror.html#xmlGenericErrorFunc and
+        // http://xmlsoft.org/html/libxml-xmlerror.html#initGenericErrorDefaultFunc so we create this with a
+        // help structure for correct a correct reference
+        xmlGenericErrorFunc l_fptr = wikipedia::XMLErrorFunction;
+        initGenericErrorDefaultFunc( &l_fptr );
         #endif
         
         // convert std::string into char array for memory parsing
