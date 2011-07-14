@@ -6,10 +6,6 @@ import string
 import platform
 import sys
 
-AddOption("--create-language", dest="createlang", type="string", nargs=0, action="store", help="reads the data for translation and add them to the different language files")
-AddOption("--compile-language", dest="compilelang", type="string", nargs=0, action="store", help="compiles the language files")
-AddOption("--create-documentation", dest="createdocu", type="string", nargs=0, action="store", help="creates the doxygen documentation (doxygen must be within the path)")
-
 
 #=== CLI parameters ===================================================================================================
 def createVariables(vars) :
@@ -181,11 +177,6 @@ def configuration_cygwin(config, vars, version, architecture) :
 
 
 #=== function for configuration creation================================================================================================
-# checks if option exists and returns a boolean
-def optionExist(name) :
-    return GetOption(name) != None
-
-
 # function for reading os configuration
 # and setting environment
 def getConfig(vars):
