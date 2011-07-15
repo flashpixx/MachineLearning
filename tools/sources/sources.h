@@ -36,6 +36,7 @@ namespace machinelearning {
          * @todo adding support for mySQL / MS SQL / Postgres SQL / Oracle via eg http://www.sqlapi.com/
          * @todo adding twitter support https://dev.twitter.com/docs and https://dev.twitter.com/docs/streaming-api/methods
          * @todo adding support for reading HTML data with WGet / Curl
+         * @todo support for http://datacatalogs.org/ and the different sources
          **/
         namespace sources {};
     
