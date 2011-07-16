@@ -38,26 +38,35 @@ namespace machinelearning {
         /** exception class for throwing on not implementated method 
          * $LastChangedDate$
          **/
-        class classmethod      : public std::runtime_error{ public : classmethod( const std::string& ); };
+        class classmethod : public std::logic_error
+        { 
+            public : 
+            
+                explicit classmethod( const std::string& p_msg) :
+                    std::logic_error( p_msg )
+                {}
+            
+                explicit classmethod( const char* p_msg ) :
+                    std::logic_error( p_msg )
+                {}    
+        };
         
         /** exception class for throwing on runtime errors
          * $LastChangedDate$
          **/
-        class runtime          : public std::runtime_error      { public : runtime( const std::string& ); };
+        class runtime : public std::runtime_error
+        { 
+            public : 
+                
+                explicit runtime( const std::string& p_msg ) :
+                    std::runtime_error( p_msg )
+                {}  
+            
+                explicit runtime( const char* p_msg ) :
+                    std::runtime_error( p_msg )
+                {}    
+        };
         
-        
-        
-        
-        /** constructor
-         * @param p_str exception message
-        **/
-        inline classmethod::classmethod( const std::string& p_str ) : std::runtime_error(p_str) {};
-        
-        /** constructor
-         * @param p_str exception message
-         **/
-        inline runtime::runtime( const std::string& p_str ) : std::runtime_error(p_str) {};
-    
     };
 };
 
