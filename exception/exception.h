@@ -45,10 +45,6 @@ namespace machinelearning {
                 explicit classmethod( const std::string& p_msg) :
                     std::logic_error( p_msg )
                 {}
-            
-                explicit classmethod( const char* p_msg ) :
-                    std::logic_error( p_msg )
-                {}    
         };
         
         /** exception class for throwing on runtime errors
@@ -61,10 +57,6 @@ namespace machinelearning {
                 explicit runtime( const std::string& p_msg ) :
                     std::runtime_error( p_msg )
                 {}  
-            
-                explicit runtime( const char* p_msg ) :
-                    std::runtime_error( p_msg )
-                {}    
         };
         
     };
