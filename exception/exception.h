@@ -27,6 +27,7 @@
 #include <string>
 #include <stdexcept>
 
+#pragma GCC visibility push(default)
 
 namespace machinelearning { 
     
@@ -61,5 +62,7 @@ namespace machinelearning {
         
     };
 };
+
+#pragma GCC visibility pop
 
 #endif
