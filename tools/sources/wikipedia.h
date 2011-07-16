@@ -415,6 +415,9 @@ namespace machinelearning { namespace tools { namespace sources {
      **/
     inline wikipedia::wikiarticle wikipedia::parseXML( const std::string& p_xml ) const
     {
+        if (p_xml.empty())
+            throw exception::runtime(_("XML data can not be parsed"));
+        
         xmlResetLastError();
         wikiarticle l_data;
         bool l_error = false;
