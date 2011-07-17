@@ -434,7 +434,7 @@ namespace machinelearning { namespace tools { namespace sources {
         
         // convert std::string into char array for memory parsing
         const char* l_xmlcontent = p_xml.c_str();
-        xmlDocPtr l_xml          = xmlParseMemory( l_xmlcontent, strlen(l_xmlcontent) );
+        xmlDocPtr l_xml          = xmlParseMemory( l_xmlcontent, p_xml.length()+1 );
         if ((!l_xml) || (xmlGetLastError())) {
             if (l_xml)
                 xmlFreeDoc( l_xml );
