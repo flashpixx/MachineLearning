@@ -32,7 +32,6 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
-#include <ctime>
 
 #include <boost/thread.hpp>
 #include <boost/filesystem.hpp>
