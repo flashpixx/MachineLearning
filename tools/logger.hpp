@@ -129,7 +129,7 @@ namespace machinelearning { namespace tools {
             /** mutex for finalizing **/
             boost::mutex m_muxfinalize;
             /** bool for running the listener **/
-            bool m_listenerruning;
+            bool m_listenerrunning;
         
             void listener( const mpi::communicator& );
         
@@ -149,7 +149,7 @@ namespace machinelearning { namespace tools {
         #ifdef MACHINELEARNING_MPI
         , m_muxlistener(),
         m_muxfinalize(),
-        m_listenerruning(false)
+        m_listenerrunning(false)
         #endif
     {
         // create temporary path for logging
@@ -167,7 +167,7 @@ namespace machinelearning { namespace tools {
     inline logger::~logger( void )
     {
         #ifdef MACHINELEARNING_MPI
-        m_listenerruning = false;
+        m_listenerrunning = false;
         #endif
         m_file.close();
     }
@@ -286,12 +286,12 @@ namespace machinelearning { namespace tools {
      **/
     inline void logger::startListener( const mpi::communicator& p_mpi )
     {
-        if ((p_mpi.size() == 1) || (m_listenerruning))
+        if ((p_mpi.size() == 1) || (m_listenerrunning))
             return;
         
         // synchonize all CPUs thread-safe
         boost::lock_guard<boost::mutex> l_lock(m_muxlistener); 
-        m_listenerruning = true;
+        m_listenerrunning = true;
         
         if (p_mpi.rank() == 0)
             boost::thread l_thread( boost::bind( &logger::listener, this, boost::cref(p_mpi)) );
@@ -304,10 +304,10 @@ namespace machinelearning { namespace tools {
      * @param p_mpi MPI object
      **/
     inline void logger::shutdownListener( const mpi::communicator& p_mpi ) {
-        if (!m_listenerruning)
+        if (!m_listenerrunning)
             return;
         
-        m_listenerruning = false;
+        m_listenerrunning = false;
         boost::lock_guard<boost::mutex> l_lock(m_muxfinalize);
         
         // we create a end-of-transmission message which sends every process except the CPU 0. CPU 0 receives messages until
@@ -364,7 +364,7 @@ namespace machinelearning { namespace tools {
     {
         boost::lock_guard<boost::mutex> l_lock(m_muxfinalize);
         
-        while (m_listenerruning) {
+        while (m_listenerrunning) {
             while (boost::optional<mpi::status> l_status = p_mpi.iprobe(mpi::any_source, MACHINELEARNING_LOGGER_MPI_TAG)) {
                 std::string l_str;
                 std::ostringstream l_stream;
