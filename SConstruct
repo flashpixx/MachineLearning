@@ -34,8 +34,8 @@ def configuration_macosx(config, vars, version, architecture) :
     config["linkerflags"]       = ""
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["LIBRARY_PATH"]
-    config["compileflags"]      = "-O2 -Os -s -pipe -Wall -pthread -finline-functions -arch "+arch+" -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
-    config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "boost_filesystem", "boost_regex"]
+    config["compileflags"]      = "-O2 -Os -s -pipe -Wall -pthread -finline-functions -arch "+arch+" -D BOOST_FILESYSTEM_DYN_LINK -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
+    config["linkto"]            = ["boost_exception", "boost_system", "boost_thread", "boost_iostreams", "boost_filesystem", "boost_regex"]
     
     if ver[0] == "10" and ver[1] == "6" :
         config["linkto"].append("tatlas")
@@ -81,8 +81,8 @@ def configuration_posix(config, vars, version, architecture) :
     config["linkerflags"]       = ""
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["LIBRARY_PATH"]
-    config["compileflags"]      = "-O2 -Os -s -pipe -Wall -pthread -finline-functions -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
-    config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "boost_filesystem", "boost_regex", "tatlas"]
+    config["compileflags"]      = "-O2 -Os -s -pipe -Wall -pthread -finline-functions -D BOOST_FILESYSTEM_DYN_LINK -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
+    config["linkto"]            = ["boost_exception", "boost_system", "boost_thread", "boost_iostreams", "boost_filesystem", "boost_regex", "tatlas"]
     
     if vars["withdebug"] :
         config["compileflags"]      += " -g"
@@ -121,8 +121,8 @@ def configuration_cygwin(config, vars, version, architecture) :
     config["linkerflags"]       = "-enable-stdcall-fixup"
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["PATH"]
-    config["compileflags"]      = "-O2 -Os -s -pipe -Wall -finline-functions -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
-    config["linkto"]            = ["cygboost_system", "cygboost_thread", "cygboost_iostreams", "cygboost_filesystem", "cygboost_regex", "lapack", "cblas", "f77blas", "atlas", "gfortran"]
+    config["compileflags"]      = "-O2 -Os -s -pipe -Wall -finline-functions -D BOOST_FILESYSTEM_DYN_LINK -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
+    config["linkto"]            = ["boost_exception", "cygboost_system", "cygboost_thread", "cygboost_iostreams", "cygboost_filesystem", "cygboost_regex", "lapack", "cblas", "f77blas", "atlas", "gfortran"]
     
     #Windows Version options see http://msdn.microsoft.com/en-us/library/aa383745%28v=vs.85%29.aspx
     if vars["winver"] == "win7" :
