@@ -274,7 +274,7 @@
  * @subsection winversion Windows Version
  * The Windows version must be set with the scons parameter <dfn>winver</dfn>. The values are:
  * <ul>
- * <li><dfn>win7</dfn> Windows 7</li>
+ * <li><dfn>win7</dfn> Windows 7 [default]</li>
  * <li><dfn>srv2008</dfn> Windows Server 2008</li>
  * <li><dfn>vista</dfn> Windows Vista</li>
  * <li><dfn>srv2003sp1</dfn> Windows Server 2003 with SP1</li>
