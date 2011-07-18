@@ -259,7 +259,7 @@
  * The path to the libraries directories must be set / added to the system or user path variable <dfn>PATH</dfn> (the Cygwin <dfn>bin</dfn> directory must be added, because all libraries are linked to the
  * <dfn>cygwin.dll</dfn>, which is stored in the <dfn>bin</dfn> directory)
  * @code
-    C:\opt\cygwin\bin;C:\opt\library\atlas\3.9.43\lib;C:\opt\library\hdf\1.8.7\lib;C:\opt\library\xml2\2.7.8\bin;C:\opt\library\boost\1.47.0\bin
+    C:\opt\cygwin\bin;C:\opt\library\atlas\3.9.43\lib;C:\opt\library\hdf\1.8.7\lib;C:\opt\library\xml2\2.7.8\bin;C:\opt\library\boost\1.47.0\bin;C:\opt\library\boost\1.47.0\lib
  * @endcode
  * Scons can be installed under Cygwin with the command within the extracted source:
  * @code
