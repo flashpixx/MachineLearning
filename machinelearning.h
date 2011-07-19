@@ -733,6 +733,7 @@
  * @todo thinking about CILK support http://supertech.csail.mit.edu/cilk/
  * @todo adding genetic algorithms
  * @todo adding simulated annealing
+ * @todo ported all gode to strict C++ code http://www.comeaucomputing.com/
 **/
 
 #ifndef MACHINELEARNING_H
