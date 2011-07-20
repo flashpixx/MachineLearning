@@ -41,7 +41,7 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
     
     if (argc < 2) {
         std::cout << "--lang \t\t language (values: en, de [default])" << std::endl;
-        std::cout << "--search \t\t returns the artice of the keyword / returns list of articles / if empty, you will get a random article" << std::endl;
+        std::cout << "--search \t returns the artice of the keyword / returns list of articles / if empty, you will get a random article" << std::endl;
         return false;
     }
     
@@ -82,14 +82,15 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
     
     p_args["search"]    = l_argmap["search"];
     
-    p_args["lang"]      = tools::sources::wikipedia::de_DE;
+    p_args["lang"] = tools::sources::wikipedia::de_DE;
     if (l_argmap["lang"].size() > 0) {
         std::string lc = l_argmap["lang"][0];
         boost::to_lower(lc);
         
         if (lc == "en")
-            p_args["lang"]      = tools::sources::wikipedia::en_EN;
+            p_args["lang"] = tools::sources::wikipedia::en_EN;
     }
+    
     
     return true;
 }
