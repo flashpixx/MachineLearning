@@ -26,8 +26,6 @@
 #ifndef MACHINELEARNING_TOOLS_SOURCES_WIKIPEDIA_H
 #define MACHINELEARNING_TOOLS_SOURCES_WIKIPEDIA_H
 
-#define MACHINELEARNING_WIKIPEDIA_HTTPAGENT  "Machine Learning Framework"
-
 #include <stdarg.h>
 #include <algorithm>
 #include <boost/asio.hpp>
@@ -159,7 +157,7 @@ namespace machinelearning { namespace tools { namespace sources {
         m_articlefound( false ),
         m_acronymfound( false ),
         m_acronym(),
-        m_httpagent(MACHINELEARNING_WIKIPEDIA_HTTPAGENT)
+        m_httpagent("Machine Learning Framework")
     {}
     
     
