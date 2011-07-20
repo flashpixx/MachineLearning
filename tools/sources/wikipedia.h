@@ -67,7 +67,8 @@ namespace machinelearning { namespace tools { namespace sources {
             };
         
             wikipedia( const language& = de_DE );
-            void getArticle( const std::string&, const language& = de_DE );
+            void getArticle( const std::string& );
+            void getArticle( const std::string&, const language& );
             void getRandomArticle( const language& );
             void getRandomArticle();
         
@@ -206,6 +207,16 @@ namespace machinelearning { namespace tools { namespace sources {
     /** reads an article
      * @param p_search keyword for searching
      * @param p_lang optional language
+     **/
+    inline void wikipedia::getArticle( const std::string& p_search )
+    {
+        getArticle( p_search, m_defaultproperties.lang );
+    
+    }
+    
+    /** reads an article
+     * @param p_search keyword for searching
+     * @param p_lang optional language
      * @note remove of languages codes are incomplet
      **/
     inline void wikipedia::getArticle( const std::string& p_search, const language& p_lang )
@@ -213,10 +224,7 @@ namespace machinelearning { namespace tools { namespace sources {
         m_articlefound = false;
         m_acronym.clear();
         
-        wikiproperties l_prop = m_defaultproperties;
-        if (l_prop.lang != p_lang)
-            l_prop = getProperties( p_lang );
-        
+        wikiproperties l_prop = getProperties( p_lang );
         
         // whitespace with underscore replace
         std::string l_search( p_search );
@@ -555,26 +563,22 @@ namespace machinelearning { namespace tools { namespace sources {
     {
         // check if changed the server name, if not we use the cached IP
         boost::system::error_code l_error = boost::asio::error::host_not_found;
-        if (p_server != m_lastserver) {
+        if (p_server == m_lastserver)
+            m_socket.connect(m_lastendpoint, l_error);
+        else {
             m_lastserver = p_server;
             
             // create resolver for server
             bip::tcp::resolver l_resolver(m_io);
             bip::tcp::resolver::query l_query(p_server, "http");
-        
+            
             // try to connect the server
-            bip::tcp::resolver::iterator l_endpoint = l_resolver.resolve( l_query );
-            bip::tcp::resolver::iterator l_endpointend;
-  
-            while (l_error && l_endpoint != l_endpointend) {
+            for(bip::tcp::resolver::iterator l_endpoint = l_resolver.resolve( l_query ); (l_error && l_endpoint != bip::tcp::resolver::iterator()); l_endpoint++) {
                 m_socket.close();
                 m_lastendpoint = *l_endpoint;
-                m_socket.connect(*l_endpoint++, l_error);
+                m_socket.connect(*l_endpoint, l_error);
             }
-
-        } else
-            m_socket.connect(m_lastendpoint, l_error);
-
+        }
             
         if (l_error)
             throw exception::runtime(_("can not connect to wikipedia server"));
