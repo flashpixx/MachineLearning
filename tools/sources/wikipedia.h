@@ -59,15 +59,10 @@ namespace machinelearning { namespace tools { namespace sources {
         
         public :
         
-            enum language {
-                en_EN   = 0,
-                de_DE   = 1
-            };
-        
-            wikipedia( const language& = de_DE );
+            wikipedia( const language::code& = language::en );
             void getArticle( const std::string& );
-            void getArticle( const std::string&, const language& );
-            void getRandomArticle( const language& );
+            void getArticle( const std::string&, const language::code& );
+            void getRandomArticle( const language::code& );
             void getRandomArticle();
         
             std::string getArticleContent( void ) const;
@@ -92,7 +87,7 @@ namespace machinelearning { namespace tools { namespace sources {
         
             /** definition for language **/
             struct wikiproperties {
-                language lang;
+                language::code lang;
                 url exporturl;
                 url randomurl;
                 std::string acronymref;
@@ -133,7 +128,7 @@ namespace machinelearning { namespace tools { namespace sources {
             std::string m_httpagent;
 
         
-            wikiproperties getProperties( const language& ) const;
+            wikiproperties getProperties( const language::code& ) const;
             unsigned int sendRequest( const std::string&, const std::string&, std::string&, const bool& = true );
             std::string getContentData( void ); 
             void throwHTTPError( const unsigned int& ) const;   
@@ -148,7 +143,7 @@ namespace machinelearning { namespace tools { namespace sources {
     /** constructor
      * @param p_lang optional language parameter (default de_DE)
      **/
-    inline wikipedia::wikipedia( const language& p_lang ) :
+    inline wikipedia::wikipedia( const language::code& p_lang ) :
         m_defaultproperties( getProperties(p_lang) ),
         m_io(),
         m_socket(m_io),
@@ -171,14 +166,14 @@ namespace machinelearning { namespace tools { namespace sources {
     /** creates the properties of a language 
      * @return struct with Wikipedia properties for extraction article information
      **/
-    inline wikipedia::wikiproperties wikipedia::getProperties( const language& p_lang ) const
+    inline wikipedia::wikiproperties wikipedia::getProperties( const language::code& p_lang ) const
     {
         wikiproperties l_prop;
         
         l_prop.lang = p_lang;
         switch (p_lang) {
             
-           case en_EN :
+            case language::en :
                 l_prop.exporturl.host   = "en.wikipedia.org";
                 l_prop.exporturl.path   = "/wiki/Special:Export/";
                 l_prop.randomurl.host   = "en.wikipedia.org";
@@ -187,7 +182,7 @@ namespace machinelearning { namespace tools { namespace sources {
                 l_prop.category         = "Category";
                 return l_prop;
                 
-            case de_DE :
+            case language::de :
                 l_prop.exporturl.host   = "de.wikipedia.org";
                 l_prop.exporturl.path   = "/wiki/Spezial:Exportieren/";
                 l_prop.randomurl.host   = "de.wikipedia.org";
@@ -196,15 +191,15 @@ namespace machinelearning { namespace tools { namespace sources {
                 l_prop.category         = "Kategorie";
                 return l_prop;
 
+            default:
+                throw exception::runtime(_("language has no option values"));
+                
         }
-        
-        throw exception::runtime(_("language is not kwon"));
     }
     
     
     /** reads an article
      * @param p_search keyword for searching
-     * @param p_lang optional language
      **/
     inline void wikipedia::getArticle( const std::string& p_search )
     {
@@ -217,7 +212,7 @@ namespace machinelearning { namespace tools { namespace sources {
      * @param p_lang optional language
      * @note remove of languages codes are incomplet
      **/
-    inline void wikipedia::getArticle( const std::string& p_search, const language& p_lang )
+    inline void wikipedia::getArticle( const std::string& p_search, const language::code& p_lang )
     {
         m_articlefound = false;
         m_acronym.clear();
@@ -296,7 +291,7 @@ namespace machinelearning { namespace tools { namespace sources {
     /** reads an random article
      * @param p_lang optional language
      **/
-    inline void wikipedia::getRandomArticle( const language& p_lang )
+    inline void wikipedia::getRandomArticle( const language::code& p_lang )
     {
         m_articlefound              = false;
         const wikiproperties l_prop = getProperties( p_lang );
