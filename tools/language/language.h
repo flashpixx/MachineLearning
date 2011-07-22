@@ -34,6 +34,7 @@ namespace machinelearning { namespace tools {
      **/
     namespace language {
     
+        /** enum with language codes on ISO 639-1 and ISO 639-3 **/
         enum code
         {
             #define LANGUAGE_CODE( iso6391, iso6393, description )    iso6391, iso6393 = iso6391,
