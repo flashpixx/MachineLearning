@@ -412,12 +412,16 @@ env.Clean("clean", files)
 #default target
 Default(None)
 
+
 if "documentation" in COMMAND_LINE_TARGETS :
     os.system("doxygen documentation.doxyfile")
+    sys.exit(0)
 elif "createlanguage" in COMMAND_LINE_TARGETS :
     createLanguage(env, True)
+    sys.exit(0)
 elif "compilelanguage" in COMMAND_LINE_TARGETS :
     createLanguage(env)
+    sys.exit(0)
 else :
 
     # catch all cpps within the framework directories and compile them to objectfiles into the builddir
