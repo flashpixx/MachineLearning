@@ -271,10 +271,15 @@ namespace machinelearning { namespace tools { namespace sources {
             it = l_what[0].second;
         }
         
-        // remove languages (short codes are found in ISO 639-1) and labels (at the end of the expression we set a [[:space:]]* for removing CR or LF)
+        // remove languages and labels (at the end of the expression we set a [[:space:]]* for removing CR or LF)
         m_article.content = boost::regex_replace(m_article.content, l_categorypattern, "");
+        std::vector<std::string> l_codes = tools::language::getCodeList( tools::language::iso639_1 );
+        std::string l_list;
+        for(std::size_t i=0; i < l_codes.size(); ++i)
+            l_list += "|" + l_codes[i];
+        l_list = l_list.substr(1);
         
-        const boost::regex l_langpattern( "\\[\\[(aa|ab|af|am|ar|as|ay|az|ba|be|bg|bh|bi|bn|bo|br|ca|co|cs|cy|da|de|dz|el|en|eo|es|et|eu|fa|fi|fj|fo|fr|fy|ga|gd|gl|gn|gu|ha|hi|he|hr|hu|hy|ia|id|ie|ik|in|is|it|iu|iw|ja|ji|jw|ka|kk|kl|km|kn|ko|ks|ku|ky|la|ln|lo|lt|lv|mg|mi|mk|ml|mn|mo|mr|ms|mt|my|na|ne|nl|no|oc|om|or|pa|pl|ps|pt|qu|rm|rn|ro|ru|rw|sa|sd|sg|sh|si|sk|sl|sm|sn|so|sq|sr|ss|st|su|sv|sw|ta|te|tg|th|ti|tk|tl|tn|to|tr|ts|tt|tw|ug|uk|ur|uz|vi|vo|wo|xh|yi|yo|za|zh|zu):(.*?)\\]\\][[:space:]]*", boost::regex_constants::icase | boost::regex_constants::perl );
+        const boost::regex l_langpattern( "\\[\\[("+l_list+"):(.*?)\\]\\][[:space:]]*", boost::regex_constants::icase | boost::regex_constants::perl );
         m_article.content = boost::regex_replace(m_article.content, l_langpattern, "");
         
         m_articlefound = true;    
