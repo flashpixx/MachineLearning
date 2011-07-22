@@ -25,6 +25,7 @@
  * the ISO 639-1 until 639-3
  * @see http://www.sil.org/iso639-3/codes.asp?order=639_1&letter=%25
  * the macro definition is set: iso639-1, iso639-3, language name
+ * $LastChangedDate$
  **/
 
 LANGUAGE_CODE(ab,abk,"Abkhazian")
