@@ -47,7 +47,7 @@ namespace machinelearning { namespace tools {
             #undef LANGUAGE_CODE
         };
         
-        /** enum for creating the code list **/
+        /** enum for creating the code list / returing type **/
         enum listcode {
             all,
             iso639_1,
