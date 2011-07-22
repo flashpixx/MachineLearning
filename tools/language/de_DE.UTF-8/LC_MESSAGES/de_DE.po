@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-07-09 22:30+0200\n"
-"PO-Revision-Date: 2011-07-09 23:01+0100\n"
+"POT-Creation-Date: 2011-07-22 23:30+0200\n"
+"PO-Revision-Date: 2011-07-22 23:30+0100\n"
 "Last-Translator: Philipp Kraus <philipp.kraus@flashpixx.de>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -88,7 +88,7 @@ msgstr "Matrixzeilen und Labelanzahl sind nicht identisch"
 
 #: clustering/nonsupervised/kmeans.hpp:97
 #: clustering/nonsupervised/neuralgas.hpp:151
-#: clustering/nonsupervised/relational_neuralgas.hpp:150
+#: clustering/nonsupervised/relational_neuralgas.hpp:151
 #: clustering/supervised/rlvq.hpp:102
 msgid "prototype size must be greater than zero"
 msgstr "Prototypdimension musst größer Null sein"
@@ -97,10 +97,10 @@ msgstr "Prototypdimension musst größer Null sein"
 #: clustering/nonsupervised/neuralgas.hpp:260
 #: clustering/nonsupervised/neuralgas.hpp:354
 #: clustering/nonsupervised/neuralgas.hpp:394
-#: clustering/nonsupervised/relational_neuralgas.hpp:294
-#: clustering/nonsupervised/relational_neuralgas.hpp:391
-#: clustering/nonsupervised/relational_neuralgas.hpp:425
-#: clustering/nonsupervised/relational_neuralgas.hpp:803
+#: clustering/nonsupervised/relational_neuralgas.hpp:295
+#: clustering/nonsupervised/relational_neuralgas.hpp:381
+#: clustering/nonsupervised/relational_neuralgas.hpp:415
+#: clustering/nonsupervised/relational_neuralgas.hpp:811
 msgid "number of prototypes must be greater than zero"
 msgstr "Anzahl der Prototypen muss größer Null sein"
 
@@ -109,9 +109,9 @@ msgstr "Anzahl der Prototypen muss größer Null sein"
 #: clustering/nonsupervised/neuralgas.hpp:398
 #: clustering/nonsupervised/neuralgas.hpp:636
 #: clustering/nonsupervised/neuralgas.hpp:927
-#: clustering/nonsupervised/relational_neuralgas.hpp:298
-#: clustering/nonsupervised/relational_neuralgas.hpp:429
-#: clustering/nonsupervised/relational_neuralgas.hpp:687
+#: clustering/nonsupervised/relational_neuralgas.hpp:299
+#: clustering/nonsupervised/relational_neuralgas.hpp:419
+#: clustering/nonsupervised/relational_neuralgas.hpp:695
 #: clustering/supervised/rlvq.hpp:212
 #: dimensionreduce/nonsupervised/mds.hpp:257
 #: functionoptimization/gradientdescent.hpp:296
@@ -125,11 +125,11 @@ msgstr "Iterationen müssen größer Null sein"
 #: clustering/nonsupervised/neuralgas.hpp:638
 #: clustering/nonsupervised/neuralgas.hpp:795
 #: clustering/nonsupervised/neuralgas.hpp:929
-#: clustering/nonsupervised/relational_neuralgas.hpp:300
-#: clustering/nonsupervised/relational_neuralgas.hpp:393
-#: clustering/nonsupervised/relational_neuralgas.hpp:431
-#: clustering/nonsupervised/relational_neuralgas.hpp:699
-#: clustering/nonsupervised/relational_neuralgas.hpp:805
+#: clustering/nonsupervised/relational_neuralgas.hpp:301
+#: clustering/nonsupervised/relational_neuralgas.hpp:383
+#: clustering/nonsupervised/relational_neuralgas.hpp:421
+#: clustering/nonsupervised/relational_neuralgas.hpp:707
+#: clustering/nonsupervised/relational_neuralgas.hpp:813
 #: clustering/nonsupervised/spectralclustering.hpp:170
 #: clustering/supervised/rlvq.hpp:216
 #: clustering/supervised/rlvq.hpp:292
@@ -142,9 +142,9 @@ msgstr "Daten- und Prototypdimension sind nicht identisch"
 #: clustering/nonsupervised/neuralgas.hpp:396
 #: clustering/nonsupervised/neuralgas.hpp:634
 #: clustering/nonsupervised/neuralgas.hpp:925
-#: clustering/nonsupervised/relational_neuralgas.hpp:296
-#: clustering/nonsupervised/relational_neuralgas.hpp:427
-#: clustering/nonsupervised/relational_neuralgas.hpp:685
+#: clustering/nonsupervised/relational_neuralgas.hpp:297
+#: clustering/nonsupervised/relational_neuralgas.hpp:417
+#: clustering/nonsupervised/relational_neuralgas.hpp:693
 #: clustering/supervised/rlvq.hpp:210
 msgid "number of datapoints are less than prototypes"
 msgstr "Anzahl der Datenpunkte ist weniger als Anzahl der Prototypen"
@@ -153,16 +153,16 @@ msgstr "Anzahl der Datenpunkte ist weniger als Anzahl der Prototypen"
 #: clustering/nonsupervised/neuralgas.hpp:402
 #: clustering/nonsupervised/neuralgas.hpp:640
 #: clustering/nonsupervised/neuralgas.hpp:931
-#: clustering/nonsupervised/relational_neuralgas.hpp:302
-#: clustering/nonsupervised/relational_neuralgas.hpp:433
-#: clustering/nonsupervised/relational_neuralgas.hpp:689
+#: clustering/nonsupervised/relational_neuralgas.hpp:303
+#: clustering/nonsupervised/relational_neuralgas.hpp:423
+#: clustering/nonsupervised/relational_neuralgas.hpp:697
 #: clustering/supervised/rlvq.hpp:218
 msgid "lambda must be greater than zero"
 msgstr "Lambda muss größer Null sein"
 
-#: clustering/nonsupervised/relational_neuralgas.hpp:304
-#: clustering/nonsupervised/relational_neuralgas.hpp:435
-#: clustering/nonsupervised/relational_neuralgas.hpp:697
+#: clustering/nonsupervised/relational_neuralgas.hpp:305
+#: clustering/nonsupervised/relational_neuralgas.hpp:425
+#: clustering/nonsupervised/relational_neuralgas.hpp:705
 #: clustering/nonsupervised/spectralclustering.hpp:168
 #: dimensionreduce/nonsupervised/mds.hpp:181
 #: dimensionreduce/nonsupervised/mds.hpp:495
@@ -194,6 +194,7 @@ msgid "datapoint dimension are less than target dimension"
 msgstr "Datenpunktdimension ist kleiner als Dimension der Zielprojektion"
 
 #: dimensionreduce/nonsupervised/mds.hpp:215
+#: neighborhood/kapproximation.hpp:106
 msgid "project option is unkown"
 msgstr "Projektionsmethode ist nicht bekannt"
 
@@ -280,7 +281,7 @@ msgstr "Schrittweite muss größer Null sein"
 msgid "there are unsed variables"
 msgstr "es existieren unbenutze Variablen (Variablen ohne Wertzuweisung)"
 
-#: neighborhood/kapproximation.hpp:85
+#: neighborhood/kapproximation.hpp:89
 msgid "number of approximate data must be greater than zero"
 msgstr "Anzahl der Prototypen muss größer Null sein"
 
@@ -301,7 +302,7 @@ msgstr "beide Matrizen haben nicht die gleiche Größe"
 msgid "number of rows / columns of the matrix must have the same dimension like the initialisation vector"
 msgstr "Anzahl der Zeilen / Spalten der Matrix müssen die gleiche Dimension wie Initialisierungsvektor haben"
 
-#: tools/logger.hpp:249
+#: tools/logger.hpp:248
 msgid "log state is unkown"
 msgstr "Sprache ist nicht bekannt"
 
@@ -316,7 +317,7 @@ msgstr "Zeilenanzahl muss größer Null sein"
 msgid "column size must be greater than zero"
 msgstr "Spaltenanzahl muss größer Null sein"
 
-#: tools/random.hpp:198
+#: tools/random.hpp:199
 msgid "distribution is not kwon"
 msgstr "Verteilung ist nicht bekannt"
 
@@ -424,12 +425,22 @@ msgstr "Zufallswert muss zwischen [0,1] einliegen"
 msgid "no words within the map"
 msgstr "Keine Wort innerhalb der Map"
 
+#: tools/language/language.h:65
+msgid "parameter is not a language code"
+msgstr "Parameter ist kein Sprachcode"
+
+#: tools/language/language.h:74
+#: tools/language/language.h:92
+msgid "language is not known"
+msgstr "Sprache ist nicht bekannt"
+
 #: tools/sources/nntp.h:167
 msgid "can not connect to news server"
 msgstr "Newsserver ist nicht erreichbar"
 
 #: tools/sources/nntp.h:216
-#: tools/sources/wikipedia.h:602
+#: tools/sources/twitter.h:176
+#: tools/sources/wikipedia.h:628
 msgid "error while reading socket data"
 msgstr "Fehler während des Lesens des Sockets"
 
@@ -497,186 +508,227 @@ msgstr "Zugriff eingeschränkt oder verboten"
 msgid "service is not available"
 msgstr "Service ist nicht erreichbar"
 
-#: tools/sources/wikipedia.h:198
-msgid "language is not kwon"
-msgstr "Sprache ist nicht bekannt"
+#: tools/sources/twitter.h:100
+msgid "can not connect to twitter search server"
+msgstr "Twitter Server ist nicht erreichbar"
 
-#: tools/sources/wikipedia.h:303
-msgid "can not find information within the http header"
-msgstr "Informationen im HTTP Header nicht gefunden"
-
-#: tools/sources/wikipedia.h:311
-msgid "can not find wikipedia document within the URL"
-msgstr "kein Wikipedia Dokument mit der URL gefunden"
-
-#: tools/sources/wikipedia.h:324
+#: tools/sources/twitter.h:117
+#: tools/sources/wikipedia.h:334
 msgid "HTTP agent name need not be empty"
 msgstr "HTTP Agent name darf nicht leer sein"
 
-#: tools/sources/wikipedia.h:335
-#: tools/sources/wikipedia.h:346
-#: tools/sources/wikipedia.h:357
-#: tools/sources/wikipedia.h:368
-#: tools/sources/wikipedia.h:379
-msgid "no article is loaded"
-msgstr "Artikel wurde nicht geladen"
-
-#: tools/sources/wikipedia.h:422
-#: tools/sources/wikipedia.h:495
-msgid "XML data can not be parsed"
-msgstr "Datei konnte nicht geöffnet werden"
-
-#: tools/sources/wikipedia.h:432
-msgid "can not detect namespace"
-msgstr "Größe konnte nicht ermittelt werden"
-
-#: tools/sources/wikipedia.h:515
-msgid "data can not be received"
-msgstr "Datei konnte nicht geöffnet werden"
-
-#: tools/sources/wikipedia.h:556
-msgid "can not connect to wikipedia server"
-msgstr "keine Verbindung zu Wikipedia Server"
-
-#: tools/sources/wikipedia.h:604
+#: tools/sources/twitter.h:178
+#: tools/sources/wikipedia.h:630
 msgid "Non-Authoritative Information"
 msgstr "nicht authentisierte Information"
 
-#: tools/sources/wikipedia.h:605
+#: tools/sources/twitter.h:179
+#: tools/sources/wikipedia.h:631
 msgid "No Content"
 msgstr "kein Inhalt"
 
-#: tools/sources/wikipedia.h:606
+#: tools/sources/twitter.h:180
+#: tools/sources/wikipedia.h:632
 msgid "Reset Content"
 msgstr "Inhalt wurde zurückgesetzt"
 
-#: tools/sources/wikipedia.h:607
+#: tools/sources/twitter.h:181
+#: tools/sources/wikipedia.h:633
 msgid "Partial Content"
 msgstr "Teilinhalt"
 
-#: tools/sources/wikipedia.h:608
+#: tools/sources/twitter.h:182
+#: tools/sources/wikipedia.h:634
 msgid "Multiple Choices"
 msgstr "Mehrfachauswahl"
 
-#: tools/sources/wikipedia.h:609
+#: tools/sources/twitter.h:183
+#: tools/sources/wikipedia.h:635
 msgid "Moved Permanently"
 msgstr "dauerhafte Umleitung"
 
-#: tools/sources/wikipedia.h:610
+#: tools/sources/twitter.h:184
+#: tools/sources/wikipedia.h:636
 msgid "Moved Temporarily"
 msgstr "temporär umgeleitet"
 
-#: tools/sources/wikipedia.h:611
+#: tools/sources/twitter.h:185
+#: tools/sources/wikipedia.h:637
 msgid "See Other"
 msgstr "siehe weitere"
 
-#: tools/sources/wikipedia.h:612
+#: tools/sources/twitter.h:186
+#: tools/sources/wikipedia.h:638
 msgid "Not Modified"
 msgstr "nicht geändert"
 
-#: tools/sources/wikipedia.h:613
+#: tools/sources/twitter.h:187
+#: tools/sources/wikipedia.h:639
 msgid "Use Proxy"
 msgstr "Proxy benutzen"
 
-#: tools/sources/wikipedia.h:614
+#: tools/sources/twitter.h:188
+#: tools/sources/wikipedia.h:640
 msgid "Temporary Redirect"
 msgstr "temporäre Umleitung"
 
-#: tools/sources/wikipedia.h:615
+#: tools/sources/twitter.h:189
+#: tools/sources/wikipedia.h:641
 msgid "Bad Request"
 msgstr "fehlerhafte Anfrage"
 
-#: tools/sources/wikipedia.h:616
+#: tools/sources/twitter.h:190
+#: tools/sources/wikipedia.h:642
 msgid "Unauthorized"
 msgstr "Zugriff nicht erlaubt"
 
-#: tools/sources/wikipedia.h:617
+#: tools/sources/twitter.h:191
+#: tools/sources/wikipedia.h:643
 msgid "Payment Required"
 msgstr "Zahlung notwendig"
 
-#: tools/sources/wikipedia.h:618
+#: tools/sources/twitter.h:192
+#: tools/sources/wikipedia.h:644
 msgid "Forbidden"
 msgstr "Zugriff verboten"
 
-#: tools/sources/wikipedia.h:619
+#: tools/sources/twitter.h:193
+#: tools/sources/wikipedia.h:645
 msgid "Not Found"
 msgstr "nicht gefunden"
 
-#: tools/sources/wikipedia.h:620
+#: tools/sources/twitter.h:194
+#: tools/sources/wikipedia.h:646
 msgid "Method Not Allowed"
 msgstr "Methode nicht erlaubt"
 
-#: tools/sources/wikipedia.h:621
+#: tools/sources/twitter.h:195
+#: tools/sources/wikipedia.h:647
 msgid "Not Acceptable"
 msgstr "nicht erreichbar"
 
-#: tools/sources/wikipedia.h:623
+#: tools/sources/twitter.h:197
+#: tools/sources/wikipedia.h:649
 msgid "Proxy Authentication Required"
 msgstr "Proxy Authentifizierung notwendig"
 
-#: tools/sources/wikipedia.h:624
+#: tools/sources/twitter.h:198
+#: tools/sources/wikipedia.h:650
 msgid "Request Time-out"
 msgstr "Anfragezeit abgelaufen"
 
-#: tools/sources/wikipedia.h:625
+#: tools/sources/twitter.h:199
+#: tools/sources/wikipedia.h:651
 msgid "Conflict"
 msgstr "Konflikt"
 
-#: tools/sources/wikipedia.h:626
+#: tools/sources/twitter.h:200
+#: tools/sources/wikipedia.h:652
 msgid "Gone"
 msgstr "Daten nicht mehr vorhanden"
 
-#: tools/sources/wikipedia.h:627
+#: tools/sources/twitter.h:201
+#: tools/sources/wikipedia.h:653
 msgid "Length Required"
 msgstr "Längenangabe erwartet"
 
-#: tools/sources/wikipedia.h:628
+#: tools/sources/twitter.h:202
+#: tools/sources/wikipedia.h:654
 msgid "Precondition Failed"
 msgstr "Voraussetzung fehlerhaft"
 
-#: tools/sources/wikipedia.h:629
+#: tools/sources/twitter.h:203
+#: tools/sources/wikipedia.h:655
 msgid "Request Entity Too Large"
 msgstr "angeforderte Daten zu groß"
 
-#: tools/sources/wikipedia.h:630
+#: tools/sources/twitter.h:204
+#: tools/sources/wikipedia.h:656
 msgid "Request-URI Too Large"
 msgstr "Angefragte URL zu lang"
 
-#: tools/sources/wikipedia.h:631
+#: tools/sources/twitter.h:205
+#: tools/sources/wikipedia.h:657
 msgid "Unsupported Media Type"
 msgstr "nicht unterstützer Medientyp"
 
-#: tools/sources/wikipedia.h:632
+#: tools/sources/twitter.h:206
+#: tools/sources/wikipedia.h:658
 msgid "Requested range not satisfiable"
 msgstr "angefragter Bereich nicht erfüllt"
 
-#: tools/sources/wikipedia.h:633
+#: tools/sources/twitter.h:207
+#: tools/sources/wikipedia.h:659
 msgid "Expectation Failed"
 msgstr "Erwartete Daten fehlerhaft"
 
-#: tools/sources/wikipedia.h:634
+#: tools/sources/twitter.h:208
+#: tools/sources/wikipedia.h:660
 msgid "Internal Server Error"
 msgstr "Internal Server Error"
 
-#: tools/sources/wikipedia.h:635
+#: tools/sources/twitter.h:209
+#: tools/sources/wikipedia.h:661
 msgid "Not Implemented"
 msgstr "nicht implementiert"
 
-#: tools/sources/wikipedia.h:636
+#: tools/sources/twitter.h:210
+#: tools/sources/wikipedia.h:662
 msgid "Bad Gateway"
 msgstr "falscher Gateway"
 
-#: tools/sources/wikipedia.h:637
+#: tools/sources/twitter.h:211
+#: tools/sources/wikipedia.h:663
 msgid "Service Unavailable"
 msgstr "Service ist nicht erreichbar"
 
-#: tools/sources/wikipedia.h:638
+#: tools/sources/twitter.h:212
+#: tools/sources/wikipedia.h:664
 msgid "Gateway Time-out"
 msgstr "Gateway Zeitüberschreitung"
 
-#: tools/sources/wikipedia.h:639
+#: tools/sources/twitter.h:213
+#: tools/sources/wikipedia.h:665
 msgid "HTTP Version not supported"
 msgstr "HTTP Version wird nicht unterstützt"
+
+#: tools/sources/wikipedia.h:195
+msgid "language has no option values"
+msgstr "Optionen für Sprache existieren nicht"
+
+#: tools/sources/wikipedia.h:313
+msgid "can not find information within the http header"
+msgstr "Informationen im HTTP Header nicht gefunden"
+
+#: tools/sources/wikipedia.h:321
+msgid "can not find wikipedia document within the URL"
+msgstr "kein Wikipedia Dokument mit der URL gefunden"
+
+#: tools/sources/wikipedia.h:345
+#: tools/sources/wikipedia.h:356
+#: tools/sources/wikipedia.h:367
+#: tools/sources/wikipedia.h:378
+#: tools/sources/wikipedia.h:389
+msgid "no article is loaded"
+msgstr "Artikel wurde nicht geladen"
+
+#: tools/sources/wikipedia.h:425
+#: tools/sources/wikipedia.h:448
+#: tools/sources/wikipedia.h:525
+msgid "XML data can not be parsed"
+msgstr "Datei konnte nicht geöffnet werden"
+
+#: tools/sources/wikipedia.h:459
+msgid "can not detect namespace"
+msgstr "Größe konnte nicht ermittelt werden"
+
+#: tools/sources/wikipedia.h:545
+msgid "data can not be received"
+msgstr "Datei konnte nicht geöffnet werden"
+
+#: tools/sources/wikipedia.h:582
+msgid "can not connect to wikipedia server"
+msgstr "keine Verbindung zu Wikipedia Server"
 
 #~ msgid "vector reserve must be greater than zero"
 #~ msgstr "Vektor Puffer muss größer Null sein"
