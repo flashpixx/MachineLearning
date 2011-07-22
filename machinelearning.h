@@ -667,7 +667,7 @@
  * @file examples/sources/cloud.cpp testprogram for create n-dimensional normal distribution
  * @file examples/other/mds_nntp.cpp program for reading newsgroup articles, stopword reduction, distance calculating and MDS plotting
  * @file examples/other/mds_wikipedia.cpp program for reading Wikipedia articles, stopword reduction, distance calculating and MDS plotting
- * @file examples/other/mds_textfile.cpp program for reading text files, stopword reduction, distance calculating and MDS plotting
+ * @file examples/other/mds_file.cpp program for reading (text) files, stopword reduction, distance calculating and MDS plotting
  *
  * @file classifier/classifier.h main header for all classifier structurs
  * @file classifier/classifier.hpp header for the abstract class implementation of the classifiers
@@ -718,7 +718,9 @@
  * @file tools/sources/wikipedia.h wikipedia client
  * @file tools/sources/cloud.hpp implementation of cloud datasets
  *
- * @file tools/language/language.h multilanguage calls
+ * @file tools/language/language.h multilanguage includes
+ * @file tools/language/bindings.h class for gettext calls
+ * @file tools/language/iso639.h include with macro definition of the language codes
  *
  * @file tools/files/files.h main header for file structurs
  * @file tools/files/csv.hpp implementation for reading and writing csv files
