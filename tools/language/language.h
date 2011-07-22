@@ -76,8 +76,8 @@ namespace machinelearning { namespace tools {
         
         
         /** converts a enum type to the string representation
-         * @param language code
-         * @param enum option for returning iso639-1 or iso639-3 representation
+         * @param p_lang language code
+         * @param p_return enum option for returning iso639-1 or iso639-3 representation
          * @return string
          **/
         inline std::string toString( const code& p_lang, const listcode& p_return = iso639_1 ) {
