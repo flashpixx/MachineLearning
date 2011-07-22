@@ -83,14 +83,10 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
     p_args["search"]    = l_argmap["search"];
     
     p_args["lang"] = tools::language::de;
-    if (l_argmap["lang"].size() > 0) {
-        std::string lc = l_argmap["lang"][0];
-        boost::to_lower(lc);
-        
-        if (lc == "en")
-            p_args["lang"] = tools::language::en;
-    }
-    
+    if (l_argmap["lang"].size() > 0)
+        try {
+            p_args["lang"] = tools::language::fromString(l_argmap["lang"][0]);
+        } catch (...) {}   
     
     return true;
 }
