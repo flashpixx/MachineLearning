@@ -82,13 +82,13 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
     
     p_args["search"]    = l_argmap["search"];
     
-    p_args["lang"] = tools::sources::wikipedia::de_DE;
+    p_args["lang"] = tools::language::de;
     if (l_argmap["lang"].size() > 0) {
         std::string lc = l_argmap["lang"][0];
         boost::to_lower(lc);
         
         if (lc == "en")
-            p_args["lang"] = tools::sources::wikipedia::en_EN;
+            p_args["lang"] = tools::language::en;
     }
     
     
@@ -128,7 +128,7 @@ int main(int argc, char* argv[]) {
     
 
     // create wikipedia object
-    tools::sources::wikipedia wiki( boost::any_cast<tools::sources::wikipedia::language>(l_args["lang"]) );
+    tools::sources::wikipedia wiki( boost::any_cast<tools::language::code>(l_args["lang"]) );
     
     // get article data
     std::vector<std::string> lsearch = boost::any_cast< std::vector<std::string> >(l_args["search"]);
