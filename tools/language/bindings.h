@@ -21,31 +21,59 @@
  @endcond
  **/
 
-#ifndef MACHINELEARNING_TOOLS_LANGUAGE_H
-#define MACHINELEARNING_TOOLS_LANGUAGE_H
+#ifndef MACHINELEARNING_MULTILANGUAGE
+#define _(string) string
+#else
+
+#ifndef MACHINELEARNING_TOOLS_LANGUAGE_BINDINGS_H
+#define MACHINELEARNING_TOOLS_LANGUAGE_BINDINGS_H
+
+#include <libintl.h>
+#include <string>
+
+#define _(string) gettext(string)
 
 
-
-namespace machinelearning { namespace tools { 
+namespace machinelearning { namespace tools { namespace language {
     
     
-    /** namespace with language structurs
-     * $LastChangedDate$
+    /** class for create langugage bindings
+     * $LastChangedDate: 2011-01-05 12:22:36 +0100 (Wed, 05 Jan 2011) $
      **/
-    namespace language {
-    
-        enum code
-        {
-            #define LANGUAGE_CODE( iso6391, iso6393, description )    iso6391, iso6393 = iso6391,
-            #include "iso639.h"
-            #undef LANGUAGE_CODE
-        };
-    
+    class bindings {
+        
+        public :
+        
+            static std::string getLanguage( void );
+            static void bind( const std::string&, const std::string&, const std::string& = "" );
+        
+        
     };
+    
+    
+    /** returns the environmental language
+     * @return string with language
+     **/
+    inline std::string bindings::getLanguage( void )
+    {
+        return getenv("LANG");
+    }
+    
+    
+    /** bind the textdomain for different language
+     * @param p_name name of language file
+     * @param p_path path to language file (eg: ./language files locate under p_path / p_lang / p_name.mo)
+     * @param p_lang language (empty for system value)
+     **/
+    inline void bindings::bind( const std::string& p_name, const std::string& p_path, const std::string& p_lang )
+    {
+        setlocale(LC_ALL, p_lang.c_str());
+        bindtextdomain(p_name.c_str(), p_path.c_str());
+        textdomain(p_name.c_str());
+    }
+    
+    
+};};};
 
-};};
-
-
-#include "bindings.h"
-
+#endif
 #endif
