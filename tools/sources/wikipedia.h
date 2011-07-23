@@ -59,7 +59,7 @@ namespace machinelearning { namespace tools { namespace sources {
         
         public :
         
-            wikipedia( const language::code& = language::en );
+            wikipedia( const language::code& = language::EN );
             void getArticle( const std::string& );
             void getArticle( const std::string&, const language::code& );
             void getRandomArticle( const language::code& );
@@ -173,7 +173,7 @@ namespace machinelearning { namespace tools { namespace sources {
         l_prop.lang = p_lang;
         switch (p_lang) {
             
-            case language::en :
+            case language::EN :
                 l_prop.exporturl.host   = "en.wikipedia.org";
                 l_prop.exporturl.path   = "/wiki/Special:Export/";
                 l_prop.randomurl.host   = "en.wikipedia.org";
@@ -182,7 +182,7 @@ namespace machinelearning { namespace tools { namespace sources {
                 l_prop.category         = "Category";
                 return l_prop;
                 
-            case language::de :
+            case language::DE :
                 l_prop.exporturl.host   = "de.wikipedia.org";
                 l_prop.exporturl.path   = "/wiki/Spezial:Exportieren/";
                 l_prop.randomurl.host   = "de.wikipedia.org";

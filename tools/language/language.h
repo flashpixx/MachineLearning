@@ -65,7 +65,7 @@ namespace machinelearning { namespace tools {
                 throw exception::runtime(_("parameter is not a language code"));
             
             std::string lc = p_lang;
-            boost::to_lower(lc);
+            boost::to_upper(lc);
             
             #define LANGUAGE_CODE( iso6391, iso6393, description )      if ((lc == #iso6391) || (lc == #iso6393)) return iso6391;
             #include "iso639.h"

@@ -82,7 +82,7 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
     
     p_args["search"]    = l_argmap["search"];
     
-    p_args["lang"] = tools::language::de;
+    p_args["lang"] = tools::language::DE;
     if (l_argmap["lang"].size() > 0)
         try {
             p_args["lang"] = tools::language::fromString(l_argmap["lang"][0]);
@@ -122,7 +122,7 @@ int main(int argc, char* argv[]) {
     if (!cliArguments(argc, argv, l_args))
         return EXIT_FAILURE;
     
-
+    
     // create wikipedia object
     tools::sources::wikipedia wiki( boost::any_cast<tools::language::code>(l_args["lang"]) );
     
@@ -139,7 +139,7 @@ int main(int argc, char* argv[]) {
             std::cout << "\n===================================================================================" << std::endl;
         }
     
-
+    
     
     return EXIT_SUCCESS;
 }
