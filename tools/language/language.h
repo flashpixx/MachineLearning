@@ -67,7 +67,7 @@ namespace machinelearning { namespace tools {
             std::string lc = p_lang;
             boost::to_lower(lc);
             
-            #define LANGUAGE_CODE( iso6391, iso6393, description )      if (lc == #iso6391) return iso6391; if (lc == #iso6393) return iso6393;
+            #define LANGUAGE_CODE( iso6391, iso6393, description )      if ((lc == #iso6391) || (lc == #iso6393)) return iso6391;
             #include "iso639.h"
             #undef LANGUAGE_CODE
             
