@@ -58,7 +58,7 @@ namespace machinelearning { namespace tools {
    
         /** convert a string into the language code 
          * @param p_lang string value with language code
-         * @return enum language code
+         * @return enum language code (upper-case)
          **/
         inline code fromString( const std::string& p_lang ) {
             if (p_lang.empty() || (p_lang.size() < 2) || (p_lang.size() > 3))
@@ -96,14 +96,19 @@ namespace machinelearning { namespace tools {
         
         /** return a list with all language codes
          * @param p_list option for creating code list
+         * @param p_lower set all return values to lower-case
          * @return vector with language codes
          **/
-        inline std::vector<std::string> getCodeList( const listcode& p_list = all ) {
+        inline std::vector<std::string> getCodeList( const listcode& p_list = all, const bool& p_lower = true ) {
             std::vector<std::string> l_list;
             
             #define LANGUAGE_CODE( iso6391, iso6393, description )      if ((p_list == all) || (p_list == iso639_1)) l_list.push_back(#iso6391); if ((p_list == all) || (p_list == iso639_3)) l_list.push_back(#iso6393);
             #include "iso639.h"
             #undef LANGUAGE_CODE
+            
+            if (p_lower)
+                for(std::vector<std::string>::iterator it = l_list.begin(); it != l_list.end(); it++)
+                    boost::to_lower( *it );
             
             return l_list;
         }
