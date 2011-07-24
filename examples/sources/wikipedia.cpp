@@ -40,7 +40,7 @@ using namespace machinelearning;
 bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_args ) {
     
     if (argc < 2) {
-        std::cout << "--lang \t\t language (values: en, de [default])" << std::endl;
+        std::cout << "--lang \t\t language (values: en [default], de)" << std::endl;
         std::cout << "--search \t returns the artice of the keyword / returns list of articles / if empty, you will get a random article" << std::endl;
         return false;
     }
@@ -82,7 +82,7 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
     
     p_args["search"]    = l_argmap["search"];
     
-    p_args["lang"] = tools::language::DE;
+    p_args["lang"] = tools::language::EN;
     if (l_argmap["lang"].size() > 0)
         try {
             p_args["lang"] = tools::language::fromString(l_argmap["lang"][0]);
