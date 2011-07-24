@@ -99,7 +99,7 @@ namespace machinelearning { namespace tools {
          * @param p_lower set all return values to lower-case
          * @return vector with language codes
          **/
-        inline std::vector<std::string> getCodeList( const listcode& p_list = all, const bool& p_lower = true ) {
+        inline std::vector<std::string> getCodeList( const listcode& p_list = all, const bool& p_lower = false ) {
             std::vector<std::string> l_list;
             
             #define LANGUAGE_CODE( iso6391, iso6393, description )      if ((p_list == all) || (p_list == iso639_1)) l_list.push_back(#iso6391); if ((p_list == all) || (p_list == iso639_3)) l_list.push_back(#iso6393);
