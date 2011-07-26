@@ -332,7 +332,7 @@ def target_sources(env, framework) :
     sources = []
 
     if env["withsources"] :
-        sources.extend( ["newsgroup.cpp", "wikipedia.cpp"] )
+        sources.extend( ["twitter.cpp", "newsgroup.cpp", "wikipedia.cpp"] )
 
     if env["withfiles"] :
         sources.append( "cloud.cpp" )

@@ -21,31 +21,59 @@
  @endcond
  **/
 
+#include <map>
+#include <ctime>
+#include <cstdlib>
 
+#include <machinelearning.h>
+#include <boost/any.hpp>
+#include <boost/lexical_cast.hpp>
 
-#ifndef MACHINELEARNING_TOOLS_H
-#define MACHINELEARNING_TOOLS_H
+using namespace machinelearning;
+/*
+#include <sstream>
+#include <boost/iostreams/device/file.hpp>
+#include <boost/iostreams/device/file_descriptor.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+namespace io = boost::iostreams;
+*/
 
-namespace machinelearning { 
+/** main program
+ * @param argc number of arguments
+ * @param argv arguments
+ **/
+int main(int argc, char* argv[]) {
+  
+    /*
+    io::filtering_ostream out;
+    //out.push(tools::iostreams::urlencoder());
+
+    out.push(io::file_sink("../machinelearning.h"));
     
-    /** namespace for all tools, which are used within the toolbox 
-     * $LastChangedDate$
-     **/
-    namespace tools {};
+    std::stringstream xout;*/
+    //std::cout << xout.str() << std::endl;
+    
+    /*
+    tools::sources::twitter tw;
+    tools::sources::twitter::searchparameter s;
+    tools::sources::twitter::searchparameter::geoposition g;
+    
+    s.setLanguage( tools::language::BR );
+    s.setResultType( tools::sources::twitter::searchparameter::mixed );
+    
+    g.longitude = 20;
+    g.latitude = 40;
+    g.radius = 1.3;
+    s.setGeoPosition(g);
+    
+    std::time_t rawtime;
+    time ( &rawtime );
+    struct tm* timeinfo = localtime ( &rawtime );
+    s.setUntilDate(*timeinfo);
+    
+    tw.search("xxx", s);
+    */
+    //std::cout << tools::function::urlencode("http://www.example.com/~user/?test=1&test1=2") << std::endl;
 
-};
-
-        
-        
-#include "random.hpp"
-#include "function.hpp"
-#include "matrix.hpp"
-#include "vector.hpp"
-#include "lapack.hpp"
-#include "logger.hpp"
-#include "sources/sources.h"
-#include "files/files.h"
-#include "language/language.h"
-#include "iostreams/iostreams.h"
-
-#endif
+    return EXIT_SUCCESS;
+}

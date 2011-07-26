@@ -47,7 +47,7 @@ namespace machinelearning {
 #include "nntp.h"
 #include "wikipedia.h"
 #include "cloud.hpp"
-//#include "twitter.h"
+#include "twitter.h"
 
 #endif
 #endif
