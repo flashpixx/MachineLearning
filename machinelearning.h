@@ -716,6 +716,7 @@
  * @file tools/sources/sources.h main header for all sources
  * @file tools/sources/nntp.h NNTP client
  * @file tools/sources/wikipedia.h wikipedia client
+ * @file tools/sources/twitter.h twitter support
  * @file tools/sources/cloud.hpp implementation of cloud datasets
  *
  * @file tools/language/language.h multilanguage includes
