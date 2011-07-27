@@ -26,11 +26,15 @@
 
 #include <locale>
 #include <sstream>
+#include <string>
 #include <boost/iostreams/concepts.hpp>
 #include <boost/iostreams/operations.hpp>
 
 namespace machinelearning { namespace tools { namespace iostreams {
 
+    /** filter class for creating a stream with "percent encoding"
+     * @see http://en.wikipedia.org/wiki/Percent-encoding
+     **/
     class urlencoder : public boost::iostreams::output_filter
     {
     
@@ -43,6 +47,10 @@ namespace machinelearning { namespace tools { namespace iostreams {
     };
     
     
+    /** create a hexdecimal value of a input char
+     * @param p_char input value
+     * @return string with char value
+     **/
     inline std::string urlencoder::toHex( const int& p_char ) const
     {
         std::stringstream l_stream;
@@ -50,6 +58,12 @@ namespace machinelearning { namespace tools { namespace iostreams {
         return l_stream.str();
     }
     
+    
+    /** create representation
+     * @param p_dest destination stream
+     * @param p_char input character
+     * @return bool for writing
+     **/
     template<typename sink> inline bool urlencoder::put(sink& p_dest, int p_char)
     {
         // unreserved characters
