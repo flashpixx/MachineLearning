@@ -25,18 +25,20 @@
 #include <ctime>
 #include <cstdlib>
 
+#include <iostream>
 #include <machinelearning.h>
 #include <boost/any.hpp>
 #include <boost/lexical_cast.hpp>
 
 using namespace machinelearning;
-/*
+
+
 #include <sstream>
 #include <boost/iostreams/device/file.hpp>
 #include <boost/iostreams/device/file_descriptor.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 namespace io = boost::iostreams;
-*/
+
 
 /** main program
  * @param argc number of arguments
@@ -44,14 +46,16 @@ namespace io = boost::iostreams;
  **/
 int main(int argc, char* argv[]) {
   
-    /*
-    io::filtering_ostream out;
-    //out.push(tools::iostreams::urlencoder());
+    io::filtering_streambuf< io::output > out;
 
-    out.push(io::file_sink("../machinelearning.h"));
+    out.push(tools::iostreams::urlencoder());
+    out.push( std::cout );
     
-    std::stringstream xout;*/
-    //std::cout << xout.str() << std::endl;
+    std::istringstream l_sstream( "abcd_ efgh tjg     abc* xxxx\ndhasidhasdbaldl", std::stringstream::binary);
+    l_sstream >> std::noskipws;
+    
+    std::copy( std::istream_iterator<char>(l_sstream), std::istream_iterator<char>(), std::ostreambuf_iterator<char>(&out) );
+    std::cout << "\n\n\n" << l_sstream.str() << std::endl;
     
     /*
     tools::sources::twitter tw;

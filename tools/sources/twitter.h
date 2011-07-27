@@ -44,6 +44,7 @@ namespace machinelearning { namespace tools { namespace sources {
     
     /** class for using Twitter
      * @see https://dev.twitter.com/docs
+     * $LastChangedDate$
      **/
     class twitter {
         
