@@ -730,6 +730,9 @@
  * @file textprocess/termfrequency.h class for creating a term frequency structur of input text
  * @file textprocess/stopwordreduction.h class for stopword reduction
  *
+ * @file tools/iostreams/iostreams.h main header for iostreams includes
+ * @file tools/iostreams/urlencoder.h encoder for url
+ *
  *
  * @todo thinking about a SSE support in the framework http://en.wikipedia.org/wiki/SSE3
  * @todo thinking about CILK support http://supertech.csail.mit.edu/cilk/
