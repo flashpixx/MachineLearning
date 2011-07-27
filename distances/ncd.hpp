@@ -663,7 +663,9 @@ namespace machinelearning { namespace distances {
             }
             
         } else {
+            // we read binary data and don't skip any whitespaces
             std::istringstream l_sstream( p_str1+p_str2, std::stringstream::binary );
+            l_sstream >> std::noskipws;
             std::copy( std::istream_iterator<char>(l_sstream), std::istream_iterator<char>(), std::ostreambuf_iterator<char>(&l_deflate) );
         }
 
