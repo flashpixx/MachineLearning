@@ -59,7 +59,7 @@ int main(int argc, char* argv[]) {
     s.setUntilDate(*timeinfo);
     
      
-    tw.search("@flashpixx", s);
+    tw.search("netzpolitik");
     
     return EXIT_SUCCESS;
 }

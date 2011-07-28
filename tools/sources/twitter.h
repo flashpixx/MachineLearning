@@ -128,7 +128,7 @@ namespace machinelearning { namespace tools { namespace sources {
             /** search parameter **/
             searchparameter m_searchparameter;
         
-            void sendRequest( bip::tcp::socket&, const std::string&, const std::string& ) const;
+            void sendRequest( bip::tcp::socket&, const std::string&, const std::string& );
             void throwHTTPError( const unsigned int& ) const;   
             std::string urlencode( const std::string& ) const;
     };
@@ -201,12 +201,18 @@ namespace machinelearning { namespace tools { namespace sources {
         m_searchparameter = p_params;
         
         // create GET query
-        std::ostringstream l_url;
-        l_url << "/search.json?q=" << urlencode(p_search) << "&" << p_params;
+        std::ostringstream l_query;
+        l_query << "/search.json?q=" << urlencode(p_search) << "&" << p_params;
         
+        // run request
+        boost::system::error_code l_error = boost::asio::error::host_not_found;
+        m_socketsearch.connect(m_resolvesearch, l_error);
+        if (l_error)
+            throw exception::runtime(_("can not connect to twitter search server"));        
+
+        sendRequest( m_socketsearch, l_query.str(), "search.twitter.com" );
+        m_socketsearch.close();
         
-        
-        std::cout << "data: " << l_url.str() << std::endl;
     }
     
     
@@ -243,9 +249,8 @@ namespace machinelearning { namespace tools { namespace sources {
      * @param p_query query call
      * @param p_server server name
      **/
-    inline void twitter::sendRequest( bip::tcp::socket& p_socket, const std::string& p_query, const std::string& p_server ) const
+    inline void twitter::sendRequest( bip::tcp::socket& p_socket, const std::string& p_query, const std::string& p_server )
     {
-        
         // create HTTP request and send them over the socket        
         boost::asio::streambuf l_request;
         std::ostream l_request_stream(&l_request);
@@ -277,7 +282,17 @@ namespace machinelearning { namespace tools { namespace sources {
 
         
         // read content data
+        l_response_stream.clear();
+        boost::system::error_code l_error;
         
+        while (boost::asio::read(p_socket, l_response, boost::asio::transfer_at_least(1), l_error));
+        
+        if (l_error != boost::asio::error::eof)
+            throw exception::runtime(_("data can not be received"));
+        
+        std::string l_data( (std::istreambuf_iterator<char>(l_response_stream)), std::istreambuf_iterator<char>());        
+        
+        std::cout << l_data << std::endl;
     }
     
     
