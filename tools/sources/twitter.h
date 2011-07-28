@@ -28,19 +28,23 @@
 #define MACHINELEARNING_TOOLS_SOURCES_TWITTER_H
 
 #include <ctime>
+#include <limits>
 #include <sstream>
 #include <iostream>
 #include <boost/asio.hpp>
+#include <boost/iostreams/copy.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
 #include <libjson/libjson.h>
 
 #include "../../exception/exception.h"
 #include "../language/language.h"
+#include "../iostreams/iostreams.h"
 
 
 namespace machinelearning { namespace tools { namespace sources {
     
     namespace bip  = boost::asio::ip;
-    
+    namespace bio  = boost::iostreams;    
     
     /** class for using Twitter
      * @see https://dev.twitter.com/docs
@@ -104,10 +108,11 @@ namespace machinelearning { namespace tools { namespace sources {
         
         
             twitter( void );
-            ~twitter( void );
+            void setHTTPAgent( const std::string& );
             void search( const std::string& ); 
             void search( const std::string&, const searchparameter& );
-        
+            
+            ~twitter( void );
         
         
         private :
@@ -123,10 +128,9 @@ namespace machinelearning { namespace tools { namespace sources {
             /** search parameter **/
             searchparameter m_searchparameter;
         
-            //unsigned int sendRequest( const std::string&, const std::string&, std::string&, const bool& = true );
+            void sendRequest( bip::tcp::socket&, const std::string&, const std::string& ) const;
             void throwHTTPError( const unsigned int& ) const;   
-            void setHTTPAgent( const std::string& );
-        
+            std::string urlencode( const std::string& ) const;
     };
     
     
@@ -175,6 +179,7 @@ namespace machinelearning { namespace tools { namespace sources {
         m_httpagent = p_agent;
     }
     
+    
     /** run a search with the last set of searchparameters / default parameters
      * @param p_search search string
      **/
@@ -183,42 +188,79 @@ namespace machinelearning { namespace tools { namespace sources {
         search( p_search, m_searchparameter );
     }
     
+    
+    /** run search with search parameters
+     * @param p_search search string
+     * @param p_params search parameter
+     **/
     inline void twitter::search( const std::string& p_search, const searchparameter& p_params )
     {
+        if (p_search.empty())
+            throw exception::runtime(_("search query need not be empty"));
+        
         m_searchparameter = p_params;
-        std::cout << "data: " << p_params << std::endl;
+        
+        // create GET query
+        std::ostringstream l_url;
+        l_url << "/search.json?q=" << urlencode(p_search) << "&" << p_params;
+        
+        
+        
+        std::cout << "data: " << l_url.str() << std::endl;
     }
     
-    // http://www.geekhideout.com/urlcode.shtml
-    // http://www.eggheadcafe.com/microsoft/C/36306735/wow-i-had-never-used-boost-iostreams-before.aspx
+    
+    /** encode a string into the URL characters and returns a string
+     * @param p_in input string
+     * @return encoded string
+     **/
+    inline std::string twitter::urlencode( const std::string& p_in ) const
+    {
+        // create a a input stream stream and disable skipping whitespaces
+        std::istringstream l_instream( p_in, std::stringstream::binary);
+        l_instream >> std::noskipws;
+    
+        // create a output stream
+        std::ostringstream l_outstream( std::stringstream::binary );
+
+        // create filter chain
+        bio::filtering_streambuf< bio::output > l_chain;
+        l_chain.push( iostreams::urlencoder( std::numeric_limits<unsigned char>::max() ) );
+        l_chain.push( l_outstream );
+        
+        // copy data (with std::copy the stream must be closed)
+        //std::copy( std::istream_iterator<char>(l_instream), std::istream_iterator<char>(), std::ostreambuf_iterator<char>(&l_chain) );
+        bio::copy( l_instream, l_chain );
+        
+        return l_outstream.str();
+    }
+        
+        
     // http://sourceforge.net/projects/libjson/
     
-    /** sends the HTTP request to the Wikipedia server and receives the header
-     * @param p_server server adress
-     * @param p_path path to the document
-     * @param p_header returning HTTP header
-     * @param p_throw bool for throwing error
-     * @return status code
+    /** sends the HTTP request to the Twitter server and receives the header and returns the data
+     * @param p_socket socket object
+     * @param p_query query call
+     * @param p_server server name
      **/
-    /*
-    inline unsigned int twitter::sendRequest( bip::tcp::socket&,  )
+    inline void twitter::sendRequest( bip::tcp::socket& p_socket, const std::string& p_query, const std::string& p_server ) const
     {
         
         // create HTTP request and send them over the socket        
         boost::asio::streambuf l_request;
         std::ostream l_request_stream(&l_request);
-        l_request_stream << "GET " << "/search.json" << "?" << " HTTP/1.1\r\n";
-        l_request_stream << "Host: " << "search.twitter.com" << "\r\n";
-        l_request_stream << "Accept: * / *\r\n"; <<== space bevore / after * must be removed
+        l_request_stream << "GET " << p_query << " HTTP/1.1\r\n";
+        l_request_stream << "Host: " << p_server << "\r\n";
+        l_request_stream << "Accept: */*\r\n";
         l_request_stream << "User-Agent: " << m_httpagent << "\r\n";
         l_request_stream << "Connection: close\r\n\r\n";
         
-        boost::asio::write( m_socketsearch, l_request );
+        boost::asio::write( p_socket, l_request );
         
         
         // read the complet HTTP header "double CR/LR"
         boost::asio::streambuf l_response;
-        boost::asio::read_until(m_socket, l_response, "\r\n\r\n");
+        boost::asio::read_until(p_socket, l_response, "\r\n\r\n");
         
         // convert stream data into string and remove the end seperator
         std::istream l_response_stream( &l_response );
@@ -236,7 +278,7 @@ namespace machinelearning { namespace tools { namespace sources {
         
         // read content data
         
-    }*/
+    }
     
     
     /** create an exception on the status code

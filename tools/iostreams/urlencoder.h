@@ -42,21 +42,56 @@ namespace machinelearning { namespace tools { namespace iostreams {
     
         public :
         
+            urlencoder( const unsigned int& );
             template<typename sink> bool put(sink&, int);
         
         private :
-            std::string toHex( const int& ) const;
+        
+            /** maximal unsigned value for the input character **/
+            const unsigned int m_maxinputsize;
+            /** number of prefill values **/
+            unsigned int m_prefill;
+        
+            std::string toHex( const unsigned int& ) const;
+            unsigned int prefill( const unsigned int& ) const;
+        
     };
+    
+    
+    
+    
+    /** constructor
+     * @param p_max maximum value for hex encoding
+    **/
+    inline urlencoder::urlencoder( const unsigned int& p_max ) :
+        m_maxinputsize( p_max ),
+        m_prefill( prefill(p_max) )
+    {}
+
+    
+    /** determine prefill number of hex codes
+     * @param p_max maximal number
+     * @return number of prefixes
+     **/
+    inline unsigned int urlencoder::prefill( const unsigned int& p_max ) const
+    {
+        unsigned int l_prefill = 0;
+        
+        for(unsigned int l_max = p_max; l_max != 0; ++l_prefill)
+            l_max >>= 4;
+        
+        return l_prefill;
+    }
     
     
     /** create a hexdecimal value of a input char
      * @param p_char input value
      * @return string with char value
      **/
-    inline std::string urlencoder::toHex( const int& p_char ) const
+    inline std::string urlencoder::toHex( const unsigned int& p_char ) const
     {
         std::stringstream l_stream;
-        l_stream << std::setfill('0') << std::setw(2) << std::hex << p_char;
+        l_stream << std::setfill('0') << std::setw(m_prefill) << std::hex << p_char;
         return l_stream.str();
     }
     
@@ -75,8 +110,11 @@ namespace machinelearning { namespace tools { namespace iostreams {
         // reserved characters
         bool l_res = boost::iostreams::put(p_dest, '%');
         
+        // for the correct hex encoding, we need a uint value, the char value are in the range
+        // -maxvalue/2 till maxvalue/2 and we change it to 0 to maxvalue-1
+        const std::string l_hex= toHex( static_cast<unsigned int>(p_char < 0 ? m_maxinputsize + p_char + 1 : p_char) % m_maxinputsize );
+        
         // change char to hex number and add the values to the stream
-        const std::string l_hex = toHex( p_char );
         for(std::size_t i=0; (i < l_hex.size()) && l_res; ++i)
             l_res = l_res && boost::iostreams::put(p_dest, l_hex[i]);
                 
