@@ -111,6 +111,7 @@ namespace machinelearning { namespace tools { namespace sources {
             void setHTTPAgent( const std::string& );
             void search( const std::string& ); 
             void search( const std::string&, const searchparameter& );
+            //void refresh( void );
             
             ~twitter( void );
         
