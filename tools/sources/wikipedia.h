@@ -214,6 +214,9 @@ namespace machinelearning { namespace tools { namespace sources {
      **/
     inline void wikipedia::getArticle( const std::string& p_search, const language::code& p_lang )
     {
+        if (p_search.empty())
+            throw exception::runtime(_("search query need not be empty"));
+        
         m_articlefound = false;
         m_acronym.clear();
         
