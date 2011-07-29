@@ -56,8 +56,7 @@
  * <li><i>optional GiNaC</i> ( http://www.ginac.de/ ) with CLN ( http://www.ginac.de/CLN/ ) [version newer or equal 1.6]</li>
  * <li><i>optional GetText</i> ( http://www.gnu.org/software/gettext ) for including multilanguage support</li>
  * <li><i>optional LibXML2</i> ( http://xmlsoft.org/ ) (used by wikipedia support)</li>
- * <li><i>optional LibJSON</i> ( http://sourceforge.net/projects/libjson/ ) (used by twitter support) ????</li>
- * <li><i>optional LibJSONCPP</i> ( https://sourceforge.net/projects/jsoncpp/ ) (used by twitter support) ????</li>
+ * <li><i>optional LibJSONCPP</i> ( https://sourceforge.net/projects/jsoncpp/ ) (used by twitter support)</li>
  * <li><i>optional Scons</i> ( http://www.scons.org/ )</li>
  * <li><i>optional Doxygen</i> ( http://www.doxygen.org/ )</li>
  * </ul>
