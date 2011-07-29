@@ -83,6 +83,7 @@ namespace machinelearning { namespace tools { namespace sources {
                     void setUntilDate( const std::tm& );
                     void setLanguage( const language::code& );
                     void setResultType( const resulttype& );
+                    void setResultCount( const std::size_t& );
                 
                     friend std::ostream& operator<< ( std::ostream&, const searchparameter& );
         
@@ -100,6 +101,8 @@ namespace machinelearning { namespace tools { namespace sources {
                     std::string m_until;
                     /** geoposition like latitude,longitude,radius_radiuslength **/
                     std::string m_geo;
+                    /** number of results **/
+                    std::size_t m_resultcount;
             };
         
         
@@ -128,6 +131,8 @@ namespace machinelearning { namespace tools { namespace sources {
             std::string sendRequest( bip::tcp::socket&, const std::string&, const std::string& );
             void throwHTTPError( const unsigned int& ) const;   
             std::string urlencode( const std::string& ) const;
+        
+            void printValueTree( Json::Value&, const std::string& = "." ) const;
     };
     
     
@@ -140,8 +145,7 @@ namespace machinelearning { namespace tools { namespace sources {
         m_searchparameter()
     {
         boost::system::error_code l_error = boost::asio::error::host_not_found;
-        /*
-        
+
         // determine IP of the twitter seach server
         bip::tcp::resolver l_resolversearch(m_iosearch);
         bip::tcp::resolver::query l_searchquery("search.twitter.com", "http");
@@ -156,7 +160,6 @@ namespace machinelearning { namespace tools { namespace sources {
         
         if (l_error)
             throw exception::runtime(_("can not connect to twitter search server"));
-         */
     }
     
     
@@ -197,8 +200,8 @@ namespace machinelearning { namespace tools { namespace sources {
             throw exception::runtime(_("search query need not be empty"));
         
         m_searchparameter = p_params;
-        /*
-        // create GET query
+        
+        // create GET query (with default values)
         std::ostringstream l_query;
         l_query << "/search.json?q=" << function::urlencode(p_search) << "&" << p_params;
         
@@ -209,14 +212,10 @@ namespace machinelearning { namespace tools { namespace sources {
             throw exception::runtime(_("can not connect to twitter search server"));        
 
         const std::string l_json = sendRequest( m_socketsearch, l_query.str(), "search.twitter.com" );
-        m_socketsearch.close();*/
+        m_socketsearch.close();
         
-        std::ostringstream l_txt;
-        std::ifstream l_file;
-        l_file.open("json.txt", std::ifstream::binary);
-        bio::copy( l_file, l_txt );
-        const std::string l_json = l_txt.str();
-        
+        if (l_json.empty())
+            throw exception::runtime(_("no JSON data received"));
         
         // JSON parsing
         Json::Value l_twitterroot;
@@ -226,11 +225,9 @@ namespace machinelearning { namespace tools { namespace sources {
         if (!l_jsonreader.parse( l_json, l_twitterroot ))
             throw exception::runtime(_("JSON data can not be parsed"));
         
+        printValueTree(l_twitterroot);
     }
     
-    
-        
-    // http://sourceforge.net/projects/libjson/
     
     /** sends the HTTP request to the Twitter server and receives the header and returns the data
      * @param p_socket socket object
@@ -251,35 +248,46 @@ namespace machinelearning { namespace tools { namespace sources {
         
         boost::asio::write( p_socket, l_request );
         
-        
-        // read the complet HTTP header "double CR/LR"
+        // read first header line and extract HTTP status data
         boost::asio::streambuf l_response;
-        boost::asio::read_until(p_socket, l_response, "\r\n\r\n");
+        boost::asio::read_until(p_socket, l_response, "\r\n");
+        std::istream l_response_stream(&l_response);
         
-        // convert stream data into string and remove the end seperator
-        std::istream l_response_stream( &l_response );
-        std::string l_header( (std::istreambuf_iterator<char>(l_response_stream)), std::istreambuf_iterator<char>());
-        l_header.erase( l_header.end()-4, l_header.end() );
+        std::string l_http_version;
+        unsigned int l_status;
+        std::string l_status_message;
         
-        // copy the return value into a string and seperates the status code
-        unsigned int l_status = 0;
-        try {
-            l_status = boost::lexical_cast<unsigned int>( l_header.substr( l_header.find(" ")+1,3) );
-        } catch (...) {}
+        l_response_stream >> l_http_version;
+        l_response_stream >> l_status;
         
+        std::getline(l_response_stream, l_status_message);
+        if (!l_response_stream || l_http_version.substr(0, 5) != "HTTP/")
+            throw exception::runtime(_("invalid response"));
         throwHTTPError( l_status );
+        
+        // read rest header until "double CR/LR"
+        boost::asio::read_until(p_socket, l_response, "\r\n\r\n");
+        // read each headerline, because on the socket can be more data than the header
+        // so we read them until the header ends
+        std::string l_header;
+        while (std::getline(l_response_stream, l_header) && l_header != "\r");
 
         
-        // read content data
-        l_response_stream.clear();
-        boost::system::error_code l_error;
+        // read content data into a string stream
+        std::ostringstream l_content( std::stringstream::binary );
         
+        if (l_response.size() > 0)
+            l_content << &l_response;
+        
+        boost::system::error_code l_error;
         while (boost::asio::read(p_socket, l_response, boost::asio::transfer_at_least(1), l_error));
         
         if (l_error != boost::asio::error::eof)
             throw exception::runtime(_("data can not be received"));
-        
-        return std::string( (std::istreambuf_iterator<char>(l_response_stream)), std::istreambuf_iterator<char>());        
+
+        l_content << &l_response;
+
+        return l_content.str();
     }
     
     
@@ -330,6 +338,61 @@ namespace machinelearning { namespace tools { namespace sources {
         }
     }
     
+    
+    inline void twitter::printValueTree( Json::Value &value, const std::string &path ) const
+    {
+        switch ( value.type() ) {
+            
+            case Json::nullValue:
+                printf("%s=null\n", path.c_str() );
+                break;
+            
+            case Json::intValue:
+                printf("%s=%d\n", path.c_str(), value.asInt() );
+                break;
+            
+            case Json::uintValue:
+                printf("%s=%u\n", path.c_str(), value.asUInt() );
+                break;
+            
+            case Json::realValue:
+                printf("%s=%.16g\n", path.c_str(), value.asDouble() );
+                break;
+            
+            case Json::stringValue:
+                printf("%s=\"%s\"\n", path.c_str(), value.asString().c_str() );
+                break;
+            
+            case Json::booleanValue:
+                printf("%s=%s\n", path.c_str(), value.asBool() ? "true" : "false" );
+                break;
+                
+            case Json::arrayValue:
+                printf("%s=[]\n", path.c_str() );
+                for ( unsigned int index =0; index < value.size(); ++index )
+                {
+                    static char buffer[16];
+                    sprintf( buffer, "[%d]", index );
+                    printValueTree(value[index], path + buffer );
+                }
+                break;
+                
+            case Json::objectValue:
+                printf("%s={}\n", path.c_str() );
+                Json::Value::Members members( value.getMemberNames() );
+                std::sort( members.begin(), members.end() );
+                std::string suffix = *(path.end()-1) == '.' ? "" : ".";
+                for ( Json::Value::Members::iterator it = members.begin(); 
+                     it != members.end(); 
+                     ++it )
+                {
+                    const std::string &name = *it;
+                    printValueTree(value[name], path + suffix + name );
+                }
+                break;
+        }
+    }
+    
 
     //======= Searchparameter ===========================================================================================================================
     
@@ -340,7 +403,8 @@ namespace machinelearning { namespace tools { namespace sources {
         m_lang( language::EN ),
         m_resulttype(),
         m_until(),
-        m_geo()
+        m_geo(),
+        m_resultcount( 0 )
     {}
     
     /** set the search language
@@ -402,6 +466,20 @@ namespace machinelearning { namespace tools { namespace sources {
         m_geo = l_stream.str();
         m_use = m_use | 8;
     }
+
+    
+    /** sets the number of results
+     * @param p_num number
+     **/
+    inline void twitter::searchparameter::setResultCount( const std::size_t& p_num )
+    {
+        if ((p_num == 0) || (p_num > 1500))
+            throw exception::runtime(_("result number must be in the range [1,1500]"));
+            
+        m_resultcount = p_num;
+        m_use         = m_use | 16;
+    }
+    
     
     /** overloaded << operator for creating the string representation of the object
      * @param p_stream output stream
@@ -421,10 +499,12 @@ namespace machinelearning { namespace tools { namespace sources {
          
         if (p_obj.m_use & 8)
             p_stream << "geocode=" << p_obj.m_geo << "&";
+        
+        if (p_obj.m_use & 16) //max 15 pages (page), max 100 per page (rpp)
+            p_stream << "rpp=" << p_obj.m_resultcount << "&";
          
         return p_stream;
     }
-    
 
     
 };};};

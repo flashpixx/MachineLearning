@@ -43,6 +43,7 @@ int main(int argc, char* argv[]) {
     
     
     tools::sources::twitter::searchparameter s;
+    /*
     tools::sources::twitter::searchparameter::geoposition g;
     
     s.setLanguage( tools::language::BR );
@@ -57,9 +58,11 @@ int main(int argc, char* argv[]) {
     time ( &rawtime );
     struct tm* timeinfo = localtime ( &rawtime );
     s.setUntilDate(*timeinfo);
-    
+    */
      
-    tw.search("netzpolitik");
+    s.setResultCount(115);
+    
+    tw.search("netzpolitik", s);
     
     return EXIT_SUCCESS;
 }

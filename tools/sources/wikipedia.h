@@ -598,26 +598,30 @@ namespace machinelearning { namespace tools { namespace sources {
         
         boost::asio::write( m_socket, l_request );
     
-        
-        // read the complet HTTP header "double CR/LR"
+        // read first header line and extract HTTP status data
         boost::asio::streambuf l_response;
-        boost::asio::read_until(m_socket, l_response, "\r\n\r\n");
+        boost::asio::read_until(m_socket, l_response, "\r\n");
+        std::istream l_response_stream(&l_response);
         
-        // convert stream data into string and remove the end seperator
-        std::istream l_response_stream( &l_response );
-        std::string l_header( (std::istreambuf_iterator<char>(l_response_stream)), std::istreambuf_iterator<char>());
-        l_header.erase( l_header.end()-4, l_header.end() );
-
-        // copy the return value into a string and seperates the status code
-        unsigned int l_status = 0;
-        try {
-            l_status = boost::lexical_cast<unsigned int>( l_header.substr( l_header.find(" ")+1,3) );
-        } catch (...) {}
+        std::string l_http_version;
+        unsigned int l_status;
+        std::string l_status_message;
         
-        if ( p_throw )
+        l_response_stream >> l_http_version;
+        l_response_stream >> l_status;
+        
+        std::getline(l_response_stream, l_status_message);
+        if (!l_response_stream || l_http_version.substr(0, 5) != "HTTP/")
+            throw exception::runtime(_("invalid response"));
+        if (p_throw)
             throwHTTPError( l_status );
         
+        // read rest header
+        boost::asio::read_until(m_socket, l_response, "\r\n\r\n");
+        std::string l_header( (std::istreambuf_iterator<char>(l_response_stream)), std::istreambuf_iterator<char>());
+        l_header.erase( l_header.end()-4, l_header.end() );
         p_header = l_header;
+        
         return l_status;
     }
 
