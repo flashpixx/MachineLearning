@@ -21,8 +21,7 @@
  @endcond
  **/
 
-#if defined(MACHINELEARNING_SOURCES) 
-//&& defined(MACHINELEARNING_SOURCES_TWITTER)
+#if defined(MACHINELEARNING_SOURCES) && defined(MACHINELEARNING_SOURCES_TWITTER)
 
 #ifndef MACHINELEARNING_TOOLS_SOURCES_TWITTER_H
 #define MACHINELEARNING_TOOLS_SOURCES_TWITTER_H
@@ -32,19 +31,16 @@
 #include <sstream>
 #include <iostream>
 #include <boost/asio.hpp>
-#include <boost/iostreams/copy.hpp>
-#include <boost/iostreams/filtering_stream.hpp>
-#include <libjson/libjson.h>
+#include <json/json.h>
 
 #include "../../exception/exception.h"
 #include "../language/language.h"
-#include "../iostreams/iostreams.h"
+#include "../function.hpp"
 
 
 namespace machinelearning { namespace tools { namespace sources {
     
     namespace bip  = boost::asio::ip;
-    namespace bio  = boost::iostreams;    
     
     /** class for using Twitter
      * @see https://dev.twitter.com/docs
@@ -129,7 +125,7 @@ namespace machinelearning { namespace tools { namespace sources {
             /** search parameter **/
             searchparameter m_searchparameter;
         
-            void sendRequest( bip::tcp::socket&, const std::string&, const std::string& );
+            std::string sendRequest( bip::tcp::socket&, const std::string&, const std::string& );
             void throwHTTPError( const unsigned int& ) const;   
             std::string urlencode( const std::string& ) const;
     };
@@ -144,7 +140,7 @@ namespace machinelearning { namespace tools { namespace sources {
         m_searchparameter()
     {
         boost::system::error_code l_error = boost::asio::error::host_not_found;
-        
+        /*
         
         // determine IP of the twitter seach server
         bip::tcp::resolver l_resolversearch(m_iosearch);
@@ -160,6 +156,7 @@ namespace machinelearning { namespace tools { namespace sources {
         
         if (l_error)
             throw exception::runtime(_("can not connect to twitter search server"));
+         */
     }
     
     
@@ -200,10 +197,10 @@ namespace machinelearning { namespace tools { namespace sources {
             throw exception::runtime(_("search query need not be empty"));
         
         m_searchparameter = p_params;
-        
+        /*
         // create GET query
         std::ostringstream l_query;
-        l_query << "/search.json?q=" << urlencode(p_search) << "&" << p_params;
+        l_query << "/search.json?q=" << function::urlencode(p_search) << "&" << p_params;
         
         // run request
         boost::system::error_code l_error = boost::asio::error::host_not_found;
@@ -211,37 +208,27 @@ namespace machinelearning { namespace tools { namespace sources {
         if (l_error)
             throw exception::runtime(_("can not connect to twitter search server"));        
 
-        sendRequest( m_socketsearch, l_query.str(), "search.twitter.com" );
-        m_socketsearch.close();
+        const std::string l_json = sendRequest( m_socketsearch, l_query.str(), "search.twitter.com" );
+        m_socketsearch.close();*/
+        
+        std::ostringstream l_txt;
+        std::ifstream l_file;
+        l_file.open("json.txt", std::ifstream::binary);
+        bio::copy( l_file, l_txt );
+        const std::string l_json = l_txt.str();
+        
+        
+        // JSON parsing
+        Json::Value l_twitterroot;
+        //Json::Features l_jsonfeatures;
+        Json::Reader l_jsonreader;
+        
+        if (!l_jsonreader.parse( l_json, l_twitterroot ))
+            throw exception::runtime(_("JSON data can not be parsed"));
         
     }
     
     
-    /** encode a string into the URL characters and returns a string
-     * @param p_in input string
-     * @return encoded string
-     **/
-    inline std::string twitter::urlencode( const std::string& p_in ) const
-    {
-        // create a a input stream stream and disable skipping whitespaces
-        std::istringstream l_instream( p_in, std::stringstream::binary);
-        l_instream >> std::noskipws;
-    
-        // create a output stream
-        std::ostringstream l_outstream( std::stringstream::binary );
-
-        // create filter chain
-        bio::filtering_streambuf< bio::output > l_chain;
-        l_chain.push( iostreams::urlencoder( std::numeric_limits<unsigned char>::max() ) );
-        l_chain.push( l_outstream );
-        
-        // copy data (with std::copy the stream must be closed)
-        //std::copy( std::istream_iterator<char>(l_instream), std::istream_iterator<char>(), std::ostreambuf_iterator<char>(&l_chain) );
-        bio::copy( l_instream, l_chain );
-        
-        return l_outstream.str();
-    }
-        
         
     // http://sourceforge.net/projects/libjson/
     
@@ -249,8 +236,9 @@ namespace machinelearning { namespace tools { namespace sources {
      * @param p_socket socket object
      * @param p_query query call
      * @param p_server server name
+     * @return JSON answer data
      **/
-    inline void twitter::sendRequest( bip::tcp::socket& p_socket, const std::string& p_query, const std::string& p_server )
+    inline std::string twitter::sendRequest( bip::tcp::socket& p_socket, const std::string& p_query, const std::string& p_server )
     {
         // create HTTP request and send them over the socket        
         boost::asio::streambuf l_request;
@@ -291,9 +279,7 @@ namespace machinelearning { namespace tools { namespace sources {
         if (l_error != boost::asio::error::eof)
             throw exception::runtime(_("data can not be received"));
         
-        std::string l_data( (std::istreambuf_iterator<char>(l_response_stream)), std::istreambuf_iterator<char>());        
-        
-        std::cout << l_data << std::endl;
+        return std::string( (std::istreambuf_iterator<char>(l_response_stream)), std::istreambuf_iterator<char>());        
     }
     
     

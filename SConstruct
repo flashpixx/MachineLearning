@@ -64,8 +64,8 @@ def configuration_macosx(config, vars, version, architecture) :
         config["linkto"].append("intl");
 
     if vars["withsources"] :
-        config["compileflags"]      += " -D MACHINELEARNING_SOURCES"
-        config["linkto"].extend( ["xml2"] )
+        config["compileflags"]      += " -D MACHINELEARNING_SOURCES -D MACHINELEARNING_SOURCES_TWITTER"
+        config["linkto"].extend( ["xml2", "libjson"] )
 
     if vars["withfiles"] :
         config["compileflags"]      += " -D MACHINELEARNING_FILES -D MACHINELEARNING_FILES_HDF"
@@ -104,8 +104,8 @@ def configuration_posix(config, vars, version, architecture) :
         config["compileflags"]      += " -D MACHINELEARNING_MULTILANGUAGE"
 
     if vars["withsources"] :
-        config["compileflags"]      += " -D MACHINELEARNING_SOURCES"
-        config["linkto"].extend( ["xml2"] )
+        config["compileflags"]      += " -D MACHINELEARNING_SOURCES -D MACHINELEARNING_SOURCES_TWITTER"
+        config["linkto"].extend( ["xml2", "libjson"] )
 
     if vars["withfiles"] :
         config["compileflags"]      += " -D MACHINELEARNING_FILES -D MACHINELEARNING_FILES_HDF"
@@ -162,8 +162,8 @@ def configuration_cygwin(config, vars, version, architecture) :
         sys.exit(1)
 
     if vars["withsources"] :
-        config["compileflags"]      += " -D MACHINELEARNING_SOURCES -D __USE_W32_SOCKETS"
-        config["linkto"].extend( ["cygxml2-2", "ws2_32"] )
+        config["compileflags"]      += " -D MACHINELEARNING_SOURCES -D MACHINELEARNING_SOURCES_TWITTER -D __USE_W32_SOCKETS"
+        config["linkto"].extend( ["cygxml2-2", "ws2_32", "libjson"] )
 
     if vars["withfiles"] :
         config["compileflags"]      += " -D MACHINELEARNING_FILES -D MACHINELEARNING_FILES_HDF"

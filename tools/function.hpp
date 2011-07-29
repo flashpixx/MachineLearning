@@ -31,11 +31,17 @@
 #include <iterator>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
+#include <boost/iostreams/copy.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+
+
+#include "iostreams/iostreams.h"
 
 
 namespace machinelearning { namespace tools { 
     
     namespace ublas         = boost::numeric::ublas;
+    namespace bio           = boost::iostreams; 
     
     
     /** class for functions
@@ -49,7 +55,7 @@ namespace machinelearning { namespace tools {
             template<typename T> static bool isNumericalZero( const T& p );
             static ublas::indirect_array<> unique( const ublas::indirect_array<>& );
             static bool fileExists( const std::string& );
-    
+            static std::string urlencode( const std::string& );
     };
 
     
@@ -106,6 +112,31 @@ namespace machinelearning { namespace tools {
         return l_file;
     }
     
+    
+    /** encode a string into the URL characters and returns a string
+     * @param p_in input string
+     * @return encoded string
+     **/
+    inline std::string function::urlencode( const std::string& p_in )
+    {
+        // create a a input stream stream and disable skipping whitespaces
+        std::istringstream l_instream( p_in, std::stringstream::binary);
+        l_instream >> std::noskipws;
+        
+        // create a output stream
+        std::ostringstream l_outstream( std::stringstream::binary );
+        
+        // create filter chain
+        bio::filtering_streambuf< bio::output > l_chain;
+        l_chain.push( iostreams::urlencoder( std::numeric_limits<unsigned char>::max() ) );
+        l_chain.push( l_outstream );
+        
+        // copy data (with std::copy the stream must be closed)
+        //std::copy( std::istream_iterator<char>(l_instream), std::istream_iterator<char>(), std::ostreambuf_iterator<char>(&l_chain) );
+        bio::copy( l_instream, l_chain );
+        
+        return l_outstream.str();
+    }
     
     
 };};
