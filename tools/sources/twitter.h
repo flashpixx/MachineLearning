@@ -32,6 +32,7 @@
 #include <iostream>
 #include <json/json.h>
 #include <boost/asio.hpp>
+#include <boost/numeric/ublas/io.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 
 #include "../../exception/exception.h"
@@ -51,7 +52,9 @@ namespace machinelearning { namespace tools { namespace sources {
         
         public :
         
+            /** inner class for representation of a tweet **/
             class tweet {
+                
                 public :
                     //const std::size_t msgid;
                     const std::time_t createat;
@@ -62,14 +65,12 @@ namespace machinelearning { namespace tools { namespace sources {
                     const std::string touser;
                     //const std::size_t touserid;
                     const ublas::vector<double> geoposition;
-                    
-                    tweet( /*const std::size_t& p_msgid,*/ const std::time_t& p_createat, const std::string& p_text, const language::code p_lang,
-                           const std::string& p_fromuser, /*const std::size_t& p_fromuserid,*/ const std::string& p_touser, /*const std::size_t& p_touserid,*/
-                           const ublas::vector<double> p_geo
-                         ) :
-                          /*msgid(p_msgid),*/ createat(p_createat), text(p_text), lang(p_lang), 
-                          fromuser(p_fromuser), /*fromuserid(p_fromuserid),*/ touser(p_touser), /*touserid(p_touserid),*/ geoposition(p_geo) 
-                    {}
+                
+                    tweet( /*const std::size_t&,*/ const std::time_t&, const std::string&, const language::code&,
+                      const std::string&, /*const std::size_t&,*/ const std::string&, /*const std::size_t&,*/
+                      const ublas::vector<double>&
+                    );
+                    friend std::ostream& operator<< ( std::ostream&, const tweet& );
             };
 
         
@@ -278,7 +279,8 @@ namespace machinelearning { namespace tools { namespace sources {
      **/
     inline std::vector<twitter::tweet> twitter::extractJsonResults( const Json::Value& p_resultarray ) const
     {
-        std::vector<twitter::tweet> l_results;
+        std::vector<twitter::tweet> l_result;
+        
         for(std::size_t i=0; i < p_resultarray.size(); ++i) {
             Json::Value l_element = p_resultarray[i];
             
@@ -305,11 +307,10 @@ namespace machinelearning { namespace tools { namespace sources {
                 }
                 
                 // create tweet object with data
-                /*
-                tweet l_tweet(
+                twitter::tweet l_tweet(
                               // message id
                               0, 
-                              l_twitterroot["text"].asString(),
+                              l_element["text"].asString(),
                               language::fromString(l_element["iso_language_code"].asString()),
                               l_element["from_user"].asString(),
                               // from user id
@@ -318,11 +319,11 @@ namespace machinelearning { namespace tools { namespace sources {
                               l_geo
                               );
                 
-                l_results.push_back(l_tweet);*/
+                l_result.push_back(l_tweet);
             }
         }           
         
-        return l_results;
+        return l_result;
     }
     
     
@@ -622,6 +623,43 @@ namespace machinelearning { namespace tools { namespace sources {
         return p_stream;
     }
 
+    
+    
+    //======= Tweet =====================================================================================================================================
+    
+    inline twitter::tweet::tweet( /*const std::size_t& p_msgid,*/ const std::time_t& p_createat, const std::string& p_text, const language::code& p_lang,
+          const std::string& p_fromuser, /*const std::size_t& p_fromuserid,*/ const std::string& p_touser, /*const std::size_t& p_touserid,*/
+          const ublas::vector<double>& p_geo
+          ) :
+        // msgid(p_msgid), 
+        createat(p_createat), 
+        text(p_text), 
+        lang(p_lang), 
+        fromuser(p_fromuser), 
+        // fromuserid(p_fromuserid), 
+        touser(p_touser), 
+        // touserid(p_touserid), 
+        geoposition(p_geo) 
+    {}
+    
+    /** overloaded << operator for creating the string representation of the object
+     * @param p_stream output stream
+     * @param p_obj object
+     * @return result stream with added data
+     **/
+    inline std::ostream& operator<< ( std::ostream& p_stream, const twitter::tweet& p_obj )
+    {
+        p_stream << p_obj.fromuser << " ()";
+        if (!p_obj.touser.empty())
+            p_stream << " to " << p_obj.touser << " ()";
+        
+        p_stream << ": '" << p_obj.text << "'";
+        
+        if (p_obj.geoposition.size() > 0)
+            p_stream << " geoposition " << p_obj.geoposition;
+        
+        return p_stream;
+    }
     
 };};};
 

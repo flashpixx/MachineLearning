@@ -62,7 +62,10 @@ int main(int argc, char* argv[]) {
      
     s.setNumberResults(10, 15);
     
-    tw.search("netzpolitik", s);
+    std::vector<tools::sources::twitter::tweet> data = tw.search("netzpolitik", s);
+    for(std::size_t i=0; i < data.size(); ++i)
+        std::cout << data[i] << std::endl;
+    
     
     return EXIT_SUCCESS;
 }
