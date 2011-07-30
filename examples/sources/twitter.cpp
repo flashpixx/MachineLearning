@@ -60,7 +60,7 @@ int main(int argc, char* argv[]) {
     s.setUntilDate(*timeinfo);
     */
      
-    s.setNumberResults(10, 15);
+    s.setNumberResults(50, 15);
     
     std::vector<tools::sources::twitter::tweet> data = tw.search("netzpolitik", s);
     for(std::size_t i=0; i < data.size(); ++i)

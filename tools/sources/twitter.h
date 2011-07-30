@@ -696,7 +696,7 @@ namespace machinelearning { namespace tools { namespace sources {
         if (!p_obj.touser.empty())
             p_stream << " to " << p_obj.touser << " ()";
         
-        p_stream << ": '" << p_obj.text << "'";
+        p_stream << ": " << p_obj.text;
         
         if (p_obj.geoposition.size() > 0)
             p_stream << " [geoposition: " << p_obj.geoposition << "]";
