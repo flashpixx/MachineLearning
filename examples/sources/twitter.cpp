@@ -60,7 +60,7 @@ int main(int argc, char* argv[]) {
     s.setUntilDate(*timeinfo);
     */
      
-    s.setResultCount(115);
+    s.setNumberResults(10, 15);
     
     tw.search("netzpolitik", s);
     

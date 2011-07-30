@@ -30,8 +30,9 @@
 #include <limits>
 #include <sstream>
 #include <iostream>
-#include <boost/asio.hpp>
 #include <json/json.h>
+#include <boost/asio.hpp>
+#include <boost/numeric/ublas/vector.hpp>
 
 #include "../../exception/exception.h"
 #include "../language/language.h"
@@ -49,6 +50,29 @@ namespace machinelearning { namespace tools { namespace sources {
     class twitter {
         
         public :
+        
+            class tweet {
+                public :
+                    //const std::size_t msgid;
+                    const std::time_t createat;
+                    const std::string text;
+                    const language::code lang;
+                    const std::string fromuser;
+                    //const std::size_t fromuserid;
+                    const std::string touser;
+                    //const std::size_t touserid;
+                    const ublas::vector<double> geoposition;
+                    
+                    tweet( /*const std::size_t& p_msgid,*/ const std::time_t& p_createat, const std::string& p_text, const language::code p_lang,
+                           const std::string& p_fromuser, /*const std::size_t& p_fromuserid,*/ const std::string& p_touser, /*const std::size_t& p_touserid,*/
+                           const ublas::vector<double> p_geo
+                         ) :
+                          /*msgid(p_msgid),*/ createat(p_createat), text(p_text), lang(p_lang), 
+                          fromuser(p_fromuser), /*fromuserid(p_fromuserid),*/ touser(p_touser), /*touserid(p_touserid),*/ geoposition(p_geo) 
+                    {}
+            };
+
+        
         
             /** inner class for the twitter optional search parameters **/
             class searchparameter {
@@ -83,7 +107,8 @@ namespace machinelearning { namespace tools { namespace sources {
                     void setUntilDate( const std::tm& );
                     void setLanguage( const language::code& );
                     void setResultType( const resulttype& );
-                    void setResultCount( const std::size_t& );
+                    void setNumberResults( const std::size_t&, const std::size_t& = 1 );
+                    void setSinceMessageID( const std::size_t& );
                 
                     friend std::ostream& operator<< ( std::ostream&, const searchparameter& );
         
@@ -101,15 +126,20 @@ namespace machinelearning { namespace tools { namespace sources {
                     std::string m_until;
                     /** geoposition like latitude,longitude,radius_radiuslength **/
                     std::string m_geo;
-                    /** number of results **/
-                    std::size_t m_resultcount;
+                    /** number of results per page **/
+                    std::size_t m_rpp;
+                    /** number of result pages **/
+                    std::size_t m_rpage;
+                    /** since message id **/
+                    std::size_t m_msgid;
+                
             };
         
         
             twitter( void );
             void setHTTPAgent( const std::string& );
-            void search( const std::string& ); 
-            void search( const std::string&, const searchparameter& );
+            std::vector<tweet> search( const std::string& ); 
+            std::vector<tweet> search( const std::string&, const searchparameter& );
             //void refresh( void );
             
             ~twitter( void );
@@ -127,12 +157,15 @@ namespace machinelearning { namespace tools { namespace sources {
             std::string m_httpagent;
             /** search parameter **/
             searchparameter m_searchparameter;
+            /** refresh URL **/
+            std::string m_refreshurl;
         
             std::string sendRequest( bip::tcp::socket&, const std::string&, const std::string& );
             void throwHTTPError( const unsigned int& ) const;   
             std::string urlencode( const std::string& ) const;
+            std::vector<tweet> extractJsonResults( const Json::Value& ) const;
         
-            void printValueTree( Json::Value&, const std::string& = "." ) const;
+            //void printValueTree( Json::Value&, const std::string& = "." ) const;
     };
     
     
@@ -142,7 +175,8 @@ namespace machinelearning { namespace tools { namespace sources {
         m_iosearch(),
         m_socketsearch(m_iosearch),
         m_httpagent("Machine Learning Framework"),
-        m_searchparameter()
+        m_searchparameter(),
+        m_refreshurl()
     {
         boost::system::error_code l_error = boost::asio::error::host_not_found;
 
@@ -183,18 +217,20 @@ namespace machinelearning { namespace tools { namespace sources {
     
     /** run a search with the last set of searchparameters / default parameters
      * @param p_search search string
+     * @return vector with tweets
      **/
-    inline void twitter::search( const std::string& p_search )
+    inline std::vector<twitter::tweet> twitter::search( const std::string& p_search )
     {
-        search( p_search, m_searchparameter );
+        return search( p_search, m_searchparameter );
     }
     
     
     /** run search with search parameters
      * @param p_search search string
      * @param p_params search parameter
+     * @return vector with tweets
      **/
-    inline void twitter::search( const std::string& p_search, const searchparameter& p_params )
+    inline std::vector<twitter::tweet> twitter::search( const std::string& p_search, const searchparameter& p_params )
     {
         if (p_search.empty())
             throw exception::runtime(_("search query need not be empty"));
@@ -219,13 +255,74 @@ namespace machinelearning { namespace tools { namespace sources {
         
         // JSON parsing
         Json::Value l_twitterroot;
-        //Json::Features l_jsonfeatures;
         Json::Reader l_jsonreader;
-        
         if (!l_jsonreader.parse( l_json, l_twitterroot ))
             throw exception::runtime(_("JSON data can not be parsed"));
         
-        printValueTree(l_twitterroot);
+        
+        // extract JSON nodes
+        if (Json::stringValue != l_twitterroot["refresh_url"].type())
+            throw exception::runtime(_("JSON data has no refresh url"));
+        m_refreshurl = l_twitterroot["refresh_url"].asString();
+        
+        if (Json::arrayValue != l_twitterroot["results"].type())
+            throw exception::runtime(_("JSON data has no result elements"));
+        
+        return extractJsonResults( l_twitterroot["results"] );
+    }
+    
+    
+    /** converts the result array into a std::vector with object data
+     * @param p_resultarray Json object
+     * @return std::vector with converted data
+     **/
+    inline std::vector<twitter::tweet> twitter::extractJsonResults( const Json::Value& p_resultarray ) const
+    {
+        std::vector<twitter::tweet> l_results;
+        for(std::size_t i=0; i < p_resultarray.size(); ++i) {
+            Json::Value l_element = p_resultarray[i];
+            
+            if ( (Json::stringValue == l_element["from_user"].type()) &&
+                (Json::intValue    == l_element["from_user_id"].type()) &&
+                (Json::stringValue == l_element["iso_language_code"].type()) &&
+                (Json::stringValue == l_element["text"].type()) 
+                //(Json::realValue   == l_element["id"].type())
+                )
+            {
+                
+                // get geo position of the element
+                ublas::vector<double> l_geo(0);
+                if (Json::objectValue == l_element["geo"].type()) {
+                    Json::Value l_geoelement = l_element["geo"];
+                    
+                    if (Json::arrayValue == l_geoelement["coordinates"].type()) {
+                        Json::Value l_coordinates = l_geoelement["coordinates"];
+                        l_geo = ublas::vector<double>(l_coordinates.size(), 0);
+                        
+                        for(std::size_t n=0; n < l_coordinates.size(); ++n)
+                            l_geo(n) = l_coordinates[n].asDouble();
+                    }
+                }
+                
+                // create tweet object with data
+                /*
+                tweet l_tweet(
+                              // message id
+                              0, 
+                              l_twitterroot["text"].asString(),
+                              language::fromString(l_element["iso_language_code"].asString()),
+                              l_element["from_user"].asString(),
+                              // from user id
+                              l_element["to_user"].asString(),
+                              // to user id
+                              l_geo
+                              );
+                
+                l_results.push_back(l_tweet);*/
+            }
+        }           
+        
+        return l_results;
     }
     
     
@@ -338,7 +435,7 @@ namespace machinelearning { namespace tools { namespace sources {
         }
     }
     
-    
+    /*
     inline void twitter::printValueTree( Json::Value &value, const std::string &path ) const
     {
         switch ( value.type() ) {
@@ -392,7 +489,7 @@ namespace machinelearning { namespace tools { namespace sources {
                 break;
         }
     }
-    
+    */
 
     //======= Searchparameter ===========================================================================================================================
     
@@ -404,7 +501,9 @@ namespace machinelearning { namespace tools { namespace sources {
         m_resulttype(),
         m_until(),
         m_geo(),
-        m_resultcount( 0 )
+        m_rpp( 0 ),
+        m_rpage( 0 ),
+        m_msgid( 0 )
     {}
     
     /** set the search language
@@ -469,15 +568,29 @@ namespace machinelearning { namespace tools { namespace sources {
 
     
     /** sets the number of results
-     * @param p_num number
+     * @param p_rpp results per page
+     * @param p_rpage number of page (begins with 1)
      **/
-    inline void twitter::searchparameter::setResultCount( const std::size_t& p_num )
+    inline void twitter::searchparameter::setNumberResults( const std::size_t& p_rpp, const std::size_t& p_rpage )
     {
-        if ((p_num == 0) || (p_num > 1500))
-            throw exception::runtime(_("result number must be in the range [1,1500]"));
-            
-        m_resultcount = p_num;
-        m_use         = m_use | 16;
+        if ((p_rpp == 0) || (p_rpp > 100))
+            throw exception::runtime(_("results per page must be in the range [1,100]"));
+        if (p_rpage * p_rpp > 1500)
+            throw exception::runtime(_("maximum results are reached"));
+        
+        m_rpp   = p_rpp;
+        m_rpage = p_rpage;
+        m_use   = m_use | 16;
+    }
+    
+    
+    /** sets the message id for the option "since message id"
+     * @param p_id message id
+     **/
+    inline void twitter::searchparameter::setSinceMessageID( const std::size_t& p_id )
+    {
+        m_msgid = p_id;
+        m_use   = m_use | 32;
     }
     
     
@@ -500,9 +613,12 @@ namespace machinelearning { namespace tools { namespace sources {
         if (p_obj.m_use & 8)
             p_stream << "geocode=" << p_obj.m_geo << "&";
         
-        if (p_obj.m_use & 16) //max 15 pages (page), max 100 per page (rpp)
-            p_stream << "rpp=" << p_obj.m_resultcount << "&";
-         
+        if (p_obj.m_use & 16) 
+            p_stream << "rpp=" << p_obj.m_rpp << "&page=" << p_obj.m_rpage << "&";
+        
+        if (p_obj.m_use & 32)
+            p_stream << "since_id=" << p_obj.m_msgid << "&";
+
         return p_stream;
     }
 
