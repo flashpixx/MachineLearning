@@ -141,7 +141,7 @@ namespace machinelearning { namespace tools { namespace sources {
             void setHTTPAgent( const std::string& );
             std::vector<tweet> search( const std::string& ); 
             std::vector<tweet> search( const std::string&, const searchparameter& );
-            //void refresh( void );
+            std::vector<tweet> refresh( void );
             
             ~twitter( void );
         
@@ -260,6 +260,47 @@ namespace machinelearning { namespace tools { namespace sources {
         if (!l_jsonreader.parse( l_json, l_twitterroot ))
             throw exception::runtime(_("JSON data can not be parsed"));
         
+        // extract JSON nodes
+        if (Json::stringValue != l_twitterroot["refresh_url"].type())
+            throw exception::runtime(_("JSON data has no refresh url"));
+        m_refreshurl = l_twitterroot["refresh_url"].asString();
+
+        if (Json::arrayValue != l_twitterroot["results"].type())
+            throw exception::runtime(_("JSON data has no result elements"));
+        
+        return extractJsonResults( l_twitterroot["results"] );
+    }
+    
+    
+    /** refreshs the last query 
+     * @return vectors with tweet
+     **/
+    inline std::vector<twitter::tweet> twitter::refresh( void )
+    {
+        if (m_refreshurl.empty())
+            throw exception::runtime(_("refresh query need not be empty"));
+        
+        // create GET query (with default values)
+        std::ostringstream l_query;
+        l_query << "/search.json" << m_refreshurl;
+        
+        // run request
+        boost::system::error_code l_error = boost::asio::error::host_not_found;
+        m_socketsearch.connect(m_resolvesearch, l_error);
+        if (l_error)
+            throw exception::runtime(_("can not connect to twitter search server"));        
+        
+        const std::string l_json = sendRequest( m_socketsearch, l_query.str(), "search.twitter.com" );
+        m_socketsearch.close();
+        
+        if (l_json.empty())
+            throw exception::runtime(_("no JSON data received"));
+        
+        // JSON parsing
+        Json::Value l_twitterroot;
+        Json::Reader l_jsonreader;
+        if (!l_jsonreader.parse( l_json, l_twitterroot ))
+            throw exception::runtime(_("JSON data can not be parsed"));
         
         // extract JSON nodes
         if (Json::stringValue != l_twitterroot["refresh_url"].type())
@@ -658,7 +699,7 @@ namespace machinelearning { namespace tools { namespace sources {
         p_stream << ": '" << p_obj.text << "'";
         
         if (p_obj.geoposition.size() > 0)
-            p_stream << " / geoposition: " << p_obj.geoposition;
+            p_stream << " [geoposition: " << p_obj.geoposition << "]";
         
         return p_stream;
     }
