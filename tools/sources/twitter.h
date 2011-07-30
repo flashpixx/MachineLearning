@@ -56,15 +56,15 @@ namespace machinelearning { namespace tools { namespace sources {
             class tweet {
                 
                 public :
-                    //const std::size_t msgid;
-                    const std::time_t createat;
-                    const std::string text;
-                    const language::code lang;
-                    const std::string fromuser;
-                    //const std::size_t fromuserid;
-                    const std::string touser;
-                    //const std::size_t touserid;
-                    const ublas::vector<double> geoposition;
+                    //std::size_t msgid;
+                    std::time_t createat;
+                    std::string text;
+                    language::code lang;
+                    std::string fromuser;
+                    //std::size_t fromuserid;
+                    std::string touser;
+                    //std::size_t touserid;
+                    ublas::vector<double> geoposition;
                 
                     tweet( /*const std::size_t&,*/ const std::time_t&, const std::string&, const language::code&,
                       const std::string&, /*const std::size_t&,*/ const std::string&, /*const std::size_t&,*/
@@ -649,6 +649,8 @@ namespace machinelearning { namespace tools { namespace sources {
      **/
     inline std::ostream& operator<< ( std::ostream& p_stream, const twitter::tweet& p_obj )
     {
+        p_stream << p_obj.createat << " [" << language::toString(p_obj.lang) << "] ";
+        
         p_stream << p_obj.fromuser << " ()";
         if (!p_obj.touser.empty())
             p_stream << " to " << p_obj.touser << " ()";
@@ -656,7 +658,7 @@ namespace machinelearning { namespace tools { namespace sources {
         p_stream << ": '" << p_obj.text << "'";
         
         if (p_obj.geoposition.size() > 0)
-            p_stream << " geoposition " << p_obj.geoposition;
+            p_stream << " / geoposition: " << p_obj.geoposition;
         
         return p_stream;
     }
