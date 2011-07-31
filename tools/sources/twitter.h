@@ -32,6 +32,7 @@
 #include <iostream>
 #include <json/json.h>
 #include <boost/asio.hpp>
+#include <boost/regex.hpp> 
 #include <boost/numeric/ublas/io.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 
@@ -56,21 +57,34 @@ namespace machinelearning { namespace tools { namespace sources {
             class tweet {
                 
                 public :
-                    //std::size_t msgid;
-                    std::time_t createat;
-                    std::string text;
-                    language::code lang;
-                    std::string fromuser;
-                    //std::size_t fromuserid;
-                    std::string touser;
-                    //std::size_t touserid;
-                    ublas::vector<double> geoposition;
-                
+
                     tweet( /*const std::size_t&,*/ const std::time_t&, const std::string&, const language::code&,
                       const std::string&, /*const std::size_t&,*/ const std::string&, /*const std::size_t&,*/
                       const ublas::vector<double>&
                     );
+                
+                    std::time_t getCreateAt( void ) const;
+                    std::string getText( void ) const;
+                    language::code getLanguage( void ) const;
+                    std::string getFromUserName( void ) const;
+                    std::string getToUserName( void ) const;
+                    ublas::vector<double> getGeoPosition( void ) const;
+                    std::vector<std::string> getLabel( void ) const;
+                
                     friend std::ostream& operator<< ( std::ostream&, const tweet& );
+                
+                private :
+                    //std::size_t m_msgid;
+                    std::time_t m_createat;
+                    std::string m_text;
+                    language::code m_lang;
+                    std::string m_fromuser;
+                    //std::size_t m_fromuserid;
+                    std::string m_touser;
+                    //std::size_t m_touserid;
+                    ublas::vector<double> m_geoposition;
+                    std::vector<std::string> m_label;
+                
             };
 
         
@@ -672,16 +686,72 @@ namespace machinelearning { namespace tools { namespace sources {
           const std::string& p_fromuser, /*const std::size_t& p_fromuserid,*/ const std::string& p_touser, /*const std::size_t& p_touserid,*/
           const ublas::vector<double>& p_geo
           ) :
-        // msgid(p_msgid), 
-        createat(p_createat), 
-        text(p_text), 
-        lang(p_lang), 
-        fromuser(p_fromuser), 
-        // fromuserid(p_fromuserid), 
-        touser(p_touser), 
-        // touserid(p_touserid), 
-        geoposition(p_geo) 
-    {}
+        // m_msgid(p_msgid), 
+        m_createat(p_createat), 
+        m_text(p_text), 
+        m_lang(p_lang), 
+        m_fromuser(p_fromuser), 
+        // m_fromuserid(p_fromuserid), 
+        m_touser(p_touser), 
+        // ,_touserid(p_touserid), 
+        m_geoposition(p_geo),
+        m_label()
+    {
+        // extract all #<word> as labels
+        boost::smatch l_what;
+        std::string::const_iterator it    = m_text.begin();
+        std::string::const_iterator l_end = m_text.end();
+
+        const boost::regex l_labelpattern( "#([[:alnum:]]+)", boost::regex_constants::perl );
+        
+        while (boost::regex_search(it, l_end, l_what, l_labelpattern)) {
+            m_label.push_back( l_what[1] );
+            it = l_what[0].second;
+        }
+    }
+    
+    
+    /** returns the "create at" field
+     * @return time
+     **/
+    inline std::time_t twitter::tweet::getCreateAt( void ) const { return m_createat; }
+    
+    
+    /** returns the tweet text
+     * @return text
+     **/
+    inline std::string twitter::tweet::getText( void ) const { return m_text; }
+    
+    
+    /** returns the language
+     * @return language code
+     **/
+    inline language::code twitter::tweet::getLanguage( void ) const { return m_lang; }
+    
+    
+    /** returns the "from user name"
+     * @return name
+     **/
+    inline std::string twitter::tweet::getFromUserName( void ) const { return m_fromuser; }
+    
+    
+    /** returns the "to user name"
+     * @return name
+     **/
+    inline std::string twitter::tweet::getToUserName( void ) const { return m_touser; }
+    
+    
+    /** returns the geo position
+     * @return ublas vector
+     **/
+    inline ublas::vector<double> twitter::tweet::getGeoPosition( void ) const { return m_geoposition; }
+    
+    
+    /** returns the labels of the twee
+     * @return vector with label
+     **/
+    inline std::vector<std::string> twitter::tweet::getLabel( void ) const { return m_label; }
+    
     
     /** overloaded << operator for creating the string representation of the object
      * @param p_stream output stream
@@ -690,16 +760,23 @@ namespace machinelearning { namespace tools { namespace sources {
      **/
     inline std::ostream& operator<< ( std::ostream& p_stream, const twitter::tweet& p_obj )
     {
-        p_stream << p_obj.createat << " [" << language::toString(p_obj.lang) << "] ";
+        p_stream << p_obj.m_createat << " [" << language::toString(p_obj.m_lang) << "] ";
         
-        p_stream << p_obj.fromuser << " ()";
-        if (!p_obj.touser.empty())
-            p_stream << " to " << p_obj.touser << " ()";
+        p_stream << p_obj.m_fromuser << " ()";
+        if (!p_obj.m_touser.empty())
+            p_stream << " to " << p_obj.m_touser << " ()";
         
-        p_stream << ": " << p_obj.text;
+        p_stream << ": " << p_obj.m_text;
         
-        if (p_obj.geoposition.size() > 0)
-            p_stream << " [geoposition: " << p_obj.geoposition << "]";
+        if (p_obj.m_geoposition.size() > 0)
+            p_stream << " [geoposition: " << p_obj.m_geoposition << "]";
+        
+        if (p_obj.m_label.size() > 0) {
+            p_stream << " [label:";
+            for (std::size_t i=0; i < p_obj.m_label.size(); ++i)
+                p_stream << " " << p_obj.m_label[i];
+            p_stream << "]";
+        }
         
         return p_stream;
     }
