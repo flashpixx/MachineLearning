@@ -155,9 +155,9 @@ namespace machinelearning { namespace tools { namespace sources {
         
             twitter( void );
             void setHTTPAgent( const std::string& );
-            std::vector<tweet> search( const std::string&, const bool& = true ); 
-            std::vector<tweet> search( const std::string&, const searchparameter&, const bool& = true );
-            std::vector<tweet> refresh( void );
+            std::vector<tweet> search( const std::string&, const std::size_t& = 0 ); 
+            std::vector<tweet> search( const std::string&, const searchparameter&, const std::size_t& = 0 );
+            std::vector<tweet> refresh( const std::size_t& = 0 );
         
             ~twitter( void );
         
@@ -180,8 +180,8 @@ namespace machinelearning { namespace tools { namespace sources {
             std::string sendRequest( bip::tcp::socket&, const std::string&, const std::string& );
             void throwHTTPError( const unsigned int& ) const;   
             std::string urlencode( const std::string& ) const;
-            std::vector<tweet> runSearchQuery( const std::string&, const bool& = true );
-            void extractSearchResult( const Json::Value&, std::vector<tweet>& ) const;
+            std::vector<tweet> runSearchQuery( const std::string&, const std::size_t& );
+            void extractSearchResult( const Json::Value&, const std::size_t&, std::vector<tweet>& ) const;
         
             void printValueTree( Json::Value&, const std::string& = "." ) const;
     };
@@ -235,22 +235,22 @@ namespace machinelearning { namespace tools { namespace sources {
     
     /** run a search with the last set of searchparameters / default parameters
      * @param p_search search string
-     * @param p_all return all data of all resulting pages
+     * @param p_number returning number of tweets (0 = maximum)
      * @return vector with tweets
      **/
-    inline std::vector<twitter::tweet> twitter::search( const std::string& p_search, const bool& p_all )
+    inline std::vector<twitter::tweet> twitter::search( const std::string& p_search, const std::size_t& p_number )
     {
-        return search( p_search, m_searchparameter, p_all );
+        return search( p_search, m_searchparameter, p_number );
     }
     
     
     /** run search with search parameters
      * @param p_search search string
      * @param p_params search parameter
-     * @param p_all return all data of all resulting pages
+     * @param p_number returning number of tweets (0 = maximum)
      * @return vector with tweets
      **/
-    inline std::vector<twitter::tweet> twitter::search( const std::string& p_search, const searchparameter& p_params, const bool& p_all )
+    inline std::vector<twitter::tweet> twitter::search( const std::string& p_search, const searchparameter& p_params, const std::size_t& p_number )
     {
         if (p_search.empty())
             throw exception::runtime(_("search query need not be empty"));
@@ -261,29 +261,30 @@ namespace machinelearning { namespace tools { namespace sources {
         std::ostringstream l_query;
         l_query << "?q=" << function::urlencode(p_search) << "&" << p_params;
         
-        return runSearchQuery(l_query.str(), p_all);
+        return runSearchQuery(l_query.str(), p_number);
     }
     
     
     /** refreshs the last query 
+     * @param p_number returning number of tweets (0 = maximum)
      * @return vectors with tweet
      **/
-    inline std::vector<twitter::tweet> twitter::refresh( void )
+    inline std::vector<twitter::tweet> twitter::refresh( const std::size_t& p_number )
     {
         if (m_refreshurl.empty())
             throw exception::runtime(_("refresh query need not be empty"));
         
-        return runSearchQuery(m_refreshurl);
+        return runSearchQuery(m_refreshurl, p_number);
     }
     
     
     /** runs a query and extract the Json data
      * @param p_search stringstream with query
-     * @param p_all return all data of all resulting pages
+     * @param p_number returning number of tweets (0 = maximum)
      * @return vector with tweet data
      * @todo check if twitter supports persistent connections, it seems there is no support (Connection: Keep-Alive)
      **/
-    inline std::vector<twitter::tweet> twitter::runSearchQuery( const std::string& p_query, const bool& p_all )
+    inline std::vector<twitter::tweet> twitter::runSearchQuery( const std::string& p_query, const std::size_t& p_number )
     {
         // run request
         boost::system::error_code l_error = boost::asio::error::host_not_found;
@@ -295,7 +296,7 @@ namespace machinelearning { namespace tools { namespace sources {
         
         // we read all pages if needed
         for(std::string l_query(p_query); !l_query.empty(); ) {
-            std::cout << l_query << std::endl;
+
             // create connection
             m_socketsearch.connect(m_resolvesearch, l_error);
             if (l_error)
@@ -320,12 +321,12 @@ namespace machinelearning { namespace tools { namespace sources {
             // if property set to read all data, we check for a next page value
             // otherwise we set stop value
             l_query.clear();
-            if ( (p_all) && (Json::stringValue == l_resultroot["next_page"].type()) )
+            if (Json::stringValue == l_resultroot["next_page"].type())
                 l_query = l_resultroot["next_page"].asString();
             
             // extract data if exists
             if (Json::arrayValue == l_resultroot["results"].type())
-                extractSearchResult( l_resultroot["results"], l_result );
+                extractSearchResult( l_resultroot["results"], p_number, l_result );
         }
 
         if (l_result.size() == 0)
@@ -336,18 +337,19 @@ namespace machinelearning { namespace tools { namespace sources {
     
     /** extracts the Json result data
      * @param p_array Json array with result data
+     * @param p_number returning number of tweets (0 = maximum)
      * @param p_result resulting vector with data
      **/
-    inline void twitter::extractSearchResult( const Json::Value& p_array, std::vector<twitter::tweet>& p_result ) const
+    inline void twitter::extractSearchResult( const Json::Value& p_array, const std::size_t& p_number, std::vector<twitter::tweet>& p_result ) const
     {
-        for(std::size_t i=0; i < p_array.size(); ++i) {
+        for(std::size_t i=0; (i < p_array.size()) && ((p_number == 0) || (p_result.size() < p_number)); ++i) {
             Json::Value l_element = p_array[i];
             
             if ( (Json::stringValue == l_element["from_user"].type()) &&
-                (Json::intValue    == l_element["from_user_id"].type()) &&
-                (Json::stringValue == l_element["iso_language_code"].type()) &&
-                (Json::stringValue == l_element["text"].type()) 
-                //(Json::realValue   == l_element["id"].type())
+                 (Json::intValue    == l_element["from_user_id"].type()) &&
+                 (Json::stringValue == l_element["iso_language_code"].type()) &&
+                 (Json::stringValue == l_element["text"].type()) 
+                 //(Json::realValue   == l_element["id"].type())
                 )
             {
                 
@@ -365,12 +367,19 @@ namespace machinelearning { namespace tools { namespace sources {
                     }
                 }
                 
+                // the language code can be different from the iso codes
+                language::code l_lang = language::EN;
+                try {
+                    l_lang = language::fromString(l_element["iso_language_code"].asString());
+                } catch (...) {}
+            
+                
                 // create tweet object with data
                 twitter::tweet l_tweet(
                               // message id
                               0, 
                               l_element["text"].asString(),
-                              language::fromString(l_element["iso_language_code"].asString()),
+                              l_lang,
                               l_element["from_user"].asString(),
                               // from user id
                               l_element["to_user"].asString(),
@@ -419,6 +428,10 @@ namespace machinelearning { namespace tools { namespace sources {
         std::getline(l_response_stream, l_status_message);
         if (!l_response_stream || l_http_version.substr(0, 5) != "HTTP/")
             throw exception::runtime(_("invalid response"));
+        
+        // status code 403 == reached maximum number of tweets, so we stop with an empty result
+        if (l_status == 403)
+            return std::string();
         throwHTTPError( l_status );
         
         // read rest header until "double CR/LR"
