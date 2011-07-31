@@ -41,8 +41,8 @@ int main(int argc, char* argv[]) {
     
     tools::sources::twitter tw;
     
-    
     tools::sources::twitter::searchparameter s;
+    
     /*
     tools::sources::twitter::searchparameter::geoposition g;
     
@@ -59,13 +59,12 @@ int main(int argc, char* argv[]) {
     struct tm* timeinfo = localtime ( &rawtime );
     s.setUntilDate(*timeinfo);
     */
+    s.setNumberResults(10);
      
-    s.setNumberResults(50, 15);
+    std::vector<tools::sources::twitter::tweet> data = tw.search("netzpolitik",s);
     
-    std::vector<tools::sources::twitter::tweet> data = tw.search("netzpolitik", s);
     for(std::size_t i=0; i < data.size(); ++i)
-        std::cout << data[i] << std::endl;
-
+        std::cout << i << " => " << data[i] << std::endl;
     
     return EXIT_SUCCESS;
 }

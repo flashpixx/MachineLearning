@@ -47,6 +47,7 @@ namespace machinelearning { namespace tools { namespace sources {
     
     /** class for using Twitter
      * @see https://dev.twitter.com/docs
+     * @todo create thread-safe structure 
      * $LastChangedDate$
      **/
     class twitter {
@@ -83,6 +84,7 @@ namespace machinelearning { namespace tools { namespace sources {
                     std::string m_touser;
                     //std::size_t m_touserid;
                     ublas::vector<double> m_geoposition;
+                    /** vector with label data **/
                     std::vector<std::string> m_label;
                 
             };
@@ -153,10 +155,10 @@ namespace machinelearning { namespace tools { namespace sources {
         
             twitter( void );
             void setHTTPAgent( const std::string& );
-            std::vector<tweet> search( const std::string& ); 
-            std::vector<tweet> search( const std::string&, const searchparameter& );
+            std::vector<tweet> search( const std::string&, const bool& = true ); 
+            std::vector<tweet> search( const std::string&, const searchparameter&, const bool& = true );
             std::vector<tweet> refresh( void );
-            
+        
             ~twitter( void );
         
         
@@ -178,9 +180,10 @@ namespace machinelearning { namespace tools { namespace sources {
             std::string sendRequest( bip::tcp::socket&, const std::string&, const std::string& );
             void throwHTTPError( const unsigned int& ) const;   
             std::string urlencode( const std::string& ) const;
-            std::vector<tweet> extractJsonResults( const Json::Value& ) const;
+            std::vector<tweet> runSearchQuery( const std::string&, const bool& = true );
+            void extractSearchResult( const Json::Value&, std::vector<tweet>& ) const;
         
-            //void printValueTree( Json::Value&, const std::string& = "." ) const;
+            void printValueTree( Json::Value&, const std::string& = "." ) const;
     };
     
     
@@ -232,20 +235,22 @@ namespace machinelearning { namespace tools { namespace sources {
     
     /** run a search with the last set of searchparameters / default parameters
      * @param p_search search string
+     * @param p_all return all data of all resulting pages
      * @return vector with tweets
      **/
-    inline std::vector<twitter::tweet> twitter::search( const std::string& p_search )
+    inline std::vector<twitter::tweet> twitter::search( const std::string& p_search, const bool& p_all )
     {
-        return search( p_search, m_searchparameter );
+        return search( p_search, m_searchparameter, p_all );
     }
     
     
     /** run search with search parameters
      * @param p_search search string
      * @param p_params search parameter
+     * @param p_all return all data of all resulting pages
      * @return vector with tweets
      **/
-    inline std::vector<twitter::tweet> twitter::search( const std::string& p_search, const searchparameter& p_params )
+    inline std::vector<twitter::tweet> twitter::search( const std::string& p_search, const searchparameter& p_params, const bool& p_all )
     {
         if (p_search.empty())
             throw exception::runtime(_("search query need not be empty"));
@@ -254,35 +259,9 @@ namespace machinelearning { namespace tools { namespace sources {
         
         // create GET query (with default values)
         std::ostringstream l_query;
-        l_query << "/search.json?q=" << function::urlencode(p_search) << "&" << p_params;
+        l_query << "?q=" << function::urlencode(p_search) << "&" << p_params;
         
-        // run request
-        boost::system::error_code l_error = boost::asio::error::host_not_found;
-        m_socketsearch.connect(m_resolvesearch, l_error);
-        if (l_error)
-            throw exception::runtime(_("can not connect to twitter search server"));        
-
-        const std::string l_json = sendRequest( m_socketsearch, l_query.str(), "search.twitter.com" );
-        m_socketsearch.close();
-        
-        if (l_json.empty())
-            throw exception::runtime(_("no JSON data received"));
-        
-        // JSON parsing
-        Json::Value l_twitterroot;
-        Json::Reader l_jsonreader;
-        if (!l_jsonreader.parse( l_json, l_twitterroot ))
-            throw exception::runtime(_("JSON data can not be parsed"));
-        
-        // extract JSON nodes
-        if (Json::stringValue != l_twitterroot["refresh_url"].type())
-            throw exception::runtime(_("JSON data has no refresh url"));
-        m_refreshurl = l_twitterroot["refresh_url"].asString();
-
-        if (Json::arrayValue != l_twitterroot["results"].type())
-            throw exception::runtime(_("JSON data has no result elements"));
-        
-        return extractJsonResults( l_twitterroot["results"] );
+        return runSearchQuery(l_query.str(), p_all);
     }
     
     
@@ -294,50 +273,75 @@ namespace machinelearning { namespace tools { namespace sources {
         if (m_refreshurl.empty())
             throw exception::runtime(_("refresh query need not be empty"));
         
-        // create GET query (with default values)
-        std::ostringstream l_query;
-        l_query << "/search.json" << m_refreshurl;
-        
-        // run request
-        boost::system::error_code l_error = boost::asio::error::host_not_found;
-        m_socketsearch.connect(m_resolvesearch, l_error);
-        if (l_error)
-            throw exception::runtime(_("can not connect to twitter search server"));        
-        
-        const std::string l_json = sendRequest( m_socketsearch, l_query.str(), "search.twitter.com" );
-        m_socketsearch.close();
-        
-        if (l_json.empty())
-            throw exception::runtime(_("no JSON data received"));
-        
-        // JSON parsing
-        Json::Value l_twitterroot;
-        Json::Reader l_jsonreader;
-        if (!l_jsonreader.parse( l_json, l_twitterroot ))
-            throw exception::runtime(_("JSON data can not be parsed"));
-        
-        // extract JSON nodes
-        if (Json::stringValue != l_twitterroot["refresh_url"].type())
-            throw exception::runtime(_("JSON data has no refresh url"));
-        m_refreshurl = l_twitterroot["refresh_url"].asString();
-        
-        if (Json::arrayValue != l_twitterroot["results"].type())
-            throw exception::runtime(_("JSON data has no result elements"));
-        
-        return extractJsonResults( l_twitterroot["results"] );
+        return runSearchQuery(m_refreshurl);
     }
     
     
-    /** converts the result array into a std::vector with object data
-     * @param p_resultarray Json object
-     * @return std::vector with converted data
+    /** runs a query and extract the Json data
+     * @param p_search stringstream with query
+     * @param p_all return all data of all resulting pages
+     * @return vector with tweet data
+     * @todo check if twitter supports persistent connections, it seems there is no support (Connection: Keep-Alive)
      **/
-    inline std::vector<twitter::tweet> twitter::extractJsonResults( const Json::Value& p_resultarray ) const
+    inline std::vector<twitter::tweet> twitter::runSearchQuery( const std::string& p_query, const bool& p_all )
     {
-        std::vector<twitter::tweet> l_result;
+        // run request
+        boost::system::error_code l_error = boost::asio::error::host_not_found;
         
-        for(std::size_t i=0; i < p_resultarray.size(); ++i) {
-            Json::Value l_element = p_resultarray[i];
+        // resulting vector for data and Json parser and clear the refresh url
+        std::vector<twitter::tweet> l_result;
+        Json::Reader l_jsonreader;
+        m_refreshurl.clear();
+        
+        // we read all pages if needed
+        for(std::string l_query(p_query); !l_query.empty(); ) {
+            std::cout << l_query << std::endl;
+            // create connection
+            m_socketsearch.connect(m_resolvesearch, l_error);
+            if (l_error)
+                throw exception::runtime(_("can not connect to twitter search server"));
+            
+            const std::string l_json = sendRequest( m_socketsearch, "/search.json"+l_query, "search.twitter.com" );
+            m_socketsearch.close();
+        
+            // if no data received we break
+            if (l_json.empty())
+                break;
+            
+            // do Json parsing
+            Json::Value l_resultroot;
+            if (!l_jsonreader.parse( l_json, l_resultroot ))
+                throw exception::runtime(_("JSON data can not be parsed"));
+            
+            // if we can find a refreh url we save it
+            if (Json::stringValue == l_resultroot["refresh_url"].type())
+                m_refreshurl = l_resultroot["refresh_url"].asString();
+            
+            // if property set to read all data, we check for a next page value
+            // otherwise we set stop value
+            l_query.clear();
+            if ( (p_all) && (Json::stringValue == l_resultroot["next_page"].type()) )
+                l_query = l_resultroot["next_page"].asString();
+            
+            // extract data if exists
+            if (Json::arrayValue == l_resultroot["results"].type())
+                extractSearchResult( l_resultroot["results"], l_result );
+        }
+
+        if (l_result.size() == 0)
+            throw exception::runtime(_("no data received"));
+        
+        return l_result;
+    }
+    
+    /** extracts the Json result data
+     * @param p_array Json array with result data
+     * @param p_result resulting vector with data
+     **/
+    inline void twitter::extractSearchResult( const Json::Value& p_array, std::vector<twitter::tweet>& p_result ) const
+    {
+        for(std::size_t i=0; i < p_array.size(); ++i) {
+            Json::Value l_element = p_array[i];
             
             if ( (Json::stringValue == l_element["from_user"].type()) &&
                 (Json::intValue    == l_element["from_user_id"].type()) &&
@@ -374,11 +378,9 @@ namespace machinelearning { namespace tools { namespace sources {
                               l_geo
                               );
                 
-                l_result.push_back(l_tweet);
+                p_result.push_back(l_tweet);
             }
         }           
-        
-        return l_result;
     }
     
     
@@ -397,7 +399,8 @@ namespace machinelearning { namespace tools { namespace sources {
         l_request_stream << "Host: " << p_server << "\r\n";
         l_request_stream << "Accept: */*\r\n";
         l_request_stream << "User-Agent: " << m_httpagent << "\r\n";
-        l_request_stream << "Connection: close\r\n\r\n";
+        l_request_stream << "Connection: close\r\n";
+        l_request_stream << "\r\n";
         
         boost::asio::write( p_socket, l_request );
         
@@ -424,7 +427,6 @@ namespace machinelearning { namespace tools { namespace sources {
         // so we read them until the header ends
         std::string l_header;
         while (std::getline(l_response_stream, l_header) && l_header != "\r");
-
         
         // read content data into a string stream
         std::ostringstream l_content( std::stringstream::binary );
@@ -491,7 +493,6 @@ namespace machinelearning { namespace tools { namespace sources {
         }
     }
     
-    /*
     inline void twitter::printValueTree( Json::Value &value, const std::string &path ) const
     {
         switch ( value.type() ) {
@@ -545,7 +546,7 @@ namespace machinelearning { namespace tools { namespace sources {
                 break;
         }
     }
-    */
+    
 
     //======= Searchparameter ===========================================================================================================================
     
