@@ -33,6 +33,7 @@
 #include <json/json.h>
 #include <boost/asio.hpp>
 #include <boost/regex.hpp> 
+#include <boost/lexical_cast.hpp>
 #include <boost/numeric/ublas/io.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 
@@ -59,8 +60,8 @@ namespace machinelearning { namespace tools { namespace sources {
                 
                 public :
 
-                    tweet( /*const std::size_t&,*/ const std::time_t&, const std::string&, const language::code&,
-                      const std::string&, /*const std::size_t&,*/ const std::string&, /*const std::size_t&,*/
+                    tweet( const unsigned long long&, const std::time_t&, const std::string&, const language::code&,
+                      const std::string&, const unsigned long long&, const std::string&, const unsigned long long&,
                       const ublas::vector<double>&
                     );
                 
@@ -68,21 +69,33 @@ namespace machinelearning { namespace tools { namespace sources {
                     std::string getText( void ) const;
                     language::code getLanguage( void ) const;
                     std::string getFromUserName( void ) const;
+                    unsigned long long getFromUserID( void ) const;
                     std::string getToUserName( void ) const;
+                    unsigned long long getToUserID( void ) const;
                     ublas::vector<double> getGeoPosition( void ) const;
                     std::vector<std::string> getLabel( void ) const;
                 
                     friend std::ostream& operator<< ( std::ostream&, const tweet& );
                 
                 private :
-                    //std::size_t m_msgid;
+                
+                    /** message id **/
+                    unsigned long long m_msgid;
+                    /** create at **/
                     std::time_t m_createat;
+                    /** message text **/
                     std::string m_text;
+                    /** message language **/
                     language::code m_lang;
+                    /** from user text **/
                     std::string m_fromuser;
-                    //std::size_t m_fromuserid;
+                    /** from user id **/
+                    unsigned long long m_fromuserid;
+                    /** to user name **/
                     std::string m_touser;
-                    //std::size_t m_touserid;
+                    /** to user id **/
+                    unsigned long long m_touserid;
+                    /** geo poisition with a ublas::vector **/
                     ublas::vector<double> m_geoposition;
                     /** vector with label data **/
                     std::vector<std::string> m_label;
@@ -125,7 +138,7 @@ namespace machinelearning { namespace tools { namespace sources {
                     void setLanguage( const language::code& );
                     void setResultType( const resulttype& );
                     void setNumberResults( const std::size_t&, const std::size_t& = 1 );
-                    void setSinceMessageID( const std::size_t& );
+                    void setSinceMessageID( const unsigned long long& );
                 
                     friend std::ostream& operator<< ( std::ostream&, const searchparameter& );
         
@@ -148,7 +161,7 @@ namespace machinelearning { namespace tools { namespace sources {
                     /** number of result pages **/
                     std::size_t m_rpage;
                     /** since message id **/
-                    std::size_t m_msgid;
+                    unsigned long long m_msgid;
                 
             };
         
@@ -295,7 +308,7 @@ namespace machinelearning { namespace tools { namespace sources {
         m_refreshurl.clear();
         
         // we read all pages if needed
-        for(std::string l_query(p_query); !l_query.empty(); ) {
+        for(std::string l_query(p_query); (!l_query.empty()) && ((p_number == 0) || (l_result.size() < p_number)); ) {
 
             // create connection
             m_socketsearch.connect(m_resolvesearch, l_error);
@@ -327,6 +340,9 @@ namespace machinelearning { namespace tools { namespace sources {
             // extract data if exists
             if (Json::arrayValue == l_resultroot["results"].type())
                 extractSearchResult( l_resultroot["results"], p_number, l_result );
+            
+            //printValueTree(l_resultroot);
+            //std::cout << "\n\n\n" << std::endl;
         }
 
         if (l_result.size() == 0)
@@ -373,17 +389,23 @@ namespace machinelearning { namespace tools { namespace sources {
                     l_lang = language::fromString(l_element["iso_language_code"].asString());
                 } catch (...) {}
             
+                unsigned long long l_touser = 0;
+                try {
+                    l_touser = boost::lexical_cast<unsigned long long>(l_element["to_user_id_str"].asString());
+                } catch (...) {}
                 
-                // create tweet object with data
+                
+                // create tweet object with data (we read the string representation of the ids
+                // and convert them with boost::lexial_cast)
                 twitter::tweet l_tweet(
-                              // message id
-                              0, 
+                              boost::lexical_cast<unsigned long long>(l_element["id_str"].asString()),
+                              0, // create date
                               l_element["text"].asString(),
                               l_lang,
                               l_element["from_user"].asString(),
-                              // from user id
+                              boost::lexical_cast<unsigned long long>(l_element["from_user_id_str"].asString()),
                               l_element["to_user"].asString(),
-                              // to user id
+                              l_touser,
                               l_geo
                               );
                 
@@ -657,7 +679,7 @@ namespace machinelearning { namespace tools { namespace sources {
     /** sets the message id for the option "since message id"
      * @param p_id message id
      **/
-    inline void twitter::searchparameter::setSinceMessageID( const std::size_t& p_id )
+    inline void twitter::searchparameter::setSinceMessageID( const unsigned long long& p_id )
     {
         m_msgid = p_id;
         m_use   = m_use | 32;
@@ -696,18 +718,18 @@ namespace machinelearning { namespace tools { namespace sources {
     
     //======= Tweet =====================================================================================================================================
     
-    inline twitter::tweet::tweet( /*const std::size_t& p_msgid,*/ const std::time_t& p_createat, const std::string& p_text, const language::code& p_lang,
-          const std::string& p_fromuser, /*const std::size_t& p_fromuserid,*/ const std::string& p_touser, /*const std::size_t& p_touserid,*/
+    inline twitter::tweet::tweet( const unsigned long long& p_msgid, const std::time_t& p_createat, const std::string& p_text, const language::code& p_lang,
+          const std::string& p_fromuser, const unsigned long long& p_fromuserid, const std::string& p_touser, const unsigned long long& p_touserid,
           const ublas::vector<double>& p_geo
           ) :
-        // m_msgid(p_msgid), 
+        m_msgid(p_msgid), 
         m_createat(p_createat), 
         m_text(p_text), 
         m_lang(p_lang), 
         m_fromuser(p_fromuser), 
-        // m_fromuserid(p_fromuserid), 
+        m_fromuserid(p_fromuserid), 
         m_touser(p_touser), 
-        // ,_touserid(p_touserid), 
+        m_touserid(p_touserid), 
         m_geoposition(p_geo),
         m_label()
     {
@@ -748,11 +770,22 @@ namespace machinelearning { namespace tools { namespace sources {
      **/
     inline std::string twitter::tweet::getFromUserName( void ) const { return m_fromuser; }
     
+    /** returns the "from user id"
+     * @return name
+     **/
+    inline unsigned long long twitter::tweet::getFromUserID( void ) const { return m_fromuserid; }
+    
     
     /** returns the "to user name"
      * @return name
      **/
     inline std::string twitter::tweet::getToUserName( void ) const { return m_touser; }
+    
+    
+    /** returns the "to user id"
+     * @return name
+     **/
+    inline unsigned long long twitter::tweet::getToUserID( void ) const { return m_touserid; }
     
     
     /** returns the geo position
@@ -774,19 +807,19 @@ namespace machinelearning { namespace tools { namespace sources {
      **/
     inline std::ostream& operator<< ( std::ostream& p_stream, const twitter::tweet& p_obj )
     {
-        p_stream << p_obj.m_createat << " [" << language::toString(p_obj.m_lang) << "] ";
+        p_stream << p_obj.m_msgid << " " << _("at") << " " << p_obj.m_createat << " [" << language::toString(p_obj.m_lang) << "] ";
         
-        p_stream << p_obj.m_fromuser << " ()";
-        if (!p_obj.m_touser.empty())
-            p_stream << " to " << p_obj.m_touser << " ()";
+        p_stream << p_obj.m_fromuser << " (" << p_obj.m_fromuserid << ")";
+        if ((!p_obj.m_touser.empty()) && (p_obj.m_touserid > 0))
+            p_stream << " " << _("to") << " " << p_obj.m_touser << " (" << p_obj.m_touserid << ")";
         
         p_stream << ": " << p_obj.m_text;
         
         if (p_obj.m_geoposition.size() > 0)
-            p_stream << " [geoposition: " << p_obj.m_geoposition << "]";
+            p_stream << " [" << _("geoposition") << ": " << p_obj.m_geoposition << "]";
         
         if (p_obj.m_label.size() > 0) {
-            p_stream << " [label:";
+            p_stream << " [" << _("label") << ":";
             for (std::size_t i=0; i < p_obj.m_label.size(); ++i)
                 p_stream << " " << p_obj.m_label[i];
             p_stream << "]";
