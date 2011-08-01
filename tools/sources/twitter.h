@@ -36,6 +36,8 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/numeric/ublas/io.hpp>
 #include <boost/numeric/ublas/vector.hpp>
+#include <boost/date_time/time_facet.hpp>
+#include <boost/date_time/local_time/local_time.hpp>
 
 #include "../../exception/exception.h"
 #include "../language/language.h"
@@ -341,8 +343,8 @@ namespace machinelearning { namespace tools { namespace sources {
             if (Json::arrayValue == l_resultroot["results"].type())
                 extractSearchResult( l_resultroot["results"], p_number, l_result );
             
-            //printValueTree(l_resultroot);
-            //std::cout << "\n\n\n" << std::endl;
+            printValueTree(l_resultroot);
+            std::cout << "\n\n\n" << std::endl;
         }
 
         if (l_result.size() == 0)
@@ -362,10 +364,10 @@ namespace machinelearning { namespace tools { namespace sources {
             Json::Value l_element = p_array[i];
             
             if ( (Json::stringValue == l_element["from_user"].type()) &&
-                 (Json::intValue    == l_element["from_user_id"].type()) &&
                  (Json::stringValue == l_element["iso_language_code"].type()) &&
-                 (Json::stringValue == l_element["text"].type()) 
-                 //(Json::realValue   == l_element["id"].type())
+                 (Json::stringValue == l_element["text"].type()) &&
+                 (Json::stringValue == l_element["id_str"].type()) &&
+                 (Json::stringValue == l_element["from_user_id_str"].type())
                 )
             {
                 
@@ -389,25 +391,47 @@ namespace machinelearning { namespace tools { namespace sources {
                     l_lang = language::fromString(l_element["iso_language_code"].asString());
                 } catch (...) {}
             
+                // the "to user id" must not be set, so we try it
                 unsigned long long l_touser = 0;
                 try {
                     l_touser = boost::lexical_cast<unsigned long long>(l_element["to_user_id_str"].asString());
                 } catch (...) {}
                 
+                // convert the timestamp
+                std::time_t l_datetime = 0;
+                if (Json::stringValue == l_element["created_at"].type()) {
+                    std::istringstream l_datestream(l_element["created_at"].asString());
+                    
+                    // parsing data to a local time type
+                    l_datestream.imbue( std::locale(l_datestream.getloc(), new boost::local_time::local_time_input_facet("%a, %d %b %Y %H:%M:%S %q")));
+                    
+                    boost::local_time::local_date_time l_localtime(boost::date_time::pos_infin);
+                    l_datestream >> l_localtime;
+                    
+                    // convert to std::time_t
+                    std::tm l_timestruct = boost::local_time::to_tm(l_localtime);
+                    
+                    l_timestruct.tm_year -= 1900;
+                    l_datetime = mktime(&l_timestruct);
+                    if ( l_datetime == -1)
+                        throw exception::runtime(_("error during time convert"));
+                }
+
                 
                 // create tweet object with data (we read the string representation of the ids
                 // and convert them with boost::lexial_cast)
-                twitter::tweet l_tweet(
-                              boost::lexical_cast<unsigned long long>(l_element["id_str"].asString()),
-                              0, // create date
-                              l_element["text"].asString(),
-                              l_lang,
-                              l_element["from_user"].asString(),
-                              boost::lexical_cast<unsigned long long>(l_element["from_user_id_str"].asString()),
-                              l_element["to_user"].asString(),
-                              l_touser,
-                              l_geo
-                              );
+                twitter::tweet l_tweet
+                (
+                    boost::lexical_cast<unsigned long long>(l_element["id_str"].asString()),
+                    l_datetime,
+                    l_element["text"].asString(),
+                    l_lang,
+                    l_element["from_user"].asString(),
+                    boost::lexical_cast<unsigned long long>(l_element["from_user_id_str"].asString()),
+                    l_element["to_user"].asString(),
+                    l_touser,
+                    l_geo
+                );
                 
                 p_result.push_back(l_tweet);
             }
@@ -807,7 +831,13 @@ namespace machinelearning { namespace tools { namespace sources {
      **/
     inline std::ostream& operator<< ( std::ostream& p_stream, const twitter::tweet& p_obj )
     {
-        p_stream << p_obj.m_msgid << " " << _("at") << " " << p_obj.m_createat << " [" << language::toString(p_obj.m_lang) << "] ";
+        p_stream << p_obj.m_msgid;
+        if (p_obj.m_createat != 0) {
+            struct std::tm* l_time = localtime(&p_obj.m_createat);
+            p_stream << " " << _("at") << " " << asctime(l_time);
+        }
+            
+        p_stream << " [" << language::toString(p_obj.m_lang) << "] ";
         
         p_stream << p_obj.m_fromuser << " (" << p_obj.m_fromuserid << ")";
         if ((!p_obj.m_touser.empty()) && (p_obj.m_touserid > 0))
