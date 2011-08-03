@@ -26,8 +26,8 @@
 #ifndef MACHINELEARNING_TOOLS_SOURCES_TWITTER_H
 #define MACHINELEARNING_TOOLS_SOURCES_TWITTER_H
 
-#include <ctime>
 #include <limits>
+#include <locale>
 #include <sstream>
 #include <iostream>
 #include <json/json.h>
@@ -37,6 +37,7 @@
 #include <boost/numeric/ublas/io.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/date_time/time_facet.hpp>
+#include <boost/date_time/gregorian/gregorian.hpp> 
 #include <boost/date_time/local_time/local_time.hpp>
 
 #include "../../exception/exception.h"
@@ -62,12 +63,12 @@ namespace machinelearning { namespace tools { namespace sources {
                 
                 public :
 
-                    tweet( const unsigned long long&, const std::time_t&, const std::string&, const language::code&,
+                    tweet( const unsigned long long&, const boost::local_time::local_date_time&, const std::string&, const language::code&,
                       const std::string&, const unsigned long long&, const std::string&, const unsigned long long&,
                       const ublas::vector<double>&
                     );
                 
-                    std::time_t getCreateAt( void ) const;
+                    boost::local_time::local_date_time getCreateAt( void ) const;
                     std::string getText( void ) const;
                     language::code getLanguage( void ) const;
                     std::string getFromUserName( void ) const;
@@ -84,7 +85,7 @@ namespace machinelearning { namespace tools { namespace sources {
                     /** message id **/
                     unsigned long long m_msgid;
                     /** create at **/
-                    std::time_t m_createat;
+                    boost::local_time::local_date_time m_createat;
                     /** message text **/
                     std::string m_text;
                     /** message language **/
@@ -136,7 +137,7 @@ namespace machinelearning { namespace tools { namespace sources {
                 
                     searchparameter( void );
                     void setGeoPosition( const geoposition& );
-                    void setUntilDate( const std::tm& );
+                    void setUntilDate( const boost::gregorian::date& );
                     void setLanguage( const language::code& );
                     void setResultType( const resulttype& );
                     void setNumberResults( const std::size_t&, const std::size_t& = 1 );
@@ -343,8 +344,8 @@ namespace machinelearning { namespace tools { namespace sources {
             if (Json::arrayValue == l_resultroot["results"].type())
                 extractSearchResult( l_resultroot["results"], p_number, l_result );
             
-            printValueTree(l_resultroot);
-            std::cout << "\n\n\n" << std::endl;
+            //printValueTree(l_resultroot);
+            //std::cout << "\n\n\n" << std::endl;
         }
 
         if (l_result.size() == 0)
@@ -398,23 +399,13 @@ namespace machinelearning { namespace tools { namespace sources {
                 } catch (...) {}
                 
                 // convert the timestamp
-                std::time_t l_datetime = 0;
+                boost::local_time::local_date_time l_datetime(boost::date_time::not_a_date_time);
                 if (Json::stringValue == l_element["created_at"].type()) {
                     std::istringstream l_datestream(l_element["created_at"].asString());
                     
                     // parsing data to a local time type
-                    l_datestream.imbue( std::locale(l_datestream.getloc(), new boost::local_time::local_time_input_facet("%a, %d %b %Y %H:%M:%S %q")));
-                    
-                    boost::local_time::local_date_time l_localtime(boost::date_time::pos_infin);
-                    l_datestream >> l_localtime;
-                    
-                    // convert to std::time_t
-                    std::tm l_timestruct = boost::local_time::to_tm(l_localtime);
-                    
-                    l_timestruct.tm_year -= 1900;
-                    l_datetime = mktime(&l_timestruct);
-                    if ( l_datetime == -1)
-                        throw exception::runtime(_("error during time convert"));
+                    l_datestream.imbue( std::locale(l_datestream.getloc(), new boost::local_time::local_time_input_facet("%a, %d %b %Y %H:%M:%S %q")) );
+                    l_datestream >> l_datetime;
                 }
 
                 
@@ -435,7 +426,7 @@ namespace machinelearning { namespace tools { namespace sources {
                 
                 p_result.push_back(l_tweet);
             }
-        }           
+        }         
     }
     
     
@@ -647,18 +638,21 @@ namespace machinelearning { namespace tools { namespace sources {
     }
     
     /** set the date value
-     * @param p_time time struct
+     * @param p_date time struct
      **/
-    inline void twitter::searchparameter::setUntilDate( const std::tm& p_time )
+    inline void twitter::searchparameter::setUntilDate( const boost::gregorian::date& p_date )
     {
+        if (p_date.is_special())
+            throw exception::runtime(_("not a valid date"));
+        
         std::stringstream l_stream;
         
-        l_stream << (p_time.tm_year+1900) << "-" << std::setfill('0');
-        
-        l_stream << std::setw(2) << p_time.tm_mon;
-        l_stream << std::setw(0) << "-";
-        l_stream << std::setw(2) << p_time.tm_mday;
-        
+        boost::gregorian::date_facet* l_format = new boost::gregorian::date_facet();
+        l_format->format("%Y-%m-%d");
+        l_stream.imbue(std::locale(std::locale::classic(), l_format)); 
+                
+        l_stream << p_date;
+
         m_until = l_stream.str();
         m_use   = m_use | 4;
     }
@@ -742,7 +736,7 @@ namespace machinelearning { namespace tools { namespace sources {
     
     //======= Tweet =====================================================================================================================================
     
-    inline twitter::tweet::tweet( const unsigned long long& p_msgid, const std::time_t& p_createat, const std::string& p_text, const language::code& p_lang,
+    inline twitter::tweet::tweet( const unsigned long long& p_msgid, const boost::local_time::local_date_time& p_createat, const std::string& p_text, const language::code& p_lang,
           const std::string& p_fromuser, const unsigned long long& p_fromuserid, const std::string& p_touser, const unsigned long long& p_touserid,
           const ublas::vector<double>& p_geo
           ) :
@@ -774,7 +768,7 @@ namespace machinelearning { namespace tools { namespace sources {
     /** returns the "create at" field
      * @return time
      **/
-    inline std::time_t twitter::tweet::getCreateAt( void ) const { return m_createat; }
+    inline boost::local_time::local_date_time twitter::tweet::getCreateAt( void ) const { return m_createat; }
     
     
     /** returns the tweet text
@@ -832,10 +826,9 @@ namespace machinelearning { namespace tools { namespace sources {
     inline std::ostream& operator<< ( std::ostream& p_stream, const twitter::tweet& p_obj )
     {
         p_stream << p_obj.m_msgid;
-        if (p_obj.m_createat != 0) {
-            struct std::tm* l_time = localtime(&p_obj.m_createat);
-            p_stream << " " << _("at") << " " << asctime(l_time);
-        }
+        
+        if ( !p_obj.m_createat.is_special() )
+            p_stream << " " << _("at") << " " << p_obj.m_createat;
             
         p_stream << " [" << language::toString(p_obj.m_lang) << "] ";
         

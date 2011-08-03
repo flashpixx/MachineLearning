@@ -48,6 +48,7 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
         std::cout << "--max \t\t maximum number of tweets (0 = maximum)" << std::endl;
         std::cout << "--rpp \t\t number of tweets on each call" << std::endl;
         std::cout << "--page \t\t number of starting page" << std::endl;
+        std::cout << "--until \t\t date value (format YYYY MM DD)" << std::endl;
         return false;
     }
      
@@ -59,6 +60,7 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
     l_argmap["max"]        = std::vector<std::string>();
     l_argmap["rpp"]        = std::vector<std::string>();
     l_argmap["page"]       = std::vector<std::string>();
+    l_argmap["until"]      = std::vector<std::string>();
     
     
     // read all arguments
@@ -118,6 +120,15 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
     if (l_argmap["max"].size() > 0)
         p_args["max"] = boost::lexical_cast<std::size_t>(l_argmap["max"][0]);
     
+    if (l_argmap["until"].size() > 3) {
+        boost::gregorian::date l_until(
+                boost::lexical_cast<std::size_t>(l_argmap["until"][0]),
+                boost::lexical_cast<std::size_t>(l_argmap["until"][1]),
+                boost::lexical_cast<std::size_t>(l_argmap["until"][2])
+        );
+        p_args["until"] = l_until;
+    }
+    
     return true;
 }
 
@@ -149,15 +160,12 @@ int main(int argc, char* argv[]) {
         l_geo.radius    = boost::any_cast<double>(l_args["geo_radius"]);
         l_geo.length    = boost::any_cast<tools::sources::twitter::searchparameter::radiuslength>(l_args["geo_length"]);
     } catch (...) {}
+    
+    try {
+        l_params.setUntilDate( boost::any_cast<boost::gregorian::date>(l_args["until"]) );
+    } catch (...) {}
 
-    /*
-    std::time_t rawtime;
-    time ( &rawtime );
-    struct tm* timeinfo = localtime ( &rawtime );
-    s.setUntilDate(*timeinfo);
-    */
-    
-    
+
     tools::sources::twitter l_twitter;
     const std::vector<std::string> l_search = boost::any_cast< std::vector<std::string> >(l_args["search"]);
     
