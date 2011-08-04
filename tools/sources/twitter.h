@@ -361,6 +361,8 @@ namespace machinelearning { namespace tools { namespace sources {
      **/
     inline void twitter::extractSearchResult( const Json::Value& p_array, const std::size_t& p_number, std::vector<twitter::tweet>& p_result ) const
     {
+        boost::local_time::local_time_input_facet* l_format = new boost::local_time::local_time_input_facet("%a, %d %b %Y %H:%M:%S %q");
+        
         for(std::size_t i=0; (i < p_array.size()) && ((p_number == 0) || (p_result.size() < p_number)); ++i) {
             Json::Value l_element = p_array[i];
             
@@ -403,8 +405,8 @@ namespace machinelearning { namespace tools { namespace sources {
                 if (Json::stringValue == l_element["created_at"].type()) {
                     std::istringstream l_datestream(l_element["created_at"].asString());
                     
-                    // parsing data to a local time type
-                    l_datestream.imbue( std::locale(l_datestream.getloc(), new boost::local_time::local_time_input_facet("%a, %d %b %Y %H:%M:%S %q")) );
+                    // parsing data to a local time type (l_format will be destroyed automatically)
+                    l_datestream.imbue( std::locale( std::locale::classic(), l_format) );
                     l_datestream >> l_datetime;
                 }
 
@@ -426,7 +428,7 @@ namespace machinelearning { namespace tools { namespace sources {
                 
                 p_result.push_back(l_tweet);
             }
-        }         
+        }
     }
     
     
