@@ -294,7 +294,7 @@ namespace machinelearning { namespace tools { namespace sources {
     
     
     /** runs a query and extract the Json data
-     * @param p_search stringstream with query
+     * @param p_query stringstream with query
      * @param p_number returning number of tweets (0 = maximum)
      * @return vector with tweet data
      * @todo check if twitter supports persistent connections, it seems there is no support (Connection: Keep-Alive)
