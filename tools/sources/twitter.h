@@ -171,9 +171,12 @@ namespace machinelearning { namespace tools { namespace sources {
         
             twitter( void );
             void setHTTPAgent( const std::string& );
+            
             std::vector<tweet> search( const std::string&, const std::size_t& = 0 ); 
             std::vector<tweet> search( const std::string&, const searchparameter&, const std::size_t& = 0 );
             std::vector<tweet> refresh( const std::size_t& = 0 );
+        
+            void searchUser( const std::string& );
         
             ~twitter( void );
         
@@ -199,7 +202,7 @@ namespace machinelearning { namespace tools { namespace sources {
             std::vector<tweet> runSearchQuery( const std::string&, const std::size_t& );
             void extractSearchResult( const Json::Value&, const std::size_t&, std::vector<tweet>& ) const;
         
-            void printValueTree( Json::Value&, const std::string& = "." ) const;
+            //void printValueTree( Json::Value&, const std::string& = "." ) const;
     };
     
     
@@ -343,9 +346,6 @@ namespace machinelearning { namespace tools { namespace sources {
             // extract data if exists
             if (Json::arrayValue == l_resultroot["results"].type())
                 extractSearchResult( l_resultroot["results"], p_number, l_result );
-            
-            //printValueTree(l_resultroot);
-            //std::cout << "\n\n\n" << std::endl;
         }
 
         if (l_result.size() == 0)
@@ -361,8 +361,6 @@ namespace machinelearning { namespace tools { namespace sources {
      **/
     inline void twitter::extractSearchResult( const Json::Value& p_array, const std::size_t& p_number, std::vector<twitter::tweet>& p_result ) const
     {
-        boost::local_time::local_time_input_facet* l_format = new boost::local_time::local_time_input_facet("%a, %d %b %Y %H:%M:%S %q");
-        
         for(std::size_t i=0; (i < p_array.size()) && ((p_number == 0) || (p_result.size() < p_number)); ++i) {
             Json::Value l_element = p_array[i];
             
@@ -405,8 +403,8 @@ namespace machinelearning { namespace tools { namespace sources {
                 if (Json::stringValue == l_element["created_at"].type()) {
                     std::istringstream l_datestream(l_element["created_at"].asString());
                     
-                    // parsing data to a local time type (l_format will be destroyed automatically)
-                    l_datestream.imbue( std::locale( std::locale::classic(), l_format) );
+                    // parsing data to a local time type (format pointer will be destroyed automatically)
+                    l_datestream.imbue( std::locale( std::locale::classic(), new boost::local_time::local_time_input_facet("%a, %d %b %Y %H:%M:%S %q")) );
                     l_datestream >> l_datetime;
                 }
 
@@ -545,7 +543,7 @@ namespace machinelearning { namespace tools { namespace sources {
         }
     }
     
-    inline void twitter::printValueTree( Json::Value &value, const std::string &path ) const
+    /*inline void twitter::printValueTree( Json::Value &value, const std::string &path ) const
     {
         switch ( value.type() ) {
             
@@ -597,7 +595,7 @@ namespace machinelearning { namespace tools { namespace sources {
                 }
                 break;
         }
-    }
+    }*/
     
 
     //======= Searchparameter ===========================================================================================================================
