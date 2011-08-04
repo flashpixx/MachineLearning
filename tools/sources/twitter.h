@@ -176,8 +176,6 @@ namespace machinelearning { namespace tools { namespace sources {
             std::vector<tweet> search( const std::string&, const searchparameter&, const std::size_t& = 0 );
             std::vector<tweet> refresh( const std::size_t& = 0 );
         
-            void searchUser( const std::string& );
-        
             ~twitter( void );
         
         
@@ -201,8 +199,6 @@ namespace machinelearning { namespace tools { namespace sources {
             std::string urlencode( const std::string& ) const;
             std::vector<tweet> runSearchQuery( const std::string&, const std::size_t& );
             void extractSearchResult( const Json::Value&, const std::size_t&, std::vector<tweet>& ) const;
-        
-            //void printValueTree( Json::Value&, const std::string& = "." ) const;
     };
     
     
@@ -542,60 +538,6 @@ namespace machinelearning { namespace tools { namespace sources {
             case 505    : throw exception::runtime(_("HTTP Version not supported"));
         }
     }
-    
-    /*inline void twitter::printValueTree( Json::Value &value, const std::string &path ) const
-    {
-        switch ( value.type() ) {
-            
-            case Json::nullValue:
-                printf("%s=null\n", path.c_str() );
-                break;
-            
-            case Json::intValue:
-                printf("%s=%d\n", path.c_str(), value.asInt() );
-                break;
-            
-            case Json::uintValue:
-                printf("%s=%u\n", path.c_str(), value.asUInt() );
-                break;
-            
-            case Json::realValue:
-                printf("%s=%.16g\n", path.c_str(), value.asDouble() );
-                break;
-            
-            case Json::stringValue:
-                printf("%s=\"%s\"\n", path.c_str(), value.asString().c_str() );
-                break;
-            
-            case Json::booleanValue:
-                printf("%s=%s\n", path.c_str(), value.asBool() ? "true" : "false" );
-                break;
-                
-            case Json::arrayValue:
-                printf("%s=[]\n", path.c_str() );
-                for ( unsigned int index =0; index < value.size(); ++index )
-                {
-                    static char buffer[16];
-                    sprintf( buffer, "[%d]", index );
-                    printValueTree(value[index], path + buffer );
-                }
-                break;
-                
-            case Json::objectValue:
-                printf("%s={}\n", path.c_str() );
-                Json::Value::Members members( value.getMemberNames() );
-                std::sort( members.begin(), members.end() );
-                std::string suffix = *(path.end()-1) == '.' ? "" : ".";
-                for ( Json::Value::Members::iterator it = members.begin(); 
-                     it != members.end(); 
-                     ++it )
-                {
-                    const std::string &name = *it;
-                    printValueTree(value[name], path + suffix + name );
-                }
-                break;
-        }
-    }*/
     
 
     //======= Searchparameter ===========================================================================================================================
