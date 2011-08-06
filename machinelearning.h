@@ -43,7 +43,7 @@
  *         <li><i>optional MPI support</i></li>
  *     </ul>
  * </li>
- * <li>Boost Bindings (SVN http://svn.boost.org/svn/boost/sandbox/numeric_bindings )</li>
+ * <li>Boost Bindings (SVN http://svn.boost.org/svn/boost/sandbox/numeric_bindings/ )</li>
  * <li>Linear Algebra PACKage ( http://www.netlib.org/lapack/ ) [Version newer 3.3]</li>
  * <li><i>optional Hierarchical Data Format (HDF)</i> ( http://www.hdfgroup.org/ ) [version newer or equal 5.1.8.4]</li>
  * <li><i>optional Message-Passing-Interface-Support</i>
@@ -54,9 +54,9 @@
  *      </ul>
  * </li>
  * <li><i>optional GiNaC</i> ( http://www.ginac.de/ ) with CLN ( http://www.ginac.de/CLN/ ) [version newer or equal 1.6]</li>
- * <li><i>optional GetText</i> ( http://www.gnu.org/software/gettext ) for including multilanguage support</li>
+ * <li><i>optional GetText</i> ( http://www.gnu.org/software/gettext/ ) (used by multilanguage support)</li>
  * <li><i>optional LibXML2</i> ( http://xmlsoft.org/ ) (used by wikipedia support)</li>
- * <li><i>optional LibJSONCPP</i> ( https://sourceforge.net/projects/jsoncpp/ ) (used by twitter support)</li>
+ * <li><i>optional LibJSONCPP</i> ( http://sourceforge.net/projects/jsoncpp/ ) (used by twitter support)</li>
  * <li><i>optional Scons</i> ( http://www.scons.org/ )</li>
  * <li><i>optional Doxygen</i> ( http://www.doxygen.org/ )</li>
  * </ul>

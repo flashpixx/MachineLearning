@@ -48,7 +48,7 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
         std::cout << "--max \t\t maximum number of tweets (0 = maximum)" << std::endl;
         std::cout << "--rpp \t\t number of tweets on each call" << std::endl;
         std::cout << "--page \t\t number of starting page" << std::endl;
-        std::cout << "--until \t\t date value (format YYYY MM DD)" << std::endl;
+        std::cout << "--until \t date value (format YYYY MM DD)" << std::endl;
         return false;
     }
      
@@ -167,16 +167,24 @@ int main(int argc, char* argv[]) {
 
 
     tools::sources::twitter l_twitter;
+    
+    std::vector<tools::sources::twitter::timelinetweet> x = l_twitter.getPublicTimeline();
+    
+    for(std::size_t i=0; i < x.size(); ++i)
+        std::cout << x[i] << std::endl;
+    
+    /*
     const std::vector<std::string> l_search = boost::any_cast< std::vector<std::string> >(l_args["search"]);
     
     for(std::size_t i=0; i < l_search.size(); ++i) {
-        std::vector<tools::sources::twitter::tweet> l_data = l_twitter.search( l_search[i], l_params, boost::any_cast<std::size_t>(l_args["max"]) );
+        std::vector<tools::sources::twitter::searchtweet> l_data = l_twitter.search( l_search[i], l_params, boost::any_cast<std::size_t>(l_args["max"]) );
         
         for(std::size_t j=0; j < l_data.size(); ++j)
             std::cout << l_data[j] << std::endl;
         
         std::cout << "===================================================================================" << std::endl;
     }
-    
+    */
+        
     return EXIT_SUCCESS;
 }

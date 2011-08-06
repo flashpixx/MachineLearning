@@ -34,6 +34,7 @@
 #include <boost/asio.hpp>
 #include <boost/regex.hpp> 
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
 #include <boost/numeric/ublas/io.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/date_time/time_facet.hpp>
@@ -51,23 +52,25 @@ namespace machinelearning { namespace tools { namespace sources {
     
     /** class for using Twitter
      * @see https://dev.twitter.com/docs
-     * @todo create thread-safe structure 
+     * @todo create thread-safe structure
+     * @todo adding support for reading timelines (see https://dev.twitter.com/docs/api#timelines )
      * $LastChangedDate$
      **/
     class twitter {
         
         public :
         
-            /** inner class for representation of a tweet **/
-            class tweet {
+            /** inner class for representation of a search tweet **/
+            class searchtweet {
                 
                 public :
 
-                    tweet( const unsigned long long&, const boost::local_time::local_date_time&, const std::string&, const language::code&,
+                    searchtweet( const unsigned long long&, const boost::local_time::local_date_time&, const std::string&, const language::code&,
                       const std::string&, const unsigned long long&, const std::string&, const unsigned long long&,
                       const ublas::vector<double>&
                     );
                 
+                    unsigned long long getMessageID( void ) const;
                     boost::local_time::local_date_time getCreateAt( void ) const;
                     std::string getText( void ) const;
                     language::code getLanguage( void ) const;
@@ -76,9 +79,9 @@ namespace machinelearning { namespace tools { namespace sources {
                     std::string getToUserName( void ) const;
                     unsigned long long getToUserID( void ) const;
                     ublas::vector<double> getGeoPosition( void ) const;
-                    std::vector<std::string> getLabel( void ) const;
+                    std::vector<std::string> getHashtags( void ) const;
                 
-                    friend std::ostream& operator<< ( std::ostream&, const tweet& );
+                    friend std::ostream& operator<< ( std::ostream&, const searchtweet& );
                 
                 private :
                 
@@ -100,9 +103,50 @@ namespace machinelearning { namespace tools { namespace sources {
                     unsigned long long m_touserid;
                     /** geo poisition with a ublas::vector **/
                     ublas::vector<double> m_geoposition;
-                    /** vector with label data **/
-                    std::vector<std::string> m_label;
+                    /** vector with hashtags **/
+                    std::vector<std::string> m_hashtags;
+            };
+        
+        
+            /** inner class of the timeline tweets **/
+            class timelinetweet {
                 
+                public :
+                
+                    timelinetweet( const unsigned long long&, const boost::local_time::local_date_time&, const std::string&, const ublas::vector<double>&,
+                                  const std::vector<std::string>&, const std::vector<std::string>&, const unsigned long long&, const std::string&, const language::code& );
+                    unsigned long long getMessageID( void ) const;
+                    boost::local_time::local_date_time getCreateAt( void ) const;
+                    std::string getText( void ) const;
+                    ublas::vector<double> getGeoPosition( void ) const;
+                    std::vector<std::string> getHashtags( void ) const;
+                    std::vector<std::string> getURLs( void ) const;
+                    unsigned long long getUserID( void ) const;
+                    std::string getUserName( void ) const;
+                    language::code getUserLanguage( void ) const;
+                
+                    friend std::ostream& operator<< ( std::ostream&, const timelinetweet& );
+                
+                private :
+                
+                    /** message id **/
+                    unsigned long long m_msgid;
+                    /** create at **/
+                    boost::local_time::local_date_time m_createat;
+                    /** message text **/
+                    std::string m_text;
+                    /** geo poisition with a ublas::vector **/
+                    ublas::vector<double> m_geoposition;
+                    /** vector with hashtags **/
+                    std::vector<std::string> m_hashtags;
+                    /** vector with urls **/
+                    std::vector<std::string> m_urls;
+                    /** user id **/
+                    unsigned long long m_userid;
+                    /** user name **/
+                    std::string m_uname;
+                    /** user language **/
+                    language::code m_ulang;
             };
 
         
@@ -172,9 +216,11 @@ namespace machinelearning { namespace tools { namespace sources {
             twitter( void );
             void setHTTPAgent( const std::string& );
             
-            std::vector<tweet> search( const std::string&, const std::size_t& = 0 ); 
-            std::vector<tweet> search( const std::string&, const searchparameter&, const std::size_t& = 0 );
-            std::vector<tweet> refresh( const std::size_t& = 0 );
+            std::vector<searchtweet> search( const std::string&, const std::size_t& = 0 ); 
+            std::vector<searchtweet> search( const std::string&, const searchparameter&, const std::size_t& = 0 );
+            std::vector<searchtweet> refresh( const std::size_t& = 0 );
+        
+            std::vector<twitter::timelinetweet> getPublicTimeline( void );
         
             ~twitter( void );
         
@@ -187,6 +233,14 @@ namespace machinelearning { namespace tools { namespace sources {
             bip::tcp::socket m_socketsearch; 
             /** resolver of search connect **/
             bip::tcp::endpoint m_resolvesearch;
+        
+            /** io service objekt for resolving the server name of the api server **/
+            boost::asio::io_service m_ioapi;
+            /** socket objekt for send / receive the data of api calls **/
+            bip::tcp::socket m_socketapi; 
+            /** resolver of api connect **/
+            bip::tcp::endpoint m_resolveapi;
+        
             /** name for the HTTP agent **/
             std::string m_httpagent;
             /** search parameter **/
@@ -197,8 +251,8 @@ namespace machinelearning { namespace tools { namespace sources {
             std::string sendRequest( bip::tcp::socket&, const std::string&, const std::string& );
             void throwHTTPError( const unsigned int& ) const;   
             std::string urlencode( const std::string& ) const;
-            std::vector<tweet> runSearchQuery( const std::string&, const std::size_t& );
-            void extractSearchResult( const Json::Value&, const std::size_t&, std::vector<tweet>& ) const;
+            std::vector<searchtweet> runSearchQuery( const std::string&, const std::size_t& );
+            void extractSearchResult( const Json::Value&, const std::size_t&, std::vector<searchtweet>& ) const;
     };
     
     
@@ -207,6 +261,8 @@ namespace machinelearning { namespace tools { namespace sources {
     inline twitter::twitter( void ) :
         m_iosearch(),
         m_socketsearch(m_iosearch),
+        m_ioapi(),
+        m_socketapi(m_ioapi),
         m_httpagent("Machine Learning Framework"),
         m_searchparameter(),
         m_refreshurl()
@@ -224,9 +280,26 @@ namespace machinelearning { namespace tools { namespace sources {
         }
         
         m_socketsearch.close();
-        
         if (l_error)
             throw exception::runtime(_("can not connect to twitter search server"));
+        
+        
+        // determine IP of the twitter api server
+        l_error = boost::asio::error::host_not_found;
+        
+        // determine IP of the twitter seach server
+        bip::tcp::resolver l_resolverapi(m_ioapi);
+        bip::tcp::resolver::query l_apiquery("api.twitter.com", "http");
+        
+        for(bip::tcp::resolver::iterator l_endpoint = l_resolverapi.resolve( l_apiquery ); (l_error && l_endpoint != bip::tcp::resolver::iterator()); l_endpoint++) {
+            m_socketapi.close();
+            m_resolveapi = *l_endpoint;
+            m_socketapi.connect(*l_endpoint, l_error);
+        }
+        
+        m_socketapi.close();
+        if (l_error)
+            throw exception::runtime(_("can not connect to twitter api server"));
     }
     
     
@@ -234,6 +307,7 @@ namespace machinelearning { namespace tools { namespace sources {
     inline twitter::~twitter( void )
     {
         m_socketsearch.close();
+        m_socketapi.close();
     }
     
     
@@ -253,7 +327,7 @@ namespace machinelearning { namespace tools { namespace sources {
      * @param p_number returning number of tweets (0 = maximum)
      * @return vector with tweets
      **/
-    inline std::vector<twitter::tweet> twitter::search( const std::string& p_search, const std::size_t& p_number )
+    inline std::vector<twitter::searchtweet> twitter::search( const std::string& p_search, const std::size_t& p_number )
     {
         return search( p_search, m_searchparameter, p_number );
     }
@@ -265,7 +339,7 @@ namespace machinelearning { namespace tools { namespace sources {
      * @param p_number returning number of tweets (0 = maximum)
      * @return vector with tweets
      **/
-    inline std::vector<twitter::tweet> twitter::search( const std::string& p_search, const searchparameter& p_params, const std::size_t& p_number )
+    inline std::vector<twitter::searchtweet> twitter::search( const std::string& p_search, const searchparameter& p_params, const std::size_t& p_number )
     {
         if (p_search.empty())
             throw exception::runtime(_("search query need not be empty"));
@@ -284,7 +358,7 @@ namespace machinelearning { namespace tools { namespace sources {
      * @param p_number returning number of tweets (0 = maximum)
      * @return vectors with tweet
      **/
-    inline std::vector<twitter::tweet> twitter::refresh( const std::size_t& p_number )
+    inline std::vector<twitter::searchtweet> twitter::refresh( const std::size_t& p_number )
     {
         if (m_refreshurl.empty())
             throw exception::runtime(_("refresh query need not be empty"));
@@ -299,13 +373,13 @@ namespace machinelearning { namespace tools { namespace sources {
      * @return vector with tweet data
      * @todo check if twitter supports persistent connections, it seems there is no support (Connection: Keep-Alive)
      **/
-    inline std::vector<twitter::tweet> twitter::runSearchQuery( const std::string& p_query, const std::size_t& p_number )
+    inline std::vector<twitter::searchtweet> twitter::runSearchQuery( const std::string& p_query, const std::size_t& p_number )
     {
         // run request
         boost::system::error_code l_error = boost::asio::error::host_not_found;
         
         // resulting vector for data and Json parser and clear the refresh url
-        std::vector<twitter::tweet> l_result;
+        std::vector<twitter::searchtweet> l_result;
         Json::Reader l_jsonreader;
         m_refreshurl.clear();
         
@@ -355,7 +429,7 @@ namespace machinelearning { namespace tools { namespace sources {
      * @param p_number returning number of tweets (0 = maximum)
      * @param p_result resulting vector with data
      **/
-    inline void twitter::extractSearchResult( const Json::Value& p_array, const std::size_t& p_number, std::vector<twitter::tweet>& p_result ) const
+    inline void twitter::extractSearchResult( const Json::Value& p_array, const std::size_t& p_number, std::vector<twitter::searchtweet>& p_result ) const
     {
         for(std::size_t i=0; (i < p_array.size()) && ((p_number == 0) || (p_result.size() < p_number)); ++i) {
             Json::Value l_element = p_array[i];
@@ -382,7 +456,7 @@ namespace machinelearning { namespace tools { namespace sources {
                     }
                 }
                 
-                // the language code can be different from the iso codes
+                // the language code can be different to the iso codes
                 language::code l_lang = language::EN;
                 try {
                     l_lang = language::fromString(l_element["iso_language_code"].asString());
@@ -407,7 +481,7 @@ namespace machinelearning { namespace tools { namespace sources {
                 
                 // create tweet object with data (we read the string representation of the ids
                 // and convert them with boost::lexial_cast)
-                twitter::tweet l_tweet
+                twitter::searchtweet l_tweet
                 (
                     boost::lexical_cast<unsigned long long>(l_element["id_str"].asString()),
                     l_datetime,
@@ -424,13 +498,142 @@ namespace machinelearning { namespace tools { namespace sources {
             }
         }
     }
+        
+    
+    /** read the public timeline (only 20 tweets, refresh all 60 seconds)
+     * @return 
+     **/
+    inline std::vector<twitter::timelinetweet> twitter::getPublicTimeline( void )
+    {
+        boost::system::error_code l_error = boost::asio::error::host_not_found;
+        
+        m_socketapi.connect(m_resolveapi, l_error);
+        if (l_error)
+            throw exception::runtime(_("can not connect to twitter search server"));
+        
+        // create GET query (with default values)
+        std::ostringstream l_query;
+        l_query << "/1/statuses/public_timeline.json?include_entities=true";
+        
+        const std::string l_json = sendRequest( m_socketapi, l_query.str(), "api.twitter.com" );
+        m_socketapi.close();
+        
+        // do Json parsing
+        Json::Value l_resultroot;
+        Json::Reader l_jsonreader;
+        if (!l_jsonreader.parse( l_json, l_resultroot ))
+            throw exception::runtime(_("JSON data can not be parsed"));
+        
+        if (Json::arrayValue != l_resultroot.type())
+            throw exception::runtime(_("no result data is found"));
+        
+        std::vector<twitter::timelinetweet> l_result;
+        for(std::size_t i=0; i < l_resultroot.size(); ++i) {
+            Json::Value l_element = l_resultroot[i];
+            
+            if ( (Json::stringValue == l_element["created_at"].type()) &&
+                (Json::stringValue == l_element["text"].type()) &&
+                (Json::stringValue == l_element["id_str"].type()) &&
+                (Json::objectValue == l_element["user"].type())
+               )
+            {
+                // get user object
+                Json::Value l_userelement = l_element["user"];
+                if ( (Json::stringValue != l_userelement["id_str"].type()) || (Json::stringValue != l_userelement["lang"].type()) || (Json::stringValue != l_userelement["screen_name"].type())  )
+                    continue;
+                
+                std::string l_message = l_element["text"].asString();
+                boost::trim( l_message );
+                if ( (l_message.empty()) || (l_userelement["screen_name"].asString().empty()) )
+                    continue;
+                
+                
+                // convert the timestamp
+                boost::local_time::local_date_time l_datetime(boost::date_time::not_a_date_time);
+                std::istringstream l_datestream(l_element["created_at"].asString());
+                
+                // parsing data to a local time type (format pointer will be destroyed automatically)
+                l_datestream.imbue( std::locale( std::locale::classic(), new boost::local_time::local_time_input_facet("%a %b %d %H:%M:%S %q %Y")) );
+                l_datestream >> l_datetime;
+                std::cout << l_element["created_at"].asString() << std::endl;
+                
+                // get geo position if exists
+                ublas::vector<double> l_geo(0);
+                if (Json::objectValue == l_element["geo"].type()) {
+                    Json::Value l_geoelement = l_element["geo"];
+                    
+                    if (Json::arrayValue == l_geoelement["coordinates"].type()) {
+                        Json::Value l_coordinates = l_geoelement["coordinates"];
+                        l_geo = ublas::vector<double>(l_coordinates.size(), 0);
+                        
+                        for(std::size_t n=0; n < l_coordinates.size(); ++n)
+                            l_geo(n) = l_coordinates[n].asDouble();
+                    }
+                }
+                
+                // get hashtags & urltags if exists
+                std::vector<std::string> l_hashtags;
+                std::vector<std::string> l_urltags;
+                
+                if (Json::objectValue == l_element["entities"].type()) {
+                    Json::Value l_entities = l_element["entities"];
+                    
+                    if (Json::arrayValue == l_entities["hashtags"].type()) {
+                        Json::Value l_hash = l_entities["hashtags"];
+                        
+                        for(std::size_t n=0; n < l_hash.size(); ++n) {
+                            Json::Value l_hashelement = l_hash[n];
+                            if ( (Json::stringValue == l_hashelement["text"].type()) && (!l_hashelement["text"].asString().empty()) )
+                                l_hashtags.push_back( l_hashelement["text"].asString() );
+                        }
+                    }
+                    
+                    
+                    if (Json::arrayValue == l_entities["urls"].type()) {
+                        Json::Value l_url = l_entities["urls"];
+                     
+                        for(std::size_t n=0; n < l_url.size(); ++n) {
+                            Json::Value l_urlelement = l_url[n];
+                            if ( (Json::stringValue == l_urlelement["text"].type()) && (!l_urlelement["text"].asString().empty()) )
+                                l_urltags.push_back( l_urlelement["text"].asString() );
+                        }
+                    }
+                }
+                
+                // the language code can be different to the iso codes
+                language::code l_lang = language::EN;
+                try {
+                    l_lang = language::fromString(l_userelement["lang"].asString());
+                } catch (...) {}
+                
+                
+                // create tweet object with data (we read the string representation of the ids
+                // and convert them with boost::lexial_cast)
+                twitter::timelinetweet l_tweet
+                (
+                    boost::lexical_cast<unsigned long long>(l_element["id_str"].asString()),
+                    l_datetime,
+                    l_message,
+                    l_geo,
+                    l_hashtags,
+                    l_urltags,
+                    boost::lexical_cast<unsigned long long>(l_userelement["id_str"].asString()),
+                    l_userelement["screen_name"].asString(),
+                    l_lang
+                );
+                
+                l_result.push_back( l_tweet );
+            }
+        }
+        return l_result;
+    }
     
     
     /** sends the HTTP request to the Twitter server and receives the header and returns the data
      * @param p_socket socket object
      * @param p_query query call
      * @param p_server server name
-     * @return JSON answer data
+     * @return answer data without header
      **/
     inline std::string twitter::sendRequest( bip::tcp::socket& p_socket, const std::string& p_query, const std::string& p_server )
     {
@@ -676,9 +879,9 @@ namespace machinelearning { namespace tools { namespace sources {
 
     
     
-    //======= Tweet =====================================================================================================================================
+    //======= Searchtweet ===============================================================================================================================
     
-    inline twitter::tweet::tweet( const unsigned long long& p_msgid, const boost::local_time::local_date_time& p_createat, const std::string& p_text, const language::code& p_lang,
+    inline twitter::searchtweet::searchtweet( const unsigned long long& p_msgid, const boost::local_time::local_date_time& p_createat, const std::string& p_text, const language::code& p_lang,
           const std::string& p_fromuser, const unsigned long long& p_fromuserid, const std::string& p_touser, const unsigned long long& p_touserid,
           const ublas::vector<double>& p_geo
           ) :
@@ -691,7 +894,7 @@ namespace machinelearning { namespace tools { namespace sources {
         m_touser(p_touser), 
         m_touserid(p_touserid), 
         m_geoposition(p_geo),
-        m_label()
+        m_hashtags()
     {
         // extract all #<word> as labels
         boost::smatch l_what;
@@ -701,63 +904,69 @@ namespace machinelearning { namespace tools { namespace sources {
         const boost::regex l_labelpattern( "#([[:alnum:]]+)", boost::regex_constants::perl );
         
         while (boost::regex_search(it, l_end, l_what, l_labelpattern)) {
-            m_label.push_back( l_what[1] );
+            m_hashtags.push_back( l_what[1] );
             it = l_what[0].second;
         }
     }
     
     
+    /** returns the message id
+     * @return message id
+     **/
+    unsigned long long twitter::searchtweet::getMessageID( void ) const { return m_msgid; }
+    
+    
     /** returns the "create at" field
      * @return time
      **/
-    inline boost::local_time::local_date_time twitter::tweet::getCreateAt( void ) const { return m_createat; }
+    inline boost::local_time::local_date_time twitter::searchtweet::getCreateAt( void ) const { return m_createat; }
     
     
     /** returns the tweet text
      * @return text
      **/
-    inline std::string twitter::tweet::getText( void ) const { return m_text; }
+    inline std::string twitter::searchtweet::getText( void ) const { return m_text; }
     
     
     /** returns the language
      * @return language code
      **/
-    inline language::code twitter::tweet::getLanguage( void ) const { return m_lang; }
+    inline language::code twitter::searchtweet::getLanguage( void ) const { return m_lang; }
     
     
     /** returns the "from user name"
      * @return name
      **/
-    inline std::string twitter::tweet::getFromUserName( void ) const { return m_fromuser; }
+    inline std::string twitter::searchtweet::getFromUserName( void ) const { return m_fromuser; }
     
     /** returns the "from user id"
      * @return name
      **/
-    inline unsigned long long twitter::tweet::getFromUserID( void ) const { return m_fromuserid; }
+    inline unsigned long long twitter::searchtweet::getFromUserID( void ) const { return m_fromuserid; }
     
     
     /** returns the "to user name"
      * @return name
      **/
-    inline std::string twitter::tweet::getToUserName( void ) const { return m_touser; }
+    inline std::string twitter::searchtweet::getToUserName( void ) const { return m_touser; }
     
     
     /** returns the "to user id"
      * @return name
      **/
-    inline unsigned long long twitter::tweet::getToUserID( void ) const { return m_touserid; }
+    inline unsigned long long twitter::searchtweet::getToUserID( void ) const { return m_touserid; }
     
     
     /** returns the geo position
      * @return ublas vector
      **/
-    inline ublas::vector<double> twitter::tweet::getGeoPosition( void ) const { return m_geoposition; }
+    inline ublas::vector<double> twitter::searchtweet::getGeoPosition( void ) const { return m_geoposition; }
     
     
-    /** returns the labels of the twee
-     * @return vector with label
+    /** returns the hashtags of the tweet
+     * @return vector with tags
      **/
-    inline std::vector<std::string> twitter::tweet::getLabel( void ) const { return m_label; }
+    inline std::vector<std::string> twitter::searchtweet::getHashtags( void ) const { return m_hashtags; }
     
     
     /** overloaded << operator for creating the string representation of the object
@@ -765,7 +974,7 @@ namespace machinelearning { namespace tools { namespace sources {
      * @param p_obj object
      * @return result stream with added data
      **/
-    inline std::ostream& operator<< ( std::ostream& p_stream, const twitter::tweet& p_obj )
+    inline std::ostream& operator<< ( std::ostream& p_stream, const twitter::searchtweet& p_obj )
     {
         p_stream << p_obj.m_msgid;
         
@@ -783,15 +992,125 @@ namespace machinelearning { namespace tools { namespace sources {
         if (p_obj.m_geoposition.size() > 0)
             p_stream << " [" << _("geoposition") << ": " << p_obj.m_geoposition << "]";
         
-        if (p_obj.m_label.size() > 0) {
-            p_stream << " [" << _("label") << ":";
-            for (std::size_t i=0; i < p_obj.m_label.size(); ++i)
-                p_stream << " " << p_obj.m_label[i];
+        if (p_obj.m_hashtags.size() > 0) {
+            p_stream << " [" << _("hashtags") << ":";
+            for (std::size_t i=0; i < p_obj.m_hashtags.size(); ++i)
+                p_stream << " " << p_obj.m_hashtags[i];
             p_stream << "]";
         }
         
         return p_stream;
     }
+    
+    
+
+    //======= Timelinetweet =============================================================================================================================
+    
+    inline twitter::timelinetweet::timelinetweet( const unsigned long long& p_msgid, const boost::local_time::local_date_time& p_createat, const std::string& p_text, const ublas::vector<double>& p_geo,
+                                                 const std::vector<std::string>& p_hashtags, const std::vector<std::string>& p_urls, const unsigned long long& p_uid, const std::string& p_uname,
+                                                 const language::code& p_ulang ) :
+        m_msgid( p_msgid ),
+        m_createat( p_createat ),
+        m_text( p_text ),
+        m_geoposition( p_geo ),
+        m_hashtags( p_hashtags ),
+        m_urls( p_urls ),
+        m_userid( p_uid ),
+        m_uname( p_uname ),
+        m_ulang( p_ulang )
+    {}
+    
+    
+    /** returns the message id
+     * @return message id
+     **/
+    unsigned long long twitter::timelinetweet::getMessageID( void ) const { return m_msgid; }
+    
+    
+    /** returns the "create at" field
+     * @return time
+     **/
+    inline boost::local_time::local_date_time twitter::timelinetweet::getCreateAt( void ) const { return m_createat; }
+    
+    
+    /** returns the tweet text
+     * @return text
+     **/
+    inline std::string twitter::timelinetweet::getText( void ) const { return m_text; }
+
+    
+    /** returns the "user id"
+     * @return name
+     **/
+    inline unsigned long long twitter::timelinetweet::getUserID( void ) const { return m_userid; }
+    
+    
+    /** returns the "user name"
+     * @return name
+     **/
+    inline std::string twitter::timelinetweet::getUserName( void ) const { return m_uname; }
+    
+
+    /** returns the geo position
+     * @return ublas vector
+     **/
+    inline ublas::vector<double> twitter::timelinetweet::getGeoPosition( void ) const { return m_geoposition; }
+    
+    
+    /** returns the hashtags of the tweet
+     * @return vector with tags
+     **/
+    inline std::vector<std::string> twitter::timelinetweet::getHashtags( void ) const { return m_hashtags; }
+    
+    
+    /** returns the urltags of the tweet
+     * @return vector with urls
+     **/
+    inline std::vector<std::string> twitter::timelinetweet::getURLs( void ) const { return m_urls; }
+    
+    
+    /** user language
+     * @return language
+     **/
+    inline language::code twitter::timelinetweet::getUserLanguage( void ) const { return m_ulang; }
+    
+
+    /** overloaded << operator for creating the string representation of the object
+     * @param p_stream output stream
+     * @param p_obj object
+     * @return result stream with added data
+     **/
+    inline std::ostream& operator<< ( std::ostream& p_stream, const twitter::timelinetweet& p_obj )
+    {
+        p_stream << p_obj.m_msgid;
+        
+        if ( !p_obj.m_createat.is_special() )
+            p_stream << " " << _("at") << " " << p_obj.m_createat;
+        
+        p_stream << " " << p_obj.m_uname << " (" << p_obj.m_userid << ")";
+        p_stream << " [" << language::toString(p_obj.m_ulang) << "] ";
+        p_stream << ": " << p_obj.m_text;
+        
+        if (p_obj.m_geoposition.size() > 0)
+            p_stream << " [" << _("geoposition") << ": " << p_obj.m_geoposition << "]";
+        
+        if (p_obj.m_hashtags.size() > 0) {
+            p_stream << " [" << _("hashtags") << ":";
+            for (std::size_t i=0; i < p_obj.m_hashtags.size(); ++i)
+                p_stream << " " << p_obj.m_hashtags[i];
+            p_stream << "]";
+        }
+        
+        if (p_obj.m_urls.size() > 0) {
+            p_stream << " [" << _("urltags") << ":";
+            for (std::size_t i=0; i < p_obj.m_urls.size(); ++i)
+                p_stream << " " << p_obj.m_urls[i];
+            p_stream << "]";
+        }
+        
+        return p_stream;
+    }
+    
     
 };};};
 
