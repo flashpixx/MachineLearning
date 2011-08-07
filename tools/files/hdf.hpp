@@ -214,15 +214,12 @@ namespace machinelearning { namespace tools { namespace files {
         hsize_t l_size[2];
         l_dataspace.getSimpleExtentDims( l_size );
         
-        // create temp structur for reading data
-        ublas::matrix<T> l_mat(l_size[1],l_size[0]);
-        T l_data[l_size[0]][l_size[1]];
-        l_dataset.read( l_data, p_datatype );
+        if ((l_size[1]==0) || (l_size[0]==0))
+            throw exception::runtime(_("dimension need not be zero"));
         
-        //copy data to ublas matrix
-        for(std::size_t i=0; i < l_mat.size1(); ++i)
-            for(std::size_t j=0; j < l_mat.size2(); ++j)
-                l_mat(i,j) = l_data[j][i];
+        // read data
+        ublas::matrix<T> l_mat(l_size[1],l_size[0]);
+        l_dataset.read( &(l_mat.data()[0]), p_datatype );
         
         l_dataspace.close();
         l_dataset.close();
@@ -250,6 +247,9 @@ namespace machinelearning { namespace tools { namespace files {
         // read vector size and create vector
         hsize_t l_size[1];
         l_dataspace.getSimpleExtentDims( l_size );
+        
+        if (l_size[0]==0)
+            throw exception::runtime(_("dimension need not be zero"));
         
         // create temp structur for reading data
         ublas::vector<T> l_vec(l_size[0]);
@@ -370,7 +370,7 @@ namespace machinelearning { namespace tools { namespace files {
      **/
     inline void hdf::writeString( const std::string& p_path, const std::string& p_value, const bool& p_utf8 ) const
     {
-        if (p_value.emmpty())
+        if (p_value.empty())
             throw exception::runtime(_("can not write empty data"));
         
         H5::DataSpace l_dataspace;
