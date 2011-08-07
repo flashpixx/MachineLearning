@@ -32,7 +32,6 @@
 using namespace machinelearning;
 
 
-
 /** read all input arguments 
  * @param argc number of arguments of "main"
  * @param argv arguments of "main"
@@ -186,6 +185,7 @@ int main(int argc, char* argv[]) {
         
             std::cout << "===================================================================================" << std::endl;
         }
-        
+  
+    
     return EXIT_SUCCESS;
 }

@@ -29,6 +29,7 @@
 #include <string>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
+#include <boost/numeric/ublas/storage.hpp>
 #include <boost/algorithm/string.hpp> 
 #include <H5Cpp.h>
 
@@ -72,6 +73,7 @@ namespace machinelearning { namespace tools { namespace files {
         
         template<typename T> ublas::matrix<T> readBlasMatrix( const std::string&, const H5::PredType& ) const;
         template<typename T> ublas::vector<T> readBlasVector( const std::string&, const H5::PredType& ) const;
+        template<typename T> T readValue( const std::string&, const H5::PredType& ) const;
         
         std::string readString( const std::string& ) const;
         std::vector<std::string> readStringVector( const std::string& ) const;
@@ -194,6 +196,7 @@ namespace machinelearning { namespace tools { namespace files {
      * @param p_path dataset name
      * @param p_datatype datatype for reading data (see http://www.hdfgroup.org/HDF5/doc/cpplus_RM/classH5_1_1PredType.html )
      * @return ublas matrix
+     * @todo read data into the unbounded array of the matrix
      **/ 
     template<typename T> inline ublas::matrix<T> hdf::readBlasMatrix( const std::string& p_path, const H5::PredType& p_datatype ) const
     {
@@ -244,22 +247,49 @@ namespace machinelearning { namespace tools { namespace files {
         if (!l_dataspace.isSimple())
             throw exception::runtime(_("dataset must be a simple datatype"));
         
-        // read matrix size and create vector
+        // read vector size and create vector
         hsize_t l_size[1];
         l_dataspace.getSimpleExtentDims( l_size );
         
         // create temp structur for reading data
         ublas::vector<T> l_vec(l_size[0]);
-        T l_data[l_size[0]];
-        l_dataset.read( l_data, p_datatype );
-        
-        //copy data to ublas matrix
-        for(std::size_t i=0; i < l_vec.size(); ++i)
-            l_vec(i) = l_data[i];
+        l_dataset.read( &(l_vec.data()[0]), p_datatype );
         
         l_dataspace.close();
         l_dataset.close();
         return l_vec;
+    }
+    
+    
+    /** reads a single value
+     * @param p_path dataset path & name
+     * @param p_datatype datatype for reading data
+     * @return single value
+     **/ 
+    template<typename T> inline T hdf::readValue( const std::string& p_path, const H5::PredType& p_datatype ) const
+    {
+        H5::DataSet   l_dataset   = m_file.openDataSet( p_path.c_str() );
+        H5::DataSpace l_dataspace = l_dataset.getSpace();
+        
+        // check datasetdimension
+        if (l_dataspace.getSimpleExtentNdims() != 1)
+            throw exception::runtime(_("dataset must be one-dimensional"));
+        if (!l_dataspace.isSimple())
+            throw exception::runtime(_("dataset must be a simple datatype"));
+        
+        // read dataset size
+        hsize_t l_size[1];
+        l_dataspace.getSimpleExtentDims( l_size );
+        if (l_size[0] != 1)
+            throw exception::runtime(_("element is not a single value"));
+        
+        // create temp structur for reading data
+        T l_value;
+        l_dataset.read( &l_value, p_datatype );
+        
+        l_dataspace.close();
+        l_dataset.close();
+        return l_value;
     }
     
     
@@ -400,12 +430,12 @@ namespace machinelearning { namespace tools { namespace files {
      * @param p_path dataset path & name
      * @param p_dataset matrixdata
      * @param p_datatype datatype for writing data (see http://www.hdfgroup.org/HDF5/doc/cpplus_RM/classH5_1_1PredType.html )
-     * @bug data copy to array does not work with big matrix data
+     * @todo remove ublas::transpose
      **/
     template<typename T> inline void hdf::writeBlasMatrix( const std::string& p_path, const ublas::matrix<T>& p_dataset, const H5::PredType& p_datatype ) const
     {        
         if ((p_dataset.size1() == 0) || (p_dataset.size2() == 0))
-            throw exception::runtime(_("can note write empty data"));
+            throw exception::runtime(_("can not write empty data"));
         
         H5::DataSet l_dataset;
         H5::DataSpace l_dataspace;
@@ -416,14 +446,8 @@ namespace machinelearning { namespace tools { namespace files {
         l_dim(1) = p_dataset.size1();
         
         createDataSpace(p_path,  p_datatype, l_dim, l_dataspace, l_dataset, l_groups);
-        
-        // copy matrix to dataset
-        T l_data[p_dataset.size2()][p_dataset.size1()];
-        for(std::size_t i=0; i < p_dataset.size1(); ++i)
-            for(std::size_t j=0; j < p_dataset.size2(); ++j)
-                l_data[j][i] = p_dataset(i,j);
-        l_dataset.write( l_data, p_datatype, l_dataspace  );
-        
+        ublas::matrix<T> l_matrix = ublas::trans(p_dataset);
+        l_dataset.write( &(l_matrix.data()[0]), p_datatype, l_dataspace  );        
         closeSpace(l_groups, l_dataset, l_dataspace);
     }
     
@@ -432,7 +456,6 @@ namespace machinelearning { namespace tools { namespace files {
      * @param p_path dataset path & name
      * @param p_dataset vectordata
      * @param p_datatype datatype for writing data (see http://www.hdfgroup.org/HDF5/doc/cpplus_RM/classH5_1_1PredType.html )
-     * @bug data copy to array does not work with big vector data
      **/
     template<typename T> inline void hdf::writeBlasVector( const std::string& p_path, const ublas::vector<T>& p_dataset, const H5::PredType& p_datatype ) const
     {     
@@ -444,13 +467,7 @@ namespace machinelearning { namespace tools { namespace files {
         std::vector<H5::Group> l_groups;
         
         createDataSpace(p_path,  p_datatype, ublas::vector<std::size_t>(1,p_dataset.size()), l_dataspace, l_dataset, l_groups);
-        
-        // copy vector to dataset
-        T l_data[p_dataset.size()];
-        for(std::size_t i=0; i < p_dataset.size(); ++i)
-            l_data[i] = p_dataset(i);
-        l_dataset.write( l_data, p_datatype, l_dataspace  );
-        
+        l_dataset.write( &(p_dataset.data()[0]), p_datatype, l_dataspace  );
         closeSpace(l_groups, l_dataset, l_dataspace);
     }
     
@@ -467,12 +484,7 @@ namespace machinelearning { namespace tools { namespace files {
         std::vector<H5::Group> l_groups;
         
         createDataSpace(p_path,  p_datatype, ublas::vector<std::size_t>(1,1), l_dataspace, l_dataset, l_groups);
-        
-        // copy value to dataset
-        T l_data[1];
-        l_data[0] = p_dataset;
-        l_dataset.write( l_data, p_datatype, l_dataspace  );
-        
+        l_dataset.write( &p_dataset, p_datatype, l_dataspace  );
         closeSpace(l_groups, l_dataset, l_dataspace);
     }
     
