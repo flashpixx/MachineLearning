@@ -59,43 +59,43 @@ namespace machinelearning { namespace tools { namespace files {
         
         public :
         
-        hdf( const std::string& );
-        hdf( const std::string&, const bool& );
-        ~hdf( void );
-        
-        void open( const std::string&, const bool& = false );
-        void flush( void ) const;
-        std::string getFilename( void ) const;
-        std::size_t getFilesize( void ) const;
-        void remove( const std::string& ) const;
-        bool pathexists( const std::string& ) const;
-        
-        
-        template<typename T> ublas::matrix<T> readBlasMatrix( const std::string&, const H5::PredType& ) const;
-        template<typename T> ublas::vector<T> readBlasVector( const std::string&, const H5::PredType& ) const;
-        template<typename T> T readValue( const std::string&, const H5::PredType& ) const;
-        
-        std::string readString( const std::string& ) const;
-        std::vector<std::string> readStringVector( const std::string& ) const;
-        
-        
-        template<typename T> void writeBlasMatrix( const std::string&, const ublas::matrix<T>&, const H5::PredType& ) const;
-        template<typename T> void writeBlasVector( const std::string&, const ublas::vector<T>&, const H5::PredType& ) const;
-        template<typename T> void writeValue( const std::string&, const T&, const H5::PredType& ) const;
-        
-        void writeString( const std::string&, const std::string&, const bool& = true ) const;
-        void writeStringVector( const std::string&, const std::vector<std::string>&, const bool& = true ) const;
+            hdf( const std::string& );
+            hdf( const std::string&, const bool& );
+            ~hdf( void );
+            
+            void open( const std::string&, const bool& = false );
+            void flush( void ) const;
+            std::string getFilename( void ) const;
+            std::size_t getFilesize( void ) const;
+            void remove( const std::string& ) const;
+            bool pathexists( const std::string& ) const;
+            
+            
+            template<typename T> ublas::matrix<T> readBlasMatrix( const std::string&, const H5::PredType& ) const;
+            template<typename T> ublas::vector<T> readBlasVector( const std::string&, const H5::PredType& ) const;
+            template<typename T> T readValue( const std::string&, const H5::PredType& ) const;
+            
+            std::string readString( const std::string& ) const;
+            std::vector<std::string> readStringVector( const std::string& ) const;
+            
+            
+            template<typename T> void writeBlasMatrix( const std::string&, const ublas::matrix<T>&, const H5::PredType& ) const;
+            template<typename T> void writeBlasVector( const std::string&, const ublas::vector<T>&, const H5::PredType& ) const;
+            template<typename T> void writeValue( const std::string&, const T&, const H5::PredType& ) const;
+            
+            void writeString( const std::string&, const std::string&, const bool& = true ) const;
+            void writeStringVector( const std::string&, const std::vector<std::string>&, const bool& = true ) const;
         
         
         private :
         
-        /** file handler **/
-        H5::H5File m_file;
-        
-        std::string createPath( const std::string&, std::vector<H5::Group>& ) const;
-        void createDataSpace( const std::string&, const H5::PredType&, const ublas::vector<std::size_t>&, H5::DataSpace&, H5::DataSet&, std::vector<H5::Group>& ) const;
-        void createStringSpace( const std::string&, const ublas::vector<std::size_t>&, const std::size_t&, H5::DataSpace&, H5::DataSet&, H5::StrType&, std::vector<H5::Group>& ) const;
-        void closeSpace( std::vector<H5::Group>&, H5::DataSet&, H5::DataSpace& ) const;
+            /** file handler **/
+            H5::H5File m_file;
+            
+            std::string createPath( const std::string&, std::vector<H5::Group>& ) const;
+            void createDataSpace( const std::string&, const H5::PredType&, const ublas::vector<std::size_t>&, H5::DataSpace&, H5::DataSet&, std::vector<H5::Group>& ) const;
+            void createStringSpace( const std::string&, const ublas::vector<std::size_t>&, const std::size_t&, H5::DataSpace&, H5::DataSet&, H5::StrType&, std::vector<H5::Group>& ) const;
+            void closeSpace( std::vector<H5::Group>&, H5::DataSet&, H5::DataSpace& ) const;
         
     };
     
