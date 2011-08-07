@@ -385,7 +385,7 @@ def target_other(env, framework) :
     sources = []
 
     if env["withfiles"] and env["withsources"] :
-        sources.extend( ["mds_nntp.cpp", "mds_wikipedia.cpp"] )
+        sources.extend( ["mds_nntp.cpp", "mds_wikipedia.cpp", "mds_twitter.cpp"] )
 
     if env["withfiles"] :
         sources.append("mds_file.cpp")

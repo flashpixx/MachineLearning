@@ -551,11 +551,11 @@ namespace machinelearning { namespace tools { namespace sources {
                 // convert the timestamp
                 boost::local_time::local_date_time l_datetime(boost::date_time::not_a_date_time);
                 std::istringstream l_datestream(l_element["created_at"].asString());
-                
+
                 // parsing data to a local time type (format pointer will be destroyed automatically)
                 l_datestream.imbue( std::locale( std::locale::classic(), new boost::local_time::local_time_input_facet("%a %b %d %H:%M:%S %q %Y")) );
                 l_datestream >> l_datetime;
-                std::cout << l_element["created_at"].asString() << std::endl;
+                //std::cout << l_element["created_at"].asString() << " " << l_datetime << std::endl;
                 
                 // get geo position if exists
                 ublas::vector<double> l_geo(0);

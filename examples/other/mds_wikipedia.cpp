@@ -65,7 +65,7 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
         std::cout << "--dimension \t\t number of project dimensions (default 3)" << std::endl;
         std::cout << "--rate \t\t\t iteration rate for sammon / hit (default 1)" << std::endl;
         std::cout << "--articles \t\t number of articles" << std::endl;
-        std::cout << "--lang \t\t\t language (values: de [default], en)" << std::endl;
+        std::cout << "--lang \t\t\t language (values: en [default], de)" << std::endl;
         std::cout << "--compress \t\t compression level (allowed values are: default, bestspeed or bestcompression)" << std::endl;
         std::cout << "--algorithm \t\t compression algorithm (allowed values are: gzip, bzip)" << std::endl;
         std::cout << "--mapping \t\t mapping type (values: metric, sammon, hit [default])" << std::endl;
@@ -157,12 +157,9 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
             p_args["compress"]    = distances::ncd<double>::bestcompression;
     }
     
-    p_args["lang"] =  tools::sources::wikipedia::de_DE;
-    if (l_argmap["lang"].size() > 0) {
-        boost::to_lower(l_argmap["lang"][0]);
-        if (l_argmap["lang"][0] == "en")
-            p_args["lang"] =  tools::sources::wikipedia::en_EN;
-    }
+    p_args["lang"] =  tools::language::EN;
+    if (l_argmap["lang"].size() > 0)
+        p_args["lang"] =  tools::language::fromString(l_argmap["lang"][0]);
     
     // check mapping argument
     p_args["mapping"] = dim::mds<double>::hit;
@@ -260,7 +257,7 @@ int main(int argc, char* argv[]) {
     
     std::vector<std::string> l_wikidata;
     std::vector<std::string> l_wikilabel;
-    tools::sources::wikipedia wiki( boost::any_cast< tools::sources::wikipedia::language >(l_args["lang"]) );
+    tools::sources::wikipedia wiki( boost::any_cast< tools::language::code >(l_args["lang"]) );
     
     #ifdef MACHINELEARNING_MPI 
     for(std::size_t i=0; i < l_artnum[loMPICom.rank()]; )

@@ -42,7 +42,7 @@ using namespace machinelearning;
 bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_args ) {
     
     if (argc < 2) {
-        std::cout << "--search \t search content" << std::endl;
+        std::cout << "--search \t search content ['timeline' returns the actuall timeline tweets and other options are ignored]" << std::endl;
         std::cout << "--lang \t\t language" << std::endl;
         std::cout << "--geo \t\t geographic position (latitude, longitude, radius, radiuslength [km = kilometer, mi = miles])" << std::endl;
         std::cout << "--max \t\t maximum number of tweets (0 = maximum)" << std::endl;
@@ -165,26 +165,27 @@ int main(int argc, char* argv[]) {
         l_params.setUntilDate( boost::any_cast<boost::gregorian::date>(l_args["until"]) );
     } catch (...) {}
 
+    const std::vector<std::string> l_search = boost::any_cast< std::vector<std::string> >(l_args["search"]);
 
+    
+        
     tools::sources::twitter l_twitter;
     
-    std::vector<tools::sources::twitter::timelinetweet> x = l_twitter.getPublicTimeline();
-    
-    for(std::size_t i=0; i < x.size(); ++i)
-        std::cout << x[i] << std::endl;
-    
-    /*
-    const std::vector<std::string> l_search = boost::any_cast< std::vector<std::string> >(l_args["search"]);
-    
-    for(std::size_t i=0; i < l_search.size(); ++i) {
-        std::vector<tools::sources::twitter::searchtweet> l_data = l_twitter.search( l_search[i], l_params, boost::any_cast<std::size_t>(l_args["max"]) );
-        
+    std::string l_searchfirst = l_search[0];
+    boost::to_lower(l_searchfirst);
+    if (l_searchfirst == "timeline") {
+        std::vector<tools::sources::twitter::timelinetweet> l_data = l_twitter.getPublicTimeline();
         for(std::size_t j=0; j < l_data.size(); ++j)
             std::cout << l_data[j] << std::endl;
+    } else
+        for(std::size_t i=0; i < l_search.size(); ++i) {
+            std::vector<tools::sources::twitter::searchtweet> l_data = l_twitter.search( l_search[i], l_params, boost::any_cast<std::size_t>(l_args["max"]) );
         
-        std::cout << "===================================================================================" << std::endl;
-    }
-    */
+            for(std::size_t j=0; j < l_data.size(); ++j)
+                std::cout << l_data[j] << std::endl;
+        
+            std::cout << "===================================================================================" << std::endl;
+        }
         
     return EXIT_SUCCESS;
 }
