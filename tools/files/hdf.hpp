@@ -370,6 +370,9 @@ namespace machinelearning { namespace tools { namespace files {
      **/
     inline void hdf::writeString( const std::string& p_path, const std::string& p_value, const bool& p_utf8 ) const
     {
+        if (p_value.emmpty())
+            throw exception::runtime(_("can not write empty data"));
+        
         H5::DataSpace l_dataspace;
         H5::DataSet l_dataset;
         H5::StrType l_str;
@@ -395,7 +398,7 @@ namespace machinelearning { namespace tools { namespace files {
     inline void hdf::writeStringVector( const std::string& p_path, const std::vector<std::string>& p_value, const bool& p_utf8 ) const
     {
         if (p_value.size() == 0)
-            throw exception::runtime(_("can note write empty data"));
+            throw exception::runtime(_("can not write empty data"));
             
         H5::DataSpace l_dataspace;
         H5::DataSet l_dataset;
@@ -408,7 +411,7 @@ namespace machinelearning { namespace tools { namespace files {
             l_maxstrlen  = std::max( l_maxstrlen, p_value[i].size() );
         
         if (l_maxstrlen == 0)
-            throw exception::runtime(_("can note write empty data"));
+            throw exception::runtime(_("can not write empty data"));
         
         // create char array for the string data, each vector element ist seperated with \0
         char l_data[(l_maxstrlen+1)*p_value.size()];
@@ -463,7 +466,7 @@ namespace machinelearning { namespace tools { namespace files {
     template<typename T> inline void hdf::writeBlasVector( const std::string& p_path, const ublas::vector<T>& p_dataset, const H5::PredType& p_datatype ) const
     {     
         if (p_dataset.size() == 0)
-            throw exception::runtime(_("can note write empty data"));
+            throw exception::runtime(_("can not write empty data"));
         
         H5::DataSet l_dataset;
         H5::DataSpace l_dataspace;
