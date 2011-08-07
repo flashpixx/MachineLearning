@@ -388,19 +388,15 @@ int main(int argc, char* argv[]) {
     tools::files::hdf target(boost::any_cast<std::string>(l_args["outfile"]), true);
     target.writeBlasMatrix<double>( "/project",  project, H5::PredType::NATIVE_DOUBLE );
     #ifndef MACHINELEARNING_MPI
-    target.writeBlasMatrix<double>( "/distances",  distancematrix, H5::PredType::NATIVE_DOUBLE );
     target.writeStringVector( "/label",  l_wikilabel );
     #else
     target.writeStringVector( "/label",  l_alllabel );
     #endif
             
             
-    std::cout << "within the target file there are three datasets: /project = projected data, /label = datapoint label";
+    std::cout << "within the target file there are three datasets: /project = projected data, /label = datapoint label" << std::endl;
     #ifdef MACHINELEARNING_MPI
-    std::cout << std::endl;	
     }
-    #else
-    std::cout << ", /distances = distance matrix" << std::endl;
     #endif
 
     

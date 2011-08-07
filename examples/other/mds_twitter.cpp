@@ -333,24 +333,20 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
         #ifdef MACHINELEARNING_MPI
         if (loMPICom.rank() == 0) {
         #endif
-            tools::files::hdf target(boost::any_cast<std::string>(l_args["outfile"]), true);
-            target.writeBlasMatrix<double>( "/project",  project, H5::PredType::NATIVE_DOUBLE );
-            #ifndef MACHINELEARNING_MPI
-            target.writeBlasMatrix<double>( "/distances",  distancematrix, H5::PredType::NATIVE_DOUBLE );
-            target.writeStringVector( "/label",  l_tweetlabel );
-            target.writeStringVector( "/uniquegroup",  l_tweet );
-            #else
-            ????
-            target.writeStringVector( "/label",  l_alllabel );
-            target.writeStringVector( "/uniquegroup",  l_tweet );
-            #endif
-            
-            std::cout << "within the target file there are three datasets: /project = projected data, /label = datapoint label, /uniquegroup = list of unique newsgroups";
-            #ifdef MACHINELEARNING_MPI
-            std::cout << std::endl;	
-        }
+        tools::files::hdf target(boost::any_cast<std::string>(l_args["outfile"]), true);
+        target.writeBlasMatrix<double>( "/project",  project, H5::PredType::NATIVE_DOUBLE );
+        #ifndef MACHINELEARNING_MPI
+        target.writeStringVector( "/label",  l_tweetlabel );
+        target.writeStringVector( "/uniquegroup",  l_tweet );
         #else
-        std::cout << ", /distances = distance matrix" << std::endl;
+        ????
+        target.writeStringVector( "/label",  l_alllabel );
+        target.writeStringVector( "/uniquegroup",  l_tweet );
+        #endif
+            
+        std::cout << "within the target file there are three datasets: /project = projected data, /label = datapoint label, /uniquegroup = list of unique newsgroups" << std::endl;
+        #ifdef MACHINELEARNING_MPI
+        }
         #endif
         
         

@@ -518,17 +518,13 @@ int main(int argc, char* argv[]) {
     target.writeStringVector( "/group",  l_allarticlegroups );
     target.writeStringVector( "/uniquegroup",  tools::vector::unique(l_allarticlegroups) );
     #else
-    target.writeBlasMatrix<double>( "/distances",  distancematrix, H5::PredType::NATIVE_DOUBLE );
     target.writeStringVector( "/group",  l_articlegroup );
     target.writeStringVector( "/uniquegroup",  tools::vector::unique(l_articlegroup) );
     #endif
     
-    std::cout << "\nwithin the target file there are three datasets: /project = projected data, /group = newsgroup label of each dataset, /uniquegroup = list of unique newsgroups";
+    std::cout << "\nwithin the target file there are three datasets: /project = projected data, /group = newsgroup label of each dataset, /uniquegroup = list of unique newsgroups" << std::endl;
     #ifdef MACHINELEARNING_MPI
-    std::cout << std::endl;	
     }
-    #else
-    std::cout << ", /distances = distance matrix" << std::endl;
     #endif
     
     
