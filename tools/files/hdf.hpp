@@ -400,6 +400,7 @@ namespace machinelearning { namespace tools { namespace files {
      * @param p_path dataset path & name
      * @param p_dataset matrixdata
      * @param p_datatype datatype for writing data (see http://www.hdfgroup.org/HDF5/doc/cpplus_RM/classH5_1_1PredType.html )
+     * @bug data copy to array does not work with big matrix data
      **/
     template<typename T> inline void hdf::writeBlasMatrix( const std::string& p_path, const ublas::matrix<T>& p_dataset, const H5::PredType& p_datatype ) const
     {        
@@ -431,6 +432,7 @@ namespace machinelearning { namespace tools { namespace files {
      * @param p_path dataset path & name
      * @param p_dataset vectordata
      * @param p_datatype datatype for writing data (see http://www.hdfgroup.org/HDF5/doc/cpplus_RM/classH5_1_1PredType.html )
+     * @bug data copy to array does not work with big vector data
      **/
     template<typename T> inline void hdf::writeBlasVector( const std::string& p_path, const ublas::vector<T>& p_dataset, const H5::PredType& p_datatype ) const
     {     
