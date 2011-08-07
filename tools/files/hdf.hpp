@@ -196,7 +196,6 @@ namespace machinelearning { namespace tools { namespace files {
      * @param p_path dataset name
      * @param p_datatype datatype for reading data (see http://www.hdfgroup.org/HDF5/doc/cpplus_RM/classH5_1_1PredType.html )
      * @return ublas matrix
-     * @todo read data into the unbounded array of the matrix
      **/ 
     template<typename T> inline ublas::matrix<T> hdf::readBlasMatrix( const std::string& p_path, const H5::PredType& p_datatype ) const
     {
