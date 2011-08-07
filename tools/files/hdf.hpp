@@ -407,6 +407,9 @@ namespace machinelearning { namespace tools { namespace files {
         for(std::size_t i=0; i < p_value.size(); ++i)
             l_maxstrlen  = std::max( l_maxstrlen, p_value[i].size() );
         
+        if (l_maxstrlen == 0)
+            throw exception::runtime(_("can note write empty data"));
+        
         // create char array for the string data, each vector element ist seperated with \0
         char l_data[(l_maxstrlen+1)*p_value.size()];
         std::size_t l_start = 0;
