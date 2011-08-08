@@ -66,19 +66,19 @@ int main(int argc, char* argv[]) {
     l_description.add_options()
         ("help", "produce help message")
         ("outfile", po::value<std::string>(), "output HDF5 file")
-        ("sources", po::value<std::string>(), "comma-separated list of text files or directories with text files (all files in the directory will be read and subdirectories will be ignored)")
+        ("sources", po::value< std::vector<std::string> >()->multitoken(), "list of text files or directories with text files (all files in the directory will be read and subdirectories will be ignored)")
         ("dimension", po::value<std::size_t>(&l_dimension)->default_value(3), "number of project dimensions (default 3)")
         ("rate", po::value<double>(&l_rate)->default_value(1), "iteration rate for sammon / hit (default 1)")
         ("compress", po::value<std::string>(&l_compress)->default_value("default"), "compression level (allowed values are: default [default], bestspeed or bestcompression)")
         ("algorithm", po::value<std::string>(&l_algorithm)->default_value("gzip"), "compression algorithm (allowed values are: gzip [default], bzip)")
         ("iteration", po::value<std::size_t>(&l_iteration)->default_value(0), "number of iterations (detected automatically)")
         ("mapping", po::value<std::string>(&l_mapping)->default_value("hit"), "mapping type (values: metric, sammon, hit [default])")
-        ("stopwordmin", po::value<double>(), "minimal value of the stopword reduction (value within the range [0,1], stopwordmin and stopwordmax must be set for using)")
-        ("stopwordmax", po::value<double>(), "maximal value of the stopword reduction (value within the range [0,1], stopwordmin and stopwordmax must be set for using)")
+        ("stopword", po::value< std::vector<double> >()->multitoken(), "minimal and maximal value of the stopword reduction (value within the range [0,1])")
     ;
     
     po::variables_map l_map;
-    po::store(po::parse_command_line(argc, argv, l_description), l_map);
+    po::positional_options_description l_input;
+    po::store(po::command_line_parser(argc, argv).options(l_description).positional(l_input).run(), l_map);
     po::notify(l_map);
     
     if (l_map.count("help")) {
@@ -102,8 +102,7 @@ int main(int argc, char* argv[]) {
     
     // first read all files
     std::vector<std::string> l_files;
-    std::vector<std::string> l_sources;
-    boost::split( l_sources, l_map["sources"].as<std::string>(), boost::is_any_of(",") );
+    const std::vector<std::string> l_sources = l_map["sources"].as< std::vector<std::string> >();
     
     for(std::size_t i=0; i < l_sources.size(); ++i) {
         
@@ -122,43 +121,45 @@ int main(int argc, char* argv[]) {
             for(std::size_t j=0; j < l_subdata.size(); ++j)
                 if (boost::filesystem::is_regular_file(l_subdata[j]))
                     l_files.push_back(l_subdata[j].generic_string());
-            
         }
     }
 
     if (l_files.size() < 2)
-        throw std::runtime_error( "at least two files are needed");
+        throw std::runtime_error("at least two files are needed");
 
     // create file and write data to hdf
     tools::files::hdf target(l_map["outfile"].as<std::string>(), true);    
     
-    
+
     
     // if stopword reduction enabled, we read the file content
     std::vector<std::string> l_content;
-    if ( (l_map.count("stopwordmin")) && (l_map.count("stopwordmax")) ) {
-        
-        for(std::size_t i=0; i < l_files.size(); ++i) {
-            std::ifstream l_file(l_files[i].c_str(), std::ifstream::in);
-            if (l_file.bad())
-                throw std::runtime_error( "file [" + l_files[i] + "] can not be read");
+    if (l_map.count("stopword")) {
+        const std::vector<double> l_val = l_map["stopword"].as< std::vector<double> >();
+        if (l_val.size() >= 2) {
+
+            for(std::size_t i=0; i < l_files.size(); ++i) {
+                std::ifstream l_file(l_files[i].c_str(), std::ifstream::in);
+                if (l_file.bad())
+                    throw std::runtime_error( "file [" + l_files[i] + "] can not be read");
                     
-            std::stringbuf l_str;
-            l_file >> &l_str;
+                std::stringbuf l_str;
+                l_file >> &l_str;
                     
-            l_content.push_back( l_str.str() );
-        }
+                l_content.push_back( l_str.str() );
+            }
         
-        std::cout << "stopword reduction..." << std::endl;
-        text::termfrequency tfc;
-        tfc.add(l_content);
+            std::cout << "stopword reduction..." << std::endl;
+            text::termfrequency tfc;
+            tfc.add(l_content);
     
-        const std::vector<std::string> l_stopwords = tfc.getTerms( l_map["stopwordmin"].as<double>(), l_map["stopwordmax"].as<double>() );
-        text::stopwordreduction stopword( l_stopwords, tfc.iscaseinsensitivity() );
-        for(std::size_t i=0; i < l_content.size(); ++i)
-            l_content[i] = stopword.remove( l_content[i] );
+            const std::vector<std::string> l_stopwords = tfc.getTerms( l_val[0], l_val[1] );
+            text::stopwordreduction stopword( l_stopwords, tfc.iscaseinsensitivity() );
+            for(std::size_t i=0; i < l_content.size(); ++i)
+                l_content[i] = stopword.remove( l_content[i] );
         
-        target.writeStringVector("/stopwords", l_stopwords);
+            target.writeStringVector("/stopwords", l_stopwords);
+        }
     }
     
             
@@ -203,5 +204,6 @@ int main(int argc, char* argv[]) {
     target.writeStringVector("/files", l_files);
            
     std::cout << "within the target file there are four datasets: /project = projected data (first row = first input file ...), /files = filename list, /stopwords = list with stopwords (if enable)" << std::endl;
+
     return EXIT_SUCCESS;
 }
