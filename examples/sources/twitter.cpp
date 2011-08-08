@@ -28,157 +28,115 @@
 #include <machinelearning.h>
 #include <boost/any.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp> 
+#include <boost/program_options/parsers.hpp>
+#include <boost/program_options/variables_map.hpp>
+#include <boost/program_options/options_description.hpp>
 
 using namespace machinelearning;
-
-
-/** read all input arguments 
- * @param argc number of arguments of "main"
- * @param argv arguments of "main"
- * @param p_args map with argument values (default values)
- * @return bool if all is correct
- **/
-bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_args ) {
-    
-    if (argc < 2) {
-        std::cout << "--search \t search content ['timeline' returns the actuall timeline tweets and other options are ignored]" << std::endl;
-        std::cout << "--lang \t\t language" << std::endl;
-        std::cout << "--geo \t\t geographic position (latitude, longitude, radius, radiuslength [km = kilometer, mi = miles])" << std::endl;
-        std::cout << "--max \t\t maximum number of tweets (0 = maximum)" << std::endl;
-        std::cout << "--rpp \t\t number of tweets on each call" << std::endl;
-        std::cout << "--page \t\t number of starting page" << std::endl;
-        std::cout << "--until \t date value (format YYYY MM DD)" << std::endl;
-        return false;
-    }
-     
-    // set default arguments
-    std::map<std::string, std::vector<std::string> > l_argmap;
-    l_argmap["search"]     = std::vector<std::string>();
-    l_argmap["lang"]       = std::vector<std::string>();
-    l_argmap["geo"]        = std::vector<std::string>();
-    l_argmap["max"]        = std::vector<std::string>();
-    l_argmap["rpp"]        = std::vector<std::string>();
-    l_argmap["page"]       = std::vector<std::string>();
-    l_argmap["until"]      = std::vector<std::string>();
-    
-    
-    // read all arguments
-    std::size_t n=1;
-    for(int i=1; i < argc; i+=n) {
-        n = 1;
-        std::string lc(argv[i]);
-        if (lc.length() < 2)
-            continue;
-        
-        lc = lc.substr(2);
-        boost::to_lower( lc );
-        
-        if (l_argmap.find(lc) != l_argmap.end()) {
-            std::vector<std::string> lv;
-            
-            for(int l=i+1; l < argc; ++l) {
-                std::string lc2(argv[l]);
-                if ( (lc2.length() >= 2) && (lc2.substr(0,2) == "--") )
-                    break;
-                
-                lv.push_back(lc2);
-                n++;
-            }
-            
-            l_argmap[lc] = lv;
-        }
-        
-    }
-    
-    if ( (l_argmap["search"].size() < 1) )
-        throw std::runtime_error("number of arguments are incorrect");
-    
-    p_args["search"]    = l_argmap["search"];
-    
-    if (l_argmap["lang"].size() > 0)
-        p_args["lang"] = tools::language::fromString(l_argmap["lang"][0]);
-    
-    if ( (l_argmap["geo"].size() == 4) ) {
-        
-        p_args["geo_latitude"]  = boost::lexical_cast<double>(l_argmap["geo"][0]);
-        p_args["geo_longitude"] = boost::lexical_cast<double>(l_argmap["geo"][1]);
-        p_args["geo_radius"]    = boost::lexical_cast<double>(l_argmap["geo"][2]);
-        
-        p_args["geo_length"] = tools::sources::twitter::searchparameter::kilometer;
-        if (l_argmap["geo"][2] == "mi")
-            p_args["geo_length"] = tools::sources::twitter::searchparameter::miles;
-    }
-    
-    if (l_argmap["rpp"].size() > 0)
-        p_args["rpp"] = boost::lexical_cast<std::size_t>(l_argmap["rpp"][0]);
-    
-    if (l_argmap["page"].size() > 0)
-        p_args["page"] = boost::lexical_cast<std::size_t>(l_argmap["page"][0]);
-    
-    p_args["max"]       = std::size_t(0);
-    if (l_argmap["max"].size() > 0)
-        p_args["max"] = boost::lexical_cast<std::size_t>(l_argmap["max"][0]);
-    
-    if (l_argmap["until"].size() > 3) {
-        boost::gregorian::date l_until(
-                boost::lexical_cast<std::size_t>(l_argmap["until"][0]),
-                boost::lexical_cast<std::size_t>(l_argmap["until"][1]),
-                boost::lexical_cast<std::size_t>(l_argmap["until"][2])
-        );
-        p_args["until"] = l_until;
-    }
-    
-    return true;
-}
-
-
+namespace po = boost::program_options;
 
 /** main program
  * @param argc number of arguments
  * @param argv arguments
  **/
 int main(int argc, char* argv[]) {
+
+    // default values
+    std::size_t l_rpp  = 10;
+    std::size_t l_max  = 0;
+    std::size_t l_page = 1;
     
-    std::map<std::string, boost::any> l_args;
-    if (!cliArguments(argc, argv, l_args))
+    // create CML options with description
+    po::options_description l_description("allowed options");
+    l_description.add_options()
+        ("help", "produce help message")
+        ("search", po::value<std::string>(), "search keyword / keyword list comma separated list ['tm' returns the actuall timeline tweets and other options are ignored]")
+        ("lang", po::value<std::string>(), "language code (iso 639-1 or -3)")
+        ("geo", po::value<std::string>(), "geographic position (format: latitude, longitude, radius, radiuslength [km = kilometer, mi = miles])")
+        ("max", po::value<std::size_t>(&l_max)->default_value(0), "maximum number of tweets [default: 0 = maximum]")
+        ("rpp", po::value<std::size_t>(&l_rpp)->default_value(15), "number of tweets on each call [default: 15]")
+        ("page", po::value<std::size_t>(&l_page)->default_value(1), "number of starting page [default: 1]")
+        ("until", po::value<std::string>(), "date value (format: YYYY-MM-DD)")
+    ;
+    
+    po::variables_map l_map;
+    po::store(po::parse_command_line(argc, argv, l_description), l_map);
+    po::notify(l_map);
+    
+    if (l_map.count("help")) {
+        std::cout << l_description << std::endl;
+        return EXIT_SUCCESS;
+    }
+    
+    if (!l_map.count("search")) {
+        std::cout << "[--search] option must be set" << std::endl;
         return EXIT_FAILURE;
+    }
     
     
+    
+    
+    // create search parameters 
     tools::sources::twitter::searchparameter l_params;
-    
-    try {
-        l_params.setLanguage( boost::any_cast<tools::language::code>(l_args["lang"]) ); 
-    } catch (...) {}
+    l_params.setNumberResults(l_rpp, l_page);
 
     
-    try {
-        tools::sources::twitter::searchparameter::geoposition l_geo;
+    if (l_map.count("lang"))
+        try {
+            l_params.setLanguage( tools::language::fromString(l_map["lang"].as<std::string>()) ); 
+        } catch (...) {}
+    
+    if (l_map.count("geo")) {
+        std::vector<std::string> l_geoparam;
+        boost::split( l_geoparam, l_map["geo"].as<std::string>(), boost::is_any_of(",") );
+
+        if (l_geoparam.size() >= 4)
+            try {
+                tools::sources::twitter::searchparameter::geoposition l_geo;
         
-        l_geo.longitude = boost::any_cast<double>(l_args["geo_longitude"]);
-        l_geo.latitude  = boost::any_cast<double>(l_args["geo_latitude"]);
-        l_geo.radius    = boost::any_cast<double>(l_args["geo_radius"]);
-        l_geo.length    = boost::any_cast<tools::sources::twitter::searchparameter::radiuslength>(l_args["geo_length"]);
-    } catch (...) {}
-    
-    try {
-        l_params.setUntilDate( boost::any_cast<boost::gregorian::date>(l_args["until"]) );
-    } catch (...) {}
+                l_geo.latitude      = boost::lexical_cast<double>(l_geoparam[0]);
+                l_geo.longitude     = boost::lexical_cast<double>(l_geoparam[1]);
+                l_geo.radius        = boost::lexical_cast<double>(l_geoparam[2]);
+                if (l_geoparam[3] == "mi")
+                    l_geo.length  = tools::sources::twitter::searchparameter::miles;
 
-    const std::vector<std::string> l_search = boost::any_cast< std::vector<std::string> >(l_args["search"]);
-
+                l_params.setGeoPosition( l_geo );
+            } catch (...) {}
+    }
     
+    if (l_map.count("until")) {
+        std::vector<std::string> l_dateparam;
+        boost::split( l_dateparam, l_map["until"].as<std::string>(), boost::is_any_of("-") );
         
+        if (l_dateparam.size() >= 3)
+            try {
+                boost::gregorian::date l_until(
+                                               boost::lexical_cast<std::size_t>(l_dateparam[0]),
+                                               boost::lexical_cast<std::size_t>(l_dateparam[1]),
+                                               boost::lexical_cast<std::size_t>(l_dateparam[2])
+                                               );
+                l_params.setUntilDate( l_until );
+            } catch (...) {}
+    }
+ 
+    
+    
+    // do twitter run
     tools::sources::twitter l_twitter;
+    
+    std::vector<std::string> l_search;
+    boost::split( l_search, l_map["search"].as<std::string>(), boost::is_any_of(",") );
     
     std::string l_searchfirst = l_search[0];
     boost::to_lower(l_searchfirst);
-    if (l_searchfirst == "timeline") {
+    if (l_searchfirst == "tm") {
         std::vector<tools::sources::twitter::timelinetweet> l_data = l_twitter.getPublicTimeline();
         for(std::size_t j=0; j < l_data.size(); ++j)
             std::cout << l_data[j] << std::endl;
     } else
         for(std::size_t i=0; i < l_search.size(); ++i) {
-            std::vector<tools::sources::twitter::searchtweet> l_data = l_twitter.search( l_search[i], l_params, boost::any_cast<std::size_t>(l_args["max"]) );
+            std::vector<tools::sources::twitter::searchtweet> l_data = l_twitter.search( l_search[i], l_params, l_max );
         
             for(std::size_t j=0; j < l_data.size(); ++j)
                 std::cout << l_data[j] << std::endl;
@@ -186,6 +144,5 @@ int main(int argc, char* argv[]) {
             std::cout << "===================================================================================" << std::endl;
         }
   
-    
     return EXIT_SUCCESS;
 }

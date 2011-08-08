@@ -36,6 +36,7 @@
  *         <li>IOStreams with ZLib and BZip2 support</li>
  *         <li>Thread support</li>
  *         <li>Math support</li>
+ *         <li>Program Options</li>
  *         <li>Regular Expression support</li>
  *         <li>Filesystem support</li>
  *         <li>System support</li>
@@ -167,10 +168,10 @@
  * @section nix Linux / Mac OS X
  * In both OS (Linux & Mac OS X) the libraries can be build with the following steps within the extracted source directory:
  * @code
- ./configure
- make
- make install
- @endcode
+    ./configure
+    make
+    make install
+ * @endcode
  * For the single packages are some notes:
  *
  * @subsection nixzip BZip2 and ZLib support 
@@ -182,7 +183,7 @@
  * @code bootstrap.sh @endcode
  * must be run. After that Boost can be build with (The MPI support can be enabled with <dfn>withmpi</dfn>, but it requires MPI sources and libraries. The configuration for MPI use can be found on
  * <dfn>www.boost.org/doc/libs/-release number-/doc/html/mpi.html</dfn>)
- * @code bjam --with-exception --with-filesystem --with-math --with-random --with-regex --with-thread --with-system --with-serialization --with-iostreams --disable-filesystem2 threading=multi runtime-link=shared variant=release toolset=gcc|darwin install @endcode
+ * @code bjam --with-exception --with-filesystem --with-math --with-random --with-regex --with-thread --with-system --with-program_options --with-date_time --with-serialization --with-iostreams --disable-filesystem2 threading=multi runtime-link=shared variant=release toolset=gcc|darwin install @endcode
  * In newer Boost version (since 1.47.0) the <dfn>bjam</dfn> command is replaced with <dfn>b2</dfn>. The <dfn>toolset</dfn> option must be:
  * <ul>
  * <li><dfn>gcc</dfn> for unix systems (Cygwin too)</li>
@@ -206,10 +207,10 @@
  * Under Linux some environmantal variables must be set, if the libraries are installed into a non-default directory. The variable <dfn>CPATH</dfn> and <dfn>CPPPATH</dfn> must be set to the include
  * directories and <dfn>LD_LIBRARY_PATH</dfn> and <dfn>LIBRARY_PATH</dfn> must be pointed to the library path. The variables can be set within the <dfn>/etc/profile</dfn> or <dfn>~/.profile</dfn> with
  * @code
- export CPPPATH=first_path:second_path
- export CPATH=$CPPPATH
- export LIBRARY_PATH=first_path:second_path
- export LD_LIBRARY_PATH=$LIBRARY_PATH
+    export CPPPATH=first_path:second_path
+    export CPATH=$CPPPATH
+    export LIBRARY_PATH=first_path:second_path
+    export LD_LIBRARY_PATH=$LIBRARY_PATH
  * @endcode
  *
  * @subsection macpath path under Mac OS X
@@ -217,9 +218,9 @@
  * with the name <dfn>environment.plist</dfn> and set the variables with data. If you run a program a variable <dfn>DYLD_LIBRARY_PATH</dfn> is also needed, but it can't set with the environmental file so
  * it is recommand that the following line is added to the <dfn>/etc/profile</dfn>:
  * @code
- export DYLD_LIBRARY_PATH=$LIBRARY_PATH
- export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$LIBRARY_PATH
- export CPATH=$CPATH:$CPPPATH
+    export DYLD_LIBRARY_PATH=$LIBRARY_PATH
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$LIBRARY_PATH
+    export CPATH=$CPATH:$CPPPATH
  * @endcode
  * The last two lines are optional, because so only the values <dfn>LIBRARY_PATH</dfn> and <dfn>CPPPATH</dfn> must be set in the file.
  *
@@ -238,40 +239,40 @@
  * Here all libraries are installed under <dfn>C:\\opt\\library</dfn> and the tools under <dfn>C:\\opt</dfn> and the version number of the library is set to a subdirectory. On Windows the 
  * <a href="http://www.bzip.org/">BZip2</a> and <a href="http://www.zlib.net/">ZLib</a> must be installed for using in the Boost.Iostreams. BZip2 sources must be extracted and run the commands
  * @code
- make
- make install PREFIX=/cygdrive/c/opt/library/bzip2/1.0.6
+    make
+    make install PREFIX=/cygdrive/c/opt/library/bzip2/1.0.6
  * @endcode
  * The ZLib library is installed with
  * @code
- configure --prefix=/cygdrive/c/opt/library/zlib/1.2.5
- make
- make install
+    configure --prefix=/cygdrive/c/opt/library/zlib/1.2.5
+    make
+    make install
  * @endcode
  * For Boost.Iostreams in the Cygwin install directory in the file <dfn>etc/profile</dfn> the following variables must be set:
  * @code
- export BZIP2_BINARY=bz2
- export BZIP2_INCLUDE=/cygdrive/c/opt/library/bzip2/1.0.6/include
- export BZIP2_LIBPATH=/cygdrive/c/opt/library/bzip2/1.0.6/lib
+    export BZIP2_BINARY=bz2
+    export BZIP2_INCLUDE=/cygdrive/c/opt/library/bzip2/1.0.6/include
+    export BZIP2_LIBPATH=/cygdrive/c/opt/library/bzip2/1.0.6/lib
  
- export ZLIB_BINARY=z
- export ZLIB_INCLUDE=/cygdrive/c/opt/library/zlib/1.2.5/include
- export ZLIB_LIBPATH=/cygdrive/c/opt/library/zlib/1.2.5/lib
+    export ZLIB_BINARY=z
+    export ZLIB_INCLUDE=/cygdrive/c/opt/library/zlib/1.2.5/include
+    export ZLIB_LIBPATH=/cygdrive/c/opt/library/zlib/1.2.5/lib
  * @endcode
  *
  * The libraries can be installed with the same steps as in Linux.
  * The path to the libraries directories must be set / added to the system or user path variable <dfn>PATH</dfn> (the Cygwin <dfn>bin</dfn> directory must be added, because all libraries are linked to the
  * <dfn>cygwin.dll</dfn>, which is stored in the <dfn>bin</dfn> directory)
  * @code
- C:\opt\cygwin\bin;C:\opt\library\atlas\3.9.43\lib;C:\opt\library\hdf\1.8.7\lib;C:\opt\library\xml2\2.7.8\bin;C:\opt\library\boost\1.47.0\bin;C:\opt\library\boost\1.47.0\lib
+    C:\opt\cygwin\bin;C:\opt\library\atlas\3.9.43\lib;C:\opt\library\hdf\1.8.7\lib;C:\opt\library\xml2\2.7.8\bin;C:\opt\library\boost\1.47.0\bin;C:\opt\library\boost\1.47.0\lib
  * @endcode
  * Scons can be installed under Cygwin with the command within the extracted source:
  * @code
- python setup.py install --prefix=/cygdrive/c/opt/scons
+    python setup.py install --prefix=/cygdrive/c/opt/scons
  * @endcode
  * The variable <dfn>CPPPATH</dfn> of the include directories is set in the file within the Cygwin install directory <dfn>etc/profile</dfn> (and to the path variable is added the scons directory)
  * @code
- PATH=$PATH:/cygdrive/c/opt/scons/bin
- export CPPPATH=/cygdrive/c/opt/library/atlas/3.9.43/include:/cygdrive/c/opt/library/boost/1.47.0/include:/cygdrive/c/opt/library/boost/sandbox/numeric_bindings:/cygdrive/c/opt/library/hdf/1.8.7/include:/cygdrive/c/opt/library/xml2/2.7.8/include/libxml2
+    PATH=$PATH:/cygdrive/c/opt/scons/bin
+    export CPPPATH=/cygdrive/c/opt/library/atlas/3.9.43/include:/cygdrive/c/opt/library/boost/1.47.0/include:/cygdrive/c/opt/library/boost/sandbox/numeric_bindings:/cygdrive/c/opt/library/hdf/1.8.7/include:/cygdrive/c/opt/library/xml2/2.7.8/include/libxml2
  * @endcode
  * 
  * @subsection winversion Windows Version
@@ -291,13 +292,13 @@
  * @subsection winscons Error with Scons
  * In some cases if Scons is running, the python would be create a memory error like:
  * @code
- 6976514 [main] python 3456 C:\opt\cygwin\bin\python.exe: *** fatal error - unable to remap \\?\C:\opt\cygwin\lib\python2.6\lib-dynload\time.dll to same address as parent: 0x260000 != 0x2C0000
- Stack trace:
- Frame     Function  Args
- 00228748  6102796B  (00228748, 00000000, 00000000, 00000000)
- 00228A38  6102796B  (6117EC60, 00008000, 00000000, 61180977)
- 00229A68  61004F1B  (611A7FAC, 61243BA4, 00260000, 002C0000)
- End of stack trace
+    6976514 [main] python 3456 C:\opt\cygwin\bin\python.exe: *** fatal error - unable to remap \\?\C:\opt\cygwin\lib\python2.6\lib-dynload\time.dll to same address as parent: 0x260000 != 0x2C0000
+    Stack trace:
+    Frame     Function  Args
+    00228748  6102796B  (00228748, 00000000, 00000000, 00000000)
+    00228A38  6102796B  (6117EC60, 00008000, 00000000, 61180977)
+    00229A68  61004F1B  (611A7FAC, 61243BA4, 00260000, 002C0000)
+    End of stack trace
  * @endcode
  * Following steps are solving the problem
  * <ol>
@@ -307,9 +308,9 @@
  * </ol>
  * If you get an error that the temporary directory is not writable, run first in a Cygwin shell the command
  * @code
- cd -to your Windows Home directory eg /cygdrive/c/Users/username-
- cd AppData/Local
- chmod 777 Temp
+    cd -to your Windows Home directory eg /cygdrive/c/Users/username-
+    cd AppData/Local
+    chmod 777 Temp
  * @endcode
  *
  *
@@ -408,41 +409,41 @@
  * for log states, which must be used for writing the messages.
  * @section normal normal use
  * @code
- // sets the log level for writing messages 
- tools::logger::getInstance()->setLevel( tools::logger::info );
+    // sets the log level for writing messages 
+    tools::logger::getInstance()->setLevel( tools::logger::info );
  
- // creates a message
- tools::logger::getInstance()->write( tools::logger::warn, "test message" );
+    // creates a message
+    tools::logger::getInstance()->write( tools::logger::warn, "test message" );
  
- // shows the filename in which the messages are write down
- std::cout << tools::logger::getInstance()->getFilename() << std::endl;
+    // shows the filename in which the messages are write down
+    std::cout << tools::logger::getInstance()->getFilename() << std::endl;
  * @endcode
  *
  * @section mpi mpi use
  * <strong>The MPI library must be compiled with thread-support and must be initialized manually</strong>
  * @code
- MPI::Init_thread( argc, argv, MPI_THREAD_SERIALIZED )
- boost::mpi::communicator l_mpi;
+    MPI::Init_thread( argc, argv, MPI_THREAD_SERIALIZED )
+    boost::mpi::communicator l_mpi;
  
- // create the listener 
- tools::logger::getInstance()->startListener( l_mpi );
+    // create the listener 
+    tools::logger::getInstance()->startListener( l_mpi );
  
  
- // sets the log level for writing messages (it is seperated for each CPU)
- tools::logger::getInstance()->setLevel( tools::logger::info );
+    // sets the log level for writing messages (it is seperated for each CPU)
+    tools::logger::getInstance()->setLevel( tools::logger::info );
  
- // creates a message in the local log
- tools::logger::getInstance()->write( tools::logger::warn, "test message" );
+    // creates a message in the local log
+    tools::logger::getInstance()->write( tools::logger::warn, "test message" );
  
- // creates a message with MPI use
- tools::logger::getInstance()->write( l_mpi, tools::logger::warn, "test message with MPI" );
+    // creates a message with MPI use
+    tools::logger::getInstance()->write( l_mpi, tools::logger::warn, "test message with MPI" );
  
- // close the listener
- tools::logger::getInstance()->shutdownListener( l_mpi );
+    // close the listener
+    tools::logger::getInstance()->shutdownListener( l_mpi );
  
- // shows the filename of each CPU (only CPU 0 collectes all messages with MPI support)
- std::cout << tools::logger::getInstance()->getFilename() << std::endl;
- MPI::Finalize();
+    // shows the filename of each CPU (only CPU 0 collectes all messages with MPI support)
+    std::cout << tools::logger::getInstance()->getFilename() << std::endl;
+    MPI::Finalize();
  * @endcode
  *
  *
@@ -452,55 +453,55 @@
  * using the support and all components are within the namespace machinelearning::tools::files
  * @section csv comma separated values (csv)
  * @code
- tools::sources::csv csv;
- 
- // read matrix data (optional second parameter is a string with separator characters)
- // the file content must be followed this order:
- // <number or rows> <number of columns>
- // 1. row: 1. column, 2.column ....
- // ....
- boost::numeric::ublas::matrix<double> matrix = csv.readBlasMatrix<double>("<filename>");
- 
- // read vector data
- // the file content must be followd this order:
- // <number of elements>
- // 1. element
- // ....
- boost::numeric::ublas::vector<double> vector = csv.readBlasVector<double>("<filename>");
- 
- // read any vector data
- // the file content must be followd this order:
- // 1. element
- // 2. element
- // ....
- std::vector<T> vec = csv::readVector<T>("<filename>");
- 
- 
- // write data
- csv.write<double>("<filename>", vector);
- // third parameter set the separater character
- csv.write<double>(""<filename>", matrix);
+     tools::sources::csv csv;
+     
+     // read matrix data (optional second parameter is a string with separator characters)
+     // the file content must be followed this order:
+     // <number or rows> <number of columns>
+     // 1. row: 1. column, 2.column ....
+     // ....
+     boost::numeric::ublas::matrix<double> matrix = csv.readBlasMatrix<double>("<filename>");
+     
+     // read vector data
+     // the file content must be followd this order:
+     // <number of elements>
+     // 1. element
+     // ....
+     boost::numeric::ublas::vector<double> vector = csv.readBlasVector<double>("<filename>");
+     
+     // read any vector data
+     // the file content must be followd this order:
+     // 1. element
+     // 2. element
+     // ....
+     std::vector<T> vec = csv::readVector<T>("<filename>");
+     
+     
+     // write data
+     csv.write<double>("<filename>", vector);
+     // third parameter set the separater character
+     csv.write<double>(""<filename>", matrix);
  * @endcode
  *
  * @section hdf hierarchical data format (hdf)
  * HDF files need on reading and writing own data formats that description can found on http://www.hdfgroup.org/HDF5/doc/cpplus_RM/classH5_1_1PredType.html 
  * @code
- // only read access
- tools::files::hdf source("<path to hdf file>");
- 
- // read matrix data
- boost::numeric::ublas::matrix<double> matrix = source.readMatrix<double>("<path to dataset>", H5::PredType::NATIVE_DOUBLE);
- // read vector data
- boost::numeric::ublas::vector<unsigned int> vector = source.readVector<unsigned int>("<path to dataset>", H5::PredType::NATIVE_UINT);
- // read string
- std::string str = source.readString("<path to data>");
- 
- // create a new & empty hdf file (read / write access)
- tools::files::hdf target("path to hdf file", true);
- target.write<double>( "<path for dataset>",  matrix, H5::PredType::NATIVE_DOUBLE );
- target.write<double>( "<path for dataset>",  vector, H5::PredType::NATIVE_DOUBLE );
- 
- // hdf file will be closed and flushed if variable lost the scope
+     // only read access
+     tools::files::hdf source("<path to hdf file>");
+     
+     // read matrix data
+     boost::numeric::ublas::matrix<double> matrix = source.readMatrix<double>("<path to dataset>", H5::PredType::NATIVE_DOUBLE);
+     // read vector data
+     boost::numeric::ublas::vector<unsigned int> vector = source.readVector<unsigned int>("<path to dataset>", H5::PredType::NATIVE_UINT);
+     // read string
+     std::string str = source.readString("<path to data>");
+     
+     // create a new & empty hdf file (read / write access)
+     tools::files::hdf target("path to hdf file", true);
+     target.write<double>( "<path for dataset>",  matrix, H5::PredType::NATIVE_DOUBLE );
+     target.write<double>( "<path for dataset>",  vector, H5::PredType::NATIVE_DOUBLE );
+     
+     // hdf file will be closed and flushed if variable lost the scope
  * @endcode
  *
  *
@@ -512,7 +513,7 @@
  * <dfn>MACHINELEARNING_MULTILANGUAGE</dfn> must be set for using the support. The message files can be edited with Poedit ( http://www.poedit.net/ ).
  * For using the language support, a call for setting the correct languages must be written wihin the main program:
  * @code
- tools::language::bind(<name of the language file, should be "ml">, <path to the language directory, shoudl be "./tools/language/">);
+    tools::language::bind(<name of the language file, should be "ml">, <path to the language directory, shoudl be "./tools/language/">);
  * @endcode
  *
  *
@@ -536,76 +537,76 @@
  * @subsection mdsnntpmatlab Matlab code for plotting NNTP distance data
  * The Matlab code on the bottom can be used for reading the HDF file and create a colored plot with all data.
  * @code
- function plotnntp( pcfile )
- pmarkersize=5;
- 
- % create colors
- textlabel  = hdf5read( pcfile, '/uniquegroup');
- label      = cell(size(textlabel,1),1);
- labelcolor = cell(size(textlabel,1),1);
- 
- col        = jet(size(textlabel,1));
- %col       = hsv(size(textlabel,1));
- for i=1:size(labelcolor,1)
- label{i}      = char(textlabel(i).data);
- labelcolor{i} = col(i, :);
- end
- 
- % we create for each label group a data matrix
- data       = hdf5read( pcfile, '/project');
- if (size(data,2) ~= 2) && (size(data,2) ~= 3)
- error('plot only with 2D or 3D');
- end
- 
- datalabel  = hdf5read( pcfile, '/group');
- 
- datacell   = cell(size(label,1),1);
- maxcount   = zeros(size(label,1),1);
- 
- for i=1:size(textlabel,1)
- datacell{i} = zeros( size(data,1), size(data,2) );
- end
- 
- for i=1:size(data,1)
- pos   = strmatch(char(datalabel(i).data), label, 'exact');
- point = datacell{pos};
- 
- point(maxcount(pos)+1,:) = data(i,:);
- 
- datacell{pos} = point;
- maxcount(pos) = maxcount(pos) + 1;
- end
- 
- % remove non-existing datasets
- emptycell = maxcount == 0;
- for i=1:numel(emptycell)
- if emptycell(i)
- datacell(i)	  = [];
- labelcolor(i) = [];
- label(i)	  = [];
- maxcount(i)	  = [];
- end
- end
- 
- % create plot
- figure;
- grid on;
- hold on;
- 
- phandle = zeros(numel(datacell),1);
- for i=1:numel(datacell)
- 
- point = datacell{i};
- point = point(1:maxcount(i), :);
- 
- if size(point,2) == 2
- phandle(i) = plot(point(:,1), point(:,2), '.', 'Color', labelcolor{i}, 'DisplayName', label{i}, MarkerSize',pmarkersize);
- else
- phandle(i) = plot3(point(:,1), point(:,2), point(:,3), '.', 'Color', labelcolor{i}, 'DisplayName', label{i}, 'MarkerSize',pmarkersize);
- end
- end
- 
- legend(phandle);
+     function plotnntp( pcfile )
+         pmarkersize=5;
+         
+         % create colors
+         textlabel  = hdf5read( pcfile, '/uniquegroup');
+         label      = cell(size(textlabel,1),1);
+         labelcolor = cell(size(textlabel,1),1);
+         
+         col        = jet(size(textlabel,1));
+         %col       = hsv(size(textlabel,1));
+         for i=1:size(labelcolor,1)
+            label{i}      = char(textlabel(i).data);
+            labelcolor{i} = col(i, :);
+         end
+         
+         % we create for each label group a data matrix
+         data       = hdf5read( pcfile, '/project');
+         if (size(data,2) ~= 2) && (size(data,2) ~= 3)
+            error('plot only with 2D or 3D');
+         end
+         
+         datalabel  = hdf5read( pcfile, '/group');
+         
+         datacell   = cell(size(label,1),1);
+         maxcount   = zeros(size(label,1),1);
+         
+         for i=1:size(textlabel,1)
+            datacell{i} = zeros( size(data,1), size(data,2) );
+         end
+         
+         for i=1:size(data,1)
+            pos   = strmatch(char(datalabel(i).data), label, 'exact');
+            point = datacell{pos};
+         
+            point(maxcount(pos)+1,:) = data(i,:);
+         
+            datacell{pos} = point;
+            maxcount(pos) = maxcount(pos) + 1;
+         end
+         
+         % remove non-existing datasets
+         emptycell = maxcount == 0;
+         for i=1:numel(emptycell)
+            if emptycell(i)
+                datacell(i)	  = [];
+                labelcolor(i) = [];
+                label(i)	  = [];
+                maxcount(i)	  = [];
+            end
+         end
+         
+         % create plot
+         figure;
+         grid on;
+         hold on;
+         
+         phandle = zeros(numel(datacell),1);
+         for i=1:numel(datacell)
+         
+            point = datacell{i};
+            point = point(1:maxcount(i), :);
+         
+            if size(point,2) == 2
+                phandle(i) = plot(point(:,1), point(:,2), '.', 'Color', labelcolor{i}, 'DisplayName', label{i}, MarkerSize',pmarkersize);
+            else
+                phandle(i) = plot3(point(:,1), point(:,2), point(:,3), '.', 'Color', labelcolor{i}, 'DisplayName', label{i}, 'MarkerSize',pmarkersize);
+            end
+         end
+         
+         legend(phandle);
  * @endcode
  *
  * @section mdswiki Distance analyse of Wikipedia articles and visualization with MDS
@@ -613,40 +614,40 @@
  *
  * @subsection mdswikimatlab Matlab code for plotting Wikipedia distance data
  * @code
- function plotwiki( pcfile, ptext)
- 
- if nargin < 2 || isempty(ptext)
- ptext = true;
- end
- pmarkersize=5;
- 
- % get data
- data  = hdf5read( pcfile, '/project');
- if (size(data,2) ~= 2) && (size(data,2) ~= 3)
- error('plot only with 2D or 3D');
- end
- label = hdf5read( pcfile, '/label');
- 
- % create plot
- figure;
- grid on;
- hold on;
- 
- if size(data,2) == 2
- plot(data(:,1), data(:,2), '.', 'MarkerSize',pmarkersize);
- else
- plot3(data(:,1), data(:,2), data(:,3), '.', 'MarkerSize',pmarkersize);
- end
- 
- for i=1:size(data,1)
- if ptext
- if size(data,2) == 2
- text( data(i,1)+0.005, data(i,2), char(label(i).data), 'FontSize', 8);
- else
- text( data(i,1)+0.005, data(i,2), data(i,3), char(label(i).data), 'FontSize', 8);
- end
- end
- end
+     function plotwiki( pcfile, ptext)
+     
+         if nargin < 2 || isempty(ptext)
+            ptext = true;
+         end
+         pmarkersize=5;
+         
+         % get data
+         data  = hdf5read( pcfile, '/project');
+         if (size(data,2) ~= 2) && (size(data,2) ~= 3)
+            error('plot only with 2D or 3D');
+         end
+         label = hdf5read( pcfile, '/label');
+         
+         % create plot
+         figure;
+         grid on;
+         hold on;
+         
+         if size(data,2) == 2
+            plot(data(:,1), data(:,2), '.', 'MarkerSize',pmarkersize);
+         else
+            plot3(data(:,1), data(:,2), data(:,3), '.', 'MarkerSize',pmarkersize);
+         end
+         
+         for i=1:size(data,1)
+            if ptext
+                if size(data,2) == 2
+                    text( data(i,1)+0.005, data(i,2), char(label(i).data), 'FontSize', 8);
+                else
+                    text( data(i,1)+0.005, data(i,2), data(i,3), char(label(i).data), 'FontSize', 8);
+                end
+            end
+         end
  * @endcode
  * 
  *

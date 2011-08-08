@@ -27,69 +27,12 @@
 #include <machinelearning.h>
 #include <boost/any.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/program_options/parsers.hpp>
+#include <boost/program_options/variables_map.hpp>
+#include <boost/program_options/options_description.hpp>
 
 using namespace machinelearning;
-
-
-/** read all input arguments 
- * @param argc number of arguments of "main"
- * @param argv arguments of "main"
- * @param p_args map with argument values (default values)
- * @return bool if all is correct
- **/
-bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_args ) {
-    
-    if (argc < 2) {
-        std::cout << "--lang \t\t language (values: en [default], de)" << std::endl;
-        std::cout << "--search \t returns the artice of the keyword / returns list of articles / if empty, you will get a random article" << std::endl;
-        return false;
-    }
-    
-    // set default arguments
-    std::map<std::string, std::vector<std::string> > l_argmap;
-    l_argmap["lang"]       = std::vector<std::string>();
-    l_argmap["search"]     = std::vector<std::string>();
-    
-    
-    // read all arguments
-    std::size_t n=1;
-    for(int i=1; i < argc; i+=n) {
-        n = 1;
-        std::string lc(argv[i]);
-        if (lc.length() < 2)
-            continue;
-        
-        lc = lc.substr(2);
-        boost::to_lower( lc );
-        
-        if (l_argmap.find(lc) != l_argmap.end()) {
-            std::vector<std::string> lv;
-            
-            for(int l=i+1; l < argc; ++l) {
-                std::string lc2(argv[l]);
-                if ( (lc2.length() >= 2) && (lc2.substr(0,2) == "--") )
-                    break;
-                
-                lv.push_back(lc2);
-                n++;
-            }
-            
-            l_argmap[lc] = lv;
-        }
-        
-    }
-    
-    
-    p_args["search"]    = l_argmap["search"];
-    
-    p_args["lang"] = tools::language::EN;
-    if (l_argmap["lang"].size() > 0)
-        try {
-            p_args["lang"] = tools::language::fromString(l_argmap["lang"][0]);
-        } catch (...) {}   
-    
-    return true;
-}
+namespace po = boost::program_options;
 
 
 /** output for one article
@@ -117,29 +60,43 @@ void output( tools::sources::wikipedia& p_wiki ) {
  * @param argv arguments
  **/
 int main(int argc, char* argv[]) {
+
+    std::string l_lang;
     
-    std::map<std::string, boost::any> l_args;
-    if (!cliArguments(argc, argv, l_args))
-        return EXIT_FAILURE;
+    // create CML options with description
+    po::options_description l_description("allowed options");
+    l_description.add_options()
+        ("help", "produce help message")
+        ("search", po::value<std::string>(), "returns the artice of the keyword / returns list of articles (comma separated) / if empty, you will get a random article")
+        ("lang", po::value<std::string>(&l_lang)->default_value("en"), "language code (iso 639-1 or -3) [default: en]")
+    ;
     
+    po::variables_map l_map;
+    po::store(po::parse_command_line(argc, argv, l_description), l_map);
+    po::notify(l_map);
+    
+    if (l_map.count("help")) {
+        std::cout << l_description << std::endl;
+        return EXIT_SUCCESS;
+    }
+
     
     // create wikipedia object
-    tools::sources::wikipedia wiki( boost::any_cast<tools::language::code>(l_args["lang"]) );
+    tools::sources::wikipedia wiki( tools::language::fromString(l_lang)  );
     
-    // get article data
-    std::vector<std::string> lsearch = boost::any_cast< std::vector<std::string> >(l_args["search"]);
-    
-    if (lsearch.size() == 0) {
+    if (!l_map.count("search")) {
         wiki.getRandomArticle();
         output(wiki);
-    } else
-        for(std::size_t i=0; i < lsearch.size(); ++i) {
-            wiki.getArticle( lsearch[i] );
+    } else {
+        std::vector<std::string> l_search;
+        boost::split( l_search, l_map["search"].as<std::string>(), boost::is_any_of(",") );
+
+        for(std::size_t i=0; i < l_search.size(); ++i) {
+            wiki.getArticle( l_search[i] );
             output(wiki);
             std::cout << "\n===================================================================================" << std::endl;
         }
-    
-    
+    }
     
     return EXIT_SUCCESS;
 }
