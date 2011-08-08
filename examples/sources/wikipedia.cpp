@@ -67,7 +67,7 @@ int main(int argc, char* argv[]) {
     po::options_description l_description("allowed options");
     l_description.add_options()
         ("help", "produce help message")
-        ("search", po::value<std::string>(), "returns the artice of the keyword / returns list of articles (comma separated) / if empty, you will get a random article")
+        ("search", po::value<std::string>(), "returns the artice of the keyword / returns list of articles (comma-separated) / if empty, you will get a random article")
         ("lang", po::value<std::string>(&l_lang)->default_value("en"), "language code (iso 639-1 or -3) [default: en]")
     ;
     

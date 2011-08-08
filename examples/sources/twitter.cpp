@@ -51,7 +51,7 @@ int main(int argc, char* argv[]) {
     po::options_description l_description("allowed options");
     l_description.add_options()
         ("help", "produce help message")
-        ("search", po::value<std::string>(), "search keyword / keyword list comma separated list ['tm' returns the actuall timeline tweets and other options are ignored]")
+        ("search", po::value<std::string>(), "search keyword / keyword list comma-separated list ['tm' returns the actuall timeline tweets and other options are ignored]")
         ("lang", po::value<std::string>(), "language code (iso 639-1 or -3)")
         ("geo", po::value<std::string>(), "geographic position (format: latitude, longitude, radius, radiuslength [km = kilometer, mi = miles])")
         ("max", po::value<std::size_t>(&l_max)->default_value(0), "maximum number of tweets [default: 0 = maximum]")

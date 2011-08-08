@@ -49,7 +49,7 @@ int main(int argc, char* argv[]) {
     l_description.add_options()
         ("help", "produce help message")
         ("server", po::value<std::string>(), "IP / address of the NNTP server")
-        ("groups", po::value<std::string>(), "list of groups / not set = show group list")
+        ("groups", po::value<std::string>(), "comma-separated list of groups / not set = show group list")
         ("content", po::value<std::string>(&l_content)->default_value("body"), "content of articles (values: full, body [default], header)")
         ("canceled", po::value<bool>(&l_cancel)->default_value(false), "show canceled articles (values: false / 0 [default], true)")
     ;

@@ -33,162 +33,17 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
+#include <boost/program_options/parsers.hpp>
+#include <boost/program_options/variables_map.hpp>
+#include <boost/program_options/options_description.hpp>
 
-
+namespace po        = boost::program_options;
 namespace ublas     = boost::numeric::ublas;
 namespace dim       = machinelearning::dimensionreduce::nonsupervised;
 namespace tools     = machinelearning::tools;
 namespace distances = machinelearning::distances;
 namespace text      = machinelearning::textprocess;
 
-
-/** read all input arguments 
- * @param argc number of arguments of "main"
- * @param argv arguments of "main"
- * @param p_args map with argument values (default values)
- * @return bool if all is correct
- **/
-bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_args ) {
-   
-    if (argc < 2) {
-        std::cout << "--outfile \t\t output HDF5 file" << std::endl;
-        std::cout << "--dimension \t\t number of project dimensions (default 3)" << std::endl;
-        std::cout << "--rate \t\t\t iteration rate for sammon / hit (default 1)" << std::endl;
-        std::cout << "--sources \t\t list of text files or directories with text files (all files in the directory will be read and subdirectories will be ignored)" << std::endl;
-        std::cout << "--compress \t\t compression level (allowed values are: default, bestspeed or bestcompression)" << std::endl;
-        std::cout << "--algorithm \t\t compression algorithm (allowed values are: gzip, bzip)" << std::endl;
-        std::cout << "--mapping \t\t mapping type (values: metric, sammon, hit [default])" << std::endl;
-        std::cout << "--iteration \t\t number of iterations (detected automatically)" << std::endl;
-        std::cout << "--stopword \t\t ranges of stopword reduction (defaults: 0.33 & 0.66 [word out of the range will be removed] or 'off' for disable)" << std::endl;
-        return false;
-    }
-    
-    
-    // set default arguments
-    std::map<std::string, std::vector<std::string> > l_argmap;
-    l_argmap["outfile"]   = std::vector<std::string>();
-    l_argmap["dimension"] = std::vector<std::string>();
-    l_argmap["iteration"] = std::vector<std::string>();
-    l_argmap["rate"]      = std::vector<std::string>();
-    l_argmap["compress"]  = std::vector<std::string>();
-    l_argmap["algorithm"] = std::vector<std::string>();
-    l_argmap["sources"]   = std::vector<std::string>(); 
-    l_argmap["mapping"]   = std::vector<std::string>(); 
-    l_argmap["stopword"]  = std::vector<std::string>();
-    
-    
-    // read all arguments
-    std::size_t n=1;
-    for(int i=1; i < argc; i+=n) {
-        n = 1;
-        std::string lc(argv[i]);
-        if (lc.length() < 2)
-            continue;
-        
-        lc = lc.substr(2);
-        boost::to_lower( lc );
-        
-        if (l_argmap.find(lc) != l_argmap.end()) {
-            std::vector<std::string> lv;
-            
-            for(int l=i+1; l < argc; ++l) {
-                std::string lc2(argv[l]);
-                if ( (lc2.length() >= 2) && (lc2.substr(0,2) == "--") )
-                    break;
-                
-                lv.push_back(lc2);
-                n++;
-            }
-            
-            l_argmap[lc] = lv;
-        }
-        
-    }
-    
-    
-    //check map values and convert them
-    if ((l_argmap["outfile"].size() != 1) ||
-        (l_argmap["sources"].size() == 0)
-        )
-        throw std::runtime_error("number of arguments are incorrect");
-    
-    
-    p_args["outfile"]       = l_argmap["outfile"][0];
-    p_args["rate"]          = double(1);
-    p_args["dimension"]     = std::size_t(3);
-    p_args["sources"]       = l_argmap["sources"];
-    
-    std::vector<float> l_stopwords;
-    l_stopwords.push_back(0.33);
-    l_stopwords.push_back(0.66);
-    
-    // check input arguments and convert them
-    p_args["algorithm"] = distances::ncd<double>::bzip2;
-    if (l_argmap["algorithm"].size() > 0) {
-        boost::to_lower(l_argmap["algorithm"][0]);
-        if (l_argmap["algorithm"][0] == "gzip")
-            p_args["algorithm"]   = distances::ncd<double>::gzip;
-        if ((l_argmap["algorithm"].size() > 0) && (l_argmap["algorithm"][0] == "bzip"))
-            p_args["algorithm"]   = distances::ncd<double>::bzip2;
-    }
-    
-    p_args["compress"] = distances::ncd<double>::defaultcompression;
-    if (l_argmap["compress"].size() > 0) {
-        boost::to_lower(l_argmap["compress"][0]);
-        if (l_argmap["compress"][0] == "default")
-            p_args["compress"]    = distances::ncd<double>::defaultcompression;
-        if (l_argmap["compress"][0] == "bestspeed")
-            p_args["compress"]    = distances::ncd<double>::bestspeed;
-        if (l_argmap["compress"][0] == "bestcompression")
-            p_args["compress"]    = distances::ncd<double>::bestcompression;
-    }
-    
-    // check mapping argument
-    p_args["mapping"] = dim::mds<double>::hit;
-    if (l_argmap["mapping"].size() == 1) {
-        boost::to_lower(l_argmap["mapping"][0]);
-        if (l_argmap["mapping"][0] == "sammon")
-            p_args["mapping"]   = dim::mds<double>::sammon;
-        if (l_argmap["mapping"][0] == "metric")
-            p_args["mapping"]   = dim::mds<double>::metric;
-    }
-    
-    
-    try {
-        if (l_argmap["dimension"].size() > 0)
-            p_args["dimension"]  = boost::lexical_cast<std::size_t>( l_argmap["dimension"][0] );
-        
-        if (l_argmap["rate"].size() > 0)
-            p_args["rate"] = boost::lexical_cast<double>(l_argmap["rate"][0]);
-                   
-        if (l_argmap["stopword"].size() >= 2) {
-            l_stopwords[0] = boost::lexical_cast<float>(l_argmap["stopword"][0]);
-            l_stopwords[1] = boost::lexical_cast<float>(l_argmap["stopword"][1]);
-        }
-        
-    } catch (...) {
-        throw std::runtime_error("numerical data can not extracted");
-    }  
-    
-    p_args["stopword"]      = l_stopwords;
-    p_args["stopwordsoff"]  = bool(false);
-    if (l_argmap["stopword"].size() >= 1) {
-        std::string l_onoff = l_argmap["stopword"][0];
-        boost::to_lower(l_onoff);
-        p_args["stopwordsoff"] = l_onoff == "off";
-    }
-    
-    // set iteration
-    p_args["iteration"] = l_argmap["files"].size();
-    if (l_argmap["iteration"].size() != 0)
-        try {
-            p_args["iteration"] = boost::lexical_cast<std::size_t>(l_argmap["iteration"][0]);
-        } catch (...) {}
-    
-    
-    return true;
-}
-    
     
     
 /** main program, that reads the text files, calculate the distance between articles 
@@ -197,17 +52,59 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
  * @param argv arguments
  **/
 int main(int argc, char* argv[]) {
+     
+    // default values
+    std::size_t l_dimension;
+    std::size_t l_iteration;
+    double l_rate;
+    std::string l_compress;
+    std::string l_algorithm;
+    std::string l_mapping;
     
-    std::map<std::string, boost::any> l_args;
-    if (!cliArguments(argc, argv, l_args))
+    // create CML options with description
+    po::options_description l_description("allowed options");
+    l_description.add_options()
+        ("help", "produce help message")
+        ("outfile", po::value<std::string>(), "output HDF5 file")
+        ("sources", po::value<std::string>(), "comma-separated list of text files or directories with text files (all files in the directory will be read and subdirectories will be ignored)")
+        ("dimension", po::value<std::size_t>(&l_dimension)->default_value(3), "number of project dimensions (default 3)")
+        ("rate", po::value<double>(&l_rate)->default_value(1), "iteration rate for sammon / hit (default 1)")
+        ("compress", po::value<std::string>(&l_compress)->default_value("default"), "compression level (allowed values are: default [default], bestspeed or bestcompression)")
+        ("algorithm", po::value<std::string>(&l_algorithm)->default_value("gzip"), "compression algorithm (allowed values are: gzip [default], bzip)")
+        ("iteration", po::value<std::size_t>(&l_iteration)->default_value(0), "number of iterations (detected automatically)")
+        ("mapping", po::value<std::string>(&l_mapping)->default_value("hit"), "mapping type (values: metric, sammon, hit [default])")
+        ("stopwordmin", po::value<double>(), "minimal value of the stopword reduction (value within the range [0,1], stopwordmin and stopwordmax must be set for using)")
+        ("stopwordmax", po::value<double>(), "maximal value of the stopword reduction (value within the range [0,1], stopwordmin and stopwordmax must be set for using)")
+    ;
+    
+    po::variables_map l_map;
+    po::store(po::parse_command_line(argc, argv, l_description), l_map);
+    po::notify(l_map);
+    
+    if (l_map.count("help")) {
+        std::cout << l_description << std::endl;
+        return EXIT_SUCCESS;
+    }
+    
+    if ( (!l_map.count("outfile")) || (!l_map.count("sources")) )  {
+        std::cout << "[--outfile] and [--sources] option must be set" << std::endl;
         return EXIT_FAILURE;
-        
+    }
+     
+     
+     
+     
+     
+     
+     
     // read all file content into a vector
     std::cout << "read files..." << std::endl;
     
     // first read all files
     std::vector<std::string> l_files;
-    const std::vector<std::string> l_sources = boost::any_cast< std::vector<std::string> >(l_args["sources"]);
+    std::vector<std::string> l_sources;
+    boost::split( l_sources, l_map["sources"].as<std::string>(), boost::is_any_of(",") );
+    
     for(std::size_t i=0; i < l_sources.size(); ++i) {
         
         boost::filesystem::path data(l_sources[i]);
@@ -233,13 +130,14 @@ int main(int argc, char* argv[]) {
         throw std::runtime_error( "at least two files are needed");
 
     // create file and write data to hdf
-    tools::files::hdf target(boost::any_cast<std::string>(l_args["outfile"]), true);    
+    tools::files::hdf target(l_map["outfile"].as<std::string>(), true);    
     
     
     
     // if stopword reduction enabled, we read the file content
     std::vector<std::string> l_content;
-    if (!boost::any_cast<bool>(l_args["stopwordsoff"])) {
+    if ( (l_map.count("stopwordmin")) && (l_map.count("stopwordmax")) ) {
+        
         for(std::size_t i=0; i < l_files.size(); ++i) {
             std::ifstream l_file(l_files[i].c_str(), std::ifstream::in);
             if (l_file.bad())
@@ -255,7 +153,7 @@ int main(int argc, char* argv[]) {
         text::termfrequency tfc;
         tfc.add(l_content);
     
-        const std::vector<std::string> l_stopwords = tfc.getTerms( boost::any_cast< std::vector<float> >(l_args["stopword"])[0], boost::any_cast< std::vector<float> >(l_args["stopword"])[1] );
+        const std::vector<std::string> l_stopwords = tfc.getTerms( l_map["stopwordmin"].as<double>(), l_map["stopwordmax"].as<double>() );
         text::stopwordreduction stopword( l_stopwords, tfc.iscaseinsensitivity() );
         for(std::size_t i=0; i < l_content.size(); ++i)
             l_content[i] = stopword.remove( l_content[i] );
@@ -266,11 +164,17 @@ int main(int argc, char* argv[]) {
             
     // run NCD
     std::cout << "calculate normalized compression distance..." << std::endl;
-    distances::ncd<double> ncd( boost::any_cast< distances::ncd<double>::compresstype >(l_args["algorithm"]) );
-    ncd.setCompressionLevel( boost::any_cast< distances::ncd<double>::compresslevel >(l_args["compress"]) );
+    distances::ncd<double> ncd( (l_algorithm == "gzip") ? distances::ncd<double>::gzip : distances::ncd<double>::bzip2 );
+    
+    ncd.setCompressionLevel( distances::ncd<double>::defaultcompression );
+    if (l_compress == "bestspeed")
+        ncd.setCompressionLevel( distances::ncd<double>::bestspeed );
+    if (l_compress == "bestcompression")
+        ncd.setCompressionLevel( distances::ncd<double>::bestcompression );
+    
     
     ublas::matrix<double> distancematrix;
-    if (!boost::any_cast<bool>(l_args["stopwordsoff"]))
+    if ( (l_map.count("stopwordmin")) && (l_map.count("stopwordmax")) )
          distancematrix = ncd.unsymmetric( l_content );
     else
         distancematrix = ncd.unsymmetric( l_files, true );
@@ -280,9 +184,16 @@ int main(int argc, char* argv[]) {
     // run hit mds over the distance matrix
     std::cout << "run mds projection..." << std::endl;
         
-    dim::mds<double> mds( boost::any_cast<std::size_t>(l_args["dimension"]), boost::any_cast<dim::mds<double>::project>(l_args["mapping"]) );
-    mds.setIteration( boost::any_cast<std::size_t>(l_args["iteration"]) );
-    mds.setRate( boost::any_cast<double>(l_args["rate"]) );
+    
+    dim::mds<double>::project l_project = dim::mds<double>::hit;
+    if (l_mapping == "metric")
+        l_project = dim::mds<double>::metric;
+    if (l_mapping == "sammon")
+        l_project = dim::mds<double>::sammon;
+    
+    dim::mds<double> mds( l_dimension, l_project );
+    mds.setIteration( l_iteration );
+    mds.setRate( l_rate );
         
     ublas::matrix<double> project = mds.map( distancematrix );
         
