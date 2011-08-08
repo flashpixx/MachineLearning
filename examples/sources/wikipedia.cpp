@@ -67,12 +67,13 @@ int main(int argc, char* argv[]) {
     po::options_description l_description("allowed options");
     l_description.add_options()
         ("help", "produce help message")
-        ("search", po::value<std::string>(), "returns the artice of the keyword / returns list of articles (comma-separated) / if empty, you will get a random article")
+        ("search", po::value< std::vector<std::string> >()->multitoken(), "returns the artice of the keyword / returns list of articles / if empty, you will get a random article")
         ("lang", po::value<std::string>(&l_lang)->default_value("en"), "language code (iso 639-1 or -3) [default: en]")
     ;
     
     po::variables_map l_map;
-    po::store(po::parse_command_line(argc, argv, l_description), l_map);
+    po::positional_options_description l_input;
+    po::store(po::command_line_parser(argc, argv).options(l_description).positional(l_input).run(), l_map);
     po::notify(l_map);
     
     if (l_map.count("help")) {
@@ -88,8 +89,7 @@ int main(int argc, char* argv[]) {
         wiki.getRandomArticle();
         output(wiki);
     } else {
-        std::vector<std::string> l_search;
-        boost::split( l_search, l_map["search"].as<std::string>(), boost::is_any_of(",") );
+        const std::vector<std::string> l_search = l_map["search"].as< std::vector<std::string> >();
 
         for(std::size_t i=0; i < l_search.size(); ++i) {
             wiki.getArticle( l_search[i] );

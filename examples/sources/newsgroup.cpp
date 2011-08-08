@@ -49,13 +49,14 @@ int main(int argc, char* argv[]) {
     l_description.add_options()
         ("help", "produce help message")
         ("server", po::value<std::string>(), "IP / address of the NNTP server")
-        ("groups", po::value<std::string>(), "comma-separated list of groups / not set = show group list")
+        ("groups", po::value< std::vector<std::string> >()->multitoken(), "list of groups / not set = show group list")
         ("content", po::value<std::string>(&l_content)->default_value("body"), "content of articles (values: full, body [default], header)")
         ("canceled", po::value<bool>(&l_cancel)->default_value(false), "show canceled articles (values: false / 0 [default], true)")
     ;
     
     po::variables_map l_map;
-    po::store(po::parse_command_line(argc, argv, l_description), l_map);
+    po::positional_options_description l_input;
+    po::store(po::command_line_parser(argc, argv).options(l_description).positional(l_input).run(), l_map);
     po::notify(l_map);
     
     if (l_map.count("help")) {
@@ -90,8 +91,7 @@ int main(int argc, char* argv[]) {
             news.setContent( tools::sources::nntp::header );
         
 
-        std::vector<std::string> l_groups;
-        boost::split( l_groups, l_map["groups"].as<std::string>(), boost::is_any_of(",") );
+        const std::vector<std::string> l_groups = l_map["groups"].as< std::vector<std::string> >();
     
         for(std::size_t i=0; i < l_groups.size(); ++i) {
             // sets the newsgroup for browsing 

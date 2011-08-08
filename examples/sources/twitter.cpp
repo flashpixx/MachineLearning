@@ -51,17 +51,18 @@ int main(int argc, char* argv[]) {
     po::options_description l_description("allowed options");
     l_description.add_options()
         ("help", "produce help message")
-        ("search", po::value<std::string>(), "search keyword / keyword list comma-separated list ['tm' returns the actuall timeline tweets and other options are ignored]")
+        ("search", po::value< std::vector<std::string> >()->multitoken(), "search keyword / keyword list list ['tm' returns the actuall timeline tweets and other options are ignored]")
         ("lang", po::value<std::string>(), "language code (iso 639-1 or -3)")
-        ("geo", po::value<std::string>(), "geographic position (format: latitude, longitude, radius, radiuslength [km = kilometer, mi = miles])")
+        ("geo", po::value< std::vector<std::string> >()->multitoken(), "geographic position (format: latitude longitude radius radiuslength [km = kilometer, mi = miles])")
         ("max", po::value<std::size_t>(&l_max)->default_value(0), "maximum number of tweets [default: 0 = maximum]")
         ("rpp", po::value<std::size_t>(&l_rpp)->default_value(15), "number of tweets on each call [default: 15]")
         ("page", po::value<std::size_t>(&l_page)->default_value(1), "number of starting page [default: 1]")
-        ("until", po::value<std::string>(), "date value (format: YYYY-MM-DD)")
+        ("until", po::value< std::vector<std::string> >()->multitoken(), "date value (format: YYYY MM DD)")
     ;
-    
+
     po::variables_map l_map;
-    po::store(po::parse_command_line(argc, argv, l_description), l_map);
+    po::positional_options_description l_input;
+    po::store(po::command_line_parser(argc, argv).options(l_description).positional(l_input).run(), l_map);
     po::notify(l_map);
     
     if (l_map.count("help")) {
@@ -88,8 +89,7 @@ int main(int argc, char* argv[]) {
         } catch (...) {}
     
     if (l_map.count("geo")) {
-        std::vector<std::string> l_geoparam;
-        boost::split( l_geoparam, l_map["geo"].as<std::string>(), boost::is_any_of(",") );
+        const std::vector<std::string> l_geoparam = l_map["geo"].as< std::vector<std::string> >();
 
         if (l_geoparam.size() >= 4)
             try {
@@ -106,8 +106,7 @@ int main(int argc, char* argv[]) {
     }
     
     if (l_map.count("until")) {
-        std::vector<std::string> l_dateparam;
-        boost::split( l_dateparam, l_map["until"].as<std::string>(), boost::is_any_of("-") );
+        const std::vector<std::string> l_dateparam = l_map["until"].as< std::vector<std::string> >();
         
         if (l_dateparam.size() >= 3)
             try {
@@ -121,13 +120,12 @@ int main(int argc, char* argv[]) {
     }
  
     
-    
+
     // do twitter run
     tools::sources::twitter l_twitter;
     
-    std::vector<std::string> l_search;
-    boost::split( l_search, l_map["search"].as<std::string>(), boost::is_any_of(",") );
-    
+    const std::vector<std::string> l_search = l_map["search"].as< std::vector<std::string> >();
+       
     std::string l_searchfirst = l_search[0];
     boost::to_lower(l_searchfirst);
     if (l_searchfirst == "tm") {
