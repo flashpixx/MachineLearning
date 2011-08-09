@@ -167,7 +167,6 @@ int main(int argc, char* argv[]) {
     std::cout << "calculate normalized compression distance..." << std::endl;
     distances::ncd<double> ncd( (l_algorithm == "gzip") ? distances::ncd<double>::gzip : distances::ncd<double>::bzip2 );
     
-    ncd.setCompressionLevel( distances::ncd<double>::defaultcompression );
     if (l_compress == "bestspeed")
         ncd.setCompressionLevel( distances::ncd<double>::bestspeed );
     if (l_compress == "bestcompression")
