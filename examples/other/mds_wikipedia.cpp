@@ -116,6 +116,7 @@ int main(int argc, char* argv[]) {
 
     // get n random wikipedia articles
     #ifdef MACHINELEARNING_MPI 
+    loMPICom.barrier();
     std::cout << "CPU " << loMPICom.rank() << ": ";
     #endif
     std::cout << "read wikipedia articles..." << std::endl;
@@ -227,7 +228,7 @@ int main(int argc, char* argv[]) {
     l_wikidata.clear();
         
         
-        
+        r
         
     // run hit mds over the distance matrix
     #ifdef MACHINELEARNING_MPI 
