@@ -228,7 +228,7 @@ int main(int argc, char* argv[]) {
     l_wikidata.clear();
         
         
-        r
+        
         
     // run hit mds over the distance matrix
     #ifdef MACHINELEARNING_MPI 
@@ -243,9 +243,9 @@ int main(int argc, char* argv[]) {
     if (l_mapping == "sammon")
         l_project = dim::mds<double>::sammon;
                                              
-     dim::mds<double> mds( l_dimension, l_project );
-     mds.setIteration( l_iteration );
-     mds.setRate( l_rate );
+    dim::mds<double> mds( l_dimension, l_project );
+    mds.setIteration( l_iteration );
+    mds.setRate( l_rate );
                             
                                              
     #ifdef MACHINELEARNING_MPI 
