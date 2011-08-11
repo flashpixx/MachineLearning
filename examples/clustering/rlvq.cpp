@@ -59,7 +59,6 @@ int main(int argc, char* argv[]) {
         ("outfile", po::value<std::string>(), "output HDF5 file")
         ("inputfile", po::value<std::string>(), "input HDF5 file")
         ("inputpath", po::value<std::string>(), "path to dataset")
-        ("prototype", po::value<std::size_t>(), "number of prototypes")
         ("labelpath", po::value<std::string>(), "path to the data labels")
         ("labeltype", po::value<std::string>(), "datatype of labels (values: string, uint, int)")
         ("iteration", po::value<std::size_t>(&l_iteration)->default_value(15), "number of iteration [default: 15]")
@@ -76,9 +75,9 @@ int main(int argc, char* argv[]) {
         return EXIT_SUCCESS;
     }
     
-    if ( (!l_map.count("outfile")) || (!l_map.count("inputfile")) || (!l_map.count("inputpath")) || (!l_map.count("prototype")) || (!l_map.count("labeltype")) ||  (!l_map.count("labelpath")))
+    if ( (!l_map.count("outfile")) || (!l_map.count("inputfile")) || (!l_map.count("inputpath")) || (!l_map.count("labeltype")) ||  (!l_map.count("labelpath")))
     {
-        std::cout << "[--outfile], [--inputfile], [--inputpath], [--labelpath], [--labeltype-] and [--prototype] option must be set" << std::endl;
+        std::cout << "[--outfile], [--inputfile], [--inputpath], [--labelpath] and [--labeltype] option must be set" << std::endl;
         return EXIT_FAILURE;
     }
     

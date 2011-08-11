@@ -29,95 +29,15 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
+#include <boost/program_options/parsers.hpp>
+#include <boost/program_options/variables_map.hpp>
+#include <boost/program_options/options_description.hpp>
 
+namespace po        = boost::program_options;
 namespace ublas     = boost::numeric::ublas;
 namespace cluster   = machinelearning::clustering::nonsupervised;
 namespace distance  = machinelearning::distances;
 namespace tools     = machinelearning::tools;
-
-
-/** read all input arguments 
- * @param argc number of arguments of "main"
- * @param argv arguments of "main"
- * @param p_args map with argument values (default values)
- * @return bool if all is correct
- **/
-bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_args ) {
-    
-    if (argc < 2) {
-        std::cout << "--inputfile \t\t input HDF5 file" << std::endl;
-        std::cout << "--inputpath \t\t path to dataset" << std::endl;
-        std::cout << "--outfile \t\t output HDF5 file" << std::endl;
-        std::cout << "--iteration \t\t number of iteration" << std::endl;
-        std::cout << "--prototype \t\t number of prototypes" << std::endl;
-        std::cout << "--log \t\t\t 'on' for enable logging" << std::endl;
-        
-        return false;
-    }
-    
-    
-    // set default arguments
-    std::map<std::string, std::vector<std::string> > l_argmap;
-    l_argmap["inputfile"] = std::vector<std::string>();
-    l_argmap["inputpath"] = std::vector<std::string>();
-    l_argmap["outfile"]   = std::vector<std::string>();
-    l_argmap["iteration"] = std::vector<std::string>();
-    l_argmap["prototype"] = std::vector<std::string>();
-    l_argmap["log"]       = std::vector<std::string>();
-    
-    
-    // read all arguments
-    std::size_t n=1;
-    for(int i=1; i < argc; i+=n) {
-        n = 1;
-        std::string lc(argv[i]);
-        if (lc.length() < 2)
-            continue;
-        
-        lc = lc.substr(2);
-        boost::to_lower( lc );
-        
-        if (l_argmap.find(lc) != l_argmap.end()) {
-            std::vector<std::string> lv;
-            
-            for(int l=i+1; l < argc; ++l) {
-                std::string lc2(argv[l]);
-                if ( (lc2.length() >= 2) && (lc2.substr(0,2) == "--") )
-                    break;
-                
-                lv.push_back(lc2);
-                n++;
-            }
-            
-            l_argmap[lc] = lv;
-        }
-        
-    }
-    
-    
-    //check map values and convert them
-    if ( (l_argmap["iteration"].size() != 1) || 
-        (l_argmap["prototype"].size() != 1) || 
-        (l_argmap["outfile"].size() != 1) || 
-        (l_argmap["inputfile"].size() != 1) || 
-        (l_argmap["inputpath"].size() != 1)
-        )
-        throw std::runtime_error("number of arguments are incorrect");
-
-    p_args["log"]           = l_argmap["log"].size() > 0;
-    p_args["inputfile"]     = l_argmap["inputfile"][0];
-    p_args["inputpath"]     = l_argmap["inputpath"][0];
-    p_args["outfile"]       = l_argmap["outfile"][0];
-    
-    try {
-        p_args["iteration"] = boost::lexical_cast<std::size_t>( l_argmap["iteration"][0] );
-        p_args["prototype"]  = boost::lexical_cast<std::size_t>( l_argmap["prototype"][0] );
-    } catch (...) {
-        throw std::runtime_error("numerical data can not extracted");
-    }  
-    
-    return true;
-}
 
 
 /** main program
@@ -126,31 +46,60 @@ bool cliArguments( int argc, char* argv[], std::map<std::string, boost::any>& p_
  **/
 int main(int argc, char* argv[]) {
     
-    std::map<std::string, boost::any> l_args;
-    if (!cliArguments(argc, argv, l_args))
+    // default values
+    bool l_log;
+    std::size_t l_iteration;
+    
+    // create CML options with description
+    po::options_description l_description("allowed options");
+    l_description.add_options()
+        ("help", "produce help message")
+        ("outfile", po::value<std::string>(), "output HDF5 file")
+        ("inputfile", po::value<std::string>(), "input HDF5 file")
+        ("inputpath", po::value<std::string>(), "path to dataset")
+        ("prototype", po::value<std::size_t>(), "number of prototypes")
+        ("iteration", po::value<std::size_t>(&l_iteration)->default_value(15), "number of iteration [default: 15]")
+        ("log", po::value<bool>(&l_log)->default_value(false), "'true' for enable logging [default: false]")
+    ;
+    
+    po::variables_map l_map;
+    po::positional_options_description l_input;
+    po::store(po::command_line_parser(argc, argv).options(l_description).positional(l_input).run(), l_map);
+    po::notify(l_map);
+    
+    if (l_map.count("help")) {
+        std::cout << l_description << std::endl;
+        return EXIT_SUCCESS;
+    }
+    
+    if ( (!l_map.count("outfile")) || (!l_map.count("inputfile")) || (!l_map.count("inputpath")) || (!l_map.count("prototype")) )
+    {
+        std::cout << "[--outfile], [--inputfile], [--inputpath] and [--prototype] option must be set" << std::endl;
         return EXIT_FAILURE;
+    }    
+    
     
     
     // read source hdf file and data
-    tools::files::hdf source( boost::any_cast<std::string>(l_args["inputfile"]) );
-    ublas::matrix<double> data = source.readBlasMatrix<double>(boost::any_cast<std::string>(l_args["inputpath"]), H5::PredType::NATIVE_DOUBLE);
+    tools::files::hdf source( l_map["inputfile"].as<std::string>() );
+    ublas::matrix<double> data = source.readBlasMatrix<double>( l_map["inputpath"].as<std::string>(), H5::PredType::NATIVE_DOUBLE);
 
     
     // create distance object, k-means object and enable logging
     distance::euclid<double> d;
-    cluster::kmeans<double> kmeans(d, boost::any_cast<std::size_t>(l_args["prototype"]), data.size2());
-    kmeans.setLogging(boost::any_cast<bool>(l_args["log"]));
+    cluster::kmeans<double> kmeans(d, l_map["prototype"].as<std::size_t>(), data.size2());
+    kmeans.setLogging(l_log);
     
     // train prototypes
-    kmeans.train(data, boost::any_cast<std::size_t>(l_args["iteration"]));
+    kmeans.train(data, l_iteration);
     
     
     // create file and write data to hdf
-    tools::files::hdf target(boost::any_cast<std::string>(l_args["outfile"]), true);
+    tools::files::hdf target(l_map["outfile"].as<std::string>(), true);
     
     target.writeBlasMatrix<double>( "/protos",  kmeans.getPrototypes(), H5::PredType::NATIVE_DOUBLE );
-    target.writeValue<std::size_t>( "/numprotos",  boost::any_cast<std::size_t>(l_args["prototype"]), H5::PredType::NATIVE_ULONG );
-    target.writeValue<std::size_t>( "/iteration",  boost::any_cast<std::size_t>(l_args["iteration"]), H5::PredType::NATIVE_ULONG );
+    target.writeValue<std::size_t>( "/numprotos",  l_map["prototype"].as<std::size_t>(), H5::PredType::NATIVE_ULONG );
+    target.writeValue<std::size_t>( "/iteration",  l_iteration, H5::PredType::NATIVE_ULONG );
     
     // if logging exists write data to file
     if (kmeans.getLogging()) {
