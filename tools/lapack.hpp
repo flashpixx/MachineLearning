@@ -78,6 +78,7 @@ namespace machinelearning { namespace tools {
      * @param p_diag diagonal matrix
      * @param p_eigval blas vector for eigenvalues [initialisation is not needed]
      * @param p_eigvec blas matrix for (normalized) eigenvectors (every column is a eigenvector) [initialisation is not needed]
+     * @bug does not work - check LAPack call
      **/
     template<typename T> inline void lapack::eigen( const ublas::matrix<T>& p_matrix, const ublas::matrix<T>& p_diag, ublas::vector<T>& p_eigval, ublas::matrix<T>& p_eigvec )
     {
