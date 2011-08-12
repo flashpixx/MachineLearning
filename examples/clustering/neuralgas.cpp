@@ -54,21 +54,8 @@ int main(int argc, char* argv[]) {
     mpi::environment loMPIenv(argc, argv);
     mpi::communicator loMPICom;
     #endif
+
     
-    
-    /*
-    std::map<std::string, boost::any> l_args;
-    
-    #ifdef MACHINELEARNING_MPI
-    mpi::environment loMPIenv(argc, argv);
-    mpi::communicator loMPICom;
-    
-    if (!cliArguments(argc, argv, l_args, loMPICom))
-    #else
-    if (!cliArguments(argc, argv, l_args))
-    #endif
-        return EXIT_FAILURE;
-     */
     
     // default values
     bool l_log;
