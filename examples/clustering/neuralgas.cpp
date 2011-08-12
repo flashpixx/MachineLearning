@@ -98,9 +98,11 @@ int main(int argc, char* argv[]) {
     
 
     #ifdef MACHINELEARNING_MPI
-    if ( !((l_map["inputfile"].as< std::vector<std::string> >().size() == static_cast<std::size_t>(loMPICom.size()) && (l_map["inputpath"].as< std::vector<std::string> >().size() == 1)) ||
-           (l_map["inputpath"].as< std::vector<std::string> >().size() == static_cast<std::size_t>(loMPICom.size()) && (l_map["inputfile"].as< std::vector<std::string> >().size() == 1)))
-       )
+    if(!(
+         ((l_map["inputfile"].as< std::vector<std::string> >().size() == static_cast<std::size_t>(loMPICom.size())) && (l_map["inputpath"].as< std::vector<std::string> >().size() == 1)) ||
+         ((l_map["inputpath"].as< std::vector<std::string> >().size() == static_cast<std::size_t>(loMPICom.size())) && (l_map["inputfile"].as< std::vector<std::string> >().size() == 1)) ||
+         ((l_map["inputpath"].as< std::vector<std::string> >().size() == static_cast<std::size_t>(loMPICom.size())) && (l_map["inputfile"].as< std::vector<std::string> >().size() == static_cast<std::size_t>(loMPICom.size())))
+         ))
         throw std::runtime_error("number of files or number of path must be equal to CPU rank");
         
     if (l_map["prototype"].as< std::vector<std::size_t> >().size() != static_cast<std::size_t>(loMPICom.size()))

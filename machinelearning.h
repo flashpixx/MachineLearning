@@ -739,6 +739,7 @@
  * @file tools/iostreams/urlencoder.h encoder for url
  *
  *
+ * @todo adding GSL support http://www.gnu.org/software/gsl/
  * @todo thinking about a SSE support in the framework http://en.wikipedia.org/wiki/SSE3
  * @todo thinking about CILK support http://supertech.csail.mit.edu/cilk/
  * @todo adding genetic algorithms
