@@ -27,6 +27,9 @@
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
 #include <boost/program_options/options_description.hpp>
+#ifdef MACHINELEARNING_MPI
+#include <boost/mpi.hpp>
+#endif
 
 namespace po        = boost::program_options;
 namespace ublas     = boost::numeric::ublas;
