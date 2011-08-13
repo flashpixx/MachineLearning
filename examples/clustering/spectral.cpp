@@ -21,13 +21,8 @@
  @endcond
  **/
 
-#include <map>
 #include <cstdlib>
-
 #include <machinelearning.h>
-#include <boost/any.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>

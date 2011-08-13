@@ -21,14 +21,9 @@
  @endcond
  **/
 
-#include <map>
-#include <string>
 #include <cstdlib>
-
 #include <machinelearning.h>
-#include <boost/any.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
-#include <boost/numeric/ublas/symmetric.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
 #include <boost/program_options/options_description.hpp>
