@@ -53,7 +53,7 @@ namespace machinelearning { namespace tools {
      * We can handle only dense / full matrix data with LAPACK
      * $LastChangedDate$
      * @see http://svn.boost.org/svn/boost/sandbox/numerical_bindings
-     * @todo try to change the matrix copy in eigen / svd to a better option (eg bindings::trans )
+     * @todo try to change the matrix copy in eigen / svd to a better option (eg bindings::trans or traits )
      * @todo add matrix exponential via Pade approximation (shown in Matlab with expmdemo)
      * @todo portage this class to the Intel Math Kernel Library http://software.intel.com/en-us/articles/intel-mkl/
      **/
