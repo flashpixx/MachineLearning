@@ -53,7 +53,7 @@ namespace machinelearning { namespace tools {
      * We can handle only dense / full matrix data with LAPACK
      * $LastChangedDate$
      * @see http://svn.boost.org/svn/boost/sandbox/numerical_bindings
-     * @todo try to change the matrix copy in eigen / svd to static casts
+     * @todo try to change the matrix copy in eigen / svd to a better option (eg bindings::trans )
      * @todo add matrix exponential via Pade approximation (shown in Matlab with expmdemo)
      * @todo portage this class to the Intel Math Kernel Library http://software.intel.com/en-us/articles/intel-mkl/
      **/
@@ -78,7 +78,6 @@ namespace machinelearning { namespace tools {
      * @param p_diag diagonal matrix
      * @param p_eigval blas vector for eigenvalues [initialisation is not needed]
      * @param p_eigvec blas matrix for (normalized) eigenvectors (every column is a eigenvector) [initialisation is not needed]
-     * @bug does not work - check LAPack call
      **/
     template<typename T> inline void lapack::eigen( const ublas::matrix<T>& p_matrix, const ublas::matrix<T>& p_diag, ublas::vector<T>& p_eigval, ublas::matrix<T>& p_eigvec )
     {
@@ -100,8 +99,8 @@ namespace machinelearning { namespace tools {
         ublas::vector<T> l_tmp1(l_eigval.size());
         ublas::matrix<T, ublas::column_major> l_tmp2(l_matrix.size1(),l_matrix.size2());
         
-        // determine eigenvector without sorting and calculate eigenvalues
-        //linalg::ggev( 'N', 'V', p_matrix, l_diag, l_eigval,  l_tmp1,  l_div,  l_tmp2,  l_eigvec, linalg::optimal_workspace() );
+        // determine generalized eigenvector without sorting and calculate eigenvalues
+        linalg::ggev( 'N', 'V', l_matrix, l_diag, l_eigval,  l_tmp1,  l_div,  l_tmp2,  l_eigvec, linalg::optimal_workspace() );
         
         // calculate eigenvalues
         for(std::size_t i=0; i < l_eigval.size(); ++i)
@@ -175,6 +174,12 @@ namespace machinelearning { namespace tools {
         // second matrix must be transpose
         l_svdvec2 = ublas::trans( l_svdvec2 );
         
+        // normalize
+        for(std::size_t i=0; i < l_svdvec1.size2(); ++i)
+            ublas::column(l_svdvec1, i) /= blas::nrm2( static_cast< ublas::vector<T> >(ublas::column(l_svdvec1, i)) );
+        for(std::size_t i=0; i < l_svdvec2.size2(); ++i)
+            ublas::column(l_svdvec2, i) /= blas::nrm2( static_cast< ublas::vector<T> >(ublas::column(l_svdvec2, i)) );
+        
         
         // we must copy the reference
         p_svdval    = l_svdval;
@@ -237,7 +242,6 @@ namespace machinelearning { namespace tools {
         }
         
         return l_vec;
-        
     }
 
 };};
