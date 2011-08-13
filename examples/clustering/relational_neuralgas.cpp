@@ -49,28 +49,7 @@ int main(int argc, char* argv[]) {
     mpi::environment loMPIenv(argc, argv);
     mpi::communicator loMPICom;
     #endif
-    
-    /*
-    std::map<std::string, boost::any> l_args;
-    
-    #ifdef MACHINELEARNING_MPI
-    mpi::environment loMPIenv(argc, argv);
-    mpi::communicator loMPICom;
-    
-    if (!cliArguments(argc, argv, l_args, loMPICom))
-    #else
-    if (!cliArguments(argc, argv, l_args))
-    #endif
-        return EXIT_FAILURE;
-     
-     std::cout << "--inputfile \t\t input HDF5 file" << std::endl;
-     std::cout << "--inputpath \t\t path to dataset" << std::endl;
-     std::cout << "--outfile \t\t output HDF5 file" << std::endl;
-     std::cout << "--iteration \t\t number of iteration" << std::endl;
-     std::cout << "--prototype \t\t number of prototypes" << std::endl;
-     std::cout << "--log \t\t\t 'on' for enable logging" << std::endl;
-     
-    */
+
     
     // default values
     bool l_log;
