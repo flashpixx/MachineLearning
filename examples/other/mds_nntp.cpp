@@ -113,7 +113,7 @@ std::vector<std::string> createGroupList( tools::sources::nntp& p_nntp, const st
  * @param p_nntp nntp object
  * @param p_numarticles number of articles
  * @param p_groups list with group names
- * @param p_articles vector with returned articles
+ * @param p_article vector with returned articles
  * @param p_articlegroup returned vector with group names for each article
 **/
 void getArticles( tools::sources::nntp& p_nntp, const std::size_t& p_numarticles, const std::vector<std::string>& p_groups, std::vector<std::string>& p_article, std::vector<std::string>& p_articlegroup )
