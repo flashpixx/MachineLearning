@@ -735,7 +735,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             // relational: (D * alpha_i)_j - 0.5 * alpha_i^t * D * alpha_i = || x^j - w^i || 
             // D = distance, alpha = weight of the prototype for the konvex combination
             ublas::matrix<T> l_adaptmatrix = ublas::prod(l_prototypes, p_data);
-            std::cout << "CPU " << p_mpi.rank() << "\t" << l_adaptmatrix << std::endl;
+
             // the adapt matrix holds all values on the block of the current CPU, so CPU 0 holds the values 0..k, CPU 1 k+1..n and so on.
             // In the next step we must calculate the inner product of each prototyp and each row of the adapt matrix, but we can't because
             // we have only parts of the rows on each CPU, so we split the prototype matrix (with the information of the processdata) in
@@ -743,9 +743,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             // it from their local adapt matrix
             ublas::matrix_range< ublas::matrix<T> > l_protorange( l_prototypes, 
                                                                   ublas::range(0, l_prototypes.size1()), 
-                                                                  ublas::range( m_processdatainfo[p_mpi.rank()].first, m_processprototypinfo[p_mpi.rank()].first+m_processdatainfo[p_mpi.rank()].second ) 
+                                                                  ublas::range( m_processdatainfo[p_mpi.rank()].first, m_processdatainfo[p_mpi.rank()].first+m_processdatainfo[p_mpi.rank()].second ) 
                                                                 );
-            
+
             for(std::size_t n=0; n < l_protorange.size1(); ++n) {
                 const T l_val = 0.5 * mpi::all_reduce( p_mpi, 
                                                        ublas::inner_prod( ublas::row(l_protorange, n), ublas::row(l_adaptmatrix, n) ), 
