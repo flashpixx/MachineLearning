@@ -149,7 +149,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     {
         if (p_prototypesize == 0)
             throw exception::runtime(_("prototype size must be greater than zero"));
- 
+        
         // normalize the prototypes
         for(std::size_t i=0; i <  m_prototypes.size1(); ++i) {
             const T l_sum = ublas::sum( ublas::row( m_prototypes, i) );
@@ -345,13 +345,13 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             }
  
             // adapt values are the new prototypes (and run normalization)
-            m_prototypes = l_adaptmatrix;
-            for(std::size_t i=0; i < m_prototypes.size1(); ++i) {
-                const T l_sum = ublas::sum( ublas::row( m_prototypes, i) );
+            for(std::size_t i=0; i < l_adaptmatrix.size1(); ++i) {
+                const T l_sum = ublas::sum( ublas::row( l_adaptmatrix, i) );
                 
                 if (!tools::function::isNumericalZero(l_sum))
-                    ublas::row( m_prototypes, i) /= l_sum;
+                    ublas::row( l_adaptmatrix, i) /= l_sum;
             }
+            m_prototypes = l_adaptmatrix;
             
             // log updated prototypes
             if (m_logging)
@@ -469,14 +469,14 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             }
             
             // adapt values are the new prototypes (and run normalization)
-            m_prototypes = l_adaptmatrix;
-            for(std::size_t i=0; i < m_prototypes.size1(); ++i) {
-                const T l_sum = ublas::sum( ublas::row( m_prototypes, i) );
+            for(std::size_t i=0; i < l_adaptmatrix.size1(); ++i) {
+                const T l_sum = ublas::sum( ublas::row( l_adaptmatrix, i) );
                 
                 if (!tools::function::isNumericalZero(l_sum))
-                    ublas::row( m_prototypes, i) /= l_sum;
+                    ublas::row( l_adaptmatrix, i) /= l_sum;
             }
-            
+            m_prototypes = l_adaptmatrix;
+                        
             // log updated prototypes
             if (m_logging)
                 m_logprototypes.push_back( m_prototypes );
@@ -535,11 +535,11 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     {
         // calculate for every prototype the distance
         // relational: (D * alpha_i)_j - 0.5 * alpha_i^t * D * alpha_i = || x^j - w^i || 
-        // D = distance, alpha = weight of the prototype for the konvex combination
+        // D = distance, alpha = weight of the prototype for the convex combination
         ublas::matrix<T> l_adaptmatrix = ublas::prod(p_prototypes, p_data);
-        
+       
         for(std::size_t n=0; n < l_adaptmatrix.size1(); ++n) {
-            const T l_val = 0.5 * ublas::inner_prod( ublas::row(m_prototypes, n), ublas::row(l_adaptmatrix, n) );
+            const T l_val = 0.5 * ublas::inner_prod( ublas::row(p_prototypes, n), ublas::row(l_adaptmatrix, n) );
             
             for(std::size_t j=0; j < l_adaptmatrix.size2(); ++j)
                 l_adaptmatrix(n, j) -= l_val;
@@ -735,11 +735,11 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             // relational: (D * alpha_i)_j - 0.5 * alpha_i^t * D * alpha_i = || x^j - w^i || 
             // D = distance, alpha = weight of the prototype for the konvex combination
             ublas::matrix<T> l_adaptmatrix = ublas::prod(l_prototypes, p_data);
-            
+            std::cout << "CPU " << p_mpi.rank() << "\t" << l_adaptmatrix << std::endl;
             // the adapt matrix holds all values on the block of the current CPU, so CPU 0 holds the values 0..k, CPU 1 k+1..n and so on.
             // In the next step we must calculate the inner product of each prototyp and each row of the adapt matrix, but we can't because
             // we have only parts of the rows on each CPU, so we split the prototype matrix (with the information of the processdata) in
-            // the correct party, create the "local" inner product and sums over all CPUs. Each CPU gets so the correct value for subtract
+            // the correct part, create the "local" inner product and sums over all CPUs. Each CPU gets so the correct value for subtract
             // it from their local adapt matrix
             ublas::matrix_range< ublas::matrix<T> > l_protorange( l_prototypes, 
                                                                   ublas::range(0, l_prototypes.size1()), 
