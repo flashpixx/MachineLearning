@@ -661,7 +661,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     template<typename T> inline ublas::matrix<T> relational_neuralgas<T>::extractLocalPrototypes( const mpi::communicator& p_mpi, ublas::matrix<T>& p_prototypes )
     {
         ublas::matrix_range< ublas::matrix<T> > l_range( p_prototypes, 
-                                                         ublas::range( m_processprototypinfo[p_mpi.rank()].first, m_processprototypinfo[p_mpi.rank()].second ), 
+                                                         ublas::range( m_processprototypinfo[p_mpi.rank()].first, m_processprototypinfo[p_mpi.rank()].first+m_processprototypinfo[p_mpi.rank()].second ), 
                                                          ublas::range( 0, p_prototypes.size2() )
                                                        );    
         
@@ -743,7 +743,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             // it from their local adapt matrix
             ublas::matrix_range< ublas::matrix<T> > l_protorange( m_prototypes, 
                                                                   ublas::range(0, l_prototypes.size1()), 
-                                                                  ublas::range( m_processdatainfo[p_mpi.rank()].first, m_processdatainfo[p_mpi.rank()].second ) 
+                                                                  ublas::range( m_processdatainfo[p_mpi.rank()].first, m_processprototypinfo[p_mpi.rank()].first+m_processdatainfo[p_mpi.rank()].second ) 
                                                                 );
             
             for(std::size_t n=0; n < l_protorange.size1(); ++n) {

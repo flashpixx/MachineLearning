@@ -42,7 +42,7 @@ namespace machinelearning {
     
     /** namespace for all clustering algorithms
      * $LastChangedDate$
-     * @todo adding SOM
+     * @todo adding SOM http://www.cis.hut.fi/research/som-research/
      **/
     namespace clustering {
         
