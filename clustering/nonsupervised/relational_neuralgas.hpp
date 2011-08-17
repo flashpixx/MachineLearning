@@ -741,7 +741,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             // we have only parts of the rows on each CPU, so we split the prototype matrix (with the information of the processdata) in
             // the correct party, create the "local" inner product and sums over all CPUs. Each CPU gets so the correct value for subtract
             // it from their local adapt matrix
-            ublas::matrix_range< ublas::matrix<T> > l_protorange( m_prototypes, 
+            ublas::matrix_range< ublas::matrix<T> > l_protorange( l_prototypes, 
                                                                   ublas::range(0, l_prototypes.size1()), 
                                                                   ublas::range( m_processdatainfo[p_mpi.rank()].first, m_processprototypinfo[p_mpi.rank()].first+m_processdatainfo[p_mpi.rank()].second ) 
                                                                 );
