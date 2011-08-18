@@ -54,6 +54,7 @@ namespace machinelearning { namespace tools { namespace files {
      * @todo add ndim cube support
      * @todo iterate over groups
      * @todo adding moving objects
+     * @todo adding MPI support
      **/
     class hdf {
         
