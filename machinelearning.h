@@ -746,7 +746,7 @@
  * @todo adding genetic algorithms
  * @todo adding simulated annealing (see GSL)
  * @todo adding voronoi tessellation
- * @todo thinking about ported code to strict C++ code http://www.comeaucomputing.com/
+ * @todo thinking about Corba support for algorithms
  **/
 
 #ifndef MACHINELEARNING_H
