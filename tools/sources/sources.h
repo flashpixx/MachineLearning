@@ -33,6 +33,7 @@ namespace machinelearning {
          * $LastChangedDate$
          * @todo adding support for OpenStreetMap http://wiki.openstreetmap.org/wiki/API / http://libosmscout.sourceforge.net
          * @todo adding support for Apache Cassandra http://en.wikipedia.org/wiki/Apache_Cassandra
+         * @todo adding support for Hadoop http://hadoop.apache.org/
          * @todo adding support for mySQL / MS SQL / Postgres SQL / Oracle via eg http://www.sqlapi.com/
          * @todo adding twitter streaming support https://dev.twitter.com/docs/streaming-api/methods
          * @todo adding support for reading HTML data with WGet / Curl
