@@ -747,6 +747,7 @@
  * @todo adding simulated annealing (see GSL)
  * @todo adding voronoi tessellation
  * @todo thinking about Corba support for algorithms
+ * @todo thinking about abstract middleware for Boinc support (eg patch clustering) http://boinc.berkeley.edu/
  **/
 
 #ifndef MACHINELEARNING_H
