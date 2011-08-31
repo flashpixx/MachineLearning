@@ -814,7 +814,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
         ublas::indirect_array<> l_idx(p_data.size1());
         const ublas::matrix<T> l_distance = ublas::prod( p_data, l_prototypes );
-        
+
         for(std::size_t i=0; i < l_distance.size1(); ++i) {
             ublas::vector<T> l_col                = ublas::row(l_distance, i);
             const ublas::indirect_array<> l_rank  = tools::vector::rankIndex( l_col );
