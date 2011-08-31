@@ -805,18 +805,18 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> inline ublas::indirect_array<> relational_neuralgas<T>::use( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data ) const
     {
-        ublas::matrix<T> l_prototypes = gatherAllPrototypes( p_mpi );
+        const ublas::matrix<T> l_prototypes = ublas::trans(gatherAllPrototypes( p_mpi ));
         
-        if (l_prototypes.size1() == 0)
+        if (l_prototypes.size2() == 0)
             throw exception::runtime(_("number of prototypes must be greater than zero"));
-        if (p_data.size2() != l_prototypes.size2())
+        if (p_data.size2() != l_prototypes.size1())
             throw exception::runtime(_("data and prototype dimension are not equal"));
         
         ublas::indirect_array<> l_idx(p_data.size1());
-        const ublas::matrix<T> l_distance = ublas::prod( l_prototypes, p_data );
+        const ublas::matrix<T> l_distance = ublas::prod( p_data, l_prototypes );
         
-        for(std::size_t i=0; i < l_distance.size2(); ++i) {
-            ublas::vector<T> l_col                = ublas::column(l_distance, i);
+        for(std::size_t i=0; i < l_distance.size1(); ++i) {
+            ublas::vector<T> l_col                = ublas::row(l_distance, i);
             const ublas::indirect_array<> l_rank  = tools::vector::rankIndex( l_col );
             l_idx[i] = l_rank(0);
         }
