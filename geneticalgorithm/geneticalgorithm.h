@@ -32,7 +32,7 @@
 namespace machinelearning { 
     
     /** namespace for genetic algorithms **/
-    namespace geneticalgorithm {} ;
+    namespace geneticalgorithm {};
     
 };
 
