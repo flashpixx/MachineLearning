@@ -29,4 +29,11 @@
 #define MACHINELEARNING_GENETICALGORITHM_H
 
 
+namespace machinelearning { 
+    
+    /** namespace for genetic algorithms **/
+    namespace geneticalgorithm {} ;
+    
+};
+
 #endif
