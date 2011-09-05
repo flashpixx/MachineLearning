@@ -743,7 +743,6 @@
  * @todo adding PAPI support http://icl.cs.utk.edu/papi/
  * @todo thinking about a SSE support in the framework http://en.wikipedia.org/wiki/SSE3
  * @todo thinking about CILK support http://supertech.csail.mit.edu/cilk/
- * @todo adding genetic algorithms
  * @todo adding simulated annealing (see GSL)
  * @todo adding voronoi tessellation
  * @todo thinking about Corba support for algorithms
@@ -764,6 +763,7 @@ namespace machinelearning {};
 #include "dimensionreduce/dimensionreduce.h"
 #include "classifier/classifier.h"
 #include "clustering/clustering.h"
+#include "geneticalgorithm/geneticalgorithm.h"
 #include "neighborhood/neighborhood.h"
 #include "distances/distances.h"
 #include "tools/tools.h"
