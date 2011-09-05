@@ -763,7 +763,7 @@ namespace machinelearning {};
 #include "dimensionreduce/dimensionreduce.h"
 #include "classifier/classifier.h"
 #include "clustering/clustering.h"
-#include "geneticalgorithm/geneticalgorithm.h"
+//#include "geneticalgorithm/geneticalgorithm.h"
 #include "neighborhood/neighborhood.h"
 #include "distances/distances.h"
 #include "tools/tools.h"

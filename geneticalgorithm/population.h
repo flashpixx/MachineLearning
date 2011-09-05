@@ -21,22 +21,36 @@
  @endcond
  **/
 
-/** header file to connect all genetic algorithm for one include
- * $LastChangedDate$
- **/
 
-#ifndef MACHINELEARNING_GENETICALGORITHM_H
-#define MACHINELEARNING_GENETICALGORITHM_H
+#ifndef MACHINELEARNING_GENETICALGORITHM_POPULATION_H
+#define MACHINELEARNING_GENETICALGORITHM_POPULATION_H
 
 
-namespace machinelearning { 
-    
-    /** namespace for genetic algorithms **/
-    namespace geneticalgorithm {};
-    
-};
+namespace machinelearning { namespace geneticalgorithm {
 
+    /** class for the population / optimization structure
+     * $LastChangedDate$
+     **/
+    class population {
+        
+        public :
+        
+            population( const individuum&, const std::size_t&; const std::size_t&, const double& );
+        
+            std::size_t size( void ) const;
+            void setEliteSize( const double& );
+            void setMutalProbability( const double& );
+            std::vector<individuum> getElite( void ) const;
+            void optimze( const std::size_t& );
+        
+        
+        private :
+      
+            
+        
+        
+    };
 
-#include "population.h"
+};};
 
 #endif
