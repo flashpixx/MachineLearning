@@ -38,14 +38,15 @@ namespace machinelearning { namespace geneticalgorithm {
         
         public :
         
-            population( const fitnessfunction&, const individual&, const std::size_t&; const std::size_t&, const double& );
+            population( const individual&, const std::size_t&; const std::size_t&, const double& );
         
             std::size_t size( void ) const;
             void setEliteSize( const std::size:_t& );
             void setMutalProbability( const double& );
-            std::vector<individuum> getElite( void ) const;
+            std::vector<individual> getElite( void ) const;
             void setParentsDie( const bool& );
-            void optimze( const std::size_t& );
+            void iterate( const fitnessfunction&, const std::size_t& );
+            bool isConverged( const fitnessfunction& );
         
         
         private :

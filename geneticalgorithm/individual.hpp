@@ -40,7 +40,6 @@ namespace machinelearning { namespace geneticalgorithm {
         
             virtual indivdual recombine( const indivdual& ) const;
             virtual void mutate( void );
-            virtual T getFitness( void ) const;
         
         private :
         

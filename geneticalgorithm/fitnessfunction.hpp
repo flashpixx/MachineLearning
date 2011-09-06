@@ -41,6 +41,7 @@ namespace machinelearning { namespace geneticalgorithm {
         public :
         
             virtual T getFitness( const individual& ) const;
+            virtual T getFitness( const population& ) const;
         
         
     };
