@@ -22,38 +22,29 @@
  **/
 
 
-#ifndef MACHINELEARNING_GENETICALGORITHM_POPULATION_H
-#define MACHINELEARNING_GENETICALGORITHM_POPULATION_H
-
-#include "individual.h"
+#ifndef MACHINELEARNING_GENETICALGORITHM_INDIVIDUAL_H
+#define MACHINELEARNING_GENETICALGORITHM_INDIVIDUAL_H
 
 
 namespace machinelearning { namespace geneticalgorithm {
-
-    /** class for the population / optimization structure
+    
+    /** abstract class of an indivdual of the population
      * $LastChangedDate$
      **/
-    class population {
-        
+    class individual {
+
         public :
         
-            population( const individual&, const std::size_t&; const std::size_t&, const double& );
-        
-            std::size_t size( void ) const;
-            void setEliteSize( const std::size:_t& );
-            void setMutalProbability( const double& );
-            std::vector<individuum> getElite( void ) const;
-            void setParentsDie( const bool& );
-            void optimze( const std::size_t& );
-        
+            virtual indivdual recombine( const indivdual& ) const;
+            virtual void mutate( void );
+            virtual double getFitness( void ) const;
         
         private :
-      
-            
         
         
     };
-
+    
 };};
 
 #endif
+
