@@ -25,19 +25,22 @@
 #ifndef MACHINELEARNING_GENETICALGORITHM_INDIVIDUAL_H
 #define MACHINELEARNING_GENETICALGORITHM_INDIVIDUAL_H
 
+#include <boost/static_assert.hpp>
+
 
 namespace machinelearning { namespace geneticalgorithm {
     
     /** abstract class of an indivdual of the population
      * $LastChangedDate$
      **/
-    class individual {
+    template<typename T> class individual {
+        BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
 
         public :
         
             virtual indivdual recombine( const indivdual& ) const;
             virtual void mutate( void );
-            virtual double getFitness( void ) const;
+            virtual T getFitness( void ) const;
         
         private :
         

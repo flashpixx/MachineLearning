@@ -21,24 +21,31 @@
  @endcond
  **/
 
-/** header file to connect all genetic algorithm for one include
- * $LastChangedDate$
- **/
 
-#ifndef MACHINELEARNING_GENETICALGORITHM_H
-#define MACHINELEARNING_GENETICALGORITHM_H
+#ifndef MACHINELEARNING_GENETICALGORITHM_FITNESS_H
+#define MACHINELEARNING_GENETICALGORITHM_FITNESS_H
+
+#include <boost/static_assert.hpp>
 
 
-namespace machinelearning { 
+
+namespace machinelearning { namespace geneticalgorithm {
     
-    /** namespace for genetic algorithms **/
-    namespace geneticalgorithm {};
+    /** abstract class of the fitness function
+     * $LastChangedDate$
+     **/
+    template<typename T> class fitness {
+        BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
+        
+        public :
+        
+        
+        private :
+        
+        
+    };
     
-};
-
-
-#include "population.h"
-#include "individual.hpp"
-#include "fitness.hpp"
+};};
 
 #endif
+
