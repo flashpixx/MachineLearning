@@ -25,7 +25,8 @@
 #ifndef MACHINELEARNING_GENETICALGORITHM_POPULATION_H
 #define MACHINELEARNING_GENETICALGORITHM_POPULATION_H
 
-#include "individual.h"
+#include "individual.hpp"
+#include "fitnessfunction.hpp"
 
 
 namespace machinelearning { namespace geneticalgorithm {
@@ -37,7 +38,7 @@ namespace machinelearning { namespace geneticalgorithm {
         
         public :
         
-            population( const individual&, const std::size_t&; const std::size_t&, const double& );
+            population( const fitnessfunction&, const individual&, const std::size_t&; const std::size_t&, const double& );
         
             std::size_t size( void ) const;
             void setEliteSize( const std::size:_t& );

@@ -27,6 +27,7 @@
 
 #include <boost/static_assert.hpp>
 
+#include "individual.hpp"
 
 
 namespace machinelearning { namespace geneticalgorithm {
@@ -34,13 +35,12 @@ namespace machinelearning { namespace geneticalgorithm {
     /** abstract class of the fitness function
      * $LastChangedDate$
      **/
-    template<typename T> class fitness {
+    template<typename T> class fitnessfunction {
         BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
         
         public :
         
-        
-        private :
+            virtual T getFitness( const individual& ) const;
         
         
     };
