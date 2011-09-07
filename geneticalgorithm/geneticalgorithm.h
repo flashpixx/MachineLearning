@@ -37,7 +37,7 @@ namespace machinelearning {
 };
 
 
-#include "population.h"
+#include "population.hpp"
 #include "individual.hpp"
 #include "fitnessfunction.hpp"
 

@@ -28,6 +28,7 @@
 #include <boost/static_assert.hpp>
 
 #include "individual.hpp"
+#include "population.hpp"
 
 
 namespace machinelearning { namespace geneticalgorithm {
@@ -40,8 +41,8 @@ namespace machinelearning { namespace geneticalgorithm {
         
         public :
         
-            virtual T getFitness( const individual& ) const;
-            virtual T getFitness( const population& ) const;
+            virtual T getFitness( const individual<T>& ) const;
+            //virtual T getFitness( const population<T>& ) const;
         
         
     };
