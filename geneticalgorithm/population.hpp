@@ -22,8 +22,8 @@
  **/
 
 
-#ifndef MACHINELEARNING_GENETICALGORITHM_POPULATION_H
-#define MACHINELEARNING_GENETICALGORITHM_POPULATION_H
+#ifndef MACHINELEARNING_GENETICALGORITHM_POPULATION_HPP
+#define MACHINELEARNING_GENETICALGORITHM_POPULATION_HPP
 
 #include "individual.hpp"
 #include "fitnessfunction.hpp"
@@ -52,7 +52,7 @@ namespace machinelearning { namespace geneticalgorithm {
             //std::vector< individual<T> > getElite( void ) const;
             void setParentsDie( const bool& );
             bool getParentDie( void ) const;
-            //void iterate( const fitnessfunction&, const std::size_t& );
+            void iterate( const fitnessfunction&, const std::size_t& );
             //bool isConverged( const fitnessfunction& );
         
         
@@ -136,6 +136,15 @@ namespace machinelearning { namespace geneticalgorithm {
     template<typename T> inline std::size_t population<T>::size( void ) const
     {
         return m_population.size();
+    }
+    
+    
+    template<typename T> inline void population<T>::iterate( const fitnessfunction& p_function, const std::size_t& p_iteration )
+    {
+        for(std::size_t i=0; i < p_iteration; ++i)
+        {
+            
+        }
     }
     
     

@@ -22,25 +22,24 @@
  **/
 
 
-#ifndef MACHINELEARNING_GENETICALGORITHM_INDIVIDUAL_HPP
-#define MACHINELEARNING_GENETICALGORITHM_INDIVIDUAL_HPP
+#ifndef MACHINELEARNING_GENETICALGORITHM_ELITESELECTION_HPP
+#define MACHINELEARNING_GENETICALGORITHM_ELITESELECTION_HPP
 
 #include <boost/static_assert.hpp>
 
 
+
 namespace machinelearning { namespace geneticalgorithm {
     
-    /** abstract class of an indivdual of the population
-     * $LastChangedDate$
+    /** abstract class of the selection function
+     * $LastChangedDate: 2011-09-07 23:58:12 +0200 (Mi, 07 Sep 2011) $
      **/
-    template<typename T> class individual {
+    template<typename T> class eliteselection {
         BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
-
-        public :
         
-            virtual individual<T>* clone( void ) const;
-            virtual individual<T> recombine( const individual<T>& ) const;
-            virtual void mutate( void );
+        public :
+
+        
         
     };
     
