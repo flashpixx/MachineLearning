@@ -32,7 +32,7 @@
 namespace machinelearning { namespace geneticalgorithm {
     
     /** abstract class of the selection function
-     * $LastChangedDate: 2011-09-07 23:58:12 +0200 (Mi, 07 Sep 2011) $
+     * $LastChangedDate$
      **/
     template<typename T> class eliteselection {
         BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
