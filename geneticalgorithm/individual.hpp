@@ -38,8 +38,13 @@ namespace machinelearning { namespace geneticalgorithm {
 
         public :
         
+            /** method for cloning the object. The method should be create a new individual for the population initialization **/
             virtual individual<T>* clone( void ) const;
+        
+            /** recombines the individual with another individual and returns the new one **/
             virtual individual<T> recombine( const individual<T>& ) const;
+        
+            /** mutates the individual **/
             virtual void mutate( void );
         
     };
