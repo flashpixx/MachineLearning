@@ -52,7 +52,7 @@ namespace machinelearning { namespace geneticalgorithm {
             //std::vector< individual<T> > getElite( void ) const;
             void setParentsDie( const bool& );
             bool getParentDie( void ) const;
-            void iterate( const fitnessfunction&, const std::size_t& );
+            void iterate( const fitnessfunction<T>&, const std::size_t& );
             //bool isConverged( const fitnessfunction& );
         
         
@@ -139,7 +139,7 @@ namespace machinelearning { namespace geneticalgorithm {
     }
     
     
-    template<typename T> inline void population<T>::iterate( const fitnessfunction& p_function, const std::size_t& p_iteration )
+    template<typename T> inline void population<T>::iterate( const fitnessfunction<T>& p_function, const std::size_t& p_iteration )
     {
         for(std::size_t i=0; i < p_iteration; ++i)
         {

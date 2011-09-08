@@ -37,7 +37,7 @@ namespace machinelearning { namespace geneticalgorithm {
     template<typename T> class eliteselection {
         BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
         
-        public :
+        //public :
 
         
         
