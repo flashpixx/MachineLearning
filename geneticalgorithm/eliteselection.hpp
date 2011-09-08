@@ -26,10 +26,16 @@
 #define MACHINELEARNING_GENETICALGORITHM_ELITESELECTION_HPP
 
 #include <boost/static_assert.hpp>
+#include <boost/numeric/ublas/vector.hpp>
+
+#include "individual.hpp"
 
 
 
 namespace machinelearning { namespace geneticalgorithm {
+    
+    namespace ublas = boost::numeric::ublas;
+    
     
     /** abstract class of the selection function
      * $LastChangedDate$
@@ -39,7 +45,7 @@ namespace machinelearning { namespace geneticalgorithm {
         
         public :
         
-            virtual void select();
+            virtual std::vector< individual<T>* > getElite( const std::vector< individual<T>* >&, const ublas::vector<T>&, const std::size_t& );
         
     };
     

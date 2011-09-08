@@ -43,7 +43,7 @@ namespace machinelearning { namespace geneticalgorithm {
         
             /** recombines the individual with another individual and returns the new one **/
             virtual individual<T> recombine( const individual<T>& ) const;
-        
+
             /** mutates the individual **/
             virtual void mutate( void );
         

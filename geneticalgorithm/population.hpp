@@ -25,15 +25,20 @@
 #ifndef MACHINELEARNING_GENETICALGORITHM_POPULATION_HPP
 #define MACHINELEARNING_GENETICALGORITHM_POPULATION_HPP
 
-#include "individual.hpp"
-#include "fitnessfunction.hpp"
-#include "eliteselection.hpp"
+#include <boost/numeric/ublas/vector.hpp>
 
 #include "../exception/exception.h"
 #include "../tools/tools.h"
 
+#include "individual.hpp"
+#include "fitnessfunction.hpp"
+#include "eliteselection.hpp"
+
 
 namespace machinelearning { namespace geneticalgorithm {
+    
+    namespace ublas = boost::numeric::ublas;
+    
 
     /** class for the population / optimization structure
      * $LastChangedDate$
@@ -43,6 +48,13 @@ namespace machinelearning { namespace geneticalgorithm {
         
         public :
         
+            enum buildoption {
+                overwriteEliteWithNew = 0,
+                useEliteAndNew        = 1,
+                fullNewBuild          = 2
+            };
+        
+        
             population( const individual<T>&, const std::size_t&, const std::size_t&, const T& );
             ~population( void );
         
@@ -50,20 +62,25 @@ namespace machinelearning { namespace geneticalgorithm {
             std::size_t size( void ) const;
             void setEliteSize( const std::size_t& );
             std::size_t getEliteSize( void ) const;
+            std::vector< individual<T> > getElite( void ) const;
             void setMutalProbability( const T& );
             T getMutalProbability( void ) const;
-            //std::vector< individual<T> > getElite( void ) const;
-            void setParentsDie( const bool& );
-            bool getParentDie( void ) const;
-            void iterate( const fitnessfunction<T>&, const eliteselection<T>&, const std::size_t& );
+            std::vector< individual<T> > getElite( void ) const;
+            void setPopulationBuild( const buildoption& );
+            buildoption getPopulationBuild( void ) const;
+            void iterate( const fitnessfunction<T>&, const eliteselection<T>&, const std::size_t&, const tools::random::distribution& = tools::random::uniform );
             //bool isConverged( const fitnessfunction&, const eliteselection<T>& );
         
         
         private :
       
+            /** option in which way the new population is build **/
+            buildoption m_buildoption;
+            /** mutation probability **/
             T m_mutateprobility;
-            bool m_parentdie;
+            /** pointer vector with elite individuals **/
             std::vector< individual<T>* > m_elite;
+            /** pointer vector with individuals **/
             std::vector< individual<T>* > m_population;
         
         
@@ -78,6 +95,7 @@ namespace machinelearning { namespace geneticalgorithm {
      * @param p_mutate mutation probility
      **/
     template<typename T> inline population<T>::population( const individual<T>& p_individualref, const std::size_t& p_size, const std::size_t& p_elite, const T& p_mutate ) :
+        m_buildoption( fullNewBuild ),
         m_mutateprobility( p_mutate ),
         m_parentdie( true ),
         m_elite( p_elite ),
@@ -109,21 +127,21 @@ namespace machinelearning { namespace geneticalgorithm {
     }
     
     
-    /** method for setting that parent individuals are removed after recombination
+    /** method for setting population-building-option
      * @param p_die bool for enabeling the option
      **/
-    template<typename T> inline void population<T>::setParentsDie( const bool& p_die )
+    template<typename T> inline void population<T>::setPopulationBuild( const buildoption& p_opt )
     {
-        m_parentdie = p_die;
+        m_buildoption = p_opt;
     }
     
     
-    /** returns the value oft the parents-die option
+    /** returns the value oft the population-building-option
      * @return bool
      **/
-    template<typename T> inline bool population<T>::getParentDie( void ) const
+    template<typename T> inline population<T>::buildoption population<T>::getPopulationBuild( void ) const
     {
-        return m_parentdie;
+        return m_buildoption;
     }
     
     
@@ -148,6 +166,20 @@ namespace machinelearning { namespace geneticalgorithm {
     template<typename T> inline std::size_t population<T>::getEliteSize( void ) const
     {
         return m_elite.capacity();
+    }
+    
+    
+    /** returns a copy of the individuals objects of the elites
+     * @return vector with individual objects
+     **/
+    template<typename T> inline std::vector< individual<T> > population<T>::getElite( void ) const
+    {
+        std::vector< individual<T> > l_elite;
+        
+        for(std::size_t i=0; i < m_elite.size(); ++i)
+            l_elite.push_back( &m_elite[i] );
+        
+        return l_elite;
     }
     
     
@@ -185,16 +217,32 @@ namespace machinelearning { namespace geneticalgorithm {
      * @param p_fitness fitness function object
      * @param p_elite elite selection object
      * @param p_iteration number of iterations
+     * @param p_distribution distribution of the mutation and build (if full build is used) probability [default uniform distribution]
      **/
-    template<typename T> inline void population<T>::iterate( const fitnessfunction<T>& p_fitness, const eliteselection<T>& p_elite, const std::size_t& p_iteration )
+    template<typename T> inline void population<T>::iterate( const fitnessfunction<T>& p_fitness, const eliteselection<T>& p_elite, const std::size_t& p_iteration, const tools::random::distribution& p_distribution )
     {
         if (p_iteration == 0)
             throw exception::runtime(_("iterations must be greater than zero"));
         
+        
+        ublas::vector<T> l_fitness(m_population.size(), 0);
+        tools::random l_rand;
+        
         for(std::size_t i=0; i < p_iteration; ++i)
         {
+            // determin the fitness value for each individual
+            for(std::size_t j=0; j < m_population.size(); ++j)
+                l_fitness(j) = m_population[j] ? p_fitness.getFitness( &m_population[j] ) : 0;
             
+            // determine elite values
+            m_elite = p_elite.getElite( m_population, l_fitness, m_elite.capacity() );
+            
+            // run over the new population and mutate some individuals
+            for(std::size_t j=0; j < m_population.size(); ++j)
+                if (l_rand.get<T>( p_distribution, 0, 1 ) <= m_mutateprobility)
+                    m_population[j]->mutate();
         }
+    
     }
     
     
