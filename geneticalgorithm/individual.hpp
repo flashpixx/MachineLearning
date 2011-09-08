@@ -38,7 +38,8 @@ namespace machinelearning { namespace geneticalgorithm {
 
         public :
         
-            virtual individual recombine( const individual& ) const;
+            virtual individual<T>* clone( void ) const;
+            virtual individual<T> recombine( const individual<T>& ) const;
             virtual void mutate( void );
         
     };

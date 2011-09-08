@@ -29,12 +29,13 @@
 #include "fitnessfunction.hpp"
 
 #include "../exception/exception.h"
+#include "../tools/tools.h"
 
 
 namespace machinelearning { namespace geneticalgorithm {
 
     /** class for the population / optimization structure
-     * $LastChangedDate: 2011-09-06 21:32:01 +0200 (Di, 06 Sep 2011) $
+     * $LastChangedDate$
      **/
     template<typename T> class population {
         BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
@@ -42,6 +43,8 @@ namespace machinelearning { namespace geneticalgorithm {
         public :
         
             population( const individual<T>&, const std::size_t&, const std::size_t&, const T& );
+            ~population( void );
+        
         
             std::size_t size( void ) const;
             void setEliteSize( const std::size_t& );
@@ -58,8 +61,7 @@ namespace machinelearning { namespace geneticalgorithm {
             T m_mutateprobility;
             bool m_parentdie;
             std::size_t m_elitesize;
-            std::size_t m_populationsize;
-            individual<T>* m_population;
+            std::vector< individual<T>* > m_population;
         
         
     };
@@ -71,17 +73,30 @@ namespace machinelearning { namespace geneticalgorithm {
         m_mutateprobility( p_mutate ),
         m_parentdie( true ),
         m_elitesize( p_elite ),
-        m_populationsize( p_size ),
-        m_population( static_cast< individual<T>* >(calloc(p_size,sizeof(p_individualref))) )
+        m_population(p_size)
     {
+        if (p_size < 3)
+            throw exception::runtime(_("population size must be greater than two"));
+        
         if (m_elitesize < 2)
             throw exception::runtime(_("elite size must be greater than one"));
         
-        if (m_elitesize > m_populationsize)
+        if (m_elitesize > p_size)
             throw exception::runtime(_("elite size must be smaller than population size"));
         
         if ( !((m_mutateprobility >= 0) && (m_mutateprobility <= 1)) )
             throw exception::runtime(_("mutation probility must be between zero and one"));
+        
+        // create individuals
+        for(std::size_t i=0; i < p_size; ++i)
+            m_population.push_back( p_individualref.clone() );
+    }
+    
+    
+    template<typename T> inline population<T>::~population( void )
+    {
+        for(std::size_t i=0; i < m_population.size(); ++i)
+            delete( m_population[i] );
     }
     
     
@@ -102,7 +117,7 @@ namespace machinelearning { namespace geneticalgorithm {
         if (p_size < 2)
             throw exception::runtime(_("elite size must be greater than one"));
         
-        if (m_elitesize > m_populationsize)
+        if (m_elitesize > m_population.size())
             throw exception::runtime(_("elite size must be smaller than population size"));
         
         m_elitesize = p_size;
@@ -120,8 +135,10 @@ namespace machinelearning { namespace geneticalgorithm {
 
     template<typename T> inline std::size_t population<T>::size( void ) const
     {
-        return m_populationsize;
+        return m_population.size();
     }
+    
+    
     
 };};
 
