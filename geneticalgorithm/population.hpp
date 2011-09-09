@@ -95,8 +95,8 @@ namespace machinelearning { namespace geneticalgorithm {
             buildoption m_buildoption;
             /** mutation probability **/
             probability m_mutateprobility;
-            /** pointer vector with elite individuals **/
-            std::vector< individual<T>* > m_elite;
+            /** vector with elite individuals **/
+            std::vector< individual<T> > m_elite;
             /** pointer vector with individuals **/
             std::vector< individual<T>* > m_population;
         
@@ -178,12 +178,7 @@ namespace machinelearning { namespace geneticalgorithm {
      **/
     template<typename T> inline std::vector< individual<T> > population<T>::getElite( void ) const
     {
-        std::vector< individual<T> > l_elite;
-        
-        for(std::size_t i=0; i < m_elite.size(); ++i)
-            l_elite.push_back( &m_elite[i] );
-        
-        return l_elite;
+        return m_elite;
     }
     
     
@@ -231,21 +226,43 @@ namespace machinelearning { namespace geneticalgorithm {
                 l_fitness(j) = m_population[j] ? p_fitness.getFitness( &m_population[j] ) : 0;
             
             // rank the fitness values
-            ublas::vector<std::size_t> l_rank = tools::vector::rankIndexVector(l_fitness);
+            const ublas::vector<std::size_t> l_rank(tools::vector::rankIndexVector(l_fitness));
             
-            // determine elite values
-            m_elite = p_elite.getElite( m_population, l_fitness, l_rank, m_elite.capacity() );
+            // determine elite values and create a local copy of the elements
+            m_elite.clear();
+            std::vector< individual<T>* > l_elite = p_elite.getElite( m_population, l_fitness, l_rank, m_elite.capacity() );
+            for(std::size_t j=0; j < l_elite.size(); ++j)
+                if (l_elite[j])
+                    m_elite.push_back( &l_elite[j] );
+            
             
             // create new individuals
             switch (m_buildoption) {
                     
                 case fullBuildFromElite :
+                    for(std::size_t j=0; j < m_population.size(); ++j) {
+                        delete( m_population[j] );
+                        
+                        //m_elite[??].combine( m_elite[??], m_population[j] );
+                    }
                     break;
 
+                    
                 case overwriteEliteWithNew :
+                    for(std::size_t j=0; j < m_elite.size(); ++j) {
+                        delete(l_elite[j]);
+                        
+                        //m_elite[??].combine( m_elite[??], l_elite[j] );
+                    }
                     break;
                     
+                    
                 case useEliteAndNewOnes :
+                    for(std::size_t j=0; j < m_elite.size(); ++j) {
+                        delete(m_population[l_rank[j]]);
+                        
+                        //m_elite[??].combine( m_elite[??], m_population[l_rank[j]] );
+                    }
                     break;
                 
             }

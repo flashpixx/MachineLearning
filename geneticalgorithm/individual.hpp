@@ -41,8 +41,12 @@ namespace machinelearning { namespace geneticalgorithm {
             /** method for cloning the object. The method should be create a new individual for the population initialization **/
             virtual individual<T>* clone( void ) const;
         
-            /** recombines the individual with another individual and returns the new one **/
-            virtual individual<T> recombine( const individual<T>& ) const;
+            /** combines the individual with another individual and returns the new one **/
+            //virtual individual<T> combine( const individual<T>& ) const;
+        
+            /** combines the individual with another individual and constructs the new one on the pointer address **/
+            virtual void combine( const individual<T>&, const individual<T>* ) const;
+        
 
             /** mutates the individual **/
             virtual void mutate( void );
