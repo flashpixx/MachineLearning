@@ -236,14 +236,16 @@ namespace machinelearning { namespace geneticalgorithm {
                     m_elite.push_back( &l_elite[j] );
             
             
-            // create new individuals
+            // create new individuals (read two individuals with uniform distribution and combine)
             switch (m_buildoption) {
                     
                 case fullBuildFromElite :
                     for(std::size_t j=0; j < m_population.size(); ++j) {
                         delete( m_population[j] );
-                        
-                        //m_elite[??].combine( m_elite[??], m_population[j] );
+                        m_elite[static_cast<std::size_t>(l_rand.get<T>(distribution(tools::random::uniform, 0, m_elite.size())))].combine( 
+                                m_elite[static_cast<std::size_t>(l_rand.get<T>(distribution(tools::random::uniform, 0, m_elite.size())))], 
+                                m_population[j]
+                        );
                     }
                     break;
 
@@ -251,8 +253,10 @@ namespace machinelearning { namespace geneticalgorithm {
                 case overwriteEliteWithNew :
                     for(std::size_t j=0; j < m_elite.size(); ++j) {
                         delete(l_elite[j]);
-                        
-                        //m_elite[??].combine( m_elite[??], l_elite[j] );
+                        m_elite[static_cast<std::size_t>(l_rand.get<T>(distribution(tools::random::uniform, 0, m_elite.size())))].combine( 
+                                m_elite[static_cast<std::size_t>(l_rand.get<T>(distribution(tools::random::uniform, 0, m_elite.size())))], 
+                                l_elite[j]
+                        );
                     }
                     break;
                     
@@ -260,13 +264,14 @@ namespace machinelearning { namespace geneticalgorithm {
                 case useEliteAndNewOnes :
                     for(std::size_t j=0; j < m_elite.size(); ++j) {
                         delete(m_population[l_rank[j]]);
-                        
-                        //m_elite[??].combine( m_elite[??], m_population[l_rank[j]] );
+                        m_elite[static_cast<std::size_t>(l_rand.get<T>(distribution(tools::random::uniform, 0, m_elite.size())))].combine( 
+                                m_elite[static_cast<std::size_t>(l_rand.get<T>(distribution(tools::random::uniform, 0, m_elite.size())))], 
+                                m_population[l_rank[j]]
+                        );
                     }
                     break;
                 
             }
-            
             
             // run over the new population and mutate some individuals
             for(std::size_t j=0; j < m_population.size(); ++j)

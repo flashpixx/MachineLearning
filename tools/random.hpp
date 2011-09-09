@@ -29,6 +29,7 @@
 #include <ctime>
 #include <limits>
 #include <sstream>
+#include <boost/static_assert.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/random.hpp>
 
@@ -178,6 +179,8 @@ namespace machinelearning { namespace tools {
      **/
     template<typename T> inline T random::get( const distribution& p_distribution, const T& p_first, const T& p_second, const T& p_third )
     {
+        BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
+        
         switch (p_distribution)
         {
             case uniform     :       return getUniform(    (function::isNumericalZero<T>(p_first) ? 0 : p_first),   (function::isNumericalZero<T>(p_second) ? 1 : p_second)  );
