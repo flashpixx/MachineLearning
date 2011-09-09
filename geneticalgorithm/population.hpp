@@ -236,6 +236,21 @@ namespace machinelearning { namespace geneticalgorithm {
             // determine elite values
             m_elite = p_elite.getElite( m_population, l_fitness, l_rank, m_elite.capacity() );
             
+            // create new individuals
+            switch (m_buildoption) {
+                    
+                case fullBuildFromElite :
+                    break;
+
+                case overwriteEliteWithNew :
+                    break;
+                    
+                case useEliteAndNewOnes :
+                    break;
+                
+            }
+            
+            
             // run over the new population and mutate some individuals
             for(std::size_t j=0; j < m_population.size(); ++j)
                 if (l_rand.get<T>( m_mutateprobility.distribution, m_mutateprobility.first, m_mutateprobility.second, m_mutateprobility.third ) <= m_mutateprobility.probability)
