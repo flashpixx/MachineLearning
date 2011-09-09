@@ -222,17 +222,19 @@ namespace machinelearning { namespace geneticalgorithm {
             throw exception::runtime(_("iterations must be greater than zero"));
         
         
-        ublas::vector<T> l_fitness(m_population.size(), 0);
         tools::random l_rand;
-        
         for(std::size_t i=0; i < p_iteration; ++i)
         {
             // determin the fitness value for each individual
+            ublas::vector<T> l_fitness(m_population.size(), 0);
             for(std::size_t j=0; j < m_population.size(); ++j)
                 l_fitness(j) = m_population[j] ? p_fitness.getFitness( &m_population[j] ) : 0;
             
+            // rank the fitness values
+            ublas::vector<std::size_t> l_rank = tools::vector::rankIndexVector(l_fitness);
+            
             // determine elite values
-            m_elite = p_elite.getElite( m_population, l_fitness, m_elite.capacity() );
+            m_elite = p_elite.getElite( m_population, l_fitness, l_rank, m_elite.capacity() );
             
             // run over the new population and mutate some individuals
             for(std::size_t j=0; j < m_population.size(); ++j)
