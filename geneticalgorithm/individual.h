@@ -37,7 +37,7 @@ namespace machinelearning { namespace geneticalgorithm {
 
         public :
         
-            /** method for cloning the object. The method should be create a new individual for the population initialization **/
+            /** method for cloning the object. The method should be create a new individual for the population initialization on the heap and returns the pointer **/
             virtual individual* clone( void ) const;
         
             /** combines the individual with another individual and returns the new one **/

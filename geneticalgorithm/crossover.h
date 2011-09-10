@@ -46,7 +46,7 @@ namespace machinelearning { namespace geneticalgorithm {
             virtual void setIndividual( const individual& );
         
             /** create the new individual into the pointer structure, after creating the list of individuals must be cleared **/
-            virtual void create( const individual* );
+            virtual void combine( const individual* );
         
     };
     

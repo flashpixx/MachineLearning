@@ -71,8 +71,8 @@ namespace machinelearning { namespace geneticalgorithm {
             void setMutalProbability( const T&, const tools::random::distribution& = tools::random::uniform, const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon() );
             std::vector< individual > getElite( void ) const;
             void setPopulationBuild( const buildoption&, const tools::random::distribution& = tools::random::uniform );
-            void iterate( const fitnessfunction<T>&, const eliteselection<T>&, const crossover&, const std::size_t& );
-            //bool isConverged( const fitnessfunction&, const eliteselection<T>& );
+            void iterate( const std::size_t&, const fitnessfunction<T>&, const eliteselection<T>&, const crossover& );
+            //bool isConverged( const std::size_t&, const fitnessfunction<T>&, const eliteselection<T>&, const crossover& );
         
         
         private :
@@ -94,7 +94,6 @@ namespace machinelearning { namespace geneticalgorithm {
                 {}
             };
         
-      
             /** option in which way the new population is build **/
             buildoption m_buildoption;
             /** mutation probability **/
@@ -105,6 +104,10 @@ namespace machinelearning { namespace geneticalgorithm {
             std::vector< individual* > m_population;
             /** boost mutex for running **/
             boost::mutex m_running;
+        
+        
+            void fitness( const std::size_t&, const std::size_t&, const fitnessfunction<T>, ublas::vector<T>& ) const;
+            void mutate( const std::size_t&, const std::size_t& ) const;
         
     };
     
@@ -213,11 +216,12 @@ namespace machinelearning { namespace geneticalgorithm {
     
     
     /** executes the algorithm iteratively
+     * @param p_iteration number of iterations
      * @param p_fitness fitness function object
      * @param p_elite elite selection object
-     * @param p_iteration number of iterations
+     * @param p_crossover crossover object
      **/
-    template<typename T> inline void population<T>::iterate( const fitnessfunction<T>& p_fitness, const eliteselection<T>& p_elite, const crossover& p_crossover, const std::size_t& p_iteration )
+    template<typename T> inline void population<T>::iterate( const std::size_t& p_iteration, const fitnessfunction<T>& p_fitness, const eliteselection<T>& p_elite, const crossover& p_crossover )
     {
         if (p_iteration == 0)
             throw exception::runtime(_("iterations must be greater than zero"));
@@ -256,7 +260,7 @@ namespace machinelearning { namespace geneticalgorithm {
                             
                             for(std::size_t j=0; j < p_crossover.getNumberOfIndividuals(); ++j)
                                 p_crossover.setIndividual( m_elite[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, 0, m_elite.size()))] );
-                            p_crossover.create(m_population[j]);
+                            p_crossover.combine(m_population[j]);
                         }
                         break;
 
@@ -267,7 +271,7 @@ namespace machinelearning { namespace geneticalgorithm {
                             
                             for(std::size_t j=0; j < p_crossover.getNumberOfIndividuals(); ++j)
                                 p_crossover.setIndividual( m_elite[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, 0, m_elite.size()))] );
-                            p_crossover.create(l_elite[j]);
+                            p_crossover.combine(l_elite[j]);
                         }
                         break;
                         
@@ -278,7 +282,7 @@ namespace machinelearning { namespace geneticalgorithm {
                             
                             for(std::size_t j=0; j < p_crossover.getNumberOfIndividuals(); ++j)
                                 p_crossover.setIndividual( m_elite[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, 0, m_elite.size()))] );
-                            p_crossover.create(m_population[l_rank[j]]);
+                            p_crossover.combine(m_population[l_rank[j]]);
                         }
                         break;
                     
@@ -294,6 +298,21 @@ namespace machinelearning { namespace geneticalgorithm {
     }
     
     
+    
+    template<typename T> inline void population<T>::fitness( const std::size_t& p_start, const std::size_t& p_end, const fitnessfunction<T> p_fitnessfunc, ublas::vector<T>& p_fitness ) const
+    {
+        for(std::size_t i=0; i < p_end; ++i)
+            p_fitness(i) = m_population[i] ? p_fitness.getFitness( *m_population[i] ) : 0;
+    }
+    
+    
+    template<typename T> inline void population<T>::mutate( const std::size_t& p_start, const std::size_t& p_end ) const
+    {
+        tools::random l_rand;
+        for(std::size_t i=0; i < p_end; ++i)
+            if (l_rand.get<T>( m_mutateprobility.distribution, m_mutateprobility.first, m_mutateprobility.second, m_mutateprobility.third ) <= m_mutateprobility.probability)
+                m_population[i]->mutate();
+    }
     
 };};
 
