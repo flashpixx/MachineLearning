@@ -243,7 +243,7 @@ namespace machinelearning { namespace geneticalgorithm {
                 std::vector< individual* > l_elite = p_elite.getElite( m_population, l_fitness, l_rank, m_elite.capacity() );
                 for(std::size_t j=0; j < l_elite.size(); ++j)
                     if (l_elite[j])
-                        m_elite.push_back( &l_elite[j] );
+                        m_elite.push_back( *l_elite[j] );
                 
                 
                 // create new individuals (read two individuals with uniform distribution and combine)
