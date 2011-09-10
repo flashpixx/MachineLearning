@@ -34,7 +34,7 @@
 #include "../exception/exception.h"
 #include "../tools/tools.h"
 
-#include "individual.hpp"
+#include "individual.h"
 #include "fitnessfunction.hpp"
 #include "eliteselection.hpp"
 
@@ -59,16 +59,16 @@ namespace machinelearning { namespace geneticalgorithm {
             };
         
         
-            population( const individual<T>&, const std::size_t&, const std::size_t& );
+            population( const individual&, const std::size_t&, const std::size_t& );
             ~population( void );
         
         
             std::size_t size( void ) const;
             void setEliteSize( const std::size_t& );
             std::size_t getEliteSize( void ) const;
-            std::vector< individual<T> > getElite( void ) const;
+            std::vector< individual > getElite( void ) const;
             void setMutalProbability( const T&, const tools::random::distribution& = tools::random::uniform, const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon() );
-            std::vector< individual<T> > getElite( void ) const;
+            std::vector< individual > getElite( void ) const;
             void setPopulationBuild( const buildoption&, const tools::random::distribution& = tools::random::uniform );
             void iterate( const fitnessfunction<T>&, const eliteselection<T>&, const std::size_t& );
             //bool isConverged( const fitnessfunction&, const eliteselection<T>& );
@@ -99,9 +99,9 @@ namespace machinelearning { namespace geneticalgorithm {
             /** mutation probability **/
             probability m_mutateprobility;
             /** vector with elite individuals **/
-            std::vector< individual<T> > m_elite;
+            std::vector< individual > m_elite;
             /** pointer vector with individuals **/
-            std::vector< individual<T>* > m_population;
+            std::vector< individual* > m_population;
             /** boost mutex for running **/
             boost::mutex m_running;
         
@@ -114,7 +114,7 @@ namespace machinelearning { namespace geneticalgorithm {
      * @param p_size size of the population
      * @param p_elite size of the elites
      **/
-    template<typename T> inline population<T>::population( const individual<T>& p_individualref, const std::size_t& p_size, const std::size_t& p_elite ) :
+    template<typename T> inline population<T>::population( const individual& p_individualref, const std::size_t& p_size, const std::size_t& p_elite ) :
         m_buildoption( 0 ),
         m_mutateprobility(),
         m_elite( p_elite ),
@@ -124,10 +124,10 @@ namespace machinelearning { namespace geneticalgorithm {
         if (p_size < 3)
             throw exception::runtime(_("population size must be greater than two"));
         
-        if (m_elite < 2)
+        if (p_elite < 2)
             throw exception::runtime(_("elite size must be greater than one"));
         
-        if (m_elite > p_size)
+        if (p_elite > p_size)
             throw exception::runtime(_("elite size must be smaller than population size"));
         
         // create individuals
@@ -181,7 +181,7 @@ namespace machinelearning { namespace geneticalgorithm {
     /** returns a copy of the individuals objects of the elites
      * @return vector with individual objects
      **/
-    template<typename T> inline std::vector< individual<T> > population<T>::getElite( void ) const
+    template<typename T> inline std::vector< individual > population<T>::getElite( void ) const
     {
         return m_elite;
     }
@@ -240,7 +240,7 @@ namespace machinelearning { namespace geneticalgorithm {
                 
                 // determine elite values and create a local copy of the elements
                 m_elite.clear();
-                std::vector< individual<T>* > l_elite = p_elite.getElite( m_population, l_fitness, l_rank, m_elite.capacity() );
+                std::vector< individual* > l_elite = p_elite.getElite( m_population, l_fitness, l_rank, m_elite.capacity() );
                 for(std::size_t j=0; j < l_elite.size(); ++j)
                     if (l_elite[j])
                         m_elite.push_back( &l_elite[j] );
@@ -252,8 +252,8 @@ namespace machinelearning { namespace geneticalgorithm {
                     case fullBuildFromElite :
                         for(std::size_t j=0; j < m_population.size(); ++j) {
                             delete( m_population[j] );
-                            m_elite[static_cast<std::size_t>(l_rand.get<T>(distribution(tools::random::uniform, 0, m_elite.size())))].combine( 
-                                    m_elite[static_cast<std::size_t>(l_rand.get<T>(distribution(tools::random::uniform, 0, m_elite.size())))], 
+                            m_elite[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, 0, m_elite.size()))].combine( 
+                                    m_elite[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, 0, m_elite.size()))], 
                                     m_population[j]
                             );
                         }
@@ -263,8 +263,8 @@ namespace machinelearning { namespace geneticalgorithm {
                     case overwriteEliteWithNew :
                         for(std::size_t j=0; j < m_elite.size(); ++j) {
                             delete(l_elite[j]);
-                            m_elite[static_cast<std::size_t>(l_rand.get<T>(distribution(tools::random::uniform, 0, m_elite.size())))].combine( 
-                                    m_elite[static_cast<std::size_t>(l_rand.get<T>(distribution(tools::random::uniform, 0, m_elite.size())))], 
+                            m_elite[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, 0, m_elite.size()))].combine( 
+                                    m_elite[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, 0, m_elite.size()))], 
                                     l_elite[j]
                             );
                         }
@@ -274,8 +274,8 @@ namespace machinelearning { namespace geneticalgorithm {
                     case useEliteAndNewOnes :
                         for(std::size_t j=0; j < m_elite.size(); ++j) {
                             delete(m_population[l_rank[j]]);
-                            m_elite[static_cast<std::size_t>(l_rand.get<T>(distribution(tools::random::uniform, 0, m_elite.size())))].combine( 
-                                    m_elite[static_cast<std::size_t>(l_rand.get<T>(distribution(tools::random::uniform, 0, m_elite.size())))], 
+                            m_elite[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, 0, m_elite.size()))].combine( 
+                                    m_elite[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, 0, m_elite.size()))], 
                                     m_population[l_rank[j]]
                             );
                         }

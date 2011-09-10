@@ -38,7 +38,7 @@ namespace machinelearning {
 
 
 #include "population.hpp"
-#include "individual.hpp"
+#include "individual.h"
 #include "fitnessfunction.hpp"
 #include "eliteselection.hpp"
 

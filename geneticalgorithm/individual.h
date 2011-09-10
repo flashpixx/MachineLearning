@@ -22,29 +22,34 @@
  **/
 
 
-#ifndef MACHINELEARNING_GENETICALGORITHM_FITNESSFUNCTION_HPP
-#define MACHINELEARNING_GENETICALGORITHM_FITNESSFUNCTION_HPP
+#ifndef MACHINELEARNING_GENETICALGORITHM_INDIVIDUAL_H
+#define MACHINELEARNING_GENETICALGORITHM_INDIVIDUAL_H
 
 #include <boost/static_assert.hpp>
-
-#include "individual.h"
-#include "population.hpp"
 
 
 namespace machinelearning { namespace geneticalgorithm {
     
-    /** abstract class of the fitness function
-     * $LastChangedDate$
+    /** abstract class of an indivdual of the population
+     * $LastChangedDate: 2011-09-09 21:26:20 +0200 (Fr, 09 Sep 2011) $
      **/
-    template<typename T> class fitnessfunction {
-        BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
-        
+    class individual {
+
         public :
         
-            /** method for calculating the fitness value of an individual / return value must be >= 0 and 0 == worst value **/
-            virtual T getFitness( const individual& ) const;
+            /** method for cloning the object. The method should be create a new individual for the population initialization **/
+            virtual individual* clone( void ) const;
         
-           // virtual T getFitness( const population<T>& ) const;
+            /** combines the individual with another individual and returns the new one **/
+            //virtual individual<T> combine( const individual<T>& ) const;
+        
+            /** combines the individual with another individual and constructs the new one on the pointer address **/
+            virtual void combine( const individual&, const individual* ) const;
+        
+
+            /** mutates the individual **/
+            virtual void mutate( void );
+        
     };
     
 };};
