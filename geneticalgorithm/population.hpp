@@ -28,6 +28,9 @@
 #include <limits>
 #include <boost/numeric/ublas/vector.hpp>
 
+#include <boost/thread.hpp>
+#include <boost/ref.hpp>
+
 #include "../exception/exception.h"
 #include "../tools/tools.h"
 
@@ -99,7 +102,8 @@ namespace machinelearning { namespace geneticalgorithm {
             std::vector< individual<T> > m_elite;
             /** pointer vector with individuals **/
             std::vector< individual<T>* > m_population;
-        
+            /** boost mutex for running **/
+            boost::mutex m_running;
         
     };
     
@@ -114,7 +118,8 @@ namespace machinelearning { namespace geneticalgorithm {
         m_buildoption( 0 ),
         m_mutateprobility(),
         m_elite( p_elite ),
-        m_population(p_size)
+        m_population(p_size),
+        m_running()
     {
         if (p_size < 3)
             throw exception::runtime(_("population size must be greater than two"));
@@ -217,66 +222,72 @@ namespace machinelearning { namespace geneticalgorithm {
             throw exception::runtime(_("iterations must be greater than zero"));
         
         
-        tools::random l_rand;
-        for(std::size_t i=0; i < p_iteration; ++i)
-        {
-            // determin the fitness value for each individual
-            ublas::vector<T> l_fitness(m_population.size(), 0);
-            for(std::size_t j=0; j < m_population.size(); ++j)
-                l_fitness(j) = m_population[j] ? p_fitness.getFitness( &m_population[j] ) : 0;
+        if (boost::thread::hardware_concurrency() > 1) {
+            // we set a lock during calculation, because the object can't handle different local states
+            boost::unique_lock<boost::mutex> l_lock( m_running );
             
-            // rank the fitness values
-            const ublas::vector<std::size_t> l_rank(tools::vector::rankIndexVector(l_fitness));
-            
-            // determine elite values and create a local copy of the elements
-            m_elite.clear();
-            std::vector< individual<T>* > l_elite = p_elite.getElite( m_population, l_fitness, l_rank, m_elite.capacity() );
-            for(std::size_t j=0; j < l_elite.size(); ++j)
-                if (l_elite[j])
-                    m_elite.push_back( &l_elite[j] );
-            
-            
-            // create new individuals (read two individuals with uniform distribution and combine)
-            switch (m_buildoption) {
-                    
-                case fullBuildFromElite :
-                    for(std::size_t j=0; j < m_population.size(); ++j) {
-                        delete( m_population[j] );
-                        m_elite[static_cast<std::size_t>(l_rand.get<T>(distribution(tools::random::uniform, 0, m_elite.size())))].combine( 
-                                m_elite[static_cast<std::size_t>(l_rand.get<T>(distribution(tools::random::uniform, 0, m_elite.size())))], 
-                                m_population[j]
-                        );
-                    }
-                    break;
-
-                    
-                case overwriteEliteWithNew :
-                    for(std::size_t j=0; j < m_elite.size(); ++j) {
-                        delete(l_elite[j]);
-                        m_elite[static_cast<std::size_t>(l_rand.get<T>(distribution(tools::random::uniform, 0, m_elite.size())))].combine( 
-                                m_elite[static_cast<std::size_t>(l_rand.get<T>(distribution(tools::random::uniform, 0, m_elite.size())))], 
-                                l_elite[j]
-                        );
-                    }
-                    break;
-                    
-                    
-                case useEliteAndNewOnes :
-                    for(std::size_t j=0; j < m_elite.size(); ++j) {
-                        delete(m_population[l_rank[j]]);
-                        m_elite[static_cast<std::size_t>(l_rand.get<T>(distribution(tools::random::uniform, 0, m_elite.size())))].combine( 
-                                m_elite[static_cast<std::size_t>(l_rand.get<T>(distribution(tools::random::uniform, 0, m_elite.size())))], 
-                                m_population[l_rank[j]]
-                        );
-                    }
-                    break;
+        } else {
+            tools::random l_rand;
+            for(std::size_t i=0; i < p_iteration; ++i)
+            {
+                // determin the fitness value for each individual
+                ublas::vector<T> l_fitness(m_population.size(), 0);
+                for(std::size_t j=0; j < m_population.size(); ++j)
+                    l_fitness(j) = m_population[j] ? p_fitness.getFitness( &m_population[j] ) : 0;
                 
+                // rank the fitness values
+                const ublas::vector<std::size_t> l_rank(tools::vector::rankIndexVector(l_fitness));
+                
+                // determine elite values and create a local copy of the elements
+                m_elite.clear();
+                std::vector< individual<T>* > l_elite = p_elite.getElite( m_population, l_fitness, l_rank, m_elite.capacity() );
+                for(std::size_t j=0; j < l_elite.size(); ++j)
+                    if (l_elite[j])
+                        m_elite.push_back( &l_elite[j] );
+                
+                
+                // create new individuals (read two individuals with uniform distribution and combine)
+                switch (m_buildoption) {
+                        
+                    case fullBuildFromElite :
+                        for(std::size_t j=0; j < m_population.size(); ++j) {
+                            delete( m_population[j] );
+                            m_elite[static_cast<std::size_t>(l_rand.get<T>(distribution(tools::random::uniform, 0, m_elite.size())))].combine( 
+                                    m_elite[static_cast<std::size_t>(l_rand.get<T>(distribution(tools::random::uniform, 0, m_elite.size())))], 
+                                    m_population[j]
+                            );
+                        }
+                        break;
+
+                        
+                    case overwriteEliteWithNew :
+                        for(std::size_t j=0; j < m_elite.size(); ++j) {
+                            delete(l_elite[j]);
+                            m_elite[static_cast<std::size_t>(l_rand.get<T>(distribution(tools::random::uniform, 0, m_elite.size())))].combine( 
+                                    m_elite[static_cast<std::size_t>(l_rand.get<T>(distribution(tools::random::uniform, 0, m_elite.size())))], 
+                                    l_elite[j]
+                            );
+                        }
+                        break;
+                        
+                        
+                    case useEliteAndNewOnes :
+                        for(std::size_t j=0; j < m_elite.size(); ++j) {
+                            delete(m_population[l_rank[j]]);
+                            m_elite[static_cast<std::size_t>(l_rand.get<T>(distribution(tools::random::uniform, 0, m_elite.size())))].combine( 
+                                    m_elite[static_cast<std::size_t>(l_rand.get<T>(distribution(tools::random::uniform, 0, m_elite.size())))], 
+                                    m_population[l_rank[j]]
+                            );
+                        }
+                        break;
+                    
+                }
+                
+                // run over the new population and mutate some individuals
+                for(std::size_t j=0; j < m_population.size(); ++j)
+                    if (l_rand.get<T>( m_mutateprobility.distribution, m_mutateprobility.first, m_mutateprobility.second, m_mutateprobility.third ) <= m_mutateprobility.probability)
+                        m_population[j]->mutate();
             }
-            
-            // run over the new population and mutate some individuals
-            for(std::size_t j=0; j < m_population.size(); ++j)
-                if (l_rand.get<T>( m_mutateprobility.distribution, m_mutateprobility.first, m_mutateprobility.second, m_mutateprobility.third ) <= m_mutateprobility.probability)
-                    m_population[j]->mutate();
         }
     
     }
