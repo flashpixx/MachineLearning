@@ -22,29 +22,31 @@
  **/
 
 
-#ifndef MACHINELEARNING_GENETICALGORITHM_INDIVIDUAL_H
-#define MACHINELEARNING_GENETICALGORITHM_INDIVIDUAL_H
+#ifndef MACHINELEARNING_GENETICALGORITHM_CROSSOVER_H
+#define MACHINELEARNING_GENETICALGORITHM_CROSSOVER_H
 
 #include <boost/static_assert.hpp>
+
+#include "individual.h"
 
 
 namespace machinelearning { namespace geneticalgorithm {
     
-    /** abstract class of an indivdual of the population
-     * $LastChangedDate$
+    /** abstract class of the crossover function
+     * $LastChangedDate: 2011-09-10 20:05:39 +0200 (Sa, 10 Sep 2011) $
      **/
-    class individual {
-
+    class crossover {
+        
         public :
         
-            /** method for cloning the object. The method should be create a new individual for the population initialization **/
-            virtual individual* clone( void ) const;
+            /** returns the number how many individuals are needed for the crossover (default should be two) **/
+            virtual std::size_t getNumberOfIndividuals( void ) const;        
         
-            /** combines the individual with another individual and returns the new one **/
-            //virtual individual<T> combine( const individual<T>& ) const;
+            /** set the individuals with a pointer **/
+            virtual void setIndividual( const individual& );
         
-            /** mutates the individual **/
-            virtual void mutate( void );
+            /** create the new individual into the pointer structure, after creating the list of individuals must be cleared **/
+            virtual void create( const individual* );
         
     };
     

@@ -154,7 +154,9 @@ namespace machinelearning { namespace tools {
     }
    
     
-    /** reads the thread object id and converts it to numeric value **/
+    /** reads the thread object id and converts it to numeric value
+     * @return thread id as time value for combination
+     **/
     inline std::time_t random::getThreadID( void )
     {
         std::size_t l_val = 1;
