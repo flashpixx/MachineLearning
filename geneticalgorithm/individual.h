@@ -31,7 +31,7 @@
 namespace machinelearning { namespace geneticalgorithm {
     
     /** abstract class of an indivdual of the population
-     * $LastChangedDate: 2011-09-09 21:26:20 +0200 (Fr, 09 Sep 2011) $
+     * $LastChangedDate$
      **/
     class individual {
 
