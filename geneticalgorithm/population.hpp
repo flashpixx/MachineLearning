@@ -108,6 +108,7 @@ namespace machinelearning { namespace geneticalgorithm {
         
             void fitness( const std::size_t&, const std::size_t&, const fitnessfunction<T>, ublas::vector<T>& ) const;
             void mutate( const std::size_t&, const std::size_t& ) const;
+            void buildpopulation( const std::size_t&, const std::size_t&, const crossover, const std::vector< individual* >&, const ublas::vector<std::size_t>& ) const;
         
     };
     
@@ -258,7 +259,7 @@ namespace machinelearning { namespace geneticalgorithm {
                         for(std::size_t j=0; j < m_population.size(); ++j) {
                             delete( m_population[j] );
                             
-                            for(std::size_t j=0; j < p_crossover.getNumberOfIndividuals(); ++j)
+                            for(std::size_t n=0; n < p_crossover.getNumberOfIndividuals(); ++n)
                                 p_crossover.setIndividual( m_elite[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, 0, m_elite.size()))] );
                             p_crossover.combine(m_population[j]);
                         }
@@ -269,7 +270,7 @@ namespace machinelearning { namespace geneticalgorithm {
                         for(std::size_t j=0; j < m_elite.size(); ++j) {
                             delete(l_elite[j]);
                             
-                            for(std::size_t j=0; j < p_crossover.getNumberOfIndividuals(); ++j)
+                            for(std::size_t n=0; n < p_crossover.getNumberOfIndividuals(); ++n)
                                 p_crossover.setIndividual( m_elite[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, 0, m_elite.size()))] );
                             p_crossover.combine(l_elite[j]);
                         }
@@ -280,7 +281,7 @@ namespace machinelearning { namespace geneticalgorithm {
                         for(std::size_t j=0; j < m_elite.size(); ++j) {
                             delete(m_population[l_rank[j]]);
                             
-                            for(std::size_t j=0; j < p_crossover.getNumberOfIndividuals(); ++j)
+                            for(std::size_t n=0; n < p_crossover.getNumberOfIndividuals(); ++n)
                                 p_crossover.setIndividual( m_elite[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, 0, m_elite.size()))] );
                             p_crossover.combine(m_population[l_rank[j]]);
                         }
@@ -312,6 +313,48 @@ namespace machinelearning { namespace geneticalgorithm {
         for(std::size_t i=0; i < p_end; ++i)
             if (l_rand.get<T>( m_mutateprobility.distribution, m_mutateprobility.first, m_mutateprobility.second, m_mutateprobility.third ) <= m_mutateprobility.probability)
                 m_population[i]->mutate();
+    }
+    
+    
+    template<typename T> inline void population<T>::buildpopulation( const std::size_t& p_start, const std::size_t& p_end, const crossover p_crossover, const std::vector< individual* >& p_elite, const ublas::vector<std::size_t>& p_rank ) const
+    {
+        tools::random l_rand;
+        
+        switch (m_buildoption) {
+                
+            case fullBuildFromElite :
+                for(std::size_t i=p_start; i < p_end; ++i) {
+                    delete( m_population[i] );
+                    
+                    for(std::size_t j=0; j < p_crossover.getNumberOfIndividuals(); ++j)
+                        p_crossover.setIndividual( m_elite[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, 0, m_elite.size()))] );
+                    p_crossover.combine(m_population[i]);
+                }
+                break;
+                
+                
+            case overwriteEliteWithNew :
+                for(std::size_t i=p_start; i < p_end; ++i) {
+                    delete(p_elite[i]);
+                    
+                    for(std::size_t j=0; j < p_crossover.getNumberOfIndividuals(); ++j)
+                        p_crossover.setIndividual( m_elite[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, 0, m_elite.size()))] );
+                    p_crossover.combine(p_elite[i]);
+                }
+                break;
+                
+                
+            case useEliteAndNewOnes :
+                for(std::size_t i=p_start; i < p_end; ++i) {
+                    delete(m_population[p_rank(i)]);
+                    
+                    for(std::size_t j=0; j < p_crossover.getNumberOfIndividuals(); ++j)
+                        p_crossover.setIndividual( m_elite[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, 0, m_elite.size()))] );
+                    p_crossover.combine(m_population[p_rank(i)]);
+                }
+                break;
+                                                    
+        }
     }
     
 };};
