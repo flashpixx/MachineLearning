@@ -307,74 +307,13 @@ namespace machinelearning { namespace geneticalgorithm {
     }
         
         /*
-        if (boost::thread::hardware_concurrency() > 1) {
-
-            
-        } else {
-            tools::random l_rand;
-            for(std::size_t i=0; i < p_iteration; ++i)
-            {
-                // determin the fitness value for each individual
-                ublas::vector<T> l_fitness(m_population.size(), 0);
-                for(std::size_t j=0; j < m_population.size(); ++j)
-                    l_fitness(j) = m_population[j] ? p_fitness.getFitness( &m_population[j] ) : 0;
-                
-                // rank the fitness values
-                const ublas::vector<std::size_t> l_rank(tools::vector::rankIndexVector(l_fitness));
-                
                 // determine elite values and create a local copy of the elements
                 m_elite.clear();
                 std::vector< individual* > l_elite = p_elite.getElite( m_population, l_fitness, l_rank, m_elite.capacity() );
                 for(std::size_t j=0; j < l_elite.size(); ++j)
                     if (l_elite[j])
                         m_elite.push_back( *l_elite[j] );
-                
-                
-                // create new individuals (read two individuals with uniform distribution and combine)
-                switch (m_buildoption) {
-                        
-                    case fullBuildFromElite :
-                        for(std::size_t j=0; j < m_population.size(); ++j) {
-                            delete( m_population[j] );
-                            
-                            for(std::size_t n=0; n < p_crossover.getNumberOfIndividuals(); ++n)
-                                p_crossover.setIndividual( m_elite[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, 0, m_elite.size()))] );
-                            p_crossover.combine(m_population[j]);
-                        }
-                        break;
-
-                        
-                    case overwriteEliteWithNew :
-                        for(std::size_t j=0; j < m_elite.size(); ++j) {
-                            delete(l_elite[j]);
-                            
-                            for(std::size_t n=0; n < p_crossover.getNumberOfIndividuals(); ++n)
-                                p_crossover.setIndividual( m_elite[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, 0, m_elite.size()))] );
-                            p_crossover.combine(l_elite[j]);
-                        }
-                        break;
-                        
-                        
-                    case useEliteAndNewOnes :
-                        for(std::size_t j=0; j < m_elite.size(); ++j) {
-                            delete(m_population[l_rank[j]]);
-                            
-                            for(std::size_t n=0; n < p_crossover.getNumberOfIndividuals(); ++n)
-                                p_crossover.setIndividual( m_elite[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, 0, m_elite.size()))] );
-                            p_crossover.combine(m_population[l_rank[j]]);
-                        }
-                        break;
-                    
-                }
-                
-                // run over the new population and mutate some individuals
-                for(std::size_t j=0; j < m_population.size(); ++j)
-                    if (l_rand.get<T>( m_mutateprobility.distribution, m_mutateprobility.first, m_mutateprobility.second, m_mutateprobility.third ) <= m_mutateprobility.probability)
-                        m_population[j]->mutate();
-            }
-        }
-    
-    }*/
+*/
     
     
     /** multithread method for calculating fitness values (start & end values must be disjuct over all threads)
