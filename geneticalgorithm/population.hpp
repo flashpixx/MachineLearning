@@ -54,9 +54,10 @@ namespace machinelearning { namespace geneticalgorithm {
         public :
         
             enum buildoption {
-                fullBuildFromElite    = 0,
-                overwriteEliteWithNew = 1,
-                useEliteAndNewOnes    = 2
+                fullBuildFromElite      = 0,
+                overwriteEliteWithNew   = 1,
+                useEliteAndNewOnes      = 2,
+                replaceRandom           = 3
             };
         
         
@@ -104,6 +105,8 @@ namespace machinelearning { namespace geneticalgorithm {
             std::vector< individual* > m_population;
             /** boost mutex for running **/
             boost::mutex m_running;
+            /** boost mutex for changing population **/
+            boost::mutex m_changepopulation;
         
         
             void fitness( const std::size_t&, const std::size_t&, const fitnessfunction<T>, ublas::vector<T>& ) const;
@@ -124,7 +127,8 @@ namespace machinelearning { namespace geneticalgorithm {
         m_mutateprobility(),
         m_elite( p_elite ),
         m_population(p_size),
-        m_running()
+        m_running(),
+        m_changepopulation()
     {
         if (p_size < 3)
             throw exception::runtime(_("population size must be greater than two"));
@@ -299,7 +303,12 @@ namespace machinelearning { namespace geneticalgorithm {
     }
     
     
-    
+    /** multithread method for calculating fitness values (start & end values must be disjuct over all threads)
+     * @param p_start start value of the population values
+     * @param p_end end value of the population values
+     * @param p_fitnessfunction fitness function object
+     * @param p_fitness reference to the fitness vector
+     **/
     template<typename T> inline void population<T>::fitness( const std::size_t& p_start, const std::size_t& p_end, const fitnessfunction<T> p_fitnessfunc, ublas::vector<T>& p_fitness ) const
     {
         for(std::size_t i=0; i < p_end; ++i)
@@ -307,6 +316,10 @@ namespace machinelearning { namespace geneticalgorithm {
     }
     
     
+    /** multithread method for mutating some population elements (start & end values must be disjuct over all threads)
+     * @param p_start start value of the population values
+     * @param p_end end value of the population values
+     **/
     template<typename T> inline void population<T>::mutate( const std::size_t& p_start, const std::size_t& p_end ) const
     {
         tools::random l_rand;
@@ -316,18 +329,24 @@ namespace machinelearning { namespace geneticalgorithm {
     }
     
     
+    /** multithread method for building new population elements (start & end values must be disjuct over all threads)
+     * @param p_start start value of the population / elite values
+     * @param p_end end value of the population  / elite 
+     * @param p_crossover crossover function object
+     * @param p_elite vector with pointer to elite elements
+     * @param p_rank ublas vector with rank values of all population elements
+     **/
     template<typename T> inline void population<T>::buildpopulation( const std::size_t& p_start, const std::size_t& p_end, const crossover p_crossover, const std::vector< individual* >& p_elite, const ublas::vector<std::size_t>& p_rank ) const
     {
         tools::random l_rand;
-        
         switch (m_buildoption) {
                 
             case fullBuildFromElite :
                 for(std::size_t i=p_start; i < p_end; ++i) {
-                    delete( m_population[i] );
-                    
                     for(std::size_t j=0; j < p_crossover.getNumberOfIndividuals(); ++j)
                         p_crossover.setIndividual( m_elite[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, 0, m_elite.size()))] );
+                    
+                    delete( m_population[i] );
                     p_crossover.combine(m_population[i]);
                 }
                 break;
@@ -335,10 +354,10 @@ namespace machinelearning { namespace geneticalgorithm {
                 
             case overwriteEliteWithNew :
                 for(std::size_t i=p_start; i < p_end; ++i) {
-                    delete(p_elite[i]);
-                    
                     for(std::size_t j=0; j < p_crossover.getNumberOfIndividuals(); ++j)
                         p_crossover.setIndividual( m_elite[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, 0, m_elite.size()))] );
+                    
+                    delete(p_elite[i]);
                     p_crossover.combine(p_elite[i]);
                 }
                 break;
@@ -346,11 +365,26 @@ namespace machinelearning { namespace geneticalgorithm {
                 
             case useEliteAndNewOnes :
                 for(std::size_t i=p_start; i < p_end; ++i) {
-                    delete(m_population[p_rank(i)]);
-                    
                     for(std::size_t j=0; j < p_crossover.getNumberOfIndividuals(); ++j)
                         p_crossover.setIndividual( m_elite[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, 0, m_elite.size()))] );
+                    
+                     delete(m_population[p_rank(i)]);
                     p_crossover.combine(m_population[p_rank(i)]);
+                }
+                break;
+                
+                
+            case replaceRandom :
+                for(std::size_t i=p_start; i < p_end; ++i) {
+                    for(std::size_t j=0; j < p_crossover.getNumberOfIndividuals(); ++j)
+                        p_crossover.setIndividual( m_elite[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, 0, m_elite.size()))] );
+                    
+                    const std::size_t l_pos( static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, 0, m_population.size())) );
+                    
+                    // we need a mutex, because different threads can modify the same pointer
+                    boost::unique_lock<boost::mutex> l_lock( m_changepopulation ); 
+                    delete(m_population[l_pos]);
+                    p_crossover.combine(m_population[l_pos]);
                 }
                 break;
                                                     
