@@ -231,10 +231,60 @@ namespace machinelearning { namespace geneticalgorithm {
         if (p_iteration == 0)
             throw exception::runtime(_("iterations must be greater than zero"));
         
+        // we set a lock during calculation, because the object can't handle different local states
+        boost::unique_lock<boost::mutex> l_lock( m_running );
         
+        
+        // create element ranges of the population and elite
+        std::size_t l_inc = m_population.size() / boost::thread::hardware_concurrency();
+        std::vector< std::pair<std::size_t, std::size_t> > l_populationparts;
+        for( std::size_t i=0; i < m_population.size(); i+= l_inc )
+            l_populationparts.push_back( std::pair<std::size_t, std::size_t>(i, i+l_inc) );
+        l_populationparts[l_populationparts.size()-1].second += m_population.size() % boost::thread::hardware_concurrency();
+        
+        l_inc = m_elite.capacity() / boost::thread::hardware_concurrency();
+        std::vector< std::pair<std::size_t, std::size_t> > l_eliteparts;
+        for( std::size_t i=0; i < m_elite.capacity(); i+= l_inc )
+            l_eliteparts.push_back( std::pair<std::size_t, std::size_t>(i, i+l_inc) );
+        l_eliteparts[l_eliteparts.size()-1].second += m_elite.capacity() % boost::thread::hardware_concurrency();
+        
+        
+        
+        // vector with fitness values and rank vector
+        ublas::vector<T> l_fitness(m_population.size(), 0);
+        ublas::vector<std::size_t> l_rank;
+        
+        // create threads for fitness calculation
+        boost::thread_group l_fitnessthreads;
+        for(std::size_t j=0; j < l_populationparts.size(); ++j)
+            l_fitnessthreads.create_thread(  boost::bind( &population<T>::fitness, this, l_populationparts[j].first, l_populationparts[j].second, p_fitness, boost::ref(l_fitness) )  );
+        
+        // create mutation threads
+        boost::thread_group l_mutationthreads;
+        for(std::size_t j=0; j < l_populationparts.size(); ++j)
+            l_mutationthreads.create_thread(  boost::bind( &population<T>::mutate, this, l_populationparts[j].first, l_populationparts[j].second )  );
+        
+        
+        
+        // run iteration process
+        for(std::size_t i=0; i < p_iteration; ++i) {
+            
+            // run fitness threads
+            l_fitnessthreads.join_all();
+                        
+            // rank the fitness values (not multithread)
+            l_rank = tools::vector::rankIndexVector(l_fitness);
+        
+            // run mutation threads           
+            l_mutationthreads.join_all();
+        
+        }
+        
+    }
+        
+        /*
         if (boost::thread::hardware_concurrency() > 1) {
-            // we set a lock during calculation, because the object can't handle different local states
-            boost::unique_lock<boost::mutex> l_lock( m_running );
+
             
         } else {
             tools::random l_rand;
@@ -300,7 +350,7 @@ namespace machinelearning { namespace geneticalgorithm {
             }
         }
     
-    }
+    }*/
     
     
     /** multithread method for calculating fitness values (start & end values must be disjuct over all threads)
