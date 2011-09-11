@@ -508,7 +508,7 @@
  *
  * @page lang multilanguage support
  * The toolbox uses <dfn>gettext</dfn> to translate the messages. The source code must include the language header file and all messages,
- * which should be supported multilanguage must be written in this way <dfn>_("messages")</dfn>. The mesages will be collcted with the
+ * which should be supported multilanguage must be written in this way <dfn>_("messages")</dfn>. The mesages will be collected with the
  * gettext tools and safed under <dfn>tools/language/#language eg. de_DE.UTF-8#/LC_MESSAGES/#language eg de_DE#.po</dfn>. The compiler flag
  * <dfn>MACHINELEARNING_MULTILANGUAGE</dfn> must be set for using the support. The message files can be edited with Poedit ( http://www.poedit.net/ ).
  * For using the language support, a call for setting the correct languages must be written wihin the main program:

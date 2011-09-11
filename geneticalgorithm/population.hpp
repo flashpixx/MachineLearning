@@ -154,7 +154,7 @@ namespace machinelearning { namespace geneticalgorithm {
     
     
     /** method for setting population-building-option
-     * @param p_die bool for enabeling the option
+     * @param p_opt bool for enabeling the option
      * @param p_distribution distribution 
      **/
     template<typename T> inline void population<T>::setPopulationBuild( const buildoption& p_opt, const tools::random::distribution& p_distribution )
@@ -200,6 +200,8 @@ namespace machinelearning { namespace geneticalgorithm {
      * @param p_prop probility
      * @param p_distribution distribution
      * @param p_first first distribution value
+     * @param p_second second distribution value
+     * @param p_third third distribution value
      **/
     template<typename T> inline void population<T>::setMutalProbability( const T& p_prop, const tools::random::distribution& p_distribution, const T& p_first, const T& p_second, const T& p_third )
     {
@@ -212,7 +214,7 @@ namespace machinelearning { namespace geneticalgorithm {
         
 
     /** returns the population size
-     * @param size of the population
+     * @return size of the population
      **/
     template<typename T> inline std::size_t population<T>::size( void ) const
     {
@@ -235,6 +237,7 @@ namespace machinelearning { namespace geneticalgorithm {
         boost::unique_lock<boost::mutex> l_lock( m_running );
         
         
+        
         // create element ranges of the population and elite
         std::size_t l_inc = m_population.size() / boost::thread::hardware_concurrency();
         std::vector< std::pair<std::size_t, std::size_t> > l_populationparts;
@@ -250,9 +253,10 @@ namespace machinelearning { namespace geneticalgorithm {
         
         
         
-        // vector with fitness values and rank vector
+        // vector with fitness values, rank vector and elite vector
         ublas::vector<T> l_fitness(m_population.size(), 0);
         ublas::vector<std::size_t> l_rank;
+        std::vector< individual* > l_elite;
         
         // create threads for fitness calculation
         boost::thread_group l_fitnessthreads;
@@ -264,7 +268,22 @@ namespace machinelearning { namespace geneticalgorithm {
         for(std::size_t j=0; j < l_populationparts.size(); ++j)
             l_mutationthreads.create_thread(  boost::bind( &population<T>::mutate, this, l_populationparts[j].first, l_populationparts[j].second )  );
         
+        // create population build threads
+        boost::thread_group l_populationthreads;
+        switch (  ((m_buildoption == fullBuildFromElite) || (m_buildoption == replaceRandom)) ? 0 : 1  ) {
         
+            case 0 :
+                for(std::size_t j=0; j < l_populationparts.size(); ++j)
+                    l_populationthreads.create_thread(  boost::bind( &population<T>::buildpopulation, this, l_populationparts[j].first, l_populationparts[j].second, p_crossover, l_elite, l_rank )  );
+                break;
+                
+            case 1 :
+                for(std::size_t j=0; j < l_eliteparts.size(); ++j)
+                    l_populationthreads.create_thread(  boost::bind( &population<T>::buildpopulation, this, l_eliteparts[j].first, l_eliteparts[j].second, p_crossover, l_elite, l_rank )  );
+                break;
+        }
+                
+                
         
         // run iteration process
         for(std::size_t i=0; i < p_iteration; ++i) {
@@ -275,6 +294,11 @@ namespace machinelearning { namespace geneticalgorithm {
             // rank the fitness values (not multithread)
             l_rank = tools::vector::rankIndexVector(l_fitness);
         
+            // create elite multithreaded
+            
+            // build new population multithreaded
+            l_populationthreads.join_all();
+            
             // run mutation threads           
             l_mutationthreads.join_all();
         
@@ -359,10 +383,10 @@ namespace machinelearning { namespace geneticalgorithm {
      * @param p_fitnessfunction fitness function object
      * @param p_fitness reference to the fitness vector
      **/
-    template<typename T> inline void population<T>::fitness( const std::size_t& p_start, const std::size_t& p_end, const fitnessfunction<T> p_fitnessfunc, ublas::vector<T>& p_fitness ) const
+    template<typename T> inline void population<T>::fitness( const std::size_t& p_start, const std::size_t& p_end, const fitnessfunction<T> p_fitnessfunction, ublas::vector<T>& p_fitness ) const
     {
         for(std::size_t i=0; i < p_end; ++i)
-            p_fitness(i) = m_population[i] ? p_fitness.getFitness( *m_population[i] ) : 0;
+            p_fitness(i) = m_population[i] ? p_fitnessfunction.getFitness( *m_population[i] ) : 0;
     }
     
     
@@ -418,7 +442,7 @@ namespace machinelearning { namespace geneticalgorithm {
                     for(std::size_t j=0; j < p_crossover.getNumberOfIndividuals(); ++j)
                         p_crossover.setIndividual( m_elite[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, 0, m_elite.size()))] );
                     
-                     delete(m_population[p_rank(i)]);
+                    delete(m_population[p_rank(i)]);
                     p_crossover.combine(m_population[p_rank(i)]);
                 }
                 break;
