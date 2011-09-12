@@ -39,7 +39,7 @@ namespace machinelearning { namespace geneticalgorithm {
         public :
         
             /** method for cloning the object. The method should be create a new individual for the population initialization on the heap and returns a smart-pointer **/
-            virtual boost::shared_ptr<individual> clone( void ) const;
+            virtual void clone( boost::shared_ptr<individual>& ) const;
         
             /** combines the individual with another individual and returns the new one **/
             //virtual individual<T> combine( const individual<T>& ) const;

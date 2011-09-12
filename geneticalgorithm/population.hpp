@@ -139,8 +139,11 @@ namespace machinelearning { namespace geneticalgorithm {
             throw exception::runtime(_("elite size must be smaller than population size"));
         
         // create individuals
-        for(std::size_t i=0; i < p_size; ++i)
-            m_population.push_back( p_individualref.clone() );
+        for(std::size_t i=0; i < p_size; ++i) {
+            boost::shared_ptr<individual> l_ptr;
+            p_individualref.clone( l_ptr );
+            m_population.push_back( l_ptr );
+        }
     }
     
     
