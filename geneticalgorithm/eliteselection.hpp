@@ -45,8 +45,8 @@ namespace machinelearning { namespace geneticalgorithm {
         
         public :
         
-            /** returns a pointer vector to the individuals which are elite **/
-            virtual std::vector< individual* > getElite( const std::vector< individual* >&, const ublas::vector<T>&, const ublas::vector<std::size_t>&, const std::size_t& );
+            /** returns a pointer vector to the individuals which are elite. The last two parameter gives the range, which elite elements should be created, eg. [0,5) **/
+            virtual std::vector< individual* > getElite( const std::size_t&, const std::size_t&, const std::vector< individual* >&, const ublas::vector<T>&, const ublas::vector<std::size_t>& );
         
     };
     

@@ -105,12 +105,13 @@ namespace machinelearning { namespace geneticalgorithm {
             std::vector< individual* > m_population;
             /** boost mutex for running **/
             boost::mutex m_running;
-            /** boost mutex for changing population **/
-            boost::mutex m_changepopulation;
+            /** boost mutex for lock during fitting **/
+            boost::mutex m_iterationlock;
         
         
             void fitness( const std::size_t&, const std::size_t&, const fitnessfunction<T>, ublas::vector<T>& ) const;
             void mutate( const std::size_t&, const std::size_t& ) const;
+            void buildelite( const std::size_t&, const std::size_t&, const eliteselection<T>, const std::vector< individual* >&, const ublas::vector<std::size_t>& );
             void buildpopulation( const std::size_t&, const std::size_t&, const crossover, const std::vector< individual* >&, const ublas::vector<std::size_t>& ) const;
         
     };
@@ -128,7 +129,7 @@ namespace machinelearning { namespace geneticalgorithm {
         m_elite( p_elite ),
         m_population(p_size),
         m_running(),
-        m_changepopulation()
+        m_iterationlock()
     {
         if (p_size < 3)
             throw exception::runtime(_("population size must be greater than two"));
@@ -251,69 +252,57 @@ namespace machinelearning { namespace geneticalgorithm {
             l_eliteparts.push_back( std::pair<std::size_t, std::size_t>(i, i+l_inc) );
         l_eliteparts[l_eliteparts.size()-1].second += m_elite.capacity() % boost::thread::hardware_concurrency();
         
+
         
-        
-        // vector with fitness values, rank vector and elite vector
-        ublas::vector<T> l_fitness(m_population.size(), 0);
-        ublas::vector<std::size_t> l_rank;
-        std::vector< individual* > l_elite;
-        
-        // create threads for fitness calculation
-        boost::thread_group l_fitnessthreads;
-        for(std::size_t j=0; j < l_populationparts.size(); ++j)
-            l_fitnessthreads.create_thread(  boost::bind( &population<T>::fitness, this, l_populationparts[j].first, l_populationparts[j].second, p_fitness, boost::ref(l_fitness) )  );
-        
-        // create mutation threads
-        boost::thread_group l_mutationthreads;
-        for(std::size_t j=0; j < l_populationparts.size(); ++j)
-            l_mutationthreads.create_thread(  boost::bind( &population<T>::mutate, this, l_populationparts[j].first, l_populationparts[j].second )  );
-        
-        // create population build threads
-        boost::thread_group l_populationthreads;
-        switch (  ((m_buildoption == fullBuildFromElite) || (m_buildoption == replaceRandom)) ? 0 : 1  ) {
-        
-            case 0 :
-                for(std::size_t j=0; j < l_populationparts.size(); ++j)
-                    l_populationthreads.create_thread(  boost::bind( &population<T>::buildpopulation, this, l_populationparts[j].first, l_populationparts[j].second, p_crossover, l_elite, l_rank )  );
-                break;
-                
-            case 1 :
-                for(std::size_t j=0; j < l_eliteparts.size(); ++j)
-                    l_populationthreads.create_thread(  boost::bind( &population<T>::buildpopulation, this, l_eliteparts[j].first, l_eliteparts[j].second, p_crossover, l_elite, l_rank )  );
-                break;
-        }
-                
-                
-        
-        // run iteration process
+        // run iteration process (each thread group must be recreated on the iteration, because after the join_all() the group is empty)
         for(std::size_t i=0; i < p_iteration; ++i) {
             
-            // run fitness threads
-            l_fitnessthreads.join_all();
+            // vector with fitness values, rank vector and elite vector
+            ublas::vector<T> l_fitness(m_population.size(), 0);
+            std::vector< individual* > l_elite;
+            
+            // create thread group for multithreading
+            boost::thread_group l_threads;
+            
+            
+            
+            // create and run fitness threads
+            for(std::size_t j=0; j < l_populationparts.size(); ++j)
+                l_threads.create_thread(  boost::bind( &population<T>::fitness, this, l_populationparts[j].first, l_populationparts[j].second, p_fitness, boost::ref(l_fitness) )  );
+            l_threads.join_all();
                         
+            
             // rank the fitness values (not multithread)
-            l_rank = tools::vector::rankIndexVector(l_fitness);
+            const ublas::vector<std::size_t> l_rank( tools::vector::rankIndexVector(l_fitness) );
         
+            
             // create elite multithreaded
+            m_elite.clear();
             
-            // build new population multithreaded
-            l_populationthreads.join_all();
             
-            // run mutation threads           
-            l_mutationthreads.join_all();
-        
+            // create build new population threads and run
+            switch (  ((m_buildoption == fullBuildFromElite) || (m_buildoption == replaceRandom)) ? 0 : 1  ) {
+                    
+                case 0 :
+                    for(std::size_t j=0; j < l_populationparts.size(); ++j)
+                        l_threads.create_thread(  boost::bind( &population<T>::buildpopulation, this, l_populationparts[j].first, l_populationparts[j].second, p_crossover, l_elite, l_rank )  );
+                    break;
+                    
+                case 1 :
+                    for(std::size_t j=0; j < l_eliteparts.size(); ++j)
+                        l_threads.create_thread(  boost::bind( &population<T>::buildpopulation, this, l_eliteparts[j].first, l_eliteparts[j].second, p_crossover, l_elite, l_rank )  );
+                    break;
+            }
+            l_threads.join_all();
+            
+            
+            // create and run mutation threads
+            for(std::size_t j=0; j < l_populationparts.size(); ++j)
+                l_threads.create_thread(  boost::bind( &population<T>::mutate, this, l_populationparts[j].first, l_populationparts[j].second )  );
+            l_threads.join_all();
         }
         
     }
-        
-        /*
-                // determine elite values and create a local copy of the elements
-                m_elite.clear();
-                std::vector< individual* > l_elite = p_elite.getElite( m_population, l_fitness, l_rank, m_elite.capacity() );
-                for(std::size_t j=0; j < l_elite.size(); ++j)
-                    if (l_elite[j])
-                        m_elite.push_back( *l_elite[j] );
-*/
     
     
     /** multithread method for calculating fitness values (start & end values must be disjuct over all threads)
@@ -395,14 +384,34 @@ namespace machinelearning { namespace geneticalgorithm {
                     const std::size_t l_pos( static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, 0, m_population.size())) );
                     
                     // we need a mutex, because different threads can modify the same pointer
-                    boost::unique_lock<boost::mutex> l_lock( m_changepopulation ); 
+                    boost::unique_lock<boost::mutex> l_lock( m_iterationlock ); 
                     delete(m_population[l_pos]);
                     p_crossover.combine(m_population[l_pos]);
                 }
                 break;
-                                                    
         }
     }
+    
+    
+    /*
+     // determine elite values and create a local copy of the elements
+     m_elite.clear();
+     std::vector< individual* > l_elite = ;
+     for(std::size_t j=0; j < l_elite.size(); ++j)
+     if (l_elite[j])
+     m_elite.push_back( *l_elite[j] );
+     */
+    
+    
+    template<typename T> inline void population<T>::buildelite( const std::size_t& p_start, const std::size_t& p_end, const eliteselection<T> p_eliteselection, const ublas::vector<T>& p_fitness, const ublas::vector<std::size_t>& p_rank, std::vector<individual*>& p_eliteptr )
+    {
+        p_eliteselection.getElite( p_start, p_end, m_population, p_fitness, p_rank, m_elite.capacity() );
+        
+        // we need a mutex, because different threads can modify the same pointer structure (vector of elite pointer and copy elite data)
+        boost::unique_lock<boost::mutex> l_lock( m_iterationlock );
+    }
+    
+    
     
 };};
 
