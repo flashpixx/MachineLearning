@@ -57,7 +57,9 @@ namespace machinelearning { namespace geneticalgorithm {
     };
 
     
-    
+    /** contructor of the binary individual
+     * @param p_size number of bytes are used
+     **/
     template<typename T> inline binaryindividual<T>::binaryindividual( const std::size_t& p_size ) :
         m_size( sizeof(std::size_t)*8 ),
         m_value(0) // static_cast<std::size_t>(m_rand.get<double>(tools::random::uniform, 0, m_size))
@@ -69,7 +71,7 @@ namespace machinelearning { namespace geneticalgorithm {
     }
     
     
-    
+    /** mutates the object **/
     template<typename T> inline void binaryindividual<T>::mutate( void )
     {
         tools::random l_rand;
@@ -78,12 +80,18 @@ namespace machinelearning { namespace geneticalgorithm {
     }
     
     
+    /** clones the object / create a new object on the heap
+     * @param p_ptr return reference of the new smart-pointer object
+     **/
     template<typename T> inline void binaryindividual<T>::clone( boost::shared_ptr< binaryindividual<T> >& p_ptr) const
     {
         p_ptr = boost::shared_ptr< binaryindividual<T> >( new binaryindividual<T>(m_size) );
     }
     
     
+    /** returns the data of the object 
+     * @param data
+     **/
     template<typename T> inline T binaryindividual<T>::getData( void ) const
     {
         return m_value;
