@@ -41,7 +41,7 @@ namespace machinelearning {
 #include "individual.hpp"
 #include "fitnessfunction.hpp"
 #include "eliteselection.hpp"
-#include "crossover.h"
+#include "crossover.hpp"
 
 #include "implementation/binaryindividual.hpp"
 

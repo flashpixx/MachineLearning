@@ -25,6 +25,7 @@
 #ifndef MACHINELEARNING_GENETICALGORITHM_ELITESELECTION_HPP
 #define MACHINELEARNING_GENETICALGORITHM_ELITESELECTION_HPP
 
+#include <boost/shared_ptr.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 
@@ -45,8 +46,8 @@ namespace machinelearning { namespace geneticalgorithm {
         
         public :
         
-            /** returns a pointer vector to the individuals which are elite. The last two parameter gives the range, which elite elements should be created, eg. [0,5) **/
-            //virtual std::vector< individual<L> > getElite( const std::size_t&, const std::size_t&, const std::vector< individual<L> >&, const ublas::vector<T>&, const ublas::vector<std::size_t>& );
+            /** returns a vector with smart-pointer to the individuals that are elite **/
+            virtual std::vector< boost::shared_ptr< individual<L> > > getElite( const std::size_t&, const std::size_t&, const std::vector< boost::shared_ptr< individual<L> > >&, const ublas::vector<T>&, const ublas::vector<std::size_t>& );
         
     };
     

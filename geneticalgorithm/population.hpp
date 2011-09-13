@@ -36,7 +36,7 @@
 #include "../tools/tools.h"
 
 #include "individual.hpp"
-#include "crossover.h"
+#include "crossover.hpp"
 #include "fitnessfunction.hpp"
 #include "eliteselection.hpp"
 
@@ -66,7 +66,7 @@ namespace machinelearning { namespace geneticalgorithm {
             std::size_t size( void ) const;
             void setEliteSize( const std::size_t& );
             std::size_t getEliteSize( void ) const;
-            std::vector< boost::shared_ptr< individual<L> > > getElite( void ) const;
+            std::vector<L> getEliteData( void ) const;
             void setMutalProbability( const T&, const tools::random::distribution& = tools::random::uniform, const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon() );
             void setPopulationBuild( const buildoption&, const tools::random::distribution& = tools::random::uniform );
             void iterate( const std::size_t&, const fitnessfunction<T,L>&, const eliteselection<T,L>&, const crossover<L>& );
@@ -180,12 +180,16 @@ namespace machinelearning { namespace geneticalgorithm {
     }
     
     
-    /** returns a copy of the individuals objects of the elites
-     * @return vector with individual objects
+    /** returns a copy of the elite data
+     * @return vector with data of the elite individuals
      **/
-    template<typename T, typename L> inline std::vector< boost::shared_ptr< individual<L> > > population<T,L>::getElite( void ) const
+    template<typename T, typename L> inline std::vector<L> population<T,L>::getEliteData( void ) const
     {
-        return m_elite;
+        std::vector<L> l_data;
+        for(std::size_t i=0; i < m_elite.size(); ++i)
+            l_data.push_back( (*m_elite[i]).getData() );
+            
+        return l_data;
     }
     
     
@@ -267,6 +271,8 @@ namespace machinelearning { namespace geneticalgorithm {
             
             // create elite multithreaded
             m_elite.clear();
+            for(std::size_t j=0; j < l_eliteparts.size(); ++j)
+                l_threads.create_thread(  boost::bind( &population<T,L>::buildelite, this, l_eliteparts[j].first, l_eliteparts[j].second, l_fitness, l_rank )  );
             
             
             // create build new population threads and run
@@ -363,22 +369,20 @@ namespace machinelearning { namespace geneticalgorithm {
     }
     
     
-    /*
-     // determine elite values and create a local copy of the elements
-     m_elite.clear();
-     std::vector< individual* > l_elite = ;
-     for(std::size_t j=0; j < l_elite.size(); ++j)
-     if (l_elite[j])
-     m_elite.push_back( *l_elite[j] );
-     */
-    
-    
+    /** multithread for building the elite data
+     * @param p_start start value of the elite values
+     * @param p_end end value of the elite
+     * @param p_eliteselection elite selection object
+     * @param p_fitness fitness values
+     * @param p_rank rank values
+     **/
     template<typename T, typename L> inline void population<T,L>::buildelite( const std::size_t& p_start, const std::size_t& p_end, const eliteselection<T,L> p_eliteselection, const ublas::vector<T>& p_fitness, const ublas::vector<std::size_t>& p_rank )
     {
-        //p_eliteselection.getElite( p_start, p_end, m_population, p_fitness, p_rank, m_elite.capacity() );
+        const std::vector< boost::shared_ptr< individual<L> > > l_elite( p_eliteselection.getElite( p_start, p_end, m_population, p_fitness, p_rank ) );
         
-        // we need a mutex, because different threads can modify the same pointer structure (vector of elite pointer and copy elite data)
-        //boost::unique_lock<boost::mutex> l_lock( m_iterationlock );
+        // we need a mutex, because different threads modify the elite property, so we must create a lock during resizing
+        boost::unique_lock<boost::mutex> l_lock( m_iterationlock );
+        std::copy( l_elite.begin(), l_elite.end(), std::back_inserter(m_elite));
     }
     
     
