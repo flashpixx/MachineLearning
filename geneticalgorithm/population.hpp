@@ -357,7 +357,7 @@ namespace machinelearning { namespace geneticalgorithm {
                     for(std::size_t j=0; j < p_crossover.getNumberOfIndividuals(); ++j)
                         p_crossover.setIndividual( *m_elite[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, 0, m_elite.size()))] );
                     
-                    m_population[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, 0, m_population.size()))] = p_crossover.combine();
+                    m_population[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, p_start, p_end))] = p_crossover.combine();
                 }
                 break;
         }

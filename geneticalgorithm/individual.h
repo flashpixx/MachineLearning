@@ -38,14 +38,16 @@ namespace machinelearning { namespace geneticalgorithm {
 
         public :
         
-            /** method for cloning the object. The method should be create a new individual for the population initialization on the heap and returns a smart-pointer **/
-            virtual void clone( boost::shared_ptr<individual>& ) const;
+            /** method for cloning the object. The method should be create a new individual for the population
+             * initialization on the heap and returns the smart-pointer to the heap object within the reference parameter. 
+             **/
+            virtual void clone( boost::shared_ptr<individual>& ) const { throw exception::classmethod(_("method is not implementated in the base class")); }
         
             /** combines the individual with another individual and returns the new one **/
             //virtual individual<T> combine( const individual<T>& ) const;
         
             /** mutates the individual **/
-            virtual void mutate( void );
+            virtual void mutate( void ) { throw exception::classmethod(_("method is not implementated in the base class")); };
         
     };
     
