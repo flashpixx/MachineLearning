@@ -35,7 +35,7 @@
 namespace machinelearning { namespace geneticalgorithm {
     
     /** class of a binary indivdual
-     * $LastChangedDate: 2011-09-10 20:05:39 +0200 (Sa, 10 Sep 2011) $
+     * $LastChangedDate$
      **/
     template<typename T> class binaryindividual : public individual<T> {
         
