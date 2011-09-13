@@ -27,7 +27,7 @@
 
 #include <boost/static_assert.hpp>
 
-#include "individual.h"
+#include "individual.hpp"
 #include "population.hpp"
 
 
@@ -36,13 +36,13 @@ namespace machinelearning { namespace geneticalgorithm {
     /** abstract class of the fitness function
      * $LastChangedDate$
      **/
-    template<typename T> class fitnessfunction {
+    template<typename T, typename L> class fitnessfunction {
         BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
         
         public :
         
             /** method for calculating the fitness value of an individual / return value must be >= 0 and 0 == worst value **/
-            virtual T getFitness( const individual& ) const;
+            virtual T getFitness( const individual<L>& ) const;
         
            // virtual T getFitness( const population<T>& ) const;
     };

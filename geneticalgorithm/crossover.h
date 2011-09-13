@@ -27,7 +27,7 @@
 
 #include <boost/static_assert.hpp>
 
-#include "individual.h"
+#include "individual.hpp"
 
 
 namespace machinelearning { namespace geneticalgorithm {
@@ -35,7 +35,7 @@ namespace machinelearning { namespace geneticalgorithm {
     /** abstract class of the crossover function
      * $LastChangedDate$
      **/
-    class crossover {
+    template<typename T> class crossover {
         
         public :
         
@@ -43,10 +43,10 @@ namespace machinelearning { namespace geneticalgorithm {
             virtual std::size_t getNumberOfIndividuals( void ) const;        
         
             /** set the individuals with a pointer **/
-            virtual void setIndividual( const individual& );
+            virtual void setIndividual( const boost::shared_ptr< individual<T> >& );
         
             /** create the new individual into the pointer structure, after creating the list of individuals must be cleared **/
-            virtual boost::shared_ptr<individual> combine( void );
+            virtual boost::shared_ptr< individual<T> > combine( void );
         
     };
     

@@ -28,7 +28,7 @@
 #include <boost/static_assert.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 
-#include "individual.h"
+#include "individual.hpp"
 
 
 
@@ -40,13 +40,13 @@ namespace machinelearning { namespace geneticalgorithm {
     /** abstract class of the selection function
      * $LastChangedDate$
      **/
-    template<typename T> class eliteselection {
+    template<typename T, typename L> class eliteselection {
         BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
         
         public :
         
             /** returns a pointer vector to the individuals which are elite. The last two parameter gives the range, which elite elements should be created, eg. [0,5) **/
-            virtual std::vector< individual* > getElite( const std::size_t&, const std::size_t&, const std::vector< individual* >&, const ublas::vector<T>&, const ublas::vector<std::size_t>& );
+            //virtual std::vector< individual<L> > getElite( const std::size_t&, const std::size_t&, const std::vector< individual<L> >&, const ublas::vector<T>&, const ublas::vector<std::size_t>& );
         
     };
     
