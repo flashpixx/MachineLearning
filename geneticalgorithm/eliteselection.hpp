@@ -46,7 +46,7 @@ namespace machinelearning { namespace geneticalgorithm {
         
         public :
         
-            /** returns a vector with smart-pointer to the individuals that are elite **/
+            /** returns a vector with smart-pointer to the individuals that are elite. The first and second values are the ranges of the elites (eg [0,3) must create the first three elites [0..2]) **/
             virtual std::vector< boost::shared_ptr< individual<L> > > getElite( const std::size_t&, const std::size_t&, const std::vector< boost::shared_ptr< individual<L> > >&, const ublas::vector<T>&, const ublas::vector<std::size_t>& );
         
     };

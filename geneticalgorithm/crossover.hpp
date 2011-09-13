@@ -42,10 +42,10 @@ namespace machinelearning { namespace geneticalgorithm {
             /** returns the number how many individuals are needed for the crossover (default should be two) **/
             virtual std::size_t getNumberOfIndividuals( void ) const;        
         
-            /** set the individuals with a pointer **/
+            /** set the individuals with a smart-pointer **/
             virtual void setIndividual( const boost::shared_ptr< individual<T> >& );
         
-            /** create the new individual into the pointer structure, after creating the list of individuals must be cleared **/
+            /** creates a new smart-pointer object with the new individual data **/
             virtual boost::shared_ptr< individual<T> > combine( void );
         
     };
