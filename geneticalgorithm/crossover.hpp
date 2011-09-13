@@ -22,32 +22,31 @@
  **/
 
 
-#ifndef MACHINELEARNING_GENETICALGORITHM_INDIVIDUAL_H
-#define MACHINELEARNING_GENETICALGORITHM_INDIVIDUAL_H
+#ifndef MACHINELEARNING_GENETICALGORITHM_CROSSOVER_H
+#define MACHINELEARNING_GENETICALGORITHM_CROSSOVER_H
 
 #include <boost/static_assert.hpp>
-#include <boost/shared_ptr.hpp>
+
+#include "individual.hpp"
 
 
 namespace machinelearning { namespace geneticalgorithm {
     
-    /** abstract class of an indivdual of the population
-     * $LastChangedDate$
+    /** abstract class of the crossover function
+     * $LastChangedDate: 2011-09-13 20:22:18 +0200 (Di, 13 Sep 2011) $
      **/
-    class individual {
-
+    template<typename T> class crossover {
+        
         public :
         
-            /** method for cloning the object. The method should be create a new individual for the population
-             * initialization on the heap and returns the smart-pointer to the heap object within the reference parameter. 
-             **/
-            virtual void clone( boost::shared_ptr<individual>& ) const { throw exception::classmethod(_("method is not implementated in the base class")); }
+            /** returns the number how many individuals are needed for the crossover (default should be two) **/
+            virtual std::size_t getNumberOfIndividuals( void ) const;        
         
-            /** combines the individual with another individual and returns the new one **/
-            //virtual individual<T> combine( const individual<T>& ) const;
+            /** set the individuals with a pointer **/
+            virtual void setIndividual( const boost::shared_ptr< individual<T> >& );
         
-            /** mutates the individual **/
-            virtual void mutate( void ) { throw exception::classmethod(_("method is not implementated in the base class")); };
+            /** create the new individual into the pointer structure, after creating the list of individuals must be cleared **/
+            virtual boost::shared_ptr< individual<T> > combine( void );
         
     };
     
