@@ -25,6 +25,9 @@
 #ifndef MACHINELEARNING_GENETICALGORITHM_IMPLEMENTATION_BINARYINDIVIDUAL_HPP
 #define MACHINELEARNING_GENETICALGORITHM_IMPLEMENTATION_BINARYINDIVIDUAL_HPP
 
+#include <cmath>
+
+#include <boost/static_assert.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include "../individual.hpp"
@@ -34,10 +37,12 @@
 
 namespace machinelearning { namespace geneticalgorithm {
     
-    /** class of a binary indivdual
+    /** class of a binary indivdual (template type must be an unsigned integral type)
      * $LastChangedDate$
      **/
     template<typename T> class binaryindividual : public individual<T> {
+        BOOST_STATIC_ASSERT( boost::is_integral<T>::value && boost::is_unsigned<T>::value );
+        
         
         public :
         
@@ -46,10 +51,13 @@ namespace machinelearning { namespace geneticalgorithm {
             T getData( void ) const;
             void clone( boost::shared_ptr<binaryindividual>& ) const;
             void mutate( void );
+            std::size_t size( void ) const;
         
         
         private :
         
+            /** number generator **/
+            tools::random m_rand;
             /** number of bit position are used **/
             const std::size_t m_size;
             /** value of the object **/
@@ -57,26 +65,28 @@ namespace machinelearning { namespace geneticalgorithm {
     };
 
     
+    
     /** contructor of the binary individual
-     * @param p_size number of bytes are used
+     * @param p_size number of bits that should be used
      **/
     template<typename T> inline binaryindividual<T>::binaryindividual( const std::size_t& p_size ) :
-        m_size( sizeof(std::size_t)*8 ),
-        m_value(0) // static_cast<std::size_t>(m_rand.get<double>(tools::random::uniform, 0, m_size))
+        m_rand(),
+        m_size( p_size ),
+        m_value(0) 
     {
         if (p_size == 0)
             throw exception::runtime(_("size number need not to be zero"));
-        if (p_size > m_size)
+        if (m_size > sizeof(T)*8)
             throw exception::runtime(_("size number is lager than datatype"));
+        
+        m_value = static_cast<T>(m_rand.get<double>(tools::random::uniform, 0, std::pow(2.0,static_cast<double>(m_size))-1));
     }
     
     
     /** mutates the object **/
     template<typename T> inline void binaryindividual<T>::mutate( void )
     {
-        tools::random l_rand;
-        const std::size_t l_mask( 0x01 << static_cast<std::size_t>(l_rand.get<double>(tools::random::uniform, 0, m_size)) );
-        m_value = (!(m_value & l_mask)) | (!l_mask);
+        m_value ^= 0x01 << static_cast<T>(m_rand.get<double>(tools::random::uniform, 0, m_size));
     }
     
     
@@ -96,6 +106,16 @@ namespace machinelearning { namespace geneticalgorithm {
     {
         return m_value;
     }
+    
+    
+    /** returns the number of bits that are used
+     * @return length
+     **/
+    template<typename T> inline std::size_t binaryindividual<T>::size( void ) const
+    {
+        return m_size;
+    }
+    
     
 };};
 
