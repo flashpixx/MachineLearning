@@ -391,6 +391,15 @@ def target_other(env, framework) :
         sources.append("mds_file.cpp")
 
     createTarget(env, "other", path, sources, framework)
+    
+    
+def target_genetic(env, framework) :
+    path = os.path.join(".", "examples", "geneticalgorithm")
+    sources = []
+
+    sources.extend( ["knapsack.cpp"] )
+
+    createTarget(env, "ga", path, sources, framework)
 #=======================================================================================================================================
 
 
@@ -435,4 +444,5 @@ else :
     target_distance(env, framework )
     target_classifier(env, framework )
     target_other(env, framework )
+    target_genetic(env, framework )
 
