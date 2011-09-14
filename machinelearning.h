@@ -397,6 +397,10 @@
  * The wikipedia class can be used for read the article data of wikipedia articles in different languages
  * @include examples/sources/wikipedia.cpp
  *
+ * @section twitter twitter
+ * The twitter class can be used for reading tweet data with different search tags
+ * @include examples/sources/twitter.cpp
+ *
  * @section cloud cloud
  * The cloud class creates a multimodal n-dimensional data set with normal distribution. The n-dimensional cube is sampled in equidistant
  * steps and on the cross-points a normal distribution is created.

@@ -99,9 +99,7 @@ namespace machinelearning { namespace geneticalgorithm {
     }
     
     
-    /** returns the data of the object 
-     * @param data
-     **/
+    /** returns the data of the object **/
     template<typename T> inline T binaryindividual<T>::getData( void ) const
     {
         return m_value;
