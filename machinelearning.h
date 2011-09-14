@@ -143,6 +143,7 @@
  * <li><dfn>distance</dfn> this target build all distance algorithms, but the <dfn>withfiles</dfn> parameter must be set</li>
  * <li><dfn>other</dfn> this target build all other examples, <dfn>withfiles</dfn> options must be set, <dfn>withsources</dfn> can be set (includes nntp and wikipedia examples) and optional 
  * <dfn>withmpi</dfn> </li>
+ * <li><dfn>ga</dfn> target for building genetic algorithms</li>
  * </ul>
  *
  * @section ex advanced documentation
