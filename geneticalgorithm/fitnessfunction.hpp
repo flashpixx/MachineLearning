@@ -45,6 +45,12 @@ namespace machinelearning { namespace geneticalgorithm {
             virtual T getFitness( const individual<L>& ) const;
         
            // virtual T getFitness( const population<T>& ) const;
+        
+        
+        protected :
+        
+            /** destructor **/
+            virtual ~fitnessfunction<T,L>( void ) {}
     };
     
 };};

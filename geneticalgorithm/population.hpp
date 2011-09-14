@@ -140,7 +140,7 @@ namespace machinelearning { namespace geneticalgorithm {
         // create individuals
         for(std::size_t i=0; i < p_size; ++i) {
             boost::shared_ptr< individual<L> > l_ptr;
-            p_individualref.clone( l_ptr );
+            (&p_individualref)->clone( l_ptr );
             m_population.push_back( l_ptr );
             //std::cout << (*l_ptr).getData() << std::endl;
         }

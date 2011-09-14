@@ -48,6 +48,11 @@ namespace machinelearning { namespace geneticalgorithm {
             /** creates a new smart-pointer object with the new individual data **/
             virtual boost::shared_ptr< individual<T> > combine( void );
         
+        
+        protected :
+        
+            /** destructor **/
+            virtual ~crossover<T>( void ) {}
     };
     
 };};
