@@ -45,7 +45,7 @@ namespace mpi       = boost::mpi;
 
     
     
-/** main program, that reads a subset of wikipedia articles, calculate the distance between articles 
+/** main program, that reads twitter tweets, calculate the distance between tweet 
  * and create the plot via MDS.
  * @param argc number of arguments
  * @param argv arguments

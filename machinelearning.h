@@ -703,6 +703,14 @@
  * @file functionoptimization/functionoptimization.h main header for function optimization
  * @file functionoptimization/gradientdescent.hpp gradient descent implementation
  *
+ * @file geneticalgorithm/geneticalgorithm.h main header for all genetic algorithms
+ * @file geneticalgorithm/population.hpp population class
+ * @file geneticalgorithm/individual.hpp abstract class of an individual
+ * @file geneticalgorithm/fitnessfunction.hpp abstract class of the fitness function
+ * @file geneticalgorithm/eliteselection.hpp abstract class of the elite selection
+ * @file geneticalgorithm/crossover.hpp abstract class of the crossover function
+ * @file geneticalgorithm/implementation/binaryindividual.hpp implementation of a binary individual
+ *
  * @file neighborhood/neighborhood.h main header for neighborhood structurs
  * @file neighborhood/neighborhood.hpp abstract class for neighborhood implementation
  * @file neighborhood/knn.hpp k-nearest-neighborhood implementation
