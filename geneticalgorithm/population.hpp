@@ -78,14 +78,14 @@ namespace machinelearning { namespace geneticalgorithm {
             /** struct of the probabilities **/
             struct probability {
                 tools::random::distribution distribution;
-                T probability;
+                T probabilityvalue;
                 T first;
                 T second;
                 T third;
                                 
                 probability() : 
                     distribution(tools::random::uniform),  
-                    probability(0.5), 
+                    probabilityvalue(0.5), 
                     first( std::numeric_limits<T>::epsilon() ),
                     second( std::numeric_limits<T>::epsilon() ),
                     third( std::numeric_limits<T>::epsilon() )
@@ -123,7 +123,7 @@ namespace machinelearning { namespace geneticalgorithm {
     template<typename T, typename L> inline population<T,L>::population( const individual<L>& p_individualref, const std::size_t& p_size, const std::size_t& p_elite ) :
         m_population( p_size ),
         m_elite( p_elite ),
-        m_buildoption( 0 ),
+        m_buildoption( fullBuildFromElite ),
         m_mutateprobility(),
         m_running(),
         m_iterationlock()
@@ -321,7 +321,7 @@ namespace machinelearning { namespace geneticalgorithm {
     {
         tools::random l_rand;
         for(std::size_t i=0; i < p_end; ++i)
-            if (l_rand.get<T>( m_mutateprobility.distribution, m_mutateprobility.first, m_mutateprobility.second, m_mutateprobility.third ) <= m_mutateprobility.probability)
+            if (l_rand.get<T>( m_mutateprobility.distribution, m_mutateprobility.first, m_mutateprobility.second, m_mutateprobility.third ) <= m_mutateprobility.probabilityvalue)
                 (*m_population[i]).mutate();
     }
     
