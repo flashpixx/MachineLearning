@@ -665,8 +665,9 @@
  * @file examples/clustering/rlvq.cpp testprogram for the rlvq algorithm
  * @file examples/classifier/lazy.cpp testprogram for the lazy-learner algorithm
  * @file examples/reducing/pca.cpp testprogram for the pca
- * @file examples/reducing/lda.cpp testprogramm for lda
- * @file examples/reducing/mds.cpp testprogramm for mds
+ * @file examples/reducing/lda.cpp testprogram for lda
+ * @file examples/reducing/mds.cpp testprogram for mds
+ * @file examples/geneticalgorithm/knapsack.cpp testprogram for genetic algorithm (knapsack problem)
  * @file examples/sources/newsgroup.cpp testprogram for NNTP using
  * @file examples/sources/wikipedia.cpp testprogram for using Wikipedia
  * @file examples/sources/cloud.cpp testprogram for create n-dimensional normal distribution
