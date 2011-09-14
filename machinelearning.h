@@ -670,10 +670,12 @@
  * @file examples/geneticalgorithm/knapsack.cpp testprogram for genetic algorithm (knapsack problem)
  * @file examples/sources/newsgroup.cpp testprogram for NNTP using
  * @file examples/sources/wikipedia.cpp testprogram for using Wikipedia
+ * @file examples/sources/twitter.cpp testprogram for using Twitter tweets
  * @file examples/sources/cloud.cpp testprogram for create n-dimensional normal distribution
  * @file examples/other/mds_nntp.cpp program for reading newsgroup articles, stopword reduction, distance calculating and MDS plotting
  * @file examples/other/mds_wikipedia.cpp program for reading Wikipedia articles, stopword reduction, distance calculating and MDS plotting
  * @file examples/other/mds_file.cpp program for reading (text) files, stopword reduction, distance calculating and MDS plotting
+ * @file examples/other/mds_twitter.cpp program for reading Twitter data and calculating plot with MDS
  *
  * @file classifier/classifier.h main header for all classifier structurs
  * @file classifier/classifier.hpp header for the abstract class implementation of the classifiers
