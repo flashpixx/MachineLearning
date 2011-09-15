@@ -49,7 +49,7 @@ namespace machinelearning { namespace geneticalgorithm {
             binaryindividual( const std::size_t& );
     
             T getData( void ) const;
-            void clone( boost::shared_ptr< binaryindividual<T> >& ) const;
+            void clone( boost::shared_ptr< individual<T> >& ) const;
             void mutate( void );
             std::size_t size( void ) const;
         
@@ -93,9 +93,9 @@ namespace machinelearning { namespace geneticalgorithm {
     /** clones the object / create a new object on the heap
      * @param p_ptr return reference of the new smart-pointer object
      **/
-    template<typename T> inline void binaryindividual<T>::clone( boost::shared_ptr< binaryindividual<T> >& p_ptr) const
+    template<typename T> inline void binaryindividual<T>::clone( boost::shared_ptr< individual<T> >& p_ptr) const
     {
-        p_ptr = boost::shared_ptr< binaryindividual<T> >( new binaryindividual<T>(m_size) );
+        p_ptr = boost::shared_ptr< individual<T> >( new binaryindividual<T>(m_size) );
     }
     
     

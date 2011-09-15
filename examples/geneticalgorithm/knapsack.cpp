@@ -35,13 +35,6 @@ namespace tools     = machinelearning::tools;
 namespace ga        = machinelearning::geneticalgorithm;
 
 
-void xxx( const ga::individual<std::size_t>& p_ref )
-{
-    boost::shared_ptr< ga::individual<std::size_t> > b;
-    (&p_ref)->clone(b);
-}
-
-
 /** main program for using the genetic algorithm to solve
  * the binary packing problem (Knapsack problem)
  * @param argc number of arguments
@@ -89,17 +82,12 @@ int main(int argc, char* argv[]) {
     }
     
     
-    
+    //http://www.learncpp.com/cpp-tutorial/121-pointers-and-references-to-the-base-class-of-derived-objects/
     // genetic algorithm
     ublas::vector<double> l_packs = tools::vector::copy(l_map["packs"].as< std::vector<double> >());
     
     ga::binaryindividual<std::size_t> l_individual( l_packs.size() );
-    xxx( l_individual );
-    
-    //boost::shared_ptr< ga::individual<std::size_t> > l_ptr;
-    //l_individual.clone( l_ptr );
-    
-    //ga::population<double,std::size_t> l_population(l_individual, l_populationsize, l_elitesize);
+    ga::population<double,std::size_t> l_population(l_individual, l_populationsize, l_elitesize);
     
     
     return EXIT_SUCCESS;
