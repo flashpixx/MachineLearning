@@ -29,6 +29,10 @@
 #include <boost/numeric/ublas/matrix_sparse.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 
+#ifdef MACHINELEARNING_MPI
+#include <boost/mpi.hpp>
+#endif
+
 #include "../clustering.hpp"
 #include "../../exception/exception.h"
 #include "../../tools/tools.h"
@@ -41,12 +45,12 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     namespace ublas = boost::numeric::ublas;
     
     
-    
     /** class for calculate (batch) k-means
      * $LastChangedDate$
      * @todo determin best k with variance analyse
      **/
-    template<typename T> class kmeans : public clustering<T> {
+    template<typename T> class kmeans : public clustering<T>
+    {
         
         public:
             
@@ -60,7 +64,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             std::size_t getPrototypeCount( void ) const;
             std::vector<T> getLoggedQuantizationError( void ) const;
             ublas::indirect_array<> use( const ublas::matrix<T>& ) const;
-            
+        
             
         private :
         

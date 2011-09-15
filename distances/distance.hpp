@@ -48,73 +48,67 @@ namespace machinelearning {
          * between matrix-, vectordata and weighted data
          * $LastChangedDate$
          **/      
-        template<typename T> class distance {
+        template<typename T> class distance
+        {
             BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );            
             
             
             public :
             
                 /** normalize a vector */
-                virtual void normalize( ublas::vector<T>& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                virtual void normalize( ublas::vector<T>& ) const = 0;
 
                 /** returns a normalized vector **/
-                virtual ublas::vector<T> getNormize( const ublas::vector<T>& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                virtual ublas::vector<T> getNormalize( const ublas::vector<T>& ) const = 0;
             
                 /** normalize a matrix on the rows or columns **/
-                virtual void normalize( ublas::matrix<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const { throw exception::classmethod(_("method is not implementated in the base class")); };        
+                virtual void normalize( ublas::matrix<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const = 0;        
                 
                 /** returns a normalized matrix on the rows or columns **/
-                virtual ublas::matrix<T> getNormalize( const ublas::matrix<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
-            
+                virtual ublas::matrix<T> getNormalize( const ublas::matrix<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const = 0;           
                 
+            
                 
                 /** return the length of the vector **/
-                virtual T getLength( const ublas::vector<T>& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                virtual T getLength( const ublas::vector<T>& ) const = 0;
             
                 /** return the length of every row or column vector within the matrix **/
-                virtual ublas::vector<T> getLength( const ublas::matrix<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
-                
+                virtual ublas::vector<T> getLength( const ublas::matrix<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const = 0;
+            
                 /** invert a value **/
-                virtual T getInvert( const T& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                virtual T getInvert( const T& ) const = 0;
                    
                 /** returns a vector with their absolute values **/
-                virtual ublas::vector<T> getAbs( const ublas::vector<T>& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                virtual ublas::vector<T> getAbs( const ublas::vector<T>& ) const = 0;
             
                 /** changes every element of the vector to their absolute value **/
-                virtual void abs( ublas::vector<T>& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                virtual void abs( ublas::vector<T>& ) const = 0;
             
                    
             
                 /** distance between two vectors **/
-                virtual T getDistance( const ublas::vector<T>&, const ublas::vector<T>& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                virtual T getDistance( const ublas::vector<T>&, const ublas::vector<T>& ) const = 0;
 
                 /** distances between row / column vectors of matrix and vector **/
-                virtual ublas::vector<T> getDistance( const ublas::matrix<T>&, const ublas::vector<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const { throw exception::classmethod(_("method is not implementated in the base class")); };        
+                virtual ublas::vector<T> getDistance( const ublas::matrix<T>&, const ublas::vector<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const = 0;
 
                 /** distances between row / column vectors of matrix and  row / column vectors of the other matrix **/
-                virtual ublas::vector<T> getDistance( const ublas::matrix<T>&, const ublas::matrix<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const { throw exception::classmethod(_("method is not implementated in the base class")); };   
+                virtual ublas::vector<T> getDistance( const ublas::matrix<T>&, const ublas::matrix<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const = 0;
             
             
             
                 /** weight distance between two vectors **/
-                virtual T getWeightedDistance( const ublas::vector<T>&, const ublas::vector<T>&, const ublas::vector<T>& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };        
+                virtual T getWeightedDistance( const ublas::vector<T>&, const ublas::vector<T>&, const ublas::vector<T>& ) const = 0;       
             
                 /** distances between row / column vectors of matrix and weighted vector **/
-                virtual ublas::vector<T> getWeightedDistance( const ublas::matrix<T>&, const ublas::vector<T>&, const ublas::vector<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                virtual ublas::vector<T> getWeightedDistance( const ublas::matrix<T>&, const ublas::vector<T>&, const ublas::vector<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const = 0;
                     
                 /** distances between row / column vectors of matrix and  row / column weighted vectors of the other matrix **/
-                virtual ublas::vector<T> getWeightedDistance( const ublas::matrix<T>&, const ublas::matrix<T>&, const ublas::matrix<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const { throw exception::classmethod(_("method is not implementated in the base class")); };        
+                virtual ublas::vector<T> getWeightedDistance( const ublas::matrix<T>&, const ublas::matrix<T>&, const ublas::matrix<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const = 0;       
             
                 /** distances between row / column vectors of matrix and  row / column of the weighted matrix **/
-                virtual ublas::vector<T> getWeightedDistance( const ublas::matrix<T>&, const ublas::vector<T>&, const ublas::matrix<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const { throw exception::classmethod(_("method is not implementated in the base class")); }; 
+                virtual ublas::vector<T> getWeightedDistance( const ublas::matrix<T>&, const ublas::vector<T>&, const ublas::matrix<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const = 0;
 
-
-            
-            
-            protected :
-            
-                /** destructor **/
-                virtual ~distance( void ) {}; 
             
         };
 

@@ -56,7 +56,11 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * on each process.
      * @todo thinking about relation calculating transform to a own distance class
      **/
-    template<typename T> class relational_neuralgas : public clustering<T>, public patch<T> {
+    template<typename T> class relational_neuralgas : public clustering<T>, public patch<T> 
+        #ifdef MACHINELEARNING_MPI 
+        , public mpiclustering<T>, public mpipatch<T>
+        #endif
+    {
         BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
         
         public:
@@ -88,6 +92,10 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             std::vector<T> getLoggedQuantizationError( const mpi::communicator& ) const;
             ublas::indirect_array<> use( const mpi::communicator&, const ublas::matrix<T>& ) const;
             void use( const mpi::communicator& ) const;
+        
+            void trainpatch( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t& ) { throw exception::classmethod(_("method is not implementated in this class")); };
+            ublas::vector<T> getPrototypeWeights( const mpi::communicator& ) const { throw exception::classmethod(_("method is not implementated in this class")); };
+            std::vector< ublas::vector<T> > getLoggedPrototypeWeights( const mpi::communicator& ) const { throw exception::classmethod(_("method is not implementated in this class")); };
             #endif
         
         

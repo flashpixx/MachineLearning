@@ -46,7 +46,8 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     /** create the local linear embedding (LLE)
      * $LastChangedDate$
      **/
-    template<typename T> class lle : public reduce<T> {
+    template<typename T> class lle : public reduce<T>
+    {
         
         public :
         

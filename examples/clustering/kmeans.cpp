@@ -39,7 +39,8 @@ namespace tools     = machinelearning::tools;
  * @param argc number of arguments
  * @param argv arguments
  **/
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[])
+{
     
     // default values
     bool l_log;

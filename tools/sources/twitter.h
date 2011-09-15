@@ -56,12 +56,14 @@ namespace machinelearning { namespace tools { namespace sources {
      * @todo adding support for reading timelines (see https://dev.twitter.com/docs/api#timelines )
      * $LastChangedDate$
      **/
-    class twitter {
+    class twitter 
+    {
         
         public :
         
             /** inner class for representation of a search tweet **/
-            class searchtweet {
+            class searchtweet 
+            {
                 
                 public :
 
@@ -109,7 +111,8 @@ namespace machinelearning { namespace tools { namespace sources {
         
         
             /** inner class of the timeline tweets **/
-            class timelinetweet {
+            class timelinetweet 
+            {
                 
                 public :
                 
@@ -152,7 +155,8 @@ namespace machinelearning { namespace tools { namespace sources {
         
         
             /** inner class for the twitter optional search parameters **/
-            class searchparameter {
+            class searchparameter 
+            {
                 
                 public :
                 

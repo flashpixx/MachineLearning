@@ -65,7 +65,8 @@ namespace machinelearning {
              * @todo add method for setting prototypes
              * @todo add supervised neural gas (see bng_supervised/bng_supervised.m)
              **/      
-            template<typename T, typename L> class clustering {
+            template<typename T, typename L> class clustering
+            {
                 BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
                 
                 
@@ -102,11 +103,6 @@ namespace machinelearning {
                     virtual ublas::indirect_array<> use( const ublas::matrix<T>& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
 
                 
-                
-                    #ifdef MACHINELEARNING_MPI
-                    #endif
-                
-                
                 protected :
                 
                     /** destructor **/
@@ -129,111 +125,118 @@ namespace machinelearning {
              * @todo add method for setting prototypes
              * @todo implement serializable interface
              **/      
-            template<typename T> class clustering {
+            template<typename T> class clustering
+            {
                 BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
                 
                 public :
 
                     /** method for training prototypes **/
-                    virtual void train( const ublas::matrix<T>&, const std::size_t& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
+                    virtual void train( const ublas::matrix<T>&, const std::size_t& ) = 0;
                 
                     /** method which returns prototypes **/
-                    virtual ublas::matrix<T> getPrototypes( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                    virtual ublas::matrix<T> getPrototypes( void ) const = 0;
                 
                     /** disable and enable logging **/
-                    virtual void setLogging( const bool& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
+                    virtual void setLogging( const bool& ) = 0;
                 
                     /** shows logging status **/
-                    virtual bool getLogging( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                    virtual bool getLogging( void ) const = 0;
                 
                     /** return history of trained prototypes **/
-                    virtual std::vector< ublas::matrix<T> > getLoggedPrototypes( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                    virtual std::vector< ublas::matrix<T> > getLoggedPrototypes( void ) const = 0;
                 
                     /** returns the dimension of prototypes **/
-                    virtual std::size_t getPrototypeSize( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                    virtual std::size_t getPrototypeSize( void ) const = 0;
                 
                     /** number of prototypes / classes **/
-                    virtual std::size_t getPrototypeNumber( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                    virtual std::size_t getPrototypeCount( void ) const = 0;
                 
                     /** return the quantizationerror **/
-                    virtual std::vector<T> getLoggedQuantizationError( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                    virtual std::vector<T> getLoggedQuantizationError( void ) const = 0;
                 
                     /** calculate prototype index for datapoints **/
-                    virtual ublas::indirect_array<> use( const ublas::matrix<T>& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
-
-                
-                
-                    #ifdef MACHINELEARNING_MPI
-                
-                    /** MPI method for training prototypes **/
-                    virtual void train( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
-                
-                    /** MPI method which returns prototypes **/
-                    virtual ublas::matrix<T> getPrototypes( const mpi::communicator& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
-                
-                    /** MPI method for returning history of trained prototypes **/
-                    virtual std::vector< ublas::matrix<T> > getLoggedPrototypes( const mpi::communicator& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
-                
-                    /** MPI method for returning the quantizationerror **/
-                    virtual std::vector<T> getLoggedQuantizationError( const mpi::communicator& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
-                
-                    /** MPI calculate prototype index for datapoints **/
-                    virtual ublas::indirect_array<> use( const mpi::communicator&, const ublas::matrix<T>& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
-                
-                    /** MPI call for determine the distance without returning and input values, only for MPI connection **/
-                    virtual void use( const mpi::communicator& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
-                
-                    #endif
-                
-                
-                protected :
-                
-                    /** destructor **/
-                    virtual ~clustering( void ) {}
-                
+                    virtual ublas::indirect_array<> use( const ublas::matrix<T>& ) const = 0;
+            
             };
             
-            
-            
+
             /** abstract class for patch clustering
              * $LastChangedDate$
              * @todo add method for setting weights
              * @todo implement serializable interface
              **/
-            template<typename T> class patch {
+            template<typename T> class patch
+            {
+                BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
                 
                 public :
                 
                     /** method for using patch clustering with one patch **/
-                    virtual void trainpatch( const ublas::matrix<T>&, const std::size_t& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
-                                
+                    virtual void trainpatch( const ublas::matrix<T>&, const std::size_t& ) = 0;
+                    
                     /** method for getting prototype weights **/
-                    virtual ublas::vector<T> getPrototypeWeights( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
-                
+                    virtual ublas::vector<T> getPrototypeWeights( void ) const = 0;
+                    
                     /** method for returning changes of the weights **/
-                    virtual std::vector< ublas::vector<T> > getLoggedPrototypeWeights( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                    virtual std::vector< ublas::vector<T> > getLoggedPrototypeWeights( void ) const = 0;
+            };            
 
+            
+            
+            #ifdef MACHINELEARNING_MPI
+            
+            /** abstract class for clustering with MPI interface
+             * $LastChangedDate$
+             **/           
+            template<typename T> class mpiclustering
+            {
+                BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
                 
+                public :
                 
-                    #ifdef MACHINELEARNING_MPI
-
-                    /** MPI method for training patch prototypes **/
-                    virtual void trainpatch( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
+                    /** MPI method for training prototypes **/
+                    virtual void train( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t& ) = 0;
                 
-                    /** MPI method for getting prototype weights **/
-                    virtual ublas::vector<T> getPrototypeWeights( const mpi::communicator& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
-
-                    /** MPI method for returning changes of the weights **/
-                    virtual std::vector< ublas::vector<T> > getLoggedPrototypeWeights( const mpi::communicator& ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
+                    /** MPI method which returns prototypes **/
+                    virtual ublas::matrix<T> getPrototypes( const mpi::communicator& ) const = 0;
                 
-                    #endif
-
+                    /** MPI method for returning history of trained prototypes **/
+                    virtual std::vector< ublas::matrix<T> > getLoggedPrototypes( const mpi::communicator& ) const = 0;
                 
-                protected :
+                    /** MPI method for returning the quantizationerror **/
+                    virtual std::vector<T> getLoggedQuantizationError( const mpi::communicator& ) const = 0;
                 
-                    /** destructor **/
-                    virtual ~patch( void ) {}
+                    /** MPI calculate prototype index for datapoints **/
+                    virtual ublas::indirect_array<> use( const mpi::communicator&, const ublas::matrix<T>& ) const = 0;
+                
+                    /** MPI call for determine the distance without returning and input values, only for MPI connection **/
+                    virtual void use( const mpi::communicator& ) const = 0;
+                
             };
+            
+            
+            /** abstract class for clustering with MPI patch interface
+             * $LastChangedDate$
+             * @todo add method for setting weights
+             **/ 
+            template<typename T> class mpipatch
+            {
+                BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
+                
+                public :
+                
+                    /** MPI method for training patch prototypes **/
+                    virtual void trainpatch( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t& ) = 0;
+                    
+                    /** MPI method for getting prototype weights **/
+                    virtual ublas::vector<T> getPrototypeWeights( const mpi::communicator& ) const = 0;
+                    
+                    /** MPI method for returning changes of the weights **/
+                    virtual std::vector< ublas::vector<T> > getLoggedPrototypeWeights( const mpi::communicator& ) const = 0;
+            };
+            
+            #endif
             
         };
     

@@ -75,7 +75,8 @@ namespace machinelearning { namespace tools {
     /** class for vector operations
      * $LastChangedDate$
      **/
-    class vector {
+    class vector 
+    {
         
         public :
         

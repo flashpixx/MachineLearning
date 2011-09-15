@@ -55,7 +55,8 @@ namespace machinelearning { namespace tools { namespace sources {
      * @todo add proxy support
      * @todo class is not thread-safe, so create mutex for thread-safe calls
      **/
-    class wikipedia {
+    class wikipedia 
+    {
         
         public :
         
@@ -80,13 +81,15 @@ namespace machinelearning { namespace tools { namespace sources {
         private :
         
             /** definition for URL **/
-            struct url {
+            struct url 
+            {
                 std::string host;
                 std::string path;
             };
         
             /** definition for language **/
-            struct wikiproperties {
+            struct wikiproperties 
+            {
                 language::code lang;
                 url exporturl;
                 url randomurl;
@@ -96,7 +99,8 @@ namespace machinelearning { namespace tools { namespace sources {
             };
         
             /** struct for article content **/
-            struct wikiarticle {
+            struct wikiarticle 
+            {
                 std::string content;
                 std::string title;
                 std::size_t articleid;

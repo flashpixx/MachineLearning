@@ -46,7 +46,8 @@ namespace machinelearning { namespace tools {
     /** class for matrix operations
      * $LastChangedDate$
      **/
-    class matrix {
+    class matrix
+    {
     
         public :
     

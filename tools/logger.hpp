@@ -72,7 +72,8 @@ namespace machinelearning { namespace tools {
      * @endcode
      * The MPI libraries must be compiled with multithread support
      **/
-    class logger {
+    class logger
+    {
         
         public :
         

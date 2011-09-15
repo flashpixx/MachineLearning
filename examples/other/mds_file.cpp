@@ -45,7 +45,8 @@ namespace text      = machinelearning::textprocess;
  * @param argc number of arguments
  * @param argv arguments
  **/
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[])
+{
      
     // default values
     std::size_t l_dimension;

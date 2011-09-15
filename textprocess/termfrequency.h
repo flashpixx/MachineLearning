@@ -42,7 +42,8 @@ namespace machinelearning { namespace textprocess {
      * that can be used for stop-word-reduction
      * $LastChangedDate$
      **/
-    class termfrequency {
+    class termfrequency
+    {
         
         public:
         

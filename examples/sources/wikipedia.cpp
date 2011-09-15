@@ -55,7 +55,8 @@ void output( tools::sources::wikipedia& p_wiki ) {
  * @param argc number of arguments
  * @param argv arguments
  **/
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[])
+{
 
     std::string l_lang;
     

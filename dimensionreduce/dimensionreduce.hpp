@@ -61,32 +61,42 @@ namespace machinelearning {
              * $LastChangedDate$
              * @todo implement serializable interface
              **/      
-            template<typename T> class reduce {
+            template<typename T> class reduce
+            {
                 BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
                 
                 
                 public :
 
                     /** maps data to target dimension **/
-                    virtual ublas::matrix<T> map( const ublas::matrix<T>& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
+                    virtual ublas::matrix<T> map( const ublas::matrix<T>& ) = 0;
                       
                     /** returns the mapped dimension **/
-                    virtual std::size_t getDimension( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
-                
-                    #ifdef MACHINELEARNING_MPI
-                    
-                    /** maps data to target dimension **/
-                    virtual ublas::matrix<T> map( const mpi::communicator&, const ublas::matrix<T>& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
-                
-                    #endif
-                
-                protected :
-                
-                    /** destructor **/
-                    virtual ~reduce( void ) {}
+                    virtual std::size_t getDimension( void ) const = 0;
 
             };
-        
+            
+            
+            #ifdef MACHINELEARNING_MPI
+            
+            /** abstract class for nonsupervised dimension reducing classes with MPI support
+             * $LastChangedDate$
+             * @todo implement serializable interface
+             **/      
+            template<typename T> class reducempi
+            {
+                BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
+                
+                
+                public :
+                
+                    /** maps data to target dimension **/
+                    virtual ublas::matrix<T> map( const mpi::communicator&, const ublas::matrix<T>& ) = 0;
+                
+            };
+
+            #endif
+
         };
         
         
@@ -101,27 +111,16 @@ namespace machinelearning {
             /** abstract class for supervised dimension reducing classes
              * $LastChangedDate$
              **/      
-            template<typename T, typename L> class reduce {
+            template<typename T, typename L> class reduce
+            {
                 
                 public :
                 
                     /** maps data to target dimension **/
-                    virtual ublas::matrix<T> map( const ublas::matrix<T>&, const std::vector<L>& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
+                    virtual ublas::matrix<T> map( const ublas::matrix<T>&, const std::vector<L>& ) = 0; 
                 
                     /** returns the mapped dimension **/
-                    virtual std::size_t getDimension( void ) const { throw exception::classmethod(_("method is not implementated in the base class")); };
-                
-                    #ifdef MACHINELEARNING_MPI
-                
-                    /** maps data to target dimension **/
-                    virtual ublas::matrix<T> map( const mpi::communicator&, const ublas::matrix<T>&, const std::vector<L>& ) { throw exception::classmethod(_("method is not implementated in the base class")); };
-                
-                    #endif
-                
-                protected :
-                
-                    /** destructor **/
-                    virtual ~reduce( void ) {}
+                    virtual std::size_t getDimension( void ) const = 0; 
                 
             };
             

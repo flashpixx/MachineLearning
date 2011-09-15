@@ -38,13 +38,13 @@
 namespace machinelearning { namespace dimensionreduce { namespace supervised {
     
     namespace ublas  = boost::numeric::ublas;
-
     
     
     /** class for projection the (Fisher) lineare discriminant analysis (LDA)
      * $LastChangedDate$
      **/
-    template<typename T, typename L> class lda : public reduce<T,L> {
+    template<typename T, typename L> class lda : public reduce<T,L>
+    {
         
         public :
         
@@ -154,6 +154,8 @@ namespace machinelearning { namespace dimensionreduce { namespace supervised {
         
         return ublas::prod(p_data, m_project);
     }
+    
+
 
 };};};
 #endif

@@ -49,7 +49,8 @@ namespace machinelearning { namespace geneticalgorithm {
     /** class for the population / optimization structure
      * $LastChangedDate$
      **/
-    template<typename T, typename L> class population {
+    template<typename T, typename L> class population
+    {
         BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
         
         public :

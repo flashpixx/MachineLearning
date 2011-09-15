@@ -47,7 +47,8 @@ namespace machinelearning { namespace classifier {
      * @todo optimize distance and label extraction with distribution (it should be faster)
      * @todo implementation of the logging structures
      **/
-    template<typename T, typename L> class lazylearner : public classifier<T, L>  {
+    template<typename T, typename L> class lazylearner : public classifier<T, L> 
+    {
         
         public :
         

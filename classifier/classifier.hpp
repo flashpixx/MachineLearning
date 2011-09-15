@@ -48,7 +48,8 @@ namespace machinelearning {
          * @todo checking method names and parameters (it's not optimal for using)
          * @todo implement serializable interface
          **/      
-        template<typename T, typename L> class classifier {
+        template<typename T, typename L> class classifier
+        {
             BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
             
             

@@ -69,7 +69,8 @@ namespace machinelearning { namespace tools {
      * @todo think about pseudo generator random seed
      * @todo reactivate binomial distribution with correct type casting
      **/
-    class random {
+    class random
+    {
         
         public :
         

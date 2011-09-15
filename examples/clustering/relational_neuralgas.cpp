@@ -46,7 +46,8 @@ namespace mpi       = boost::mpi;
  * @param argc number of arguments
  * @param argv arguments
  **/
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[])
+{
 
     #ifdef MACHINELEARNING_MPI
     mpi::environment loMPIenv(argc, argv);

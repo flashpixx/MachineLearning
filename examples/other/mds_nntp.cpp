@@ -178,7 +178,8 @@ void getArticles( tools::sources::nntp& p_nntp, const std::size_t& p_numarticles
  * @param argc number of arguments
  * @param argv arguments
 **/
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[])
+{
     
     // default values
     std::size_t l_dimension;

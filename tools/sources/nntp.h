@@ -51,7 +51,8 @@ namespace machinelearning { namespace tools { namespace sources {
      * @todo ssl connection
      * @todo authentification
      **/
-    class nntp {
+    class nntp 
+    {
         
         public :
         

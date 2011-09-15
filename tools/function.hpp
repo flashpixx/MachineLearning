@@ -47,7 +47,8 @@ namespace machinelearning { namespace tools {
     /** class for functions
      * $LastChangedDate$
      **/
-    class function {
+    class function
+    {
         
         public :
 

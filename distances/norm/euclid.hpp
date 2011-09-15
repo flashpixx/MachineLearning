@@ -47,7 +47,8 @@ namespace machinelearning { namespace distances {
      * $LastChangedDate$
      * @todo portage this class to the Intel Math Kernel Library http://software.intel.com/en-us/articles/intel-mkl/
      **/
-    template<typename T> class euclid : public distance<T> {
+    template<typename T> class euclid : public distance<T>
+    {
         
 
         public:

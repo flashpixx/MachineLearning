@@ -36,21 +36,17 @@ namespace machinelearning { namespace geneticalgorithm {
     /** abstract class of the fitness function
      * $LastChangedDate$
      **/
-    template<typename T, typename L> class fitnessfunction {
+    template<typename T, typename L> class fitnessfunction
+    {
         BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
         
         public :
         
             /** method for calculating the fitness value of an individual / return value must be >= 0 and 0 == worst value **/
-            virtual T getFitness( const individual<L>& ) const;
+        virtual T getFitness( const individual<L>& ) const = 0;
         
            // virtual T getFitness( const population<T>& ) const;
         
-        
-        protected :
-        
-            /** destructor **/
-            virtual ~fitnessfunction<T,L>( void ) {}
     };
     
 };};

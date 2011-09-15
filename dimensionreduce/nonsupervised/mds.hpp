@@ -48,7 +48,11 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     /** create the multidimensional scaling (MDS) with different algorithms
      * $LastChangedDate$
      **/
-    template<typename T> class mds : public reduce<T> {
+    template<typename T> class mds : public reduce<T>
+        #ifdef MACHINELEARNING_MPI
+        , public reducempi<T>
+        #endif
+    {
         
         public :
         

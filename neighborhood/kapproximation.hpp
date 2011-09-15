@@ -45,7 +45,8 @@ namespace machinelearning { namespace neighborhood {
      * $LastChangedDate$
      * @todo switch code to using distance classes / objects
      **/
-    template<typename T> class kapproximation {
+    template<typename T> class kapproximation
+    {
         BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
         
         public:

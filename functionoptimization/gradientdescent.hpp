@@ -57,7 +57,8 @@ namespace machinelearning { namespace functionaloptimization {
      * $LastChangedDate$
      * @bug uncomplete, so doesn't work
      **/
-    template<typename T, std::size_t D=1> class gradientdescent {
+    template<typename T, std::size_t D=1> class gradientdescent
+    {
         BOOST_STATIC_ASSERT(D > 0);         // array dimension must be greater than 0
         
     

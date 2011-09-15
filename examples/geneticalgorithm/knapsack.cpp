@@ -40,7 +40,8 @@ namespace ga        = machinelearning::geneticalgorithm;
  * @param argc number of arguments
  * @param argv arguments
  **/
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[])
+{
     
     std::size_t l_populationsize;
     std::size_t l_elitesize;

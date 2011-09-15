@@ -56,7 +56,8 @@ namespace machinelearning { namespace tools { namespace files {
      * @todo adding moving objects
      * @todo adding MPI support
      **/
-    class hdf {
+    class hdf
+    {
         
         public :
         

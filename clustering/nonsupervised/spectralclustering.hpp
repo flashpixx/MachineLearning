@@ -50,7 +50,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * @todo create eigengap heurstic
      * @bug incomplete (using not implementated)
      **/
-    template<typename T> class spectralclustering : public clustering<T> {
+    template<typename T> class spectralclustering : public clustering<T>
+    {
         
         
         public :
@@ -65,7 +66,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             std::size_t getPrototypeSize( void ) const;
             std::size_t getPrototypeCount( void ) const;
             std::vector<T> getLoggedQuantizationError( void ) const;
-            //ublas::indirect_array< std::vector<std::size_t> > use( const ublas::matrix<T>& ) const;
+            ublas::indirect_array<> use( const ublas::matrix<T>& ) const { throw exception::classmethod(_("method is not implementated in this class")); };
             
             //static std::size_t getEigenGap( const ublas::matrix<T>& ) const;
             //static std::size_t getEigenGap( const ublas::matrix<T>&, const ublas::matrix<T>& ) const;

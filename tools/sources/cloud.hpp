@@ -45,7 +45,8 @@ namespace machinelearning { namespace tools { namespace sources {
      * cube points with a normalized distribution
      * $LastChangedDate$
      **/
-    template<typename T> class cloud {
+    template<typename T> class cloud 
+    {
         
         
         public :

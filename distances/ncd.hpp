@@ -61,7 +61,8 @@ namespace machinelearning { namespace distances {
      * with some different algorithms like gzip and bzip2
      * $LastChangedDate$
      **/
-    template<typename T> class ncd {
+    template<typename T> class ncd
+    {
         BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
         
         

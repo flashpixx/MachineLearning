@@ -35,24 +35,19 @@ namespace machinelearning { namespace geneticalgorithm {
     /** abstract class of the crossover function
      * $LastChangedDate$
      **/
-    template<typename T> class crossover {
+    template<typename T> class crossover
+    {
         
         public :
         
             /** returns the number how many individuals are needed for the crossover (default should be two) **/
-            virtual std::size_t getNumberOfIndividuals( void ) const;        
+            virtual std::size_t getNumberOfIndividuals( void ) const = 0;     
         
             /** set the individuals with a smart-pointer **/
-            virtual void setIndividual( const boost::shared_ptr< individual<T> >& );
+            virtual void setIndividual( const boost::shared_ptr< individual<T> >& ) = 0;
         
             /** creates a new smart-pointer object with the new individual data **/
-            virtual boost::shared_ptr< individual<T> > combine( void );
-        
-        
-        protected :
-        
-            /** destructor **/
-            virtual ~crossover<T>( void ) {}
+            virtual boost::shared_ptr< individual<T> > combine( void ) = 0;
     };
     
 };};
