@@ -25,8 +25,8 @@
  * $LastChangedDate$
  **/
 
-#ifndef MACHINELEARNING_CLUSTERING_H
-#define MACHINELEARNING_CLUSTERING_H
+#ifndef __MACHINELEARNING_CLUSTERING_H
+#define __MACHINELEARNING_CLUSTERING_H
 
 #include "clustering.hpp"
 

@@ -22,8 +22,8 @@
  **/
 
 
-#ifndef MACHINELEARNING_DISTANCES_DISTANCE_HPP
-#define MACHINELEARNING_DISTANCES_DISTANCE_HPP
+#ifndef __MACHINELEARNING_DISTANCES_DISTANCE_HPP
+#define __MACHINELEARNING_DISTANCES_DISTANCE_HPP
 
 #include <boost/static_assert.hpp>
 #include <boost/numeric/ublas/vector.hpp>

@@ -70,7 +70,7 @@
  * <li>all template classes / algorithms must have a floating point datatype on instantiation, because the datastructurs need this types for correct value calculating. The (base) classes use a static 
  * assertion for checking the value type</li>
  * <li>all compiler flags start with <dfn>MACHINELEARNING_</dfn></li>
- * <li>all include defines for header files are set in this way <dfn>MACHINELEARNING_DIRECTORY_FILE_H/HPP</dfn>
+ * <li>all include defines for header files are set in this way <dfn>__MACHINELEARNING_DIRECTORY_FILE_H/HPP</dfn>
  * <li>all structures are in the namespace <dfn>machinelearning</dfn></li>
  * <li>all messages should get the structure <dfn>_("<message>")</dfn>, because the underline prefix is the support for different languages</li>
  * </ul>
@@ -765,8 +765,8 @@
  * @todo thinking about abstract middleware for Boinc support (eg patch clustering) http://boinc.berkeley.edu/
  **/
 
-#ifndef MACHINELEARNING_H
-#define MACHINELEARNING_H
+#ifndef __MACHINELEARNING_H
+#define __MACHINELEARNING_H
 
 
 /** main namespace of the framework

@@ -25,8 +25,8 @@
  * $LastChangedDate$
  **/
 
-#ifndef MACHINELEARNING_DIMENSIONREDUCE_H
-#define MACHINELEARNING_DIMENSIONREDUCE_H
+#ifndef __MACHINELEARNING_DIMENSIONREDUCE_H
+#define __MACHINELEARNING_DIMENSIONREDUCE_H
 
 #include "dimensionreduce.hpp"
 #include "supervised/lda.hpp"

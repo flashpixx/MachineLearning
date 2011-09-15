@@ -27,8 +27,8 @@
  * $LastChangedDate$
  **/
 
-#ifndef MACHINELEARNING_DISTANCES_H
-#define MACHINELEARNING_DISTANCES_H
+#ifndef __MACHINELEARNING_DISTANCES_H
+#define __MACHINELEARNING_DISTANCES_H
 
 #include "distance.hpp"
 

@@ -21,8 +21,8 @@
  @endcond
  **/
 
-#ifndef MACHINELEARNING_EXCEPTION_H
-#define MACHINELEARNING_EXCEPTION_H
+#ifndef __MACHINELEARNING_EXCEPTION_H
+#define __MACHINELEARNING_EXCEPTION_H
 
 #include <string>
 #include <stdexcept>

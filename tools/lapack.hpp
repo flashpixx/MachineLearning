@@ -22,8 +22,8 @@
  **/
 
 
-#ifndef MACHINELEARNING_TOOLS_LAPACK_HPP
-#define MACHINELEARNING_TOOLS_LAPACK_HPP
+#ifndef __MACHINELEARNING_TOOLS_LAPACK_HPP
+#define __MACHINELEARNING_TOOLS_LAPACK_HPP
 
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>

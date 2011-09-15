@@ -21,8 +21,8 @@
  @endcond
  **/
 
-#ifndef MACHINELEARNING_CLASSIFIER_HPP
-#define MACHINELEARNING_CLASSIFIER_HPP
+#ifndef __MACHINELEARNING_CLASSIFIER_HPP
+#define __MACHINELEARNING_CLASSIFIER_HPP
 
 
 #include <boost/static_assert.hpp>
