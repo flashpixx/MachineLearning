@@ -43,7 +43,7 @@ namespace machinelearning { namespace geneticalgorithm {
         public :
         
             /** method for calculating the fitness value of an individual / return value must be >= 0 and 0 == worst value **/
-        virtual T getFitness( const individual<L>& ) const = 0;
+            virtual T getFitness( const individual<L>& ) const = 0;
         
            // virtual T getFitness( const population<T>& ) const;
         

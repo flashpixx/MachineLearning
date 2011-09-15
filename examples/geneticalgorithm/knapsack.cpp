@@ -35,6 +35,54 @@ namespace tools     = machinelearning::tools;
 namespace ga        = machinelearning::geneticalgorithm;
 
 
+/** fitness function for determine the binary packing **/
+template<typename T, typename L> class fitness : public ga::fitnessfunction<T,L>
+{
+    public :
+    
+        fitness( const ublas::vector<T>& p_weight, const T& p_max ) : m_weight(p_weight), m_max(p_max) {}
+        T getFitness( const ga::individual<L>& p_ind ) const
+        {
+            // simple fitness function: create only the difference between individual and maximum size, values less than zero, will be set to zero
+            T l_sum = 0;
+            for(std::size_t i=0; i < m_weight.size(); ++i)
+                l_sum += m_weight(i) * (p_ind.getData() & (0x01 << i));
+            
+            return std::max( m_max - l_sum, static_cast<double>(0));
+        }
+    
+
+    private :
+    
+        const ublas::vector<T> m_weight;
+        const T m_max;
+};
+
+
+/** crossover function (using a k-crossover) **/
+template<typename T> class crossover : public ga::crossover<T>
+{
+    public :
+    
+        crossover( const std::size_t& p_k, const double& p_probability) : m_k(p_k), m_probability(p_probability), m_ind() {}
+        std::size_t getNumberOfIndividuals( void ) const { return m_k; }     
+        
+        void setIndividual( const boost::shared_ptr< ga::individual<T> >& p_ind ) { m_ind.push_back( p_ind ); }
+        boost::shared_ptr< ga::individual<T> > combine( void )
+        {
+            m_ind.clear();
+        }
+    
+    
+    private :
+    
+        const std::size_t m_k;
+        const double m_probability;
+        std::vector< boost::shared_ptr< ga::individual<T> > > m_ind;
+};
+
+
+
 /** main program for using the genetic algorithm to solve
  * the binary packing problem (Knapsack problem)
  * @param argc number of arguments
@@ -83,11 +131,15 @@ int main(int argc, char* argv[])
     }
     
     
-    //http://www.learncpp.com/cpp-tutorial/121-pointers-and-references-to-the-base-class-of-derived-objects/
-    // genetic algorithm
-    ublas::vector<double> l_packs = tools::vector::copy(l_map["packs"].as< std::vector<double> >());
+    const ublas::vector<double> l_packs = tools::vector::copy(l_map["packs"].as< std::vector<double> >());
     
+
+    
+    // genetic algorithm (basic structure eg individual, fitness function, crossover function [see above])
+    fitness<double,std::size_t> l_fitnessfunc( l_packs, l_map["maxpacksize"].as<double>() );
     ga::binaryindividual<std::size_t> l_individual( l_packs.size() );
+
+    // create population
     ga::population<double,std::size_t> l_population(l_individual, l_populationsize, l_elitesize);
     
     
