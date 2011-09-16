@@ -53,6 +53,7 @@ namespace machinelearning { namespace geneticalgorithm {
             void clone( boost::shared_ptr< individual<T> >& ) const;
             void mutate( void );
             std::size_t size( void ) const;
+            void setData( const T& );
         
         
         private :
@@ -81,6 +82,15 @@ namespace machinelearning { namespace geneticalgorithm {
             throw exception::runtime(_("size number is lager than datatype"));
         
         m_value = static_cast<T>(m_rand.get<double>(tools::random::uniform, 0, std::pow(2.0,static_cast<double>(m_size))-1));
+    }
+    
+    
+    /** sets the value
+     * @param p_data value
+     **/
+    template<typename T> inline void binaryindividual<T>::setData( const T& p_data )
+    {
+        m_value = p_data; 
     }
     
     

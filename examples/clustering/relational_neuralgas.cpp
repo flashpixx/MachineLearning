@@ -89,7 +89,7 @@ int main(int argc, char* argv[])
     
     if ( (!l_map.count("outfile")) || (!l_map.count("inputfile")) || (!l_map.count("inputpath")) || (!l_map.count("prototype")) )
     {
-        std::cout << "[--outfile], [--inputfile], [--inputpath] and [--prototype] option must be set" << std::endl;
+        std::cerr << "[--outfile], [--inputfile], [--inputpath] and [--prototype] option must be set" << std::endl;
         return EXIT_FAILURE;
     }    
     

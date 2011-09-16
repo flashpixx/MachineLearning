@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
     }
     
     if ( (!l_map.count("outfile")) || (!l_map.count("articles")) )  {
-        std::cout << "[--outfile] and [--articles] option must be set" << std::endl;
+        std::cerr << "[--outfile] and [--articles] option must be set" << std::endl;
         return EXIT_FAILURE;
     }
     

@@ -78,7 +78,7 @@ int main(int argc, char* argv[])
     }
     
     if ( (!l_map.count("infile")) || (!l_map.count("inpath")) || (!l_map.count("outfile")) ) {
-        std::cout << "[--infile], [--inpath] and [--outfile] option must be set" << std::endl;
+        std::cerr << "[--infile], [--inpath] and [--outfile] option must be set" << std::endl;
         return EXIT_FAILURE;
     }
     

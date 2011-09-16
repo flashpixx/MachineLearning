@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
     }
     
     if (!l_map.count("server")) {
-        std::cout << "[--server] option must be set" << std::endl;
+        std::cerr << "[--server] option must be set" << std::endl;
         return EXIT_FAILURE;
     }
     

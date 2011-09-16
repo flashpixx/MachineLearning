@@ -64,18 +64,27 @@ template<typename T> class crossover : public ga::crossover<T>
 {
     public :
     
-        crossover( const std::size_t& p_k, const double& p_probability) : m_k(p_k), m_probability(p_probability), m_ind() {}
+        crossover( const std::size_t& p_k, const double& p_probability) : m_rand(), m_k(p_k), m_probability(p_probability), m_ind() {}
         std::size_t getNumberOfIndividuals( void ) const { return m_k; }     
         
         void setIndividual( const boost::shared_ptr< ga::individual<T> >& p_ind ) { m_ind.push_back( p_ind ); }
         boost::shared_ptr< ga::individual<T> > combine( void )
         {
+            T l_new;
+            for(std::size_t i=0; i < m_k; ++i) {
+                
+            }
             m_ind.clear();
+            
+            boost::shared_ptr< ga::individual<T> > l_obj( new ga::binaryindividual<T>(3) );
+            l_obj->setData(l_new);
+            return l_obj;
         }
     
     
     private :
     
+        const tools::random m_rand;
         const std::size_t m_k;
         const double m_probability;
         std::vector< boost::shared_ptr< ga::individual<T> > > m_ind;
@@ -121,12 +130,12 @@ int main(int argc, char* argv[])
     }
     
     if ( (!l_map.count("packs")) || (!l_map.count("maxpacksize")) )  {
-        std::cout << "[--packs] and [--maxpacksize] must be set" << std::endl;
+        std::cerr << "[--packs] and [--maxpacksize] must be set" << std::endl;
         return EXIT_FAILURE;
     }
     
     if (l_map["packs"].as< std::vector<double> >().size() < 2) {
-        std::cout << "[--packs] must be greater or equal two" << std::endl;
+        std::cerr << "[--packs] must be greater or equal two" << std::endl;
         return EXIT_FAILURE;
     }
     

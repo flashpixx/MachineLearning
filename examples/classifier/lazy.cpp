@@ -75,7 +75,7 @@ int main(int argc, char* argv[])
     
     if ( (!l_map.count("outfile")) || (!l_map.count("inputfile")) || (!l_map.count("datapath")) || (!l_map.count("datalabel")) || (!l_map.count("unkowndata")) || (!l_map.count("labeltype")) )
     {
-        std::cout << "[--outfile], [--inputfile], [--datapath], [--datalabel], [--unkwondata] and [--labeltype] option must be set" << std::endl;
+        std::cerr << "[--outfile], [--inputfile], [--datapath], [--datalabel], [--unkwondata] and [--labeltype] option must be set" << std::endl;
         return EXIT_FAILURE;
     }   
     

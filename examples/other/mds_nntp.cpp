@@ -222,7 +222,7 @@ int main(int argc, char* argv[])
     }
     
     if ( (!l_map.count("outfile")) || (!l_map.count("articles")) || (!l_map.count("groups")) || (!l_map.count("server")) )  {
-        std::cout << "[--server], [--outfile], [--groups] and [--articles] option must be set" << std::endl;
+        std::cerr << "[--server], [--outfile], [--groups] and [--articles] option must be set" << std::endl;
         return EXIT_FAILURE;
     }
     

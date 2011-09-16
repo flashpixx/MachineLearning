@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
     }
     
     if (!l_map.count("sources"))  {
-        std::cout << "[--sources] must be set" << std::endl;
+        std::cerr << "[--sources] must be set" << std::endl;
         return EXIT_FAILURE;
     }
     

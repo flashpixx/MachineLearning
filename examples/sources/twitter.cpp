@@ -66,7 +66,7 @@ int main(int argc, char* argv[])
     }
     
     if (!l_map.count("search")) {
-        std::cout << "[--search] option must be set" << std::endl;
+        std::cerr << "[--search] option must be set" << std::endl;
         return EXIT_FAILURE;
     }
     

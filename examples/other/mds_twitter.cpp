@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
     }
     
     if ( (!l_map.count("outfile")) || (!l_map.count("search")) )  {
-        std::cout << "[--outfile] and [--search] option must be set" << std::endl;
+        std::cerr << "[--outfile] and [--search] option must be set" << std::endl;
         return EXIT_FAILURE;
     }
     

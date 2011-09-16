@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
     }
     
     if ( (!l_map.count("outfile")) || (!l_map.count("sources")) )  {
-        std::cout << "[--outfile] and [--sources] option must be set" << std::endl;
+        std::cerr << "[--outfile] and [--sources] option must be set" << std::endl;
         return EXIT_FAILURE;
     }
      

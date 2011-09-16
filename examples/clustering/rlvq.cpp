@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
     
     if ( (!l_map.count("outfile")) || (!l_map.count("inputfile")) || (!l_map.count("inputpath")) || (!l_map.count("labeltype")) ||  (!l_map.count("labelpath")))
     {
-        std::cout << "[--outfile], [--inputfile], [--inputpath], [--labelpath] and [--labeltype] option must be set" << std::endl;
+        std::cerr << "[--outfile], [--inputfile], [--inputpath], [--labelpath] and [--labeltype] option must be set" << std::endl;
         return EXIT_FAILURE;
     }
     
