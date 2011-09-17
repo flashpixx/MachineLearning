@@ -50,7 +50,10 @@ namespace machinelearning { namespace tools {
     };
     
     
-    
+    /** returns the class name of a pointer
+     * @param p_ptr pointer
+     * @return string with class name and namespaces
+     **/
     template <typename T> inline std::string typeinfo::getClassName( const T* p_ptr )
     {
         try {
@@ -66,6 +69,10 @@ namespace machinelearning { namespace tools {
     }
     
     
+    /** returns the class name of a reference
+     * @param p_ptr reference
+     * @return string with class name and namespaces
+     **/
     template <typename T> inline std::string typeinfo::getClassName( const T& p_obj )
     {
         try {
