@@ -76,7 +76,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         m_dim( p_dim )
     {
         if (p_dim == 0)
-            throw exception::runtime(_("dimension must be greater than zero"));
+            throw exception::runtime(_("dimension must be greater than zero"), *this);
     }
     
     
@@ -98,7 +98,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     template<typename T> inline ublas::matrix<T> lle<T>::map( const ublas::matrix<T>& p_data )
     {
         if (p_data.size2() <= m_dim)
-            throw exception::runtime(_("data points are less than target dimension"));
+            throw exception::runtime(_("data points are less than target dimension"), *this);
         
         // if number of neighborhood greate than data dimension (column size)
         // regularize weight-matrix

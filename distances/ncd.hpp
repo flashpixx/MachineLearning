@@ -429,7 +429,7 @@ namespace machinelearning { namespace distances {
     template<typename T> inline ublas::matrix<T> ncd<T>::unsymmetric( const std::vector<std::string>& p_strvec, const bool& p_isfile  )
     {
         if (p_strvec.size() == 0)
-            throw exception::runtime(_("vector size must be greater than zero"));
+            throw exception::runtime(_("vector size must be greater than zero"), *this);
         
         // init data
         ublas::vector<std::size_t> l_cache(p_strvec.size(), 0);
@@ -491,7 +491,7 @@ namespace machinelearning { namespace distances {
     template<typename T> inline ublas::symmetric_matrix<T, ublas::upper> ncd<T>::symmetric( const std::vector<std::string>& p_strvec, const bool& p_isfile  )
     {
          if (p_strvec.size() == 0)
-             throw exception::runtime(_("vector size must be greater than zero"));
+             throw exception::runtime(_("vector size must be greater than zero"), *this);
          
          // init data
          ublas::vector<std::size_t> l_cache(p_strvec.size(), 0);
@@ -557,7 +557,7 @@ namespace machinelearning { namespace distances {
     template<typename T> inline ublas::matrix<T> ncd<T>::unsquare ( const std::vector<std::string>& p_strvec1, const std::vector<std::string>& p_strvec2, const bool& p_isfile )
     {
         if ( (p_strvec1.size() == 0) || (p_strvec2.size() == 0) )
-            throw exception::runtime(_("vector size must be greater than zero"));
+            throw exception::runtime(_("vector size must be greater than zero"), *this);
         
         // init data
         ublas::vector<std::size_t> l_cache(p_strvec1.size() + p_strvec2.size(), 0);
@@ -622,7 +622,7 @@ namespace machinelearning { namespace distances {
     template<typename T> inline std::size_t ncd<T>::deflate( const bool& p_isfile, const std::string& p_str1, const std::string& p_str2 ) const
     {
         if (p_str1.empty())
-            throw exception::runtime(_("string size must be greater than zero"));
+            throw exception::runtime(_("string size must be greater than zero"), *this);
         
         // for each compress algorithm we removed the header & footer size of the resulting count
         // @see http://en.wikipedia.org/wiki/Bzip2#File_format
@@ -651,14 +651,14 @@ namespace machinelearning { namespace distances {
             
             l_file.open(p_str1.c_str(), std::ifstream::binary);
             if (!l_file.is_open())
-                throw exception::runtime(_("file can not be opened"));
+                throw exception::runtime(_("file can not be opened"), *this);
             std::copy( std::istream_iterator<char>(l_file), std::istream_iterator<char>(), std::ostreambuf_iterator<char>(&l_deflate) );
             l_file.close();
             
             if (!p_str2.empty()) {
                 l_file.open(p_str2.c_str(), std::ifstream::binary);
                 if (!l_file.is_open())
-                    throw exception::runtime(_("file can not be opened"));
+                    throw exception::runtime(_("file can not be opened"), *this);
                 std::copy( std::istream_iterator<char>(l_file), std::istream_iterator<char>(), std::ostreambuf_iterator<char>(&l_deflate) );
                 l_file.close();                
             }

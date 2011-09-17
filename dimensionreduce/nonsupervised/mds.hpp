@@ -128,7 +128,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         m_centering( none )
     {
         if (p_dim == 0)
-            throw exception::runtime(_("dimension must be greater than zero"));
+            throw exception::runtime(_("dimension must be greater than zero"), *this);
     }
     
     
@@ -182,9 +182,9 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     template<typename T> inline ublas::matrix<T> mds<T>::map( const ublas::matrix<T>& p_data )
     {
         if (p_data.size1() != p_data.size2())
-            throw exception::runtime( _("matrix must be square") );
+            throw exception::runtime( _("matrix must be square"), *this );
         if (p_data.size2() <= m_dim)
-            throw exception::runtime(_("datapoint dimension are less than target dimension"));
+            throw exception::runtime(_("datapoint dimension are less than target dimension"), *this);
                 
         // do centering
         ublas::matrix<T> l_data = p_data;
@@ -216,7 +216,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                 return project_hit(l_data);
                        
             default :
-                throw exception::runtime(_("project option is unkown"));
+                throw exception::runtime(_("project option is unkown"), *this);
 
         };
     }
@@ -258,9 +258,9 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     template<typename T> inline ublas::matrix<T> mds<T>::project_sammon( const ublas::matrix<T>& p_data ) const
     {
         if (m_iteration == 0)
-            throw exception::runtime(_("iterations must be greater than zero"));
+            throw exception::runtime(_("iterations must be greater than zero"), *this);
         if (m_step == 0)
-            throw exception::runtime(_("steps must be greater than zero"));
+            throw exception::runtime(_("steps must be greater than zero"), *this);
         
         
         // create the distance for each row/colum (create distance matrix) of the matrix and sets the diagonal elements to one
@@ -307,7 +307,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                     break;
                 
                 if (n == m_step)
-                    throw exception::runtime(_("sammon mapping may not converge"));
+                    throw exception::runtime(_("sammon mapping may not converge"), *this);
                 
                 l_adapt                     *= static_cast<T>(0.5);
             }
@@ -376,7 +376,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         
         // create init matrix and values
         if (l_zeros.size() == p_data.size1() * p_data.size2())
-            throw exception::runtime(_("data matrix has only zero entries"));
+            throw exception::runtime(_("data matrix has only zero entries"), *this);
         
         ublas::matrix<T> l_data = p_data;
         const T l_datainv       = static_cast<T>(1) / (l_data.size1() * l_data.size2() - l_zeros.size());
@@ -488,7 +488,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     {
         // centering works only on non-mpi-use because we 
         if ( (m_centering == singlecenter) || (m_centering == doublecenter) )
-            throw exception::runtime(_("centering can not be used with MPI"));
+            throw exception::runtime(_("centering can not be used with MPI"), *this);
         
         // we check data dimension (data matrix over all CPUs must be squared and the column size of
         // the prototype matrix must be equal to the data size)
@@ -496,7 +496,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         mpi::all_reduce(p_mpi, p_data.size2(), l_col, std::plus<std::size_t>());
         
         if (l_col != p_data.size1())
-            throw exception::runtime(_("matrix must be square"));
+            throw exception::runtime(_("matrix must be square"), *this);
 
         
         // do project
@@ -506,7 +506,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
                 return project_hit(p_mpi, p_data);
                 
             default :
-                throw exception::runtime(_("MPI project option is unkown"));
+                throw exception::runtime(_("MPI project option is unkown"), *this);
                 
         };
     }
@@ -543,7 +543,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         std::size_t l_numzeros = 0;
         mpi::all_reduce(p_mpi, l_zeros.size(), l_numzeros, std::plus<std::size_t>());
         if (l_numzeros == p_data.size1() * p_data.size1())
-            throw exception::runtime(_("data matrix has only zero entries"));
+            throw exception::runtime(_("data matrix has only zero entries"), *this);
     
         ublas::matrix<T> l_data = p_data;
         const T l_datainv       = static_cast<T>(1) / (l_data.size1() * l_data.size1() - l_numzeros);
