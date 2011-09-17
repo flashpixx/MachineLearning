@@ -27,7 +27,8 @@
 #include <string>
 #include <stdexcept>
 
-#pragma GCC visibility push(default)
+#include "../tools/typeinfo.h"
+
 
 namespace machinelearning { 
     
@@ -46,7 +47,17 @@ namespace machinelearning {
                 explicit classmethod( const std::string& p_msg) :
                     std::logic_error( p_msg )
                 {}
+            
+                template <typename T> explicit classmethod( const std::string& p_msg, const T* p_ptr ) :
+                    std::logic_error( p_msg + ( !tools::typeinfo::getClassName(p_ptr).empty() ? " ["+tools::typeinfo::getClassName(p_ptr)+"]" : "") )
+                {}  
+            
+                template <typename T> explicit classmethod( const std::string& p_msg, const T& p_obj ) :
+                    std::logic_error( p_msg + ( !tools::typeinfo::getClassName(p_obj).empty() ? " ["+tools::typeinfo::getClassName(p_obj)+"]" : "") )
+                {}  
         };
+        
+        
         
         /** exception class for throwing on runtime errors
          * $LastChangedDate$
@@ -58,11 +69,18 @@ namespace machinelearning {
                 explicit runtime( const std::string& p_msg ) :
                     std::runtime_error( p_msg )
                 {}  
+            
+                template <typename T> explicit runtime( const std::string& p_msg, const T* p_ptr ) :
+                    std::runtime_error( p_msg + ( !tools::typeinfo::getClassName(p_ptr).empty() ? " ["+tools::typeinfo::getClassName(p_ptr)+"]" : "") )
+                {}  
+            
+                template <typename T> explicit runtime( const std::string& p_msg, const T& p_obj ) :
+                    std::runtime_error( p_msg + ( !tools::typeinfo::getClassName(p_obj).empty() ? " ["+tools::typeinfo::getClassName(p_obj)+"]" : "") )
+                {}  
         };
+             
         
     };
 };
-
-#pragma GCC visibility pop
 
 #endif

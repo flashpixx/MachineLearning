@@ -130,13 +130,13 @@ namespace machinelearning { namespace geneticalgorithm {
         m_iterationlock()
     {
         if (p_size < 3)
-            throw exception::runtime(_("population size must be greater than two"));
+            throw exception::runtime(_("population size must be greater than two"), *this);
         
         if (p_elite < 2)
-            throw exception::runtime(_("elite size must be greater than one"));
+            throw exception::runtime(_("elite size must be greater than one"), *this);
         
         if (p_elite >= p_size)
-            throw exception::runtime(_("elite size must be smaller than population size"));
+            throw exception::runtime(_("elite size must be smaller than population size"), *this);
         
         // create individuals
         for(std::size_t i=0; i < p_size; ++i) {
@@ -164,10 +164,10 @@ namespace machinelearning { namespace geneticalgorithm {
     template<typename T, typename L> inline void population<T,L>::setEliteSize( const std::size_t& p_size )
     {
         if (p_size < 2)
-            throw exception::runtime(_("elite size must be greater than one"));
+            throw exception::runtime(_("elite size must be greater than one"), *this);
         
         if (p_size >= m_population.capacity())
-            throw exception::runtime(_("elite size must be smaller than population size"));
+            throw exception::runtime(_("elite size must be smaller than population size"), *this);
         
         m_elite.resize(p_size);
     }
@@ -230,7 +230,7 @@ namespace machinelearning { namespace geneticalgorithm {
     template<typename T, typename L> inline void population<T,L>::iterate( const std::size_t& p_iteration, const fitnessfunction<T,L>& p_fitness, const eliteselection<T,L>& p_elite, const crossover<L>& p_crossover )
     {
         if (p_iteration == 0)
-            throw exception::runtime(_("iterations must be greater than zero"));
+            throw exception::runtime(_("iterations must be greater than zero"), *this);
         
         // we set a lock during calculation, because the object can't handle different local states
         boost::unique_lock<boost::mutex> l_lock( m_running );

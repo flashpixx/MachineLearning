@@ -206,9 +206,9 @@ namespace machinelearning { namespace tools { namespace files {
         
         // check datasetdimension
         if (l_dataspace.getSimpleExtentNdims() != 2)
-            throw exception::runtime(_("dataset must be two-dimensional"));
+            throw exception::runtime(_("dataset must be two-dimensional"), *this);
         if (!l_dataspace.isSimple())
-            throw exception::runtime(_("dataset must be a simple datatype"));
+            throw exception::runtime(_("dataset must be a simple datatype"), *this);
         
         // read matrix size and create matrix
         // (first element is column size, second row size)
@@ -216,7 +216,7 @@ namespace machinelearning { namespace tools { namespace files {
         l_dataspace.getSimpleExtentDims( l_size );
         
         if ((l_size[1]==0) || (l_size[0]==0))
-            throw exception::runtime(_("dimension need not be zero"));
+            throw exception::runtime(_("dimension need not be zero"), *this);
         
         // read data
         ublas::matrix<T> l_mat(l_size[1],l_size[0]);
@@ -241,16 +241,16 @@ namespace machinelearning { namespace tools { namespace files {
         
         // check datasetdimension
         if (l_dataspace.getSimpleExtentNdims() != 1)
-            throw exception::runtime(_("dataset must be one-dimensional"));
+            throw exception::runtime(_("dataset must be one-dimensional"), *this);
         if (!l_dataspace.isSimple())
-            throw exception::runtime(_("dataset must be a simple datatype"));
+            throw exception::runtime(_("dataset must be a simple datatype"), *this);
         
         // read vector size and create vector
         hsize_t l_size[1];
         l_dataspace.getSimpleExtentDims( l_size );
         
         if (l_size[0]==0)
-            throw exception::runtime(_("dimension need not be zero"));
+            throw exception::runtime(_("dimension need not be zero"), *this);
         
         // create temp structur for reading data
         ublas::vector<T> l_vec(l_size[0]);
@@ -274,15 +274,15 @@ namespace machinelearning { namespace tools { namespace files {
         
         // check datasetdimension
         if (l_dataspace.getSimpleExtentNdims() != 1)
-            throw exception::runtime(_("dataset must be one-dimensional"));
+            throw exception::runtime(_("dataset must be one-dimensional"), *this);
         if (!l_dataspace.isSimple())
-            throw exception::runtime(_("dataset must be a simple datatype"));
+            throw exception::runtime(_("dataset must be a simple datatype"), *this);
         
         // read dataset size
         hsize_t l_size[1];
         l_dataspace.getSimpleExtentDims( l_size );
         if (l_size[0] != 1)
-            throw exception::runtime(_("element is not a single value"));
+            throw exception::runtime(_("element is not a single value"), *this);
         
         // create temp structur for reading data
         T l_value;
@@ -305,9 +305,9 @@ namespace machinelearning { namespace tools { namespace files {
         
         // check datasetdimension
         if (l_dataspace.getSimpleExtentNdims() != 1)
-            throw exception::runtime(_("dataset must be one-dimensional"));
+            throw exception::runtime(_("dataset must be one-dimensional"), *this);
         if (!l_dataspace.isSimple())
-            throw exception::runtime(_("dataset must be a simple datatype"));
+            throw exception::runtime(_("dataset must be a simple datatype"), *this);
           
         // the storage size is the whole string array data
         char l_data[l_dataset.getStorageSize()];
@@ -318,7 +318,7 @@ namespace machinelearning { namespace tools { namespace files {
         
         // check correct size for avoid wrong memcopy
         if (l_dataset.getStorageSize() % l_str.getSize() != 0)
-            throw exception::runtime(_("block size can not seperated by the string length"));
+            throw exception::runtime(_("block size can not seperated by the string length"), *this);
         
         // each element has max l_str.getSize() chars (with \0), so the array will be cut on
         // each l_str.getSize()-th element ( l_dataset.getStorageSize() = l_str.getSize * number of elements)
@@ -348,9 +348,9 @@ namespace machinelearning { namespace tools { namespace files {
         
         // check datasetdimension
         if (l_dataspace.getSimpleExtentNdims() != 1)
-            throw exception::runtime(_("dataset must be one-dimensional"));
+            throw exception::runtime(_("dataset must be one-dimensional"), *this);
         if (!l_dataspace.isSimple())
-            throw exception::runtime(_("dataset must be a simple datatype"));       
+            throw exception::runtime(_("dataset must be a simple datatype"), *this);       
         
         // read size of chars and create dataspace
         char l_chars[l_dataset.getStorageSize()];
@@ -372,7 +372,7 @@ namespace machinelearning { namespace tools { namespace files {
     inline void hdf::writeString( const std::string& p_path, const std::string& p_value, const bool& p_utf8 ) const
     {
         if (p_value.empty())
-            throw exception::runtime(_("can not write empty data"));
+            throw exception::runtime(_("can not write empty data"), *this);
         
         H5::DataSpace l_dataspace;
         H5::DataSet l_dataset;
@@ -399,7 +399,7 @@ namespace machinelearning { namespace tools { namespace files {
     inline void hdf::writeStringVector( const std::string& p_path, const std::vector<std::string>& p_value, const bool& p_utf8 ) const
     {
         if (p_value.size() == 0)
-            throw exception::runtime(_("can not write empty data"));
+            throw exception::runtime(_("can not write empty data"), *this);
             
         H5::DataSpace l_dataspace;
         H5::DataSet l_dataset;
@@ -412,7 +412,7 @@ namespace machinelearning { namespace tools { namespace files {
             l_maxstrlen  = std::max( l_maxstrlen, p_value[i].size() );
         
         if (l_maxstrlen == 0)
-            throw exception::runtime(_("can not write empty data"));
+            throw exception::runtime(_("can not write empty data"), *this);
         
         // create char array for the string data, each vector element ist seperated with \0
         char l_data[(l_maxstrlen+1)*p_value.size()];
@@ -442,7 +442,7 @@ namespace machinelearning { namespace tools { namespace files {
     template<typename T> inline void hdf::writeBlasMatrix( const std::string& p_path, const ublas::matrix<T>& p_dataset, const H5::PredType& p_datatype ) const
     {        
         if ((p_dataset.size1() == 0) || (p_dataset.size2() == 0))
-            throw exception::runtime(_("can not write empty data"));
+            throw exception::runtime(_("can not write empty data"), *this);
         
         H5::DataSet l_dataset;
         H5::DataSpace l_dataspace;
@@ -467,7 +467,7 @@ namespace machinelearning { namespace tools { namespace files {
     template<typename T> inline void hdf::writeBlasVector( const std::string& p_path, const ublas::vector<T>& p_dataset, const H5::PredType& p_datatype ) const
     {     
         if (p_dataset.size() == 0)
-            throw exception::runtime(_("can not write empty data"));
+            throw exception::runtime(_("can not write empty data"), *this);
         
         H5::DataSet l_dataset;
         H5::DataSpace l_dataspace;
@@ -525,7 +525,7 @@ namespace machinelearning { namespace tools { namespace files {
     inline void hdf::createDataSpace( const std::string& p_path, const H5::PredType& p_datatype, const ublas::vector<std::size_t>& p_dim, H5::DataSpace& p_dataspace, H5::DataSet& p_dataset, std::vector<H5::Group>& p_groups ) const
     {
         if (p_dim.size() == 0)
-            throw exception::runtime(_("it is at least one dimension requires"));
+            throw exception::runtime(_("it is at least one dimension requires"), *this);
         
         hsize_t l_size[p_dim.size()];
         for(std::size_t i=0; i < p_dim.size(); ++i)
@@ -536,7 +536,7 @@ namespace machinelearning { namespace tools { namespace files {
         const std::string l_path = createPath( p_path, p_groups );
         
         if (l_path.empty())
-            throw exception::runtime(_("empty path is forbidden"));
+            throw exception::runtime(_("empty path is forbidden"), *this);
         
         if (p_groups.size() == 0)
             p_dataset = m_file.createDataSet( l_path.c_str(), p_datatype, p_dataspace );
@@ -557,7 +557,7 @@ namespace machinelearning { namespace tools { namespace files {
     void hdf::createStringSpace( const std::string& p_path, const ublas::vector<std::size_t>& p_dim, const std::size_t& p_strlen, H5::DataSpace& p_dataspace, H5::DataSet& p_dataset, H5::StrType& p_str, std::vector<H5::Group>& p_groups ) const
     {
         if (p_dim.size() == 0)
-            throw exception::runtime(_("it is at least one dimension requires"));
+            throw exception::runtime(_("it is at least one dimension requires"), *this);
         
         hsize_t l_size[p_dim.size()];
         for(std::size_t i=0; i < p_dim.size(); ++i)
@@ -568,7 +568,7 @@ namespace machinelearning { namespace tools { namespace files {
         const std::string l_path = createPath( p_path, p_groups );
         
         if (l_path.empty())
-            throw exception::runtime(_("empty path is forbidden"));
+            throw exception::runtime(_("empty path is forbidden"), *this);
         
         p_str     = H5::StrType(0, p_strlen+1);
         if (p_groups.size() == 0)
@@ -597,7 +597,7 @@ namespace machinelearning { namespace tools { namespace files {
         
         // path must have more than zero elements
         if (l_path.size() == 0)
-            throw exception::runtime(_("empty path is forbidden"));
+            throw exception::runtime(_("empty path is forbidden"), *this);
         
         // if only one element then create dataset directly
         if (l_path.size() == 1)
@@ -625,7 +625,7 @@ namespace machinelearning { namespace tools { namespace files {
             return *l_path.end();
         }
         
-        throw exception::runtime(_("can not create path structure"));
+        throw exception::runtime(_("can not create path structure"), *this);
     }
     
     

@@ -23,29 +23,64 @@
 
 
 
-#ifndef __MACHINELEARNING_TOOLS_H
-#define __MACHINELEARNING_TOOLS_H
+#ifndef __MACHINELEARNING_TOOLS_TYPEINFO_H
+#define __MACHINELEARNING_TOOLS_TYPEINFO_H
 
-namespace machinelearning { 
+#include <string>
+#include <typeinfo>
+
+#ifdef __GNUC__
+#include <cxxabi.h>
+#endif
+
+namespace machinelearning { namespace tools {
     
-    /** namespace for all tools, which are used within the toolbox 
-     * $LastChangedDate$
+    
+    /** class that creates a typeinfo interface
+     * $LastChangedDate: 2011-09-15 16:39:49 +0200 (Do, 15 Sep 2011) $
      **/
-    namespace tools {};
+    class typeinfo
+    {
 
-};
-
+        public :
         
-#include "typeinfo.h"        
-#include "random.hpp"
-#include "function.hpp"
-#include "matrix.hpp"
-#include "vector.hpp"
-#include "lapack.hpp"
-#include "logger.hpp"
-#include "sources/sources.h"
-#include "files/files.h"
-#include "language/language.h"
-#include "iostreams/iostreams.h"
+            template <typename T> static std::string getClassName( const T* );
+            template <typename T> static std::string getClassName( const T& );
+        
+    };
+    
+    
+    
+    template <typename T> inline std::string typeinfo::getClassName( const T* p_ptr )
+    {
+        try {
+
+            #ifdef __GNUC__
+            return std::string(abi::__cxa_demangle( typeid(*p_ptr).name(), NULL, 0, NULL ));
+            #endif
+        
+        
+        } catch (...) {}
+
+        return std::string();
+    }
+    
+    
+    template <typename T> inline std::string typeinfo::getClassName( const T& p_obj )
+    {
+        try {
+            
+            #ifdef __GNUC__
+            return std::string(abi::__cxa_demangle( typeid(p_obj).name(), NULL, 0, NULL ));
+            #endif
+            
+            
+        } catch (...) {}
+        
+        return std::string();
+    }
+    
+    
+};};
 
 #endif

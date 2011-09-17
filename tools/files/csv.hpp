@@ -83,7 +83,7 @@ namespace machinelearning { namespace tools { namespace files {
             std::getline(l_stream, l_line);
             std::size_t l_vecsize = boost::lexical_cast<std::size_t>(l_line);
             if (l_vecsize == 0)
-                throw exception::runtime(_("vector dimension must be greater than zero"));
+                throw exception::runtime(_("vector dimension must be greater than zero"), *this);
         
             for(std::size_t i=0; (i < l_vecsize) && (std::getline(l_stream, l_line)); ++i)
                 l_data.push_back(l_line);
@@ -114,7 +114,7 @@ namespace machinelearning { namespace tools { namespace files {
     template<typename T> inline ublas::matrix<T> csv::readBlasMatrix( const std::string& p_file, const std::string& p_separator, const bool& p_header ) const
     {
         if (p_separator.empty())
-            throw exception::runtime(_("separator can not be empty"));
+            throw exception::runtime(_("separator can not be empty"), *this);
 
         std::ifstream l_stream( p_file.c_str(), std::ifstream::in ); 
         l_stream.seekg( std::ios_base::beg );        
@@ -132,7 +132,7 @@ namespace machinelearning { namespace tools { namespace files {
             // seperate dimensions
             boost::split( l_splitline, l_line, boost::is_any_of(p_separator) );
             if (l_splitline.size() < 2)
-                throw exception::runtime(_("can not separate size"));
+                throw exception::runtime(_("can not separate size"), *this);
 
             l_row = boost::lexical_cast<std::size_t>( l_splitline[0] );
             l_col = boost::lexical_cast<std::size_t>( l_splitline[1] );  
@@ -159,9 +159,9 @@ namespace machinelearning { namespace tools { namespace files {
                     
         
         if (l_col == 0)
-            throw exception::runtime(_("column size must be greater than zero"));
+            throw exception::runtime(_("column size must be greater than zero"), *this);
         if (l_row == 0)
-            throw exception::runtime(_("row size must be greater than zero"));
+            throw exception::runtime(_("row size must be greater than zero"), *this);
 
         
         ublas::matrix<T> l_mat( l_row, l_col ); 

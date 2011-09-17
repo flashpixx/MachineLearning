@@ -285,7 +285,7 @@ namespace machinelearning { namespace tools { namespace sources {
         
         m_socketsearch.close();
         if (l_error)
-            throw exception::runtime(_("can not connect to twitter search server"));
+            throw exception::runtime(_("can not connect to twitter search server"), *this);
         
         
         // determine IP of the twitter api server
@@ -303,7 +303,7 @@ namespace machinelearning { namespace tools { namespace sources {
         
         m_socketapi.close();
         if (l_error)
-            throw exception::runtime(_("can not connect to twitter api server"));
+            throw exception::runtime(_("can not connect to twitter api server"), *this);
     }
     
     
@@ -321,7 +321,7 @@ namespace machinelearning { namespace tools { namespace sources {
     inline void twitter::setHTTPAgent( const std::string& p_agent) 
     {
         if (p_agent.empty())
-            throw exception::runtime(_("HTTP agent name need not be empty"));
+            throw exception::runtime(_("HTTP agent name need not be empty"), *this);
         m_httpagent = p_agent;
     }
     
@@ -346,7 +346,7 @@ namespace machinelearning { namespace tools { namespace sources {
     inline std::vector<twitter::searchtweet> twitter::search( const std::string& p_search, const searchparameter& p_params, const std::size_t& p_number )
     {
         if (p_search.empty())
-            throw exception::runtime(_("search query need not be empty"));
+            throw exception::runtime(_("search query need not be empty"), *this);
         
         m_searchparameter = p_params;
         
@@ -365,7 +365,7 @@ namespace machinelearning { namespace tools { namespace sources {
     inline std::vector<twitter::searchtweet> twitter::refresh( const std::size_t& p_number )
     {
         if (m_refreshurl.empty())
-            throw exception::runtime(_("refresh query need not be empty"));
+            throw exception::runtime(_("refresh query need not be empty"), *this);
         
         return runSearchQuery(m_refreshurl, p_number);
     }
@@ -393,7 +393,7 @@ namespace machinelearning { namespace tools { namespace sources {
             // create connection
             m_socketsearch.connect(m_resolvesearch, l_error);
             if (l_error)
-                throw exception::runtime(_("can not connect to twitter search server"));
+                throw exception::runtime(_("can not connect to twitter search server"), *this);
             
             const std::string l_json = sendRequest( m_socketsearch, "/search.json"+l_query, "search.twitter.com" );
             m_socketsearch.close();
@@ -405,7 +405,7 @@ namespace machinelearning { namespace tools { namespace sources {
             // do Json parsing
             Json::Value l_resultroot;
             if (!l_jsonreader.parse( l_json, l_resultroot ))
-                throw exception::runtime(_("JSON data can not be parsed"));
+                throw exception::runtime(_("JSON data can not be parsed"), *this);
             
             // if we can find a refreh url we save it
             if (Json::stringValue == l_resultroot["refresh_url"].type())
@@ -423,7 +423,7 @@ namespace machinelearning { namespace tools { namespace sources {
         }
 
         if (l_result.size() == 0)
-            throw exception::runtime(_("no data received"));
+            throw exception::runtime(_("no data received"), *this);
         
         return l_result;
     }
@@ -513,7 +513,7 @@ namespace machinelearning { namespace tools { namespace sources {
         
         m_socketapi.connect(m_resolveapi, l_error);
         if (l_error)
-            throw exception::runtime(_("can not connect to twitter search server"));
+            throw exception::runtime(_("can not connect to twitter search server"), *this);
         
         // create GET query (with default values)
         std::ostringstream l_query;
@@ -526,10 +526,10 @@ namespace machinelearning { namespace tools { namespace sources {
         Json::Value l_resultroot;
         Json::Reader l_jsonreader;
         if (!l_jsonreader.parse( l_json, l_resultroot ))
-            throw exception::runtime(_("JSON data can not be parsed"));
+            throw exception::runtime(_("JSON data can not be parsed"), *this);
         
         if (Json::arrayValue != l_resultroot.type())
-            throw exception::runtime(_("no result data is found"));
+            throw exception::runtime(_("no result data is found"), *this);
         
         std::vector<twitter::timelinetweet> l_result;
         for(std::size_t i=0; i < l_resultroot.size(); ++i) {
@@ -667,7 +667,7 @@ namespace machinelearning { namespace tools { namespace sources {
         
         std::getline(l_response_stream, l_status_message);
         if (!l_response_stream || l_http_version.substr(0, 5) != "HTTP/")
-            throw exception::runtime(_("invalid response"));
+            throw exception::runtime(_("invalid response"), *this);
         
         // status code 403 == reached maximum number of tweets, so we stop with an empty result
         if (l_status == 403)
@@ -691,7 +691,7 @@ namespace machinelearning { namespace tools { namespace sources {
         while (boost::asio::read(p_socket, l_response, boost::asio::transfer_at_least(1), l_error));
         
         if (l_error != boost::asio::error::eof)
-            throw exception::runtime(_("data can not be received"));
+            throw exception::runtime(_("data can not be received"), *this);
 
         l_content << &l_response;
 
@@ -705,44 +705,44 @@ namespace machinelearning { namespace tools { namespace sources {
     inline void twitter::throwHTTPError( const unsigned int& p_status ) const
     {
         switch (p_status) {
-            case 0      : throw exception::runtime(_("error while reading socket data"));     
+            case 0      : throw exception::runtime(_("error while reading socket data"), *this);     
                 
-            case 203    : throw exception::runtime(_("Non-Authoritative Information"));
-            case 204    : throw exception::runtime(_("No Content"));
-            case 205    : throw exception::runtime(_("Reset Content"));
-            case 206    : throw exception::runtime(_("Partial Content"));
-            case 300    : throw exception::runtime(_("Multiple Choices"));
-            case 301    : throw exception::runtime(_("Moved Permanently"));
-            case 302    : throw exception::runtime(_("Moved Temporarily"));
-            case 303    : throw exception::runtime(_("See Other"));
-            case 304    : throw exception::runtime(_("Not Modified"));
-            case 305    : throw exception::runtime(_("Use Proxy"));
-            case 307    : throw exception::runtime(_("Temporary Redirect"));
-            case 400    : throw exception::runtime(_("Bad Request"));
-            case 401    : throw exception::runtime(_("Unauthorized"));
-            case 402    : throw exception::runtime(_("Payment Required"));
-            case 403    : throw exception::runtime(_("Forbidden"));
-            case 404    : throw exception::runtime(_("Not Found"));
-            case 405    : throw exception::runtime(_("Method Not Allowed"));
-            case 406    : throw exception::runtime(_("Not Acceptable"));
+            case 203    : throw exception::runtime(_("Non-Authoritative Information"), *this);
+            case 204    : throw exception::runtime(_("No Content"), *this);
+            case 205    : throw exception::runtime(_("Reset Content"), *this);
+            case 206    : throw exception::runtime(_("Partial Content"), *this);
+            case 300    : throw exception::runtime(_("Multiple Choices"), *this);
+            case 301    : throw exception::runtime(_("Moved Permanently"), *this);
+            case 302    : throw exception::runtime(_("Moved Temporarily"), *this);
+            case 303    : throw exception::runtime(_("See Other"), *this);
+            case 304    : throw exception::runtime(_("Not Modified"), *this);
+            case 305    : throw exception::runtime(_("Use Proxy"), *this);
+            case 307    : throw exception::runtime(_("Temporary Redirect"), *this);
+            case 400    : throw exception::runtime(_("Bad Request"), *this);
+            case 401    : throw exception::runtime(_("Unauthorized"), *this);
+            case 402    : throw exception::runtime(_("Payment Required"), *this);
+            case 403    : throw exception::runtime(_("Forbidden"), *this);
+            case 404    : throw exception::runtime(_("Not Found"), *this);
+            case 405    : throw exception::runtime(_("Method Not Allowed"), *this);
+            case 406    : throw exception::runtime(_("Not Acceptable"), *this);
                 
-            case 407    : throw exception::runtime(_("Proxy Authentication Required"));
-            case 408    : throw exception::runtime(_("Request Time-out"));
-            case 409    : throw exception::runtime(_("Conflict"));
-            case 410    : throw exception::runtime(_("Gone"));
-            case 411    : throw exception::runtime(_("Length Required"));
-            case 412    : throw exception::runtime(_("Precondition Failed"));
-            case 413    : throw exception::runtime(_("Request Entity Too Large"));
-            case 414    : throw exception::runtime(_("Request-URI Too Large"));
-            case 415    : throw exception::runtime(_("Unsupported Media Type"));
-            case 416    : throw exception::runtime(_("Requested range not satisfiable"));
-            case 417    : throw exception::runtime(_("Expectation Failed"));
-            case 500    : throw exception::runtime(_("Internal Server Error"));
-            case 501    : throw exception::runtime(_("Not Implemented"));
-            case 502    : throw exception::runtime(_("Bad Gateway"));
-            case 503    : throw exception::runtime(_("Service Unavailable"));
-            case 504    : throw exception::runtime(_("Gateway Time-out"));
-            case 505    : throw exception::runtime(_("HTTP Version not supported"));
+            case 407    : throw exception::runtime(_("Proxy Authentication Required"), *this);
+            case 408    : throw exception::runtime(_("Request Time-out"), *this);
+            case 409    : throw exception::runtime(_("Conflict"), *this);
+            case 410    : throw exception::runtime(_("Gone"), *this);
+            case 411    : throw exception::runtime(_("Length Required"), *this);
+            case 412    : throw exception::runtime(_("Precondition Failed"), *this);
+            case 413    : throw exception::runtime(_("Request Entity Too Large"), *this);
+            case 414    : throw exception::runtime(_("Request-URI Too Large"), *this);
+            case 415    : throw exception::runtime(_("Unsupported Media Type"), *this);
+            case 416    : throw exception::runtime(_("Requested range not satisfiable"), *this);
+            case 417    : throw exception::runtime(_("Expectation Failed"), *this);
+            case 500    : throw exception::runtime(_("Internal Server Error"), *this);
+            case 501    : throw exception::runtime(_("Not Implemented"), *this);
+            case 502    : throw exception::runtime(_("Bad Gateway"), *this);
+            case 503    : throw exception::runtime(_("Service Unavailable"), *this);
+            case 504    : throw exception::runtime(_("Gateway Time-out"), *this);
+            case 505    : throw exception::runtime(_("HTTP Version not supported"), *this);
         }
     }
     
@@ -781,7 +781,7 @@ namespace machinelearning { namespace tools { namespace sources {
             case popular :      m_resulttype = "popular"; break;
             case recent  :      m_resulttype = "recent";  break;
                 
-            default : throw exception::runtime(_("option value is unkown"));
+            default : throw exception::runtime(_("option value is unkown"), *this);
         }
         m_use    = m_use | 2;
     }
@@ -792,7 +792,7 @@ namespace machinelearning { namespace tools { namespace sources {
     inline void twitter::searchparameter::setUntilDate( const boost::gregorian::date& p_date )
     {
         if (p_date.is_special())
-            throw exception::runtime(_("not a valid date"));
+            throw exception::runtime(_("not a valid date"), *this);
         
         std::stringstream l_stream;
         
@@ -833,9 +833,9 @@ namespace machinelearning { namespace tools { namespace sources {
     inline void twitter::searchparameter::setNumberResults( const std::size_t& p_rpp, const std::size_t& p_rpage )
     {
         if ((p_rpp == 0) || (p_rpp > 100))
-            throw exception::runtime(_("results per page must be in the range [1,100]"));
+            throw exception::runtime(_("results per page must be in the range [1,100]"), *this);
         if (p_rpage * p_rpp > 1500)
-            throw exception::runtime(_("maximum results are reached"));
+            throw exception::runtime(_("maximum results are reached"), *this);
         
         m_rpp   = p_rpp;
         m_rpage = p_rpage;

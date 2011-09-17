@@ -78,7 +78,7 @@ namespace machinelearning { namespace textprocess {
         m_caseinsensitive( p_caseinsensitive )
     {
         if (p_list.size() == 0)
-            throw exception::runtime(_("stopwordlist can not be empty"));
+            throw exception::runtime(_("stopwordlist can not be empty"), *this);
         
         // we create a regular expression with perl syntax (default) for masking chars within the words,
         // that are also used for regular expressions
@@ -93,7 +93,7 @@ namespace machinelearning { namespace textprocess {
         l_stopwordsexpr += boost::regex_replace(p_list[p_list.size()-1], l_mask, l_replace);
         
         if (l_stopwordsexpr.empty())
-            throw exception::runtime(_("stopwordlist can not be empty"));
+            throw exception::runtime(_("stopwordlist can not be empty"), *this);
         
         
         // create regular expression case-sensitive / case-insensitive with perl syntax (default)

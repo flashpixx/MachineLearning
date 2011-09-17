@@ -246,7 +246,7 @@ namespace machinelearning { namespace tools {
             case warn   : p_stream << "[warn]       " << p_val;   break;
             case error  : p_stream << "[error]      " << p_val;   break;
                 
-            default     : throw exception::runtime(_("log state is unkown"));
+            default     : throw exception::runtime(_("log state is unkown"), *this);
         }
     }
     

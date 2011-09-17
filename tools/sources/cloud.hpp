@@ -101,7 +101,7 @@ namespace machinelearning { namespace tools { namespace sources {
         m_sampling(p_dim, 5)
     {
         if (p_dim < 2)
-            throw exception::runtime(_("number of dimensions must be greater than one"));
+            throw exception::runtime(_("number of dimensions must be greater than one"), *this);
         
         for(std::size_t i=0; i < p_dim; ++i)
             m_range.push_back( std::pair<T,T>(0,1) );
@@ -115,16 +115,16 @@ namespace machinelearning { namespace tools { namespace sources {
     template<typename T> inline void cloud<T>::setVariance( const T& p_min, const T& p_max )
     {
         if (tools::function::isNumericalZero(p_min))
-            throw exception::runtime(_("minimum need not be zero"));
+            throw exception::runtime(_("minimum need not be zero"), *this);
         
         if (tools::function::isNumericalZero(p_max))
-            throw exception::runtime(_("maximum need not be zero"));       
+            throw exception::runtime(_("maximum need not be zero"), *this);       
         
         if (p_min > p_max)
-            throw exception::runtime(_("minimal value is greater than maximal value"));
+            throw exception::runtime(_("minimal value is greater than maximal value"), *this);
         
         if ((p_min < 0) || (p_max < 0))
-            throw exception::runtime(_("minimum and maximum must be greater than zero"));
+            throw exception::runtime(_("minimum and maximum must be greater than zero"), *this);
         
         m_variance       = std::pair<T,T>(p_min, p_max);
         m_randomvariance = true;
@@ -147,7 +147,7 @@ namespace machinelearning { namespace tools { namespace sources {
     template<typename T> inline void cloud<T>::setPoints( const std::size_t& p_min, const std::size_t& p_max )
     {
         if (p_min > p_max)
-            throw exception::runtime(_("minimal value is greater than maximal value"));
+            throw exception::runtime(_("minimal value is greater than maximal value"), *this);
         
         m_points       = std::pair<std::size_t,std::size_t>(p_min, p_max);
         m_randompoints = true;
@@ -172,13 +172,13 @@ namespace machinelearning { namespace tools { namespace sources {
     template<typename T> inline void cloud<T>::setRange( const std::size_t& p_dim, const T& p_min, const T& p_max, const std::size_t& p_sample )
     {
         if ( p_dim >= m_dimension )
-            throw exception::runtime(_("dimension must be smaller than saved dimension"));
+            throw exception::runtime(_("dimension must be smaller than saved dimension"), *this);
         
         if (p_min > p_max)
-            throw exception::runtime(_("minimal value is greater than maximal value"));
+            throw exception::runtime(_("minimal value is greater than maximal value"), *this);
         
         if (p_sample == 0)
-            throw exception::runtime(_("sampling value must be greater than zero"));
+            throw exception::runtime(_("sampling value must be greater than zero"), *this);
     
         m_range[p_dim]      = std::pair<T,T>(p_min, p_max);
         m_sampling(p_dim)   = p_sample;
@@ -194,7 +194,7 @@ namespace machinelearning { namespace tools { namespace sources {
     template<typename T> inline ublas::matrix<T> cloud<T>::generate( const cloudcreate& p_build, const T& p_random, const bool& p_shuffle ) const
     {
         if ( (p_build == random) && ((p_random < 0) || (p_random > 1)) )
-            throw exception::runtime(_("random value must be between [0,1]"));
+            throw exception::runtime(_("random value must be between [0,1]"), *this);
         
         // create sampling adaption
         ublas::vector<T> l_sampleadaption(m_dimension, 1);

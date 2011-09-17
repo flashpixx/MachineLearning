@@ -48,7 +48,7 @@ template<typename T, typename L> class fitness : public ga::fitnessfunction<T,L>
             for(std::size_t i=0; i < m_weight.size(); ++i)
                 l_sum += m_weight(i) * p_ind[i];
             
-            return std::max( m_max - l_sum, static_cast<double>(0));
+            return std::max( m_max - l_sum, 0.0);
         }
     
 
@@ -99,6 +99,7 @@ template<typename T> class crossover : public ga::crossover<T>
  **/
 int main(int argc, char* argv[])
 {
+    
     
     std::size_t l_populationsize;
     std::size_t l_elitesize;

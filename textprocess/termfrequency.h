@@ -99,7 +99,7 @@ namespace machinelearning { namespace textprocess {
         m_wordcount( 0 )
     {
         if (m_seperators.empty())
-            throw exception::runtime(_("separator can not be empty"));
+            throw exception::runtime(_("separator can not be empty"), *this);
     }
     
     
@@ -190,9 +190,9 @@ namespace machinelearning { namespace textprocess {
     inline std::vector<std::string> termfrequency::getTerms( const float& p_val1, const float& p_val2, const comparison& p_comp1, const comparison& p_comp2 )
     {
         if ( (p_val1 < 0) || (p_val1 > 1) || (p_val2 < 0) || (p_val2 > 1) )
-            throw exception::runtime(_("ranges must be between [0,1]"));
+            throw exception::runtime(_("ranges must be between [0,1]"), *this);
         if (m_wordcount == 0)
-            throw exception::runtime(_("no words within the map"));
+            throw exception::runtime(_("no words within the map"), *this);
         
         
         std::vector<std::string> l_list;
@@ -215,9 +215,9 @@ namespace machinelearning { namespace textprocess {
     inline std::vector<std::string> termfrequency::getTerms( const float& p_val, const comparison& p_comp )
     {
         if ( (p_val < 0) || (p_val > 1) )
-            throw exception::runtime(_("ranges must be between [0,1]"));
+            throw exception::runtime(_("ranges must be between [0,1]"), *this);
         if (m_wordcount == 0)
-            throw exception::runtime(_("no words within the map"));
+            throw exception::runtime(_("no words within the map"), *this);
         
         std::vector<std::string> l_list;
         

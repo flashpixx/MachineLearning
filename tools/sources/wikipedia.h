@@ -196,7 +196,7 @@ namespace machinelearning { namespace tools { namespace sources {
                 return l_prop;
 
             default:
-                throw exception::runtime(_("language has no option values"));
+                throw exception::runtime(_("language has no option values"), *this);
                 
         }
     }
@@ -219,7 +219,7 @@ namespace machinelearning { namespace tools { namespace sources {
     inline void wikipedia::getArticle( const std::string& p_search, const language::code& p_lang )
     {
         if (p_search.empty())
-            throw exception::runtime(_("search query need not be empty"));
+            throw exception::runtime(_("search query need not be empty"), *this);
         
         m_articlefound = false;
         m_acronym.clear();
@@ -317,7 +317,7 @@ namespace machinelearning { namespace tools { namespace sources {
         // read the location header tag and extract the URL
         std::size_t l_found = l_header.find("Location:");
         if (l_found == std::string::npos)
-            throw exception::runtime(_("can not find information within the http header"));
+            throw exception::runtime(_("can not find information within the http header"), *this);
         
         // extract Location URL
         const std::string l_url = l_header.substr(l_found+10, l_header.find("\r\n", l_found)-l_found-10);
@@ -325,7 +325,7 @@ namespace machinelearning { namespace tools { namespace sources {
         // extract document of the URL
         l_found = l_url.rfind("/");
         if (l_found == std::string::npos)
-            throw exception::runtime(_("can not find wikipedia document within the URL"));
+            throw exception::runtime(_("can not find wikipedia document within the URL"), *this);
         
         // get the article
         getArticle( l_url.substr(l_found+1), l_prop.lang );
@@ -338,7 +338,7 @@ namespace machinelearning { namespace tools { namespace sources {
     inline void wikipedia::setHTTPAgent( const std::string& p_agent) 
     {
         if (p_agent.empty())
-            throw exception::runtime(_("HTTP agent name need not be empty"));
+            throw exception::runtime(_("HTTP agent name need not be empty"), *this);
         m_httpagent = p_agent;
     }
     
@@ -349,7 +349,7 @@ namespace machinelearning { namespace tools { namespace sources {
     inline std::string wikipedia::getArticleContent( void ) const
     {
         if (!m_articlefound)
-            throw exception::runtime(_("no article is loaded"));
+            throw exception::runtime(_("no article is loaded"), *this);
         
         return m_article.content;
     }
@@ -360,7 +360,7 @@ namespace machinelearning { namespace tools { namespace sources {
     inline std::string wikipedia::getArticleTitle( void ) const
     {
         if (!m_articlefound)
-            throw exception::runtime(_("no article is loaded"));
+            throw exception::runtime(_("no article is loaded"), *this);
         
         return m_article.title;
     }
@@ -371,7 +371,7 @@ namespace machinelearning { namespace tools { namespace sources {
     inline std::size_t wikipedia::getArticleRevision( void ) const
     {
         if (!m_articlefound)
-            throw exception::runtime(_("no article is loaded"));
+            throw exception::runtime(_("no article is loaded"), *this);
         
         return m_article.revisionid;
     }
@@ -382,7 +382,7 @@ namespace machinelearning { namespace tools { namespace sources {
     inline std::size_t wikipedia::getArticleID( void ) const
     {
         if (!m_articlefound)
-            throw exception::runtime(_("no article is loaded"));
+            throw exception::runtime(_("no article is loaded"), *this);
         
         return m_article.articleid;
     }
@@ -393,7 +393,7 @@ namespace machinelearning { namespace tools { namespace sources {
     inline std::vector<std::string> wikipedia::getArticleLabel( void ) const
     {
         if (!m_articlefound)
-            throw exception::runtime(_("no article is loaded"));
+            throw exception::runtime(_("no article is loaded"), *this);
         
         return m_article.label;
     }
@@ -429,7 +429,7 @@ namespace machinelearning { namespace tools { namespace sources {
     inline wikipedia::wikiarticle wikipedia::parseXML( const std::string& p_xml ) const
     {
         if (p_xml.empty())
-            throw exception::runtime(_("XML data can not be parsed"));
+            throw exception::runtime(_("XML data can not be parsed"), *this);
         
         xmlResetLastError();
         wikiarticle l_data;
@@ -452,7 +452,7 @@ namespace machinelearning { namespace tools { namespace sources {
             if (l_xml)
                 xmlFreeDoc( l_xml );
             xmlCleanupParser();
-            throw exception::runtime(_("XML data can not be parsed"));
+            throw exception::runtime(_("XML data can not be parsed"), *this);
         }
         
         // extract the namespace 
@@ -463,7 +463,7 @@ namespace machinelearning { namespace tools { namespace sources {
             xmlFreeDoc( l_xml );
             xmlCleanupParser();
             
-            throw exception::runtime(_("can not detect namespace"));
+            throw exception::runtime(_("can not detect namespace"), *this);
         }
         l_namespace = l_namespace.substr(0, l_found );
 
@@ -529,7 +529,7 @@ namespace machinelearning { namespace tools { namespace sources {
         xmlCleanupParser();
            
         if (l_error)
-            throw exception::runtime(_("XML data can not be parsed"));
+            throw exception::runtime(_("XML data can not be parsed"), *this);
 
         return l_data;
         
@@ -549,7 +549,7 @@ namespace machinelearning { namespace tools { namespace sources {
         while (boost::asio::read(m_socket, l_response, boost::asio::transfer_at_least(1), l_error));
         
         if (l_error != boost::asio::error::eof)
-            throw exception::runtime(_("data can not be received"));
+            throw exception::runtime(_("data can not be received"), *this);
         
         std::string l_data( (std::istreambuf_iterator<char>(l_response_stream)), std::istreambuf_iterator<char>());        
         
@@ -586,7 +586,7 @@ namespace machinelearning { namespace tools { namespace sources {
         }
             
         if (l_error)
-            throw exception::runtime(_("can not connect to wikipedia server"));
+            throw exception::runtime(_("can not connect to wikipedia server"), *this);
         
         
         
@@ -616,7 +616,7 @@ namespace machinelearning { namespace tools { namespace sources {
         
         std::getline(l_response_stream, l_status_message);
         if (!l_response_stream || l_http_version.substr(0, 5) != "HTTP/")
-            throw exception::runtime(_("invalid response"));
+            throw exception::runtime(_("invalid response"), *this);
         if (p_throw)
             throwHTTPError( l_status );
         
@@ -636,44 +636,44 @@ namespace machinelearning { namespace tools { namespace sources {
     inline void wikipedia::throwHTTPError( const unsigned int& p_status ) const
     {
         switch (p_status) {
-            case 0      : throw exception::runtime(_("error while reading socket data"));     
+            case 0      : throw exception::runtime(_("error while reading socket data"), *this);     
                 
-            case 203    : throw exception::runtime(_("Non-Authoritative Information"));
-            case 204    : throw exception::runtime(_("No Content"));
-            case 205    : throw exception::runtime(_("Reset Content"));
-            case 206    : throw exception::runtime(_("Partial Content"));
-            case 300    : throw exception::runtime(_("Multiple Choices"));
-            case 301    : throw exception::runtime(_("Moved Permanently"));
-            case 302    : throw exception::runtime(_("Moved Temporarily"));
-            case 303    : throw exception::runtime(_("See Other"));
-            case 304    : throw exception::runtime(_("Not Modified"));
-            case 305    : throw exception::runtime(_("Use Proxy"));
-            case 307    : throw exception::runtime(_("Temporary Redirect"));
-            case 400    : throw exception::runtime(_("Bad Request"));
-            case 401    : throw exception::runtime(_("Unauthorized"));
-            case 402    : throw exception::runtime(_("Payment Required"));
-            case 403    : throw exception::runtime(_("Forbidden"));
-            case 404    : throw exception::runtime(_("Not Found"));
-            case 405    : throw exception::runtime(_("Method Not Allowed"));
-            case 406    : throw exception::runtime(_("Not Acceptable"));
+            case 203    : throw exception::runtime(_("Non-Authoritative Information"), *this);
+            case 204    : throw exception::runtime(_("No Content"), *this);
+            case 205    : throw exception::runtime(_("Reset Content"), *this);
+            case 206    : throw exception::runtime(_("Partial Content"), *this);
+            case 300    : throw exception::runtime(_("Multiple Choices"), *this);
+            case 301    : throw exception::runtime(_("Moved Permanently"), *this);
+            case 302    : throw exception::runtime(_("Moved Temporarily"), *this);
+            case 303    : throw exception::runtime(_("See Other"), *this);
+            case 304    : throw exception::runtime(_("Not Modified"), *this);
+            case 305    : throw exception::runtime(_("Use Proxy"), *this);
+            case 307    : throw exception::runtime(_("Temporary Redirect"), *this);
+            case 400    : throw exception::runtime(_("Bad Request"), *this);
+            case 401    : throw exception::runtime(_("Unauthorized"), *this);
+            case 402    : throw exception::runtime(_("Payment Required"), *this);
+            case 403    : throw exception::runtime(_("Forbidden"), *this);
+            case 404    : throw exception::runtime(_("Not Found"), *this);
+            case 405    : throw exception::runtime(_("Method Not Allowed"), *this);
+            case 406    : throw exception::runtime(_("Not Acceptable"), *this);
                 
-            case 407    : throw exception::runtime(_("Proxy Authentication Required"));
-            case 408    : throw exception::runtime(_("Request Time-out"));
-            case 409    : throw exception::runtime(_("Conflict"));
-            case 410    : throw exception::runtime(_("Gone"));
-            case 411    : throw exception::runtime(_("Length Required"));
-            case 412    : throw exception::runtime(_("Precondition Failed"));
-            case 413    : throw exception::runtime(_("Request Entity Too Large"));
-            case 414    : throw exception::runtime(_("Request-URI Too Large"));
-            case 415    : throw exception::runtime(_("Unsupported Media Type"));
-            case 416    : throw exception::runtime(_("Requested range not satisfiable"));
-            case 417    : throw exception::runtime(_("Expectation Failed"));
-            case 500    : throw exception::runtime(_("Internal Server Error"));
-            case 501    : throw exception::runtime(_("Not Implemented"));
-            case 502    : throw exception::runtime(_("Bad Gateway"));
-            case 503    : throw exception::runtime(_("Service Unavailable"));
-            case 504    : throw exception::runtime(_("Gateway Time-out"));
-            case 505    : throw exception::runtime(_("HTTP Version not supported"));
+            case 407    : throw exception::runtime(_("Proxy Authentication Required"), *this);
+            case 408    : throw exception::runtime(_("Request Time-out"), *this);
+            case 409    : throw exception::runtime(_("Conflict"), *this);
+            case 410    : throw exception::runtime(_("Gone"), *this);
+            case 411    : throw exception::runtime(_("Length Required"), *this);
+            case 412    : throw exception::runtime(_("Precondition Failed"), *this);
+            case 413    : throw exception::runtime(_("Request Entity Too Large"), *this);
+            case 414    : throw exception::runtime(_("Request-URI Too Large"), *this);
+            case 415    : throw exception::runtime(_("Unsupported Media Type"), *this);
+            case 416    : throw exception::runtime(_("Requested range not satisfiable"), *this);
+            case 417    : throw exception::runtime(_("Expectation Failed"), *this);
+            case 500    : throw exception::runtime(_("Internal Server Error"), *this);
+            case 501    : throw exception::runtime(_("Not Implemented"), *this);
+            case 502    : throw exception::runtime(_("Bad Gateway"), *this);
+            case 503    : throw exception::runtime(_("Service Unavailable"), *this);
+            case 504    : throw exception::runtime(_("Gateway Time-out"), *this);
+            case 505    : throw exception::runtime(_("HTTP Version not supported"), *this);
         }
     }
     
