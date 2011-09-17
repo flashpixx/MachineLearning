@@ -87,7 +87,7 @@ namespace machinelearning { namespace neighborhood {
         m_number(p_num)
     {
         if (p_num == 0)
-            throw exception::runtime(_("number of approximate data must be greater than zero"));
+            throw exception::runtime(_("number of approximate data must be greater than zero"), *this);
     }
     
     
@@ -104,7 +104,7 @@ namespace machinelearning { namespace neighborhood {
                 return approx_knn( p_prototypes, p_multiplier, p_distance );
         
             default :
-                throw exception::runtime(_("project option is unkown"));
+                throw exception::runtime(_("project option is unkown"), *this);
         }
     }
     

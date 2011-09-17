@@ -37,7 +37,7 @@ namespace machinelearning { namespace tools {
     
     
     /** class that creates a typeinfo interface
-     * $LastChangedDate: 2011-09-15 16:39:49 +0200 (Do, 15 Sep 2011) $
+     * $LastChangedDate$
      **/
     class typeinfo
     {

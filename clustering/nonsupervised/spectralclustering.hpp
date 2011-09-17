@@ -66,7 +66,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             std::size_t getPrototypeSize( void ) const;
             std::size_t getPrototypeCount( void ) const;
             std::vector<T> getLoggedQuantizationError( void ) const;
-            ublas::indirect_array<> use( const ublas::matrix<T>& ) const { throw exception::classmethod(_("method is not implementated in this class")); };
+            ublas::indirect_array<> use( const ublas::matrix<T>& ) const { throw exception::classmethod(_("method is not implementated in this class"), *this); };
             
             //static std::size_t getEigenGap( const ublas::matrix<T>& ) const;
             //static std::size_t getEigenGap( const ublas::matrix<T>&, const ublas::matrix<T>& ) const;
@@ -166,9 +166,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     template<typename T> inline void spectralclustering<T>::train( const ublas::matrix<T>& p_similarity, const std::size_t& p_iterations )
     {
         if (p_similarity.size1() != p_similarity.size2())
-            throw exception::runtime(_("matrix must be square"));
+            throw exception::runtime(_("matrix must be square"), *this);
         if (p_similarity.size2() < m_kmeans.getPrototypeCount())
-            throw exception::runtime(_("data and prototype dimension are not equal"));
+            throw exception::runtime(_("data and prototype dimension are not equal"), *this);
 
         
         // create squared degree and normalized graph laplacian

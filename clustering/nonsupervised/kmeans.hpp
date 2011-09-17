@@ -98,9 +98,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         m_quantizationerror( std::vector<T>() )
     {
         if (p_prototypesize == 0)
-            throw exception::runtime(_("prototype size must be greater than zero"));
+            throw exception::runtime(_("prototype size must be greater than zero"), *this);
         if (p_prototypes == 0)
-            throw exception::runtime(_("number of prototypes must be greater than zero"));
+            throw exception::runtime(_("number of prototypes must be greater than zero"), *this);
     }
     
     
@@ -159,11 +159,11 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     template<typename T> inline void kmeans<T>::train( const ublas::matrix<T>& p_data, const std::size_t& p_iterations )
     {
         if (p_iterations == 0)
-            throw exception::runtime(_("iterations must be greater than zero"));
+            throw exception::runtime(_("iterations must be greater than zero"), *this);
         if (p_data.size2() != m_prototypes.size2())
-            throw exception::runtime(_("data and prototype dimension are not equal"));
+            throw exception::runtime(_("data and prototype dimension are not equal"), *this);
         if (p_data.size1() < m_prototypes.size1())
-            throw exception::runtime(_("number of datapoints are less than prototypes"));
+            throw exception::runtime(_("number of datapoints are less than prototypes"), *this);
         
         
         // creates logging
@@ -258,7 +258,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     template<typename T> inline ublas::indirect_array<> kmeans<T>::use( const ublas::matrix<T>& p_data ) const
     {
         if (p_data.size1() < m_prototypes.size1())
-            throw exception::runtime(_("number of datapoints are less than prototypes"));        
+            throw exception::runtime(_("number of datapoints are less than prototypes"), *this);        
         
         ublas::indirect_array<> l_idx(p_data.size1());
         ublas::matrix<T> l_distance(m_prototypes.size1(), p_data.size1());

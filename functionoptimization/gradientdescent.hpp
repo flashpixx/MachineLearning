@@ -170,7 +170,7 @@ namespace machinelearning { namespace functionaloptimization {
         m_static()
     {
         if (p_func.empty())
-            throw exception::runtime(_("function need not be empty"));
+            throw exception::runtime(_("function need not be empty"), *this);
         
         
         // create expression parser, parse expresseion and add symbols to table
@@ -180,7 +180,7 @@ namespace machinelearning { namespace functionaloptimization {
             m_expression = l_parser( p_func );
             m_exprtable  = l_parser.get_syms();
         } catch (...) {
-            throw exception::runtime(_("arithmetic expression could not be parsed"));
+            throw exception::runtime(_("arithmetic expression could not be parsed"), *this);
         }
         
     
@@ -197,11 +197,11 @@ namespace machinelearning { namespace functionaloptimization {
     template<typename T, std::size_t D> inline void gradientdescent<T,D>::setErrorFunction( const std::string& p_optimizevars, const std::string& p_errfunc, const std::string& p_funcname, const std::string& p_separator )
     {
         if (p_errfunc.empty())
-            throw exception::runtime(_("error function need not be empty"));
+            throw exception::runtime(_("error function need not be empty"), *this);
         if (p_funcname.empty())
-            throw exception::runtime(_("variable name for the function need not be empty"));
+            throw exception::runtime(_("variable name for the function need not be empty"), *this);
         if (p_separator.empty())
-            throw exception::runtime(_("separators need not be empty"));
+            throw exception::runtime(_("separators need not be empty"), *this);
         
         // clear properties
         m_optimize.clear();
@@ -219,7 +219,7 @@ namespace machinelearning { namespace functionaloptimization {
                 continue;
         
              if (m_exprtable.find(l_sep[i]) == m_exprtable.end())
-                 throw exception::runtime(_("variable for optimization is not found in the expression symbol table"));
+                 throw exception::runtime(_("variable for optimization is not found in the expression symbol table"), *this);
              
              m_derivationvars.push_back( l_sep[i] );
         }
@@ -241,12 +241,12 @@ namespace machinelearning { namespace functionaloptimization {
             m_fulltable = l_parser.get_syms();
             m_fulltable.erase(p_funcname);
         } catch (...) {
-            throw exception::runtime(_("arithmetic expression could not be parsed"));
+            throw exception::runtime(_("arithmetic expression could not be parsed"), *this);
         }
         
         // checks number of variables (target symbolic var, so increment +1)
         if (m_exprtable.size()+1 != m_fulltable.size())
-            throw exception::runtime(_("only one variable for the data must be added"));        
+            throw exception::runtime(_("only one variable for the data must be added"), *this);        
     }
     
     
@@ -259,7 +259,7 @@ namespace machinelearning { namespace functionaloptimization {
     template<typename T, std::size_t D> inline void gradientdescent<T,D>::setOptimizeVar( const std::string& p_name, const T& p_lower, const T& p_upper )
     {
         if (std::find(m_derivationvars.begin(), m_derivationvars.end(), p_name) == m_derivationvars.end())
-            throw exception::runtime(_("variable for optimization is not found in the expression symbol table"));
+            throw exception::runtime(_("variable for optimization is not found in the expression symbol table"), *this);
         
         m_optimize[p_name] = std::pair<T,T>(p_lower, p_upper);
     }
@@ -283,7 +283,7 @@ namespace machinelearning { namespace functionaloptimization {
     template<typename T, std::size_t D> inline void gradientdescent<T,D>::setStaticVar( const std::string& p_name, const boost::multi_array<T,D>& p_data )
     {
         if ( (std::find(m_derivationvars.begin(), m_derivationvars.end(), p_name) != m_derivationvars.end()) || (m_fulltable.find(p_name) == m_fulltable.end()) )
-            throw exception::runtime(_("static variable is not in the symbol table or is an optimazation variable"));
+            throw exception::runtime(_("static variable is not in the symbol table or is an optimazation variable"), *this);
         
         m_static[p_name] = p_data;
     }
@@ -294,13 +294,13 @@ namespace machinelearning { namespace functionaloptimization {
     template<typename T, std::size_t D> inline std::map<std::string, T> gradientdescent<T,D>::optimize( const std::size_t& p_iteration, const T& p_stepsize, const std::vector<std::string>& p_batch ) const
     {
         if (p_iteration == 0)
-            throw exception::runtime(_("iterations must be greater than zero"));
+            throw exception::runtime(_("iterations must be greater than zero"), *this);
         if ( (p_stepsize < 0 ) || (tools::function::isNumericalZero(p_stepsize)) )
-            throw exception::runtime(_("stepsize must be greater than zero"));
+            throw exception::runtime(_("stepsize must be greater than zero"), *this);
         
         // all variables must be set to a numerical value, so we check it
         if (m_static.size() + m_optimize.size() != m_fulltable.size())
-            throw exception::runtime(_("there are unsed variables"));
+            throw exception::runtime(_("there are unsed variables"), *this);
                 
            
         // creating worker
@@ -372,7 +372,7 @@ namespace machinelearning { namespace functionaloptimization {
             m_errorfunction         = l_parser( p_errorfunction );
             m_errorfunctionsymbols  = l_parser.get_syms();
         } catch (...) {
-            throw exception::runtime(_("arithmetic expression could not be parsed"));
+            throw exception::runtime(_("arithmetic expression could not be parsed"), *this);
         }
     }
     

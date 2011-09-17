@@ -93,9 +93,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             ublas::indirect_array<> use( const mpi::communicator&, const ublas::matrix<T>& ) const;
             void use( const mpi::communicator& ) const;
         
-            void trainpatch( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t& ) { throw exception::classmethod(_("method is not implementated in this class")); };
-            ublas::vector<T> getPrototypeWeights( const mpi::communicator& ) const { throw exception::classmethod(_("method is not implementated in this class")); };
-            std::vector< ublas::vector<T> > getLoggedPrototypeWeights( const mpi::communicator& ) const { throw exception::classmethod(_("method is not implementated in this class")); };
+            void trainpatch( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t& ) { throw exception::classmethod(_("method is not implementated in this class"), *this); };
+            ublas::vector<T> getPrototypeWeights( const mpi::communicator& ) const { throw exception::classmethod(_("method is not implementated in this class"), *this); };
+            std::vector< ublas::vector<T> > getLoggedPrototypeWeights( const mpi::communicator& ) const { throw exception::classmethod(_("method is not implementated in this class"), *this); };
             #endif
         
         
@@ -156,7 +156,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         #endif
     {
         if (p_prototypesize == 0)
-            throw exception::runtime(_("prototype size must be greater than zero"));
+            throw exception::runtime(_("prototype size must be greater than zero"), *this);
         
         // normalize the prototypes
         for(std::size_t i=0; i <  m_prototypes.size1(); ++i) {
@@ -183,7 +183,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         m_firstpatch(true)
     {
         if (p_prototypesize == 0)
-            throw exception::runtime(_("prototype size must be greater than zero"));
+            throw exception::runtime(_("prototype size must be greater than zero"), *this);
         
         // normalize the prototypes
         for(std::size_t i=0; i <  m_prototypes.size1(); ++i) {
@@ -300,17 +300,17 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     template<typename T> inline void relational_neuralgas<T>::train( const ublas::matrix<T>& p_data, const std::size_t& p_iterations, const T& p_lambda )
     {
         if (m_prototypes.size1() == 0)
-            throw exception::runtime(_("number of prototypes must be greater than zero"));
+            throw exception::runtime(_("number of prototypes must be greater than zero"), *this);
         if (p_data.size1() < m_prototypes.size1())
-            throw exception::runtime(_("number of datapoints are less than prototypes"));
+            throw exception::runtime(_("number of datapoints are less than prototypes"), *this);
         if (p_iterations == 0)
-            throw exception::runtime(_("iterations must be greater than zero"));
+            throw exception::runtime(_("iterations must be greater than zero"), *this);
         if (p_data.size2() != m_prototypes.size2())
-            throw exception::runtime(_("data and prototype dimension are not equal"));
+            throw exception::runtime(_("data and prototype dimension are not equal"), *this);
         if (p_lambda <= 0)
-            throw exception::runtime(_("lambda must be greater than zero"));
+            throw exception::runtime(_("lambda must be greater than zero"), *this);
         if (p_data.size1() != p_data.size2())
-            throw exception::runtime(_("matrix must be square"));
+            throw exception::runtime(_("matrix must be square"), *this);
         
         
         // creates logging
@@ -386,9 +386,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     template<typename T> inline ublas::indirect_array<> relational_neuralgas<T>::use( const ublas::matrix<T>& p_data ) const
     {
         if (m_prototypes.size1() == 0)
-            throw exception::runtime(_("number of prototypes must be greater than zero"));
+            throw exception::runtime(_("number of prototypes must be greater than zero"), *this);
         if (p_data.size2() != m_prototypes.size2())
-            throw exception::runtime(_("data and prototype dimension are not equal"));
+            throw exception::runtime(_("data and prototype dimension are not equal"), *this);
         
         ublas::indirect_array<> l_idx(p_data.size1());
         const ublas::matrix<T> l_distance = ublas::prod( p_data, ublas::trans(m_prototypes) );
@@ -420,17 +420,17 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     template<typename T> inline void relational_neuralgas<T>::trainpatch( const ublas::matrix<T>& p_data, const std::size_t& p_iterations, const T& p_lambda )
     {
         if (m_prototypes.size1() == 0)
-            throw exception::runtime(_("number of prototypes must be greater than zero"));
+            throw exception::runtime(_("number of prototypes must be greater than zero"), *this);
         if (p_data.size1() < m_prototypes.size1())
-            throw exception::runtime(_("number of datapoints are less than prototypes"));
+            throw exception::runtime(_("number of datapoints are less than prototypes"), *this);
         if (p_iterations == 0)
-            throw exception::runtime(_("iterations must be greater than zero"));
+            throw exception::runtime(_("iterations must be greater than zero"), *this);
         if (p_data.size2() != m_prototypes.size2())
-            throw exception::runtime(_("data and prototype dimension are not equal"));
+            throw exception::runtime(_("data and prototype dimension are not equal"), *this);
         if (p_lambda <= 0)
-            throw exception::runtime(_("lambda must be greater than zero"));
+            throw exception::runtime(_("lambda must be greater than zero"), *this);
         if (p_data.size1() != p_data.size2())
-            throw exception::runtime(_("matrix must be square"));
+            throw exception::runtime(_("matrix must be square"), *this);
         
         
         // creates logging
@@ -698,11 +698,11 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     template<typename T> inline void relational_neuralgas<T>::train( const mpi::communicator& p_mpi, const ublas::matrix<T>& p_data, const std::size_t& p_iterations, const T& p_lambda )
     {
         if (p_data.size1() < m_prototypes.size1())
-            throw exception::runtime(_("number of datapoints are less than prototypes"));
+            throw exception::runtime(_("number of datapoints are less than prototypes"), *this);
         if (p_iterations == 0)
-            throw exception::runtime(_("iterations must be greater than zero"));
+            throw exception::runtime(_("iterations must be greater than zero"), *this);
         if (p_lambda <= 0)
-            throw exception::runtime(_("lambda must be greater than zero")); 
+            throw exception::runtime(_("lambda must be greater than zero"), *this); 
         
         // we check data dimension (data matrix over all CPUs must be squared and the column size of
         // the prototype matrix must be equal to the data size)
@@ -710,9 +710,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         mpi::all_reduce(p_mpi, p_data.size2(), l_col, std::plus<std::size_t>());
         
         if (l_col != p_data.size1())
-            throw exception::runtime(_("matrix must be square"));
+            throw exception::runtime(_("matrix must be square"), *this);
         if (l_col != m_prototypes.size2())
-            throw exception::runtime(_("data and prototype dimension are not equal"));
+            throw exception::runtime(_("data and prototype dimension are not equal"), *this);
         
         
         // we use the max. of all values of each process
@@ -816,9 +816,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         const ublas::matrix<T> l_prototypes = ublas::trans(gatherAllPrototypes( p_mpi ));
         
         if (l_prototypes.size2() == 0)
-            throw exception::runtime(_("number of prototypes must be greater than zero"));
+            throw exception::runtime(_("number of prototypes must be greater than zero"), *this);
         if (p_data.size2() != l_prototypes.size1())
-            throw exception::runtime(_("data and prototype dimension are not equal"));
+            throw exception::runtime(_("data and prototype dimension are not equal"), *this);
         
         ublas::indirect_array<> l_idx(p_data.size1());
         const ublas::matrix<T> l_distance = ublas::prod( p_data, l_prototypes );
