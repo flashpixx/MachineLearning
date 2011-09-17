@@ -59,7 +59,7 @@
  * <li><i>optional LibXML2</i> ( http://xmlsoft.org/ ) (used by wikipedia support)</li>
  * <li><i>optional LibJSONCPP</i> ( http://sourceforge.net/projects/jsoncpp/ ) (used by twitter support)</li>
  * <li><i>optional Scons</i> ( http://www.scons.org/ )</li>
- * <li><i>optional Doxygen</i> ( http://www.doxygen.org/ )</li>
+ * <li><i>optional Doxygen</i> ( http://www.doxygen.org/ ) with Graphviz support ( http://www.graphviz.org )</li>
  * </ul>
  * For manual installation of the library you can follow the short @subpage installationnotes
  *

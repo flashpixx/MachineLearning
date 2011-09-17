@@ -46,7 +46,7 @@ template<typename T, typename L> class fitness : public ga::fitnessfunction<T,L>
             // simple fitness function: create only the difference between individual and maximum size, values less than zero, will be set to zero
             T l_sum = 0;
             for(std::size_t i=0; i < m_weight.size(); ++i)
-                l_sum += m_weight(i) * (p_ind.getData() & (0x01 << i));
+                l_sum += m_weight(i) * p_ind[i];
             
             return std::max( m_max - l_sum, static_cast<double>(0));
         }
@@ -77,7 +77,7 @@ template<typename T> class crossover : public ga::crossover<T>
             m_ind.clear();
             
             boost::shared_ptr< ga::individual<T> > l_obj( new ga::binaryindividual<T>(3) );
-            l_obj->setData(l_new);
+            //l_obj->setData(l_new);
             return l_obj;
         }
     
