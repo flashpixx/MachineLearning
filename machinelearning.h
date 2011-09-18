@@ -121,6 +121,7 @@
  * plattform specified options for compiling the sources. For compiling the test cpp files in the test directory the following option can
  * be set (Hierarchical Data Format is needed) [see options and default values with <dfn>scons -Q -h</dfn>]
  * <ul>
+ * <li><dfn>atlaslink</dfn> adds the option which ATLAS library is linked (multi = multithreadding [tatlas] or single = singlethreadding [satlas])
  * <li><dfn>withrandomdevice</dfn> adds the compilerflag for random device support</li>
  * <li><dfn>withmpi</dfn> adds the compilerflag for cluster / MPI support</li>
  * <li><dfn>withmultilanguage</dfn> adds the multilanguage support with gettext</li>

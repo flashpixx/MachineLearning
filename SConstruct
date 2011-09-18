@@ -20,7 +20,7 @@ def createVariables(vars) :
 
     vars.Add(EnumVariable("winver", "value of the Windows version", "win7", allowed_values=("win7", "srv2008", "vista", "srv2003sp1", "xpsp2", "srv2003", "xp", "w2000")))
 
-    vars.Add(EnumVariable("atlas", "value of the atlas threadding", "multi", allowed_values=("multi", "single")))
+    vars.Add(EnumVariable("atlaslink", "value of the atlas threadding", "multi", allowed_values=("multi", "single")))
 
 
 #=== function for os configuration ===================================================================================================
@@ -39,7 +39,7 @@ def configuration_macosx(config, vars, version, architecture) :
     config["compileflags"]      = "-O2 -Os -s -pipe -Wall -pthread -finline-functions -arch "+arch+" -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
     config["linkto"]            = ["boost_exception", "boost_system", "boost_thread", "boost_iostreams", "boost_filesystem", "boost_regex", "boost_program_options"]
 
-    if vars["atlas"] == "multi" :
+    if vars["atlaslink"] == "multi" :
         config["linkto"].extend( ["tatlas"] )
     else :
         config["linkto"].extend( ["satlas"] )
@@ -85,7 +85,7 @@ def configuration_posix(config, vars, version, architecture) :
     config["compileflags"]      = "-O2 -Os -s -pipe -Wall -pthread -finline-functions -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
     config["linkto"]            = ["boost_exception", "boost_system", "boost_thread", "boost_iostreams", "boost_filesystem", "boost_regex", "boost_program_options"]
 
-    if vars["atlas"] == "multi" :
+    if vars["atlaslink"] == "multi" :
         config["linkto"].extend( ["tatlas"] )
     else :
         config["linkto"].extend( ["satlas"] )
@@ -148,7 +148,7 @@ def configuration_cygwin(config, vars, version, architecture) :
     elif vars["winver"] == "w2000" :
         config["compileflags"] += " -D _WIN32_WINNT=0x0500"
 
-    if vars["atlas"] == "multi" :
+    if vars["atlaslink"] == "multi" :
         config["linkto"].extend( ["tatlas"] )
     else :
         config["linkto"].extend( ["satlas"] )
