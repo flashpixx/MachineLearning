@@ -20,6 +20,8 @@ def createVariables(vars) :
 
     vars.Add(EnumVariable("winver", "value of the Windows version", "win7", allowed_values=("win7", "srv2008", "vista", "srv2003sp1", "xpsp2", "srv2003", "xp", "w2000")))
 
+    vars.Add(EnumVariable("atlas", "value of the atlas threadding", "multi", allowed_values=("multi", "single")))
+
 
 #=== function for os configuration ===================================================================================================
 # configuration for OSX build
@@ -37,11 +39,10 @@ def configuration_macosx(config, vars, version, architecture) :
     config["compileflags"]      = "-O2 -Os -s -pipe -Wall -pthread -finline-functions -arch "+arch+" -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
     config["linkto"]            = ["boost_exception", "boost_system", "boost_thread", "boost_iostreams", "boost_filesystem", "boost_regex", "boost_program_options"]
 
-    if ver[0] == "10" and ver[1] == "6" :
-        config["linkto"].append("tatlas")
+    if vars["atlas"] == "multi" :
+        config["linkto"].extend( ["tatlas"] )
     else :
-        config["linkto"].extend( ["atlas", "lapack"] )
-
+        config["linkto"].extend( ["satlas"] )
 
     if vars["withdebug"] :
         config["compileflags"]      += " -g"
@@ -82,7 +83,12 @@ def configuration_posix(config, vars, version, architecture) :
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["LIBRARY_PATH"]
     config["compileflags"]      = "-O2 -Os -s -pipe -Wall -pthread -finline-functions -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
-    config["linkto"]            = ["boost_exception", "boost_system", "boost_thread", "boost_iostreams", "boost_filesystem", "boost_regex", "boost_program_options", "tatlas"]
+    config["linkto"]            = ["boost_exception", "boost_system", "boost_thread", "boost_iostreams", "boost_filesystem", "boost_regex", "boost_program_options"]
+
+    if vars["atlas"] == "multi" :
+        config["linkto"].extend( ["tatlas"] )
+    else :
+        config["linkto"].extend( ["satlas"] )
 
     if vars["withdebug"] :
         config["compileflags"]      += " -g"
@@ -141,6 +147,11 @@ def configuration_cygwin(config, vars, version, architecture) :
         config["compileflags"] += " -D _WIN32_WINNT=0x0501"
     elif vars["winver"] == "w2000" :
         config["compileflags"] += " -D _WIN32_WINNT=0x0500"
+
+    if vars["atlas"] == "multi" :
+        config["linkto"].extend( ["tatlas"] )
+    else :
+        config["linkto"].extend( ["satlas"] )
 
     if vars["withdebug"] :
         config["compileflags"]      += " -g"
@@ -391,8 +402,8 @@ def target_other(env, framework) :
         sources.append("mds_file.cpp")
 
     createTarget(env, "other", path, sources, framework)
-    
-    
+
+
 def target_genetic(env, framework) :
     path = os.path.join(".", "examples", "geneticalgorithm")
     sources = []
