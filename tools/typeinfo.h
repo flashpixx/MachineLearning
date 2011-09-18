@@ -70,7 +70,7 @@ namespace machinelearning { namespace tools {
     
     
     /** returns the class name of a reference
-     * @param p_ptr reference
+     * @param p_obj reference
      * @return string with class name and namespaces
      **/
     template <typename T> inline std::string typeinfo::getClassName( const T& p_obj )
