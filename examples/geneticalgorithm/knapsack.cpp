@@ -35,7 +35,8 @@ namespace tools     = machinelearning::tools;
 namespace ga        = machinelearning::geneticalgorithm;
 
 
-/** fitness function for determine the binary packing **/
+/** @cond
+ fitness function for determine the binary packing **/
 template<typename T, typename L> class fitness : public ga::fitnessfunction<T,L>
 {
     public :
@@ -89,7 +90,7 @@ template<typename T> class crossover : public ga::crossover<T>
         const double m_probability;
         std::vector< boost::shared_ptr< ga::individual<T> > > m_ind;
 };
-
+/** @endcond **/
 
 
 /** main program for using the genetic algorithm to solve
