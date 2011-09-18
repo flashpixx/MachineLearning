@@ -50,6 +50,7 @@ namespace machinelearning { namespace geneticalgorithm {
             binaryindividual( const std::size_t& );
     
             T operator[]( const std::size_t& ) const;
+            T& operator[]( const std::size_t& );
             void clone( boost::shared_ptr< individual<T> >& ) const;
             void mutate( void );
             std::size_t size( void ) const;
