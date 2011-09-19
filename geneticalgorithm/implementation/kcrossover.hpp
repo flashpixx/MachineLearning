@@ -106,8 +106,11 @@ namespace machinelearning { namespace geneticalgorithm {
         
         std::size_t l_pos = 0;
         for(std::size_t i=0; (i < m_cuts) && (l_pos != l_new->size()-1); ++i) {
+            std::size_t l_old = l_pos;
             l_pos = static_cast<std::size_t>(m_random.get<double>(tools::random::uniform, l_pos, l_new->size()));
    
+            for(std::size_t n=l_old; n <= l_pos; ++n)
+                (*l_new)[n] = (*(m_individuals[i]))[n];
         }
         
         // after create, we clear the internal list
