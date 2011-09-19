@@ -105,13 +105,17 @@ namespace machinelearning { namespace geneticalgorithm {
         m_individuals[0]->clone(l_new);
         
         std::size_t l_pos = 0;
-        for(std::size_t i=0; (i < m_cuts) && (l_pos != l_new->size()-1); ++i) {
+        for(std::size_t i=0; (i < m_cuts) && (l_pos != l_new->size()); ++i) {
             std::size_t l_old = l_pos;
-            l_pos = static_cast<std::size_t>(m_random.get<double>(tools::random::uniform, l_pos, l_new->size()));
+            l_pos = static_cast<std::size_t>(m_random.get<double>(tools::random::uniform, l_pos, l_new->size()+1));
    
-            for(std::size_t n=l_old; n <= l_pos; ++n)
+            for(std::size_t n=l_old; n < l_pos; ++n)
                 (*l_new)[n] = (*(m_individuals[i]))[n];
         }
+        
+        // add the rest of the last individual element (if we do not break in the first loop)
+        for(std::size_t n=l_pos; n < l_new->size(); ++n)
+            (*l_new)[n] = (*(m_individuals[m_individuals.size()-1]))[n];
         
         // after create, we clear the internal list
         m_individuals.clear();
