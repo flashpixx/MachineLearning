@@ -22,7 +22,7 @@
  **/
 
 /** 
- * @mainpage Machine Learning Framework
+ * @mainpage Requirements, Installation Notes and Examples
  * @author Philipp Kraus <philipp.kraus@flashpixx.de> 
  *
  * @section licenseSection license
