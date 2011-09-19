@@ -44,5 +44,6 @@ namespace machinelearning {
 #include "crossover.hpp"
 
 #include "implementation/binaryindividual.hpp"
+#include "implementation/kcrossover.hpp"
 
 #endif
