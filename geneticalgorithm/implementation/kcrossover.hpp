@@ -104,8 +104,10 @@ namespace machinelearning { namespace geneticalgorithm {
         boost::shared_ptr< individual<T> > l_new;
         m_individuals[0]->clone(l_new);
         
-        for(std::size_t i=0; i < m_individuals.size(); ++i) {
-            
+        std::size_t l_pos = 0;
+        for(std::size_t i=0; (i < m_cuts) && (l_pos != l_new->size()-1); ++i) {
+            l_pos = static_cast<std::size_t>(m_random.get<double>(tools::random::uniform, l_pos, l_new->size()));
+   
         }
         
         // after create, we clear the internal list
