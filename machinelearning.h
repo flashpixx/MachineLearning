@@ -22,7 +22,7 @@
  **/
 
 /** 
- * @mainpage Requirements, Installation Notes and Examples
+ * @mainpage Basic Information
  * @author Philipp Kraus <philipp.kraus@flashpixx.de> 
  *
  * @section licenseSection license
