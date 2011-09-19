@@ -706,8 +706,7 @@
  * @file distances/norm/euclid.hpp class for euclidian distances
  * @file distances/ncd.hpp implementation of the normalize compression distance
  *
- * @file exception/exception.cpp implementation of the exceptions
- * @file exception/exception.h header file for exceptions
+ * @file exception/exception.h header file for exceptions with implemention
  *
  * @file functionoptimization/functionoptimization.h main header for function optimization
  * @file functionoptimization/gradientdescent.hpp gradient descent implementation
@@ -719,6 +718,7 @@
  * @file geneticalgorithm/eliteselection.hpp abstract class of the elite selection
  * @file geneticalgorithm/crossover.hpp abstract class of the crossover function
  * @file geneticalgorithm/implementation/binaryindividual.hpp implementation of a binary individual
+ * @file geneticalgorithm/implementation/kcrossover.hpp k-crossover implementation
  *
  * @file neighborhood/neighborhood.h main header for neighborhood structurs
  * @file neighborhood/neighborhood.hpp abstract class for neighborhood implementation
@@ -726,13 +726,12 @@
  *
  * @file tools/tools.h main header for tools algorithms
  * @file tools/function.hpp different functions eg. numerical limit checking
- * @file tools/logger.cpp logger static implementation
  * @file tools/logger.hpp logger implementation
  * @file tools/lapack.hpp wrapper class for LAPack calls
  * @file tools/matrix.hpp implementation of matrix operations
  * @file tools/vector.hpp implementation of vector operations
  * @file tools/random.hpp random implementation 
- * @file tools/random.cpp random static implementation
+ * @file tools/typeinfo.h implemention of the typeinfo interface
  *
  * @file tools/sources/sources.h main header for all sources
  * @file tools/sources/nntp.h NNTP client
