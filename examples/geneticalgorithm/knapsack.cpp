@@ -149,7 +149,7 @@ int main(int argc, char* argv[])
     // genetic algorithm (basic structure eg individual, fitness function, crossover function [see above])
     fitness<double,std::size_t> l_fitnessfunc( l_packs, l_map["maxpacksize"].as<double>() );
     ga::binaryindividual<std::size_t> l_individual( l_packs.size() );
-
+    
     // create population
     ga::population<double,std::size_t> l_population(l_individual, l_populationsize, l_elitesize);
     

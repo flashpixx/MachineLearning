@@ -46,9 +46,9 @@ namespace machinelearning { namespace tools {
         
             template <typename T> static std::string getClassName( const T* );
             template <typename T> static std::string getClassName( const T& );
-        
+            //template <class T> static std::string getClassName( const T& );
     };
-    
+
     
     /** returns the class name of a pointer
      * @param p_ptr pointer

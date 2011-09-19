@@ -760,6 +760,7 @@
  * @todo adding PAPI support http://icl.cs.utk.edu/papi/
  * @todo thinking about a SSE support in the framework http://en.wikipedia.org/wiki/SSE3
  * @todo thinking about CILK support http://supertech.csail.mit.edu/cilk/
+ * @todo adding support to OpenMP http://openmp.org/wp/
  * @todo adding simulated annealing (see GSL)
  * @todo adding voronoi tessellation
  * @todo thinking about Corba support for algorithms

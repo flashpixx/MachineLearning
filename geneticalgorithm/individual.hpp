@@ -43,8 +43,8 @@ namespace machinelearning { namespace geneticalgorithm {
              * initialization on the heap and returns the smart-pointer to the heap object within the reference parameter. 
              **/
             virtual void clone( boost::shared_ptr< individual<T> >& ) const = 0;
-
-            /** returns the data at the position of the individual **/
+        
+            /** returns a value of a data element at the position of the individual **/
             virtual T operator[]( const std::size_t& ) const = 0;
         
             /** returns a reference of a data element at the position of the individual **/

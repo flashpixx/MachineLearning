@@ -25,8 +25,6 @@
 #ifndef __MACHINELEARNING_GENETICALGORITHM_IMPLEMENTATION_BINARYINDIVIDUAL_HPP
 #define __MACHINELEARNING_GENETICALGORITHM_IMPLEMENTATION_BINARYINDIVIDUAL_HPP
 
-#include <cmath>
-
 #include <boost/static_assert.hpp>
 #include <boost/shared_ptr.hpp>
 
@@ -48,9 +46,10 @@ namespace machinelearning { namespace geneticalgorithm {
         public :
         
             binaryindividual( const std::size_t& );
+            ~binaryindividual( void );
     
-            T operator[]( const std::size_t& ) const;
             T& operator[]( const std::size_t& );
+            T operator[]( const std::size_t& ) const;
             void clone( boost::shared_ptr< individual<T> >& ) const;
             void mutate( void );
             std::size_t size( void ) const;
@@ -63,7 +62,8 @@ namespace machinelearning { namespace geneticalgorithm {
             /** number of bit position are used **/
             const std::size_t m_size;
             /** value of the object **/
-            T m_value;
+            T* m_value;
+
     };
 
     
@@ -74,31 +74,59 @@ namespace machinelearning { namespace geneticalgorithm {
     template<typename T> inline binaryindividual<T>::binaryindividual( const std::size_t& p_size ) :
         m_rand(),
         m_size( p_size ),
-        m_value(0) 
+        m_value( NULL ) 
     {
         if (p_size == 0)
             throw exception::runtime(_("size number need not to be zero"), *this);
-        if (m_size > sizeof(T)*8)
-            throw exception::runtime(_("size number is lager than datatype"), *this);
         
-        m_value = static_cast<T>(m_rand.get<double>(tools::random::uniform, 0, std::pow(2.0,static_cast<double>(m_size))-1));
+        m_value = static_cast<T*>(calloc( m_size, sizeof(T) ));
+        for(std::size_t i=0; i < m_size; ++i)
+            m_value[i] = static_cast<T>(m_rand.get<double>(tools::random::uniform, 0, 2));
     }
 
+    
+    /** destructor **/
+    template<typename T> inline binaryindividual<T>::~binaryindividual( void )
+    {
+        free(m_value);
+    }
 
-    /** read data on index position
+    
+    /** return reference on index position
      * @param p_index index position
-     * @return return value
+     * @return reference
+     **/
+    template<typename T> inline T& binaryindividual<T>::operator[]( const std::size_t& p_index )
+    {
+        if (p_index >= m_size)
+            throw exception::runtime(_("index out of range"), *this);
+
+        // only at this point we can create different values [0,1],
+        // so we reorganize here values
+        for( std::size_t i=0; i < m_size; ++i)
+            m_value[i] = m_value[i] != 0 ? 1 : 0;
+        
+        return  m_value[p_index];
+    }
+    
+    
+    /** read value on index position
+     * @param p_index index position
+     * @return value
      **/
     template<typename T> inline T binaryindividual<T>::operator[]( const std::size_t& p_index ) const
     {
-        return  m_value & (0x01 << p_index);
-    }
+        if (p_index >= m_size)
+            throw exception::runtime(_("index out of range"), *this);
     
+        return  m_value[p_index] != 0 ? 1 : 0;
+    }
     
     /** mutates the object **/
     template<typename T> inline void binaryindividual<T>::mutate( void )
     {
-        m_value ^= 0x01 << static_cast<T>(m_rand.get<double>(tools::random::uniform, 0, m_size));
+        const std::size_t l_pos = static_cast<std::size_t>(m_rand.get<double>(tools::random::uniform, 0, m_size));
+        m_value[l_pos] = m_value[l_pos] == 0 ? 1 : 0;
     }
     
     
