@@ -34,7 +34,7 @@
 namespace machinelearning { namespace geneticalgorithm { namespace fitness {
     
     /** abstract class of the fitness function
-     * $LastChangedDate: 2011-09-20 13:14:41 +0200 (Di, 20 Sep 2011) $
+     * $LastChangedDate$
      **/
     template<typename T, typename L> class fitness
     {

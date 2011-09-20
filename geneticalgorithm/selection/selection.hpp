@@ -40,7 +40,7 @@ namespace machinelearning { namespace geneticalgorithm { namespace selection {
     
     
     /** abstract class of the selection function
-     * $LastChangedDate: 2011-09-20 12:51:24 +0200 (Di, 20 Sep 2011) $
+     * $LastChangedDate$
      **/
     template<typename T, typename L> class selection
     {
