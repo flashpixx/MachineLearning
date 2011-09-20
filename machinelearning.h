@@ -721,6 +721,8 @@
  * @file geneticalgorithm/crossover/crossover.h main header file for all crossover classes
  * @file geneticalgorithm/crossover/crossover.hpp abstract class of the crossover function
  * @file geneticalgorithm/crossover/kcrossover.hpp k-crossover implementation
+ * @file geneticalgorithm/selection/selection.h main header file for all selection classes
+ * @file geneticalgorithm/selection/selection.hpp abstract class of the selection function
  *
  * @file neighborhood/neighborhood.h main header for neighborhood structurs
  * @file neighborhood/neighborhood.hpp abstract class for neighborhood implementation
