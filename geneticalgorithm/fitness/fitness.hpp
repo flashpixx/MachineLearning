@@ -22,19 +22,34 @@
  **/
 
 
-#ifndef __MACHINELEARNING_GENETICALGORITHM_SELECTION_SELECTION_H
-#define __MACHINELEARNING_GENETICALGORITHM_SELECTION_SELECTION_H
+#ifndef __MACHINELEARNING_GENETICALGORITHM_FITNESS_FITNESS_HPP
+#define __MACHINELEARNING_GENETICALGORITHM_FITNESS_FITNESS_HPP
 
-namespace machinelearning { namespace geneticalgorithm { 
+#include <boost/static_assert.hpp>
+
+#include "../individual/individual.hpp"
+//#include "population.hpp"
+
+
+namespace machinelearning { namespace geneticalgorithm { namespace fitness {
     
-    /** namespace of the genetic algorithms for selection structures
-     * $LastChangedDate$
+    /** abstract class of the fitness function
+     * $LastChangedDate: 2011-09-20 13:14:41 +0200 (Di, 20 Sep 2011) $
      **/
-    namespace selection {};
+    template<typename T, typename L> class fitness
+    {
+        BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
+        
+        public :
+        
+            /** method for calculating the fitness value of an individual / return value must be >= 0 and 0 == worst value **/
+            virtual T getFitness( const individual::individual<L>& ) const = 0;
+        
+           // virtual T getFitness( const population<T>& ) const;
+        
+    };
     
-};};
-
-#include "selection.hpp"
+};};};
 
 #endif
 
