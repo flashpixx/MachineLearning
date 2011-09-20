@@ -53,7 +53,7 @@ namespace machinelearning { namespace geneticalgorithm { namespace crossover {
         private :
         
             /** random object **/
-            const tools::random m_random;
+            tools::random m_random;
             /** cut positions of the elements **/
             const std::size_t m_cuts;
             /** list with elements **/

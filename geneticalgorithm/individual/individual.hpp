@@ -41,19 +41,26 @@ namespace machinelearning { namespace geneticalgorithm { namespace individual {
         
             /** method for cloning the object. The method should be create a new individual for the population
              * initialization on the heap and returns the smart-pointer to the heap object within the reference parameter. 
+             * @param p_individual reference in which the new individual smart-pointer object is written
              **/
-            virtual void clone( boost::shared_ptr< individual<T> >& ) const = 0;
+            virtual void clone( boost::shared_ptr< individual<T> >& p_individual ) const = 0;
         
-            /** returns a value of a data element at the position of the individual **/
-            virtual T operator[]( const std::size_t& ) const = 0;
+            /** returns a value of a data element at the position of the individual
+             * @param p_index index position of the gen position
+             **/
+            virtual T operator[]( const std::size_t& p_index ) const = 0;
         
-            /** returns a reference of a data element at the position of the individual **/
-            virtual T& operator[]( const std::size_t& ) = 0;
+            /** returns a reference of a data element at the position of the individual
+             * @param p_index index position of the gen position
+             **/
+            virtual T& operator[]( const std::size_t& p_index ) = 0;
         
             /** mutates the individual **/
             virtual void mutate( void ) = 0;
         
-            /** returns the number of positions / length **/
+            /** returns the number of positions / length
+             * @return length / size of the gen sequence
+             **/
             virtual std::size_t size( void ) const = 0;
     
     };

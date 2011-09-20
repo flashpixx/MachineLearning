@@ -73,6 +73,7 @@ int main(int argc, char* argv[])
     std::size_t l_populationsize;
     std::size_t l_elitesize;
     std::size_t l_iteration;
+    std::size_t l_cuts;
     double l_packsize;
     double l_mutation;
     
@@ -85,6 +86,7 @@ int main(int argc, char* argv[])
         ("maxpacksize", po::value<double>(&l_packsize), "maximum pack size")
         ("population", po::value<std::size_t>(&l_populationsize)->default_value(50), "population size / number of individuals")
         ("elite", po::value<std::size_t>(&l_elitesize)->default_value(10), "elite size / number of individuals that are elite")
+        ("crossover", po::value<std::size_t>(&l_cuts)->default_value(3), "cut point of the crossover")
         ("iteration", po::value<std::size_t>(&l_iteration)->default_value(10), "number of iterations")
         ("mutation", po::value<double>(&l_mutation)->default_value(0.35), "mutation probability")
     ;
@@ -115,8 +117,9 @@ int main(int argc, char* argv[])
 
     
     // genetic algorithm (basic structure eg individual, fitness function, crossover function [see above])
-    fitness<double,std::size_t> l_fitnessfunc( l_packs, l_map["maxpacksize"].as<double>() );
+    fitness<double,std::size_t> l_fitness( l_packs, l_map["maxpacksize"].as<double>() );
     ga::individual::binaryindividual<std::size_t> l_individual( l_packs.size() );
+    ga::crossover::kcrossover<std::size_t> l_crossover(l_cuts);
     
     // create population
     ga::population<double,std::size_t> l_population(l_individual, l_populationsize, l_elitesize);
