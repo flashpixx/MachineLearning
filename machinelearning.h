@@ -758,7 +758,14 @@
  * @file tools/iostreams/iostreams.h main header for iostreams includes
  * @file tools/iostreams/urlencoder.h encoder for url
  *
- *
+ **/
+
+#ifndef __MACHINELEARNING_H
+#define __MACHINELEARNING_H
+
+
+/** main namespace of the framework
+ * $LastChangedDate$
  * @todo adding GSL support http://www.gnu.org/software/gsl/
  * @todo adding PAPI support http://icl.cs.utk.edu/papi/
  * @todo thinking about a SSE support in the framework http://en.wikipedia.org/wiki/SSE3
@@ -768,14 +775,6 @@
  * @todo adding voronoi tessellation
  * @todo thinking about Corba support for algorithms
  * @todo thinking about abstract middleware for Boinc support (eg patch clustering) http://boinc.berkeley.edu/
- **/
-
-#ifndef __MACHINELEARNING_H
-#define __MACHINELEARNING_H
-
-
-/** main namespace of the framework
- * $LastChangedDate$
  **/
 namespace machinelearning {};
 

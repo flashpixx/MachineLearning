@@ -431,7 +431,7 @@ namespace machinelearning { namespace tools { namespace sources {
     /** extracts the Json result data
      * @param p_array Json array with result data
      * @param p_number returning number of tweets (0 = maximum)
-     * @param p_result resulting vector with data
+     * @param p_result result vector with data
      **/
     inline void twitter::extractSearchResult( const Json::Value& p_array, const std::size_t& p_number, std::vector<twitter::searchtweet>& p_result ) const
     {
