@@ -33,7 +33,7 @@
 #include "../../tools/tools.h"
 
 
-namespace machinelearning { namespace geneticalgorithm {
+namespace machinelearning { namespace geneticalgorithm { 
 
     /** k-crossover algorithm
      * $LastChangedDate$
