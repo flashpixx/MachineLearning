@@ -22,14 +22,14 @@
  **/
 
 
-#ifndef __MACHINELEARNING_GENETICALGORITHM_INDIVIDUAL_HPP
-#define __MACHINELEARNING_GENETICALGORITHM_INDIVIDUAL_HPP
+#ifndef __MACHINELEARNING_GENETICALGORITHM_INDIVIDUAL_INDIVIDUAL_HPP
+#define __MACHINELEARNING_GENETICALGORITHM_INDIVIDUAL_INDIVIDUAL_HPP
 
 #include <boost/shared_ptr.hpp>
 
 
 
-namespace machinelearning { namespace geneticalgorithm {
+namespace machinelearning { namespace geneticalgorithm { namespace individual {
     
     /** abstract class of an indivdual of the population
      * $LastChangedDate$
@@ -58,7 +58,7 @@ namespace machinelearning { namespace geneticalgorithm {
     
     };
     
-};};
+};};};
 
 #endif
 

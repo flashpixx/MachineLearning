@@ -22,18 +22,18 @@
  **/
 
 
-#ifndef __MACHINELEARNING_GENETICALGORITHM_IMPLEMENTATION_BINARYINDIVIDUAL_HPP
-#define __MACHINELEARNING_GENETICALGORITHM_IMPLEMENTATION_BINARYINDIVIDUAL_HPP
+#ifndef __MACHINELEARNING_GENETICALGORITHM_INDIVIDUAL_BINARYINDIVIDUAL_HPP
+#define __MACHINELEARNING_GENETICALGORITHM_INDIVIDUAL_BINARYINDIVIDUAL_HPP
 
 #include <boost/static_assert.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include "../individual.hpp"
+#include "individual.hpp"
 #include "../../tools/tools.h"
 #include "../../exception/exception.h"
 
 
-namespace machinelearning { namespace geneticalgorithm {
+namespace machinelearning { namespace geneticalgorithm { namespace individual {
     
     /** class of a binary indivdual (template type must be an unsigned integral type)
      * $LastChangedDate$
@@ -148,7 +148,7 @@ namespace machinelearning { namespace geneticalgorithm {
     }
     
     
-};};
+};};};
 
 #endif
 

@@ -35,7 +35,7 @@
 #include "../exception/exception.h"
 #include "../tools/tools.h"
 
-#include "individual.hpp"
+#include "individual/individual.hpp"
 #include "crossover.hpp"
 #include "fitnessfunction.hpp"
 #include "eliteselection.hpp"
@@ -62,7 +62,7 @@ namespace machinelearning { namespace geneticalgorithm {
             };
         
         
-            population( const individual<L>&, const std::size_t&, const std::size_t& );
+            population( const individual::individual<L>&, const std::size_t&, const std::size_t& );
         
             std::size_t size( void ) const;
             void setEliteSize( const std::size_t& );
@@ -94,9 +94,9 @@ namespace machinelearning { namespace geneticalgorithm {
             };
         
             /** vector with smart-pointer of individuals **/
-            std::vector< boost::shared_ptr< individual<L> > > m_population;
+            std::vector< boost::shared_ptr< individual::individual<L> > > m_population;
             /** vector with smart-pointer of elite-individuals **/
-            std::vector< boost::shared_ptr< individual<L> > > m_elite;
+            std::vector< boost::shared_ptr< individual::individual<L> > > m_elite;
             /** option in which way the new population is build **/
             buildoption m_buildoption;
             /** mutation probability **/
@@ -121,7 +121,7 @@ namespace machinelearning { namespace geneticalgorithm {
      * @param p_size size of the population
      * @param p_elite size of the elites
      **/
-    template<typename T, typename L> inline population<T,L>::population( const individual<L>& p_individualref, const std::size_t& p_size, const std::size_t& p_elite ) :
+    template<typename T, typename L> inline population<T,L>::population( const individual::individual<L>& p_individualref, const std::size_t& p_size, const std::size_t& p_elite ) :
         m_population( p_size ),
         m_elite( p_elite ),
         m_buildoption( fullBuildFromElite ),
@@ -140,10 +140,9 @@ namespace machinelearning { namespace geneticalgorithm {
         
         // create individuals
         for(std::size_t i=0; i < p_size; ++i) {
-            boost::shared_ptr< individual<L> > l_ptr;
+            boost::shared_ptr< individual::individual<L> > l_ptr;
             (&p_individualref)->clone( l_ptr );
             m_population.push_back( l_ptr );
-            //std::cout << (*l_ptr).getData() << std::endl;
         }
     }
     
@@ -380,7 +379,7 @@ namespace machinelearning { namespace geneticalgorithm {
      **/
     template<typename T, typename L> inline void population<T,L>::buildelite( const std::size_t& p_start, const std::size_t& p_end, const eliteselection<T,L> p_eliteselection, const ublas::vector<T>& p_fitness, const ublas::vector<std::size_t>& p_rank )
     {
-        const std::vector< boost::shared_ptr< individual<L> > > l_elite( p_eliteselection.getElite( p_start, p_end, m_population, p_fitness, p_rank ) );
+        const std::vector< boost::shared_ptr< individual::individual<L> > > l_elite( p_eliteselection.getElite( p_start, p_end, m_population, p_fitness, p_rank ) );
         
         // we need a mutex, because different threads modify the elite property, so we must create a lock during resizing
         boost::unique_lock<boost::mutex> l_lock( m_iterationlock );

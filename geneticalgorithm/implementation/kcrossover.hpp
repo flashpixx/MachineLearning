@@ -28,7 +28,7 @@
 #include <boost/static_assert.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include "../individual.hpp"
+#include "../individual/individual.hpp"
 #include "../../exception/exception.h"
 #include "../../tools/tools.h"
 
@@ -45,8 +45,8 @@ namespace machinelearning { namespace geneticalgorithm {
             kcrossover( const std::size_t& );
         
             std::size_t getNumberOfIndividuals( void ) const;    
-            boost::shared_ptr< individual<T> > combine( void );
-            void setIndividual( const boost::shared_ptr< individual<T> >& );
+            boost::shared_ptr< individual::individual<T> > combine( void );
+            void setIndividual( const boost::shared_ptr< individual::individual<T> >& );
         
         
         private :
@@ -56,7 +56,7 @@ namespace machinelearning { namespace geneticalgorithm {
             /** cut positions of the elements **/
             const std::size_t m_cuts;
             /** list with elements **/
-            std::vector< boost::shared_ptr< individual<T> > > m_individuals;
+            std::vector< boost::shared_ptr< individual::individual<T> > > m_individuals;
     };
 
     
@@ -86,7 +86,7 @@ namespace machinelearning { namespace geneticalgorithm {
     /** sets a individual to the list
      * @param p_individual individual object
      **/
-    template<typename T> inline void kcrossover<T>::setIndividual( const boost::shared_ptr< individual<T> >& p_individual )
+    template<typename T> inline void kcrossover<T>::setIndividual( const boost::shared_ptr< individual::individual<T> >& p_individual )
     {
         m_individuals.push_back( p_individual );
     }
@@ -98,10 +98,10 @@ namespace machinelearning { namespace geneticalgorithm {
      * the population object breaks down until it has added the number of individuals that are resolved 
      * with getNumberOfIndividuals call
      **/
-    template<typename T> inline boost::shared_ptr< individual<T> > kcrossover<T>::combine( void )
+    template<typename T> inline boost::shared_ptr< individual::individual<T> > kcrossover<T>::combine( void )
     {
         // we create the new individual with the clone method, because we don't know the exactly class call
-        boost::shared_ptr< individual<T> > l_new;
+        boost::shared_ptr< individual::individual<T> > l_new;
         m_individuals[0]->clone(l_new);
         
         std::size_t l_pos = 0;

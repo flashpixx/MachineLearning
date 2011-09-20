@@ -21,29 +21,21 @@
  @endcond
  **/
 
-/** header file to connect all genetic algorithm for one include
- * $LastChangedDate$
- **/
 
-#ifndef __MACHINELEARNING_GENETICALGORITHM_H
-#define __MACHINELEARNING_GENETICALGORITHM_H
+#ifndef __MACHINELEARNING_GENETICALGORITHM_INDIVIDUAL_H
+#define __MACHINELEARNING_GENETICALGORITHM_INDIVIDUAL_H
 
-
-namespace machinelearning { 
+namespace machinelearning { namespace geneticalgorithm { 
     
-    /** namespace for genetic algorithms **/
-    namespace geneticalgorithm {};
+    /** namespace for individual structures
+     * $LastChangedDate: 2011-09-20 11:06:45 +0200 (Di, 20 Sep 2011) $
+     **/
+    namespace individual {};
     
-};
+};};
 
-
-#include "population.hpp"
-#include "fitnessfunction.hpp"
-#include "eliteselection.hpp"
-#include "crossover.hpp"
-
-#include "individual/individual.h"
-
-#include "implementation/kcrossover.hpp"
+#include "individual.hpp"
+#include "binaryindividual.hpp"
 
 #endif
+

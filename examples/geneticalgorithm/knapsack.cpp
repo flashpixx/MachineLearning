@@ -42,7 +42,7 @@ template<typename T, typename L> class fitness : public ga::fitnessfunction<T,L>
     public :
     
         fitness( const ublas::vector<T>& p_weight, const T& p_max ) : m_weight(p_weight), m_max(p_max) {}
-        T getFitness( const ga::individual<L>& p_ind ) const
+        T getFitness( const ga::individual::individual<L>& p_ind ) const
         {
             // simple fitness function: create only the difference between individual and maximum size, values less than zero, will be set to zero
             T l_sum = 0;
@@ -116,7 +116,7 @@ int main(int argc, char* argv[])
     
     // genetic algorithm (basic structure eg individual, fitness function, crossover function [see above])
     fitness<double,std::size_t> l_fitnessfunc( l_packs, l_map["maxpacksize"].as<double>() );
-    ga::binaryindividual<std::size_t> l_individual( l_packs.size() );
+    ga::individual::binaryindividual<std::size_t> l_individual( l_packs.size() );
     
     // create population
     ga::population<double,std::size_t> l_population(l_individual, l_populationsize, l_elitesize);

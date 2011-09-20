@@ -27,7 +27,7 @@
 
 #include <boost/static_assert.hpp>
 
-#include "individual.hpp"
+#include "individual/individual.hpp"
 
 
 namespace machinelearning { namespace geneticalgorithm {
@@ -44,10 +44,10 @@ namespace machinelearning { namespace geneticalgorithm {
             virtual std::size_t getNumberOfIndividuals( void ) const = 0;     
         
             /** set the individuals with a smart-pointer **/
-            virtual void setIndividual( const boost::shared_ptr< individual<T> >& ) = 0;
+            virtual void setIndividual( const boost::shared_ptr< individual::individual<T> >& ) = 0;
         
             /** creates a new smart-pointer object with the new individual data **/
-            virtual boost::shared_ptr< individual<T> > combine( void ) = 0;
+            virtual boost::shared_ptr< individual::individual<T> > combine( void ) = 0;
     };
     
 };};
