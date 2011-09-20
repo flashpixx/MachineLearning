@@ -40,10 +40,9 @@ namespace machinelearning {
 #include "population.hpp"
 #include "fitnessfunction.hpp"
 #include "eliteselection.hpp"
-#include "crossover.hpp"
 
 #include "individual/individual.h"
+#include "crossover/crossover.h"
 
-#include "implementation/kcrossover.hpp"
 
 #endif

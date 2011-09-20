@@ -22,15 +22,15 @@
  **/
 
 
-#ifndef __MACHINELEARNING_GENETICALGORITHM_CROSSOVER_HPP
-#define __MACHINELEARNING_GENETICALGORITHM_CROSSOVER_HPP
+#ifndef __MACHINELEARNING_GENETICALGORITHM_CROSSOVER_CROSSOVER_HPP
+#define __MACHINELEARNING_GENETICALGORITHM_CROSSOVER_CROSSOVER_HPP
 
 #include <boost/static_assert.hpp>
 
-#include "individual/individual.hpp"
+#include "../individual/individual.hpp"
 
 
-namespace machinelearning { namespace geneticalgorithm {
+namespace machinelearning { namespace geneticalgorithm { namespace crossover {
     
     /** abstract class of the crossover function
      * $LastChangedDate$
@@ -50,7 +50,7 @@ namespace machinelearning { namespace geneticalgorithm {
             virtual boost::shared_ptr< individual::individual<T> > combine( void ) = 0;
     };
     
-};};
+};};};
 
 #endif
 

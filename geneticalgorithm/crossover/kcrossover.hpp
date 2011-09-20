@@ -22,18 +22,19 @@
  **/
 
 
-#ifndef __MACHINELEARNING_GENETICALGORITHM_IMPLEMENTATION_KCROSSOVER_HPP
-#define __MACHINELEARNING_GENETICALGORITHM_IMPLEMENTATION_KCROSSOVER_HPP
+#ifndef __MACHINELEARNING_GENETICALGORITHM_CROSSOVER_KCROSSOVER_HPP
+#define __MACHINELEARNING_GENETICALGORITHM_CROSSOVER_KCROSSOVER_HPP
 
 #include <boost/static_assert.hpp>
 #include <boost/shared_ptr.hpp>
 
+#include "crossover.hpp"
 #include "../individual/individual.hpp"
 #include "../../exception/exception.h"
 #include "../../tools/tools.h"
 
 
-namespace machinelearning { namespace geneticalgorithm { 
+namespace machinelearning { namespace geneticalgorithm { namespace crossover {
 
     /** k-crossover algorithm
      * $LastChangedDate$
@@ -123,6 +124,6 @@ namespace machinelearning { namespace geneticalgorithm {
         return l_new;
     }
 
-};};
+};};};
 
 #endif
