@@ -38,8 +38,8 @@ namespace machinelearning {
 
 
 #include "population.hpp"
-#include "fitnessfunction.hpp"
 
+#include "fitness/fitness.h"
 #include "selection/selection.h"
 #include "individual/individual.h"
 #include "crossover/crossover.h"

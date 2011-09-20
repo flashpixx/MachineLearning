@@ -37,7 +37,7 @@ namespace ga        = machinelearning::geneticalgorithm;
 
 /** @cond
  fitness function for determine the binary packing **/
-template<typename T, typename L> class fitness : public ga::fitnessfunction<T,L>
+template<typename T, typename L> class fitness : public ga::fitness::fitness<T,L>
 {
     public :
     

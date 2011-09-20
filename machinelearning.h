@@ -713,8 +713,8 @@
  *
  * @file geneticalgorithm/geneticalgorithm.h main header for all genetic algorithms
  * @file geneticalgorithm/population.hpp population class
- * @file geneticalgorithm/fitnessfunction.hpp abstract class of the fitness function
- * @file geneticalgorithm/eliteselection.hpp abstract class of the elite selection
+ * @file geneticalgorithm/fitness/fitness.h main header file for all fitness classes
+ * @file geneticalgorithm/fitness/fitness.hpp abstract class of the fitness function
  * @file geneticalgorithm/individual/individual.h main header file for all individual classes
  * @file geneticalgorithm/individual/individual.hpp abstract class of an individual
  * @file geneticalgorithm/individual/binaryindividual.hpp implementation of a binary individual

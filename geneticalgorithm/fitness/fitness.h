@@ -22,20 +22,19 @@
  **/
 
 
-#ifndef __MACHINELEARNING_GENETICALGORITHM_INDIVIDUAL_INDIVIDUAL_H
-#define __MACHINELEARNING_GENETICALGORITHM_INDIVIDUAL_INDIVIDUAL_H
+#ifndef __MACHINELEARNING_GENETICALGORITHM_FITNESS_FITNESS_H
+#define __MACHINELEARNING_GENETICALGORITHM_FITNESS_FITNESS_H
 
 namespace machinelearning { namespace geneticalgorithm { 
     
-    /** namespace of the genetic algorithms for individual structures
-     * $LastChangedDate$
+    /** namespace of the genetic algorithms for fitness structures
+     * $LastChangedDate: 2011-09-20 11:32:42 +0200 (Di, 20 Sep 2011) $
      **/
-    namespace individual {};
+    namespace fitness {};
     
 };};
 
-#include "individual.hpp"
-#include "binaryindividual.hpp"
+#include "fitness.hpp"
 
 #endif
 
