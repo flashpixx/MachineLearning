@@ -22,7 +22,7 @@
  **/
 
 /** 
- * @mainpage Basic Information
+ * @mainpage Base Information
  * @author Philipp Kraus <philipp.kraus@flashpixx.de> 
  *
  * @section licenseSection license
@@ -147,7 +147,7 @@
  * <li><dfn>ga</dfn> target for building genetic algorithms</li>
  * </ul>
  *
- * @section ex advanced documentation
+ * @section ex examples
  * <ul>
  * <li>@subpage classifier</li>
  * <li>@subpage clustering</li>
@@ -322,14 +322,14 @@
  *
  *
  *
- * @page classifier classifier
+ * @page classifier Example Classifier
  * The classifier algorithms are tempalte classes.
  * @section lazy lazy learner
  * @include examples/classifier/lazy.cpp
  *
  *
  *
- * @page clustering clustering
+ * @page clustering Example Clustering
  * The clustering classes are templates classes, there are two main structures <i>supervised</i> and <i>nonsupervised</i>. The namespaces are named in the same way machinelearning::clustering::nonsupervised or 
  * machinelearning::clustering::supervised. All classes are subclasses of their supervised / unsupervised base class. Especially the supervised classes have two template parameters, first for the data and second
  * for their labels, the nonsupervised uses only one template parameter. The examples show the different using.
@@ -354,7 +354,7 @@
  *
  *
  *
- * @page dimreduce dimension reducing
+ * @page dimreduce Example Dimensionreduce
  * The dimension reducing classes are in the namespace machinelearning::dimensionreduce::nonsupervised and machinelearning::dimensionreduce::supervised can be used
  * for dimension reduction. Supervised uses two template parameter first one for datatype, second one for labeling. The nonsupervised is used only one parameter
  * (for datatype). The examples show the different option
@@ -374,7 +374,7 @@
  *
  *
  *
- * @page distances distances
+ * @page distances Example Distances
  * The namespace machinelearning::distances holds all types of distances. Every distance function is a subclass of <i>distance</i> and calculates distances values for vector- and matrixdata.
  * The class must be implementated as a template class and must hold some special functions for using the distance operation. In the namespace is also the ncd-class that creates a
  * symmetric/asymmetric dissimilarity matrix of string- or filedata with the <i>normalized compression distance</i>, that based on an approximation of the the Kolmogorov complexity. The
@@ -385,7 +385,7 @@
  *
  *
  *
- * @page sources data sources
+ * @page sources Example Data Sources
  * The toolbox implements some structures for geting datasets. The compile option <dfn>MACHINELEARNING_SOURCES</dfn> must be set for compiling the namespace
  * machinelearning::tools::sources .
  *
@@ -409,7 +409,7 @@
  * 
  *
  *
- * @page logger logger
+ * @page logger Examples Logger
  * Within the toolbox is a logger class which implements a thread-safe and optional MPI logger. The logger create a singletone object that create
  * a file access for writing messages. The MPI component sends all messages with non-blocking communication to the CPU 0. See in the logger class
  * for log states, which must be used for writing the messages.
@@ -454,7 +454,7 @@
  *
  *
  *
- * @page files file support
+ * @page files Example File Support
  * The toolbox supports different file formats. The compile option <dfn>MACHINELEARNING_FILES</dfn> must be set for
  * using the support and all components are within the namespace machinelearning::tools::files
  * @section csv comma separated values (csv)
@@ -512,7 +512,7 @@
  *
  *
  *
- * @page lang multilanguage support
+ * @page lang Multilanguage Support
  * The toolbox uses <dfn>gettext</dfn> to translate the messages. The source code must include the language header file and all messages,
  * which should be supported multilanguage must be written in this way <dfn>_("messages")</dfn>. The mesages will be collected with the
  * gettext tools and safed under <dfn>tools/language/&quot;language eg. de_DE.UTF-8&quot;/LC_MESSAGES/&quot;language eg de_DE&quot;.po</dfn>. The compiler flag
@@ -524,7 +524,7 @@
  *
  *
  *
- * @page other other examples
+ * @page other Examples (other)
  *
  * @section toc Table of contents
  * <ul>
