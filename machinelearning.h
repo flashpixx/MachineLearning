@@ -715,11 +715,12 @@
  * @file geneticalgorithm/population.hpp population class
  * @file geneticalgorithm/fitnessfunction.hpp abstract class of the fitness function
  * @file geneticalgorithm/eliteselection.hpp abstract class of the elite selection
- * @file geneticalgorithm/crossover.hpp abstract class of the crossover function
  * @file geneticalgorithm/individual/individual.h main header file for all individual classes
  * @file geneticalgorithm/individual/individual.hpp abstract class of an individual
  * @file geneticalgorithm/individual/binaryindividual.hpp implementation of a binary individual
- * @file geneticalgorithm/implementation/kcrossover.hpp k-crossover implementation
+ * @file geneticalgorithm/crossover/crossover.h main header file for all crossover classes
+ * @file geneticalgorithm/crossover/crossover.hpp abstract class of the crossover function
+ * @file geneticalgorithm/crossover/kcrossover.hpp k-crossover implementation
  *
  * @file neighborhood/neighborhood.h main header for neighborhood structurs
  * @file neighborhood/neighborhood.hpp abstract class for neighborhood implementation
