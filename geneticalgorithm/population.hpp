@@ -35,10 +35,10 @@
 #include "../exception/exception.h"
 #include "../tools/tools.h"
 
-#include "individual/individual.hpp"
-#include "crossover/crossover.hpp"
+#include "individual/individual.h"
+#include "crossover/crossover.h"
+#include "selection/selection.h"
 #include "fitnessfunction.hpp"
-#include "eliteselection.hpp"
 
 
 namespace machinelearning { namespace geneticalgorithm {
@@ -70,8 +70,8 @@ namespace machinelearning { namespace geneticalgorithm {
             std::vector<L> getEliteData( void ) const;
             void setMutalProbability( const T&, const tools::random::distribution& = tools::random::uniform, const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon() );
             void setPopulationBuild( const buildoption&, const tools::random::distribution& = tools::random::uniform );
-            void iterate( const std::size_t&, const fitnessfunction<T,L>&, const eliteselection<T,L>&, const crossover::crossover<L>& );
-            //bool isConverged( const std::size_t&, const fitnessfunction<T>&, const eliteselection<T>&, const crossover& );
+            void iterate( const std::size_t&, const fitnessfunction<T,L>&, const selection::selection<T,L>&, const crossover::crossover<L>& );
+            //bool isConverged( const std::size_t&, const fitnessfunction<T>&, const selection::selection<T>&, const crossover& );
         
         
         private :
@@ -109,7 +109,7 @@ namespace machinelearning { namespace geneticalgorithm {
         
             void fitness( const std::size_t&, const std::size_t&, const fitnessfunction<T,L>, ublas::vector<T>& ) const;
             void mutate( const std::size_t&, const std::size_t& ) const;
-            void buildelite( const std::size_t&, const std::size_t&, const eliteselection<T,L>, const ublas::vector<T>&, const ublas::vector<std::size_t>& );
+            void buildelite( const std::size_t&, const std::size_t&, const selection::selection<T,L>, const ublas::vector<T>&, const ublas::vector<std::size_t>& );
             void buildpopulation( const std::size_t&, const std::size_t&, const crossover::crossover<L>, const ublas::vector<std::size_t>& ) const;
         
     };
@@ -226,7 +226,7 @@ namespace machinelearning { namespace geneticalgorithm {
      * @param p_elite elite selection object
      * @param p_crossover crossover object
      **/
-    template<typename T, typename L> inline void population<T,L>::iterate( const std::size_t& p_iteration, const fitnessfunction<T,L>& p_fitness, const eliteselection<T,L>& p_elite, const crossover::crossover<L>& p_crossover )
+    template<typename T, typename L> inline void population<T,L>::iterate( const std::size_t& p_iteration, const fitnessfunction<T,L>& p_fitness, const selection::selection<T,L>& p_elite, const crossover::crossover<L>& p_crossover )
     {
         if (p_iteration == 0)
             throw exception::runtime(_("iterations must be greater than zero"), *this);
@@ -377,7 +377,7 @@ namespace machinelearning { namespace geneticalgorithm {
      * @param p_fitness fitness values
      * @param p_rank rank values
      **/
-    template<typename T, typename L> inline void population<T,L>::buildelite( const std::size_t& p_start, const std::size_t& p_end, const eliteselection<T,L> p_eliteselection, const ublas::vector<T>& p_fitness, const ublas::vector<std::size_t>& p_rank )
+    template<typename T, typename L> inline void population<T,L>::buildelite( const std::size_t& p_start, const std::size_t& p_end, const selection::selection<T,L> p_eliteselection, const ublas::vector<T>& p_fitness, const ublas::vector<std::size_t>& p_rank )
     {
         const std::vector< boost::shared_ptr< individual::individual<L> > > l_elite( p_eliteselection.getElite( p_start, p_end, m_population, p_fitness, p_rank ) );
         
