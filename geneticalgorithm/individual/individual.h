@@ -28,7 +28,7 @@
 namespace machinelearning { namespace geneticalgorithm { 
     
     /** namespace for individual structures
-     * $LastChangedDate: 2011-09-20 11:06:45 +0200 (Di, 20 Sep 2011) $
+     * $LastChangedDate$
      **/
     namespace individual {};
     
