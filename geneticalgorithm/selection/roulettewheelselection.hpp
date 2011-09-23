@@ -31,6 +31,7 @@
 
 #include "selection.hpp"
 #include "../individual/individual.hpp"
+#include "../../tools/tools.h"
 
 
 
@@ -49,27 +50,58 @@ namespace machinelearning { namespace geneticalgorithm { namespace selection {
         
         public :
         
+            roulettewheelselection( void );
             std::vector< boost::shared_ptr< individual::individual<L> > > getElite( const std::size_t&, const std::size_t&, const std::vector< boost::shared_ptr< individual::individual<L> > >&, const ublas::vector<T>&, const ublas::vector<std::size_t>&, const ublas::vector<std::size_t>& ) const;
+        
+        
+        private :
+        
+            /** random object **/
+            tools::random m_random;
         
     };
     
     
     
+    /** constructor **/
+    template<typename T, typename L> roulettewheelselection<T,L>::roulettewheelselection( void ) :
+        m_random()
+    {}
+    
+        
     /** returns the roulette-wheel-selection elites
      * @param p_start start value of the elite values
      * @param p_end end value of the elite values ([start, end) elite elements must be created)
      * @param p_population const reference to the population
      * @param p_fitness vector with fitnss values (index is equal to the index of the population)
      * @param p_rankIndex rank index (first index has the position of the population element, that has the smalles fitness value)
-     * @param p_rank rank values (first element equal to polulation index has the rank value, which rank has the first individual)
+     * @param p_rank rank values (first element equal to polulation index has the rank value of the first individual)
      **/
     template<typename T, typename L> std::vector< boost::shared_ptr< individual::individual<L> > > roulettewheelselection<T,L>::getElite( const std::size_t& p_start, const std::size_t& p_end, const std::vector< boost::shared_ptr< individual::individual<L> > >& p_population, const ublas::vector<T>& p_fitness, const ublas::vector<std::size_t>& p_rankIndex, const ublas::vector<std::size_t>& p_rank ) const
     {
-        const T l_mult = 360.0 / ublas::sum(p_fitness);
+        const ublas::vector<T> l_probability = p_fitness / ublas::sum(p_fitness);
         std::vector< boost::shared_ptr< individual::individual<L> > > l_elite;
         
-        for(std::size_t i=p_start; i < <p_end; ++i) {
+        for(std::size_t i=p_start; i < p_end; ++i) {
             
+            // calculate (probabilities - values) and remove all values < 0 and get the smallest value
+            const ublas::vector<T> l_diff = l_probability - m_random.get<double>(tools::random::uniform, 0.0, 1.0);
+            
+            // determine the first index with an element >= 0
+            std::size_t n = 0;
+            for(n=0; (n < l_diff.size()) && (l_diff(n) < 0); ++n);
+            
+            // determine smallest element (we can start with n, because the loop before stops on the first element >= 0)
+            for(std::size_t j=n+1; j < l_diff.size(); ++j) {
+                if (l_diff(j) < 0)
+                    continue;
+            
+                if (l_diff(j) < l_diff(n))
+                    n = j;
+            }
+            
+            
+            l_elite.push_back( p_population[n] );
         }
         
         return l_elite;

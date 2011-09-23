@@ -56,9 +56,9 @@ namespace machinelearning { namespace geneticalgorithm {
         public :
         
             enum buildoption {
-                fullBuildFromElite      = 0,
-                removeWorst             = 1,
-                replaceRandom           = 2
+                eliteonly      = 0,
+                steadystates   = 1,
+                random         = 2
             };
         
         
@@ -124,7 +124,7 @@ namespace machinelearning { namespace geneticalgorithm {
     template<typename T, typename L> inline population<T,L>::population( const individual::individual<L>& p_individualref, const std::size_t& p_size, const std::size_t& p_elite ) :
         m_population( p_size ),
         m_elite( p_elite ),
-        m_buildoption( fullBuildFromElite ),
+        m_buildoption( eliteonly ),
         m_mutateprobility(),
         m_running(),
         m_iterationlock()
@@ -241,13 +241,22 @@ namespace machinelearning { namespace geneticalgorithm {
         std::vector< std::pair<std::size_t, std::size_t> > l_populationparts;
         for( std::size_t i=0; i < m_population.size(); i+= l_inc )
             l_populationparts.push_back( std::pair<std::size_t, std::size_t>(i, i+l_inc) );
-        l_populationparts[l_populationparts.size()-1].second += m_population.size() % boost::thread::hardware_concurrency();
+        
+        if (l_populationparts.size() == 0)
+            l_populationparts.push_back( std::pair<std::size_t, std::size_t>(0, m_population.size()) );
+        else
+            l_populationparts[l_populationparts.size()-1].second += m_population.size() % boost::thread::hardware_concurrency();
+        
         
         l_inc = m_elite.capacity() / boost::thread::hardware_concurrency();
         std::vector< std::pair<std::size_t, std::size_t> > l_eliteparts;
         for( std::size_t i=0; i < m_elite.capacity(); i+= l_inc )
             l_eliteparts.push_back( std::pair<std::size_t, std::size_t>(i, i+l_inc) );
-        l_eliteparts[l_eliteparts.size()-1].second += m_elite.capacity() % boost::thread::hardware_concurrency();
+        
+        if (l_eliteparts.size() == 0)
+            l_eliteparts.push_back( std::pair<std::size_t, std::size_t>(0, m_elite.capacity()) );
+        else
+            l_eliteparts[l_eliteparts.size()-1].second += m_elite.capacity() % boost::thread::hardware_concurrency();
         
 
         
@@ -278,7 +287,7 @@ namespace machinelearning { namespace geneticalgorithm {
             
             
             // create build new population threads and run
-            switch (  ((m_buildoption == fullBuildFromElite) || (m_buildoption == replaceRandom)) ? 0 : 1  ) {
+            switch (  ((m_buildoption == eliteonly) || (m_buildoption == random)) ? 0 : 1  ) {
                     
                 case 0 :
                     for(std::size_t j=0; j < l_populationparts.size(); ++j)
@@ -339,7 +348,7 @@ namespace machinelearning { namespace geneticalgorithm {
         tools::random l_rand;
         switch (m_buildoption) {
                 
-            case fullBuildFromElite :
+            case eliteonly :
                 for(std::size_t i=p_start; i < p_end; ++i) {
                     for(std::size_t j=0; j < p_crossover.getNumberOfIndividuals(); ++j)
                         p_crossover.setIndividual( m_elite[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, 0, m_elite.size()))] );
@@ -349,7 +358,7 @@ namespace machinelearning { namespace geneticalgorithm {
                 break;
                 
                 
-            case removeWorst :
+            case steadystates :
                 for(std::size_t i=p_start; i < p_end; ++i) {
                     for(std::size_t j=0; j < p_crossover.getNumberOfIndividuals(); ++j)
                         p_crossover.setIndividual( m_elite[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, 0, m_elite.size()))] );
@@ -359,7 +368,7 @@ namespace machinelearning { namespace geneticalgorithm {
                 break;
                 
                 
-            case replaceRandom :
+            case random :
                 for(std::size_t i=p_start; i < p_end; ++i) {
                     for(std::size_t j=0; j < p_crossover.getNumberOfIndividuals(); ++j)
                         p_crossover.setIndividual( m_elite[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, 0, m_elite.size()))] );

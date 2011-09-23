@@ -66,7 +66,7 @@ namespace machinelearning { namespace tools {
      * system-random-generator can be used. The class holds different distribution that
      * can be used. The system-random-generator must be set with the compileflag 
      * $LastChangedDate$
-     * @todo think about pseudo generator random seed
+     * @todo think about pseudo generator random seed (because on cloning the object in different thread the seed is euqal in each thread, so it generates the same numbers)
      * @todo reactivate binomial distribution with correct type casting
      **/
     class random

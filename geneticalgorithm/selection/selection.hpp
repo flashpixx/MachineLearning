@@ -54,7 +54,7 @@ namespace machinelearning { namespace geneticalgorithm { namespace selection {
              * @param p_population const reference to the population
              * @param p_fitness vector with fitnss values (index is equal to the index of the population)
              * @param p_rankIndex rank index (first index has the position of the population element, that has the smalles fitness value)
-             * @param p_rank rank values (first element equal to polulation index has the rank value, which rank has the first individual)
+             * @param p_rank rank values (first element equal to polulation index has the rank value of the first individual)
              **/
             virtual std::vector< boost::shared_ptr< individual::individual<L> > > 
                     getElite( 
