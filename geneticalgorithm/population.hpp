@@ -67,7 +67,7 @@ namespace machinelearning { namespace geneticalgorithm {
             std::size_t size( void ) const;
             void setEliteSize( const std::size_t& );
             std::size_t getEliteSize( void ) const;
-            std::vector<L> getEliteData( void ) const;
+            std::vector< individual::individual<L> > getElite( void ) const;
             void setMutalProbability( const T&, const tools::random::distribution& = tools::random::uniform, const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon() );
             void setPopulationBuild( const buildoption&, const tools::random::distribution& = tools::random::uniform );
             void iterate( const std::size_t&, const fitness::fitness<T,L>&, const selection::selection<T,L>&, const crossover::crossover<L>& );
@@ -181,14 +181,14 @@ namespace machinelearning { namespace geneticalgorithm {
     }
     
     
-    /** returns a copy of the elite data
+    /** returns a copy of the elite individuals 
      * @return vector with data of the elite individuals
      **/
-    template<typename T, typename L> inline std::vector<L> population<T,L>::getEliteData( void ) const
+    template<typename T, typename L> inline std::vector< individual::individual<L> > population<T,L>::getElite( void ) const
     {
-        std::vector<L> l_data;
+        std::vector< individual::individual<L> > l_data;
         for(std::size_t i=0; i < m_elite.size(); ++i)
-            l_data.push_back( (*m_elite[i]).getData() );
+            l_data.push_back( *m_elite[i] );
             
         return l_data;
     }

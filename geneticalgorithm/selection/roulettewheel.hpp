@@ -51,7 +51,7 @@ namespace machinelearning { namespace geneticalgorithm { namespace selection {
         public :
         
             roulettewheel( void );
-            std::vector< boost::shared_ptr< individual::individual<L> > > getElite( const std::size_t&, const std::size_t&, const std::vector< boost::shared_ptr< individual::individual<L> > >&, const ublas::vector<T>&, const ublas::vector<std::size_t>&, const ublas::vector<std::size_t>& ) const;
+            std::vector< boost::shared_ptr< individual::individual<L> > > getElite( const std::size_t&, const std::size_t&, const std::vector< boost::shared_ptr< individual::individual<L> > >&, const ublas::vector<T>&, const ublas::vector<std::size_t>&, const ublas::vector<std::size_t>& );
         
         
         private :
@@ -77,7 +77,7 @@ namespace machinelearning { namespace geneticalgorithm { namespace selection {
      * @param p_rankIndex rank index (first index has the position of the population element, that has the smalles fitness value)
      * @param p_rank rank values (first element equal to polulation index has the rank value of the first individual)
      **/
-    template<typename T, typename L> std::vector< boost::shared_ptr< individual::individual<L> > > roulettewheelselection<T,L>::getElite( const std::size_t& p_start, const std::size_t& p_end, const std::vector< boost::shared_ptr< individual::individual<L> > >& p_population, const ublas::vector<T>& p_fitness, const ublas::vector<std::size_t>& p_rankIndex, const ublas::vector<std::size_t>& p_rank ) const
+    template<typename T, typename L> std::vector< boost::shared_ptr< individual::individual<L> > > roulettewheel<T,L>::getElite( const std::size_t& p_start, const std::size_t& p_end, const std::vector< boost::shared_ptr< individual::individual<L> > >& p_population, const ublas::vector<T>& p_fitness, const ublas::vector<std::size_t>& p_rankIndex, const ublas::vector<std::size_t>& p_rank )
     {
         const ublas::vector<T> l_probability = p_fitness / ublas::sum(p_fitness);
         std::vector< boost::shared_ptr< individual::individual<L> > > l_elite;
@@ -85,7 +85,10 @@ namespace machinelearning { namespace geneticalgorithm { namespace selection {
         for(std::size_t i=p_start; i < p_end; ++i) {
             
             // calculate (probabilities - values) and remove all values < 0 and get the smallest value
-            const ublas::vector<T> l_diff = l_probability - m_random.get<double>(tools::random::uniform, 0.0, 1.0);
+            const T l_propvalue           = m_random.get<T>(tools::random::uniform, 0.0, 1.0);
+            ublas::vector<T> l_diff       = l_probability;
+            BOOST_FOREACH( T& p, l_diff)
+                p -= l_propvalue;
             
             // determine the first index with an element >= 0
             std::size_t n = 0;

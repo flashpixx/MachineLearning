@@ -64,7 +64,7 @@ namespace machinelearning { namespace geneticalgorithm { namespace selection {
                               const ublas::vector<T>& p_fitness,
                               const ublas::vector<std::size_t>& p_rankIndex,
                               const ublas::vector<std::size_t>& p_rank
-                            ) const = 0;
+                            ) = 0;
         
     };
     
