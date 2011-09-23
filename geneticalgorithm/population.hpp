@@ -271,9 +271,9 @@ namespace machinelearning { namespace geneticalgorithm {
             
             // create and run fitness threads
             for(std::size_t j=0; j < l_populationparts.size(); ++j)
-                l_threads.create_thread(  boost::bind( &population<T,L>::fitness, this, l_populationparts[j].first, l_populationparts[j].second, p_fitness, boost::ref(l_fitness) )  );
+                l_threads.create_thread(  boost::bind( &population<T,L>::fitness, this, l_populationparts[j].first, l_populationparts[j].second, boost::ref(p_fitness), boost::ref(l_fitness) )  );
             l_threads.join_all();
-                        
+            /*            
             
             // rank the fitness values (not multithread)
             const ublas::vector<std::size_t> l_rankIndex( tools::vector::rankIndexVector(l_fitness) );
@@ -300,7 +300,7 @@ namespace machinelearning { namespace geneticalgorithm {
                     break;
             }
             l_threads.join_all();
-            
+            */
             
             // create and run mutation threads
             for(std::size_t j=0; j < l_populationparts.size(); ++j)
@@ -319,8 +319,8 @@ namespace machinelearning { namespace geneticalgorithm {
      **/
     template<typename T, typename L> inline void population<T,L>::fitness( const std::size_t& p_start, const std::size_t& p_end, const fitness::fitness<T,L> p_fitnessfunction, ublas::vector<T>& p_fitness ) const
     {
-        for(std::size_t i=0; i < p_end; ++i)
-            p_fitness(i) = m_population[i] ? p_fitnessfunction.getFitness( *m_population[i] ) : 0;
+        for(std::size_t i=p_start; i < p_end; ++i)
+            p_fitness(i) = p_fitnessfunction.getFitness( *m_population[i] );
     }
     
     
@@ -331,7 +331,7 @@ namespace machinelearning { namespace geneticalgorithm {
     template<typename T, typename L> inline void population<T,L>::mutate( const std::size_t& p_start, const std::size_t& p_end ) const
     {
         tools::random l_rand;
-        for(std::size_t i=0; i < p_end; ++i)
+        for(std::size_t i=p_start; i < p_end; ++i)
             if (l_rand.get<T>( m_mutateprobility.distribution, m_mutateprobility.first, m_mutateprobility.second, m_mutateprobility.third ) <= m_mutateprobility.probabilityvalue)
                 (*m_population[i]).mutate();
     }
