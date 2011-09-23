@@ -119,6 +119,7 @@ int main(int argc, char* argv[])
     fitness<double,std::size_t> l_fitness( l_packs, l_map["maxpacksize"].as<double>() );
     ga::individual::binaryindividual<std::size_t> l_individual( l_packs.size() );
     ga::crossover::kcrossover<std::size_t> l_crossover(l_cuts);
+    ga::selection::roulettewheel
     
     // create population
     ga::population<double,std::size_t> l_population(l_individual, l_populationsize, l_elitesize);

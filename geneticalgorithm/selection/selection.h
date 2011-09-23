@@ -35,7 +35,7 @@ namespace machinelearning { namespace geneticalgorithm {
 };};
 
 #include "selection.hpp"
-#include "roulettewheelselection.hpp"
+#include "roulettewheel.hpp"
 
 #endif
 

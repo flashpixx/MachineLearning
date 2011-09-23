@@ -42,15 +42,15 @@ namespace machinelearning { namespace geneticalgorithm { namespace selection {
     
     
     /** class of the roulette-wheel-selection
-     * $LastChangedDate$
+     * $LastChangedDate: 2011-09-24 00:11:30 +0200 (Sa, 24 Sep 2011) $
      **/
-    template<typename T, typename L> class roulettewheelselection : public selection<T,L>
+    template<typename T, typename L> class roulettewheel : public selection<T,L>
     {
         BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
         
         public :
         
-            roulettewheelselection( void );
+            roulettewheel( void );
             std::vector< boost::shared_ptr< individual::individual<L> > > getElite( const std::size_t&, const std::size_t&, const std::vector< boost::shared_ptr< individual::individual<L> > >&, const ublas::vector<T>&, const ublas::vector<std::size_t>&, const ublas::vector<std::size_t>& ) const;
         
         
@@ -64,7 +64,7 @@ namespace machinelearning { namespace geneticalgorithm { namespace selection {
     
     
     /** constructor **/
-    template<typename T, typename L> roulettewheelselection<T,L>::roulettewheelselection( void ) :
+    template<typename T, typename L> roulettewheel<T,L>::roulettewheel( void ) :
         m_random()
     {}
     
