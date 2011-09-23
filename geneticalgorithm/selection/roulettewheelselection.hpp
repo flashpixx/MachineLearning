@@ -41,7 +41,7 @@ namespace machinelearning { namespace geneticalgorithm { namespace selection {
     
     
     /** class of the roulette-wheel-selection
-     * $LastChangedDate: 2011-09-20 17:17:25 +0200 (Di, 20 Sep 2011) $
+     * $LastChangedDate$
      **/
     template<typename T, typename L> class roulettewheelselection : public selection<T,L>
     {
