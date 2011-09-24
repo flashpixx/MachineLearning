@@ -260,7 +260,7 @@ namespace machinelearning { namespace geneticalgorithm {
         
 
         
-        // run iteration process (each thread group must be recreated on the iteration, because after the join_all() the group is empty)
+        // run iteration process (each thread group must be recreated on the iteration, because after the join_all() the threads are "out-of-range")
         for(std::size_t i=0; i < p_iteration; ++i) {
             
             // vector with fitness values and thread object
@@ -271,15 +271,21 @@ namespace machinelearning { namespace geneticalgorithm {
             
             // create and run fitness threads
             for(std::size_t j=0; j < l_populationparts.size(); ++j)
-                l_threads.create_thread(  boost::bind( &population<T,L>::fitness, this, l_populationparts[j].first, l_populationparts[j].second, boost::ref(p_fitness), boost::ref(l_fitness) )  );
+                l_threads.create_thread(  boost::bind( &population<T,L>::fitness, this, l_populationparts[j].first, l_populationparts[j].second, p_fitness, boost::ref(l_fitness) )  );
             l_threads.join_all();
-            /*            
-            
+                        
+            // scales the fitness values to [0,x] (not multithread)
+            T l_min = 0;
+            BOOST_FOREACH( T p, l_fitness)
+                l_min = std::min(l_min, p);
+            BOOST_FOREACH( T& p, l_fitness)
+                p -= l_min;
+             
             // rank the fitness values (not multithread)
             const ublas::vector<std::size_t> l_rankIndex( tools::vector::rankIndexVector(l_fitness) );
             const ublas::vector<std::size_t> l_rank( tools::vector::rank(l_fitness) );
             
-            
+            /*
             // create elite multithreaded
             m_elite.clear();
             for(std::size_t j=0; j < l_eliteparts.size(); ++j)
