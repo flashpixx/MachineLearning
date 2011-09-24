@@ -67,7 +67,7 @@ namespace machinelearning { namespace geneticalgorithm { namespace selection {
     template<typename T, typename L> roulettewheel<T,L>::roulettewheel( void ) :
         m_random()
     {}
-    
+
         
     /** returns the roulette-wheel-selection elites
      * @param p_start start value of the elite values

@@ -116,14 +116,14 @@ int main(int argc, char* argv[])
 
     
     // genetic algorithm (basic structure eg individual, fitness function, crossover function [see above])
-    fitness<double,std::size_t> l_fitness( l_packs, l_map["maxpacksize"].as<double>() );
-    ga::individual::binaryindividual<std::size_t> l_individual( l_packs.size() );
-    ga::crossover::kcrossover<std::size_t> l_crossover(l_cuts);
-    ga::selection::roulettewheel<double,std::size_t> l_selection;
+    fitness<double,unsigned char> l_fitness( l_packs, l_map["maxpacksize"].as<double>() );
+    ga::individual::binaryindividual<unsigned char> l_individual( l_packs.size() );
+    ga::crossover::kcrossover<unsigned char> l_crossover(l_cuts);
+    ga::selection::roulettewheel<double,unsigned char> l_selection;
     
     
     // create population and iterate the data
-    ga::population<double,std::size_t> l_population(l_individual, l_populationsize, l_elitesize);
+    ga::population<double,unsigned char> l_population(l_individual, l_populationsize, l_elitesize);
     
     l_population.iterate( l_iteration, l_fitness, l_selection, l_crossover );
     

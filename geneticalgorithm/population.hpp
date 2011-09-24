@@ -144,7 +144,7 @@ namespace machinelearning { namespace geneticalgorithm {
         // create individuals
         for(std::size_t i=0; i < p_size; ++i) {
             boost::shared_ptr< individual::individual<L> > l_ptr;
-            (&p_individualref)->clone( l_ptr );
+            p_individualref.clone( l_ptr );
             m_population.push_back( l_ptr );
         }
     }
@@ -399,13 +399,14 @@ namespace machinelearning { namespace geneticalgorithm {
      **/
     template<typename T, typename L> inline void population<T,L>::buildelite( const std::size_t& p_start, const std::size_t& p_end, selection::selection<T,L>& p_eliteselection, const ublas::vector<T>& p_fitness, const ublas::vector<std::size_t>& p_rankIndex, const ublas::vector<std::size_t>& p_rank )
     {
-        
+        // build elite
         std::vector< boost::shared_ptr< individual::individual<L> > > l_elite;
         p_eliteselection.getElite( p_start, p_end, m_population, p_fitness, p_rankIndex, p_rank, l_elite );
         
         // we need a mutex, because different threads modify the elite property, so we must create a lock during resizing
         boost::unique_lock<boost::mutex> l_lock( m_iterationlock );
         std::copy( l_elite.begin(), l_elite.end(), std::back_inserter(m_elite));
+        std::cout << p_start << " " << &p_eliteselection << std::endl;
     }
     
     
