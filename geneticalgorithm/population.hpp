@@ -70,7 +70,7 @@ namespace machinelearning { namespace geneticalgorithm {
             std::vector< individual::individual<L> > getElite( void ) const;
             void setMutalProbability( const T&, const tools::random::distribution& = tools::random::uniform, const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon() );
             void setPopulationBuild( const buildoption&, const tools::random::distribution& = tools::random::uniform );
-            void iterate( const std::size_t&, const fitness::fitness<T,L>&, const selection::selection<T,L>&, const crossover::crossover<L>& );
+            void iterate( const std::size_t&, fitness::fitness<T,L>&, selection::selection<T,L>&, crossover::crossover<L>& );
             //bool isConverged( const std::size_t&, const fitness::fitness<T>&, const selection::selection<T>&, const crossover& );
         
         
@@ -105,12 +105,14 @@ namespace machinelearning { namespace geneticalgorithm {
             boost::mutex m_running;
             /** boost mutex for lock during fitting **/
             boost::mutex m_iterationlock;
+            /** elite size **/
+            std::size_t m_elitesize;
         
         
-            void fitness( const std::size_t&, const std::size_t&, const fitness::fitness<T,L>, ublas::vector<T>& ) const;
+            void fitness( const std::size_t&, const std::size_t&, fitness::fitness<T,L>&, ublas::vector<T>& ) const;
             void mutate( const std::size_t&, const std::size_t& ) const;
-            void buildelite( const std::size_t&, const std::size_t&, const selection::selection<T,L>, const ublas::vector<T>&, const ublas::vector<std::size_t>&, const ublas::vector<std::size_t>& );
-            void buildpopulation( const std::size_t&, const std::size_t&, const crossover::crossover<L>, const ublas::vector<std::size_t>& ) const;
+            void buildelite( const std::size_t&, const std::size_t&, selection::selection<T,L>&, const ublas::vector<T>&, const ublas::vector<std::size_t>&, const ublas::vector<std::size_t>& );
+            void buildpopulation( const std::size_t&, const std::size_t&, crossover::crossover<L>&, const ublas::vector<std::size_t>& ) const;
         
     };
     
@@ -122,12 +124,13 @@ namespace machinelearning { namespace geneticalgorithm {
      * @param p_elite size of the elites
      **/
     template<typename T, typename L> inline population<T,L>::population( const individual::individual<L>& p_individualref, const std::size_t& p_size, const std::size_t& p_elite ) :
-        m_population( p_size ),
-        m_elite( p_elite ),
+        m_population(),
+        m_elite(),
         m_buildoption( eliteonly ),
         m_mutateprobility(),
         m_running(),
-        m_iterationlock()
+        m_iterationlock(),
+        m_elitesize(p_elite)
     {
         if (p_size < 3)
             throw exception::runtime(_("population size must be greater than two"), *this);
@@ -165,10 +168,10 @@ namespace machinelearning { namespace geneticalgorithm {
         if (p_size < 2)
             throw exception::runtime(_("elite size must be greater than one"), *this);
         
-        if (p_size >= m_population.capacity())
+        if (p_size >= m_population.size())
             throw exception::runtime(_("elite size must be smaller than population size"), *this);
         
-        m_elite.resize(p_size);
+        m_elitesize = p_size;
     }
     
     
@@ -177,7 +180,7 @@ namespace machinelearning { namespace geneticalgorithm {
      **/
     template<typename T, typename L> inline std::size_t population<T,L>::getEliteSize( void ) const
     {
-        return m_elite.capacity();
+        return m_elitesize;
     }
     
     
@@ -226,11 +229,11 @@ namespace machinelearning { namespace geneticalgorithm {
      * @param p_elite elite selection object
      * @param p_crossover crossover object
      **/
-    template<typename T, typename L> inline void population<T,L>::iterate( const std::size_t& p_iteration, const fitness::fitness<T,L>& p_fitness, const selection::selection<T,L>& p_elite, const crossover::crossover<L>& p_crossover )
+    template<typename T, typename L> inline void population<T,L>::iterate( const std::size_t& p_iteration, fitness::fitness<T,L>& p_fitness, selection::selection<T,L>& p_elite, crossover::crossover<L>& p_crossover )
     {
         if (p_iteration == 0)
             throw exception::runtime(_("iterations must be greater than zero"), *this);
-        
+
         // we set a lock during calculation, because the object can't handle different local states
         boost::unique_lock<boost::mutex> l_lock( m_running );
         
@@ -248,15 +251,15 @@ namespace machinelearning { namespace geneticalgorithm {
             l_populationparts[l_populationparts.size()-1].second += m_population.size() % boost::thread::hardware_concurrency();
         
         
-        l_inc = m_elite.capacity() / boost::thread::hardware_concurrency();
+        l_inc = m_elitesize / boost::thread::hardware_concurrency();
         std::vector< std::pair<std::size_t, std::size_t> > l_eliteparts;
-        for( std::size_t i=0; i < m_elite.capacity(); i+= l_inc )
+        for( std::size_t i=0; i < m_elitesize; i+= l_inc )
             l_eliteparts.push_back( std::pair<std::size_t, std::size_t>(i, i+l_inc) );
         
         if (l_eliteparts.size() == 0)
-            l_eliteparts.push_back( std::pair<std::size_t, std::size_t>(0, m_elite.capacity()) );
+            l_eliteparts.push_back( std::pair<std::size_t, std::size_t>(0, m_elitesize) );
         else
-            l_eliteparts[l_eliteparts.size()-1].second += m_elite.capacity() % boost::thread::hardware_concurrency();
+            l_eliteparts[l_eliteparts.size()-1].second += m_elitesize % boost::thread::hardware_concurrency();
         
 
         
@@ -271,38 +274,39 @@ namespace machinelearning { namespace geneticalgorithm {
             
             // create and run fitness threads
             for(std::size_t j=0; j < l_populationparts.size(); ++j)
-                l_threads.create_thread(  boost::bind( &population<T,L>::fitness, this, l_populationparts[j].first, l_populationparts[j].second, p_fitness, boost::ref(l_fitness) )  );
+                l_threads.create_thread(  boost::bind( &population<T,L>::fitness, this, l_populationparts[j].first, l_populationparts[j].second, boost::ref(p_fitness), boost::ref(l_fitness) )  );
             l_threads.join_all();
                         
             // scales the fitness values to [0,x] (not multithread)
             T l_min = 0;
-            BOOST_FOREACH( T p, l_fitness)
+            BOOST_FOREACH( T p, l_fitness )
                 l_min = std::min(l_min, p);
-            BOOST_FOREACH( T& p, l_fitness)
+            BOOST_FOREACH( T& p, l_fitness )
                 p -= l_min;
              
             // rank the fitness values (not multithread)
             const ublas::vector<std::size_t> l_rankIndex( tools::vector::rankIndexVector(l_fitness) );
             const ublas::vector<std::size_t> l_rank( tools::vector::rank(l_fitness) );
+
             
-            /*
             // create elite multithreaded
             m_elite.clear();
             for(std::size_t j=0; j < l_eliteparts.size(); ++j)
-                l_threads.create_thread(  boost::bind( &population<T,L>::buildelite, this, l_eliteparts[j].first, l_eliteparts[j].second, l_fitness, l_rankIndex, l_rank )  );
+                l_threads.create_thread(  boost::bind( &population<T,L>::buildelite, this, l_eliteparts[j].first, l_eliteparts[j].second, boost::ref(p_elite), boost::ref(l_fitness), boost::ref(l_rankIndex), boost::ref(l_rank) )  );
+            l_threads.join_all();
             
-            
+            /*
             // create build new population threads and run
             switch (  ((m_buildoption == eliteonly) || (m_buildoption == random)) ? 0 : 1  ) {
                     
                 case 0 :
                     for(std::size_t j=0; j < l_populationparts.size(); ++j)
-                        l_threads.create_thread(  boost::bind( &population<T,L>::buildpopulation, this, l_populationparts[j].first, l_populationparts[j].second, p_crossover, l_rankIndex )  );
+                        l_threads.create_thread(  boost::bind( &population<T,L>::buildpopulation, this, l_populationparts[j].first, l_populationparts[j].second, boost::ref(p_crossover), boost::ref(l_rankIndex) )  );
                     break;
                     
                 case 1 :
                     for(std::size_t j=0; j < l_eliteparts.size(); ++j)
-                        l_threads.create_thread(  boost::bind( &population<T,L>::buildpopulation, this, l_eliteparts[j].first, l_eliteparts[j].second, p_crossover, l_rankIndex )  );
+                        l_threads.create_thread(  boost::bind( &population<T,L>::buildpopulation, this, l_eliteparts[j].first, l_eliteparts[j].second, boost::ref(p_crossover), boost::ref(l_rankIndex) )  );
                     break;
             }
             l_threads.join_all();
@@ -313,7 +317,6 @@ namespace machinelearning { namespace geneticalgorithm {
                 l_threads.create_thread(  boost::bind( &population<T,L>::mutate, this, l_populationparts[j].first, l_populationparts[j].second )  );
             l_threads.join_all();
         }
-        
     }
     
     
@@ -323,7 +326,7 @@ namespace machinelearning { namespace geneticalgorithm {
      * @param p_fitnessfunction fitness function object
      * @param p_fitness reference to the fitness vector
      **/
-    template<typename T, typename L> inline void population<T,L>::fitness( const std::size_t& p_start, const std::size_t& p_end, const fitness::fitness<T,L> p_fitnessfunction, ublas::vector<T>& p_fitness ) const
+    template<typename T, typename L> inline void population<T,L>::fitness( const std::size_t& p_start, const std::size_t& p_end, fitness::fitness<T,L>& p_fitnessfunction, ublas::vector<T>& p_fitness ) const
     {
         for(std::size_t i=p_start; i < p_end; ++i)
             p_fitness(i) = p_fitnessfunction.getFitness( *m_population[i] );
@@ -349,7 +352,7 @@ namespace machinelearning { namespace geneticalgorithm {
      * @param p_crossover crossover function object
      * @param p_rankIdx ublas vector with rank index values of population elements
      **/
-    template<typename T, typename L> inline void population<T,L>::buildpopulation( const std::size_t& p_start, const std::size_t& p_end, const crossover::crossover<L> p_crossover, const ublas::vector<std::size_t>& p_rankIdx ) const
+    template<typename T, typename L> inline void population<T,L>::buildpopulation( const std::size_t& p_start, const std::size_t& p_end, crossover::crossover<L>& p_crossover, const ublas::vector<std::size_t>& p_rankIdx ) const
     {
         tools::random l_rand;
         switch (m_buildoption) {
@@ -394,9 +397,11 @@ namespace machinelearning { namespace geneticalgorithm {
      * @param p_rankIndex vector with index values in ascending order (0. element has the index of the smalles fitness value within the population)
      * @param p_rank rank index (0. elements = 0. element within the population has the rank value (position) within the population )
      **/
-    template<typename T, typename L> inline void population<T,L>::buildelite( const std::size_t& p_start, const std::size_t& p_end, const selection::selection<T,L> p_eliteselection, const ublas::vector<T>& p_fitness, const ublas::vector<std::size_t>& p_rankIndex, const ublas::vector<std::size_t>& p_rank )
+    template<typename T, typename L> inline void population<T,L>::buildelite( const std::size_t& p_start, const std::size_t& p_end, selection::selection<T,L>& p_eliteselection, const ublas::vector<T>& p_fitness, const ublas::vector<std::size_t>& p_rankIndex, const ublas::vector<std::size_t>& p_rank )
     {
-        const std::vector< boost::shared_ptr< individual::individual<L> > > l_elite( p_eliteselection.getElite( p_start, p_end, m_population, p_fitness, p_rankIndex, p_rank ) );
+        
+        std::vector< boost::shared_ptr< individual::individual<L> > > l_elite;
+        p_eliteselection.getElite( p_start, p_end, m_population, p_fitness, p_rankIndex, p_rank, l_elite );
         
         // we need a mutex, because different threads modify the elite property, so we must create a lock during resizing
         boost::unique_lock<boost::mutex> l_lock( m_iterationlock );

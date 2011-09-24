@@ -55,15 +55,17 @@ namespace machinelearning { namespace geneticalgorithm { namespace selection {
              * @param p_fitness vector with fitnss values (index is equal to the index of the population)
              * @param p_rankIndex rank index (first index has the position of the population element, that has the smalles fitness value)
              * @param p_rank rank values (first element equal to polulation index has the rank value of the first individual)
+             * @param p_elite vector with elite individual [must not be thread-safe]
              **/
-            virtual std::vector< boost::shared_ptr< individual::individual<L> > > 
+            virtual void 
                     getElite( 
                               const std::size_t& p_start, 
                               const std::size_t& p_end,
                               const std::vector< boost::shared_ptr< individual::individual<L> > >& p_population,
                               const ublas::vector<T>& p_fitness,
                               const ublas::vector<std::size_t>& p_rankIndex,
-                              const ublas::vector<std::size_t>& p_rank
+                              const ublas::vector<std::size_t>& p_rank,
+                              std::vector< boost::shared_ptr< individual::individual<L> > >& p_elite
                             ) = 0;
         
     };

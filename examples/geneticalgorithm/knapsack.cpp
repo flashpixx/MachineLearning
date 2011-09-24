@@ -121,6 +121,7 @@ int main(int argc, char* argv[])
     ga::crossover::kcrossover<std::size_t> l_crossover(l_cuts);
     ga::selection::roulettewheel<double,std::size_t> l_selection;
     
+    
     // create population and iterate the data
     ga::population<double,std::size_t> l_population(l_individual, l_populationsize, l_elitesize);
     

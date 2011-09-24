@@ -25,6 +25,7 @@
 #ifndef __MACHINELEARNING_GENETICALGORITHM_FITNESS_FITNESS_HPP
 #define __MACHINELEARNING_GENETICALGORITHM_FITNESS_FITNESS_HPP
 
+#include <boost/shared_ptr.hpp>
 #include <boost/static_assert.hpp>
 
 #include "../individual/individual.hpp"
