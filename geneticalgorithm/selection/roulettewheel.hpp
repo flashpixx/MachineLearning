@@ -54,7 +54,7 @@ namespace machinelearning { namespace geneticalgorithm { namespace selection {
         
             void getElite( const std::size_t&, const std::size_t&, const std::vector< boost::shared_ptr< individual::individual<L> > >&, const ublas::vector<T>&, const ublas::vector<std::size_t>&, const ublas::vector<std::size_t>&,std::vector< boost::shared_ptr< individual::individual<L> > >&  );
         
-            void eachIteration( const std::vector< boost::shared_ptr< individual::individual<L> > >& ) {}
+            void onEachIteration( const std::vector< boost::shared_ptr< individual::individual<L> > >& ) {}
         
         
         private :

@@ -49,7 +49,7 @@ namespace machinelearning { namespace geneticalgorithm { namespace crossover {
             boost::shared_ptr< individual::individual<T> > combine( void );
             void setIndividual( const boost::shared_ptr< individual::individual<T> >& );
             
-            void eachIteration( const std::vector< boost::shared_ptr< individual::individual<T> > >& ) {}
+            void onEachIteration( const std::vector< boost::shared_ptr< individual::individual<T> > >& ) {}
         
         
         private :

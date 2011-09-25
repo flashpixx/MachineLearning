@@ -29,7 +29,6 @@
 #include <boost/static_assert.hpp>
 
 #include "../individual/individual.hpp"
-//#include "population.hpp"
 
 
 namespace machinelearning { namespace geneticalgorithm { namespace fitness {
@@ -51,7 +50,7 @@ namespace machinelearning { namespace geneticalgorithm { namespace fitness {
             /** method that is called at the end of each iteration
              * @param p_population population
              **/
-            virtual void eachIteration( const std::vector< boost::shared_ptr< individual::individual<L> > >& p_population ) = 0;
+            virtual void onEachIteration( const std::vector< boost::shared_ptr< individual::individual<L> > >& p_population ) = 0;
         
     };
     

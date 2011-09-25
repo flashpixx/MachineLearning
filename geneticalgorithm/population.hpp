@@ -320,8 +320,9 @@ namespace machinelearning { namespace geneticalgorithm {
             
             
             // call the "eachIteration" method of each object for updating local object properties (not multithreaded, because of synchronization)
-            p_fitness.eachIteration( m_population );
-            p_elite.eachIteration( m_population );
+            p_fitness.onEachIteration( m_population );
+            p_elite.onEachIteration( m_population );
+            p_crossover.onEachIteration( m_population );
         }
     }
     
