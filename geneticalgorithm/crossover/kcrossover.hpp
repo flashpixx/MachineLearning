@@ -119,7 +119,7 @@ namespace machinelearning { namespace geneticalgorithm { namespace crossover {
         // add the rest of the last individual element (if we do not break in the first loop)
         for(std::size_t n=l_pos; n < l_new->size(); ++n)
             (*l_new)[n] = (*(m_individuals[m_individuals.size()-1]))[n];
-        
+    
         // after create, we clear the internal list
         m_individuals.clear();
         

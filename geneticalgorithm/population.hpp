@@ -349,7 +349,7 @@ namespace machinelearning { namespace geneticalgorithm {
         tools::random l_rand;
         for(std::size_t i=p_start; i < p_end; ++i)
             if (l_rand.get<T>( m_mutateprobility.distribution, m_mutateprobility.first, m_mutateprobility.second, m_mutateprobility.third ) <= m_mutateprobility.probabilityvalue)
-                (*m_population[i]).mutate();
+                m_population[i]->mutate();
     }
     
     
@@ -410,10 +410,12 @@ namespace machinelearning { namespace geneticalgorithm {
         std::vector< boost::shared_ptr< individual::individual<L> > > l_elite;
         p_eliteselection.getElite( p_start, p_end, m_population, p_fitness, p_rankIndex, p_rank, l_elite );
         
+        if (l_elite.size() == 0)
+            return;
+        
         // we need a mutex, because different threads modify the elite property, so we must create a lock during resizing
         boost::unique_lock<boost::mutex> l_lock( m_iterationlock );
         std::copy( l_elite.begin(), l_elite.end(), std::back_inserter(m_elite));
-        std::cout << p_start << " " << &p_eliteselection << std::endl;
     }
     
     
