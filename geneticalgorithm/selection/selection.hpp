@@ -68,6 +68,11 @@ namespace machinelearning { namespace geneticalgorithm { namespace selection {
                               std::vector< boost::shared_ptr< individual::individual<L> > >& p_elite
                             ) = 0;
         
+            /** method that is called at the end of each iteration
+             * @param p_population population
+             **/
+            virtual void eachIteration( const std::vector< boost::shared_ptr< individual::individual<L> > >& p_population ) = 0;
+        
     };
     
 };};};

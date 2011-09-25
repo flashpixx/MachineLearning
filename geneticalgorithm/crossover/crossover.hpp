@@ -54,6 +54,11 @@ namespace machinelearning { namespace geneticalgorithm { namespace crossover {
              * @return returns a new smart-pointer object with the combinated individuals
              **/
             virtual boost::shared_ptr< individual::individual<T> > combine( void ) = 0;
+        
+            /** method that is called at the end of each iteration
+             * @param p_population population
+             **/
+            virtual void eachIteration( const std::vector< boost::shared_ptr< individual::individual<T> > >& p_population ) = 0;
     };
     
 };};};

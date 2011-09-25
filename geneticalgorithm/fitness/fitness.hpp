@@ -48,7 +48,10 @@ namespace machinelearning { namespace geneticalgorithm { namespace fitness {
              **/
             virtual T getFitness( const individual::individual<L>& p_individual ) const = 0;
         
-           // virtual T getFitness( const population<T>& ) const;
+            /** method that is called at the end of each iteration
+             * @param p_population population
+             **/
+            virtual void eachIteration( const std::vector< boost::shared_ptr< individual::individual<L> > >& p_population ) = 0;
         
     };
     

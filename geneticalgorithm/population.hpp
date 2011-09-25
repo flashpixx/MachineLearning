@@ -317,6 +317,11 @@ namespace machinelearning { namespace geneticalgorithm {
             for(std::size_t j=0; j < l_populationparts.size(); ++j)
                 l_threads.create_thread(  boost::bind( &population<T,L>::mutate, this, l_populationparts[j].first, l_populationparts[j].second )  );
             l_threads.join_all();
+            
+            
+            // call the "eachIteration" method of each object for updating local object properties (not multithreaded, because of synchronization)
+            p_fitness.eachIteration( m_population );
+            p_elite.eachIteration( m_population );
         }
     }
     

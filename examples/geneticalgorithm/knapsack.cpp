@@ -52,6 +52,8 @@ template<typename T, typename L> class fitness : public ga::fitness::fitness<T,L
             return std::max( m_max - l_sum, 0.0);
         }
     
+        void eachIteration( const std::vector< boost::shared_ptr< ga::individual::individual<L> > >& ) {}
+    
 
     private :
     
