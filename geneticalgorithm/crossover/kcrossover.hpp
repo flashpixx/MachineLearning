@@ -45,6 +45,7 @@ namespace machinelearning { namespace geneticalgorithm { namespace crossover {
         
             kcrossover( const std::size_t& );
         
+            void clone( boost::shared_ptr< crossover<T> >& ) const;
             std::size_t getNumberOfIndividuals( void ) const;    
             boost::shared_ptr< individual::individual<T> > combine( void );
             void setIndividual( const boost::shared_ptr< individual::individual<T> >& );
@@ -74,6 +75,15 @@ namespace machinelearning { namespace geneticalgorithm { namespace crossover {
     {
         if (p_cuts == 0)
             throw exception::runtime(_("elements must be greater than zero"), *this);
+    }
+    
+    
+    /** method for cloning the object, for using on multithread
+     * @param p_ptr smart-pointer object
+     **/
+    template<typename T> inline void kcrossover<T>::clone( boost::shared_ptr< crossover<T> >& p_ptr ) const
+    {
+        p_ptr = boost::shared_ptr< crossover<T> >( new kcrossover<T>(m_cuts) );
     }
 
     
@@ -119,7 +129,7 @@ namespace machinelearning { namespace geneticalgorithm { namespace crossover {
         // add the rest of the last individual element (if we do not break in the first loop)
         for(std::size_t n=l_pos; n < l_new->size(); ++n)
             (*l_new)[n] = (*(m_individuals[m_individuals.size()-1]))[n];
-    
+        
         // after create, we clear the internal list
         m_individuals.clear();
         

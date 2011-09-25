@@ -52,6 +52,11 @@ template<typename T, typename L> class fitness : public ga::fitness::fitness<T,L
             return std::max( m_max - l_sum, 0.0);
         }
     
+        void clone( boost::shared_ptr< ga::fitness::fitness<T,L> >& p_ptr ) const
+        {
+            p_ptr = boost::shared_ptr< ga::fitness::fitness<T,L> >( new fitness(m_weight, m_max) );
+        }
+    
         void onEachIteration( const std::vector< boost::shared_ptr< ga::individual::individual<L> > >& ) {}
     
 

@@ -52,6 +52,7 @@ namespace machinelearning { namespace geneticalgorithm { namespace selection {
         
             roulettewheel( void );
         
+            void clone( boost::shared_ptr< selection<T,L> >& p_ptr ) const;
             void getElite( const std::size_t&, const std::size_t&, const std::vector< boost::shared_ptr< individual::individual<L> > >&, const ublas::vector<T>&, const ublas::vector<std::size_t>&, const ublas::vector<std::size_t>&,std::vector< boost::shared_ptr< individual::individual<L> > >&  );
         
             void onEachIteration( const std::vector< boost::shared_ptr< individual::individual<L> > >& ) {}
@@ -67,9 +68,18 @@ namespace machinelearning { namespace geneticalgorithm { namespace selection {
     
     
     /** constructor **/
-    template<typename T, typename L> roulettewheel<T,L>::roulettewheel( void ) :
+    template<typename T, typename L> inline roulettewheel<T,L>::roulettewheel( void ) :
         m_random()
     {}
+    
+    
+    /** method for cloning the object, for using on multithread
+     * @param p_ptr smart-pointer object
+     **/
+    template<typename T, typename L> inline void roulettewheel<T,L>::clone( boost::shared_ptr< selection<T,L> >& p_ptr ) const
+    {
+        p_ptr = boost::shared_ptr< selection<T,L> >( new roulettewheel<T,L>() );
+    }
 
         
     /** returns the roulette-wheel-selection elites
@@ -81,7 +91,7 @@ namespace machinelearning { namespace geneticalgorithm { namespace selection {
      * @param p_rank rank values (first element equal to polulation index has the rank value of the first individual)
      * @param p_elite vector with elite individual
      **/
-    template<typename T, typename L> void roulettewheel<T,L>::getElite( const std::size_t& p_start, const std::size_t& p_end, const std::vector< boost::shared_ptr< individual::individual<L> > >& p_population, const ublas::vector<T>& p_fitness, const ublas::vector<std::size_t>& p_rankIndex, const ublas::vector<std::size_t>& p_rank, std::vector< boost::shared_ptr< individual::individual<L> > >& p_elite )
+    template<typename T, typename L> inline void roulettewheel<T,L>::getElite( const std::size_t& p_start, const std::size_t& p_end, const std::vector< boost::shared_ptr< individual::individual<L> > >& p_population, const ublas::vector<T>& p_fitness, const ublas::vector<std::size_t>& p_rankIndex, const ublas::vector<std::size_t>& p_rank, std::vector< boost::shared_ptr< individual::individual<L> > >& p_elite )
     {
         const ublas::vector<T> l_probability = p_fitness / ublas::sum(p_fitness);
         

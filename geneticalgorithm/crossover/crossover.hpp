@@ -55,6 +55,11 @@ namespace machinelearning { namespace geneticalgorithm { namespace crossover {
              **/
             virtual boost::shared_ptr< individual::individual<T> > combine( void ) = 0;
         
+            /** method for cloning the object, for using on multithread
+             * @param p_ptr smart-pointer object
+             **/
+            virtual void clone( boost::shared_ptr< crossover<T> >& p_ptr ) const = 0;
+        
             /** method that is called at the end of each iteration
              * @param p_population population
              **/

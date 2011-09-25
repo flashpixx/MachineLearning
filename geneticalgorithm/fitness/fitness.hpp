@@ -46,6 +46,11 @@ namespace machinelearning { namespace geneticalgorithm { namespace fitness {
              * @param p_individual reference to an individual
              **/
             virtual T getFitness( const individual::individual<L>& p_individual ) const = 0;
+       
+            /** method for cloning the object, for using on multithread
+             * @param p_ptr smart-pointer object
+             **/
+            virtual void clone( boost::shared_ptr< fitness<T,L> >& p_ptr ) const = 0;
         
             /** method that is called at the end of each iteration
              * @param p_population population

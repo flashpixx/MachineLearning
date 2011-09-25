@@ -68,6 +68,11 @@ namespace machinelearning { namespace geneticalgorithm { namespace selection {
                               std::vector< boost::shared_ptr< individual::individual<L> > >& p_elite
                             ) = 0;
         
+            /** method for cloning the object, for using on multithread
+             * @param p_ptr smart-pointer object
+             **/
+            virtual void clone( boost::shared_ptr< selection<T,L> >& p_ptr ) const = 0;
+        
             /** method that is called at the end of each iteration
              * @param p_population population
              **/

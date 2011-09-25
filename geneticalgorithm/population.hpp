@@ -335,8 +335,12 @@ namespace machinelearning { namespace geneticalgorithm {
      **/
     template<typename T, typename L> inline void population<T,L>::fitness( const std::size_t& p_start, const std::size_t& p_end, fitness::fitness<T,L>& p_fitnessfunction, ublas::vector<T>& p_fitness )
     {
+        // create local selection object
+        boost::shared_ptr< fitness::fitness<T,L> > l_fitness;
+        p_fitnessfunction.clone( l_fitness );
+        
         for(std::size_t i=p_start; i < p_end; ++i)
-            p_fitness(i) = p_fitnessfunction.getFitness( *m_population[i] );
+            p_fitness(i) = l_fitness->getFitness( *m_population[i] );
     }
     
     
@@ -361,35 +365,40 @@ namespace machinelearning { namespace geneticalgorithm {
      **/
     template<typename T, typename L> inline void population<T,L>::buildpopulation( const std::size_t& p_start, const std::size_t& p_end, crossover::crossover<L>& p_crossover, const ublas::vector<std::size_t>& p_rankIdx ) 
     {
+        // create local selection object
+        boost::shared_ptr< crossover::crossover<L> > l_crossover;
+        p_crossover.clone( l_crossover );
+        
         tools::random l_rand;
+        
         switch (m_buildoption) {
                 
             case eliteonly :
                 for(std::size_t i=p_start; i < p_end; ++i) {
-                    for(std::size_t j=0; j < p_crossover.getNumberOfIndividuals(); ++j)
-                        p_crossover.setIndividual( m_elite[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, 0, m_elite.size()))] );
+                    for(std::size_t j=0; j < l_crossover->getNumberOfIndividuals(); ++j)
+                        l_crossover->setIndividual( m_elite[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, 0, m_elite.size()))] );
                     
-                    m_population[i] = p_crossover.combine();
+                    m_population[i] = l_crossover->combine();
                 }
                 break;
                 
                 
             case steadystates :
                 for(std::size_t i=p_start; i < p_end; ++i) {
-                    for(std::size_t j=0; j < p_crossover.getNumberOfIndividuals(); ++j)
-                        p_crossover.setIndividual( m_elite[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, 0, m_elite.size()))] );
+                    for(std::size_t j=0; j < l_crossover->getNumberOfIndividuals(); ++j)
+                        l_crossover->setIndividual( m_elite[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, 0, m_elite.size()))] );
 
-                    m_population[p_rankIdx(i)] = p_crossover.combine();
+                    m_population[p_rankIdx(i)] = l_crossover->combine();
                 }
                 break;
                 
                 
             case random :
                 for(std::size_t i=p_start; i < p_end; ++i) {
-                    for(std::size_t j=0; j < p_crossover.getNumberOfIndividuals(); ++j)
-                        p_crossover.setIndividual( m_elite[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, 0, m_elite.size()))] );
+                    for(std::size_t j=0; j < l_crossover->getNumberOfIndividuals(); ++j)
+                        l_crossover->setIndividual( m_elite[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, 0, m_elite.size()))] );
                     
-                    m_population[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, p_start, p_end))] = p_crossover.combine();
+                    m_population[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, p_start, p_end))] = l_crossover->combine();
                 }
                 break;
         }
@@ -406,9 +415,13 @@ namespace machinelearning { namespace geneticalgorithm {
      **/
     template<typename T, typename L> inline void population<T,L>::buildelite( const std::size_t& p_start, const std::size_t& p_end, selection::selection<T,L>& p_eliteselection, const ublas::vector<T>& p_fitness, const ublas::vector<std::size_t>& p_rankIndex, const ublas::vector<std::size_t>& p_rank )
     {
+        // create local selection object
+        boost::shared_ptr< selection::selection<T,L> > l_selection;
+        p_eliteselection.clone( l_selection );
+        
         // build elite
         std::vector< boost::shared_ptr< individual::individual<L> > > l_elite;
-        p_eliteselection.getElite( p_start, p_end, m_population, p_fitness, p_rankIndex, p_rank, l_elite );
+        l_selection->getElite( p_start, p_end, m_population, p_fitness, p_rankIndex, p_rank, l_elite );
         
         if (l_elite.size() == 0)
             return;
