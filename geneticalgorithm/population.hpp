@@ -109,10 +109,10 @@ namespace machinelearning { namespace geneticalgorithm {
             std::size_t m_elitesize;
         
         
-            void fitness( const std::size_t&, const std::size_t&, fitness::fitness<T,L>&, ublas::vector<T>& ) const;
-            void mutate( const std::size_t&, const std::size_t& ) const;
+            void fitness( const std::size_t&, const std::size_t&, fitness::fitness<T,L>&, ublas::vector<T>& );
+            void mutate( const std::size_t&, const std::size_t& );
             void buildelite( const std::size_t&, const std::size_t&, selection::selection<T,L>&, const ublas::vector<T>&, const ublas::vector<std::size_t>&, const ublas::vector<std::size_t>& );
-            void buildpopulation( const std::size_t&, const std::size_t&, crossover::crossover<L>&, const ublas::vector<std::size_t>& ) const;
+            void buildpopulation( const std::size_t&, const std::size_t&, crossover::crossover<L>&, const ublas::vector<std::size_t>& );
         
     };
     
@@ -295,7 +295,7 @@ namespace machinelearning { namespace geneticalgorithm {
                 l_threads.create_thread(  boost::bind( &population<T,L>::buildelite, this, l_eliteparts[j].first, l_eliteparts[j].second, boost::ref(p_elite), boost::ref(l_fitness), boost::ref(l_rankIndex), boost::ref(l_rank) )  );
             l_threads.join_all();
             
-            /*
+            
             // create build new population threads and run
             switch (  ((m_buildoption == eliteonly) || (m_buildoption == random)) ? 0 : 1  ) {
                     
@@ -308,9 +308,10 @@ namespace machinelearning { namespace geneticalgorithm {
                     for(std::size_t j=0; j < l_eliteparts.size(); ++j)
                         l_threads.create_thread(  boost::bind( &population<T,L>::buildpopulation, this, l_eliteparts[j].first, l_eliteparts[j].second, boost::ref(p_crossover), boost::ref(l_rankIndex) )  );
                     break;
+                    
             }
             l_threads.join_all();
-            */
+            
             
             // create and run mutation threads
             for(std::size_t j=0; j < l_populationparts.size(); ++j)
@@ -326,7 +327,7 @@ namespace machinelearning { namespace geneticalgorithm {
      * @param p_fitnessfunction fitness function object
      * @param p_fitness reference to the fitness vector
      **/
-    template<typename T, typename L> inline void population<T,L>::fitness( const std::size_t& p_start, const std::size_t& p_end, fitness::fitness<T,L>& p_fitnessfunction, ublas::vector<T>& p_fitness ) const
+    template<typename T, typename L> inline void population<T,L>::fitness( const std::size_t& p_start, const std::size_t& p_end, fitness::fitness<T,L>& p_fitnessfunction, ublas::vector<T>& p_fitness )
     {
         for(std::size_t i=p_start; i < p_end; ++i)
             p_fitness(i) = p_fitnessfunction.getFitness( *m_population[i] );
@@ -337,7 +338,7 @@ namespace machinelearning { namespace geneticalgorithm {
      * @param p_start start value of the population values
      * @param p_end end value of the population values
      **/
-    template<typename T, typename L> inline void population<T,L>::mutate( const std::size_t& p_start, const std::size_t& p_end ) const
+    template<typename T, typename L> inline void population<T,L>::mutate( const std::size_t& p_start, const std::size_t& p_end )
     {
         tools::random l_rand;
         for(std::size_t i=p_start; i < p_end; ++i)
@@ -352,7 +353,7 @@ namespace machinelearning { namespace geneticalgorithm {
      * @param p_crossover crossover function object
      * @param p_rankIdx ublas vector with rank index values of population elements
      **/
-    template<typename T, typename L> inline void population<T,L>::buildpopulation( const std::size_t& p_start, const std::size_t& p_end, crossover::crossover<L>& p_crossover, const ublas::vector<std::size_t>& p_rankIdx ) const
+    template<typename T, typename L> inline void population<T,L>::buildpopulation( const std::size_t& p_start, const std::size_t& p_end, crossover::crossover<L>& p_crossover, const ublas::vector<std::size_t>& p_rankIdx ) 
     {
         tools::random l_rand;
         switch (m_buildoption) {
