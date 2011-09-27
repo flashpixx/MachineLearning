@@ -67,11 +67,11 @@ namespace machinelearning { namespace geneticalgorithm {
             std::size_t size( void ) const;
             void setEliteSize( const std::size_t& );
             std::size_t getEliteSize( void ) const;
-            std::vector< individual::individual<L> > getElite( void ) const;
+            std::vector< boost::shared_ptr< individual::individual<L> > > getElite( void ) const;
             void setMutalProbability( const T&, const tools::random::distribution& = tools::random::uniform, const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon() );
             void setPopulationBuild( const buildoption&, const tools::random::distribution& = tools::random::uniform );
             void iterate( const std::size_t&, fitness::fitness<T,L>&, selection::selection<T,L>&, crossover::crossover<L>& );
-            //bool isConverged( const std::size_t&, const fitness::fitness<T>&, const selection::selection<T>&, const crossover& );
+            //bool iterateUntilConverged( const std::size_t&, const fitness::fitness<T>&, const selection::selection<T>&, const crossover& );
         
         
         private :
@@ -93,6 +93,8 @@ namespace machinelearning { namespace geneticalgorithm {
                 {}
             };
         
+            /** reference of the individual **/
+            const individual::individual<L>& m_individualref;
             /** vector with smart-pointer of individuals **/
             std::vector< boost::shared_ptr< individual::individual<L> > > m_population;
             /** vector with smart-pointer of elite-individuals **/
@@ -124,6 +126,7 @@ namespace machinelearning { namespace geneticalgorithm {
      * @param p_elite size of the elites
      **/
     template<typename T, typename L> inline population<T,L>::population( const individual::individual<L>& p_individualref, const std::size_t& p_size, const std::size_t& p_elite ) :
+        m_individualref( p_individualref ), 
         m_population(),
         m_elite(),
         m_buildoption( eliteonly ),
@@ -144,14 +147,14 @@ namespace machinelearning { namespace geneticalgorithm {
         // create individuals
         for(std::size_t i=0; i < p_size; ++i) {
             boost::shared_ptr< individual::individual<L> > l_ptr;
-            p_individualref.clone( l_ptr );
+            m_individualref.clone( l_ptr );
             m_population.push_back( l_ptr );
         }
     }
     
     
     /** method for setting population-building-option
-     * @param p_opt bool for enabeling the option
+     * @param p_opt build option
      * @param p_distribution distribution 
      **/
     template<typename T, typename L> inline void population<T,L>::setPopulationBuild( const buildoption& p_opt, const tools::random::distribution& p_distribution )
@@ -185,15 +188,31 @@ namespace machinelearning { namespace geneticalgorithm {
     
     
     /** returns a copy of the elite individuals 
-     * @return vector with data of the elite individuals
+     * @return vector with smart-pointer objects of the elite individuals
      **/
-    template<typename T, typename L> inline std::vector< individual::individual<L> > population<T,L>::getElite( void ) const
+    template<typename T, typename L> inline std::vector< boost::shared_ptr< individual::individual<L> > > population<T,L>::getElite( void ) const
     {
-        std::vector< individual::individual<L> > l_data;
-        for(std::size_t i=0; i < m_elite.size(); ++i)
-            l_data.push_back( *m_elite[i] );
+        std::vector< boost::shared_ptr< individual::individual<L> > > l_result;
+        
+        for(std::size_t i=0; i < m_elite.size(); ++i) {
+            boost::shared_ptr< individual::individual<L> > l_ind;
+            m_individualref.clone( l_ind );
             
-        return l_data;
+            if (l_ind->size() != m_elite[i]->size())
+                throw exception::runtime(_("element sizes are not equal"), *this);
+        
+            for(std::size_t n=0; n < m_elite[i]->size(); ++n) {
+                // we need a copy of the value - the [] operator returns a reference so we force the value-copy
+                T l_value = (*(m_elite[i]))[n];
+                //std::cout << static_cast<int>(l_value) << " ";
+                (*l_ind)[n] = l_value;
+            }
+            //std::cout << std::endl;
+            l_result.push_back( l_ind );
+            
+        }
+        
+        return l_result;
     }
     
     
@@ -242,8 +261,8 @@ namespace machinelearning { namespace geneticalgorithm {
         // create element ranges of the population and elite
         std::size_t l_inc = m_population.size() / boost::thread::hardware_concurrency();
         std::vector< std::pair<std::size_t, std::size_t> > l_populationparts;
-        for( std::size_t i=0; i < m_population.size(); i+= l_inc )
-            l_populationparts.push_back( std::pair<std::size_t, std::size_t>(i, i+l_inc) );
+        //for( std::size_t i=0; i < m_population.size(); i+= l_inc )
+        //    l_populationparts.push_back( std::pair<std::size_t, std::size_t>(i, i+l_inc) );
         
         if (l_populationparts.size() == 0)
             l_populationparts.push_back( std::pair<std::size_t, std::size_t>(0, m_population.size()) );
@@ -253,8 +272,8 @@ namespace machinelearning { namespace geneticalgorithm {
         
         l_inc = m_elitesize / boost::thread::hardware_concurrency();
         std::vector< std::pair<std::size_t, std::size_t> > l_eliteparts;
-        for( std::size_t i=0; i < m_elitesize; i+= l_inc )
-            l_eliteparts.push_back( std::pair<std::size_t, std::size_t>(i, i+l_inc) );
+        //for( std::size_t i=0; i < m_elitesize; i+= l_inc )
+        //    l_eliteparts.push_back( std::pair<std::size_t, std::size_t>(i, i+l_inc) );
         
         if (l_eliteparts.size() == 0)
             l_eliteparts.push_back( std::pair<std::size_t, std::size_t>(0, m_elitesize) );
@@ -289,11 +308,13 @@ namespace machinelearning { namespace geneticalgorithm {
             const ublas::vector<std::size_t> l_rank( tools::vector::rank(l_fitness) );
 
             
+            
             // create elite multithreaded
             m_elite.clear();
             for(std::size_t j=0; j < l_eliteparts.size(); ++j)
                 l_threads.create_thread(  boost::bind( &population<T,L>::buildelite, this, l_eliteparts[j].first, l_eliteparts[j].second, boost::ref(p_elite), boost::ref(l_fitness), boost::ref(l_rankIndex), boost::ref(l_rank) )  );
             l_threads.join_all();
+                  
             
             
             // create build new population threads and run
@@ -311,12 +332,14 @@ namespace machinelearning { namespace geneticalgorithm {
                     
             }
             l_threads.join_all();
+
             
             
             // create and run mutation threads
             for(std::size_t j=0; j < l_populationparts.size(); ++j)
                 l_threads.create_thread(  boost::bind( &population<T,L>::mutate, this, l_populationparts[j].first, l_populationparts[j].second )  );
             l_threads.join_all();
+            
             
             
             // call the "eachIteration" method of each object for updating local object properties (not multithreaded, because of synchronization)
@@ -365,6 +388,9 @@ namespace machinelearning { namespace geneticalgorithm {
      **/
     template<typename T, typename L> inline void population<T,L>::buildpopulation( const std::size_t& p_start, const std::size_t& p_end, crossover::crossover<L>& p_crossover, const ublas::vector<std::size_t>& p_rankIdx ) 
     {
+        if (m_elite.size() == 0)
+            return;
+        
         // create local selection object
         boost::shared_ptr< crossover::crossover<L> > l_crossover;
         p_crossover.clone( l_crossover );

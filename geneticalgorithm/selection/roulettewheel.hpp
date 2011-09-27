@@ -93,28 +93,24 @@ namespace machinelearning { namespace geneticalgorithm { namespace selection {
      **/
     template<typename T, typename L> inline void roulettewheel<T,L>::getElite( const std::size_t& p_start, const std::size_t& p_end, const std::vector< boost::shared_ptr< individual::individual<L> > >& p_population, const ublas::vector<T>& p_fitness, const ublas::vector<std::size_t>& p_rankIndex, const ublas::vector<std::size_t>& p_rank, std::vector< boost::shared_ptr< individual::individual<L> > >& p_elite )
     {
-        const ublas::vector<T> l_probability = p_fitness / ublas::sum(p_fitness);
+        // calculate probability
+        const T l_max = ublas::sum(p_fitness);
+        if (tools::function::isNumericalZero(l_max))
+            throw exception::runtime(_("fitness values are all zero"), *this);
         
+        ublas::vector<T> l_probability( p_fitness / l_max );
+        ublas::vector<std::size_t> l_index( tools::vector::rankIndexVector( l_probability ) );
+       
+        // get elements
         for(std::size_t i=p_start; i < p_end; ++i) {
+
+            // determine random value
+            const T l_rand = m_random.get<T>(tools::random::uniform, 0.0, 1.0);
             
-            // calculate (probabilities - values) and remove all values < 0 and get the smallest value
-            const T l_propvalue           = m_random.get<T>(tools::random::uniform, 0.0, 1.0);
-            ublas::vector<T> l_diff       = l_probability;
-            BOOST_FOREACH( T& p, l_diff)
-                p -= l_propvalue;
-            
-            // determine the first index with an element >= 0
-            std::size_t n = 0;
-            for(n=0; (n < l_diff.size()) && (l_diff(n) < 0); ++n);
-            
-            // determine smallest element (we can start with n, because the loop before stops on the first element >= 0)
-            for(std::size_t j=n+1; j < l_diff.size(); ++j) {
-                if (l_diff(j) < 0)
-                    continue;
-            
-                if (l_diff(j) < l_diff(n))
-                    n = j;
-            }
+            // determine next element with the probability
+            std::size_t n  = 0;
+            for(; (n < l_index.size()) && (l_probability[l_index[n]] <= l_rand ); ++n);
+            n = std::min(n, l_index.size()-1);
             
             p_elite.push_back( p_population[n] );
         }

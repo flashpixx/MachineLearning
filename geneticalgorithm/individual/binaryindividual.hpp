@@ -50,6 +50,7 @@ namespace machinelearning { namespace geneticalgorithm { namespace individual {
     
             T& operator[]( const std::size_t& );
             T operator[]( const std::size_t& ) const;
+            void show( void ) const;
             void clone( boost::shared_ptr< individual<T> >& ) const;
             void mutate( void );
             std::size_t size( void ) const;
@@ -79,7 +80,10 @@ namespace machinelearning { namespace geneticalgorithm { namespace individual {
         if (p_size == 0)
             throw exception::runtime(_("size number need not to be zero"), *this);
         
-        m_value = static_cast<T*>(calloc( m_size, sizeof(T) ));
+        m_value = (T*)calloc( m_size, sizeof(T) );
+        if (!m_value)
+            throw exception::runtime(_("can not allocate memory"), *this);
+        
         for(std::size_t i=0; i < m_size; ++i)
             m_value[i] = static_cast<T>(m_rand.get<double>(tools::random::uniform, 0, 2));
     }
@@ -121,6 +125,7 @@ namespace machinelearning { namespace geneticalgorithm { namespace individual {
     
         return  m_value[p_index] != 0 ? 1 : 0;
     }
+   
     
     /** mutates the object **/
     template<typename T> inline void binaryindividual<T>::mutate( void )

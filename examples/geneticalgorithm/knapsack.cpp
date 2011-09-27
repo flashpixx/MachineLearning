@@ -23,6 +23,7 @@
 
 
 #include <cstdlib>
+#include <sstream>
 #include <machinelearning.h>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/program_options/parsers.hpp>
@@ -117,7 +118,6 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
     
-    
     const ublas::vector<double> l_packs = tools::vector::copy(l_map["packs"].as< std::vector<double> >());
     
 
@@ -127,12 +127,41 @@ int main(int argc, char* argv[])
     ga::individual::binaryindividual<unsigned char> l_individual( l_packs.size() );
     ga::crossover::kcrossover<unsigned char> l_crossover(l_cuts);
     ga::selection::roulettewheel<double,unsigned char> l_selection;
+
     
-    
-    // create population and iterate the data
+    // create population, iterate the data and return a copy of elite data
     ga::population<double,unsigned char> l_population(l_individual, l_populationsize, l_elitesize);
     
     l_population.iterate( l_iteration, l_fitness, l_selection, l_crossover );
+    
+    const std::vector< boost::shared_ptr< ga::individual::individual<unsigned char> > > l_elite = l_population.getElite();
+    
+    
+    
+    // create output
+    std::cout << "best packing options with pack / position values [ value, value, ... ]: \n" << std::endl;
+    
+    for(std::size_t i=0; i < l_elite.size(); ++i) {
+        
+        std::stringstream  l_pos;
+        std::stringstream  l_packvalue;
+        bool l_first = true;
+        
+        for(std::size_t j=0; j < l_elite[i]->size(); ++j)
+            if ( (*(l_elite[i]))[j] ) {
+                
+                if (!l_first) {
+                    l_pos << ", ";
+                    l_packvalue << ", ";
+                }
+                
+                l_first = false;
+                l_pos << j;
+                l_packvalue << l_packs[j];
+            }
+                
+        std::cout << i << ".\tpack value: [" << l_packvalue.str() << "]\tposition: [" << l_pos.str() << "]" << std::endl;
+    }
     
     
     return EXIT_SUCCESS;

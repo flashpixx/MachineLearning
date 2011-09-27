@@ -106,33 +106,32 @@ namespace machinelearning { namespace geneticalgorithm { namespace crossover {
     
     
     /** creates a new child of the elements
-     * @return smart-pointer of the new element
      * @note we must not check the ranges, because it will be correct with the constructor set and
      * the population object breaks down until it has added the number of individuals that are resolved 
      * with getNumberOfIndividuals call
+     * @return new smart-pointer object with the individual
      **/
     template<typename T> inline boost::shared_ptr< individual::individual<T> > kcrossover<T>::combine( void )
     {
-        // we create the new individual with the clone method, because we don't know the exactly class call
+        // we create a new individual and overwrite the parameter data
         boost::shared_ptr< individual::individual<T> > l_new;
-        m_individuals[0]->clone(l_new);
-        
+        m_individuals[0]->clone( l_new );
+
+        // create crossover parts and add them to the new individual
         std::size_t l_pos = 0;
-        for(std::size_t i=0; (i < m_cuts) && (l_pos != l_new->size()); ++i) {
+        for(std::size_t i=0; (i < m_individuals.size()) && (l_pos < l_new->size()); ++i) {
             std::size_t l_old = l_pos;
-            l_pos = static_cast<std::size_t>(m_random.get<double>(tools::random::uniform, l_pos, l_new->size()+1));
-   
-            for(std::size_t n=l_old; n < l_pos; ++n)
-                (*l_new)[n] = (*(m_individuals[i]))[n];
+            l_pos = static_cast<std::size_t>(m_random.get<double>(tools::random::uniform, l_pos+1, l_new->size()+1));
+            
+            for(std::size_t n=l_old; n < l_pos; ++n) {
+                // we need a copy of the value - the [] operator returns a reference so we force the value-copy
+                T l_value = (*(m_individuals[i]))[n];
+                (*l_new)[n] = l_value;
+            }
         }
-        
-        // add the rest of the last individual element (if we do not break in the first loop)
-        for(std::size_t n=l_pos; n < l_new->size(); ++n)
-            (*l_new)[n] = (*(m_individuals[m_individuals.size()-1]))[n];
         
         // after create, we clear the internal list
         m_individuals.clear();
-        
         return l_new;
     }
 
