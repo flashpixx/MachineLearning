@@ -316,7 +316,7 @@ namespace machinelearning { namespace geneticalgorithm {
             if (l_optimumreached)
                 break;
             
-            
+
             
             // create build new population threads and run
             switch (  ((m_buildoption == eliteonly) || (m_buildoption == random)) ? 0 : 1  ) {

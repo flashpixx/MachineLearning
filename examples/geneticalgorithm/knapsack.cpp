@@ -25,6 +25,7 @@
 #include <cstdlib>
 #include <sstream>
 #include <machinelearning.h>
+#include <boost/lexical_cast.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
@@ -102,6 +103,7 @@ int main(int argc, char* argv[])
         ("population", po::value<std::size_t>(&l_populationsize)->default_value(50), "population size / number of individuals")
         ("elite", po::value<std::size_t>(&l_elitesize)->default_value(3), "elite size / number of individuals that are elite")
         ("crossover", po::value<std::size_t>(&l_cuts)->default_value(1), "cut point of the crossover")
+        ("selection", po::value< std::vector<std::string> >()->multitoken(), "type of selection (values: bestof <number = 3> [default], roulette)")
         ("iteration", po::value<std::size_t>(&l_iteration)->default_value(10), "number of iterations")
         ("mutation", po::value<double>(&l_mutation)->default_value(0.4), "mutation probability")
     ;
@@ -126,6 +128,18 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
     
+    
+    std::string l_selectionopt("bestof");
+    std::size_t l_selectionnumber(3);
+    
+    if ( (l_map.count("selection")) && (l_map["selection"].as< std::vector<std::string> >().size() > 0) ) {
+        l_selectionopt = l_map["selection"].as< std::vector<std::string> >()[0];
+
+        if ((l_selectionopt == "bestof") && (l_map["selection"].as< std::vector<std::string> >().size() > 1))
+            l_selectionnumber = boost::lexical_cast<std::size_t>(l_map["selection"].as< std::vector<std::string> >()[1]);
+    }
+    
+
     const ublas::vector<double> l_packs = tools::vector::copy(l_map["packs"].as< std::vector<double> >());
     
     if (l_map["maxpacksize"].as<double>() > ublas::sum(l_packs)) {
@@ -138,21 +152,29 @@ int main(int argc, char* argv[])
     fitness<double,unsigned char> l_fitness( l_packs, l_map["maxpacksize"].as<double>() );
     ga::individual::binaryindividual<unsigned char> l_individual( l_packs.size() );
     ga::crossover::kcrossover<unsigned char> l_crossover(l_cuts);
-    ga::selection::roulettewheel<double,unsigned char> l_selection;
+    ga::selection::selection<double,unsigned char>* l_selection = NULL;
+    
+    if (l_selectionopt == "roulette")
+        l_selection = new ga::selection::roulettewheel<double,unsigned char>();
+    
+    if ( (l_selectionopt == "bestof") || (!l_selection) )
+        l_selection = new ga::selection::bestof<double,unsigned char>(l_selectionnumber);
+    
 
     
     // create population, iterate the data and return a copy of elite data
     ga::population<double,unsigned char> l_population(l_individual, l_populationsize, l_elitesize);
     
     l_population.setMutalProbability( l_map["mutation"].as<double>() );
-    l_population.iterate( l_iteration, l_fitness, l_selection, l_crossover );
+    l_population.iterate( l_iteration, l_fitness, *l_selection, l_crossover );
     
+    delete l_selection;
     const std::vector< boost::shared_ptr< ga::individual::individual<unsigned char> > > l_elite = l_population.getElite();
     
     
     
     // create output
-    std::cout << "best packing options with pack / position values [ value, value, ... ]: \n" << std::endl;
+    std::cout << "best packing options with pack / position values [ value, value, ... ] (position starts with one): \n" << std::endl;
     
     for(std::size_t i=0; i < l_elite.size(); ++i) {
         
@@ -170,7 +192,7 @@ int main(int argc, char* argv[])
                 }
                 
                 l_first = false;
-                l_pos << j;
+                l_pos << (j+1);
                 l_packvalue << l_packs[j];
                 l_sum += l_packs[j];
             }

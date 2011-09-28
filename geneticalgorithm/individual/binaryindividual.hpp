@@ -25,6 +25,7 @@
 #ifndef __MACHINELEARNING_GENETICALGORITHM_INDIVIDUAL_BINARYINDIVIDUAL_HPP
 #define __MACHINELEARNING_GENETICALGORITHM_INDIVIDUAL_BINARYINDIVIDUAL_HPP
 
+#include <iostream>
 #include <boost/static_assert.hpp>
 #include <boost/shared_ptr.hpp>
 
@@ -55,7 +56,6 @@ namespace machinelearning { namespace geneticalgorithm { namespace individual {
             void mutate( void );
             std::size_t size( void ) const;
         
-        
         private :
         
             /** number generator **/
@@ -66,7 +66,8 @@ namespace machinelearning { namespace geneticalgorithm { namespace individual {
             T* m_value;
 
     };
-
+    
+    
     
     
     /** contructor of the binary individual

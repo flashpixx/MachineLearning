@@ -25,6 +25,7 @@
 #ifndef __MACHINELEARNING_GENETICALGORITHM_INDIVIDUAL_INDIVIDUAL_HPP
 #define __MACHINELEARNING_GENETICALGORITHM_INDIVIDUAL_INDIVIDUAL_HPP
 
+//#include <iostream>
 #include <boost/shared_ptr.hpp>
 
 
@@ -62,6 +63,11 @@ namespace machinelearning { namespace geneticalgorithm { namespace individual {
              * @return length / size of the gen sequence
              **/
             virtual std::size_t size( void ) const = 0;
+        
+        
+        //private :
+        
+            //virtual std::ostream& toStream( std::ostream& ) = 0;
     
     };
     

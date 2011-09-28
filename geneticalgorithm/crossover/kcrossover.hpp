@@ -74,7 +74,7 @@ namespace machinelearning { namespace geneticalgorithm { namespace crossover {
         m_individuals()
     {
         if (p_cuts == 0)
-            throw exception::runtime(_("elements must be greater than zero"), *this);
+            throw exception::runtime(_("cuts must be greater than zero"), *this);
     }
     
     

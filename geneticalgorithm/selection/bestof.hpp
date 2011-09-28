@@ -22,8 +22,8 @@
  **/
 
 
-#ifndef __MACHINELEARNING_GENETICALGORITHM_SELECTION_ROULETTEWHEEL_HPP
-#define __MACHINELEARNING_GENETICALGORITHM_SELECTION_ROULETTEWHEEL_HPP
+#ifndef __MACHINELEARNING_GENETICALGORITHM_SELECTION_BESTOF_HPP
+#define __MACHINELEARNING_GENETICALGORITHM_SELECTION_BESTOF_HPP
 
 #include <boost/shared_ptr.hpp>
 #include <boost/static_assert.hpp>
@@ -41,16 +41,16 @@ namespace machinelearning { namespace geneticalgorithm { namespace selection {
     namespace ublas = boost::numeric::ublas;
     
     
-    /** class of the roulette-wheel-selection
-     * $LastChangedDate$
+    /** class of the bestof-selection
+     * $LastChangedDate: 2011-09-28 00:43:44 +0200 (Mi, 28 Sep 2011) $
      **/
-    template<typename T, typename L> class roulettewheel : public selection<T,L>
+    template<typename T, typename L> class bestof : public selection<T,L>
     {
         BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
         
         public :
         
-            roulettewheel( void );
+            bestof( const std::size_t& );
         
             void clone( boost::shared_ptr< selection<T,L> >& p_ptr ) const;
             void getElite( const std::size_t&, const std::size_t&, const std::vector< boost::shared_ptr< individual::individual<L> > >&, const ublas::vector<T>&, const ublas::vector<std::size_t>&, const ublas::vector<std::size_t>&,std::vector< boost::shared_ptr< individual::individual<L> > >&  );
@@ -60,29 +60,32 @@ namespace machinelearning { namespace geneticalgorithm { namespace selection {
         
         private :
         
-            /** random object **/
-            tools::random m_random;
+            /** number of elements **/
+            const std::size_t m_number;
         
     };
     
     
     
     /** constructor **/
-    template<typename T, typename L> inline roulettewheel<T,L>::roulettewheel( void ) :
-        m_random()
-    {}
+    template<typename T, typename L> inline bestof<T,L>::bestof( const std::size_t& p_num ) :
+        m_number( p_num )
+    {
+        if (p_num == 0)
+            throw exception::runtime(_("number must be greater than zero"), *this);
+    }
     
     
     /** method for cloning the object, for using on multithread
      * @param p_ptr smart-pointer object
      **/
-    template<typename T, typename L> inline void roulettewheel<T,L>::clone( boost::shared_ptr< selection<T,L> >& p_ptr ) const
+    template<typename T, typename L> inline void bestof<T,L>::clone( boost::shared_ptr< selection<T,L> >& p_ptr ) const
     {
-        p_ptr = boost::shared_ptr< selection<T,L> >( new roulettewheel<T,L>() );
+        p_ptr = boost::shared_ptr< selection<T,L> >( new bestof<T,L>(m_number) );
     }
-
-        
-    /** returns the roulette-wheel-selection elites
+    
+    
+    /** returns the first n elites
      * @param p_start start value of the elite values
      * @param p_end end value of the elite values ([start, end) elite elements must be created)
      * @param p_population const reference to the population
@@ -91,29 +94,13 @@ namespace machinelearning { namespace geneticalgorithm { namespace selection {
      * @param p_rank rank values (first element equal to polulation index has the rank value of the first individual)
      * @param p_elite vector with elite individual
      **/
-    template<typename T, typename L> inline void roulettewheel<T,L>::getElite( const std::size_t& p_start, const std::size_t& p_end, const std::vector< boost::shared_ptr< individual::individual<L> > >& p_population, const ublas::vector<T>& p_fitness, const ublas::vector<std::size_t>& p_rankIndex, const ublas::vector<std::size_t>& p_rank, std::vector< boost::shared_ptr< individual::individual<L> > >& p_elite )
+    template<typename T, typename L> inline void bestof<T,L>::getElite( const std::size_t& p_start, const std::size_t& p_end, const std::vector< boost::shared_ptr< individual::individual<L> > >& p_population, const ublas::vector<T>& p_fitness, const ublas::vector<std::size_t>& p_rankIndex, const ublas::vector<std::size_t>& p_rank, std::vector< boost::shared_ptr< individual::individual<L> > >& p_elite )
     {
-        // calculate probability
-        const T l_max = ublas::sum(p_fitness);
-        if (tools::function::isNumericalZero(l_max))
-            throw exception::runtime(_("fitness values are all zero"), *this);
+        if (p_start >= m_number)
+            return;
         
-        ublas::vector<T> l_probability( p_fitness / l_max );
-        ublas::vector<std::size_t> l_index( tools::vector::rankIndexVector( l_probability ) );
-       
-        // get elements
-        for(std::size_t i=p_start; i < p_end; ++i) {
-
-            // determine random value
-            const T l_rand = m_random.get<T>(tools::random::uniform, 0.0, 1.0);
-            
-            // determine next element with the probability
-            std::size_t n  = 0;
-            for(; (n < l_index.size()) && (l_probability[l_index[n]] <= l_rand ); ++n);
-            n = std::min(n, l_index.size()-1);
-            
-            p_elite.push_back( p_population[n] );
-        }
+        for(std::size_t i=p_start; i < m_number; ++i)
+            p_elite.push_back( p_population[p_rankIndex[p_rankIndex.size()-1-i]] );
     }
     
     
