@@ -261,8 +261,8 @@ namespace machinelearning { namespace geneticalgorithm {
         // create element ranges of the population and elite
         std::size_t l_inc = m_population.size() / boost::thread::hardware_concurrency();
         std::vector< std::pair<std::size_t, std::size_t> > l_populationparts;
-        //for( std::size_t i=0; i < m_population.size(); i+= l_inc )
-        //    l_populationparts.push_back( std::pair<std::size_t, std::size_t>(i, i+l_inc) );
+        for( std::size_t i=0; i < m_population.size()-1; i+= l_inc )
+            l_populationparts.push_back( std::pair<std::size_t, std::size_t>(i, i+l_inc) );
         
         if (l_populationparts.size() == 0)
             l_populationparts.push_back( std::pair<std::size_t, std::size_t>(0, m_population.size()) );
@@ -272,15 +272,15 @@ namespace machinelearning { namespace geneticalgorithm {
         
         l_inc = m_elitesize / boost::thread::hardware_concurrency();
         std::vector< std::pair<std::size_t, std::size_t> > l_eliteparts;
-        //for( std::size_t i=0; i < m_elitesize; i+= l_inc )
-        //    l_eliteparts.push_back( std::pair<std::size_t, std::size_t>(i, i+l_inc) );
+        for( std::size_t i=0; i < m_elitesize-1; i+=l_inc )
+            l_eliteparts.push_back( std::pair<std::size_t, std::size_t>(i, i+l_inc) );
         
         if (l_eliteparts.size() == 0)
             l_eliteparts.push_back( std::pair<std::size_t, std::size_t>(0, m_elitesize) );
         else
             l_eliteparts[l_eliteparts.size()-1].second += m_elitesize % boost::thread::hardware_concurrency();
-        
 
+        
         
         // run iteration process (each thread group must be recreated on the iteration, because after the join_all() the threads are "out-of-range")
         for(std::size_t i=0; i < p_iteration; ++i) {
@@ -297,9 +297,7 @@ namespace machinelearning { namespace geneticalgorithm {
             l_threads.join_all();
                         
             // scales the fitness values to [0,x] (not multithread)
-            T l_min = 0;
-            BOOST_FOREACH( T p, l_fitness )
-                l_min = std::min(l_min, p);
+            const T l_min = tools::vector::min( l_fitness);
             BOOST_FOREACH( T& p, l_fitness )
                 p -= l_min;
              

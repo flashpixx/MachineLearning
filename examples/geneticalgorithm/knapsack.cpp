@@ -143,6 +143,7 @@ int main(int argc, char* argv[])
     
     for(std::size_t i=0; i < l_elite.size(); ++i) {
         
+        double l_sum = 0;
         std::stringstream  l_pos;
         std::stringstream  l_packvalue;
         bool l_first = true;
@@ -158,9 +159,10 @@ int main(int argc, char* argv[])
                 l_first = false;
                 l_pos << j;
                 l_packvalue << l_packs[j];
+                l_sum += l_packs[j];
             }
                 
-        std::cout << i << ".\tpack value: [" << l_packvalue.str() << "]\tposition: [" << l_pos.str() << "]" << std::endl;
+        std::cout << (i+1) << ".\tpack value: " << l_sum << " = [" << l_packvalue.str() << "]\tposition: [" << l_pos.str() << "]" << std::endl;
     }
     
     
