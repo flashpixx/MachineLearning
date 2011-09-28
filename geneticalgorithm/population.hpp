@@ -257,6 +257,7 @@ namespace machinelearning { namespace geneticalgorithm {
         
         // create element ranges of the population and elite for multithreadding
         std::size_t l_inc = m_population.size() / boost::thread::hardware_concurrency();
+        l_inc = l_inc == 0 ? m_population.size() : l_inc;
         std::vector< std::pair<std::size_t, std::size_t> > l_populationparts;
         for( std::size_t i=0; i < m_population.size()-1; i+=l_inc )
             l_populationparts.push_back( std::pair<std::size_t, std::size_t>(i, i+l_inc) );
