@@ -86,9 +86,9 @@ namespace machinelearning { namespace geneticalgorithm {
                                 
                 probability() : 
                     distribution(tools::random::uniform),  
-                    probabilityvalue(0.5), 
-                    first( std::numeric_limits<T>::epsilon() ),
-                    second( std::numeric_limits<T>::epsilon() ),
+                    probabilityvalue( 0.4 ), 
+                    first( 0.0 ),
+                    second( 1.0 ),
                     third( std::numeric_limits<T>::epsilon() )
                 {}
             };
@@ -222,11 +222,11 @@ namespace machinelearning { namespace geneticalgorithm {
      **/
     template<typename T, typename L> inline void population<T,L>::setMutalProbability( const T& p_prop, const tools::random::distribution& p_distribution, const T& p_first, const T& p_second, const T& p_third )
     {
-        m_mutateprobility.distribution = p_distribution;
-        m_mutateprobility.probability  = p_prop;
-        m_mutateprobility.first        = p_first;
-        m_mutateprobility.second       = p_second;
-        m_mutateprobility.third        = p_third;
+        m_mutateprobility.distribution      = p_distribution;
+        m_mutateprobility.probabilityvalue  = p_prop;
+        m_mutateprobility.first             = p_first;
+        m_mutateprobility.second            = p_second;
+        m_mutateprobility.third             = p_third;
     }
         
 

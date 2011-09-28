@@ -100,10 +100,10 @@ int main(int argc, char* argv[])
         ("packs", po::value< std::vector<double> >()->multitoken(), "weights / costs of the different packs")
         ("maxpacksize", po::value<double>(&l_packsize), "maximum pack size")
         ("population", po::value<std::size_t>(&l_populationsize)->default_value(50), "population size / number of individuals")
-        ("elite", po::value<std::size_t>(&l_elitesize)->default_value(10), "elite size / number of individuals that are elite")
-        ("crossover", po::value<std::size_t>(&l_cuts)->default_value(3), "cut point of the crossover")
+        ("elite", po::value<std::size_t>(&l_elitesize)->default_value(3), "elite size / number of individuals that are elite")
+        ("crossover", po::value<std::size_t>(&l_cuts)->default_value(1), "cut point of the crossover")
         ("iteration", po::value<std::size_t>(&l_iteration)->default_value(10), "number of iterations")
-        ("mutation", po::value<double>(&l_mutation)->default_value(0.35), "mutation probability")
+        ("mutation", po::value<double>(&l_mutation)->default_value(0.4), "mutation probability")
     ;
     
     po::variables_map l_map;
@@ -144,6 +144,7 @@ int main(int argc, char* argv[])
     // create population, iterate the data and return a copy of elite data
     ga::population<double,unsigned char> l_population(l_individual, l_populationsize, l_elitesize);
     
+    l_population.setMutalProbability( l_map["mutation"].as<double>() );
     l_population.iterate( l_iteration, l_fitness, l_selection, l_crossover );
     
     const std::vector< boost::shared_ptr< ga::individual::individual<unsigned char> > > l_elite = l_population.getElite();
