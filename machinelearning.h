@@ -723,6 +723,8 @@
  * @file geneticalgorithm/crossover/kcrossover.hpp k-crossover implementation
  * @file geneticalgorithm/selection/selection.h main header file for all selection classes
  * @file geneticalgorithm/selection/selection.hpp abstract class of the selection function
+ * @file geneticalgorithm/selection/roulettewheel.hpp class with roulette-wheel-selection
+ * @file geneticalgorithm/selection/bestof.hpp abstract class with best-of-selection
  *
  * @file neighborhood/neighborhood.h main header for neighborhood structurs
  * @file neighborhood/neighborhood.hpp abstract class for neighborhood implementation
@@ -771,6 +773,7 @@
  * @todo thinking about a SSE support in the framework http://en.wikipedia.org/wiki/SSE3
  * @todo thinking about CILK support http://supertech.csail.mit.edu/cilk/
  * @todo adding support to OpenMP http://openmp.org/wp/
+ * @todo adding Java Native Interface wrapper for using algorithms under Java http://java.sun.com/docs/books/jni/
  * @todo adding simulated annealing (see GSL)
  * @todo adding voronoi tessellation
  * @todo thinking about Corba support for algorithms
