@@ -42,7 +42,7 @@ namespace machinelearning { namespace geneticalgorithm { namespace selection {
     
     
     /** class of the bestof-selection
-     * $LastChangedDate: 2011-09-28 00:43:44 +0200 (Mi, 28 Sep 2011) $
+     * $LastChangedDate$
      **/
     template<typename T, typename L> class bestof : public selection<T,L>
     {
