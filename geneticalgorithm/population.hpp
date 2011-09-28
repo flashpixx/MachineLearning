@@ -312,7 +312,11 @@ namespace machinelearning { namespace geneticalgorithm {
             for(std::size_t j=0; j < l_eliteparts.size(); ++j)
                 l_threads.create_thread(  boost::bind( &population<T,L>::buildelite, this, l_eliteparts[j].first, l_eliteparts[j].second, boost::ref(p_elite), boost::ref(l_fitness), boost::ref(l_rankIndex), boost::ref(l_rank) )  );
             l_threads.join_all();
-                  
+            
+            // updateing elite size
+            m_elitesize = m_elite.size();
+
+            // break if optimum is found
             if (l_optimumreached)
                 break;
             
