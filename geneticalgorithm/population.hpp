@@ -265,9 +265,11 @@ namespace machinelearning { namespace geneticalgorithm {
             l_populationparts.push_back( std::pair<std::size_t, std::size_t>(0, m_population.size()) );
         else
             l_populationparts[l_populationparts.size()-1].second += m_population.size() % boost::thread::hardware_concurrency();
+        l_populationparts[l_populationparts.size()-1].second = std::min( l_populationparts[l_populationparts.size()-1].second, m_population.size() );
         
         
         l_inc = m_elitesize / boost::thread::hardware_concurrency();
+        l_inc = l_inc == 0 ? m_elitesize : l_inc;
         std::vector< std::pair<std::size_t, std::size_t> > l_eliteparts;
         for( std::size_t i=0; i < m_elitesize-1; i+=l_inc )
             l_eliteparts.push_back( std::pair<std::size_t, std::size_t>(i, i+l_inc) );
@@ -276,8 +278,10 @@ namespace machinelearning { namespace geneticalgorithm {
             l_eliteparts.push_back( std::pair<std::size_t, std::size_t>(0, m_elitesize) );
         else
             l_eliteparts[l_eliteparts.size()-1].second += m_elitesize % boost::thread::hardware_concurrency();
+        l_eliteparts[l_eliteparts.size()-1].second = std::min( l_eliteparts[l_eliteparts.size()-1].second, m_elitesize );
 
-        
+
+
         
         // run iteration process (each thread group must be recreated on the iteration, because after the join_all() the threads are "out-of-range")
         for(std::size_t i=0; i < p_iteration; ++i) {
