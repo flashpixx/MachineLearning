@@ -17,10 +17,13 @@ def createVariables(vars) :
     vars.Add(BoolVariable("withsymbolicmath", "compile for using symbolic math expression (needed by gradient descent)", False))
 
     vars.Add(BoolVariable("withdebug", "compile with debug information", False))
+    vars.Add(BoolVariable("withoptimize", "compile with CPU optimization code", True))
 
     vars.Add(EnumVariable("winver", "value of the Windows version", "win7", allowed_values=("win7", "srv2008", "vista", "srv2003sp1", "xpsp2", "srv2003", "xp", "w2000")))
 
-    vars.Add(EnumVariable("atlaslink", "value of the atlas threadding", "multi", allowed_values=("multi", "single")))
+    vars.Add(EnumVariable("atlaslink", "value of the atlas threadding (multi = tatlas, single = satlas)", "multi", allowed_values=("multi", "single")))
+    
+    vars.Add(EnumVariable("cputype", "value of the cpu type [see: http://gcc.gnu.org/onlinedocs/gcc/i386-and-x86_002d64-Options.html]", "native", allowed_values=("native", "generic", "i386", "i486", "i586", "i686", "pentium-mmx", "pentiumpro", "pentium2", "pentium3", "pentium-m", "pentium4", "prescott", "nocona", "core2", "corei7", "corei7-avx", "core-avx-i", "atom", "k6", "k6-2", "athlon", "athlon-4", "k8", "k8-sse3", "amdfam10", "winchip-c6", "winchip2", "c3", "c3-2", "geode" )))
 
 
 #=== function for os configuration ===================================================================================================
@@ -36,7 +39,7 @@ def configuration_macosx(config, vars, version, architecture) :
     config["linkerflags"]       = ""
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["LIBRARY_PATH"]
-    config["compileflags"]      = "-O2 -Os -s -pipe -Wall -pthread -finline-functions -arch "+arch+" -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
+    config["compileflags"]      = "-pipe -Wall -pthread -arch "+arch+" -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
     config["linkto"]            = ["boost_exception", "boost_system", "boost_thread", "boost_iostreams", "boost_filesystem", "boost_regex", "boost_program_options"]
 
     if vars["atlaslink"] == "multi" :
@@ -75,6 +78,9 @@ def configuration_macosx(config, vars, version, architecture) :
     if vars["withsymbolicmath"] :
         config["compileflags"]      += " -D MACHINELEARNING_SYMBOLICMATH"
         config["linkto"].append("ginac")
+        
+    if vars["withoptimize"] :
+        config["compileflags"]      += " -O2 -Os -s -mfpmath=sse -finline-functions -mtune="+vars["cputype"]
 
 
 # configuration for Posix (Linux) build
@@ -82,7 +88,7 @@ def configuration_posix(config, vars, version, architecture) :
     config["linkerflags"]       = ""
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["LIBRARY_PATH"]
-    config["compileflags"]      = "-O2 -Os -s -pipe -Wall -pthread -finline-functions -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
+    config["compileflags"]      = "-pipe -Wall -pthread -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
     config["linkto"]            = ["boost_exception", "boost_system", "boost_thread", "boost_iostreams", "boost_filesystem", "boost_regex", "boost_program_options"]
 
     if vars["atlaslink"] == "multi" :
@@ -120,6 +126,9 @@ def configuration_posix(config, vars, version, architecture) :
     if vars["withsymbolicmath"] :
         config["compileflags"]      += " -D MACHINELEARNING_SYMBOLICMATH"
         config["linkto"].append("ginac")
+        
+    if vars["withoptimize"] :
+        config["compileflags"]      += " -O2 -Os -s -mfpmath=sse -finline-functions -mtune="+vars["cputype"]
 
 
 # configuration for Windows Cygwin build
@@ -127,7 +136,7 @@ def configuration_cygwin(config, vars, version, architecture) :
     config["linkerflags"]       = "-enable-stdcall-fixup"
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["PATH"]
-    config["compileflags"]      = "-O2 -Os -s -pipe -Wall -finline-functions -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
+    config["compileflags"]      = "-pipe -Wall -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
     config["linkto"]            = ["boost_exception", "cygboost_system", "cygboost_thread", "cygboost_iostreams", "cygboost_filesystem", "cygboost_regex", "cygboost_program_options", "lapack", "cblas", "f77blas", "atlas", "gfortran"]
 
     #Windows Version options see http://msdn.microsoft.com/en-us/library/aa383745%28v=vs.85%29.aspx
@@ -183,6 +192,9 @@ def configuration_cygwin(config, vars, version, architecture) :
     if vars["withsymbolicmath"] :
         config["compileflags"]      += " -D MACHINELEARNING_SYMBOLICMATH"
         config["linkto"].append("ginac")
+        
+    if vars["withoptimize"] :
+        config["compileflags"]      += " -O2 -Os -s -mfpmath=sse -finline-functions -mtune="+vars["cputype"]
 #=======================================================================================================================================
 
 
