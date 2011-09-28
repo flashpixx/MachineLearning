@@ -45,7 +45,14 @@ namespace machinelearning { namespace geneticalgorithm { namespace fitness {
             /** method for calculating the fitness value of an individual / return value should be [0, best value]
              * @param p_individual reference to an individual
              **/
-            virtual T getFitness( const individual::individual<L>& p_individual ) const = 0;
+            virtual T getFitness( const individual::individual<L>& p_individual ) = 0;
+        
+            /** bool method, that will be true if the optimal fitness values is reached. The
+             * iteration process will bes stopped immediately, but the elite individual will
+             * be added basis of the fitness value to the elite list
+             * @return bool for stopping iteration process
+             **/
+            virtual bool isOptimumReached( void ) const = 0;
        
             /** method for cloning the object, for using on multithread
              * @param p_ptr smart-pointer object

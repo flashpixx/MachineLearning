@@ -111,7 +111,7 @@ namespace machinelearning { namespace geneticalgorithm {
             std::size_t m_elitesize;
         
         
-            void fitness( const std::size_t&, const std::size_t&, fitness::fitness<T,L>&, ublas::vector<T>& );
+            void fitness( const std::size_t&, const std::size_t&, fitness::fitness<T,L>&, ublas::vector<T>&, bool& );
             void mutate( const std::size_t&, const std::size_t& );
             void buildelite( const std::size_t&, const std::size_t&, selection::selection<T,L>&, const ublas::vector<T>&, const ublas::vector<std::size_t>&, const ublas::vector<std::size_t>& );
             void buildpopulation( const std::size_t&, const std::size_t&, crossover::crossover<L>&, const ublas::vector<std::size_t>& );
@@ -204,12 +204,9 @@ namespace machinelearning { namespace geneticalgorithm {
             for(std::size_t n=0; n < m_elite[i]->size(); ++n) {
                 // we need a copy of the value - the [] operator returns a reference so we force the value-copy
                 T l_value = (*(m_elite[i]))[n];
-                //std::cout << static_cast<int>(l_value) << " ";
                 (*l_ind)[n] = l_value;
             }
-            //std::cout << std::endl;
             l_result.push_back( l_ind );
-            
         }
         
         return l_result;
@@ -261,7 +258,7 @@ namespace machinelearning { namespace geneticalgorithm {
         // create element ranges of the population and elite
         std::size_t l_inc = m_population.size() / boost::thread::hardware_concurrency();
         std::vector< std::pair<std::size_t, std::size_t> > l_populationparts;
-        for( std::size_t i=0; i < m_population.size()-1; i+= l_inc )
+        for( std::size_t i=0; i < m_population.size()-1; i+=l_inc )
             l_populationparts.push_back( std::pair<std::size_t, std::size_t>(i, i+l_inc) );
         
         if (l_populationparts.size() == 0)
@@ -292,10 +289,13 @@ namespace machinelearning { namespace geneticalgorithm {
             
             
             // create and run fitness threads
+            bool l_optimumreached = false;
             for(std::size_t j=0; j < l_populationparts.size(); ++j)
-                l_threads.create_thread(  boost::bind( &population<T,L>::fitness, this, l_populationparts[j].first, l_populationparts[j].second, boost::ref(p_fitness), boost::ref(l_fitness) )  );
+                l_threads.create_thread(  boost::bind( &population<T,L>::fitness, this, l_populationparts[j].first, l_populationparts[j].second, boost::ref(p_fitness), boost::ref(l_fitness), boost::ref(l_optimumreached) )  );
             l_threads.join_all();
-                        
+            
+
+        
             // scales the fitness values to [0,x] (not multithread)
             const T l_min = tools::vector::min( l_fitness);
             BOOST_FOREACH( T& p, l_fitness )
@@ -313,6 +313,9 @@ namespace machinelearning { namespace geneticalgorithm {
                 l_threads.create_thread(  boost::bind( &population<T,L>::buildelite, this, l_eliteparts[j].first, l_eliteparts[j].second, boost::ref(p_elite), boost::ref(l_fitness), boost::ref(l_rankIndex), boost::ref(l_rank) )  );
             l_threads.join_all();
                   
+            if (l_optimumreached)
+                break;
+            
             
             
             // create build new population threads and run
@@ -354,14 +357,19 @@ namespace machinelearning { namespace geneticalgorithm {
      * @param p_fitnessfunction fitness function object
      * @param p_fitness reference to the fitness vector
      **/
-    template<typename T, typename L> inline void population<T,L>::fitness( const std::size_t& p_start, const std::size_t& p_end, fitness::fitness<T,L>& p_fitnessfunction, ublas::vector<T>& p_fitness )
+    template<typename T, typename L> inline void population<T,L>::fitness( const std::size_t& p_start, const std::size_t& p_end, fitness::fitness<T,L>& p_fitnessfunction, ublas::vector<T>& p_fitness, bool& p_optimumreached )
     {
         // create local selection object
         boost::shared_ptr< fitness::fitness<T,L> > l_fitness;
         p_fitnessfunction.clone( l_fitness );
         
-        for(std::size_t i=p_start; i < p_end; ++i)
+        for(std::size_t i=p_start; (i < p_end) && (!p_optimumreached); ++i) {
             p_fitness(i) = l_fitness->getFitness( *m_population[i] );
+            if (l_fitness->isOptimumReached()) {
+                boost::unique_lock<boost::mutex> l_lock( m_iterationlock );
+                p_optimumreached = true;
+            }
+        }
     }
     
     

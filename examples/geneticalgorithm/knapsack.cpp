@@ -42,15 +42,22 @@ template<typename T, typename L> class fitness : public ga::fitness::fitness<T,L
 {
     public :
     
-        fitness( const ublas::vector<T>& p_weight, const T& p_max ) : m_weight(p_weight), m_max(p_max) {}
-        T getFitness( const ga::individual::individual<L>& p_ind ) const
+        fitness( const ublas::vector<T>& p_weight, const T& p_max ) : m_optimum(false), m_weight(p_weight), m_max(p_max) {}
+    
+        T getFitness( const ga::individual::individual<L>& p_ind )
         {
-            // simple fitness function: create only the difference between individual and maximum size, values less than zero, will be set to zero
+            // simple fitness function: sum over the set weights
             T l_sum = 0;
             for(std::size_t i=0; i < m_weight.size(); ++i)
                 l_sum += m_weight(i) * p_ind[i];
             
-            return std::max( m_max - l_sum, 0.0);
+            m_optimum = tools::function::isNumericalEqual(l_sum, m_max);
+            return l_sum > m_max ? 0.0 : l_sum;
+        }
+    
+        bool isOptimumReached( void ) const
+        {
+            return m_optimum;
         }
     
         void clone( boost::shared_ptr< ga::fitness::fitness<T,L> >& p_ptr ) const
@@ -63,6 +70,7 @@ template<typename T, typename L> class fitness : public ga::fitness::fitness<T,L
 
     private :
     
+        bool m_optimum;
         const ublas::vector<T> m_weight;
         const T m_max;
 };
@@ -120,7 +128,11 @@ int main(int argc, char* argv[])
     
     const ublas::vector<double> l_packs = tools::vector::copy(l_map["packs"].as< std::vector<double> >());
     
-
+    if (l_map["maxpacksize"].as<double>() > ublas::sum(l_packs)) {
+        std::cerr << "sum of pack values must be equal or smaller than maximum pack size (all packs can be used)" << std::endl;
+        return EXIT_FAILURE;
+    }        
+    
     
     // genetic algorithm (basic structure eg individual, fitness function, crossover function [see above])
     fitness<double,unsigned char> l_fitness( l_packs, l_map["maxpacksize"].as<double>() );
@@ -162,7 +174,7 @@ int main(int argc, char* argv[])
                 l_sum += l_packs[j];
             }
                 
-        std::cout << (i+1) << ".\tpack value: " << l_sum << " = [" << l_packvalue.str() << "]\tposition: [" << l_pos.str() << "]" << std::endl;
+        std::cout << (i+1) << ".\tpack value: " << l_sum << " = [" << l_packvalue.str() << "]\t\tposition: [" << l_pos.str() << "]" << std::endl;
     }
     
     
