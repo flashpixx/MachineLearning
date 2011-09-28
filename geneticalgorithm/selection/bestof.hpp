@@ -41,7 +41,7 @@ namespace machinelearning { namespace geneticalgorithm { namespace selection {
     namespace ublas = boost::numeric::ublas;
     
     
-    /** class of the bestof-selection
+    /** class of the bestof-selection. uses the n best elements of the population
      * $LastChangedDate$
      **/
     template<typename T, typename L> class bestof : public selection<T,L>
@@ -67,7 +67,9 @@ namespace machinelearning { namespace geneticalgorithm { namespace selection {
     
     
     
-    /** constructor **/
+    /** constructor
+     * @param p_num number of elements that should be used
+     **/
     template<typename T, typename L> inline bestof<T,L>::bestof( const std::size_t& p_num ) :
         m_number( p_num )
     {
