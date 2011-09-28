@@ -170,7 +170,7 @@ int main(int argc, char* argv[])
     
     delete l_selection;
     const std::vector< boost::shared_ptr< ga::individual::individual<unsigned char> > > l_elite = l_population.getElite();
-    
+
     
     
     // create output

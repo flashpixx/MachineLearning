@@ -99,9 +99,14 @@ namespace machinelearning { namespace geneticalgorithm { namespace selection {
     template<typename T, typename L> inline void bestof<T,L>::getElite( const std::size_t& p_start, const std::size_t& p_end, const std::vector< boost::shared_ptr< individual::individual<L> > >& p_population, const ublas::vector<T>& p_fitness, const ublas::vector<std::size_t>& p_rankIndex, const ublas::vector<std::size_t>& p_rank, std::vector< boost::shared_ptr< individual::individual<L> > >& p_elite )
     {
         const std::size_t l_end = std::min(p_end, m_number);
-        
-        for(std::size_t i=p_start; i < l_end; ++i)
-            p_elite.push_back( p_population[p_rankIndex[p_rankIndex.size()-1-i]] );
+
+        std::size_t n = p_start;
+        for(std::size_t i=p_start; i < p_end; ++i) {
+            p_elite.push_back( p_population[p_rankIndex[p_rankIndex.size()-1-n]] );
+            n++;
+            if (n >= l_end)
+                n = p_start;
+        }
     }
     
     

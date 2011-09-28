@@ -282,7 +282,6 @@ namespace machinelearning { namespace geneticalgorithm {
         l_eliteparts[l_eliteparts.size()-1].second = std::min( l_eliteparts[l_eliteparts.size()-1].second, m_elitesize );
 
 
-
         
         // run iteration process (each thread group must be recreated on the iteration, because after the join_all() the threads are "out-of-range")
         for(std::size_t i=0; i < p_iteration; ++i) {
