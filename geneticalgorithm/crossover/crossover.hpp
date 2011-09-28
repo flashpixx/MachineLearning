@@ -51,7 +51,7 @@ namespace machinelearning { namespace geneticalgorithm { namespace crossover {
             virtual void setIndividual( const boost::shared_ptr< individual::individual<T> >& p_individual ) = 0;
         
             /** creates a new smart-pointer object with the new individual data
-             * @param p_ptr a new smart-pointer object of the individual that should be replaced
+             * @return a new smart-pointer object of the individual that should be replaced
              **/
             virtual boost::shared_ptr< individual::individual<T> > combine( void ) = 0;
         

@@ -360,6 +360,7 @@ namespace machinelearning { namespace geneticalgorithm {
      * @param p_end end value of the population values
      * @param p_fitnessfunction fitness function object
      * @param p_fitness reference to the fitness vector
+     * @param p_optimumreached bool reference for stop calculation immediately
      **/
     template<typename T, typename L> inline void population<T,L>::fitness( const std::size_t& p_start, const std::size_t& p_end, fitness::fitness<T,L>& p_fitnessfunction, ublas::vector<T>& p_fitness, bool& p_optimumreached )
     {
