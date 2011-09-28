@@ -174,7 +174,7 @@ int main(int argc, char* argv[])
     
     
     // create output
-    std::cout << "best packing options with pack / position values [ value, value, ... ] (position starts with one): \n" << std::endl;
+    std::cout << "best packing options with pack / position values [ value, value, ... ] (position starts with one):" << std::endl;
     
     for(std::size_t i=0; i < l_elite.size(); ++i) {
         
