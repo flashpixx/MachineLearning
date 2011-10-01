@@ -67,10 +67,23 @@ namespace machinelearning {
             if (!p_ptr)
                 p_env->ThrowNew( p_env->FindClass("java/lang/Exception"), _("pointer to object is empty") );
             
-            // read Java object member variable for pointer storing
+            // read Java object member variable for pointer storing (the first call must be thread-safe, because the global field index is be written)
             if (!p_id) {
                 jclass l_class = p_env->GetObjectClass( p_object );
+                
+                if (p_env->MonitorEnter(p_env, p_object) != JNI_OK) {
+                    delete(p_ptr);
+                    p_env->ThrowNew( p_env->FindClass("java/lang/Exception"), _("call is not within a thread-safe content") );
+                    return NULL;
+                }
+                
                 p_idx = p_env->GetFieldID( l_class, "cpp_ptr", "J" );
+                
+                if (p_env->MonitorExit(p_env, p_object) != JNI_OK) {
+                    delete(p_ptr);
+                    p_env->ThrowNew( p_env->FindClass("java/lang/Exception"), _("release thread can not be determine correctly") );
+                    return NULL;
+                }
             }
 
             // check field index
