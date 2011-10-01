@@ -24,10 +24,11 @@
 package machinelearning.dimensionreduce.nonsupervised;
 
 
+
 /** create the principal component analysis (PCA)
  * $LastChangedDate$
  **/
-public class pca<T> extends reduce<T> {
+public class pca<T> implements reduce<T> {
     
     /** static call of the external library **/
     static { System.loadLibrary("machinelearning"); }

@@ -29,7 +29,7 @@ package machinelearning;
  * solving memory management
  * $LastChangedDate$
  **/
-public abstract class object {
+interface object {
     
     /** dispose method for freeing memory of underlaying objects **/
     public abstract void dispose();

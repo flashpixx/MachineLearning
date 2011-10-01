@@ -25,6 +25,14 @@ JNIEXPORT jint JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_ge
 
 /*
  * Class:     machinelearning_dimensionreduce_nonsupervised_pca
+ * Method:    getProject
+ * Signature: ()[[Ljava/lang/Object;
+ */
+JNIEXPORT jobjectArray JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_getProject
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     machinelearning_dimensionreduce_nonsupervised_pca
  * Method:    dispose
  * Signature: ()V
  */

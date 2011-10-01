@@ -287,10 +287,14 @@ def getRekusivFiles(startdir, ending, pdontuse=[], pShowPath=True, pAbsPath=Fals
         clst.extend(lst)
     else :
         ldontuse = [os.path.join(startdir, i) for i in pdontuse]
-        for n in ldontuse :
-            for i in lst :
-                if not(i.startswith(n)) :
-                    clst.append(i)
+        for i in lst :
+            lladd = True;
+
+            for n in ldontuse :
+                lladd = lladd and not(i.startswith(n));
+                
+            if lladd :
+                clst.append(i)
 
     return clst
 
@@ -329,6 +333,28 @@ def createLanguage(env, onlycompile=False) :
             os.system( "msgfmt -v -o " + os.path.join(os.path.dirname(i),"ml.mo") +" "+ i )
 
 
+# creates the JNI stub files
+def createJNIStub() :
+    # classnames that are not used for stub creating
+    notused = ["machinelearning.object", "machinelearning.dimensionreduce.nonsupervised.reduce"]
+
+
+    # compile first all classes
+    po = getRekusivFiles( os.path.join(os.curdir, "java"), ".java", ["jni"])
+    for i in po :
+        os.system( "javac -cp " + os.path.join(os.curdir, "java") + " " + i )
+        
+    # create stubs within the path
+    po = getRekusivFiles( os.path.join(os.curdir, "java"), ".class", ["jni"] )
+    for i in po :
+        parts = (os.path.splitext(i)[0]).split(os.sep) 
+        # remove first two parts
+        parts = parts[2:]
+        classname = ".".join(parts)
+        
+        #differnt classnames are not used
+        if classname not in notused :
+            os.system( "javah -classpath " + os.path.join(os.curdir, "java") + " -o " + os.path.splitext(i)[0] + ".h " + classname  )
 #=======================================================================================================================================
 
 #=== build targets =====================================================================================================================
@@ -439,6 +465,7 @@ Help(vars.GenerateHelpText(env))
 files = []
 files.extend( getRekusivFiles(os.curdir, env["OBJSUFFIX"]) )
 files.extend( getRekusivFiles(os.curdir, ".po~") )
+files.extend( getRekusivFiles(os.curdir, ".class") )
 env.Clean("clean", files)
 
 #default target
@@ -453,6 +480,9 @@ elif "createlanguage" in COMMAND_LINE_TARGETS :
     sys.exit(0)
 elif "compilelanguage" in COMMAND_LINE_TARGETS :
     createLanguage(env)
+    sys.exit(0)
+elif "jnistub" in COMMAND_LINE_TARGETS :
+    createJNIStub()
     sys.exit(0)
 else :
 
