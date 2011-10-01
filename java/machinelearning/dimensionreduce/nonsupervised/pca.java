@@ -38,9 +38,9 @@ public class pca<T> implements reduce<T> {
     
     
     /** constructor
-     * @param p_size number of target dimensions
+     * @param p_dim number of target dimensions
      **/
-    public pca( int p_size ) { cpp_ptr = cpp_ctor(p_size); }
+    public pca( int p_dim ) { cpp_ptr = cpp_ctor(p_dim); }
     
     /** finalizer, that calls the disposer **/
     protected void finalize() { this.dispose(); }
@@ -67,8 +67,9 @@ public class pca<T> implements reduce<T> {
     
     
     /** native ctor method with the return of the pointer
+     * @param p_dim dimension
      * @return pointer address
      **/
-    private native long cpp_ctor( int p_size );
+    private native long cpp_ctor( int p_dim );
     
 }
