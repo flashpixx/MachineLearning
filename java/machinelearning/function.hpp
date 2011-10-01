@@ -92,12 +92,19 @@ namespace machinelearning {
          **/         
         template<typename T> inline void disposeObjectPointer(JNIEnv* p_env, jobject& p_object, jFieldID& p_idx)
         {
+            // dispose must be thread-safe so we do this
+            if (p_env->MonitorEnter(p_env, p_object) != JNI_OK) {
+                p_env->ThrowNew( p_env->FindClass("java/lang/Exception"), _("call is not within a thread-safe content") );
+                return;
+            }
+        
             // destroy the object and sets the pointer field to null (the field is stored as a "final" field, but it can change by JNI call)
             delete( getObjectPointer(p_env, p_object, p_idx) );
-            p_env->SetLongField(p_object, p_idx, 0);            
-        }
-        
-        
+            p_env->SetLongField(p_object, p_idx, 0); 
+            
+            // release the synchronize content
+            if (p_env->MonitorExit(p_env, p_object) != JNI_OK)
+                p_env->ThrowNew( p_env->FindClass("java/lang/Exception"), _("release thread can not be determine correctly") );
     };
 };
 #endif
