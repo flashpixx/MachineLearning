@@ -118,6 +118,7 @@ namespace machinelearning {
              * $LastChangedDate$
              * @todo add method for setting prototypes
              * @todo implement serializable interface
+             * @todo remove set logging and add to cluster method
              **/      
             template<typename T> class clustering
             {
