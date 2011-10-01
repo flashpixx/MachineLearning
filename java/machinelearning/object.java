@@ -25,8 +25,8 @@ package machinelearning;
 
 
 /** class that must derviated in each object in the package, that uses
- * the JNI interface, because each must implement the methods for
- * solving memory management
+ * the JNI interface, because each class must implement the methods for
+ * clearing memory management
  * $LastChangedDate$
  **/
 interface object {

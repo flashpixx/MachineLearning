@@ -36,7 +36,7 @@ namespace machinelearning {
 
         
         /** checks the field id, that is used for determine the object pointer
-         * @param p_env JNI environmental
+         * @param p_env JNI environment
          * @param p_object JNI object
          * @param p_idx field index object
          **/
@@ -46,15 +46,17 @@ namespace machinelearning {
                 p_env->ThrowNew( p_env->FindClass("java/lang/Exception"), _("pointer to object is empty") );  
             
             T* l_ptr = (T*) p_env->GetLongField(p_object, p_idx);
-            if (!l_ptr)
+            if (!l_ptr) {
                 p_env->ThrowNew( p_env->FindClass("java/lang/Exception"), _("pointer to object is not empty") );
-            
+                return NULL;
+            }
+                
             return l_ptr;
         }
 
 
         /** sets the object pointer in the object variable
-         * @param p_env JNI environmental
+         * @param p_env JNI environment
          * @param p_object JNI object
          * @param p_idx field index object
          * @param p_ptr object pointer
@@ -72,6 +74,7 @@ namespace machinelearning {
             if (!p_idx) {
                 delete(p_ptr);
                 p_env->ThrowNew( p_env->FindClass("java/lang/Exception"), _("pointer field can not detected") );
+                return NULL;
             }
             
             return (jlong)p_ptr;
@@ -79,14 +82,13 @@ namespace machinelearning {
 
         
         /** dispose the object pointer within the Java object
-         * @param p_env JNI environmental
+         * @param p_env JNI environment
          * @param p_object JNI object
          * @param p_idx field index object
          **/         
         template<typename T> inline void disposeObjectPointer(JNIEnv* p_env, jobject& p_object, jFieldID& p_idx)
         {
-            T* l_ptr = getObjectPointer(p_env, p_object, p_idx);
-            delete(l_ptr);
+            delete( getObjectPointer(p_env, p_object, p_idx) );
             p_env->SetLongField(p_object, p_idx, 0);            
         }
         

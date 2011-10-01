@@ -682,6 +682,13 @@
  * @file examples/other/mds_file.cpp program for reading (text) files, stopword reduction, distance calculating and MDS plotting
  * @file examples/other/mds_twitter.cpp program for reading Twitter data and calculating plot with MDS
  *
+ * @file java/machinelearning/function.hpp helper function of the JNI implementation
+ * @file java/machinelearning/object.java main abstract interface for JNI interfaces of each object
+ * @file java/machinelearning/dimensionreduce/nonsupervised/reduce.java abstract reduce interface 
+ * @file java/machinelearning/dimensionreduce/nonsupervised/pca.java PCA implementation
+ * @file java/machinelearning/dimensionreduce/nonsupervised/pca.h JNI stub class of the PCA implementation
+ * @file java/machinelearning/dimensionreduce/nonsupervised/pca.cpp implementation of the PCA JNI object
+ *
  * @file classifier/classifier.h main header for all classifier structurs
  * @file classifier/classifier.hpp header for the abstract class implementation of the classifiers
  * @file classifier/lazylearner.hpp lazy learner algorithm
