@@ -45,6 +45,7 @@ namespace machinelearning {
             if (!p_idx)
                 p_env->ThrowNew( p_env->FindClass("java/lang/Exception"), _("pointer to object is empty") );  
             
+            // read pointer reference on the object and cast it to the pointer of the object
             T* l_ptr = (T*) p_env->GetLongField(p_object, p_idx);
             if (!l_ptr) {
                 p_env->ThrowNew( p_env->FindClass("java/lang/Exception"), _("pointer to object is not empty") );
@@ -66,17 +67,20 @@ namespace machinelearning {
             if (!p_ptr)
                 p_env->ThrowNew( p_env->FindClass("java/lang/Exception"), _("pointer to object is empty") );
             
+            // read Java object member variable for pointer storing
             if (!p_id) {
                 jclass l_class = p_env->GetObjectClass( p_object );
                 p_idx = p_env->GetFieldID( l_class, "cpp_ptr", "J" );
             }
 
+            // check field index
             if (!p_idx) {
                 delete(p_ptr);
                 p_env->ThrowNew( p_env->FindClass("java/lang/Exception"), _("pointer field can not detected") );
                 return NULL;
             }
             
+            // return casted pointer
             return (jlong)p_ptr;
         }
 
@@ -88,6 +92,7 @@ namespace machinelearning {
          **/         
         template<typename T> inline void disposeObjectPointer(JNIEnv* p_env, jobject& p_object, jFieldID& p_idx)
         {
+            // destroy the object and sets the pointer field to null (the field is stored as a "final" field, but it can change by JNI call)
             delete( getObjectPointer(p_env, p_object, p_idx) );
             p_env->SetLongField(p_object, p_idx, 0);            
         }
