@@ -27,20 +27,30 @@
 #include <jni.h>
 #include <machinelearning.h>
 
-namespace machinelearning { 
-    
-    /** namespace for JNI / JAVA wrapper code 
-     * $LastChangedDate$
-     **/
-    namespace java {
+namespace machinelearning { namespace java {
 
         
+        /** class for function that connect Java and C++ objects / reference
+         * $LastChangedDate$
+         **/
+        class objectregister {
+            
+            public :
+            
+                template<typename T> static T* getObjectPointer(JNIEnv*, jobject&, jFieldID&);
+                template<typename T> static jlong createObjectPointer(JNIEnv*, jobject&, jFieldID&, T*);
+                template<typename T> static void disposeObjectPointer(JNIEnv*, jobject&, jFieldID&);
+            
+        };
+            
+    
+    
         /** checks the field id, that is used for determine the object pointer
          * @param p_env JNI environment
          * @param p_object JNI object
          * @param p_idx field index object
          **/
-        template<typename T> inline T* getObjectPointer(JNIEnv* p_env, jobject& p_object, jFieldID& p_idx)
+        template<typename T> inline T* objectregister::getObjectPointer(JNIEnv* p_env, jobject& p_object, jFieldID& p_idx)
         {
             if (!p_idx)
                 p_env->ThrowNew( p_env->FindClass("java/lang/Exception"), _("pointer to object is empty") );  
@@ -62,7 +72,7 @@ namespace machinelearning {
          * @param p_idx field index object
          * @param p_ptr object pointer
          **/
-        template<typename T> inline jlong createObjectPointer(JNIEnv* p_env, jobject& p_object, jFieldID& p_idx, T* p_ptr)
+        template<typename T> inline jlong objectregister::createObjectPointer(JNIEnv* p_env, jobject& p_object, jFieldID& p_idx, T* p_ptr)
         {
             if (!p_ptr)
                 p_env->ThrowNew( p_env->FindClass("java/lang/Exception"), _("pointer to object is empty") );
@@ -103,7 +113,7 @@ namespace machinelearning {
          * @param p_object JNI object
          * @param p_idx field index object
          **/         
-        template<typename T> inline void disposeObjectPointer(JNIEnv* p_env, jobject& p_object, jFieldID& p_idx)
+        template<typename T> inline void objectregister::disposeObjectPointer(JNIEnv* p_env, jobject& p_object, jFieldID& p_idx)
         {
             // dispose must be thread-safe so we do this
             if (p_env->MonitorEnter(p_env, p_object) != JNI_OK) {
@@ -118,6 +128,7 @@ namespace machinelearning {
             // release the synchronize content
             if (p_env->MonitorExit(p_env, p_object) != JNI_OK)
                 p_env->ThrowNew( p_env->FindClass("java/lang/Exception"), _("release thread can not be determine correctly") );
-    };
-};
+    }
+    
+};};
 #endif
