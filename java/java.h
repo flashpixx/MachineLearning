@@ -29,7 +29,7 @@
 namespace machinelearning { 
     
     /** namespace for JNI / JAVA wrapper code 
-     * $LastChangedDate: 2011-10-01 23:59:35 +0200 (Sa, 01 Okt 2011) $
+     * $LastChangedDate$
      **/
     namespace java {};
     

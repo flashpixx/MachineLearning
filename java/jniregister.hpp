@@ -31,7 +31,7 @@ namespace machinelearning { namespace java {
 
         
         /** class for function that connect Java and C++ objects / reference
-         * $LastChangedDate: 2011-10-02 19:54:16 +0200 (Sun, 02 Oct 2011) $
+         * $LastChangedDate$
          **/
         class jniregister {
             
