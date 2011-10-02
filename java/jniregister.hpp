@@ -21,11 +21,11 @@
  @endcond
  **/
 
-#ifndef __MACHINELEARNING_JAVA_MACHINELEARNING_FUNCTION
-#define __MACHINELEARNING_JAVA_MACHINELEARNING_FUNCTION
+#ifndef __MACHINELEARNING_JAVA_JNIREGISTER_HPP
+#define __MACHINELEARNING_JAVA_JNIREGISTER_HPP
 
 #include <jni.h>
-#include <machinelearning.h>
+
 
 namespace machinelearning { namespace java {
 
@@ -37,9 +37,9 @@ namespace machinelearning { namespace java {
             
             public :
             
-                template<typename T> static T* getObjectPointer(JNIEnv*, jobject&, jFieldID&);
-                template<typename T> static jlong createObjectPointer(JNIEnv*, jobject&, jFieldID&, T*);
-                template<typename T> static void disposeObjectPointer(JNIEnv*, jobject&, jFieldID&);
+                template<typename T> static T* getObjectPointer(JNIEnv*, jobject&, jfieldID&);
+                template<typename T> static jlong createObjectPointer(JNIEnv*, jobject&, jfieldID&, T*);
+                template<typename T> static void disposeObjectPointer(JNIEnv*, jobject&, jfieldID&);
             
         };
             
@@ -50,7 +50,7 @@ namespace machinelearning { namespace java {
          * @param p_object JNI object
          * @param p_idx field index object
          **/
-        template<typename T> inline T* jniregister::getObjectPointer(JNIEnv* p_env, jobject& p_object, jFieldID& p_idx)
+        template<typename T> inline T* jniregister::getObjectPointer(JNIEnv* p_env, jobject& p_object, jfieldID& p_idx)
         {
             if (!p_idx)
                 p_env->ThrowNew( p_env->FindClass("java/lang/Exception"), _("pointer to object is empty") );  
@@ -72,16 +72,16 @@ namespace machinelearning { namespace java {
          * @param p_idx field index object
          * @param p_ptr object pointer
          **/
-        template<typename T> inline jlong jniregister::createObjectPointer(JNIEnv* p_env, jobject& p_object, jFieldID& p_idx, T* p_ptr)
+        template<typename T> inline jlong jniregister::createObjectPointer(JNIEnv* p_env, jobject& p_object, jfieldID& p_idx, T* p_ptr)
         {
             if (!p_ptr)
                 p_env->ThrowNew( p_env->FindClass("java/lang/Exception"), _("pointer to object is empty") );
             
             // read Java object member variable for pointer storing (the first call must be thread-safe, because the global field index is be written)
-            if (!p_id) {
+            if (!p_idx) {
                 jclass l_class = p_env->GetObjectClass( p_object );
                 
-                if (p_env->MonitorEnter(p_env, p_object) != JNI_OK) {
+                if (p_env->MonitorEnter(p_object) != JNI_OK) {
                     delete(p_ptr);
                     p_env->ThrowNew( p_env->FindClass("java/lang/Exception"), _("call is not within a thread-safe content") );
                     return NULL;
@@ -89,7 +89,7 @@ namespace machinelearning { namespace java {
                 
                 p_idx = p_env->GetFieldID( l_class, "cpp_ptr", "J" );
                 
-                if (p_env->MonitorExit(p_env, p_object) != JNI_OK) {
+                if (p_env->MonitorExit(p_object) != JNI_OK) {
                     delete(p_ptr);
                     p_env->ThrowNew( p_env->FindClass("java/lang/Exception"), _("release thread can not be determine correctly") );
                     return NULL;
@@ -113,20 +113,20 @@ namespace machinelearning { namespace java {
          * @param p_object JNI object
          * @param p_idx field index object
          **/         
-        template<typename T> inline void jniregister::disposeObjectPointer(JNIEnv* p_env, jobject& p_object, jFieldID& p_idx)
+        template<typename T> inline void jniregister::disposeObjectPointer(JNIEnv* p_env, jobject& p_object, jfieldID& p_idx)
         {
             // dispose must be thread-safe so we do this
-            if (p_env->MonitorEnter(p_env, p_object) != JNI_OK) {
+            if (p_env->MonitorEnter(p_object) != JNI_OK) {
                 p_env->ThrowNew( p_env->FindClass("java/lang/Exception"), _("call is not within a thread-safe content") );
                 return;
             }
         
             // destroy the object and sets the pointer field to null (the field is stored as a "final" field, but it can change by JNI call)
-            delete( getObjectPointer(p_env, p_object, p_idx) );
+            delete( jniregister::getObjectPointer<T>(p_env, p_object, p_idx) );
             p_env->SetLongField(p_object, p_idx, 0); 
             
             // release the synchronize content
-            if (p_env->MonitorExit(p_env, p_object) != JNI_OK)
+            if (p_env->MonitorExit(p_object) != JNI_OK)
                 p_env->ThrowNew( p_env->FindClass("java/lang/Exception"), _("release thread can not be determine correctly") );
     }
     
