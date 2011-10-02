@@ -24,7 +24,6 @@
 #ifndef __MACHINELEARNING_JAVA_MACHINELEARNING_JNIINTERFACE_H
 #define __MACHINELEARNING_JAVA_MACHINELEARNING_JNIINTERFACE_H
 
-/** header file to connect all dimensional reducing algorithm for one include
 
 namespace machinelearning { 
     
