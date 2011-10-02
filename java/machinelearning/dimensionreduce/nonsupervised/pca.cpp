@@ -30,7 +30,7 @@ namespace ml  = machinelearning;
 namespace dim = machinelearning::dimensionreduce::nonsupervised;
 
 /** field id that stores the ID that stores the pointer **/
-jFieldID machinelearning_dimensionreduce_nonsupervised_pca_fieldidx = NULL;
+jFieldID fieldidx_machinelearning_dimensionreduce_nonsupervised_pca = NULL;
 
 
 /** constructor call
@@ -42,7 +42,7 @@ jFieldID machinelearning_dimensionreduce_nonsupervised_pca_fieldidx = NULL;
 JNIEXPORT jlong JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_cpp_1ctor(JNIEnv* p_env, jobject p_object, jint p_dimension)
 {
     new pca
-    return ml::java::createObjectPointer(p_env, p_object, machinelearning_dimensionreduce_nonsupervised_pca_fieldidx, );
+    return ml::java::createObjectPointer(p_env, p_object, fieldidx_machinelearning_dimensionreduce_nonsupervised_pca );
 }
 
 
@@ -52,7 +52,7 @@ JNIEXPORT jlong JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_c
  **/
 JNIEXPORT void JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_dispose(JNIEnv* p_env, jobject p_object)
 {
-    ml::java::disposeObjectPointer(p_env, p_object, machinelearning_dimensionreduce_nonsupervised_pca_fieldidx);
+    ml::java::disposeObjectPointer(p_env, p_object, fieldidx_machinelearning_dimensionreduce_nonsupervised_pca);
 }
 
 
