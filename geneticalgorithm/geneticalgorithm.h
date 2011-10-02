@@ -31,7 +31,9 @@
 
 namespace machinelearning { 
     
-    /** namespace for genetic algorithms **/
+    /** namespace for genetic algorithms
+     * @todo adding different individuals, crossover and fitness function for example use
+     **/
     namespace geneticalgorithm {};
     
 };

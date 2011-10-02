@@ -36,7 +36,6 @@ jfieldID fieldidx_machinelearning_dimensionreduce_nonsupervised_pca = NULL;
 /** constructor call
  * @param p_env JNI environment
  * @param p_object JNI object
- * @param p_idx field index object
  * @param p_dimension dimension value
 **/
 JNIEXPORT jlong JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_cpp_1ctor(JNIEnv* p_env, jobject p_object, jint p_dimension)
