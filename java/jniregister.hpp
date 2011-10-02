@@ -31,9 +31,9 @@ namespace machinelearning { namespace java {
 
         
         /** class for function that connect Java and C++ objects / reference
-         * $LastChangedDate$
+         * $LastChangedDate: 2011-10-02 19:54:16 +0200 (Sun, 02 Oct 2011) $
          **/
-        class objectregister {
+        class jniregister {
             
             public :
             
@@ -50,7 +50,7 @@ namespace machinelearning { namespace java {
          * @param p_object JNI object
          * @param p_idx field index object
          **/
-        template<typename T> inline T* objectregister::getObjectPointer(JNIEnv* p_env, jobject& p_object, jFieldID& p_idx)
+        template<typename T> inline T* jniregister::getObjectPointer(JNIEnv* p_env, jobject& p_object, jFieldID& p_idx)
         {
             if (!p_idx)
                 p_env->ThrowNew( p_env->FindClass("java/lang/Exception"), _("pointer to object is empty") );  
@@ -72,7 +72,7 @@ namespace machinelearning { namespace java {
          * @param p_idx field index object
          * @param p_ptr object pointer
          **/
-        template<typename T> inline jlong objectregister::createObjectPointer(JNIEnv* p_env, jobject& p_object, jFieldID& p_idx, T* p_ptr)
+        template<typename T> inline jlong jniregister::createObjectPointer(JNIEnv* p_env, jobject& p_object, jFieldID& p_idx, T* p_ptr)
         {
             if (!p_ptr)
                 p_env->ThrowNew( p_env->FindClass("java/lang/Exception"), _("pointer to object is empty") );
@@ -113,7 +113,7 @@ namespace machinelearning { namespace java {
          * @param p_object JNI object
          * @param p_idx field index object
          **/         
-        template<typename T> inline void objectregister::disposeObjectPointer(JNIEnv* p_env, jobject& p_object, jFieldID& p_idx)
+        template<typename T> inline void jniregister::disposeObjectPointer(JNIEnv* p_env, jobject& p_object, jFieldID& p_idx)
         {
             // dispose must be thread-safe so we do this
             if (p_env->MonitorEnter(p_env, p_object) != JNI_OK) {
