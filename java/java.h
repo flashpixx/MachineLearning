@@ -21,8 +21,8 @@
  @endcond
  **/
 
-#ifndef __MACHINELEARNING_JAVA_MACHINELEARNING_JNIINTERFACE_H
-#define __MACHINELEARNING_JAVA_MACHINELEARNING_JNIINTERFACE_H
+#ifndef __MACHINELEARNING_JAVA_JAVA_H
+#define __MACHINELEARNING_JAVA_JAVA_H
 
 
 namespace machinelearning { 
@@ -34,7 +34,7 @@ namespace machinelearning {
     
 };
 
-
+#include "../machinelearning.h"
 #include "jniregister.hpp"
 
 #endif
