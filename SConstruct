@@ -492,9 +492,6 @@ files.extend( getRekusivFiles(os.curdir, ".class") )
 
 env.Clean("clean", files)
 
-#default target
-Default(None)
-
 
 # catch all cpps within the framework directories and compile them to objectfiles into the builddir
 #framework = getRekusivFiles(os.curdir, ".cpp", ["examples"])
