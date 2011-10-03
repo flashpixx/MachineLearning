@@ -437,7 +437,7 @@ def target_java(env) :
     targets.append( env.SharedLibrary( target=os.path.join("#build", "java", "machinelearning"), source=sources ) )
     
     # build Jar and create Jar Index
-    targets.append( env.Command("buildjar", "", "jar cf " + os.path.join(os.curdir, "build", "machinelearning.jar") + " -C " + os.path.join("build", "java" ) + " .") )
+    targets.append( env.Command("buildjar", "", "jar cfm " + os.path.join(os.curdir, "build", "machinelearning.jar") + " "+os.path.join(os.curdir, "java", "manifest.mf")+" -C " + os.path.join("build", "java" ) + " .") )
     targets.append( env.Command("indexjar", "", "jar i " + os.path.join(os.curdir, "build", "machinelearning.jar") ) )
 
     env.Alias("java", targets)
