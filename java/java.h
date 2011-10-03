@@ -35,6 +35,6 @@ namespace machinelearning {
 };
 
 #include "../machinelearning.h"
-#include "jniregister.hpp"
+#include "jni.hpp"
 
 #endif
