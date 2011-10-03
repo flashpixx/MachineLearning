@@ -136,6 +136,7 @@
  * <ul>
  * <li><dfn>documentation</dfn> create the documentation with Doxygen (Doxygen must be installed and be reached within the path)</li>
  * <li><dfn>java</dfn> create the the C/C++ stub files of each Java class, create the shared library and add all to the Jar file</li>
+ * <li><dfn>javap</dfn> create 
  * <li><dfn>createlanguage</dfn> creates the language files / adds new messages to the existing files (xgettext must be called, so it should be within the path)</li>
  * <li><dfn>updatelanguage</dfn> compiles all language files (msgfmt must be called, so it should be within the path)</li>
  * <li><dfn>source</dfn> sources are eg. Wikipedia, NNTP, but the parameter <dfn>withsources</dfn> must be set for compiling and for the cloud example the files parameter must be set additionally</li>

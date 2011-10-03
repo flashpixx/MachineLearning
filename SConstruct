@@ -408,11 +408,14 @@ def target_genetic(env, framework) :
     
 def target_java(env) :
     # build Java classes
+    po = getRekusivFiles( os.path.join(os.curdir, "java"), ".java" )
     targets = env.Java(target=os.path.join("#build", "java"), source=os.path.join(os.curdir, "java"));
     
-    # create JNI stubs
-    po = getRekusivFiles( os.path.join(os.curdir, "java"), ".java" )
+    # list with Java classes that are used for the JavaP command
+    javaplist = []
+    javaplist.extend(targets)
 
+    # create JNI stubs and JavaP command
     notused = ["machinelearning.object", "machinelearning.dimensionreduce.nonsupervised.reduce"]
     for i in po :
         # split file and directory parts
@@ -426,6 +429,7 @@ def target_java(env) :
         #differnt classnames are not used
         if classname not in notused :
             targets.append( env.Command( headerfile, "", "javah -classpath " + os.path.join(os.curdir, "build", "java") + " -o " + os.path.join(os.curdir, "java", headerfile) + " " + classname  ) )
+            javaplist.append( env.Command("javap", "", "javap -classpath "+os.path.join("build", "java" )+" -s -p "+classname) )
 
                                 
     # build SharedLibrary
@@ -435,8 +439,9 @@ def target_java(env) :
     # build Jar and create Jar Index
     targets.append( env.Command("buildjar", "", "jar cf " + os.path.join(os.curdir, "build", "machinelearning.jar") + " -C " + os.path.join("build", "java" ) + " .") )
     targets.append( env.Command("indexjar", "", "jar i " + os.path.join(os.curdir, "build", "machinelearning.jar") ) )
-    
+
     env.Alias("java", targets)
+    env.Alias("javap", javaplist)
     
     
 def target_language(env) :

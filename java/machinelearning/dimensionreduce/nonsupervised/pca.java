@@ -42,8 +42,8 @@ public class pca<T> implements reduce<T> {
      **/
     public pca( int p_dim ) { cpp_ptr = cpp_ctor(p_dim); }
     
-    /** finalizer, that calls the disposer **/
-    protected void finalize() { this.dispose(); }
+    /** finalizer, that calls the disposer with exception handling **/
+    protected void finalize() { try { this.dispose(); } catch(Exception e) {} }
     
     
     /** run the mapping structure
