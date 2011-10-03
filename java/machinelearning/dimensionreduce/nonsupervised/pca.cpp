@@ -21,13 +21,17 @@
  @endcond
  **/
 
+#include <boost/numeric/ublas/matrix.hpp>
 
 #include "pca.h"
 #include "../../../java.h"
 
 
-namespace java = machinelearning::java;
-namespace dim = machinelearning::dimensionreduce::nonsupervised;
+namespace java  = machinelearning::java;
+namespace tools = machinelearning::tools;
+namespace dim   = machinelearning::dimensionreduce::nonsupervised;
+namespace ublas = boost::numeric::ublas;
+
 
 /** field id that stores the ID that stores the pointer **/
 jfieldID fieldidx_machinelearning_dimensionreduce_nonsupervised_pca = NULL;

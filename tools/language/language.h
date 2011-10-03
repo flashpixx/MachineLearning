@@ -71,7 +71,7 @@ namespace machinelearning { namespace tools {
             #include "iso639.h"
             #undef LANGUAGE_CODE
             
-            throw exception::runtime(_("language is not known ["+p_lang+"]"));
+            throw exception::runtime(_("language is not known")+ " ["+p_lang+"]"));
         }
         
         

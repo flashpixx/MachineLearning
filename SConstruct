@@ -249,6 +249,7 @@ def getConfig(vars):
     env.Replace(LIBS        = config["linkto"])
     env.Replace(LIBPATH     = config["librarypath"])
     env.Replace(CPPSUFFIXES = [".hpp", ".h", ".cpp"])
+    #env.Replace(JAVACLASSPATH = [os.path.join(os.curdir, "java")])
 
     # Scons < 2: env.BuildDir("build", ".", duplicate=0)
     env.VariantDir("build", ".", duplicate=0)
@@ -297,65 +298,9 @@ def getRekusivFiles(startdir, ending, pdontuse=[], pShowPath=True, pAbsPath=Fals
                 clst.append(i)
 
     return clst
-
-
-# build languagefiles
-def createLanguage(env, onlycompile=False) :
-    # compiling with: msgfmt -v -o target.mo source.po
-    # add new data: msgmerge --no-wrap --update old_file.po newer_file.pot
-
-    po = getRekusivFiles(os.curdir, ".po", ["examples"])
-
-    if onlycompile :
-        # compiling all files
-        for i in po :
-            os.system( "msgfmt -v -o " + os.path.join(os.path.dirname(i),"ml.mo") +" "+ i )
-
-    else :
-        sources = []
-        for i in env["CPPSUFFIXES"] :
-            sources.extend( getRekusivFiles(os.curdir, i, ["examples"]) )
-
-        cmd = "xgettext --output="+os.path.join("tools", "language", "language.po")+" --keyword=_ --language=c++ ";
-        for i in sources :
-            cmd = cmd + i + " "
-        os.system(cmd);
-
-
-        # get all language files in the subdirs and add the new texts
-        for i in po :
-            os.system( "msgmerge --no-wrap --update " + i + " "+os.path.join("tools", "language", "language.po") )
-
-        os.remove("tools/language/language.po")
-
-        # compiling all files
-        for i in po :
-            os.system( "msgfmt -v -o " + os.path.join(os.path.dirname(i),"ml.mo") +" "+ i )
-
-
-# creates the JNI stub files
-def createJNIStub() :
-    # classnames that are not used for stub creating
-    notused = ["machinelearning.object", "machinelearning.dimensionreduce.nonsupervised.reduce"]
-
-
-    # compile first all classes
-    po = getRekusivFiles( os.path.join(os.curdir, "java"), ".java", ["jni"])
-    for i in po :
-        os.system( "javac -cp " + os.path.join(os.curdir, "java") + " " + i )
-        
-    # create stubs within the path
-    po = getRekusivFiles( os.path.join(os.curdir, "java"), ".class", ["jni"] )
-    for i in po :
-        parts = (os.path.splitext(i)[0]).split(os.sep) 
-        # remove first two parts
-        parts = parts[2:]
-        classname = ".".join(parts)
-        
-        #differnt classnames are not used
-        if classname not in notused :
-            os.system( "javah -classpath " + os.path.join(os.curdir, "java") + " -o " + os.path.splitext(i)[0] + ".h " + classname  )
 #=======================================================================================================================================
+
+
 
 #=== build targets =====================================================================================================================
 
@@ -449,6 +394,72 @@ def target_genetic(env, framework) :
     sources.extend( ["knapsack.cpp"] )
 
     createTarget(env, "ga", path, sources, framework)
+
+    
+def target_java(env) :
+    # build Java classes
+    targets = env.Java(target=os.path.join("#build", "java"), source=os.path.join(os.curdir, "java"));
+    
+    # create JNI stubs
+    po = getRekusivFiles( os.path.join(os.curdir, "java"), ".java" )
+
+    notused = ["machinelearning.object", "machinelearning.dimensionreduce.nonsupervised.reduce"]
+    for i in po :
+        # split file and directory parts
+        parts = (os.path.splitext(i)[0]).split(os.sep) 
+        
+        # remove first three parts
+        parts = parts[2:]
+        classname  = ".".join(parts)
+        headerfile = os.sep.join(parts) + ".h"
+            
+        #differnt classnames are not used
+        if classname not in notused :
+            targets.append( env.Command( headerfile, "", "javah -classpath " + os.path.join(os.curdir, "build", "java") + " -o " + os.path.join(os.curdir, "java", headerfile) + " " + classname  ) )
+
+                                
+    # build SharedLibrary
+    sources = getRekusivFiles( os.path.join(os.curdir, "java"), ".cpp")
+    targets.append( env.SharedLibrary( target=os.path.join("#build", "java", "machinelearning"), source=sources ) )
+    
+    # build Jar and create Jar Index
+    targets.append( env.Command("buildjar", "", "jar cf " + os.path.join(os.curdir, "build", "machinelearning.jar") + " -C " + os.path.join("build", "java" ) + " .") )
+    targets.append( env.Command("indexjar", "", "jar i " + os.path.join(os.curdir, "build", "machinelearning.jar") ) )
+    
+    env.Alias("java", targets)
+    
+    
+def target_language(env) :
+        sources = []
+        for i in env["CPPSUFFIXES"] :
+            sources.extend( getRekusivFiles(os.curdir, i, ["examples"]) )
+
+        # get all strings out of the sources
+        updatetargets = []
+        createtargets = []
+        updatetargets.append( env.Command("xgettext", "", "xgettext --output="+os.path.join("tools", "language", "language.po")+" --keyword=_ --language=c++ " + " ".join(sources)) )
+        createtargets.extend( updatetargets )
+
+
+        # get all language files in the subdirs and add the new texts
+        po = getRekusivFiles(os.curdir, ".po", ["examples", "java", "build"])
+        for i in po :
+            updatetargets.append( env.Command("msmerge", "", "msgmerge --no-wrap --update " + i + " "+os.path.join("tools", "language", "language.po") ) )
+            createtargets.append( env.Command("msmerge", "", "msgmerge --no-wrap --update " + i + " "+os.path.join("tools", "language", "language.po") ) )
+            
+        createtargets.append( env.Command("deletelang", "", [Delete(os.path.join("tools", "language", "language.po"))] ) )
+        updatetargets.append( env.Command("deletelang", "", [Delete(os.path.join("tools", "language", "language.po"))] ) )
+
+        # compiling all files
+        for i in po :
+            updatetargets.append( env.Command("msgfmt", "", "msgfmt -v -o " + os.path.join(os.path.dirname(i),"ml.mo") +" "+ i ) )
+        
+        env.Alias("updatelanguage", updatetargets)
+        env.Alias("createlanguage", createtargets)            
+    
+    
+def target_documentation(env) :
+    env.Alias("documentation", env.Command("documentation", "", "doxygen documentation.doxyfile"))
 #=======================================================================================================================================
 
 
@@ -466,36 +477,26 @@ files = []
 files.extend( getRekusivFiles(os.curdir, env["OBJSUFFIX"]) )
 files.extend( getRekusivFiles(os.curdir, ".po~") )
 files.extend( getRekusivFiles(os.curdir, ".class") )
+
 env.Clean("clean", files)
 
 #default target
 Default(None)
 
 
-if "documentation" in COMMAND_LINE_TARGETS :
-    os.system("doxygen documentation.doxyfile")
-    sys.exit(0)
-elif "createlanguage" in COMMAND_LINE_TARGETS :
-    createLanguage(env, True)
-    sys.exit(0)
-elif "compilelanguage" in COMMAND_LINE_TARGETS :
-    createLanguage(env)
-    sys.exit(0)
-elif "jnistub" in COMMAND_LINE_TARGETS :
-    createJNIStub()
-    sys.exit(0)
-else :
+# catch all cpps within the framework directories and compile them to objectfiles into the builddir
+#framework = getRekusivFiles(os.curdir, ".cpp", ["examples"])
+framework = []
 
-    # catch all cpps within the framework directories and compile them to objectfiles into the builddir
-    #framework = getRekusivFiles(os.curdir, ".cpp", ["examples"])
-    framework = []
-
-    # create building targets
-    target_sources( env, framework )
-    target_clustering( env, framework )
-    target_reducing( env, framework )
-    target_distance(env, framework )
-    target_classifier(env, framework )
-    target_other(env, framework )
-    target_genetic(env, framework )
+# create building targets
+target_language( env )
+target_documentation( env )
+target_java( env )
+target_sources( env, framework )
+target_clustering( env, framework )
+target_reducing( env, framework )
+target_distance(env, framework )
+target_classifier(env, framework )
+target_other(env, framework )
+target_genetic(env, framework )
 

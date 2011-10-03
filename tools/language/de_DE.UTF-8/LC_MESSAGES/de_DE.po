@@ -1,752 +1,827 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-07-22 23:30+0200\n"
-"PO-Revision-Date: 2011-07-22 23:30+0100\n"
+"POT-Creation-Date: 2011-10-03 11:30+0200\n"
+"PO-Revision-Date: 2011-10-03 14:17+0100\n"
 "Last-Translator: Philipp Kraus <philipp.kraus@flashpixx.de>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: classifier/classifier.hpp:58
-#: classifier/classifier.hpp:61
-#: classifier/classifier.hpp:64
-#: classifier/classifier.hpp:67
-#: classifier/classifier.hpp:70
-#: classifier/classifier.hpp:73
-#: classifier/classifier.hpp:76
-#: classifier/classifier.hpp:79
-#: classifier/classifier.hpp:82
-#: clustering/clustering.hpp:75
-#: clustering/clustering.hpp:78
-#: clustering/clustering.hpp:81
-#: clustering/clustering.hpp:84
-#: clustering/clustering.hpp:87
-#: clustering/clustering.hpp:90
-#: clustering/clustering.hpp:93
-#: clustering/clustering.hpp:96
-#: clustering/clustering.hpp:99
-#: clustering/clustering.hpp:102
-#: clustering/clustering.hpp:138
-#: clustering/clustering.hpp:141
-#: clustering/clustering.hpp:144
-#: clustering/clustering.hpp:147
-#: clustering/clustering.hpp:150
-#: clustering/clustering.hpp:153
-#: clustering/clustering.hpp:156
-#: clustering/clustering.hpp:159
-#: clustering/clustering.hpp:162
-#: clustering/clustering.hpp:169
-#: clustering/clustering.hpp:172
-#: clustering/clustering.hpp:175
-#: clustering/clustering.hpp:178
-#: clustering/clustering.hpp:181
-#: clustering/clustering.hpp:184
-#: clustering/clustering.hpp:208
-#: clustering/clustering.hpp:211
-#: clustering/clustering.hpp:214
-#: clustering/clustering.hpp:221
-#: clustering/clustering.hpp:224
-#: clustering/clustering.hpp:227
-#: dimensionreduce/dimensionreduce.hpp:71
-#: dimensionreduce/dimensionreduce.hpp:74
-#: dimensionreduce/dimensionreduce.hpp:79
-#: dimensionreduce/dimensionreduce.hpp:109
-#: dimensionreduce/dimensionreduce.hpp:112
-#: dimensionreduce/dimensionreduce.hpp:117
-#: distances/distance.hpp:58
-#: distances/distance.hpp:61
-#: distances/distance.hpp:64
-#: distances/distance.hpp:67
-#: distances/distance.hpp:72
-#: distances/distance.hpp:75
-#: distances/distance.hpp:78
-#: distances/distance.hpp:81
-#: distances/distance.hpp:84
-#: distances/distance.hpp:89
-#: distances/distance.hpp:92
-#: distances/distance.hpp:95
-#: distances/distance.hpp:100
-#: distances/distance.hpp:103
-#: distances/distance.hpp:106
-#: distances/distance.hpp:109
-#: neighborhood/neighborhood.hpp:60
-#: neighborhood/neighborhood.hpp:63
-#: neighborhood/neighborhood.hpp:66
-#: neighborhood/neighborhood.hpp:69
-#: neighborhood/neighborhood.hpp:72
-msgid "method is not implementated in the base class"
-msgstr "Methode ist nicht implementiert, da sie Teil einer Basisklasse ist"
-
-#: classifier/lazylearner.hpp:192
-#: clustering/supervised/rlvq.hpp:214
+#: classifier/lazylearner.hpp:193
+#: clustering/supervised/rlvq.hpp:215
 #: dimensionreduce/supervised/lda.hpp:105
 msgid "matrix rows and label size are not equal"
-msgstr "Matrixzeilen und Labelanzahl sind nicht identisch"
+msgstr "Matrixzeilenanzhal und Labelanzahl nicht gleich"
 
-#: clustering/nonsupervised/kmeans.hpp:97
-#: clustering/nonsupervised/neuralgas.hpp:151
-#: clustering/nonsupervised/relational_neuralgas.hpp:151
-#: clustering/supervised/rlvq.hpp:102
+#: clustering/nonsupervised/kmeans.hpp:101
+#: clustering/nonsupervised/neuralgas.hpp:155
+#: clustering/nonsupervised/relational_neuralgas.hpp:159
+#: clustering/supervised/rlvq.hpp:103
 msgid "prototype size must be greater than zero"
-msgstr "Prototypdimension musst größer Null sein"
+msgstr "Prototypdimension muss größer Null sein"
 
-#: clustering/nonsupervised/kmeans.hpp:99
-#: clustering/nonsupervised/neuralgas.hpp:260
-#: clustering/nonsupervised/neuralgas.hpp:354
-#: clustering/nonsupervised/neuralgas.hpp:394
-#: clustering/nonsupervised/relational_neuralgas.hpp:295
-#: clustering/nonsupervised/relational_neuralgas.hpp:381
-#: clustering/nonsupervised/relational_neuralgas.hpp:415
-#: clustering/nonsupervised/relational_neuralgas.hpp:811
-msgid "number of prototypes must be greater than zero"
-msgstr "Anzahl der Prototypen muss größer Null sein"
-
-#: clustering/nonsupervised/kmeans.hpp:158
+#: clustering/nonsupervised/kmeans.hpp:103
 #: clustering/nonsupervised/neuralgas.hpp:264
+#: clustering/nonsupervised/neuralgas.hpp:358
 #: clustering/nonsupervised/neuralgas.hpp:398
-#: clustering/nonsupervised/neuralgas.hpp:636
-#: clustering/nonsupervised/neuralgas.hpp:927
-#: clustering/nonsupervised/relational_neuralgas.hpp:299
-#: clustering/nonsupervised/relational_neuralgas.hpp:419
-#: clustering/nonsupervised/relational_neuralgas.hpp:695
-#: clustering/supervised/rlvq.hpp:212
-#: dimensionreduce/nonsupervised/mds.hpp:257
-#: functionoptimization/gradientdescent.hpp:296
-msgid "iterations must be greater than zero"
-msgstr "Iterationen müssen größer Null sein"
-
-#: clustering/nonsupervised/kmeans.hpp:160
-#: clustering/nonsupervised/neuralgas.hpp:266
-#: clustering/nonsupervised/neuralgas.hpp:356
-#: clustering/nonsupervised/neuralgas.hpp:400
-#: clustering/nonsupervised/neuralgas.hpp:638
-#: clustering/nonsupervised/neuralgas.hpp:795
-#: clustering/nonsupervised/neuralgas.hpp:929
-#: clustering/nonsupervised/relational_neuralgas.hpp:301
-#: clustering/nonsupervised/relational_neuralgas.hpp:383
-#: clustering/nonsupervised/relational_neuralgas.hpp:421
-#: clustering/nonsupervised/relational_neuralgas.hpp:707
-#: clustering/nonsupervised/relational_neuralgas.hpp:813
-#: clustering/nonsupervised/spectralclustering.hpp:170
-#: clustering/supervised/rlvq.hpp:216
-#: clustering/supervised/rlvq.hpp:292
-msgid "data and prototype dimension are not equal"
-msgstr "Daten- und Prototypdimension sind nicht identisch"
+#: clustering/nonsupervised/relational_neuralgas.hpp:303
+#: clustering/nonsupervised/relational_neuralgas.hpp:389
+#: clustering/nonsupervised/relational_neuralgas.hpp:423
+#: clustering/nonsupervised/relational_neuralgas.hpp:819
+msgid "number of prototypes must be greater than zero"
+msgstr "Prototypanzahl muss größer Null sein"
 
 #: clustering/nonsupervised/kmeans.hpp:162
-#: clustering/nonsupervised/kmeans.hpp:257
-#: clustering/nonsupervised/neuralgas.hpp:262
-#: clustering/nonsupervised/neuralgas.hpp:396
-#: clustering/nonsupervised/neuralgas.hpp:634
-#: clustering/nonsupervised/neuralgas.hpp:925
-#: clustering/nonsupervised/relational_neuralgas.hpp:297
-#: clustering/nonsupervised/relational_neuralgas.hpp:417
-#: clustering/nonsupervised/relational_neuralgas.hpp:693
-#: clustering/supervised/rlvq.hpp:210
-msgid "number of datapoints are less than prototypes"
-msgstr "Anzahl der Datenpunkte ist weniger als Anzahl der Prototypen"
-
 #: clustering/nonsupervised/neuralgas.hpp:268
 #: clustering/nonsupervised/neuralgas.hpp:402
 #: clustering/nonsupervised/neuralgas.hpp:640
 #: clustering/nonsupervised/neuralgas.hpp:931
-#: clustering/nonsupervised/relational_neuralgas.hpp:303
-#: clustering/nonsupervised/relational_neuralgas.hpp:423
-#: clustering/nonsupervised/relational_neuralgas.hpp:697
-#: clustering/supervised/rlvq.hpp:218
+#: clustering/nonsupervised/relational_neuralgas.hpp:307
+#: clustering/nonsupervised/relational_neuralgas.hpp:427
+#: clustering/nonsupervised/relational_neuralgas.hpp:703
+#: clustering/supervised/rlvq.hpp:213
+#: dimensionreduce/nonsupervised/mds.hpp:261
+#: functionoptimization/gradientdescent.hpp:297
+#: geneticalgorithm/population.hpp:251
+msgid "iterations must be greater than zero"
+msgstr "Iterationen müssen größer Null sein"
+
+#: clustering/nonsupervised/kmeans.hpp:164
+#: clustering/nonsupervised/neuralgas.hpp:270
+#: clustering/nonsupervised/neuralgas.hpp:360
+#: clustering/nonsupervised/neuralgas.hpp:404
+#: clustering/nonsupervised/neuralgas.hpp:642
+#: clustering/nonsupervised/neuralgas.hpp:799
+#: clustering/nonsupervised/neuralgas.hpp:933
+#: clustering/nonsupervised/relational_neuralgas.hpp:309
+#: clustering/nonsupervised/relational_neuralgas.hpp:391
+#: clustering/nonsupervised/relational_neuralgas.hpp:429
+#: clustering/nonsupervised/relational_neuralgas.hpp:715
+#: clustering/nonsupervised/relational_neuralgas.hpp:821
+#: clustering/nonsupervised/spectralclustering.hpp:171
+#: clustering/supervised/rlvq.hpp:217
+#: clustering/supervised/rlvq.hpp:293
+msgid "data and prototype dimension are not equal"
+msgstr "Daten- und Prototypdimension nicht identisch"
+
+#: clustering/nonsupervised/kmeans.hpp:166
+#: clustering/nonsupervised/kmeans.hpp:261
+#: clustering/nonsupervised/neuralgas.hpp:266
+#: clustering/nonsupervised/neuralgas.hpp:400
+#: clustering/nonsupervised/neuralgas.hpp:638
+#: clustering/nonsupervised/neuralgas.hpp:929
+#: clustering/nonsupervised/relational_neuralgas.hpp:305
+#: clustering/nonsupervised/relational_neuralgas.hpp:425
+#: clustering/nonsupervised/relational_neuralgas.hpp:701
+#: clustering/supervised/rlvq.hpp:211
+msgid "number of datapoints are less than prototypes"
+msgstr "Anzahl Datenpunkte weniger als Anzahl Prototypen"
+
+#: clustering/nonsupervised/neuralgas.hpp:272
+#: clustering/nonsupervised/neuralgas.hpp:406
+#: clustering/nonsupervised/neuralgas.hpp:644
+#: clustering/nonsupervised/neuralgas.hpp:935
+#: clustering/nonsupervised/relational_neuralgas.hpp:311
+#: clustering/nonsupervised/relational_neuralgas.hpp:431
+#: clustering/nonsupervised/relational_neuralgas.hpp:705
+#: clustering/supervised/rlvq.hpp:219
 msgid "lambda must be greater than zero"
 msgstr "Lambda muss größer Null sein"
 
-#: clustering/nonsupervised/relational_neuralgas.hpp:305
-#: clustering/nonsupervised/relational_neuralgas.hpp:425
-#: clustering/nonsupervised/relational_neuralgas.hpp:705
-#: clustering/nonsupervised/spectralclustering.hpp:168
-#: dimensionreduce/nonsupervised/mds.hpp:181
-#: dimensionreduce/nonsupervised/mds.hpp:495
-#: tools/lapack.hpp:85
-#: tools/lapack.hpp:127
-#: tools/lapack.hpp:228
-#: tools/matrix.hpp:246
+#: clustering/nonsupervised/relational_neuralgas.hpp:96
+#: clustering/nonsupervised/relational_neuralgas.hpp:97
+#: clustering/nonsupervised/relational_neuralgas.hpp:98
+#: clustering/nonsupervised/spectralclustering.hpp:69
+msgid "method is not implementated in this class"
+msgstr "Methode ist nicht in der Klasse implementiert"
+
+#: clustering/nonsupervised/relational_neuralgas.hpp:313
+#: clustering/nonsupervised/relational_neuralgas.hpp:433
+#: clustering/nonsupervised/relational_neuralgas.hpp:713
+#: clustering/nonsupervised/spectralclustering.hpp:169
+#: dimensionreduce/nonsupervised/mds.hpp:185
+#: dimensionreduce/nonsupervised/mds.hpp:499
+#: tools/lapack.hpp:86
+#: tools/lapack.hpp:128
+#: tools/lapack.hpp:235
+#: tools/matrix.hpp:247
 msgid "matrix must be square"
 msgstr "Matrix muss quadratisch sein"
 
-#: clustering/supervised/rlvq.hpp:220
+#: clustering/supervised/rlvq.hpp:221
 msgid "eta must be greater than zero"
 msgstr "Eta muss größer Null sein"
 
-#: dimensionreduce/nonsupervised/lle.hpp:78
-#: dimensionreduce/nonsupervised/mds.hpp:127
-#: dimensionreduce/nonsupervised/pca.hpp:72
+#: dimensionreduce/nonsupervised/lle.hpp:79
+#: dimensionreduce/nonsupervised/mds.hpp:131
+#: dimensionreduce/nonsupervised/pca.hpp:73
 #: dimensionreduce/supervised/lda.hpp:74
 msgid "dimension must be greater than zero"
 msgstr "Dimension muss größer Null sein"
 
-#: dimensionreduce/nonsupervised/lle.hpp:100
+#: dimensionreduce/nonsupervised/lle.hpp:101
 msgid "data points are less than target dimension"
-msgstr "Datenpunktdimension ist kleiner als Dimension der Zielprojektion"
+msgstr "Datenpunkte sind weniger als Zieldimensionen"
 
-#: dimensionreduce/nonsupervised/mds.hpp:183
-#: dimensionreduce/nonsupervised/pca.hpp:100
+#: dimensionreduce/nonsupervised/mds.hpp:187
+#: dimensionreduce/nonsupervised/pca.hpp:101
 msgid "datapoint dimension are less than target dimension"
-msgstr "Datenpunktdimension ist kleiner als Dimension der Zielprojektion"
+msgstr "Datenpunkt Dimension ist kleiner als Zieldimension"
 
-#: dimensionreduce/nonsupervised/mds.hpp:215
-#: neighborhood/kapproximation.hpp:106
+#: dimensionreduce/nonsupervised/mds.hpp:219
+#: neighborhood/kapproximation.hpp:107
 msgid "project option is unkown"
-msgstr "Projektionsmethode ist nicht bekannt"
+msgstr "Projektionsoption unbekannt"
 
-#: dimensionreduce/nonsupervised/mds.hpp:259
+#: dimensionreduce/nonsupervised/mds.hpp:263
 msgid "steps must be greater than zero"
-msgstr "Schrittweite muss größer Null sein"
+msgstr "Schritte müssen größer Null sein"
 
-#: dimensionreduce/nonsupervised/mds.hpp:306
+#: dimensionreduce/nonsupervised/mds.hpp:310
 msgid "sammon mapping may not converge"
-msgstr "Sammons Map konnte nicht konvergieren"
+msgstr "Sammon-Mapping ist nicht konvergiert"
 
-#: dimensionreduce/nonsupervised/mds.hpp:375
-#: dimensionreduce/nonsupervised/mds.hpp:542
+#: dimensionreduce/nonsupervised/mds.hpp:379
+#: dimensionreduce/nonsupervised/mds.hpp:546
 msgid "data matrix has only zero entries"
-msgstr "Matrix hat nur Null Elemente"
+msgstr "Datenmatrix hat nur Nulleinträge"
 
-#: dimensionreduce/nonsupervised/mds.hpp:487
+#: dimensionreduce/nonsupervised/mds.hpp:491
 msgid "centering can not be used with MPI"
-msgstr "Centering kann nicht mit MPI genutzt werden"
+msgstr "Centering kann mit MPI nicht verwendet werden"
 
-#: dimensionreduce/nonsupervised/mds.hpp:505
+#: dimensionreduce/nonsupervised/mds.hpp:509
 msgid "MPI project option is unkown"
-msgstr "Projektionsmethode ist nicht bekannt"
+msgstr "MPI Projektionsioption nicht bekannt"
 
 #: dimensionreduce/supervised/lda.hpp:112
 msgid "target dimension must be less than unique data classes"
-msgstr "Zieldimension musst kleiner sein als Anzahl der eindeutigen Klassen"
+msgstr "Zieldimension muss kleiner sein als eindeutige Klassenanzahl"
 
-#: distances/ncd.hpp:431
-#: distances/ncd.hpp:493
-#: distances/ncd.hpp:559
+#: distances/ncd.hpp:432
+#: distances/ncd.hpp:494
+#: distances/ncd.hpp:560
 msgid "vector size must be greater than zero"
-msgstr "Vektor Puffer muss größer Null sein"
+msgstr "Vektordimension muss größer Null sein"
 
-#: distances/ncd.hpp:624
+#: distances/ncd.hpp:625
 msgid "string size must be greater than zero"
-msgstr "Zeichenanzahl muss größer Null sein"
+msgstr "Stringlänge muss größer Null sein"
 
-#: distances/ncd.hpp:653
-#: distances/ncd.hpp:660
+#: distances/ncd.hpp:654
+#: distances/ncd.hpp:661
 msgid "file can not be opened"
 msgstr "Datei konnte nicht geöffnet werden"
 
-#: functionoptimization/gradientdescent.hpp:172
+#: functionoptimization/gradientdescent.hpp:173
 msgid "function need not be empty"
 msgstr "Funktion darf nicht leer sein"
 
-#: functionoptimization/gradientdescent.hpp:182
-#: functionoptimization/gradientdescent.hpp:243
-#: functionoptimization/gradientdescent.hpp:374
+#: functionoptimization/gradientdescent.hpp:183
+#: functionoptimization/gradientdescent.hpp:244
+#: functionoptimization/gradientdescent.hpp:375
 msgid "arithmetic expression could not be parsed"
-msgstr "Arithmetischer Ausdruckt konnte nicht geparst werden"
+msgstr "arithmetischer Ausdruck konnte nicht verarbeitet werden"
 
-#: functionoptimization/gradientdescent.hpp:199
+#: functionoptimization/gradientdescent.hpp:200
 msgid "error function need not be empty"
-msgstr "Fehlerfunktion darf nicht leer sein"
+msgstr "Errorfunktion darf nicht leer sein"
 
-#: functionoptimization/gradientdescent.hpp:201
+#: functionoptimization/gradientdescent.hpp:202
 msgid "variable name for the function need not be empty"
 msgstr "Variablenname für die Funktion darf nicht leer sein"
 
-#: functionoptimization/gradientdescent.hpp:203
+#: functionoptimization/gradientdescent.hpp:204
 msgid "separators need not be empty"
-msgstr "Separator darf nicht leer sein"
+msgstr "Separatoren dürfen nicht leer sein"
 
-#: functionoptimization/gradientdescent.hpp:221
-#: functionoptimization/gradientdescent.hpp:261
+#: functionoptimization/gradientdescent.hpp:222
+#: functionoptimization/gradientdescent.hpp:262
 msgid "variable for optimization is not found in the expression symbol table"
-msgstr "Variable zur Optimierung ist nicht im symbolischen Ausdruck enthalten"
+msgstr "Variable zur Optimierung ist nicht in der Ausdrucksymboltabelle"
 
-#: functionoptimization/gradientdescent.hpp:248
+#: functionoptimization/gradientdescent.hpp:249
 msgid "only one variable for the data must be added"
-msgstr "nur eine Variable darf dem Ausdruck hinzugefügt werden"
+msgstr "nur eine Variable darf für die Daten hinzugefügt werden"
 
-#: functionoptimization/gradientdescent.hpp:285
+#: functionoptimization/gradientdescent.hpp:286
 msgid "static variable is not in the symbol table or is an optimazation variable"
-msgstr "statische Variable ist nicht in der Symboltabelle oder es ist eine zu optimierende Variable"
+msgstr "statische Variable ist nicht in der Symboltabelle oder ist keine Variablen, die optimiert wird"
 
-#: functionoptimization/gradientdescent.hpp:298
+#: functionoptimization/gradientdescent.hpp:299
 msgid "stepsize must be greater than zero"
-msgstr "Schrittweite muss größer Null sein"
+msgstr "Schrittgröße muss größer Null sein"
 
-#: functionoptimization/gradientdescent.hpp:302
+#: functionoptimization/gradientdescent.hpp:303
 msgid "there are unsed variables"
-msgstr "es existieren unbenutze Variablen (Variablen ohne Wertzuweisung)"
+msgstr "es existieren unbenutzte Variablen"
 
-#: neighborhood/kapproximation.hpp:89
+#: geneticalgorithm/population.hpp:139
+msgid "population size must be greater than two"
+msgstr "Populationsgröße muss größer Zwei sein"
+
+#: geneticalgorithm/population.hpp:142
+#: geneticalgorithm/population.hpp:172
+msgid "elite size must be greater than one"
+msgstr "Eliteanzahl muss größer Eins sein"
+
+#: geneticalgorithm/population.hpp:145
+#: geneticalgorithm/population.hpp:175
+msgid "elite size must be smaller than population size"
+msgstr "Eliteanzahl muss kleiner als Populationsgröße sein"
+
+#: geneticalgorithm/population.hpp:202
+msgid "element sizes are not equal"
+msgstr "Elementanzahl nicht identisch"
+
+#: geneticalgorithm/crossover/kcrossover.hpp:77
+msgid "cuts must be greater than zero"
+msgstr "Schnitte muss größer Null sein"
+
+#: geneticalgorithm/individual/binaryindividual.hpp:82
+msgid "size number need not to be zero"
+msgstr "Anzahl darf nicht Null sein"
+
+#: geneticalgorithm/individual/binaryindividual.hpp:86
+msgid "can not allocate memory"
+msgstr "Speicher kann nicht allokiert werden"
+
+#: geneticalgorithm/individual/binaryindividual.hpp:107
+#: geneticalgorithm/individual/binaryindividual.hpp:125
+msgid "index out of range"
+msgstr "Index außerhalb des Definitionsbereiches"
+
+#: geneticalgorithm/selection/bestof.hpp:77
+msgid "number must be greater than zero"
+msgstr "Anzahl muss größer Null sein"
+
+#: geneticalgorithm/selection/roulettewheel.hpp:99
+msgid "fitness values are all zero"
+msgstr "alle Fitnesswerte sind Null"
+
+#: java/jniregister.hpp:56
+#: java/jniregister.hpp:78
+msgid "pointer to object is empty"
+msgstr "Zeiger auf das Objekt ist leer"
+
+#: java/jniregister.hpp:61
+msgid "pointer to object is not empty"
+msgstr "Zeiger auf das Objekt ist nicht leer"
+
+#: java/jniregister.hpp:86
+#: java/jniregister.hpp:120
+msgid "call is not within a thread-safe content"
+msgstr "Aufruf ist nicht in einem thread-sicheren Bereich"
+
+#: java/jniregister.hpp:94
+#: java/jniregister.hpp:130
+msgid "release thread can not be determine correctly"
+msgstr "Threadrelease kann nicht richtig beendet werden"
+
+#: java/jniregister.hpp:102
+msgid "pointer field can not detected"
+msgstr "Zeigerfeld konnte nicht ermittelt werden"
+
+#: neighborhood/kapproximation.hpp:90
 msgid "number of approximate data must be greater than zero"
-msgstr "Anzahl der Prototypen muss größer Null sein"
+msgstr "Anzahl der approximierten Daten muss größer Null sein"
 
-#: neighborhood/knn.hpp:98
+#: neighborhood/knn.hpp:99
 msgid "knn must be greater than zero"
-msgstr "Eta muss größer Null sein"
+msgstr "kNN muss größer Null sein"
 
-#: neighborhood/knn.hpp:120
-#: neighborhood/knn.hpp:152
+#: neighborhood/knn.hpp:121
+#: neighborhood/knn.hpp:153
 msgid "knn is greater than datapoints"
-msgstr "KNN ist größer als Anzahl der Datenpunkte"
+msgstr "kNN ist größer als Datenpunkte"
 
-#: tools/lapack.hpp:87
+#: tools/lapack.hpp:88
 msgid "both matrices have not the same size"
 msgstr "beide Matrizen haben nicht die gleiche Größe"
 
-#: tools/lapack.hpp:230
+#: tools/lapack.hpp:237
 msgid "number of rows / columns of the matrix must have the same dimension like the initialisation vector"
-msgstr "Anzahl der Zeilen / Spalten der Matrix müssen die gleiche Dimension wie Initialisierungsvektor haben"
+msgstr "Anzahl der Zeilen / Spalten der Matrix müssen die selbe Dimension haben, wie der Initialisierungsvektor"
 
-#: tools/logger.hpp:248
+#: tools/logger.hpp:249
 msgid "log state is unkown"
-msgstr "Sprache ist nicht bekannt"
+msgstr "Logging Status unbekannt"
 
-#: tools/matrix.hpp:132
-#: tools/matrix.hpp:370
-#: tools/files/csv.hpp:163
+#: tools/matrix.hpp:133
+#: tools/matrix.hpp:371
+#: tools/files/csv.hpp:164
 msgid "row size must be greater than zero"
 msgstr "Zeilenanzahl muss größer Null sein"
 
-#: tools/matrix.hpp:134
-#: tools/files/csv.hpp:161
+#: tools/matrix.hpp:135
+#: tools/files/csv.hpp:162
 msgid "column size must be greater than zero"
 msgstr "Spaltenanzahl muss größer Null sein"
 
-#: tools/random.hpp:199
+#: tools/random.hpp:205
 msgid "distribution is not kwon"
-msgstr "Verteilung ist nicht bekannt"
+msgstr "Verteilung unbekannt"
 
-#: tools/files/csv.hpp:85
+#: tools/files/csv.hpp:86
 msgid "vector dimension must be greater than zero"
 msgstr "Vektordimension muss größer Null sein"
 
-#: tools/files/csv.hpp:116
-#: textprocess/termfrequency.h:101
+#: tools/files/csv.hpp:117
+#: textprocess/termfrequency.h:102
 msgid "separator can not be empty"
 msgstr "Separator darf nicht leer sein"
 
-#: tools/files/csv.hpp:134
+#: tools/files/csv.hpp:135
 msgid "can not separate size"
-msgstr "Größe konnte nicht ermittelt werden"
+msgstr "kann Größe nicht separieren "
 
-#: tools/files/hdf.hpp:205
+#: tools/files/hdf.hpp:209
 msgid "dataset must be two-dimensional"
-msgstr "Datensatz muss zwei-dimensional sein"
+msgstr "Daten müssen zweidimensional sein"
 
-#: tools/files/hdf.hpp:207
-#: tools/files/hdf.hpp:245
+#: tools/files/hdf.hpp:211
+#: tools/files/hdf.hpp:246
 #: tools/files/hdf.hpp:279
-#: tools/files/hdf.hpp:322
+#: tools/files/hdf.hpp:310
+#: tools/files/hdf.hpp:353
 msgid "dataset must be a simple datatype"
-msgstr "Datensatz muss ein Simpledatentyp sein"
+msgstr "Daten müssen einen einfachen Datentyp besitzen"
 
-#: tools/files/hdf.hpp:243
+#: tools/files/hdf.hpp:219
+#: tools/files/hdf.hpp:253
+msgid "dimension need not be zero"
+msgstr "Dimension darf nicht Null sein"
+
+#: tools/files/hdf.hpp:244
 #: tools/files/hdf.hpp:277
-#: tools/files/hdf.hpp:320
+#: tools/files/hdf.hpp:308
+#: tools/files/hdf.hpp:351
 msgid "dataset must be one-dimensional"
-msgstr "Datensatz muss ein-dimensional sein"
+msgstr "Daten müssen eindimensional sein"
 
-#: tools/files/hdf.hpp:290
+#: tools/files/hdf.hpp:285
+msgid "element is not a single value"
+msgstr "Element ist kein einfacher Wert"
+
+#: tools/files/hdf.hpp:321
 msgid "block size can not seperated by the string length"
-msgstr "Blockgröße kann nicht mit der Stringlänge zerlegt werden"
+msgstr "Blockgröße kann nicht von der Stringlänge separiert werden"
 
-#: tools/files/hdf.hpp:368
-#: tools/files/hdf.hpp:407
-#: tools/files/hdf.hpp:438
-msgid "can note write empty data"
-msgstr "Leere Daten können nicht geschrieben werden"
+#: tools/files/hdf.hpp:375
+#: tools/files/hdf.hpp:402
+#: tools/files/hdf.hpp:415
+#: tools/files/hdf.hpp:445
+#: tools/files/hdf.hpp:470
+msgid "can not write empty data"
+msgstr "leere Daten können nicht geschrieben werden"
 
-#: tools/files/hdf.hpp:507
-#: tools/files/hdf.hpp:539
+#: tools/files/hdf.hpp:528
+#: tools/files/hdf.hpp:560
 msgid "it is at least one dimension requires"
-msgstr "mindestens eine Dimension wird benötigt"
+msgstr "es ist mindestens eine Dimension nötig"
 
-#: tools/files/hdf.hpp:518
-#: tools/files/hdf.hpp:550
-#: tools/files/hdf.hpp:579
+#: tools/files/hdf.hpp:539
+#: tools/files/hdf.hpp:571
+#: tools/files/hdf.hpp:600
 msgid "empty path is forbidden"
-msgstr "Eine leere Pfadangabe ist verboten"
+msgstr "leerer Pfad ist verboten"
 
-#: tools/files/hdf.hpp:607
+#: tools/files/hdf.hpp:628
 msgid "can not create path structure"
-msgstr "kann Pfad Struktur nicht erzeugen"
+msgstr "Pfadstruktur konnte nicht erzeugt werden"
 
-#: tools/sources/cloud.hpp:103
+#: tools/sources/cloud.hpp:104
 msgid "number of dimensions must be greater than one"
 msgstr "Anzahl der Dimensionen muss größer Eins sein"
 
-#: tools/sources/cloud.hpp:117
+#: tools/sources/cloud.hpp:118
 msgid "minimum need not be zero"
 msgstr "Minimum darf nicht Null sein"
 
-#: tools/sources/cloud.hpp:120
+#: tools/sources/cloud.hpp:121
 msgid "maximum need not be zero"
 msgstr "Maximum darf nicht Null sein"
 
-#: tools/sources/cloud.hpp:123
-#: tools/sources/cloud.hpp:149
-#: tools/sources/cloud.hpp:177
+#: tools/sources/cloud.hpp:124
+#: tools/sources/cloud.hpp:150
+#: tools/sources/cloud.hpp:178
 msgid "minimal value is greater than maximal value"
-msgstr "Minimumwert ist größer als Maximumswert"
+msgstr "Minimumwert ist größer als Maximumwert"
 
-#: tools/sources/cloud.hpp:126
+#: tools/sources/cloud.hpp:127
 msgid "minimum and maximum must be greater than zero"
 msgstr "Minimum und Maximum müssen größer Null sein"
 
-#: tools/sources/cloud.hpp:174
+#: tools/sources/cloud.hpp:175
 msgid "dimension must be smaller than saved dimension"
-msgstr "Dimensionswert muss kleiner sein als gespeicherter Wert"
+msgstr "Dimension muss kleiner sein, als gespeicherte Dimension"
 
-#: tools/sources/cloud.hpp:180
+#: tools/sources/cloud.hpp:181
 msgid "sampling value must be greater than zero"
-msgstr "Samplingwert muss größer Null sein"
+msgstr "Sampling muss größer Null sein"
 
-#: tools/sources/cloud.hpp:196
+#: tools/sources/cloud.hpp:197
 msgid "random value must be between [0,1]"
-msgstr "Zufallswert muss zwischen [0,1] einliegen"
+msgstr "Zufallswert muss zwischen [0,1] liegen"
 
-#: textprocess/stopwordreduction.h:80
-#: textprocess/stopwordreduction.h:95
+#: textprocess/stopwordreduction.h:81
+#: textprocess/stopwordreduction.h:96
 msgid "stopwordlist can not be empty"
-msgstr "Separator darf nicht leer sein"
+msgstr "Stopwortliste kann nicht leer sein"
 
-#: textprocess/termfrequency.h:192
-#: textprocess/termfrequency.h:217
+#: textprocess/termfrequency.h:193
+#: textprocess/termfrequency.h:218
 msgid "ranges must be between [0,1]"
-msgstr "Zufallswert muss zwischen [0,1] einliegen"
+msgstr "Bereich muss zwischen [0,1] liegen"
 
-#: textprocess/termfrequency.h:194
-#: textprocess/termfrequency.h:219
+#: textprocess/termfrequency.h:195
+#: textprocess/termfrequency.h:220
 msgid "no words within the map"
-msgstr "Keine Wort innerhalb der Map"
+msgstr "keine Worte in der Map"
 
 #: tools/language/language.h:65
 msgid "parameter is not a language code"
-msgstr "Parameter ist kein Sprachcode"
+msgstr "Parameter ist kein Sprachencode"
 
 #: tools/language/language.h:74
 #: tools/language/language.h:92
 msgid "language is not known"
-msgstr "Sprache ist nicht bekannt"
+msgstr "Sprache ist unbekannt"
 
-#: tools/sources/nntp.h:167
+#: tools/sources/nntp.h:168
 msgid "can not connect to news server"
-msgstr "Newsserver ist nicht erreichbar"
+msgstr "Verbindung zu Newsserver nicht möglich"
 
-#: tools/sources/nntp.h:216
-#: tools/sources/twitter.h:176
-#: tools/sources/wikipedia.h:628
+#: tools/sources/nntp.h:217
+#: tools/sources/twitter.h:708
+#: tools/sources/wikipedia.h:639
 msgid "error while reading socket data"
-msgstr "Fehler während des Lesens des Sockets"
+msgstr "Fehler während Socketzugriff"
 
-#: tools/sources/nntp.h:219
+#: tools/sources/nntp.h:220
 msgid "no such group"
 msgstr "keine Gruppe gefunden"
 
-#: tools/sources/nntp.h:220
-msgid "no newsgroup has been selected"
-msgstr "keine Newsgroup wurde ausgewählt"
-
 #: tools/sources/nntp.h:221
+msgid "no newsgroup has been selected"
+msgstr "keine Newsgroup ausgewählt"
+
+#: tools/sources/nntp.h:222
 msgid "no article has been selected"
 msgstr "kein Artikel ausgewählt"
 
-#: tools/sources/nntp.h:222
-msgid "no next article found"
-msgstr "kein weiterer Artikel gefunden"
-
 #: tools/sources/nntp.h:223
-msgid "no previous article found"
-msgstr "kein Vorgängerartikel gefunden"
+msgid "no next article found"
+msgstr "kein Artikel gefunden"
 
 #: tools/sources/nntp.h:224
-msgid "no such article number in this group"
-msgstr "Artikelnummer nicht in der Gruppe gefunden"
+msgid "no previous article found"
+msgstr "keinen Vorgängerartikel gefunden"
 
 #: tools/sources/nntp.h:225
-msgid "no such article found"
-msgstr "keinen Artikel gefunden"
+msgid "no such article number in this group"
+msgstr "keine Artikelanzahl in der Gruppe"
 
 #: tools/sources/nntp.h:226
-msgid "article not wanted - do not send"
-msgstr "Artikel nicht gewollt - nicht senden"
+msgid "no such article found"
+msgstr "kein Artikel gefunden"
 
 #: tools/sources/nntp.h:227
-msgid "transfer failed - try again later"
-msgstr "Transfer fehlgeschlagen, später versuchen"
+msgid "article not wanted - do not send"
+msgstr "Artikel nicht gewollt - nicht gesendet"
 
 #: tools/sources/nntp.h:228
-msgid "article rejected - do not try again"
-msgstr "Artikel abgelehnt - nicht erneut senden"
+msgid "transfer failed - try again later"
+msgstr "Übertragung fehlerhaft - später versuchen"
 
 #: tools/sources/nntp.h:229
-msgid "posting not allowed"
-msgstr "Posting ist nicht erlaubt"
+msgid "article rejected - do not try again"
+msgstr "Artikel abgelehnt - nicht wiederholen"
 
 #: tools/sources/nntp.h:230
-msgid "posting failed"
-msgstr "Posting fehlgeschlagen"
+msgid "posting not allowed"
+msgstr "Posting nicht erlaubt"
 
-#: tools/sources/nntp.h:233
-msgid "command not recognized"
-msgstr "Größe konnte nicht ermittelt werden"
+#: tools/sources/nntp.h:231
+msgid "posting failed"
+msgstr "Posting ist fehlgeschlagen"
 
 #: tools/sources/nntp.h:234
-msgid "command syntax error"
-msgstr "Kommando Syntax Fehler"
+msgid "command not recognized"
+msgstr "Kommando nicht bekannt"
 
 #: tools/sources/nntp.h:235
-msgid "access restriction or permission denied"
-msgstr "Zugriff eingeschränkt oder verboten"
+msgid "command syntax error"
+msgstr "Kommandosyntax Fehler"
 
 #: tools/sources/nntp.h:236
+msgid "access restriction or permission denied"
+msgstr "Zugriffsbeschränkung oder Zugriff verboten"
+
+#: tools/sources/nntp.h:237
 msgid "service is not available"
-msgstr "Service ist nicht erreichbar"
+msgstr "Service nicht erreichbar"
 
-#: tools/sources/twitter.h:100
+#: tools/sources/twitter.h:288
+#: tools/sources/twitter.h:396
+#: tools/sources/twitter.h:516
 msgid "can not connect to twitter search server"
-msgstr "Twitter Server ist nicht erreichbar"
+msgstr "konnte nicht zu Twitter-Such-Server verbinden"
 
-#: tools/sources/twitter.h:117
-#: tools/sources/wikipedia.h:334
+#: tools/sources/twitter.h:306
+msgid "can not connect to twitter api server"
+msgstr "konnte nicht zu Twitter-API-Server verbinden"
+
+#: tools/sources/twitter.h:324
+#: tools/sources/wikipedia.h:341
 msgid "HTTP agent name need not be empty"
-msgstr "HTTP Agent name darf nicht leer sein"
+msgstr "HTTP Agent darf nicht leer sein"
 
-#: tools/sources/twitter.h:178
-#: tools/sources/wikipedia.h:630
+#: tools/sources/twitter.h:349
+#: tools/sources/wikipedia.h:222
+msgid "search query need not be empty"
+msgstr "Suchanfrage darf nicht leer sein"
+
+#: tools/sources/twitter.h:368
+msgid "refresh query need not be empty"
+msgstr "Refreshanfrage darf nicht leer sein"
+
+#: tools/sources/twitter.h:408
+#: tools/sources/twitter.h:529
+msgid "JSON data can not be parsed"
+msgstr "JSON Daten konnten nicht verarbeitet werden"
+
+#: tools/sources/twitter.h:426
+msgid "no data received"
+msgstr "keine Daten empfangen"
+
+#: tools/sources/twitter.h:532
+msgid "no result data is found"
+msgstr "keine Rückgabedaten gefunden"
+
+#: tools/sources/twitter.h:670
+#: tools/sources/wikipedia.h:619
+msgid "invalid response"
+msgstr "ungültige Antwort"
+
+#: tools/sources/twitter.h:694
+#: tools/sources/wikipedia.h:552
+msgid "data can not be received"
+msgstr "Daten konnten nicht empfangen werden"
+
+#: tools/sources/twitter.h:710
+#: tools/sources/wikipedia.h:641
 msgid "Non-Authoritative Information"
-msgstr "nicht authentisierte Information"
+msgstr "keine Authentifizierungsinformationen"
 
-#: tools/sources/twitter.h:179
-#: tools/sources/wikipedia.h:631
+#: tools/sources/twitter.h:711
+#: tools/sources/wikipedia.h:642
 msgid "No Content"
 msgstr "kein Inhalt"
 
-#: tools/sources/twitter.h:180
-#: tools/sources/wikipedia.h:632
+#: tools/sources/twitter.h:712
+#: tools/sources/wikipedia.h:643
 msgid "Reset Content"
-msgstr "Inhalt wurde zurückgesetzt"
+msgstr "Content resettet"
 
-#: tools/sources/twitter.h:181
-#: tools/sources/wikipedia.h:633
+#: tools/sources/twitter.h:713
+#: tools/sources/wikipedia.h:644
 msgid "Partial Content"
 msgstr "Teilinhalt"
 
-#: tools/sources/twitter.h:182
-#: tools/sources/wikipedia.h:634
+#: tools/sources/twitter.h:714
+#: tools/sources/wikipedia.h:645
 msgid "Multiple Choices"
-msgstr "Mehrfachauswahl"
+msgstr "unterschiedliche Auswahlmöglichkeiten"
 
-#: tools/sources/twitter.h:183
-#: tools/sources/wikipedia.h:635
+#: tools/sources/twitter.h:715
+#: tools/sources/wikipedia.h:646
 msgid "Moved Permanently"
-msgstr "dauerhafte Umleitung"
+msgstr "dauerhaft verschoben"
 
-#: tools/sources/twitter.h:184
-#: tools/sources/wikipedia.h:636
+#: tools/sources/twitter.h:716
+#: tools/sources/wikipedia.h:647
 msgid "Moved Temporarily"
-msgstr "temporär umgeleitet"
+msgstr "temporär verschoben"
 
-#: tools/sources/twitter.h:185
-#: tools/sources/wikipedia.h:637
+#: tools/sources/twitter.h:717
+#: tools/sources/wikipedia.h:648
 msgid "See Other"
-msgstr "siehe weitere"
+msgstr "see andere"
 
-#: tools/sources/twitter.h:186
-#: tools/sources/wikipedia.h:638
+#: tools/sources/twitter.h:718
+#: tools/sources/wikipedia.h:649
 msgid "Not Modified"
-msgstr "nicht geändert"
+msgstr "nicht modifizert"
 
-#: tools/sources/twitter.h:187
-#: tools/sources/wikipedia.h:639
+#: tools/sources/twitter.h:719
+#: tools/sources/wikipedia.h:650
 msgid "Use Proxy"
 msgstr "Proxy benutzen"
 
-#: tools/sources/twitter.h:188
-#: tools/sources/wikipedia.h:640
+#: tools/sources/twitter.h:720
+#: tools/sources/wikipedia.h:651
 msgid "Temporary Redirect"
 msgstr "temporäre Umleitung"
 
-#: tools/sources/twitter.h:189
-#: tools/sources/wikipedia.h:641
+#: tools/sources/twitter.h:721
+#: tools/sources/wikipedia.h:652
 msgid "Bad Request"
-msgstr "fehlerhafte Anfrage"
+msgstr "ungültige Anfrage"
 
-#: tools/sources/twitter.h:190
-#: tools/sources/wikipedia.h:642
+#: tools/sources/twitter.h:722
+#: tools/sources/wikipedia.h:653
 msgid "Unauthorized"
-msgstr "Zugriff nicht erlaubt"
+msgstr "nicht authorisiert"
 
-#: tools/sources/twitter.h:191
-#: tools/sources/wikipedia.h:643
+#: tools/sources/twitter.h:723
+#: tools/sources/wikipedia.h:654
 msgid "Payment Required"
 msgstr "Zahlung notwendig"
 
-#: tools/sources/twitter.h:192
-#: tools/sources/wikipedia.h:644
+#: tools/sources/twitter.h:724
+#: tools/sources/wikipedia.h:655
 msgid "Forbidden"
-msgstr "Zugriff verboten"
+msgstr "Verboten"
 
-#: tools/sources/twitter.h:193
-#: tools/sources/wikipedia.h:645
+#: tools/sources/twitter.h:725
+#: tools/sources/wikipedia.h:656
 msgid "Not Found"
 msgstr "nicht gefunden"
 
-#: tools/sources/twitter.h:194
-#: tools/sources/wikipedia.h:646
+#: tools/sources/twitter.h:726
+#: tools/sources/wikipedia.h:657
 msgid "Method Not Allowed"
 msgstr "Methode nicht erlaubt"
 
-#: tools/sources/twitter.h:195
-#: tools/sources/wikipedia.h:647
+#: tools/sources/twitter.h:727
+#: tools/sources/wikipedia.h:658
 msgid "Not Acceptable"
-msgstr "nicht erreichbar"
+msgstr "nicht akzeptiert"
 
-#: tools/sources/twitter.h:197
-#: tools/sources/wikipedia.h:649
+#: tools/sources/twitter.h:729
+#: tools/sources/wikipedia.h:660
 msgid "Proxy Authentication Required"
-msgstr "Proxy Authentifizierung notwendig"
+msgstr "Proxyauthentifizierung notwendig"
 
-#: tools/sources/twitter.h:198
-#: tools/sources/wikipedia.h:650
+#: tools/sources/twitter.h:730
+#: tools/sources/wikipedia.h:661
 msgid "Request Time-out"
-msgstr "Anfragezeit abgelaufen"
+msgstr "Anfragezeitüberschreitung"
 
-#: tools/sources/twitter.h:199
-#: tools/sources/wikipedia.h:651
+#: tools/sources/twitter.h:731
+#: tools/sources/wikipedia.h:662
 msgid "Conflict"
 msgstr "Konflikt"
 
-#: tools/sources/twitter.h:200
-#: tools/sources/wikipedia.h:652
+#: tools/sources/twitter.h:732
+#: tools/sources/wikipedia.h:663
 msgid "Gone"
-msgstr "Daten nicht mehr vorhanden"
+msgstr "nicht vorhanden"
 
-#: tools/sources/twitter.h:201
-#: tools/sources/wikipedia.h:653
+#: tools/sources/twitter.h:733
+#: tools/sources/wikipedia.h:664
 msgid "Length Required"
-msgstr "Längenangabe erwartet"
+msgstr "Länge notwendig"
 
-#: tools/sources/twitter.h:202
-#: tools/sources/wikipedia.h:654
+#: tools/sources/twitter.h:734
+#: tools/sources/wikipedia.h:665
 msgid "Precondition Failed"
-msgstr "Voraussetzung fehlerhaft"
+msgstr "Voraussetzung nicht erfolgt"
 
-#: tools/sources/twitter.h:203
-#: tools/sources/wikipedia.h:655
+#: tools/sources/twitter.h:735
+#: tools/sources/wikipedia.h:666
 msgid "Request Entity Too Large"
-msgstr "angeforderte Daten zu groß"
+msgstr "Requesteintrag ist zu lange"
 
-#: tools/sources/twitter.h:204
-#: tools/sources/wikipedia.h:656
+#: tools/sources/twitter.h:736
+#: tools/sources/wikipedia.h:667
 msgid "Request-URI Too Large"
-msgstr "Angefragte URL zu lang"
+msgstr "Request-URL zu lang"
 
-#: tools/sources/twitter.h:205
-#: tools/sources/wikipedia.h:657
+#: tools/sources/twitter.h:737
+#: tools/sources/wikipedia.h:668
 msgid "Unsupported Media Type"
-msgstr "nicht unterstützer Medientyp"
+msgstr "ungültiger Medientyp"
 
-#: tools/sources/twitter.h:206
-#: tools/sources/wikipedia.h:658
+#: tools/sources/twitter.h:738
+#: tools/sources/wikipedia.h:669
 msgid "Requested range not satisfiable"
-msgstr "angefragter Bereich nicht erfüllt"
+msgstr "angefragter Bereich nicht erfüllbar"
 
-#: tools/sources/twitter.h:207
-#: tools/sources/wikipedia.h:659
+#: tools/sources/twitter.h:739
+#: tools/sources/wikipedia.h:670
 msgid "Expectation Failed"
-msgstr "Erwartete Daten fehlerhaft"
+msgstr "Erwartung nicht erfüllt"
 
-#: tools/sources/twitter.h:208
-#: tools/sources/wikipedia.h:660
+#: tools/sources/twitter.h:740
+#: tools/sources/wikipedia.h:671
 msgid "Internal Server Error"
-msgstr "Internal Server Error"
+msgstr "interner Serverfehler"
 
-#: tools/sources/twitter.h:209
-#: tools/sources/wikipedia.h:661
+#: tools/sources/twitter.h:741
+#: tools/sources/wikipedia.h:672
 msgid "Not Implemented"
 msgstr "nicht implementiert"
 
-#: tools/sources/twitter.h:210
-#: tools/sources/wikipedia.h:662
+#: tools/sources/twitter.h:742
+#: tools/sources/wikipedia.h:673
 msgid "Bad Gateway"
-msgstr "falscher Gateway"
+msgstr "ungültiger Gateway"
 
-#: tools/sources/twitter.h:211
-#: tools/sources/wikipedia.h:663
+#: tools/sources/twitter.h:743
+#: tools/sources/wikipedia.h:674
 msgid "Service Unavailable"
-msgstr "Service ist nicht erreichbar"
+msgstr "Service nicht erreichbar"
 
-#: tools/sources/twitter.h:212
-#: tools/sources/wikipedia.h:664
+#: tools/sources/twitter.h:744
+#: tools/sources/wikipedia.h:675
 msgid "Gateway Time-out"
-msgstr "Gateway Zeitüberschreitung"
+msgstr "Gateway Zeitüberschreibung"
 
-#: tools/sources/twitter.h:213
-#: tools/sources/wikipedia.h:665
+#: tools/sources/twitter.h:745
+#: tools/sources/wikipedia.h:676
 msgid "HTTP Version not supported"
 msgstr "HTTP Version wird nicht unterstützt"
 
-#: tools/sources/wikipedia.h:195
+#: tools/sources/twitter.h:784
+msgid "option value is unkown"
+msgstr "Optionswert nicht bekannt"
+
+#: tools/sources/twitter.h:795
+msgid "not a valid date"
+msgstr "kein valides Datum"
+
+#: tools/sources/twitter.h:836
+msgid "results per page must be in the range [1,100]"
+msgstr "Rückgaben pro Seite müssen innerhalb des Bereich [1,100] sein"
+
+#: tools/sources/twitter.h:838
+msgid "maximum results are reached"
+msgstr "maximale Anzahl erreicht"
+
+#: tools/sources/twitter.h:986
+#: tools/sources/twitter.h:1092
+msgid "at"
+msgstr "um"
+
+#: tools/sources/twitter.h:992
+msgid "to"
+msgstr "von"
+
+#: tools/sources/twitter.h:997
+#: tools/sources/twitter.h:1099
+msgid "geoposition"
+msgstr "Geoposition"
+
+#: tools/sources/twitter.h:1000
+#: tools/sources/twitter.h:1102
+msgid "hashtags"
+msgstr "Hashtags"
+
+#: tools/sources/twitter.h:1109
+msgid "urltags"
+msgstr "URL Tags"
+
+#: tools/sources/wikipedia.h:199
 msgid "language has no option values"
-msgstr "Optionen für Sprache existieren nicht"
+msgstr "Sprache hat keine Optionen"
 
-#: tools/sources/wikipedia.h:313
+#: tools/sources/wikipedia.h:320
 msgid "can not find information within the http header"
-msgstr "Informationen im HTTP Header nicht gefunden"
+msgstr "konnte Informationen nicht im HTTP Header finden"
 
-#: tools/sources/wikipedia.h:321
+#: tools/sources/wikipedia.h:328
 msgid "can not find wikipedia document within the URL"
-msgstr "kein Wikipedia Dokument mit der URL gefunden"
+msgstr "konnte Wikipedia Dokument nicht anhand der URL ermitteln"
 
-#: tools/sources/wikipedia.h:345
-#: tools/sources/wikipedia.h:356
-#: tools/sources/wikipedia.h:367
-#: tools/sources/wikipedia.h:378
-#: tools/sources/wikipedia.h:389
+#: tools/sources/wikipedia.h:352
+#: tools/sources/wikipedia.h:363
+#: tools/sources/wikipedia.h:374
+#: tools/sources/wikipedia.h:385
+#: tools/sources/wikipedia.h:396
 msgid "no article is loaded"
-msgstr "Artikel wurde nicht geladen"
+msgstr "kein Artikel geladen"
 
-#: tools/sources/wikipedia.h:425
-#: tools/sources/wikipedia.h:448
-#: tools/sources/wikipedia.h:525
+#: tools/sources/wikipedia.h:432
+#: tools/sources/wikipedia.h:455
+#: tools/sources/wikipedia.h:532
 msgid "XML data can not be parsed"
-msgstr "Datei konnte nicht geöffnet werden"
+msgstr "XML Daten konnten nicht verarbeitet werden"
 
-#: tools/sources/wikipedia.h:459
+#: tools/sources/wikipedia.h:466
 msgid "can not detect namespace"
-msgstr "Größe konnte nicht ermittelt werden"
+msgstr "Konnte Namespace nicht ermitteln"
 
-#: tools/sources/wikipedia.h:545
-msgid "data can not be received"
-msgstr "Datei konnte nicht geöffnet werden"
-
-#: tools/sources/wikipedia.h:582
+#: tools/sources/wikipedia.h:589
 msgid "can not connect to wikipedia server"
-msgstr "keine Verbindung zu Wikipedia Server"
+msgstr "Konnte Wikiepdia Server nicht erreichen"
 
-#~ msgid "vector reserve must be greater than zero"
-#~ msgstr "Vektor Puffer muss größer Null sein"
-
-#~ msgid "program fault"
-#~ msgstr "Programm Abbruch"
-
-#~ msgid "length must be greater than zero"
-#~ msgstr "Länge muss größer Null sein"
-
-#~ msgid "number of vertices must be greater than zero"
-#~ msgstr "Anzahl der Prototypen muss größer Null sein"
-
-#~ msgid "matrix are not symmetric"
-#~ msgstr "Matrix ist nicht symmetrisch"
-
-#~ msgid "there are no variables for optimization"
-#~ msgstr "es existieren keine Variablen zur Optimierung"
-
-#~ msgid "derivations and initialisation have not the same size"
-#~ msgstr "beide Matrizen haben nicht die gleiche Größe"
