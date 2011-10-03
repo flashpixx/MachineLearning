@@ -205,16 +205,26 @@ def configuration_cygwin(config, vars, version, architecture) :
 def getConfig(vars):
     env = Environment(variables=vars)
     config = {}
+    
+    # read path and add environment path values
+    syspath = [env["ENV"]["PATH"], os.environ["PATH"]]
 
     if env['PLATFORM'].lower() == "darwin" :
         configuration_macosx(config, env, platform.mac_ver()[0], platform.machine())
+        env["ENV"]["PATH"] = ":".join(syspath)
+        
     elif env['PLATFORM'].lower() == "cygwin" :
         configuration_cygwin(config, env, "", platform.machine())
+        env["ENV"]["PATH"] = ":".join(syspath)
+        
     elif env['PLATFORM'].lower() == "posix" :
         configuration_posix(config, env, "", platform.machine())
+        env["ENV"]["PATH"] = ":".join(syspath)
+
     else :
         print "configuration for ["+env['PLATFORM']+"] not exists"
         exit(1)
+
 
     if not(config) :
         print "Configuration is empty"
@@ -257,7 +267,7 @@ def getConfig(vars):
 
     #dict = env.Dictionary()
     #for i,j in dict.iteritems():
-    #    print i, j
+        #print i, j
 
     return env
 
@@ -459,7 +469,7 @@ def target_language(env) :
     
     
 def target_documentation(env) :
-    env.Alias("documentation", env.Command("documentation", "", "doxygen documentation.doxyfile"))
+    env.Alias("documentation", env.Command("doxygen", "", "doxygen documentation.doxyfile"))
 #=======================================================================================================================================
 
 
@@ -475,6 +485,8 @@ Help(vars.GenerateHelpText(env))
 # add files for deleting
 files = []
 files.extend( getRekusivFiles(os.curdir, env["OBJSUFFIX"]) )
+files.extend( getRekusivFiles(os.curdir, env["SHOBJSUFFIX"]) )
+files.extend( getRekusivFiles(os.curdir, env["SHLIBSUFFIX"]) )
 files.extend( getRekusivFiles(os.curdir, ".po~") )
 files.extend( getRekusivFiles(os.curdir, ".class") )
 
