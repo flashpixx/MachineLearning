@@ -267,7 +267,7 @@ def getConfig(vars):
 
     #dict = env.Dictionary()
     #for i,j in dict.iteritems():
-        #print i, j
+    #    print i, j
 
     return env
 
@@ -416,7 +416,7 @@ def target_java(env) :
     javaplist.extend(targets)
 
     # create JNI stubs and JavaP command
-    notused = ["machinelearning.object", "machinelearning.dimensionreduce.nonsupervised.reduce"]
+    notused = ["machinelearning.object", "machinelearning.exception.runtime", "machinelearning.exception.classmethod", "machinelearning.dimensionreduce.nonsupervised.reduce"]
     for i in po :
         # split file and directory parts
         parts = (os.path.splitext(i)[0]).split(os.sep) 
@@ -492,6 +492,7 @@ files = []
 files.extend( getRekusivFiles(os.curdir, env["OBJSUFFIX"]) )
 files.extend( getRekusivFiles(os.curdir, env["SHOBJSUFFIX"]) )
 files.extend( getRekusivFiles(os.curdir, env["SHLIBSUFFIX"]) )
+files.extend( getRekusivFiles(os.curdir, ".jnilib") )
 files.extend( getRekusivFiles(os.curdir, ".po~") )
 files.extend( getRekusivFiles(os.curdir, ".class") )
 

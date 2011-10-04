@@ -21,53 +21,23 @@
  @endcond
  **/
 
-package machinelearning.dimensionreduce.nonsupervised;
+package machinelearning.exception;
 
 
 
-/** create the principal component analysis (PCA)
+/** classmethod exception class equal to the C++ exception
  * $LastChangedDate$
- * @see http://download.oracle.com/javase/1.4.2/docs/api/java/lang/System.html#mapLibraryName%28java.lang.String%29
  **/
-public class pca<T> extends machinelearning.object implements reduce<T> {
+public class classmethod extends UnsupportedOperationException {
     
-    /** private member, that stores the pointer of the native object **/
-    private final long cpp_ptr;
     
+    /** constructor **/
+    public classmethod() { super(); }
     
     /** constructor
-     * @param p_dim number of target dimensions
+     * @apram p_msg message
      **/
-    public pca( int p_dim ) { cpp_ptr = cpp_ctor(p_dim); }
+    public classmethod(String p_msg) { super(p_msg); }
     
-    /** finalizer, that calls the disposer with exception handling **/
-    protected void finalize() { try { this.dispose(); } catch(Exception e) {} }
-    
-    
-    /** run the mapping structure
-     * @param p_data input data / matrix
-     * @return project data
-     **/
-    public native T[][] map( T[][] p_data );
-    
-    /** returns the project dimension
-     * @return number of dimensions
-     **/
-    public native int getDimension();
-    
-    /** returns the projection vectors
-     * @return array with project vectors
-     **/
-    public native T[][] getProject();
-    
-    /** dispose for clearing memory **/
-    public native void dispose();
-    
-    
-    /** native ctor method with the return of the pointer
-     * @param p_dim dimension
-     * @return pointer address
-     **/
-    private native long cpp_ctor( int p_dim );
     
 }
