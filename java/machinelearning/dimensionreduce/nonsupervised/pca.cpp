@@ -44,7 +44,7 @@ jfieldID fieldidx_machinelearning_dimensionreduce_nonsupervised_pca = NULL;
 **/
 JNIEXPORT jlong JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_cpp_1ctor(JNIEnv* p_env, jobject p_object, jint p_dimension)
 {
-    p_env->ThrowNew( p_env->FindClass("java/lang/Exception"), _("huhu") );  
+    p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("huhu") );  
     return 0;
     //new pca
     //return reg::createObjectPointer(p_env, p_object, fieldidx_machinelearning_dimensionreduce_nonsupervised_pca );

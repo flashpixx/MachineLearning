@@ -27,7 +27,6 @@ package machinelearning.dimensionreduce.nonsupervised;
 
 /** create the principal component analysis (PCA)
  * $LastChangedDate$
- * @see http://download.oracle.com/javase/1.4.2/docs/api/java/lang/System.html#mapLibraryName%28java.lang.String%29
  **/
 public class pca<T> extends machinelearning.object implements reduce<T> {
     
