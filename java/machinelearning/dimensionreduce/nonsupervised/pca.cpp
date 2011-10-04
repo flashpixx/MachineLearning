@@ -33,61 +33,123 @@ namespace dim   = machinelearning::dimensionreduce::nonsupervised;
 namespace ublas = boost::numeric::ublas;
 
 
+// ======= delegate for double =============================================================================================================================
+
 /** field id that stores the ID that stores the pointer **/
-jfieldID fieldidx_machinelearning_dimensionreduce_nonsupervised_pca = NULL;
+jfieldID fieldidxptr_machinelearning_dimensionreduce_nonsupervised_pca_delegate_double    = NULL;
 
-
-/** constructor call
+/** constructor call for delegate double
  * @param p_env JNI environment
  * @param p_object JNI object
  * @param p_dimension dimension value
-**/
-JNIEXPORT jlong JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_cpp_1ctor(JNIEnv* p_env, jobject p_object, jint p_dimension)
+ * @return pointer
+ **/
+JNIEXPORT jlong JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00024delegate_1double_cpp_1ctor(JNIEnv* p_env, jobject p_object, jint p_dim)
 {
-    p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("huhu") );  
-    return 0;
-    //new pca
-    //return reg::createObjectPointer(p_env, p_object, fieldidx_machinelearning_dimensionreduce_nonsupervised_pca );
+    
 }
 
-
-/** dispose call for an java object
+/** destructor call for delegate double
  * @param p_env JNI environment
  * @param p_object JNI object
  **/
-JNIEXPORT void JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_dispose(JNIEnv* p_env, jobject p_object)
+JNIEXPORT void JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00024delegate_1double_dispose(JNIEnv* p_env, jobject p_object)
 {
-    //reg::disposeObjectPointer(p_env, p_object, fieldidx_machinelearning_dimensionreduce_nonsupervised_pca);
+    
 }
 
-
-/** mapping method
+/** returns the number of project dimension
  * @param p_env JNI environment
  * @param p_object JNI object
- * @param p_data Java Array
- * @return result data array
+ * @return dimension number
  **/
-JNIEXPORT jobjectArray JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_map(JNIEnv* p_env, jobject p_object, jobjectArray p_data)
+JNIEXPORT jint JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00024delegate_1double_getDimension(JNIEnv* p_env, jobject p_object)
 {
-  
+    
 }
 
-
-/** returns the number of dimensions
+/** maps data to the target dimension
  * @param p_env JNI environment
  * @param p_object JNI object
- * @return number of dimensions
+ * @retunr mapped data
  **/
-JNIEXPORT jint JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_getDimension(JNIEnv* p_env, jobject p_object)
+JNIEXPORT jobjectArray JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00024delegate_1double_map(JNIEnv* p_env, jobject p_object, jobjectArray p_data)
 {
+    
 }
 
-
-/** returns the projection / eigenvectors
+/** get the project vectors
  * @param p_env JNI environment
  * @param p_object JNI object
- * @return array with eigenvector
+ * @return vector array
  **/
-JNIEXPORT jobjectArray JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_getProject(JNIEnv* p_env, jobject p_object)
+JNIEXPORT jobjectArray JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00024delegate_1double_getProject(JNIEnv* p_env, jobject p_object)
 {
+    
 }
+
+
+
+// ======= delegate for float ==============================================================================================================================
+
+/** field id that stores the ID that stores the pointer **/
+jfieldID fieldidxptr_machinelearning_dimensionreduce_nonsupervised_pca_delegate_float     = NULL;
+
+/** constructor call for delegate double
+ * @param p_env JNI environment
+ * @param p_object JNI object
+ * @param p_dimension dimension value
+ * @return pointer
+ **/
+JNIEXPORT jlong JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00024delegate_1float_cpp_1ctor(JNIEnv* p_env, jobject p_object, jint p_dim)
+{
+    
+}
+
+/** destructor call for delegate double
+ * @param p_env JNI environment
+ * @param p_object JNI object
+ **/
+JNIEXPORT void JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00024delegate_1float_dispose(JNIEnv* p_env, jobject p_object)
+{
+    
+}
+
+/** returns the number of project dimension
+ * @param p_env JNI environment
+ * @param p_object JNI object
+ * @return dimension number
+ **/
+JNIEXPORT jint JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00024delegate_1float_getDimension(JNIEnv* p_env, jobject p_object)
+{
+    
+}
+
+/** maps data to the target dimension
+ * @param p_env JNI environment
+ * @param p_object JNI object
+ * @retunr mapped data
+ **/
+JNIEXPORT jobjectArray JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00024delegate_1float_map(JNIEnv* p_env, jobject p_object, jobjectArray p_data)
+{
+    
+}
+
+/** get the project vectors
+ * @param p_env JNI environment
+ * @param p_object JNI object
+ * @return vector array
+ **/
+JNIEXPORT jobjectArray JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00024delegate_1float_getProject(JNIEnv* p_env, jobject p_object)
+{
+    
+}
+
+
+
+
+
+
+
+
+

@@ -408,29 +408,20 @@ def target_genetic(env, framework) :
     
 def target_java(env) :
     # build Java classes
-    po = getRekusivFiles( os.path.join(os.curdir, "java"), ".java" )
     targets = env.Java(target=os.path.join("#build", "java"), source=os.path.join(os.curdir, "java"));
     
     # list with Java classes that are used for the JavaP command
     javaplist = []
     javaplist.extend(targets)
 
-    # create JNI stubs and JavaP command
-    notused = ["machinelearning.object", "machinelearning.exception.runtime", "machinelearning.exception.classmethod", "machinelearning.dimensionreduce.nonsupervised.reduce"]
-    for i in po :
-        # split file and directory parts
-        parts = (os.path.splitext(i)[0]).split(os.sep) 
-        
-        # remove first three parts
-        parts = parts[2:]
-        classname  = ".".join(parts)
+    # create JNI stubs and JavaP command (so we add the classes manually)
+    stubs = ["machinelearning.dimensionreduce.nonsupervised.pca"]
+    for i in stubs :
+        # split file and directory parts and substitute $ to _ and create the headerfile
+        parts = i.replace("$", "_").split(".") 
         headerfile = os.sep.join(parts) + ".h"
-            
-        #differnt classnames are not used
-        if classname not in notused :
-            targets.append( env.Command( headerfile, "", "javah -classpath " + os.path.join(os.curdir, "build", "java") + " -o " + os.path.join(os.curdir, "java", headerfile) + " " + classname  ) )
-            javaplist.append( env.Command("javap", "", "javap -classpath "+os.path.join("build", "java" )+" -s -p "+classname) )
-
+        
+        targets.append( env.Command( headerfile, "", "javah -classpath " + os.path.join(os.curdir, "build", "java") + " -o " + os.path.join(os.curdir, "java", headerfile) + " " + i  ) )
                                 
     # build SharedLibrary
     sources = getRekusivFiles( os.path.join(os.curdir, "java"), ".cpp")
@@ -438,10 +429,8 @@ def target_java(env) :
     
     # build Jar and create Jar Index
     targets.append( env.Command("buildjar", "", "jar cf " + os.path.join(os.curdir, "build", "machinelearning.jar") + " -C " + os.path.join("build", "java" ) + " .") )
-    targets.append( env.Command("indexjar", "", "jar i " + os.path.join(os.curdir, "build", "machinelearning.jar") ) )
 
-    env.Alias("java", targets)
-    env.Alias("javap", javaplist)
+    env.Alias("javac", targets)
     
     
 def target_language(env) :
@@ -494,7 +483,7 @@ files.extend( getRekusivFiles(os.curdir, env["SHOBJSUFFIX"]) )
 files.extend( getRekusivFiles(os.curdir, env["SHLIBSUFFIX"]) )
 files.extend( getRekusivFiles(os.curdir, ".jnilib") )
 files.extend( getRekusivFiles(os.curdir, ".po~") )
-files.extend( getRekusivFiles(os.curdir, ".class") )
+#files.extend( getRekusivFiles(os.curdir, ".class") )
 
 env.Clean("clean", files)
 

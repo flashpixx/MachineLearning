@@ -52,13 +52,14 @@ namespace machinelearning { namespace java {
          **/
         template<typename T> inline T* jni::getObjectPointer(JNIEnv* p_env, jobject& p_object, jfieldID& p_idx)
         {
+            // check the field index
             if (!p_idx)
-                p_env->ThrowNew( p_env->FindClass("java/lang/Exception"), _("pointer to object is empty") );  
+                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("pointer to object is empty") );  
             
             // read pointer reference on the object and cast it to the pointer of the object
             T* l_ptr = (T*) p_env->GetLongField(p_object, p_idx);
             if (!l_ptr) {
-                p_env->ThrowNew( p_env->FindClass("java/lang/Exception"), _("pointer to object is not empty") );
+                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("pointer to object is not empty") );
                 return NULL;
             }
                 
@@ -74,24 +75,35 @@ namespace machinelearning { namespace java {
          **/
         template<typename T> inline jlong jni::createObjectPointer(JNIEnv* p_env, jobject& p_object, jfieldID& p_idx, T* p_ptr)
         {
+            // check pointer to C++ object
             if (!p_ptr)
-                p_env->ThrowNew( p_env->FindClass("java/lang/Exception"), _("pointer to object is empty") );
-            
-            // read Java object member variable for pointer storing (the first call must be thread-safe, because the global field index is be written)
+                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("pointer to object is empty") );
+
+            // check parameter field is set
             if (!p_idx) {
-                jclass l_class = p_env->GetObjectClass( p_object );
                 
+                // get java class of the object
+                jclass l_class = p_env->GetObjectClass( p_object );
+                if (!l_class) {
+                    delete(p_ptr);
+                    p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("cant not find associated java class") );
+                    return NULL;
+                }
+                    
+                // check if the object is in a thread-safe content and lock it
                 if (p_env->MonitorEnter(p_object) != JNI_OK) {
                     delete(p_ptr);
-                    p_env->ThrowNew( p_env->FindClass("java/lang/Exception"), _("call is not within a thread-safe content") );
+                    p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("call is not within a thread-safe content") );
                     return NULL;
                 }
                 
+                // set the field index to the parameter
                 p_idx = p_env->GetFieldID( l_class, "cpp_ptr", "J" );
                 
+                // release thread content
                 if (p_env->MonitorExit(p_object) != JNI_OK) {
                     delete(p_ptr);
-                    p_env->ThrowNew( p_env->FindClass("java/lang/Exception"), _("release thread can not be determine correctly") );
+                    p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("release thread can not be determine correctly") );
                     return NULL;
                 }
             }
@@ -99,11 +111,11 @@ namespace machinelearning { namespace java {
             // check field index
             if (!p_idx) {
                 delete(p_ptr);
-                p_env->ThrowNew( p_env->FindClass("java/lang/Exception"), _("pointer field can not detected") );
+                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("pointer field can not detected") );
                 return NULL;
             }
             
-            // return casted pointer
+            // return casted pointer to the call
             return (jlong)p_ptr;
         }
 
@@ -115,9 +127,9 @@ namespace machinelearning { namespace java {
          **/         
         template<typename T> inline void jni::disposeObjectPointer(JNIEnv* p_env, jobject& p_object, jfieldID& p_idx)
         {
-            // dispose must be thread-safe so we do this
+            // dispose must be thread-safe so do this
             if (p_env->MonitorEnter(p_object) != JNI_OK) {
-                p_env->ThrowNew( p_env->FindClass("java/lang/Exception"), _("call is not within a thread-safe content") );
+                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("call is not within a thread-safe content") );
                 return;
             }
         
@@ -127,7 +139,7 @@ namespace machinelearning { namespace java {
             
             // release the synchronize content
             if (p_env->MonitorExit(p_object) != JNI_OK)
-                p_env->ThrowNew( p_env->FindClass("java/lang/Exception"), _("release thread can not be determine correctly") );
+                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("release thread can not be determine correctly") );
     }
     
 };};
