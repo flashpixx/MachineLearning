@@ -30,7 +30,7 @@ package machinelearning.dimensionreduce.nonsupervised;
  **/
 public class pca<T extends Number> extends machinelearning.object implements reduce<T> {
     
-    private interface strategy<L> {
+    private interface strategy<L extends Number> {
         
         public int getDimension();
 
@@ -58,6 +58,8 @@ public class pca<T extends Number> extends machinelearning.object implements red
         public native void dispose();
         
         private native long cpp_ctor( int p_dim );
+        
+        protected void finalize() { try { dispose(); } catch(Exception e) {} }
     }
     
     private class delegate_double implements strategy<Double> {
@@ -75,6 +77,8 @@ public class pca<T extends Number> extends machinelearning.object implements red
         public native void dispose();
         
         private native long cpp_ctor( int p_dim );
+        
+        protected void finalize() { try { dispose(); } catch(Exception e) {} }
     }
     
     
@@ -87,15 +91,13 @@ public class pca<T extends Number> extends machinelearning.object implements red
      * @param p_dim number of target dimensions
      **/
     public pca( int p_dim ) {
-    /*
-        if (T instanceof Float)
-            m_pca = new pca_float(p_dim);
-        if (T instanceof Double)
-            m_pca = new pca_double(p_dim);
-        */
-        if (m_pca == null)
-            throw new machinelearning.exception.runtime("datatype can not use with PCA");
+        m_pca = (strategy<T>)(new delegate_float(p_dim));
+        //m_pca = (strategy<T>)(new delegate_double(p_dim));
+        
+        //if (m_pca == null)
+        //    throw new machinelearning.exception.runtime("datatype can not use with PCA");
     }
+
     
     /** finalizer, that calls the disposer with exception handling **/
     protected void finalize() { try { dispose(); } catch(Exception e) {} }
