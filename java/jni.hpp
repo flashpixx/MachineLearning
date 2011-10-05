@@ -40,6 +40,7 @@ namespace machinelearning { namespace java {
                 template<typename T> static T* getObjectPointer(JNIEnv*, jobject&, jfieldID&);
                 template<typename T> static jlong createObjectPointer(JNIEnv*, jobject&, jfieldID&, T*);
                 template<typename T> static void disposeObjectPointer(JNIEnv*, jobject&, jfieldID&);
+                static jmethodID getMethodID(JNIEnv*, jobject&, const char*, const char*);
             
         };
             
@@ -53,7 +54,7 @@ namespace machinelearning { namespace java {
         template<typename T> inline T* jni::getObjectPointer(JNIEnv* p_env, jobject& p_object, jfieldID& p_idx)
         {
             // check the field index
-            if (!p_idx)
+            if (p_idx == 0)
                 p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("pointer to object is empty") );  
             
             // read pointer reference on the object and cast it to the pointer of the object
@@ -80,13 +81,13 @@ namespace machinelearning { namespace java {
                 p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("pointer to object is empty") );
 
             // check parameter field is set
-            if (!p_idx) {
+            if (p_idx == 0) {
                 
                 // get java class of the object
                 jclass l_class = p_env->GetObjectClass( p_object );
-                if (!l_class) {
+                if (l_class == 0) {
                     delete(p_ptr);
-                    p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("cant not find associated java class") );
+                    p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("can not find associated java class") );
                     return NULL;
                 }
                     
@@ -109,7 +110,7 @@ namespace machinelearning { namespace java {
             }
 
             // check field index
-            if (!p_idx) {
+            if (p_idx == 0) {
                 delete(p_ptr);
                 p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("pointer field can not detected") );
                 return NULL;
@@ -140,7 +141,33 @@ namespace machinelearning { namespace java {
             // release the synchronize content
             if (p_env->MonitorExit(p_object) != JNI_OK)
                 p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("release thread can not be determine correctly") );
-    }
+        }
+    
+    
+        /** returns the method id of an object
+         * @param p_env JNI environment
+         * @param p_object JNI object
+         * @param p_name method name
+         * @param p_signatur method signature
+         * @return method id
+         **/
+        inline jmethodID jni::getMethodID(JNIEnv* p_env, jobject& p_object, const char* p_name, const char* p_signatur)
+        {
+            jclass l_class = p_env->GetObjectClass( p_object );
+            if (l_class == 0) {
+                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("can not find associated java class") );
+                return 0;
+            }
+            
+            jmethodID l_id = p_env->GetMethodID(l_class, p_name, p_signatur);
+            if (l_id == 0) {
+                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("can not find method with signature: ") );
+                return 0;
+            }
+
+            return l_id;
+        }
+    
     
 };};
 #endif
