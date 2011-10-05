@@ -50,6 +50,7 @@ namespace machinelearning { namespace java {
                 static jmethodID getMethodID(JNIEnv*, const char*, const char*, const char*);
                 static void getCtor(JNIEnv*, const char*, const char*, jclass&, jmethodID&);
                 static ublas::matrix<double> getDoubleMatrixFrom2DArray( JNIEnv*, const jobjectArray& );
+                static ublas::matrix<float> getFloatMatrixFrom2DArray( JNIEnv*, const jobjectArray& );
             
         };
             
@@ -224,7 +225,7 @@ namespace machinelearning { namespace java {
         }
     
     
-        /** creates a ublas matrox form a java 2D array
+        /** creates a ublas double matrix from a java 2D array
          * @param p_env JNI environment
          * @param p_data java array
          * @return ublas matrix if matrix have zero columns and/or rows the array can not be read
@@ -247,6 +248,40 @@ namespace machinelearning { namespace java {
             
             // read array data
             l_data = ublas::matrix<double>(l_rows, l_cols);
+            for(std::size_t i=0; i < l_rows; ++i) {
+                jobjectArray l_coldata = (jobjectArray)p_env->GetObjectArrayElement(p_data, i);
+                
+                for(std::size_t j=0; j < std::min(l_cols, static_cast<std::size_t>(p_env->GetArrayLength(l_coldata))); ++j)
+                    l_data(i,j) = p_env->CallDoubleMethod( p_env->GetObjectArrayElement(l_coldata, j), l_valueof );
+            }
+            
+            return l_data;
+        }
+    
+
+        /** creates a ublas float matrix from a java 2D array
+         * @param p_env JNI environment
+         * @param p_data java array
+         * @return ublas matrix if matrix have zero columns and/or rows the array can not be read
+         **/
+        inline ublas::matrix<float> jni::getFloatMatrixFrom2DArray( JNIEnv* p_env, const jobjectArray& p_data )
+        {
+            ublas::matrix<float> l_data(0,0);
+            
+            // convert the java array to a ublas matrix (first read the row dimension and than read the first array element, cast it to jobjectArray and get the length)
+            const std::size_t l_rows = p_env->GetArrayLength(p_data);
+            if (l_rows == 0)
+                return l_data;
+            
+            const std::size_t l_cols = p_env->GetArrayLength( (jobjectArray)p_env->GetObjectArrayElement(p_data, 0) );
+            if (l_cols == 0)
+                return l_data;
+            
+            // each element in the array is a "java.lang.Double" value, for reading the value the method "double doubleValue()" must be called, so get the ID
+            const jmethodID l_valueof = java::jni::getMethodID(p_env, "java/lang/Float", "floatValue", "()F"); 
+            
+            // read array data
+            l_data = ublas::matrix<float>(l_rows, l_cols);
             for(std::size_t i=0; i < l_rows; ++i) {
                 jobjectArray l_coldata = (jobjectArray)p_env->GetObjectArrayElement(p_data, i);
                 

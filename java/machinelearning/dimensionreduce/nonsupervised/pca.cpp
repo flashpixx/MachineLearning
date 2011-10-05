@@ -86,12 +86,14 @@ JNIEXPORT jint JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00
  **/
 JNIEXPORT jobjectArray JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00024delegate_1double_map(JNIEnv* p_env, jobject p_object, jobjectArray p_data)
 {
-    ublas::matrix<double> l_data = java::jni::getDoubleMatrixFrom2DArray( p_env, p_data );
-
-    std::cout << "\n\n\n" << l_data << std::endl;
+    // create an empty object array for define always a returing value otherwise a NullPointerException is thrown
     
-    
-    // create an empty object array for define always a returing value
+    // convert input data
+    ublas::matrix<double> l_data = java::jni::getDoubleMatrixFrom2DArray( p_env, p_data );    
+    if ((l_data.size1() == 0) || (l_data.size2() == 0)) {
+        p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("data matrix is empty") );
+        //return;
+    }
     
     //dim::pca<double>* l_ptr = java::jni::getObjectPointer< dim::pca<double> >(p_env, p_object, fidx_machinelearning_dimensionreduce_nonsupervised_pca_delegate_double);
 }
