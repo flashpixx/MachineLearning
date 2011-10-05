@@ -86,32 +86,14 @@ JNIEXPORT jint JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00
  **/
 JNIEXPORT jobjectArray JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00024delegate_1double_map(JNIEnv* p_env, jobject p_object, jobjectArray p_data)
 {
-    std::cout << "\n\n\n" << std::endl;
+    ublas::matrix<double> l_data = java::jni::getDoubleMatrixFrom2DArray( p_env, p_data );
+
+    std::cout << "\n\n\n" << l_data << std::endl;
     
-    //dim::pca<double>* l_ptr = java::jni::getObjectPointer< dim::pca<double> >(p_env, p_object, fidx_machinelearning_dimensionreduce_nonsupervised_pca_delegate_double);
     
     // create an empty object array for define always a returing value
     
-    
-    // convert the java array to a ublas matrix (first read the row dimension and than read the first array element, cast it to jobjectArray and get the length)
-    std::size_t l_rows = p_env->GetArrayLength(p_data);
-    std::size_t l_cols = 0;
-    if (l_rows > 0)
-        l_cols = p_env->GetArrayLength( (jobjectArray)p_env->GetObjectArrayElement(p_data, 0) );
-
-    ublas::matrix<double> l_data(l_rows, l_cols);
-    for(std::size_t i=0; i < l_rows; ++i) {
-        jobjectArray l_coldata = (jobjectArray)p_env->GetObjectArrayElement(p_data, i);
-        for(std::size_t j=0; j < std::min(l_cols, p_env->GetArrayLength(l_coldata); ++j)
-            //l_data(i,j) = 
-            //floatValue()
-            std::cout << " " << std::endl;
-            
-        std::cout << std::endl;
-    }
-    
-    
-    std::cout << l_data << std::endl;
+    //dim::pca<double>* l_ptr = java::jni::getObjectPointer< dim::pca<double> >(p_env, p_object, fidx_machinelearning_dimensionreduce_nonsupervised_pca_delegate_double);
 }
 
 /** get the project vectors

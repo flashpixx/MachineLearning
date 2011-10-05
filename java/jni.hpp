@@ -24,23 +24,32 @@
 #ifndef __MACHINELEARNING_JAVA_JNI_HPP
 #define __MACHINELEARNING_JAVA_JNI_HPP
 
+#include <boost/numeric/ublas/matrix.hpp>
+
 #include <jni.h>
 
 
 namespace machinelearning { namespace java {
+    
+        namespace ublas = boost::numeric::ublas;
 
         
         /** class for function that connect Java and C++ objects / reference
+         * @note the JNIEnv pointer need not be a const reference, because
+         * the environment can be changed
          * $LastChangedDate$
          **/
         class jni {
             
             public :
             
-                template<typename T> static T* getObjectPointer(JNIEnv*, jobject&, jfieldID&);
-                template<typename T> static jlong createObjectPointer(JNIEnv*, jobject&, jfieldID&, T*);
-                template<typename T> static void disposeObjectPointer(JNIEnv*, jobject&, jfieldID&);
-                static jmethodID getMethodID(JNIEnv*, jobject&, const char*, const char*);
+                template<typename T> static T* getObjectPointer(JNIEnv*, const jobject&, const jfieldID&);
+                template<typename T> static jlong createObjectPointer(JNIEnv*, const jobject&, jfieldID&, T*);
+                template<typename T> static void disposeObjectPointer(JNIEnv*, const jobject&, const jfieldID&);
+                static jmethodID getMethodID(JNIEnv*, const jobject&, const char*, const char*);
+                static jmethodID getMethodID(JNIEnv*, const char*, const char*, const char*);
+                static void getCtor(JNIEnv*, const char*, const char*, jclass&, jmethodID&);
+                static ublas::matrix<double> getDoubleMatrixFrom2DArray( JNIEnv*, const jobjectArray& );
             
         };
             
@@ -51,14 +60,14 @@ namespace machinelearning { namespace java {
          * @param p_object JNI object
          * @param p_idx field index object
          **/
-        template<typename T> inline T* jni::getObjectPointer(JNIEnv* p_env, jobject& p_object, jfieldID& p_idx)
+        template<typename T> inline T* jni::getObjectPointer(JNIEnv* p_env, const jobject& p_object, const jfieldID& p_idx)
         {
             // check the field index
             if (p_idx == 0)
                 p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("pointer to object is empty") );  
             
             // read pointer reference on the object and cast it to the pointer of the object
-            T* l_ptr = (T*) p_env->GetLongField(p_object, p_idx);
+            T* l_ptr = (T*)( p_env->GetLongField(p_object, p_idx) );
             if (!l_ptr) {
                 p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("pointer to object is not empty") );
                 return NULL;
@@ -74,7 +83,7 @@ namespace machinelearning { namespace java {
          * @param p_idx field index object
          * @param p_ptr object pointer
          **/
-        template<typename T> inline jlong jni::createObjectPointer(JNIEnv* p_env, jobject& p_object, jfieldID& p_idx, T* p_ptr)
+        template<typename T> inline jlong jni::createObjectPointer(JNIEnv* p_env, const jobject& p_object, jfieldID& p_idx, T* p_ptr)
         {
             // check pointer to C++ object
             if (!p_ptr)
@@ -126,7 +135,7 @@ namespace machinelearning { namespace java {
          * @param p_object JNI object
          * @param p_idx field index object
          **/         
-        template<typename T> inline void jni::disposeObjectPointer(JNIEnv* p_env, jobject& p_object, jfieldID& p_idx)
+        template<typename T> inline void jni::disposeObjectPointer(JNIEnv* p_env, const jobject& p_object, const jfieldID& p_idx)
         {
             // dispose must be thread-safe so do this
             if (p_env->MonitorEnter(p_object) != JNI_OK) {
@@ -151,7 +160,7 @@ namespace machinelearning { namespace java {
          * @param p_signatur method signature
          * @return method id
          **/
-        inline jmethodID jni::getMethodID(JNIEnv* p_env, jobject& p_object, const char* p_name, const char* p_signatur)
+        inline jmethodID jni::getMethodID(JNIEnv* p_env, const jobject& p_object, const char* p_name, const char* p_signatur)
         {
             jclass l_class = p_env->GetObjectClass( p_object );
             if (l_class == 0) {
@@ -161,13 +170,92 @@ namespace machinelearning { namespace java {
             
             jmethodID l_id = p_env->GetMethodID(l_class, p_name, p_signatur);
             if (l_id == 0) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("can not find method with signature: ") );
+                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("can not find method with signature") );
                 return 0;
             }
 
             return l_id;
         }
     
+    
+        /** returns the method id of a class
+         * @param p_env JNI environment
+         * @param p_classname class name
+         * @param p_methodname method name
+         * @param p_signatur method signature
+         * @return method id
+         **/
+        inline jmethodID jni::getMethodID(JNIEnv* p_env, const char* p_classname, const char* p_methodname, const char* p_signatur)
+        {
+            jclass l_class = p_env->FindClass(p_classname);
+            if (l_class == 0) {
+                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("can not find associated java class") );
+                return 0;
+            }
+            
+            jmethodID l_id = p_env->GetMethodID(l_class, p_methodname, p_signatur);
+            if (l_id == 0) {
+                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("can not find method with signature") );
+                return 0;
+            }
+            
+            return l_id;
+        }
+
+
+        /** create resources to the constructor call
+         * @param p_env JNI environment
+         * @param p_name name of the class
+         * @param p_signatur signatur for the constructor
+         * @param p_classid reference to the class id
+         * @param p_ctorid reference to the ctor method id
+         **/
+        inline void jni::getCtor(JNIEnv* p_env, const char* p_name, const char* p_signatur, jclass& p_classid, jmethodID& p_ctorid)
+        {
+            p_ctorid  = 0;
+            p_classid = p_env->FindClass(p_name);
+            if (p_classid == 0)
+                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("can not find associated java class") );
+            else {
+                p_ctorid = p_env->GetMethodID(p_classid, "<init>", p_signatur);
+                if (p_ctorid == 0)
+                    p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("can not find constructor call") );
+            }
+        }
+    
+    
+        /** creates a ublas matrox form a java 2D array
+         * @param p_env JNI environment
+         * @param p_data java array
+         * @return ublas matrix if matrix have zero columns and/or rows the array can not be read
+         **/
+        inline ublas::matrix<double> jni::getDoubleMatrixFrom2DArray( JNIEnv* p_env, const jobjectArray& p_data )
+        {
+            ublas::matrix<double> l_data(0,0);
+            
+            // convert the java array to a ublas matrix (first read the row dimension and than read the first array element, cast it to jobjectArray and get the length)
+            const std::size_t l_rows = p_env->GetArrayLength(p_data);
+            if (l_rows == 0)
+                return l_data;
+            
+            const std::size_t l_cols = p_env->GetArrayLength( (jobjectArray)p_env->GetObjectArrayElement(p_data, 0) );
+            if (l_cols == 0)
+                return l_data;
+            
+            // each element in the array is a "java.lang.Double" value, for reading the value the method "double doubleValue()" must be called, so get the ID
+            const jmethodID l_valueof = java::jni::getMethodID(p_env, "java/lang/Double", "doubleValue", "()D"); 
+            
+            // read array data
+            l_data = ublas::matrix<double>(l_rows, l_cols);
+            for(std::size_t i=0; i < l_rows; ++i) {
+                jobjectArray l_coldata = (jobjectArray)p_env->GetObjectArrayElement(p_data, i);
+                
+                for(std::size_t j=0; j < std::min(l_cols, static_cast<std::size_t>(p_env->GetArrayLength(l_coldata))); ++j)
+                    l_data(i,j) = p_env->CallDoubleMethod( p_env->GetObjectArrayElement(l_coldata, j), l_valueof );
+            }
+            
+            return l_data;
+        }
     
 };};
 #endif
