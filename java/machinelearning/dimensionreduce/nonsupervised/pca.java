@@ -30,60 +30,107 @@ package machinelearning.dimensionreduce.nonsupervised;
  **/
 public class pca<T extends Number> extends machinelearning.object implements reduce<T> {
     
-    private interface strategy<L extends Number> {
+    /** inner class interface for using the delegate pattern
+     * with the conrect type binding of the native class
+     **/
+    private interface strategy<L extends Number> extends reduce<L> {
         
+        /** returning dimensions **/
         public int getDimension();
 
+        /** map data **/
         public L[][] map( L[][] p_data );
         
+        /** returns eigenvectors **/
         public L[][] getProject();
         
+        /** freeing memory **/
         public void dispose();
         
     }
     
     
+    /** delegate class for float datatype **/
     private class delegate_float implements strategy<Float> {
         
+        /** private pointer member **/
         private final long cpp_ptr;
         
+        /** constructor
+         * @param p_dim number of dimension
+         **/
         public delegate_float( int p_dim ) { cpp_ptr = cpp_ctor(p_dim); }
         
+        /** returns the number of dimension
+         * @return dimension
+         **/
         public native int getDimension();
         
+        /** maps the data
+         * @param p_data 2D input array (matrix)
+         * @return projected data
+         **/
         public native Float[][] map( Float[][] p_data );
         
+        /** returns the eigenvectors for projection
+         * @return 2D array with eigenvectors
+         **/
         public native Float[][] getProject();
         
+        /** release objects **/
         public native void dispose();
         
+        /** JNI constructor call
+         * @param p_dim nuber of dimension
+         **/
         private native long cpp_ctor( int p_dim );
         
+        /** finalizer **/
         protected void finalize() { try { dispose(); } catch(Exception e) {} }
     }
     
+    /** delegate class for double datatype **/
     private class delegate_double implements strategy<Double> {
         
+        /** private pointer member **/
         private final long cpp_ptr;
         
+        /** constructor
+         * @param p_dim number of dimension
+         **/
         public delegate_double( int p_dim ) { cpp_ptr = cpp_ctor(p_dim); }
         
+        /** returns the number of dimension
+         * @return dimension
+         **/
         public native int getDimension();
         
+        /** maps the data
+         * @param p_data 2D input array (matrix)
+         * @return projected data
+         **/
         public native Double[][] map( Double[][] p_data );
         
+        /** returns the eigenvectors for projection
+         * @return 2D array with eigenvectors
+         **/
         public native Double[][] getProject();
         
+        /** release objects **/
         public native void dispose();
         
+        /** JNI constructor call
+         * @param p_dim nuber of dimension
+         **/
         private native long cpp_ctor( int p_dim );
         
+        /** finalizer **/
         protected void finalize() { try { dispose(); } catch(Exception e) {} }
     }
     
     
     
-    
+    /** member for storing the delegated object **/
     private strategy<T> m_delegate = null;
     
     

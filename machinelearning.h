@@ -685,8 +685,11 @@
  * @file examples/other/mds_twitter.cpp program for reading Twitter data and calculating plot with MDS
  *
  * @file java/java.h main include for all JNI functions
- * @file java/jniregister.hpp register class for connect object data between C++ and Java objects
+ * @file java/jni.hpp register class for connect object data between C++ and Java objects
  * @file java/machinelearning/object.java main abstract interface for JNI interfaces of each object
+ * @file java/machinelearning/exception/runtime.java runtime exception (see C++ exception)
+ * @file java/machinelearning/exception/classmethod.java classmethod exception (see C++ exception)
+ * @file java/machinelearning/exception/unknowntype.java exception if the generic datatype can not be used
  * @file java/machinelearning/dimensionreduce/nonsupervised/reduce.java abstract reduce interface 
  * @file java/machinelearning/dimensionreduce/nonsupervised/pca.java PCA implementation
  * @file java/machinelearning/dimensionreduce/nonsupervised/pca.h JNI stub class of the PCA implementation
