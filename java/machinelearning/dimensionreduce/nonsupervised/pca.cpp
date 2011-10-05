@@ -117,11 +117,11 @@ JNIEXPORT jlong JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_0
     jlong l_ptr = 0;
     
     try {
-        l_ptr = java::jni::createObjectPointer(p_env, p_object, fidx_machinelearning_dimensionreduce_nonsupervised_pca_delegate_double, new dim::pca<float>(p_dim));
+        l_ptr = java::jni::createObjectPointer(p_env, p_object, fidx_machinelearning_dimensionreduce_nonsupervised_pca_delegate_float, new dim::pca<float>(p_dim));
     } catch (const std::exception& e) {
         p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), e.what() );
     }
-    
+
     return l_ptr;
 }
 
