@@ -84,20 +84,21 @@ public class pca<T extends Number> extends machinelearning.object implements red
     
     
     
-    private strategy<T> m_pca = null;
+    private strategy<T> m_delegate = null;
     
     
     /** constructor
      * @param p_dim number of target dimensions
      **/
-    public pca( int p_dim ) {
-        m_pca = (strategy<T>)(new delegate_float(p_dim));
-        //m_pca = (strategy<T>)(new delegate_double(p_dim));
-        
-        //if (m_pca == null)
-        //    throw new machinelearning.exception.runtime("datatype can not use with PCA");
+    public pca( Class p_type, int p_dim ) {
+        if (p_type == Float.class)
+            m_delegate = (strategy<T>)(new delegate_float(p_dim));
+        else
+            if (p_type == Double.class)
+                m_delegate = (strategy<T>)(new delegate_double(p_dim));
+            else
+               throw new machinelearning.exception.unknowntype("datatype can not use with PCA");
     }
-
     
     /** finalizer, that calls the disposer with exception handling **/
     protected void finalize() { try { dispose(); } catch(Exception e) {} }
@@ -107,19 +108,19 @@ public class pca<T extends Number> extends machinelearning.object implements red
      * @param p_data input data / matrix
      * @return project data
      **/
-    public T[][] map( T[][] p_data ) { return m_pca.map(p_data); }
+    public T[][] map( T[][] p_data ) { return m_delegate.map(p_data); }
     
     /** returns the project dimension
      * @return number of dimensions
      **/
-    public int getDimension() { return m_pca.getDimension(); }
+    public int getDimension() { return m_delegate.getDimension(); }
     
     /** returns the projection vectors
      * @return array with project vectors
      **/
-    public T[][] getProject() { return m_pca.getProject(); };
+    public T[][] getProject() { return m_delegate.getProject(); };
     
     /** dispose for clearing memory **/
-    public void dispose() { m_pca.dispose(); };
+    public void dispose() { m_delegate.dispose(); };
     
 }
