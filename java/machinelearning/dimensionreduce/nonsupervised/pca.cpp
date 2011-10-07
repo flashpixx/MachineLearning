@@ -35,6 +35,8 @@ namespace dim   = machinelearning::dimensionreduce::nonsupervised;
 namespace ublas = boost::numeric::ublas;
 
 
+/* $LastChangedDate$ */
+
 // ======= delegate for double =============================================================================================================================
 
 /** field id that stores the ID that stores the pointer **/

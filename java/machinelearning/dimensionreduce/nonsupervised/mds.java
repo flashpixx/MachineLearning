@@ -26,7 +26,7 @@ package machinelearning.dimensionreduce.nonsupervised;
 
 
 /** create the multidimensional scaling (MDS) with different algorithms
- * $LastChangedDate: 2011-10-07 22:56:58 +0200 (Fr, 07 Okt 2011) $
+ * $LastChangedDate$
  **/
 public class mds<T extends Number> extends machinelearning.object implements reduce<T> {
 
