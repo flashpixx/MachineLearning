@@ -26,13 +26,13 @@
 #include <boost/numeric/ublas/matrix.hpp>
 
 #include "mds.h"
-#include "../../../java.h"
+/*#include "../../../java.h"
 
 
 namespace java  = machinelearning::java;
 namespace tools = machinelearning::tools;
 namespace dim   = machinelearning::dimensionreduce::nonsupervised;
-namespace ublas = boost::numeric::ublas;
+namespace ublas = boost::numeric::ublas;*/
 
 
 /* $LastChangedDate$ */
