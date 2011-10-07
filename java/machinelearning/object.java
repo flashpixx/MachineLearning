@@ -46,6 +46,7 @@ public abstract class object {
         // first try to load the JNI library (first load)
         try {
             System.loadLibrary("machinelearning");
+
         } catch (UnsatisfiedLinkError e_link1) {
             
             try {
@@ -53,6 +54,7 @@ public abstract class object {
                 Field l_syspath = ClassLoader.class.getDeclaredField("sys_paths");
                 l_syspath.setAccessible( true );
                 l_syspath.set( null, null );
+                l_syspath = null;
             } catch(Exception e_prop) { e_prop.printStackTrace(); } finally {
                 
                 // create first a temp directory for setting the native libraries
@@ -71,7 +73,7 @@ public abstract class object {
                     try {
                         // extract from the classname the location of the JAR (remove URL prefix jar:file: and suffix after .jar)
                         String l_jarfile = Class.forName("machinelearning.object").getResource("").toString();
-                        l_jarfile = l_jarfile.substring(9, l_jarfile.lastIndexOf(".jar!")) + ".jar";
+                        l_jarfile        = l_jarfile.substring(9, l_jarfile.lastIndexOf(".jar!")) + ".jar";
                     
                         // open the Jar file to get all Jar entries and extract the "native" subdirectory
                         JarFile l_jar = new JarFile( l_jarfile, true );
@@ -98,14 +100,26 @@ public abstract class object {
                                 
                                 l_boutstream.close();
                                 l_outstream.close();
+                                    
+                                l_binstream  = null;
+                                l_instream   = null;
+                                l_boutstream = null;
+                                l_outstream  = null;   
                             }
+                            
+                            l_fileentry = null;
                         }
+                        
+                        l_list    = null;
+                        l_jar     = null;
+                        l_jarfile = null;
                     } catch(Exception e_file) { e_file.printStackTrace(); }
                     
                     // last try to load library (third load)
                     System.loadLibrary("machinelearning");
                 }
-                
+             
+                l_temp = null;
             }
         }
     }

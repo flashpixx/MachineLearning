@@ -51,6 +51,8 @@ namespace machinelearning { namespace java {
                 static void getCtor(JNIEnv*, const char*, const char*, jclass&, jmethodID&);
                 static ublas::matrix<double> getDoubleMatrixFrom2DArray( JNIEnv*, const jobjectArray& );
                 static ublas::matrix<float> getFloatMatrixFrom2DArray( JNIEnv*, const jobjectArray& );
+                static jobjectArray getJObjectArrayFromMatrix( JNIEnv*, const ublas::matrix<double>& );
+                static jobjectArray getJObjectArrayFromMatrix( JNIEnv*, const ublas::matrix<float>& );
             
         };
             
@@ -64,7 +66,7 @@ namespace machinelearning { namespace java {
         template<typename T> inline T* jni::getObjectPointer(JNIEnv* p_env, const jobject& p_object, const jfieldID& p_idx)
         {
             // check the field index
-            if (p_idx == 0)
+            if (!p_idx)
                 p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("pointer to object is empty") );  
             
             // read pointer reference on the object and cast it to the pointer of the object
@@ -91,11 +93,12 @@ namespace machinelearning { namespace java {
                 p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("pointer to object is empty") );
 
             // check parameter field is set
-            if (p_idx == 0) {
+            if (!p_idx) {
                 
                 // get java class of the object
                 jclass l_class = p_env->GetObjectClass( p_object );
-                if (l_class == 0) {
+                if (!l_class) {
+                    //p_env->DeleteLocalRef(l_class);
                     delete(p_ptr);
                     p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("can not find associated java class") );
                     return NULL;
@@ -103,6 +106,7 @@ namespace machinelearning { namespace java {
                     
                 // check if the object is in a thread-safe content and lock it
                 if (p_env->MonitorEnter(p_object) != JNI_OK) {
+                    //p_env->DeleteLocalRef(l_class);
                     delete(p_ptr);
                     p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("call is not within a thread-safe content") );
                     return NULL;
@@ -113,6 +117,7 @@ namespace machinelearning { namespace java {
                 
                 // release thread content
                 if (p_env->MonitorExit(p_object) != JNI_OK) {
+                    //p_env->DeleteLocalRef(l_class);
                     delete(p_ptr);
                     p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("release thread can not be determine correctly") );
                     return NULL;
@@ -120,7 +125,7 @@ namespace machinelearning { namespace java {
             }
 
             // check field index
-            if (p_idx == 0) {
+            if (!p_idx) {
                 delete(p_ptr);
                 p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("pointer field can not detected") );
                 return NULL;
@@ -160,21 +165,25 @@ namespace machinelearning { namespace java {
          * @param p_name method name
          * @param p_signatur method signature
          * @return method id
+         * @todo check jmethodID use for memory leak
          **/
         inline jmethodID jni::getMethodID(JNIEnv* p_env, const jobject& p_object, const char* p_name, const char* p_signatur)
         {
             jclass l_class = p_env->GetObjectClass( p_object );
-            if (l_class == 0) {
+            if (!l_class) {
+                //p_env->DeleteLocalRef(l_class);
                 p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("can not find associated java class") );
-                return 0;
+                return NULL;
             }
             
             jmethodID l_id = p_env->GetMethodID(l_class, p_name, p_signatur);
-            if (l_id == 0) {
+            if (!l_id) {
+                //p_env->DeleteLocalRef(l_class);
                 p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("can not find method with signature") );
-                return 0;
+                return NULL;
             }
 
+            p_env->DeleteLocalRef(l_class);
             return l_id;
         }
     
@@ -185,21 +194,25 @@ namespace machinelearning { namespace java {
          * @param p_methodname method name
          * @param p_signatur method signature
          * @return method id
+         * @todo check jmethodID use for memory leak
          **/
         inline jmethodID jni::getMethodID(JNIEnv* p_env, const char* p_classname, const char* p_methodname, const char* p_signatur)
         {
             jclass l_class = p_env->FindClass(p_classname);
-            if (l_class == 0) {
+            if (!l_class) {
+                //p_env->DeleteLocalRef(l_class);
                 p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("can not find associated java class") );
-                return 0;
+                return NULL;
             }
             
             jmethodID l_id = p_env->GetMethodID(l_class, p_methodname, p_signatur);
-            if (l_id == 0) {
+            if (!l_id) {
+                //p_env->DeleteLocalRef(l_class);
                 p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("can not find method with signature") );
-                return 0;
+                return NULL;
             }
             
+            //p_env->DeleteLocalRef(l_class);
             return l_id;
         }
 
@@ -215,11 +228,11 @@ namespace machinelearning { namespace java {
         {
             p_ctorid  = 0;
             p_classid = p_env->FindClass(p_name);
-            if (p_classid == 0)
+            if (!p_classid)
                 p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("can not find associated java class") );
             else {
                 p_ctorid = p_env->GetMethodID(p_classid, "<init>", p_signatur);
-                if (p_ctorid == 0)
+                if (!p_ctorid)
                     p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("can not find constructor call") );
             }
         }
@@ -229,6 +242,7 @@ namespace machinelearning { namespace java {
          * @param p_env JNI environment
          * @param p_data java array
          * @return ublas matrix if matrix have zero columns and/or rows the array can not be read
+         * @todo check jmethodID use for memory leak
          **/
         inline ublas::matrix<double> jni::getDoubleMatrixFrom2DArray( JNIEnv* p_env, const jobjectArray& p_data )
         {
@@ -263,6 +277,7 @@ namespace machinelearning { namespace java {
          * @param p_env JNI environment
          * @param p_data java array
          * @return ublas matrix if matrix have zero columns and/or rows the array can not be read
+         * @todo check jmethodID use for memory leak
          **/
         inline ublas::matrix<float> jni::getFloatMatrixFrom2DArray( JNIEnv* p_env, const jobjectArray& p_data )
         {
@@ -286,10 +301,70 @@ namespace machinelearning { namespace java {
                 jobjectArray l_coldata = (jobjectArray)p_env->GetObjectArrayElement(p_data, i);
                 
                 for(std::size_t j=0; j < std::min(l_cols, static_cast<std::size_t>(p_env->GetArrayLength(l_coldata))); ++j)
-                    l_data(i,j) = p_env->CallDoubleMethod( p_env->GetObjectArrayElement(l_coldata, j), l_valueof );
+                    l_data(i,j) = p_env->CallFloatMethod( p_env->GetObjectArrayElement(l_coldata, j), l_valueof );
+            }
+
+            return l_data;
+        }
+    
+        
+        /** creates a 2D java array of an ublas double matrix
+         * @param p_env JNI environment
+         * @param p_data input data matrix
+         * @return java array / or a null object if the matrix is empty
+         **/
+        inline jobjectArray jni::getJObjectArrayFromMatrix( JNIEnv* p_env, const ublas::matrix<double>& p_data )
+        {
+            if ( (p_data.size1() == 0) || (p_data.size2() == 0) )
+                return (jobjectArray)p_env->NewGlobalRef(NULL);
+            
+            jclass l_elementclass   = NULL;
+            jmethodID l_elementctor = NULL;
+            java::jni::getCtor(p_env, "java/lang/Double", "(D)V", l_elementclass, l_elementctor);
+            
+            // create the row array
+            jobjectArray l_row = p_env->NewObjectArray( static_cast<jint>(p_data.size1()), p_env->FindClass("[Ljava/lang/Double;"), NULL );
+            for(std::size_t i=0; i < p_data.size1(); ++i) {
+                
+                // create column array and fill data into the double java object
+                jobjectArray l_col = p_env->NewObjectArray( static_cast<jint>(p_data.size2()), l_elementclass, NULL );
+                for(std::size_t j=0; j < p_data.size2(); ++j)
+                    p_env->SetObjectArrayElement(l_col, j, p_env->NewObject(l_elementclass, l_elementctor, p_data(i,j)) );
+                
+                p_env->SetObjectArrayElement(l_row, i, l_col);
             }
             
-            return l_data;
+            return l_row;
+        }
+    
+    
+        /** creates a 2D java array of an ublas float matrix
+         * @param p_env JNI environment
+         * @param p_data input data matrix
+         * @return java array / or a null object if the matrix is empty
+         **/
+        inline jobjectArray jni::getJObjectArrayFromMatrix( JNIEnv* p_env, const ublas::matrix<float>& p_data )
+        {
+            if ( (p_data.size1() == 0) || (p_data.size2() == 0) )
+                return (jobjectArray)p_env->NewGlobalRef(NULL);
+            
+            jclass l_elementclass   = NULL;
+            jmethodID l_elementctor = NULL;
+            java::jni::getCtor(p_env, "java/lang/Float", "(F)V", l_elementclass, l_elementctor);
+            
+            // create the row array
+            jobjectArray l_row = p_env->NewObjectArray( static_cast<jint>(p_data.size1()), p_env->FindClass("[Ljava/lang/Float;"), NULL );
+            for(std::size_t i=0; i < p_data.size1(); ++i) {
+                
+                // create column array and fill data into the double java object
+                jobjectArray l_col = p_env->NewObjectArray( static_cast<jint>(p_data.size2()), l_elementclass, NULL );
+                for(std::size_t j=0; j < p_data.size2(); ++j)
+                    p_env->SetObjectArrayElement(l_col, j, p_env->NewObject(l_elementclass, l_elementctor, p_data(i,j)) );
+                
+                p_env->SetObjectArrayElement(l_row, i, l_col);
+            }
+            
+            return l_row;
         }
     
 };};

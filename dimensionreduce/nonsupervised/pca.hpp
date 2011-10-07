@@ -97,6 +97,10 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     **/
     template<typename T> inline ublas::matrix<T> pca<T>::map( const ublas::matrix<T>& p_data )
     {
+        if (p_data.size1() == 0)
+            throw exception::runtime(_("row size must be greater than zero"), *this);
+        if (p_data.size2() == 0)
+            throw exception::runtime(_("column size must be greater than zero"), *this);
         if (p_data.size2() <= m_dim)
             throw exception::runtime(_("datapoint dimension are less than target dimension"), *this);
         

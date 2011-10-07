@@ -135,6 +135,7 @@ public class pca<T extends Number> extends machinelearning.object implements red
     
     
     /** constructor
+     * @param p_type reference to the generic type of the class
      * @param p_dim number of target dimensions
      **/
     public pca( Class p_type, int p_dim ) {

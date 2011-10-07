@@ -35,7 +35,7 @@ public class unknowntype extends IllegalArgumentException {
     public unknowntype() { super(); }
     
     /** constructor
-     * @apram p_msg message
+     * @param p_msg message
      **/
     public unknowntype(String p_msg) { super(p_msg); }
     

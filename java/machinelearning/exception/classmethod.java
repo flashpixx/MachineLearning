@@ -35,7 +35,7 @@ public class classmethod extends UnsupportedOperationException {
     public classmethod() { super(); }
     
     /** constructor
-     * @apram p_msg message
+     * @param p_msg message
      **/
     public classmethod(String p_msg) { super(p_msg); }
     

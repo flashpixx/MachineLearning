@@ -86,16 +86,31 @@ JNIEXPORT jint JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00
  **/
 JNIEXPORT jobjectArray JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00024delegate_1double_map(JNIEnv* p_env, jobject p_object, jobjectArray p_data)
 {
-    // create an empty object array for define always a returing value otherwise a NullPointerException is thrown
-    
-    // convert input data
-    ublas::matrix<double> l_data = java::jni::getDoubleMatrixFrom2DArray( p_env, p_data );    
-    if ((l_data.size1() == 0) || (l_data.size2() == 0)) {
-        p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("data matrix is empty") );
-        //return;
+    // check if the input array is a NULL object, than break with a default NullPointerException
+    if (!p_data) {
+        p_env->ThrowNew( p_env->FindClass("java/lang/NullPointerException"), _("data matrix is null") );
+        return (jobjectArray)p_env->NewGlobalRef(NULL);
     }
     
-    //dim::pca<double>* l_ptr = java::jni::getObjectPointer< dim::pca<double> >(p_env, p_object, fidx_machinelearning_dimensionreduce_nonsupervised_pca_delegate_double);
+    // convert input data and returning a null-object if an error occurs
+    const ublas::matrix<double> l_data = java::jni::getDoubleMatrixFrom2DArray( p_env, p_data );    
+    if ((l_data.size1() == 0) || (l_data.size2() == 0)) {
+        p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("data matrix is empty") );
+        return (jobjectArray)p_env->NewGlobalRef(NULL);
+    }
+    
+    // run PCA with the data and catches exception
+    dim::pca<double>* l_ptr = java::jni::getObjectPointer< dim::pca<double> >(p_env, p_object, fidx_machinelearning_dimensionreduce_nonsupervised_pca_delegate_double);
+    ublas::matrix<double> l_result;
+    try {
+        l_result = l_ptr->map(l_data);
+    } catch (const std::exception& e) {
+        p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), e.what() );
+        return (jobjectArray)p_env->NewGlobalRef(NULL);
+    }
+    
+    // returns the data within a java 2D array
+    return java::jni::getJObjectArrayFromMatrix(p_env, l_result);
 }
 
 /** get the project vectors
@@ -160,6 +175,31 @@ JNIEXPORT jint JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00
  **/
 JNIEXPORT jobjectArray JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00024delegate_1float_map(JNIEnv* p_env, jobject p_object, jobjectArray p_data)
 {
+    // check if the input array is a NULL object, than break with a default NullPointerException
+    if (!p_data) {
+        p_env->ThrowNew( p_env->FindClass("java/lang/NullPointerException"), _("data matrix is null") );
+        return (jobjectArray)p_env->NewGlobalRef(NULL);
+    }
+    
+    // convert input data and returning a null-object if an error occurs
+    const ublas::matrix<float> l_data = java::jni::getFloatMatrixFrom2DArray( p_env, p_data );    
+    if ((l_data.size1() == 0) || (l_data.size2() == 0)) {
+        p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("data matrix is empty") );
+        return (jobjectArray)p_env->NewGlobalRef(NULL);
+    }
+    
+    // run PCA with the data and catches exception
+    dim::pca<float>* l_ptr = java::jni::getObjectPointer< dim::pca<float> >(p_env, p_object, fidx_machinelearning_dimensionreduce_nonsupervised_pca_delegate_float);
+    ublas::matrix<float> l_result;
+    try {
+        l_result = l_ptr->map(l_data);
+    } catch (const std::exception& e) {
+        p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), e.what() );
+        return (jobjectArray)p_env->NewGlobalRef(NULL);
+    }
+    
+    // returns the data within a java 2D array
+    return java::jni::getJObjectArrayFromMatrix(p_env, l_result);
     
 }
 
