@@ -149,7 +149,7 @@ public class pca<T extends Number> extends machinelearning.object implements red
     }
     
     /** finalizer, that calls the disposer with exception handling **/
-    protected void finalize() { try { dispose(); } catch(Exception e) {} }
+    protected void finalize() { dispose(); }
     
     
     /** run the mapping structure
