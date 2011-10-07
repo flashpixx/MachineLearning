@@ -25,10 +25,24 @@ package machinelearning.dimensionreduce.nonsupervised;
 
 
 
-/** create the principal component analysis (PCA)
- * $LastChangedDate$
+/** create the multidimensional scaling (MDS) with different algorithms
+ * $LastChangedDate: 2011-10-07 22:56:58 +0200 (Fr, 07 Okt 2011) $
  **/
-public class pca<T extends Number> extends machinelearning.object implements reduce<T> {
+public class mds<T extends Number> extends machinelearning.object implements reduce<T> {
+
+    /** inner class with enum options of projection method **/
+    public enum project
+    {
+        metric, sammon, hit
+    }
+    
+    /** inner class with enum options of centering methods **/
+    public enum centeroption
+    {
+        none, singlecenter, doublecenter
+    }
+            
+    
     
     /** inner class interface for using the delegate pattern
      * with the conrect type binding of the native class
@@ -37,17 +51,27 @@ public class pca<T extends Number> extends machinelearning.object implements red
         
         /** returning dimensions **/
         public int getDimension();
-
-        /** map data
-         * @param p_data 2D input array (matrix)
-         * @return projected data
-         **/
-        public L[][] map( L[][] p_data );
         
-        /** returns the eigenvectors of projection
-         * @return 2D array with eigenvectors
+        /** set the number of iteration
+         * @param p_iteration iterations
          **/
-        public L[][] getProject();
+        public void setIteration( int p_iteration );
+        
+        /* set number of step
+         * @param p_step setps
+         **/
+        public void setStep( int p_step );
+        
+        /** set rate
+         * @param p_rate rate
+         **/
+        public void setRate( L p_rate );
+        
+        /** set centering option **/
+        public void setCentering( centeroption p_center );
+        
+        /** map data **/
+        public L[][] map( L[][] p_data );
         
         /** freeing memory **/
         public void dispose();
@@ -64,12 +88,30 @@ public class pca<T extends Number> extends machinelearning.object implements red
         /** constructor
          * @param p_dim number of dimension
          **/
-        public delegate_float( int p_dim ) { cpp_ptr = cpp_ctor(p_dim); }
+        public delegate_float( int p_dim, project p_project ) { cpp_ptr = cpp_ctor(p_dim, p_project); }
         
         /** returns the number of dimension
          * @return dimension
          **/
         public native int getDimension();
+        
+        /** set the number of iteration
+         * @param p_iteration iterations
+         **/
+        public native void setIteration( int p_iteration );
+        
+        /* set number of step
+         * @param p_step setps
+         **/
+        public native void setStep( int p_step );
+        
+        /** set rate
+         * @param p_rate rate
+         **/
+        public native void setRate( Float p_rate );
+        
+        /** set centering option **/
+        public native void setCentering( centeroption p_center );
         
         /** maps the data
          * @param p_data 2D input array (matrix)
@@ -77,18 +119,13 @@ public class pca<T extends Number> extends machinelearning.object implements red
          **/
         public native Float[][] map( Float[][] p_data );
         
-        /** returns the eigenvectors of projection
-         * @return 2D array with eigenvectors
-         **/
-        public native Float[][] getProject();
-        
         /** release objects **/
         public native void dispose();
         
         /** JNI constructor call
          * @param p_dim nuber of dimension
          **/
-        private native long cpp_ctor( int p_dim );
+        private native long cpp_ctor( int p_dim, project p_project );
         
         /** finalizer **/
         protected void finalize() { try { dispose(); } catch(Exception e) {} }
@@ -104,12 +141,30 @@ public class pca<T extends Number> extends machinelearning.object implements red
         /** constructor
          * @param p_dim number of dimension
          **/
-        public delegate_double( int p_dim ) { cpp_ptr = cpp_ctor(p_dim); }
+        public delegate_double( int p_dim, project p_project ) { cpp_ptr = cpp_ctor(p_dim, p_project); }
         
         /** returns the number of dimension
          * @return dimension
          **/
         public native int getDimension();
+        
+        /** set the number of iteration
+         * @param p_iteration iterations
+         **/
+        public native void setIteration( int p_iteration );
+        
+        /* set number of step
+         * @param p_step setps
+         **/
+        public native void setStep( int p_step );
+        
+        /** set rate
+         * @param p_rate rate
+         **/
+        public native void setRate( Double p_rate );
+        
+        /** set centering option **/
+        public native void setCentering( centeroption p_center );
         
         /** maps the data
          * @param p_data 2D input array (matrix)
@@ -117,22 +172,17 @@ public class pca<T extends Number> extends machinelearning.object implements red
          **/
         public native Double[][] map( Double[][] p_data );
         
-        /** returns the eigenvectors of projection
-         * @return 2D array with eigenvectors
-         **/
-        public native Double[][] getProject();
-        
         /** release objects **/
         public native void dispose();
         
         /** JNI constructor call
          * @param p_dim nuber of dimension
          **/
-        private native long cpp_ctor( int p_dim );
+        private native long cpp_ctor( int p_dim, project p_project );
         
         /** finalizer **/
         protected void finalize() { try { dispose(); } catch(Exception e) {} }
-    }
+     }
     
     
     
@@ -143,15 +193,16 @@ public class pca<T extends Number> extends machinelearning.object implements red
     /** constructor
      * @param p_type reference to the generic type of the class
      * @param p_dim number of target dimensions
+     * @param p_project projection option
      **/
-    public pca( Class p_type, int p_dim ) {
+    public mds( Class p_type, int p_dim, project p_project ) {
         if (p_type == Float.class)
-            m_delegate = (strategy<T>)(new delegate_float(p_dim));
+            m_delegate = (strategy<T>)(new delegate_float(p_dim, p_project));
         else
             if (p_type == Double.class)
-                m_delegate = (strategy<T>)(new delegate_double(p_dim));
+                m_delegate = (strategy<T>)(new delegate_double(p_dim, p_project));
             else
-               throw new machinelearning.exception.unknowntype("datatype can not use with PCA");
+                throw new machinelearning.exception.unknowntype("datatype can not use with MDS");
     }
     
     /** finalizer, that calls the disposer with exception handling **/
@@ -168,10 +219,23 @@ public class pca<T extends Number> extends machinelearning.object implements red
      **/
     public int getDimension() { return m_delegate.getDimension(); }
     
-    /** returns the projection vectors
-     * @return array with project vectors
+    /** set the number of iteration
+     * @param p_iteration iterations
      **/
-    public T[][] getProject() { return m_delegate.getProject(); };
+    public void setIteration( int p_iteration ) { m_delegate.setIteration(p_iteration); }
+    
+    /* set number of step
+     * @param p_step setps
+     **/
+    public void setStep( int p_step ) { m_delegate.setStep(p_step); }
+    
+    /** set rate
+     * @param p_rate rate
+     **/
+    public void setRate( T p_rate ) { m_delegate.setRate( p_rate ); }
+    
+    /** set centering option **/
+    public void setCentering( centeroption p_center ) { m_delegate.setCentering( p_center ); }
     
     /** dispose for clearing memory **/
     public void dispose() { m_delegate.dispose(); };

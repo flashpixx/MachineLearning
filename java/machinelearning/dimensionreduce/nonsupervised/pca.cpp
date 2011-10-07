@@ -120,6 +120,8 @@ JNIEXPORT jobjectArray JNICALL Java_machinelearning_dimensionreduce_nonsupervise
  **/
 JNIEXPORT jobjectArray JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00024delegate_1double_getProject(JNIEnv* p_env, jobject p_object)
 {
+    dim::pca<double>* l_ptr = java::jni::getObjectPointer< dim::pca<double> >(p_env, p_object, fidx_machinelearning_dimensionreduce_nonsupervised_pca_delegate_double);
+    return java::jni::getJObjectArrayFromMatrix(p_env, l_ptr->getProject());
 }
 
 
@@ -210,14 +212,6 @@ JNIEXPORT jobjectArray JNICALL Java_machinelearning_dimensionreduce_nonsupervise
  **/
 JNIEXPORT jobjectArray JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00024delegate_1float_getProject(JNIEnv* p_env, jobject p_object)
 {
-    
+    dim::pca<float>* l_ptr = java::jni::getObjectPointer< dim::pca<float> >(p_env, p_object, fidx_machinelearning_dimensionreduce_nonsupervised_pca_delegate_float);
+    return java::jni::getJObjectArrayFromMatrix(p_env, l_ptr->getProject());
 }
-
-
-
-
-
-
-
-
-
