@@ -161,10 +161,10 @@ JNIEXPORT jlong JNICALL Java_machinelearning_dimensionreduce_nonsupervised_mds_0
 }
 #endif
 #endif
-/* Header for class machinelearning_dimensionreduce_nonsupervised_mds_strategy */
+/* Header for class machinelearning_dimensionreduce_nonsupervised_mds_Strategy */
 
-#ifndef _Included_machinelearning_dimensionreduce_nonsupervised_mds_strategy
-#define _Included_machinelearning_dimensionreduce_nonsupervised_mds_strategy
+#ifndef _Included_machinelearning_dimensionreduce_nonsupervised_mds_Strategy
+#define _Included_machinelearning_dimensionreduce_nonsupervised_mds_Strategy
 #ifdef __cplusplus
 extern "C" {
 #endif

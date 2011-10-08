@@ -113,10 +113,10 @@ JNIEXPORT jlong JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_0
 }
 #endif
 #endif
-/* Header for class machinelearning_dimensionreduce_nonsupervised_pca_strategy */
+/* Header for class machinelearning_dimensionreduce_nonsupervised_pca_Strategy */
 
-#ifndef _Included_machinelearning_dimensionreduce_nonsupervised_pca_strategy
-#define _Included_machinelearning_dimensionreduce_nonsupervised_pca_strategy
+#ifndef _Included_machinelearning_dimensionreduce_nonsupervised_pca_Strategy
+#define _Included_machinelearning_dimensionreduce_nonsupervised_pca_Strategy
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -47,7 +47,7 @@ public class mds<T extends Number> extends machinelearning.Object implements Red
     /** inner class interface for using the delegate pattern
      * with the conrect type binding of the native class
      **/
-    private interface strategy<L extends Number> extends Reduce<L> {
+    private interface Strategy<L extends Number> extends Reduce<L> {
         
         /** returning dimensions **/
         public int getDimension();
@@ -80,7 +80,7 @@ public class mds<T extends Number> extends machinelearning.Object implements Red
     
     
     /** delegate class for float datatype **/
-    private class delegate_float implements strategy<Float> {
+    private class delegate_float implements Strategy<Float> {
         
         /** private pointer member **/
         private final long cpp_ptr;
@@ -135,7 +135,7 @@ public class mds<T extends Number> extends machinelearning.Object implements Red
     
     
     /** delegate class for double datatype **/
-    private class delegate_double implements strategy<Double> {
+    private class delegate_double implements Strategy<Double> {
         
         /** private pointer member **/
         private final long cpp_ptr;
@@ -191,7 +191,7 @@ public class mds<T extends Number> extends machinelearning.Object implements Red
     
     
     /** member for storing the delegated object **/
-    private strategy<T> m_delegate = null;
+    private Strategy<T> m_delegate = null;
     
     
     /** constructor
@@ -201,10 +201,10 @@ public class mds<T extends Number> extends machinelearning.Object implements Red
      **/
     public mds( Class p_type, int p_dim, project p_project ) {
         if (p_type == Float.class)
-            m_delegate = (strategy<T>)(new delegate_float(p_dim, p_project));
+            m_delegate = (Strategy<T>)(new delegate_float(p_dim, p_project));
         else
             if (p_type == Double.class)
-                m_delegate = (strategy<T>)(new delegate_double(p_dim, p_project));
+                m_delegate = (Strategy<T>)(new delegate_double(p_dim, p_project));
             else
                 throw new machinelearning.exception.Unknowntype("datatype can not use with MDS");
     }
