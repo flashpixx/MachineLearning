@@ -84,7 +84,6 @@ namespace machinelearning { namespace tools {
                 info  = 3
             };
                 
-            
             static logger* getInstance( void );
             void setLevel( const logstate& );
             logstate getLevel( void ) const;
@@ -102,7 +101,7 @@ namespace machinelearning { namespace tools {
         private : 
         
             /** local instance **/
-            static logger* m_instance = NULL;
+            static logger* m_instance;
             /** filename for logging output **/
             std::string m_filename;
             /** logstate for writing data **/
@@ -137,10 +136,7 @@ namespace machinelearning { namespace tools {
         
     };
     
-    
-    logger* logger::m_instance  = NULL;
-    
-    
+
     /** constructor **/
     inline logger::logger( void ) :
         m_filename(),
