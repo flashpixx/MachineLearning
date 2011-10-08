@@ -135,9 +135,10 @@
  * show a build target, but some targets will be build first if different parameters are set
  * <ul>
  * <li><dfn>documentation</dfn> create the documentation with Doxygen (Doxygen must be installed and be reached within the path)</li>
- * <li><dfn>javac</dfn> create the the C/C++ stub files of each Java class, create the shared library and add all to the Jar file</li>
  * <li><dfn>createlanguage</dfn> creates the language files / adds new messages to the existing files (xgettext must be called, so it should be within the path)</li>
  * <li><dfn>updatelanguage</dfn> compiles all language files (msgfmt must be called, so it should be within the path)</li>
+ * <li><dfn>clean / -c</dfn> target that cleans framework files</li>
+ * </ul><ul>
  * <li><dfn>source</dfn> sources are eg. Wikipedia, NNTP, but the parameter <dfn>withsources</dfn> must be set for compiling and for the cloud example the files parameter must be set additionally</li>
  * <li><dfn>clustering</dfn> this target build all clustering algorithms, but the <dfn>withfiles</dfn> parameter must be set</li>
  * <li><dfn>classifier</dfn> this target build all classifier algorithms, but the <dfn>withfiles</dfn> parameter must be set</li>
@@ -146,7 +147,8 @@
  * <li><dfn>other</dfn> this target build all other examples, <dfn>withfiles</dfn> options must be set, <dfn>withsources</dfn> can be set (includes nntp and wikipedia examples) and optional 
  * <dfn>withmpi</dfn> </li>
  * <li><dfn>ga</dfn> target for building genetic algorithms</li>
- * <li><dfn>clean / -c</dfn> target that cleans framework files</li>
+ * </ul><ul>
+ * <li><dfn>javac</dfn> create the the C/C++ stub files of each Java class, create the shared library and add all to the Jar file</li>
  * </ul>
  *
  * @section ex examples

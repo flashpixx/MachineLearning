@@ -87,6 +87,7 @@ public class mds<T extends Number> extends machinelearning.object implements red
         
         /** constructor
          * @param p_dim number of dimension
+         * @param p_project project option
          **/
         public delegate_float( int p_dim, project p_project ) { cpp_ptr = cpp_ctor(p_dim, p_project); }
         
@@ -124,6 +125,7 @@ public class mds<T extends Number> extends machinelearning.object implements red
         
         /** JNI constructor call
          * @param p_dim nuber of dimension
+         * @param p_project project option
          **/
         private native long cpp_ctor( int p_dim, project p_project );
         
@@ -140,6 +142,7 @@ public class mds<T extends Number> extends machinelearning.object implements red
         
         /** constructor
          * @param p_dim number of dimension
+         * @param p_project project option
          **/
         public delegate_double( int p_dim, project p_project ) { cpp_ptr = cpp_ctor(p_dim, p_project); }
         
@@ -177,6 +180,7 @@ public class mds<T extends Number> extends machinelearning.object implements red
         
         /** JNI constructor call
          * @param p_dim nuber of dimension
+         * @param p_project project option
          **/
         private native long cpp_ctor( int p_dim, project p_project );
         

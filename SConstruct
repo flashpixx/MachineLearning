@@ -259,7 +259,6 @@ def getConfig(vars):
     env.Replace(LIBS        = config["linkto"])
     env.Replace(LIBPATH     = config["librarypath"])
     env.Replace(CPPSUFFIXES = [".hpp", ".h", ".cpp"])
-    #env.Replace(JAVACLASSPATH = [os.path.join(os.curdir, "java")])
 
     # Scons < 2: env.BuildDir("build", ".", duplicate=0)
     env.VariantDir("build", ".", duplicate=0)
@@ -406,9 +405,9 @@ def target_genetic(env, framework) :
     createTarget(env, "ga", path, sources, framework)
 
     
-def target_java(env) :
+def target_javac(env, vars) :
     # build Java classes
-    targets = env.Java(target=os.path.join("#build", "java"), source=os.path.join(os.curdir, "java"));
+    targets = env.Java(target=os.path.join("#build", "javalib"), source=os.path.join(os.curdir, "java"))
     
     # list with Java classes that are used for the JavaP command
     javaplist = []
@@ -421,45 +420,50 @@ def target_java(env) :
         parts = i.replace("$", "_").split(".") 
         headerfile = os.sep.join(parts) + ".h"
         
-        targets.append( env.Command( headerfile, "", "javah -classpath " + os.path.join(os.curdir, "build", "java") + " -o " + os.path.join(os.curdir, "java", headerfile) + " " + i  ) )
+        targets.append( env.Command( headerfile, "", "javah -classpath " + os.path.join(os.curdir, "build", "javalib") + " -o " + os.path.join(os.curdir, "java", headerfile) + " " + i  ) )
                                 
     # build SharedLibrary
     sources = getRekusivFiles( os.path.join(os.curdir, "java"), ".cpp")
-    targets.append( env.SharedLibrary( target=os.path.join("#build", "java", "native", "machinelearning"), source=sources ) )
+    targets.append( env.SharedLibrary( target=os.path.join("#build", "javalib", "native", "machinelearning"), source=sources ) )
     
     # build Jar and create Jar Index
-    targets.append( env.Command("buildjar", "", "jar cf " + os.path.join(os.curdir, "build", "machinelearning.jar") + " -C " + os.path.join("build", "java" ) + " .") )
+    targets.append( env.Command("buildjar", "", "jar cf " + os.path.join(os.curdir, "build", "machinelearning.jar") + " -C " + os.path.join("build", "javalib" ) + " .") )
 
     env.Alias("javac", targets)
     
     
+def target_javaexamples(env) :
+    # set classpath only for example compiling (jar file must be set within the build directory)
+    env.Alias("javareduce", env.Java(target=os.path.join("#build", "java", "reduce"), source=os.path.join(os.curdir, "examples", "java", "reducing"), JAVACLASSPATH = [os.path.join(os.curdir, "build", "machinelearning.jar")]) )
+    
+    
 def target_language(env) :
-        sources = []
-        for i in env["CPPSUFFIXES"] :
-            sources.extend( getRekusivFiles(os.curdir, i, ["examples"]) )
+    sources = []
+    for i in env["CPPSUFFIXES"] :
+        sources.extend( getRekusivFiles(os.curdir, i, ["examples"]) )
 
-        # get all strings out of the sources
-        updatetargets = []
-        createtargets = []
-        updatetargets.append( env.Command("xgettext", "", "xgettext --output="+os.path.join("tools", "language", "language.po")+" --keyword=_ --language=c++ " + " ".join(sources)) )
-        createtargets.extend( updatetargets )
+    # get all strings out of the sources
+    updatetargets = []
+    createtargets = []
+    updatetargets.append( env.Command("xgettext", "", "xgettext --output="+os.path.join("tools", "language", "language.po")+" --keyword=_ --language=c++ " + " ".join(sources)) )
+    createtargets.extend( updatetargets )
 
 
-        # get all language files in the subdirs and add the new texts
-        po = getRekusivFiles(os.curdir, ".po", ["examples", "java", "build"])
-        for i in po :
-            updatetargets.append( env.Command("msmerge", "", "msgmerge --no-wrap --update " + i + " "+os.path.join("tools", "language", "language.po") ) )
-            createtargets.append( env.Command("msmerge", "", "msgmerge --no-wrap --update " + i + " "+os.path.join("tools", "language", "language.po") ) )
-            
-        createtargets.append( env.Command("deletelang", "", [Delete(os.path.join("tools", "language", "language.po"))] ) )
-        updatetargets.append( env.Command("deletelang", "", [Delete(os.path.join("tools", "language", "language.po"))] ) )
-
-        # compiling all files
-        for i in po :
-            updatetargets.append( env.Command("msgfmt", "", "msgfmt -v -o " + os.path.join(os.path.dirname(i),"ml.mo") +" "+ i ) )
+    # get all language files in the subdirs and add the new texts
+    po = getRekusivFiles(os.curdir, ".po", ["examples", "java", "build"])
+    for i in po :
+        updatetargets.append( env.Command("msmerge", "", "msgmerge --no-wrap --update " + i + " "+os.path.join("tools", "language", "language.po") ) )
+        createtargets.append( env.Command("msmerge", "", "msgmerge --no-wrap --update " + i + " "+os.path.join("tools", "language", "language.po") ) )
         
-        env.Alias("updatelanguage", updatetargets)
-        env.Alias("createlanguage", createtargets)            
+    createtargets.append( env.Command("deletelang", "", [Delete(os.path.join("tools", "language", "language.po"))] ) )
+    updatetargets.append( env.Command("deletelang", "", [Delete(os.path.join("tools", "language", "language.po"))] ) )
+
+    # compiling all files
+    for i in po :
+        updatetargets.append( env.Command("msgfmt", "", "msgfmt -v -o " + os.path.join(os.path.dirname(i),"ml.mo") +" "+ i ) )
+    
+    env.Alias("updatelanguage", updatetargets)
+    env.Alias("createlanguage", createtargets)            
     
     
 def target_documentation(env) :
@@ -495,7 +499,10 @@ framework = []
 # create building targets
 target_language( env )
 target_documentation( env )
-target_java( env )
+
+target_javac( env, vars )
+target_javaexamples( env )
+
 target_sources( env, framework )
 target_clustering( env, framework )
 target_reducing( env, framework )
