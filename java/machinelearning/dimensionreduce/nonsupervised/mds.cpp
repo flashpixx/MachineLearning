@@ -56,7 +56,7 @@ JNIEXPORT jlong JNICALL Java_machinelearning_dimensionreduce_nonsupervised_mds_0
     try {
         l_ptr = java::jni::createObjectPointer(p_env, p_object, fidx_machinelearning_dimensionreduce_nonsupervised_mds_delegate_double, new dim::mds<double>(p_dimension));
     } catch (const std::exception& e) {
-        p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), e.what() );
+        p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
     }
     
     return l_ptr;
@@ -137,7 +137,7 @@ JNIEXPORT jobjectArray JNICALL Java_machinelearning_dimensionreduce_nonsupervise
     // convert input data and returning a null-object if an error occurs
     const ublas::matrix<double> l_data = java::jni::getDoubleMatrixFrom2DArray( p_env, p_data );    
     if ((l_data.size1() == 0) || (l_data.size2() == 0)) {
-        p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), _("data matrix is empty") );
+        p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), _("data matrix is empty") );
         return (jobjectArray)p_env->NewGlobalRef(NULL);
     }
     
@@ -147,7 +147,7 @@ JNIEXPORT jobjectArray JNICALL Java_machinelearning_dimensionreduce_nonsupervise
     try {
         l_result = tools::matrix::setNumericalZero(l_ptr->map(l_data));
     } catch (const std::exception& e) {
-        p_env->ThrowNew( p_env->FindClass("machinelearning/exception/runtime"), e.what() );
+        p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
         return (jobjectArray)p_env->NewGlobalRef(NULL);
     }
     
