@@ -27,7 +27,7 @@ package machinelearning.dimensionreduce.nonsupervised;
 /** abstract class for nonsupervised project algorithms
  * $LastChangedDate$
  **/
-interface reduce<T extends Number> {
+interface Reduce<T extends Number> {
     
     /** map method that reduce the data
      * @param p_data input data

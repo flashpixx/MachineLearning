@@ -34,7 +34,7 @@ import java.lang.reflect.*;
  * clearing memory management and loading native library
  * $LastChangedDate$
  **/
-public abstract class object {
+public abstract class Object {
     
     
     /** static call of the external library, each class that uses the native

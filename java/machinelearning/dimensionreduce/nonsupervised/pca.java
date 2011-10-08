@@ -28,7 +28,7 @@ package machinelearning.dimensionreduce.nonsupervised;
 /** create the principal component analysis (PCA)
  * $LastChangedDate$
  **/
-public class pca<T extends Number> extends machinelearning.object implements reduce<T> {
+public class pca<T extends Number> extends machinelearning.Object implements Reduce<T> {
     
     /** inner class interface for using the delegate pattern
      * with the conrect type binding of the native class

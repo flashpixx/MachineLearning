@@ -28,7 +28,7 @@ package machinelearning.dimensionreduce.nonsupervised;
 /** create the multidimensional scaling (MDS) with different algorithms
  * $LastChangedDate$
  **/
-public class mds<T extends Number> extends machinelearning.object implements reduce<T> {
+public class mds<T extends Number> extends machinelearning.Object implements Reduce<T> {
 
     /** inner class with enum options of projection method **/
     public enum project
