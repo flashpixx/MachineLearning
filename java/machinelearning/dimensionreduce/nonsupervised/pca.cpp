@@ -39,7 +39,7 @@ namespace ublas = boost::numeric::ublas;
 
 // ======= delegate for double =============================================================================================================================
 
-/** field id that stores the ID that stores the pointer **/
+/** field id that stores the ID of the double pointer **/
 static jfieldID fidx_machinelearning_dimensionreduce_nonsupervised_pca_delegatedouble    = NULL;
 
 /** constructor call for delegate double
@@ -131,7 +131,7 @@ JNIEXPORT jobjectArray JNICALL Java_machinelearning_dimensionreduce_nonsupervise
 
 // ======= delegate for float ==============================================================================================================================
 
-/** field id that stores the ID that stores the pointer **/
+/** field id that stores the ID of the float pointer **/
 static jfieldID fidx_machinelearning_dimensionreduce_nonsupervised_pca_delegatefloat     = NULL;
 
 /** constructor call for delegate double

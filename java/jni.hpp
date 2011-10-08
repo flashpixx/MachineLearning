@@ -53,6 +53,7 @@ namespace machinelearning { namespace java {
                 static ublas::matrix<float> getFloatMatrixFrom2DArray( JNIEnv*, const jobjectArray& );
                 static jobjectArray getJObjectArrayFromMatrix( JNIEnv*, const ublas::matrix<double>& );
                 static jobjectArray getJObjectArrayFromMatrix( JNIEnv*, const ublas::matrix<float>& );
+                static std::size_t getEnumOrdinalValue( JNIEnv*, const jobject& );
             
         };
             
@@ -365,6 +366,17 @@ namespace machinelearning { namespace java {
             }
             
             return l_row;
+        }
+    
+        
+        /** get the ordinal [0,1,..] value representation if the java enum value
+         * @param p_env JNI environment
+         * @param p_object java enum object
+         * @return ordinal value
+         **/
+        inline std::size_t jni::getEnumOrdinalValue( JNIEnv* p_env, const jobject& p_object )
+        {
+            return static_cast<std::size_t>(p_env->CallIntMethod(p_object, jni::getMethodID(p_env, p_object, "ordinal", "()I")));
         }
     
 };};

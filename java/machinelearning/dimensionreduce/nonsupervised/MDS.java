@@ -30,13 +30,17 @@ package machinelearning.dimensionreduce.nonsupervised;
  **/
 public class MDS<T extends Number> extends machinelearning.Object implements Reduce<T> {
 
-    /** inner class with enum options of projection method **/
+    /** inner class with enum options of projection method
+     * @note order of the enum values must be equal to the order of the C++ class
+     **/
     public enum Project
     {
         METRIC, SAMMON, HIT
     }
     
-    /** inner class with enum options of centering methods **/
+    /** inner class with enum options of centering methods
+     * @note order of the enum values must be equal to the order of the C++ class
+     **/
     public enum Centeroption
     {
         NONE, SINGLECENTER, DOUBLECENTER
