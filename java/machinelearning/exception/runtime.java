@@ -28,7 +28,7 @@ package machinelearning.exception;
 /** runtime exception class equal to the C++ exception
  * $LastChangedDate$
  **/
-public class runtime extends RuntimeException {
+public class Runtime extends RuntimeException {
 
     
     /** constructor **/

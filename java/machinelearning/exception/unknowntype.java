@@ -28,7 +28,7 @@ package machinelearning.exception;
 /** classmethod exception class equal to the C++ exception
  * $LastChangedDate$
  **/
-public class unknowntype extends IllegalArgumentException {
+public class Unknowntype extends IllegalArgumentException {
     
     
     /** constructor **/
@@ -37,7 +37,7 @@ public class unknowntype extends IllegalArgumentException {
     /** constructor
      * @param p_msg message
      **/
-    public unknowntype(String p_msg) { super(p_msg); }
+    public Unknowntype(String p_msg) { super(p_msg); }
     
     
 }

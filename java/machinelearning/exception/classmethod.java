@@ -28,16 +28,16 @@ package machinelearning.exception;
 /** classmethod exception class equal to the C++ exception
  * $LastChangedDate$
  **/
-public class classmethod extends UnsupportedOperationException {
+public class Classmethod extends UnsupportedOperationException {
     
     
     /** constructor **/
-    public classmethod() { super(); }
+    public Classmethod() { super(); }
     
     /** constructor
      * @param p_msg message
      **/
-    public classmethod(String p_msg) { super(p_msg); }
+    public Classmethod(String p_msg) { super(p_msg); }
     
     
 }
