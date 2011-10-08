@@ -27,7 +27,7 @@ import java.util.Random;
 
 
 /** java testprogram for using PCA **/
-public class pcaexample {
+public class pca {
 	
 	
     /** main method
@@ -48,7 +48,7 @@ public class pcaexample {
 		}
 
         // create PCA object for Double datatypes
-        pca<Double> l_pca = new pca<Double>(Double.class, 3);
+        PCA<Double> l_pca = new PCA<Double>(Double.class, 3);
         
         
         // maps the random data points
