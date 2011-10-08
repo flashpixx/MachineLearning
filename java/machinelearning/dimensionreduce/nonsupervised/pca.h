@@ -11,102 +11,102 @@ extern "C" {
 }
 #endif
 #endif
-/* Header for class machinelearning_dimensionreduce_nonsupervised_pca_delegate_double */
+/* Header for class machinelearning_dimensionreduce_nonsupervised_pca_DelegateDouble */
 
-#ifndef _Included_machinelearning_dimensionreduce_nonsupervised_pca_delegate_double
-#define _Included_machinelearning_dimensionreduce_nonsupervised_pca_delegate_double
+#ifndef _Included_machinelearning_dimensionreduce_nonsupervised_pca_DelegateDouble
+#define _Included_machinelearning_dimensionreduce_nonsupervised_pca_DelegateDouble
 #ifdef __cplusplus
 extern "C" {
 #endif
 /*
- * Class:     machinelearning_dimensionreduce_nonsupervised_pca_delegate_double
+ * Class:     machinelearning_dimensionreduce_nonsupervised_pca_DelegateDouble
  * Method:    getDimension
  * Signature: ()I
  */
-JNIEXPORT jint JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00024delegate_1double_getDimension
+JNIEXPORT jint JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00024DelegateDouble_getDimension
   (JNIEnv *, jobject);
 
 /*
- * Class:     machinelearning_dimensionreduce_nonsupervised_pca_delegate_double
+ * Class:     machinelearning_dimensionreduce_nonsupervised_pca_DelegateDouble
  * Method:    map
  * Signature: ([[Ljava/lang/Double;)[[Ljava/lang/Double;
  */
-JNIEXPORT jobjectArray JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00024delegate_1double_map
+JNIEXPORT jobjectArray JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00024DelegateDouble_map
   (JNIEnv *, jobject, jobjectArray);
 
 /*
- * Class:     machinelearning_dimensionreduce_nonsupervised_pca_delegate_double
+ * Class:     machinelearning_dimensionreduce_nonsupervised_pca_DelegateDouble
  * Method:    getProject
  * Signature: ()[[Ljava/lang/Double;
  */
-JNIEXPORT jobjectArray JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00024delegate_1double_getProject
+JNIEXPORT jobjectArray JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00024DelegateDouble_getProject
   (JNIEnv *, jobject);
 
 /*
- * Class:     machinelearning_dimensionreduce_nonsupervised_pca_delegate_double
+ * Class:     machinelearning_dimensionreduce_nonsupervised_pca_DelegateDouble
  * Method:    dispose
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00024delegate_1double_dispose
+JNIEXPORT void JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00024DelegateDouble_dispose
   (JNIEnv *, jobject);
 
 /*
- * Class:     machinelearning_dimensionreduce_nonsupervised_pca_delegate_double
- * Method:    cpp_ctor
+ * Class:     machinelearning_dimensionreduce_nonsupervised_pca_DelegateDouble
+ * Method:    cppCtor
  * Signature: (I)J
  */
-JNIEXPORT jlong JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00024delegate_1double_cpp_1ctor
+JNIEXPORT jlong JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00024DelegateDouble_cppCtor
   (JNIEnv *, jobject, jint);
 
 #ifdef __cplusplus
 }
 #endif
 #endif
-/* Header for class machinelearning_dimensionreduce_nonsupervised_pca_delegate_float */
+/* Header for class machinelearning_dimensionreduce_nonsupervised_pca_DelegateFloat */
 
-#ifndef _Included_machinelearning_dimensionreduce_nonsupervised_pca_delegate_float
-#define _Included_machinelearning_dimensionreduce_nonsupervised_pca_delegate_float
+#ifndef _Included_machinelearning_dimensionreduce_nonsupervised_pca_DelegateFloat
+#define _Included_machinelearning_dimensionreduce_nonsupervised_pca_DelegateFloat
 #ifdef __cplusplus
 extern "C" {
 #endif
 /*
- * Class:     machinelearning_dimensionreduce_nonsupervised_pca_delegate_float
+ * Class:     machinelearning_dimensionreduce_nonsupervised_pca_DelegateFloat
  * Method:    getDimension
  * Signature: ()I
  */
-JNIEXPORT jint JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00024delegate_1float_getDimension
+JNIEXPORT jint JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00024DelegateFloat_getDimension
   (JNIEnv *, jobject);
 
 /*
- * Class:     machinelearning_dimensionreduce_nonsupervised_pca_delegate_float
+ * Class:     machinelearning_dimensionreduce_nonsupervised_pca_DelegateFloat
  * Method:    map
  * Signature: ([[Ljava/lang/Float;)[[Ljava/lang/Float;
  */
-JNIEXPORT jobjectArray JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00024delegate_1float_map
+JNIEXPORT jobjectArray JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00024DelegateFloat_map
   (JNIEnv *, jobject, jobjectArray);
 
 /*
- * Class:     machinelearning_dimensionreduce_nonsupervised_pca_delegate_float
+ * Class:     machinelearning_dimensionreduce_nonsupervised_pca_DelegateFloat
  * Method:    getProject
  * Signature: ()[[Ljava/lang/Float;
  */
-JNIEXPORT jobjectArray JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00024delegate_1float_getProject
+JNIEXPORT jobjectArray JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00024DelegateFloat_getProject
   (JNIEnv *, jobject);
 
 /*
- * Class:     machinelearning_dimensionreduce_nonsupervised_pca_delegate_float
+ * Class:     machinelearning_dimensionreduce_nonsupervised_pca_DelegateFloat
  * Method:    dispose
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00024delegate_1float_dispose
+JNIEXPORT void JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00024DelegateFloat_dispose
   (JNIEnv *, jobject);
 
 /*
- * Class:     machinelearning_dimensionreduce_nonsupervised_pca_delegate_float
- * Method:    cpp_ctor
+ * Class:     machinelearning_dimensionreduce_nonsupervised_pca_DelegateFloat
+ * Method:    cppCtor
  * Signature: (I)J
  */
-JNIEXPORT jlong JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00024delegate_1float_cpp_1ctor
+JNIEXPORT jlong JNICALL Java_machinelearning_dimensionreduce_nonsupervised_pca_00024DelegateFloat_cppCtor
   (JNIEnv *, jobject, jint);
 
 #ifdef __cplusplus

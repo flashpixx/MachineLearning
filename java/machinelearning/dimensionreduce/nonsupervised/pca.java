@@ -56,7 +56,7 @@ public class pca<T extends Number> extends machinelearning.Object implements Red
     
     
     /** delegate class for float datatype **/
-    private class delegate_float implements Strategy<Float> {
+    private class DelegateFloat implements Strategy<Float> {
         
         /** private pointer member **/
         private final long cpp_ptr;
@@ -64,7 +64,7 @@ public class pca<T extends Number> extends machinelearning.Object implements Red
         /** constructor
          * @param p_dim number of dimension
          **/
-        public delegate_float( int p_dim ) { cpp_ptr = cpp_ctor(p_dim); }
+        public DelegateFloat( int p_dim ) { cpp_ptr = cppCtor(p_dim); }
         
         /** returns the number of dimension
          * @return dimension
@@ -88,7 +88,7 @@ public class pca<T extends Number> extends machinelearning.Object implements Red
         /** JNI constructor call
          * @param p_dim nuber of dimension
          **/
-        private native long cpp_ctor( int p_dim );
+        private native long cppCtor( int p_dim );
         
         /** finalizer **/
         protected void finalize() { try { dispose(); } catch(Exception e) {} }
@@ -96,7 +96,7 @@ public class pca<T extends Number> extends machinelearning.Object implements Red
     
     
     /** delegate class for double datatype **/
-    private class delegate_double implements Strategy<Double> {
+    private class DelegateDouble implements Strategy<Double> {
         
         /** private pointer member **/
         private final long cpp_ptr;
@@ -104,7 +104,7 @@ public class pca<T extends Number> extends machinelearning.Object implements Red
         /** constructor
          * @param p_dim number of dimension
          **/
-        public delegate_double( int p_dim ) { cpp_ptr = cpp_ctor(p_dim); }
+        public DelegateDouble( int p_dim ) { cpp_ptr = cppCtor(p_dim); }
         
         /** returns the number of dimension
          * @return dimension
@@ -128,7 +128,7 @@ public class pca<T extends Number> extends machinelearning.Object implements Red
         /** JNI constructor call
          * @param p_dim nuber of dimension
          **/
-        private native long cpp_ctor( int p_dim );
+        private native long cppCtor( int p_dim );
         
         /** finalizer **/
         protected void finalize() { try { dispose(); } catch(Exception e) {} }
@@ -146,10 +146,10 @@ public class pca<T extends Number> extends machinelearning.Object implements Red
      **/
     public pca( Class p_type, int p_dim ) {
         if (p_type == Float.class)
-            m_delegate = (Strategy<T>)(new delegate_float(p_dim));
+            m_delegate = (Strategy<T>)(new DelegateFloat(p_dim));
         else
             if (p_type == Double.class)
-                m_delegate = (Strategy<T>)(new delegate_double(p_dim));
+                m_delegate = (Strategy<T>)(new DelegateDouble(p_dim));
             else
                throw new machinelearning.exception.Unknowntype("datatype can not use with PCA");
     }
