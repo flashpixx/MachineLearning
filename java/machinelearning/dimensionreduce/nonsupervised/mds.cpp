@@ -40,7 +40,7 @@ namespace ublas = boost::numeric::ublas;
 // ======= delegate for double =============================================================================================================================
 
 /** field id that stores the ID that stores the pointer **/
-static jfieldID fidx_machinelearning_dimensionreduce_nonsupervised_mds_delegate_double    = NULL;
+static jfieldID fidx_machinelearning_dimensionreduce_nonsupervised_mds_delegatedouble    = NULL;
 
 /** constructor call for delegate double
  * @param p_env JNI environment
@@ -49,12 +49,12 @@ static jfieldID fidx_machinelearning_dimensionreduce_nonsupervised_mds_delegate_
  * @param p_type enum object with type option
  * @return pointer
  **/
-JNIEXPORT jlong JNICALL Java_machinelearning_dimensionreduce_nonsupervised_mds_00024delegate_1double_cpp_1ctor(JNIEnv* p_env, jobject p_object, jint p_dimension, jobject p_type)
+JNIEXPORT jlong JNICALL Java_machinelearning_dimensionreduce_nonsupervised_MDS_00024DelegateDouble_cppCtor(JNIEnv* p_env, jobject p_object, jint p_dimension, jobject p_type)
 {
     jlong l_ptr = 0;
     
     try {
-        l_ptr = java::jni::createObjectPointer(p_env, p_object, fidx_machinelearning_dimensionreduce_nonsupervised_mds_delegate_double, new dim::mds<double>(p_dimension));
+        l_ptr = java::jni::createObjectPointer(p_env, p_object, fidx_machinelearning_dimensionreduce_nonsupervised_mds_delegatedouble, new dim::mds<double>(p_dimension));
     } catch (const std::exception& e) {
         p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
     }
@@ -66,9 +66,9 @@ JNIEXPORT jlong JNICALL Java_machinelearning_dimensionreduce_nonsupervised_mds_0
  * @param p_env JNI environment
  * @param p_object JNI object
  **/
-JNIEXPORT void JNICALL Java_machinelearning_dimensionreduce_nonsupervised_mds_00024delegate_1double_dispose(JNIEnv* p_env, jobject p_object)
+JNIEXPORT void JNICALL Java_machinelearning_dimensionreduce_nonsupervised_MDS_00024DelegateDouble_dispose(JNIEnv* p_env, jobject p_object)
 {
-    java::jni::disposeObjectPointer< dim::mds<double> >(p_env, p_object, fidx_machinelearning_dimensionreduce_nonsupervised_mds_delegate_double);
+    java::jni::disposeObjectPointer< dim::mds<double> >(p_env, p_object, fidx_machinelearning_dimensionreduce_nonsupervised_mds_delegatedouble);
 }
 
 /** returns the number of project dimension
@@ -76,9 +76,9 @@ JNIEXPORT void JNICALL Java_machinelearning_dimensionreduce_nonsupervised_mds_00
  * @param p_object JNI object
  * @return dimension number
  **/
-JNIEXPORT jint JNICALL Java_machinelearning_dimensionreduce_nonsupervised_mds_00024delegate_1double_getDimension(JNIEnv* p_env, jobject p_object)
+JNIEXPORT jint JNICALL Java_machinelearning_dimensionreduce_nonsupervised_MDS_00024DelegateDouble_getDimension(JNIEnv* p_env, jobject p_object)
 {
-    dim::mds<double>* l_ptr = java::jni::getObjectPointer< dim::mds<double> >(p_env, p_object, fidx_machinelearning_dimensionreduce_nonsupervised_mds_delegate_double);
+    dim::mds<double>* l_ptr = java::jni::getObjectPointer< dim::mds<double> >(p_env, p_object, fidx_machinelearning_dimensionreduce_nonsupervised_mds_delegatedouble);
     return l_ptr->getDimension();
 }
 
@@ -87,9 +87,9 @@ JNIEXPORT jint JNICALL Java_machinelearning_dimensionreduce_nonsupervised_mds_00
  * @param p_object JNI object
  * @param p_iteration number of iterations
  **/
-JNIEXPORT void JNICALL Java_machinelearning_dimensionreduce_nonsupervised_mds_00024delegate_1double_setIteration(JNIEnv* p_env, jobject p_object, jint p_iteration)
+JNIEXPORT void JNICALL Java_machinelearning_dimensionreduce_nonsupervised_MDS_00024DelegateDouble_setIteration(JNIEnv* p_env, jobject p_object, jint p_iteration)
 {
-    dim::mds<double>* l_ptr = java::jni::getObjectPointer< dim::mds<double> >(p_env, p_object, fidx_machinelearning_dimensionreduce_nonsupervised_mds_delegate_double);
+    dim::mds<double>* l_ptr = java::jni::getObjectPointer< dim::mds<double> >(p_env, p_object, fidx_machinelearning_dimensionreduce_nonsupervised_mds_delegatedouble);
     l_ptr->setIteration( static_cast<std::size_t>(p_iteration) );
 }
 
@@ -98,9 +98,9 @@ JNIEXPORT void JNICALL Java_machinelearning_dimensionreduce_nonsupervised_mds_00
  * @param p_object JNI object
  * @param p_step number of steps
  **/
-JNIEXPORT void JNICALL Java_machinelearning_dimensionreduce_nonsupervised_mds_00024delegate_1double_setStep(JNIEnv* p_env, jobject p_object, jint p_step)
+JNIEXPORT void JNICALL Java_machinelearning_dimensionreduce_nonsupervised_MDS_00024DelegateDouble_setStep(JNIEnv* p_env, jobject p_object, jint p_step)
 {
-    dim::mds<double>* l_ptr = java::jni::getObjectPointer< dim::mds<double> >(p_env, p_object, fidx_machinelearning_dimensionreduce_nonsupervised_mds_delegate_double);
+    dim::mds<double>* l_ptr = java::jni::getObjectPointer< dim::mds<double> >(p_env, p_object, fidx_machinelearning_dimensionreduce_nonsupervised_mds_delegatedouble);
     l_ptr->setStep( static_cast<std::size_t>(p_step) );
 }
 
@@ -109,13 +109,13 @@ JNIEXPORT void JNICALL Java_machinelearning_dimensionreduce_nonsupervised_mds_00
  * @param p_object JNI object
  * @param p_rate rate value
  **/
-JNIEXPORT void JNICALL Java_machinelearning_dimensionreduce_nonsupervised_mds_00024delegate_1double_setRate(JNIEnv* p_env, jobject p_object, jobject p_rate)
+JNIEXPORT void JNICALL Java_machinelearning_dimensionreduce_nonsupervised_MDS_00024DelegateDouble_setRate(JNIEnv* p_env, jobject p_object, jobject p_rate)
 {
-    dim::mds<double>* l_ptr = java::jni::getObjectPointer< dim::mds<double> >(p_env, p_object, fidx_machinelearning_dimensionreduce_nonsupervised_mds_delegate_double);
+    dim::mds<double>* l_ptr = java::jni::getObjectPointer< dim::mds<double> >(p_env, p_object, fidx_machinelearning_dimensionreduce_nonsupervised_mds_delegatedouble);
     l_ptr->setRate( p_env->CallDoubleMethod(p_rate, java::jni::getMethodID(p_env, "java/lang/Double", "doubleValue", "()D")) );
 }
 
-JNIEXPORT void JNICALL Java_machinelearning_dimensionreduce_nonsupervised_mds_00024delegate_1double_setCentering(JNIEnv* p_env, jobject p_object, jobject p_center)
+JNIEXPORT void JNICALL Java_machinelearning_dimensionreduce_nonsupervised_MDS_00024DelegateDouble_setCentering(JNIEnv* p_env, jobject p_object, jobject p_center)
 {
     
 }
@@ -126,7 +126,7 @@ JNIEXPORT void JNICALL Java_machinelearning_dimensionreduce_nonsupervised_mds_00
  * @param p_data input data
  * @return mapped data
  **/
-JNIEXPORT jobjectArray JNICALL Java_machinelearning_dimensionreduce_nonsupervised_mds_00024delegate_1double_map(JNIEnv* p_env, jobject p_object, jobjectArray p_data)
+JNIEXPORT jobjectArray JNICALL Java_machinelearning_dimensionreduce_nonsupervised_MDS_00024DelegateDouble_map(JNIEnv* p_env, jobject p_object, jobjectArray p_data)
 {
     // check if the input array is a NULL object, than break with a default NullPointerException
     if (!p_data) {
@@ -142,7 +142,7 @@ JNIEXPORT jobjectArray JNICALL Java_machinelearning_dimensionreduce_nonsupervise
     }
     
     // run MDS with the data and catches exception and sets around zero values to exactly zero for java programmers
-    dim::mds<double>* l_ptr = java::jni::getObjectPointer< dim::mds<double> >(p_env, p_object, fidx_machinelearning_dimensionreduce_nonsupervised_mds_delegate_double);
+    dim::mds<double>* l_ptr = java::jni::getObjectPointer< dim::mds<double> >(p_env, p_object, fidx_machinelearning_dimensionreduce_nonsupervised_mds_delegatedouble);
     ublas::matrix<double> l_result;
     try {
         l_result = tools::matrix::setNumericalZero(l_ptr->map(l_data));

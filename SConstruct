@@ -414,7 +414,7 @@ def target_javac(env, vars) :
     javaplist.extend(targets)
 
     # create JNI stubs and JavaP command (so we add the classes manually)
-    stubs = ["machinelearning.dimensionreduce.nonsupervised.PCA", "machinelearning.dimensionreduce.nonsupervised.mds"]
+    stubs = ["machinelearning.dimensionreduce.nonsupervised.PCA", "machinelearning.dimensionreduce.nonsupervised.MDS"]
     for i in stubs :
         # split file and directory parts and substitute $ to _ and create the headerfile
         parts = i.replace("$", "_").split(".") 

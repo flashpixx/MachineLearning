@@ -28,18 +28,18 @@ package machinelearning.dimensionreduce.nonsupervised;
 /** create the multidimensional scaling (MDS) with different algorithms
  * $LastChangedDate$
  **/
-public class mds<T extends Number> extends machinelearning.Object implements Reduce<T> {
+public class MDS<T extends Number> extends machinelearning.Object implements Reduce<T> {
 
     /** inner class with enum options of projection method **/
-    public enum project
+    public enum Project
     {
-        metric, sammon, hit
+        METRIC, SAMMON, HIT
     }
     
     /** inner class with enum options of centering methods **/
-    public enum centeroption
+    public enum Centeroption
     {
-        none, singlecenter, doublecenter
+        NONE, SINGLECENTER, DOUBLECENTER
     }
             
     
@@ -68,7 +68,7 @@ public class mds<T extends Number> extends machinelearning.Object implements Red
         public void setRate( L p_rate );
         
         /** set centering option **/
-        public void setCentering( centeroption p_center );
+        public void setCentering( Centeroption p_center );
         
         /** map data **/
         public L[][] map( L[][] p_data );
@@ -80,7 +80,7 @@ public class mds<T extends Number> extends machinelearning.Object implements Red
     
     
     /** delegate class for float datatype **/
-    private class delegate_float implements Strategy<Float> {
+    private class DelegateFloat implements Strategy<Float> {
         
         /** private pointer member **/
         private final long cpp_ptr;
@@ -89,7 +89,7 @@ public class mds<T extends Number> extends machinelearning.Object implements Red
          * @param p_dim number of dimension
          * @param p_project project option
          **/
-        public delegate_float( int p_dim, project p_project ) { cpp_ptr = cpp_ctor(p_dim, p_project); }
+        public DelegateFloat( int p_dim, Project p_project ) { cpp_ptr = cppCtor(p_dim, p_project); }
         
         /** returns the number of dimension
          * @return dimension
@@ -112,7 +112,7 @@ public class mds<T extends Number> extends machinelearning.Object implements Red
         public native void setRate( Float p_rate );
         
         /** set centering option **/
-        public native void setCentering( centeroption p_center );
+        public native void setCentering( Centeroption p_center );
         
         /** maps the data
          * @param p_data 2D input array (matrix)
@@ -127,7 +127,7 @@ public class mds<T extends Number> extends machinelearning.Object implements Red
          * @param p_dim nuber of dimension
          * @param p_project project option
          **/
-        private native long cpp_ctor( int p_dim, project p_project );
+        private native long cppCtor( int p_dim, Project p_project );
         
         /** finalizer **/
         protected void finalize() { try { dispose(); } catch(Exception e) {} }
@@ -135,7 +135,7 @@ public class mds<T extends Number> extends machinelearning.Object implements Red
     
     
     /** delegate class for double datatype **/
-    private class delegate_double implements Strategy<Double> {
+    private class DelegateDouble implements Strategy<Double> {
         
         /** private pointer member **/
         private final long cpp_ptr;
@@ -144,7 +144,7 @@ public class mds<T extends Number> extends machinelearning.Object implements Red
          * @param p_dim number of dimension
          * @param p_project project option
          **/
-        public delegate_double( int p_dim, project p_project ) { cpp_ptr = cpp_ctor(p_dim, p_project); }
+        public DelegateDouble( int p_dim, Project p_project ) { cpp_ptr = cppCtor(p_dim, p_project); }
         
         /** returns the number of dimension
          * @return dimension
@@ -167,7 +167,7 @@ public class mds<T extends Number> extends machinelearning.Object implements Red
         public native void setRate( Double p_rate );
         
         /** set centering option **/
-        public native void setCentering( centeroption p_center );
+        public native void setCentering( Centeroption p_center );
         
         /** maps the data
          * @param p_data 2D input array (matrix)
@@ -182,7 +182,7 @@ public class mds<T extends Number> extends machinelearning.Object implements Red
          * @param p_dim nuber of dimension
          * @param p_project project option
          **/
-        private native long cpp_ctor( int p_dim, project p_project );
+        private native long cppCtor( int p_dim, Project p_project );
         
         /** finalizer **/
         protected void finalize() { try { dispose(); } catch(Exception e) {} }
@@ -199,12 +199,12 @@ public class mds<T extends Number> extends machinelearning.Object implements Red
      * @param p_dim number of target dimensions
      * @param p_project projection option
      **/
-    public mds( Class p_type, int p_dim, project p_project ) {
+    public MDS( Class p_type, int p_dim, Project p_project ) {
         if (p_type == Float.class)
-            m_delegate = (Strategy<T>)(new delegate_float(p_dim, p_project));
+            m_delegate = (Strategy<T>)(new DelegateFloat(p_dim, p_project));
         else
             if (p_type == Double.class)
-                m_delegate = (Strategy<T>)(new delegate_double(p_dim, p_project));
+                m_delegate = (Strategy<T>)(new DelegateDouble(p_dim, p_project));
             else
                 throw new machinelearning.exception.Unknowntype("datatype can not use with MDS");
     }
@@ -239,7 +239,7 @@ public class mds<T extends Number> extends machinelearning.Object implements Red
     public void setRate( T p_rate ) { m_delegate.setRate( p_rate ); }
     
     /** set centering option **/
-    public void setCentering( centeroption p_center ) { m_delegate.setCentering( p_center ); }
+    public void setCentering( Centeroption p_center ) { m_delegate.setCentering( p_center ); }
     
     /** dispose for clearing memory **/
     public void dispose() { m_delegate.dispose(); };
