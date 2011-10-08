@@ -28,7 +28,7 @@ package machinelearning.dimensionreduce.nonsupervised;
 /** create the principal component analysis (PCA)
  * $LastChangedDate$
  **/
-public class pca<T extends Number> extends machinelearning.Object implements Reduce<T> {
+public class PCA<T extends Number> extends machinelearning.Object implements Reduce<T> {
     
     /** inner class interface for using the delegate pattern
      * with the conrect type binding of the native class
@@ -144,7 +144,7 @@ public class pca<T extends Number> extends machinelearning.Object implements Red
      * @param p_type reference to the generic type of the class
      * @param p_dim number of target dimensions
      **/
-    public pca( Class p_type, int p_dim ) {
+    public PCA( Class p_type, int p_dim ) {
         if (p_type == Float.class)
             m_delegate = (Strategy<T>)(new DelegateFloat(p_dim));
         else
