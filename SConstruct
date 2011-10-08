@@ -418,7 +418,7 @@ def target_javac(env, vars) :
     for i in stubs :
         # split file and directory parts and substitute $ to _ and create the headerfile
         parts = i.replace("$", "_").split(".") 
-        headerfile = os.sep.join(parts) + ".h"
+        headerfile = (os.sep.join(parts) + ".h").lower()
         
         targets.append( env.Command( headerfile, "", "javah -classpath " + os.path.join(os.curdir, "build", "javalib") + " -o " + os.path.join(os.curdir, "java", headerfile) + " " + i  ) )
                                 

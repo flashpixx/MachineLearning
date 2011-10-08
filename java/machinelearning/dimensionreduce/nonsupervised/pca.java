@@ -33,7 +33,7 @@ public class pca<T extends Number> extends machinelearning.Object implements Red
     /** inner class interface for using the delegate pattern
      * with the conrect type binding of the native class
      **/
-    private interface strategy<L extends Number> extends reduce<L> {
+    private interface strategy<L extends Number> extends Reduce<L> {
         
         /** returning dimensions **/
         public int getDimension();
@@ -151,7 +151,7 @@ public class pca<T extends Number> extends machinelearning.Object implements Red
             if (p_type == Double.class)
                 m_delegate = (strategy<T>)(new delegate_double(p_dim));
             else
-               throw new machinelearning.exception.unknowntype("datatype can not use with PCA");
+               throw new machinelearning.exception.Unknowntype("datatype can not use with PCA");
     }
     
     /** finalizer, that calls the disposer with exception handling **/

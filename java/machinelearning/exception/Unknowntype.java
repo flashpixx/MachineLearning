@@ -32,7 +32,7 @@ public class Unknowntype extends IllegalArgumentException {
     
     
     /** constructor **/
-    public unknowntype() { super(); }
+    public Unknowntype() { super(); }
     
     /** constructor
      * @param p_msg message

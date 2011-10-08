@@ -32,23 +32,23 @@ public class Runtime extends RuntimeException {
 
     
     /** constructor **/
-    public runtime() { super(); }
+    public Runtime() { super(); }
     
     /** constructor 
      * @param p_msg message
      **/
-    public runtime(String p_msg) { super(p_msg); }
+    public Runtime(String p_msg) { super(p_msg); }
     
     /** constructor
      * @param p_msg message
      * @param p_cause cause
      **/
-    public runtime(String p_msg, Throwable p_cause) { super(p_msg, p_cause); }
+    public Runtime(String p_msg, Throwable p_cause) { super(p_msg, p_cause); }
     
     /** constructor
      * @param p_cause
      **/
-    public runtime(Throwable p_cause) { super(p_cause); }
+    public Runtime(Throwable p_cause) { super(p_cause); }
 
 
 }

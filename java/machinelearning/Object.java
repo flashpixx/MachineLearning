@@ -72,7 +72,7 @@ public abstract class Object {
                     
                     try {
                         // extract from the classname the location of the JAR (remove URL prefix jar:file: and suffix after .jar)
-                        String l_jarfile = Class.forName("machinelearning.object").getResource("").toString();
+                        String l_jarfile = Class.forName("machinelearning.Object").getResource("").toString();
                         l_jarfile        = l_jarfile.substring(9, l_jarfile.lastIndexOf(".jar!")) + ".jar";
                     
                         // open the Jar file to get all Jar entries and extract the "native" subdirectory
