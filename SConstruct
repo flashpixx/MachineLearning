@@ -483,7 +483,7 @@ files.extend( getRekusivFiles(os.curdir, env["SHOBJSUFFIX"]) )
 files.extend( getRekusivFiles(os.curdir, env["SHLIBSUFFIX"]) )
 files.extend( getRekusivFiles(os.curdir, ".jnilib") )
 files.extend( getRekusivFiles(os.curdir, ".po~") )
-#files.extend( getRekusivFiles(os.curdir, ".class") )
+files.extend( getRekusivFiles(os.curdir, ".jar") )
 
 env.Clean("clean", files)
 

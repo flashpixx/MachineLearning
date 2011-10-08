@@ -554,7 +554,7 @@ namespace machinelearning { namespace tools { namespace files {
      * @param p_str string type (@see http://www.hdfgroup.org/HDF5/doc/cpplus_RM/classH5_1_1DataType.html)
      * @param p_groups groups for closing
      **/
-    void hdf::createStringSpace( const std::string& p_path, const ublas::vector<std::size_t>& p_dim, const std::size_t& p_strlen, H5::DataSpace& p_dataspace, H5::DataSet& p_dataset, H5::StrType& p_str, std::vector<H5::Group>& p_groups ) const
+    inline void hdf::createStringSpace( const std::string& p_path, const ublas::vector<std::size_t>& p_dim, const std::size_t& p_strlen, H5::DataSpace& p_dataspace, H5::DataSet& p_dataset, H5::StrType& p_str, std::vector<H5::Group>& p_groups ) const
     {
         if (p_dim.size() == 0)
             throw exception::runtime(_("it is at least one dimension requires"), *this);

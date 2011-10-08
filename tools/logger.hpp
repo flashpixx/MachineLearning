@@ -102,7 +102,7 @@ namespace machinelearning { namespace tools {
         private : 
         
             /** local instance **/
-            static logger* m_instance;
+            static logger* m_instance = NULL;
             /** filename for logging output **/
             std::string m_filename;
             /** logstate for writing data **/
