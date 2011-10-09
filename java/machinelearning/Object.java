@@ -40,6 +40,10 @@ public abstract class Object {
     /** static call of the external library, each class that uses the native
      * interface calls must be derivated from this abstract base class, so
      * we create a own glue code of library binding
+     * @bug does not work if system path(es) not set. Depended libraries eg boost_system
+     * are not loaded from the machinelearning-library.
+     * @todo switch to a own classload for loading dynamic libraries with the depend
+     * libraries
      **/
     static { 
         
