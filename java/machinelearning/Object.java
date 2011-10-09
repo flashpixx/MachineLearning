@@ -44,6 +44,9 @@ public abstract class Object {
      * are not loaded from the machinelearning-library.
      * @todo switch to a own classload for loading dynamic libraries with the depend
      * libraries
+     * @todo add with the own classload a memory management so that the classload stores
+     * references to each object that use native calls, so a main classloader call
+     * runs each dispose-method on the native objects for cleaning memory
      **/
     static { 
         

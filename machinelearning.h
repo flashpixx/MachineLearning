@@ -686,17 +686,22 @@
  * @file examples/other/mds_wikipedia.cpp program for reading Wikipedia articles, stopword reduction, distance calculating and MDS plotting
  * @file examples/other/mds_file.cpp program for reading (text) files, stopword reduction, distance calculating and MDS plotting
  * @file examples/other/mds_twitter.cpp program for reading Twitter data and calculating plot with MDS
+ * @file examples/java/reducing/pca.java example java program for using PCA
+ * @file examples/java/reducing/mds.java example java program for using MDS
  *
  * @file java/java.h main include for all JNI functions
  * @file java/jni.hpp register class for connect object data between C++ and Java objects
- * @file java/machinelearning/object.java main abstract interface for JNI interfaces of each object
- * @file java/machinelearning/exception/runtime.java runtime exception (see C++ exception)
- * @file java/machinelearning/exception/classmethod.java classmethod exception (see C++ exception)
- * @file java/machinelearning/exception/unknowntype.java exception if the generic datatype can not be used
- * @file java/machinelearning/dimensionreduce/nonsupervised/reduce.java abstract reduce interface 
- * @file java/machinelearning/dimensionreduce/nonsupervised/pca.java PCA implementation
+ * @file java/machinelearning/Object.java main abstract interface for JNI interfaces of each object
+ * @file java/machinelearning/exception/Runtime.java runtime exception (see C++ exception)
+ * @file java/machinelearning/exception/Classmethod.java classmethod exception (see C++ exception)
+ * @file java/machinelearning/exception/Unknowntype.java exception if the generic datatype can not be used
+ * @file java/machinelearning/dimensionreduce/nonsupervised/Reduce.java abstract reduce interface 
+ * @file java/machinelearning/dimensionreduce/nonsupervised/PCA.java PCA implementation
  * @file java/machinelearning/dimensionreduce/nonsupervised/pca.h JNI stub class of the PCA implementation
  * @file java/machinelearning/dimensionreduce/nonsupervised/pca.cpp implementation of the PCA JNI object
+ * @file java/machinelearning/dimensionreduce/nonsupervised/MDS.java MDS implementation
+ * @file java/machinelearning/dimensionreduce/nonsupervised/mds.h JNI stub class of the MDS implementation
+ * @file java/machinelearning/dimensionreduce/nonsupervised/mds.cpp implementation of the MDS JNI object
  *
  * @file classifier/classifier.h main header for all classifier structurs
  * @file classifier/classifier.hpp header for the abstract class implementation of the classifiers
