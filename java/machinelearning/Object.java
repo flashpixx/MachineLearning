@@ -56,7 +56,7 @@ public abstract class Object {
             
             // library can not load, so define all used libraries
             // in the order that are loaded
-            final String[] l_libraries = {"boost_thread", "boost_system", "machinelearning"};
+            final String[] l_libraries = {"boost_system", "boost_filesystem", "boost_iostreams", "boost_thread", "boost_regex", "machinelearning"};
             
             // create first a temp directory for setting the native libraries
             File l_temp = new File(  System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + "machinelearning" );
