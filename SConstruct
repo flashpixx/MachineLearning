@@ -40,12 +40,12 @@ def configuration_macosx(config, vars, version, architecture) :
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["LIBRARY_PATH"]
     config["compileflags"]      = "-pipe -Wall -pthread -arch "+arch+" -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
-    config["linkto"]            = ["boost_exception", "boost_system", "boost_thread", "boost_iostreams", "boost_filesystem", "boost_regex"]
+    config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "boost_regex"]
 
 
-    # Java target must not linked again boost program options
+    # Java target must not linked again different boost libs
     if not("javac" in COMMAND_LINE_TARGETS) :
-        config["linkto"].extend(["boost_program_options"])
+        config["linkto"].extend(["boost_program_options", "boost_exception", "boost_filesystem"])
 
     if vars["atlaslink"] == "multi" :
         config["linkto"].extend( ["tatlas"] )
@@ -94,12 +94,12 @@ def configuration_posix(config, vars, version, architecture) :
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["LIBRARY_PATH"]
     config["compileflags"]      = "-pipe -Wall -pthread -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
-    config["linkto"]            = ["boost_exception", "boost_system", "boost_thread", "boost_iostreams", "boost_filesystem", "boost_regex"]
-    
-    
-    # Java target must not linked again boost program options
+    config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "boost_regex"]
+
+
+    # Java target must not linked again different boost libs
     if not("javac" in COMMAND_LINE_TARGETS) :
-        config["linkto"].extend(["boost_program_options"])
+        config["linkto"].extend(["boost_program_options", "boost_exception", "boost_filesystem"])
 
     if vars["atlaslink"] == "multi" :
         config["linkto"].extend( ["tatlas"] )
@@ -147,12 +147,13 @@ def configuration_cygwin(config, vars, version, architecture) :
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["PATH"]
     config["compileflags"]      = "-pipe -Wall -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
-    config["linkto"]            = ["boost_exception", "cygboost_system", "cygboost_thread", "cygboost_iostreams", "cygboost_filesystem", "cygboost_regex", "lapack", "cblas", "f77blas", "atlas", "gfortran"]
+    config["linkto"]            = ["boost_exception", "cygboost_system", "cygboost_thread", "cygboost_iostreams", "cygboost_filesystem", "cygboost_regex"]
+    config["linkto"]            = ["cygboost_system", "cygboost_thread", "cygboost_iostreams", "cygboost_regex"]
 
 
-    # Java target must not linked again boost program options
+    # Java target must not linked again different boost libs
     if not("javac" in COMMAND_LINE_TARGETS) :
-        config["linkto"].extend(["cygboost_program_options"])
+        config["linkto"].extend(["cygboost_program_options", "boost_exception", "cygboost_filesystem"])
 
     #Windows Version options see http://msdn.microsoft.com/en-us/library/aa383745%28v=vs.85%29.aspx
     if vars["winver"] == "win7" :
@@ -173,9 +174,9 @@ def configuration_cygwin(config, vars, version, architecture) :
         config["compileflags"] += " -D _WIN32_WINNT=0x0500"
 
     if vars["atlaslink"] == "multi" :
-        config["linkto"].extend( ["tatlas"] )
+        config["linkto"].extend( ["tatlas", "lapack", "cblas", "f77blas", "atlas", "gfortran"] )
     else :
-        config["linkto"].extend( ["satlas"] )
+        config["linkto"].extend( ["satlas", "lapack", "cblas", "f77blas", "atlas", "gfortran"] )
 
     if vars["withdebug"] :
         config["compileflags"]      += " -g"

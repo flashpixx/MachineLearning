@@ -56,7 +56,16 @@ public abstract class Object {
             
             // library can not load, so define all used libraries
             // in the order that are loaded
-            final String[] l_libraries = {"tatlas", "hdf5.7", "hdf5_cpp.7", "boost_system", "boost_filesystem", "boost_iostreams", "boost_thread", "boost_regex", "machinelearning"};
+            
+            
+            // OSX Snow Leopard order
+            final String[] l_libraries = {"tatlas", "hdf5.7", "hdf5_cpp.7", "boost_system", "boost_iostreams", "boost_thread", "boost_regex", "boost_random", "machinelearning"};
+
+            // Ubuntu Linux
+            //final String[] l_libraries = {"satlas", "hdf5.7", "hdf5_cpp.7", "boost_system", "boost_filesystem", "boost_iostreams", "boost_thread", "boost_regex", "boost_random", "machinelearning"};
+
+            
+            
             
             // create first a temp directory for setting the native libraries
             File l_temp = new File(  System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + "machinelearning" );
@@ -75,6 +84,7 @@ public abstract class Object {
         
                     // load library
                     System.load(l_lib);
+                    l_lib = null;
                 }
             } catch (UnsatisfiedLinkError e_link2) {
             
@@ -136,6 +146,7 @@ public abstract class Object {
                     
                     // load library
                     System.load(l_lib);
+                    l_lib = null;
                 }
             }
                 
