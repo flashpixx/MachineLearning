@@ -26,7 +26,6 @@ package machinelearning;
 import java.io.*;
 import java.util.*;
 import java.util.jar.*;
-import java.lang.reflect.*;
 
 
 /** class that must derviated in each object in the package, that uses
@@ -50,84 +49,98 @@ public abstract class Object {
      **/
     static {
 
-        // first try to load the JNI library (first load)
+        // first try to load the JNI library directly
         try {
             System.loadLibrary("machinelearning");
-
         } catch (UnsatisfiedLinkError e_link1) {
-
+            
+            // library can not load, so define all used libraries
+            // in the order that are loaded
+            final String[] l_libraries = {"boost_system", "machinelearning"};
+            
+            // create first a temp directory for setting the native libraries
+            File l_temp = new File(  System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + "machinelearning" );
+            if (!l_temp.isDirectory())
+                l_temp.mkdirs();
+            
+            // try to load the libraries manually from the temporary directory
             try {
-                // property value (like "java.library.path") are cached so we clear the cache manually to allow reloading
-                Field l_syspath = ClassLoader.class.getDeclaredField("sys_paths");
-                l_syspath.setAccessible( true );
-                l_syspath.set( null, null );
-                l_syspath = null;
-            } catch(Exception e_prop) { e_prop.printStackTrace(); } finally {
-
-                // create first a temp directory for setting the native libraries
-                File l_temp = new File(  System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + "machinelearning" );
-                if (!l_temp.isDirectory())
-                    l_temp.mkdirs();
-
-                // add temporary directory to the library path
-                System.setProperty( "java.library.path", System.getProperty("java.library.path") + System.getProperty("path.separator") + l_temp );
-
-                // try to load library with the temporary path (second load)
+                for(String i : l_libraries) {
+                    // create manually path
+                    String l_lib = l_temp + System.getProperty("file.separator") + System.mapLibraryName(i);
+                    
+                    // OSX adds *.jnilib but switch to *.dylib
+                    if (System.getProperty("os.name").toLowerCase().indexOf( "mac" ) >= 0)
+                        l_lib = l_lib.substring(0, l_lib.indexOf(".jnilib")) + ".dylib";
+        
+                    // load library
+                    System.load(l_lib);
+                }
+            } catch (UnsatisfiedLinkError e_link2) {
+            
+                // extract files from the Jar
                 try {
-                    System.loadLibrary("machinelearning");
-                } catch (UnsatisfiedLinkError e_link2) {
-
-                    try {
-                        // extract from the classname the location of the JAR (remove URL prefix jar:file: and suffix after .jar)
-                        String l_jarfile = Class.forName("machinelearning.Object").getResource("").toString();
-                        l_jarfile        = l_jarfile.substring(9, l_jarfile.lastIndexOf(".jar!")) + ".jar";
-
-                        // open the Jar file to get all Jar entries and extract the "native" subdirectory
-                        JarFile l_jar = new JarFile( l_jarfile, true );
-                        Enumeration<JarEntry> l_list = l_jar.entries();
-
-                        while (l_list.hasMoreElements()) {
-
-                            String l_fileentry = l_list.nextElement().getName();
-                            if ( (l_fileentry.startsWith("native/")) && (l_fileentry.charAt(l_fileentry.length()-1) != '/') ) {
-
-                                // copy stream with buffered stream because it's faster
-                                InputStream l_instream            = l_jar.getInputStream(l_jar.getEntry(l_fileentry));
-                                BufferedInputStream l_binstream   = new BufferedInputStream(l_instream);
-
-                                FileOutputStream l_outstream      = new FileOutputStream(l_temp.toString() + System.getProperty("file.separator") + l_fileentry.substring(7, l_fileentry.length()) );
-                                BufferedOutputStream l_boutstream = new BufferedOutputStream(l_outstream);
-
-                                int l_data;
-                                while ((l_data = l_binstream.read ()) != -1)
-                                    l_boutstream.write(l_data);
-
+                    // extract from the classname the location of the JAR (remove URL prefix jar:file: and suffix after .jar)
+                    String l_jarfile = Class.forName("machinelearning.Object").getResource("").toString();
+                    l_jarfile        = l_jarfile.substring(9, l_jarfile.lastIndexOf(".jar!")) + ".jar";
+                    
+                    // open the Jar file to get all Jar entries and extract the "native" subdirectory
+                    JarFile l_jar = new JarFile( l_jarfile, true );
+                    Enumeration<JarEntry> l_list = l_jar.entries();
+                    
+                    while (l_list.hasMoreElements()) {
+                        
+                        String l_fileentry = l_list.nextElement().getName();
+                        if ( (l_fileentry.startsWith("native/")) && (l_fileentry.charAt(l_fileentry.length()-1) != '/') ) {
+                            
+                            // copy stream with buffered stream because it's faster
+                            InputStream l_instream            = l_jar.getInputStream(l_jar.getEntry(l_fileentry));
+                            BufferedInputStream l_binstream   = new BufferedInputStream(l_instream);
+                            
+                            FileOutputStream l_outstream      = new FileOutputStream(l_temp.toString() + System.getProperty("file.separator") + l_fileentry.substring(7, l_fileentry.length()) );
+                            BufferedOutputStream l_boutstream = new BufferedOutputStream(l_outstream);
+                            
+                            int l_data;
+                            while ((l_data = l_binstream.read ()) != -1)
+                                l_boutstream.write(l_data);
+                                
                                 l_binstream.close();
                                 l_instream.close();
-
+                                
                                 l_boutstream.close();
                                 l_outstream.close();
-
+                                
                                 l_binstream  = null;
                                 l_instream   = null;
                                 l_boutstream = null;
                                 l_outstream  = null;
-                            }
-
-                            l_fileentry = null;
-                        }
-
-                        l_list    = null;
-                        l_jar     = null;
-                        l_jarfile = null;
-                    } catch(Exception e_file) { e_file.printStackTrace(); }
-
-                    // last try to load library (third load)
-                    System.loadLibrary("machinelearning");
+                                }
+                        
+                        l_fileentry = null;
+                    }
+                    
+                    l_list    = null;
+                    l_jar     = null;
+                    l_jarfile = null;
+                } catch(Exception e_file) { e_file.printStackTrace(); }
+                
+                
+                // try to load libraries manually
+                for(String i : l_libraries) {
+                    // create manually path
+                    String l_lib = l_temp + System.getProperty("file.separator") + System.mapLibraryName(i);
+                
+                    // OSX adds *.jnilib but switch to *.dylib
+                    if (System.getProperty("os.name").toLowerCase().indexOf( "mac" ) >= 0)
+                        l_lib = l_lib.substring(0, l_lib.indexOf(".jnilib")) + ".dylib";
+                    
+                    // load library
+                    System.load(l_lib);
                 }
-
-                l_temp = null;
             }
+                
+            l_temp = null;
+            
         }
     }
 
