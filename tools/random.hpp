@@ -88,8 +88,9 @@ namespace machinelearning { namespace tools {
                 rayleigh    = 9,
                 chisquared  = 10,
                 pareto      = 11,
-                triangular  = 12
-                //binomial    = 13
+                triangular  = 12,
+                beta        = 13
+                //binomial    = 14
             };
             
             
@@ -133,9 +134,9 @@ namespace machinelearning { namespace tools {
     
     
     
-    #ifdef MACHINELEARNING_RANDOMDEVICE
-    boost::random_device random::m_random;
-    #endif
+    //#ifdef MACHINELEARNING_RANDOMDEVICE
+    //boost::random_device random::m_random;
+    //#endif
     
     
     /** constructor with creating a own number generator
@@ -199,6 +200,7 @@ namespace machinelearning { namespace tools {
             case rayleigh    :       return getRayleigh(   (function::isNumericalZero<T>(p_first) ? 1 : p_first)  );
             case chisquared  :       return getChiSquared( (function::isNumericalZero<T>(p_first) ? 1 : p_first)  );
             case pareto      :       return getPareto(     (function::isNumericalZero<T>(p_first) ? 0 : p_first),   (function::isNumericalZero<T>(p_second) ? 1 : p_second)  );
+            case beta        :       return getBeta(       (function::isNumericalZero<T>(p_first) ? 0 : p_first),   (function::isNumericalZero<T>(p_second) ? 1 : p_second) );
             case triangular  :       return getTriangular( (function::isNumericalZero<T>(p_first) ? 0 : p_first),   (function::isNumericalZero<T>(p_second) ? static_cast<T>(0.5) : p_second),  (function::isNumericalZero<T>(p_third) ? 1 : p_third) );
         }
         
