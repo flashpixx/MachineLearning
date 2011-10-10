@@ -132,21 +132,21 @@ public abstract class Object {
                     l_list    = null;
                     l_jar     = null;
                     l_jarfile = null;
-                } catch(Exception e_file) { e_file.printStackTrace(); }
+                } catch(Exception e_file) { e_file.printStackTrace(); } finally {
                 
-                
-                // try to load libraries manually
-                for(String i : l_libraries) {
-                    // create manually path
-                    String l_lib = l_temp + System.getProperty("file.separator") + System.mapLibraryName(i);
-                
-                    // OSX adds *.jnilib but switch to *.dylib
-                    if (System.getProperty("os.name").toLowerCase().indexOf( "mac" ) >= 0)
-                        l_lib = l_lib.substring(0, l_lib.indexOf(".jnilib")) + ".dylib";
+                    // try to load libraries manually
+                    for(String i : l_libraries) {
+                        // create manually path
+                        String l_lib = l_temp + System.getProperty("file.separator") + System.mapLibraryName(i);
                     
-                    // load library
-                    System.load(l_lib);
-                    l_lib = null;
+                        // OSX adds *.jnilib but switch to *.dylib
+                        if (System.getProperty("os.name").toLowerCase().indexOf( "mac" ) >= 0)
+                            l_lib = l_lib.substring(0, l_lib.indexOf(".jnilib")) + ".dylib";
+                          
+                        // load library
+                        System.load(l_lib);
+                        l_lib = null;
+                    }
                 }
             }
                 

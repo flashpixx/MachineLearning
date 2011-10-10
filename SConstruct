@@ -36,6 +36,7 @@ def configuration_macosx(config, vars, version, architecture) :
     if ver[0] == "10" and ver[1] == "6" :
         arch = "x86_64"
 
+    config["shlinkerflags"]     = ""
     config["linkerflags"]       = ""
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["LIBRARY_PATH"]
@@ -46,6 +47,9 @@ def configuration_macosx(config, vars, version, architecture) :
     # Java target must not linked again different boost libs
     if not("javac" in COMMAND_LINE_TARGETS) :
         config["linkto"].extend(["boost_program_options", "boost_exception", "boost_filesystem"])
+    else :
+        # on the java target the installed name of the library must be set
+        config["shlinkerflags"] = "-install_name ${TARGET.file}"
 
     if vars["atlaslink"] == "multi" :
         config["linkto"].extend( ["tatlas"] )
@@ -90,6 +94,7 @@ def configuration_macosx(config, vars, version, architecture) :
 
 # configuration for Posix (Linux) build
 def configuration_posix(config, vars, version, architecture) :
+    config["shlinkerflags"]     = ""
     config["linkerflags"]       = ""
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["LIBRARY_PATH"]
@@ -143,6 +148,7 @@ def configuration_posix(config, vars, version, architecture) :
 
 # configuration for Windows Cygwin build
 def configuration_cygwin(config, vars, version, architecture) :
+    config["shlinkerflags"]     = ""
     config["linkerflags"]       = "-enable-stdcall-fixup"
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["PATH"]
@@ -245,7 +251,7 @@ def getConfig(vars):
         print "Configuration is empty"
         exit(1)
 
-    for i in [ "compiler", "compileflags", "linkerflags", "include", "librarypath", "linkto" ] :
+    for i in [ "compiler", "compileflags", "linkerflags", "shlinkerflags", "include", "librarypath", "linkto" ] :
         if not(config.has_key(i)) :
             print "field ["+i+"] is not set in the configuration"
             exit(1)
@@ -274,6 +280,8 @@ def getConfig(vars):
     env.Replace(LIBS        = config["linkto"])
     env.Replace(LIBPATH     = config["librarypath"])
     env.Replace(CPPSUFFIXES = [".hpp", ".h", ".cpp"])
+    env.Append(SHLINKFLAGS  = config["shlinkerflags"])
+    
 
     # Scons < 2: env.BuildDir("build", ".", duplicate=0)
     env.VariantDir("build", ".", duplicate=0)
@@ -440,6 +448,8 @@ def target_javac(env, vars) :
     # build SharedLibrary
     sources = getRekusivFiles( os.path.join(os.curdir, "java"), ".cpp")
     targets.append( env.SharedLibrary( target=os.path.join("#build", "javalib", "native", "machinelearning"), source=sources ) )
+    
+    #read with otool -L linked libs and change them with install_name_tool -id / -change depencies and local names on OSX
     
     # build Jar and create Jar Index
     targets.append( env.Command("buildjar", "", "jar cf " + os.path.join(os.curdir, "build", "machinelearning.jar") + " -C " + os.path.join("build", "javalib" ) + " .") )
