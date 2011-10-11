@@ -445,7 +445,12 @@ def target_javac(env, vars, framework) :
         
         targets.append( env.Command( headerfile, "", "javah -classpath " + os.path.join(os.curdir, "build", "javalib") + " -o " + os.path.join(os.curdir, "java", headerfile) + " " + i  ) )
         
-    # copy external libraries in the native directory for Jar adding
+    # build SharedLibrary
+    sources = getRekusivFiles( os.path.join(os.curdir, "java"), ".cpp")
+    sources.extend(framework)
+    targets.append( env.SharedLibrary( target=os.path.join("#build", "javalib", "native", "machinelearning"), source=sources ) )
+
+    # copy external libraries in the native directory for Jar adding (copy works only if target directories exists)
     dirs      = env["LIBPATH"].split(os.pathsep)
     copyfiles = []
     for n in env["LIBS"] :
@@ -454,12 +459,7 @@ def target_javac(env, vars, framework) :
         if libfiles <> None :
             copyfiles.append( Copy(os.path.join("build", "javalib", "native", name), libfiles.path) )
     targets.append( env.Command("copyexternallib", "", copyfiles) )
-        
-                                
-    # build SharedLibrary
-    sources = getRekusivFiles( os.path.join(os.curdir, "java"), ".cpp")
-    sources.extend(framework)
-    targets.append( env.SharedLibrary( target=os.path.join("#build", "javalib", "native", "machinelearning"), source=sources ) )
+
     
     #read with otool -L linked libs and change them with install_name_tool -id / -change depencies and local names on OSX
     
