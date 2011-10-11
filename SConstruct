@@ -5,6 +5,7 @@ import glob
 import string
 import platform
 import sys
+import shutil
 
 
 #=== CLI parameters ===================================================================================================
@@ -282,7 +283,6 @@ def getConfig(vars):
     env.Replace(CPPSUFFIXES = [".hpp", ".h", ".cpp"])
     env.Append(SHLINKFLAGS  = config["shlinkerflags"])
     
-
     # Scons < 2: env.BuildDir("build", ".", duplicate=0)
     env.VariantDir("build", ".", duplicate=0)
     env.Append(CPPPATH=["."])
@@ -330,6 +330,12 @@ def getRekusivFiles(startdir, ending, pdontuse=[], pShowPath=True, pAbsPath=Fals
                 clst.append(i)
 
     return clst
+    
+def fileInDir(filename, directory) :
+    for i in os.listdir(directory) :
+        if i == filename :
+            return True
+    return False
 #=======================================================================================================================================
 
 
@@ -450,6 +456,14 @@ def target_javac(env, vars) :
     targets.append( env.SharedLibrary( target=os.path.join("#build", "javalib", "native", "machinelearning"), source=sources ) )
     
     #read with otool -L linked libs and change them with install_name_tool -id / -change depencies and local names on OSX
+    
+    # copy libs
+    #dirs = env["LIBPATH"].split(os.pathsep)
+    #for n in env["LIBS"] :
+    #    name = env["LIBPREFIX"] + n + env["SHLIBSUFFIX"]
+    #    for i in dirs : 
+    #        if fileInDir(name, i) :
+    #            shutil.copyfile( os.path.join(i, name), os.path.join("build", "javalib", "native", name ) )
     
     # build Jar and create Jar Index
     targets.append( env.Command("buildjar", "", "jar cf " + os.path.join(os.curdir, "build", "machinelearning.jar") + " -C " + os.path.join("build", "javalib" ) + " .") )

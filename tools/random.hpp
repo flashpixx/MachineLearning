@@ -134,9 +134,9 @@ namespace machinelearning { namespace tools {
     
     
     
-    //#ifdef MACHINELEARNING_RANDOMDEVICE
-    //boost::random_device random::m_random;
-    //#endif
+    #ifdef MACHINELEARNING_RANDOMDEVICE
+    boost::random_device random::m_random;
+    #endif
     
     
     /** constructor with creating a own number generator

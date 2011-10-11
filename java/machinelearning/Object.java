@@ -46,6 +46,8 @@ public abstract class Object {
      * @todo add with the own classload a memory management so that the classload stores
      * references to each object that use native calls, so a main classloader call
      * runs each dispose-method on the native objects for cleaning memory
+     * @todo the memory management can be worked with addShutDownHook(), so on this
+     * event objects can be destroyed
      **/
     static {
 

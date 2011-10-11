@@ -136,6 +136,9 @@ namespace machinelearning { namespace tools {
         
     };
     
+    /** initialization of the static class member **/
+    logger::logger* logger::m_instance = NULL;
+    
 
     /** constructor **/
     inline logger::logger( void ) :
