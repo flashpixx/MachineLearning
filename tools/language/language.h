@@ -113,7 +113,7 @@ namespace machinelearning { namespace tools {
             return l_list;
         }
         
-    };
+    }
 
 }}
 #endif

@@ -94,7 +94,7 @@ namespace machinelearning {
                     virtual std::size_t getPrototypeSize( void ) const = 0;
                 
                     /** number of prototypes / classes **/
-                    virtual std::size_t getPrototypeNumber( void ) const = 0;
+                    virtual std::size_t getPrototypeCount( void ) const = 0;
                 
                     /** return the quantizationerror **/
                     virtual std::vector<T> getLoggedQuantizationError( void ) const = 0;

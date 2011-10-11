@@ -295,6 +295,7 @@ namespace machinelearning { namespace tools { namespace files {
     
     
     /** reads a string array from HDF file into a std::vector
+     * @todo switch array to a vector, because it creates pedantic errors
      * @param p_path path to element
      * @return std::vector with std::string elements
      **/
