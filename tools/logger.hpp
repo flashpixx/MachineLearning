@@ -377,8 +377,5 @@ namespace machinelearning { namespace tools {
     #endif
     
     
-};};
-
-
-
+}}
 #endif

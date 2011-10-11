@@ -121,7 +121,5 @@ namespace machinelearning { namespace tools { namespace iostreams {
         return l_res;
     }
 
-};};};
-
-
+}}}
 #endif

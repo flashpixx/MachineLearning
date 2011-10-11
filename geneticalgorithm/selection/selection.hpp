@@ -80,7 +80,6 @@ namespace machinelearning { namespace geneticalgorithm { namespace selection {
         
     };
     
-};};};
-
+}}}
 #endif
 

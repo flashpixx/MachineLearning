@@ -106,7 +106,6 @@ namespace machinelearning {
         };
              
         
-    };
-};
-
+    }
+}
 #endif

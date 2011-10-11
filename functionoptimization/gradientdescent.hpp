@@ -420,7 +420,6 @@ namespace machinelearning { namespace functionaloptimization {
         //}
     }
     
-};};
-
+}}
 #endif
 #endif

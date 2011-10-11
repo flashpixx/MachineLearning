@@ -66,7 +66,6 @@ namespace machinelearning { namespace geneticalgorithm { namespace crossover {
             virtual void onEachIteration( const std::vector< boost::shared_ptr< individual::individual<T> > >& p_population ) = 0;
     };
     
-};};};
-
+}}}
 #endif
 

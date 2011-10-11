@@ -166,5 +166,5 @@ namespace machinelearning { namespace neighborhood {
     
     
     
-};};
+}}
 #endif

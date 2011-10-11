@@ -135,6 +135,5 @@ namespace machinelearning { namespace geneticalgorithm { namespace crossover {
         return l_new;
     }
 
-};};};
-
+}}}
 #endif

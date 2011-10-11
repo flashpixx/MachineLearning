@@ -30,9 +30,9 @@ namespace machinelearning {
     /** namespace for JNI / JAVA wrapper code 
      * $LastChangedDate$
      **/
-    namespace java {};
+    namespace java {}
     
-};
+}
 
 #include "../machinelearning.h"
 #include "jni.hpp"

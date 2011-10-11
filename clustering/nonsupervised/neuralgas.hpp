@@ -205,7 +205,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     template<typename T> inline std::size_t neuralgas<T>::getPrototypeSize( void ) const 
     {
         return m_prototypes.size2();
-    };
+    }
     
     
     /** returns the number of prototypes
@@ -214,7 +214,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     template<typename T> inline std::size_t neuralgas<T>::getPrototypeCount( void ) const 
     {
         return m_prototypes.size1();
-    };
+    }
     
     
     /** returns the quantisation error 
@@ -1054,7 +1054,5 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     
     #endif
     
-};};};
-
-
+}}}
 #endif

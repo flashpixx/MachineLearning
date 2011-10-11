@@ -31,9 +31,9 @@ namespace machinelearning {
     /** namespace for all tools, which are used within the toolbox 
      * $LastChangedDate$
      **/
-    namespace tools {};
+    namespace tools {}
 
-};
+}
 
         
 #include "typeinfo.h"        

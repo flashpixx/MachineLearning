@@ -136,7 +136,7 @@ namespace machinelearning { namespace classifier {
     template<typename T, typename L> inline std::size_t lazylearner<T, L>::getDatabaseSize( void ) const 
     {
         return m_basedata.size2();
-    };
+    }
     
     
     /** returns the number of prototypes
@@ -145,7 +145,7 @@ namespace machinelearning { namespace classifier {
     template<typename T, typename L> inline std::size_t lazylearner<T, L>::getDatabaseCount( void ) const 
     {
         return m_basedata.size1();
-    };
+    }
     
     
     /** enabled / disable logging
@@ -318,6 +318,6 @@ namespace machinelearning { namespace classifier {
     }
     
     
-};};
+}}
 #endif
 

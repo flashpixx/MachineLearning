@@ -61,7 +61,7 @@ namespace boost { namespace lambda {
         typedef typename ublas::vector<T, Allocator>::reference type;
     };
     
-};};
+}}
 
 
 
@@ -299,6 +299,5 @@ namespace machinelearning { namespace tools {
         return l_idx;
     }
     
-};};
-
+}}
 #endif

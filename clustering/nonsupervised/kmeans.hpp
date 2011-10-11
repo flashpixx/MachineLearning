@@ -223,7 +223,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     template<typename T> inline std::size_t kmeans<T>::getPrototypeSize( void ) const 
     {
         return m_prototypes.size2();
-    };
+    }
 
     
     /** returns the number of prototypes
@@ -232,7 +232,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     template<typename T> inline std::size_t kmeans<T>::getPrototypeCount( void ) const 
     {
         return m_prototypes.size1();
-    };
+    }
     
     
     /** calculate the quantization error
@@ -280,5 +280,5 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
 
     
 
-};};};
+}}}
 #endif

@@ -379,5 +379,5 @@ namespace machinelearning { namespace java {
             return static_cast<std::size_t>(p_env->CallIntMethod(p_object, jni::getMethodID(p_env, p_object, "ordinal", "()I")));
         }
     
-};};
+}}
 #endif

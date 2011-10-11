@@ -678,5 +678,5 @@ namespace machinelearning { namespace distances {
     }
     
     
-};};
+}}
 #endif

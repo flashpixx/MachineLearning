@@ -460,6 +460,5 @@ namespace machinelearning { namespace tools {
         return l_mat;
     }
         
-};};
-
+}}
 #endif

@@ -66,7 +66,6 @@ namespace machinelearning { namespace geneticalgorithm { namespace fitness {
         
     };
     
-};};};
-
+}}}
 #endif
 

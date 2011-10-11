@@ -31,9 +31,9 @@ namespace machinelearning {
     /** namespace for all textprocessing algorithm
      * $LastChangedDate$
      **/
-    namespace textprocess {};
+    namespace textprocess {}
     
-};
+}
 
 
 

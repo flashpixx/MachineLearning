@@ -83,7 +83,7 @@ namespace machinelearning { namespace distances {
     template<typename T> inline void euclid<T>::normalize( ublas::vector<T>& p_vec ) const 
     {
         p_vec /= blas::nrm2( p_vec );
-    };
+    }    
     
     
    
@@ -108,7 +108,7 @@ namespace machinelearning { namespace distances {
                     break;
         }
         
-    };
+    }
     
     
     
@@ -121,7 +121,7 @@ namespace machinelearning { namespace distances {
         ublas::vector<T> l_vec = p_vec;
         normalize(l_vec);
         return l_vec;
-    };
+    }
     
     
     
@@ -405,6 +405,5 @@ namespace machinelearning { namespace distances {
     }
     
     
-};};
-
+}}
 #endif

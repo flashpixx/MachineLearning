@@ -97,7 +97,7 @@ namespace machinelearning {
 
             #endif
 
-        };
+        }
         
         
         
@@ -124,8 +124,8 @@ namespace machinelearning {
                 
             };
             
-        };
+        }
         
-    };
-};
+    }
+}
 #endif

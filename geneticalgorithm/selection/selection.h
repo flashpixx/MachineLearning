@@ -30,9 +30,9 @@ namespace machinelearning { namespace geneticalgorithm {
     /** namespace of the genetic algorithms for selection structures
      * $LastChangedDate$
      **/
-    namespace selection {};
+    namespace selection {}
     
-};};
+}}
 
 #include "selection.hpp"
 #include "roulettewheel.hpp"

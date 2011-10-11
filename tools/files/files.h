@@ -32,10 +32,10 @@ namespace machinelearning {
         /** namespace for file support
          * $LastChangedDate$
          **/
-        namespace files {};
+        namespace files {}
     
-    };
-};
+    }
+}
 
 
 #include "csv.hpp"

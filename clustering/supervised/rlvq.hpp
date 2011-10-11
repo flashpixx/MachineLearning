@@ -154,7 +154,7 @@ namespace machinelearning { namespace clustering { namespace supervised {
     template<typename T, typename L> inline std::size_t rlvq<T, L>::getPrototypeSize( void ) const 
     {
         return m_prototypes.size2();
-    };
+    }
 
     
     /** returns the number of prototypes
@@ -163,7 +163,7 @@ namespace machinelearning { namespace clustering { namespace supervised {
     template<typename T, typename L> inline std::size_t rlvq<T, L>::getPrototypeCount( void ) const 
     {
         return m_prototypes.size1();
-    };
+    }
     
     
     /** returns the quantisation error 
@@ -306,6 +306,5 @@ namespace machinelearning { namespace clustering { namespace supervised {
     }
 
 
-};};};
-
+}}}
 #endif

@@ -154,7 +154,6 @@ namespace machinelearning { namespace geneticalgorithm { namespace individual {
     }
     
     
-};};};
-
+}}}
 #endif
 

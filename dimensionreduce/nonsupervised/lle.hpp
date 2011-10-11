@@ -160,5 +160,5 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         
     }
 
-};};};
+}}}
 #endif

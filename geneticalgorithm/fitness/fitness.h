@@ -30,9 +30,9 @@ namespace machinelearning { namespace geneticalgorithm {
     /** namespace of the genetic algorithms for fitness structures
      * $LastChangedDate$
      **/
-    namespace fitness {};
+    namespace fitness {}
     
-};};
+}}
 
 #include "fitness.hpp"
 

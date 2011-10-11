@@ -30,8 +30,8 @@ namespace machinelearning {
     /** namespace with structurs for fitting functions
      * $LastChangedDate$
      **/
-    namespace functionaloptimization {};
-};
+    namespace functionaloptimization {}
+}
 
 #include "gradientdescent.hpp"
 

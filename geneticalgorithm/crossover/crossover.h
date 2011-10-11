@@ -30,9 +30,9 @@ namespace machinelearning { namespace geneticalgorithm {
     /** namespace of the genetic algorithms for crossover structures
      * $LastChangedDate$
      **/
-    namespace crossover {};
+    namespace crossover {}
     
-};};
+}}
 
 #include "crossover.hpp"
 #include "kcrossover.hpp"

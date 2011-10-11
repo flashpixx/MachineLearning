@@ -140,7 +140,5 @@ namespace machinelearning { namespace tools {
     }
     
     
-};};
-
-
+}}
 #endif

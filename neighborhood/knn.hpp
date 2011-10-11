@@ -214,5 +214,5 @@ namespace machinelearning { namespace neighborhood {
         return l_distance;
     }
 
-};};
+}}
 #endif

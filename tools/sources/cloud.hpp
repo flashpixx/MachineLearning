@@ -299,8 +299,6 @@ namespace machinelearning { namespace tools { namespace sources {
 
     }    
     
-};};};
-
-
+}}}
 #endif
 #endif

@@ -30,10 +30,10 @@ namespace machinelearning {
         /** namespace with classes for iostreams (eg URL encoding / decoding)
          * $LastChangedDate$
         **/
-        namespace iostreams {};
+        namespace iostreams {}
         
-    };
-};
+    }
+}
 
 #include "urlencoder.h"
 

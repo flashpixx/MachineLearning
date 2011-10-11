@@ -277,7 +277,5 @@ namespace machinelearning { namespace textprocess {
         }
     }
     
-};};
-
-
+}}
 #endif

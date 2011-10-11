@@ -74,6 +74,6 @@ namespace machinelearning {
             
         };
     
-    };
-};
+    }
+}
 #endif

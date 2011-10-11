@@ -41,10 +41,10 @@ namespace machinelearning {
          * @todo adding support for web-sockets http://www.whatwg.org/specs/web-socket-protocol/
          * @todo adding support for differnt source of http://datacatalogs.org/ 
          **/
-        namespace sources {};
+        namespace sources {}
     
-    };
-};
+    }
+}
 
 #include "nntp.h"
 #include "wikipedia.h"

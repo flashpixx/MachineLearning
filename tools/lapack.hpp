@@ -246,5 +246,5 @@ namespace machinelearning { namespace tools {
         return l_vec;
     }
 
-};};
+}}
 #endif

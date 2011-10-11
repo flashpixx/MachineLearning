@@ -130,6 +130,5 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         return ublas::prod(l_center, m_project);
     }
     
-};};};
-
+}}}
 #endif

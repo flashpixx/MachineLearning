@@ -800,7 +800,7 @@
  * @todo thinking about Corba support for algorithms
  * @todo thinking about abstract middleware for Boinc support (eg patch clustering) http://boinc.berkeley.edu/
  **/
-namespace machinelearning {};
+namespace machinelearning {}
 
 
 #include "exception/exception.h"

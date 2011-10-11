@@ -124,6 +124,5 @@ namespace machinelearning { namespace textprocess {
         return xps::regex_replace(p_text, m_stopwordsexpr, ""); //, boost::match_default | boost::format_all);
     }
 
-};};
-
+}}
 #endif

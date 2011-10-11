@@ -483,7 +483,5 @@ namespace machinelearning { namespace tools {
         return quantile(l_range, l_uniform());
     }
     
-};};
-
-
+}}
 #endif

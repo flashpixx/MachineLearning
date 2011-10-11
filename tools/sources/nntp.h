@@ -634,7 +634,6 @@ namespace machinelearning { namespace tools { namespace sources {
         return m_end != p_it.m_end;
     }
     
-};};};
-
+}}}
 #endif
 #endif
