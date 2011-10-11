@@ -665,6 +665,7 @@
  *
  *
  * @file machinelearning.h main header for including in a project
+ * @file machinelearning.cpp main implementation file of the project, that must be compiled and added to the compile targets
  *
  * @file examples/distance/ncd.cpp testprogram for the normalized compression distance
  * @file examples/clustering/neuralgas.cpp testprogram for the neural gas algorithm
