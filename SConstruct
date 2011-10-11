@@ -330,12 +330,6 @@ def getRekusivFiles(startdir, ending, pdontuse=[], pShowPath=True, pAbsPath=Fals
                 clst.append(i)
 
     return clst
-    
-def fileInDir(filename, directory) :
-    for i in os.listdir(directory) :
-        if i == filename :
-            return True
-    return False
 #=======================================================================================================================================
 
 
@@ -450,6 +444,17 @@ def target_javac(env, vars, framework) :
         headerfile = (os.sep.join(parts) + ".h").lower()
         
         targets.append( env.Command( headerfile, "", "javah -classpath " + os.path.join(os.curdir, "build", "javalib") + " -o " + os.path.join(os.curdir, "java", headerfile) + " " + i  ) )
+        
+    # copy external libraries in the native directory for Jar adding
+    dirs      = env["LIBPATH"].split(os.pathsep)
+    copyfiles = []
+    for n in env["LIBS"] :
+        name     = env["LIBPREFIX"] + n + env["SHLIBSUFFIX"]
+        libfiles = env.FindFile(name, dirs)
+        if libfiles <> None :
+            copyfiles.append( Copy(os.path.join("build", "javalib", "native", name), libfiles.path) )
+    targets.append( env.Command("copyexternallib", "", copyfiles) )
+        
                                 
     # build SharedLibrary
     sources = getRekusivFiles( os.path.join(os.curdir, "java"), ".cpp")
@@ -458,14 +463,7 @@ def target_javac(env, vars, framework) :
     
     #read with otool -L linked libs and change them with install_name_tool -id / -change depencies and local names on OSX
     
-    # copy libs
-    #dirs = env["LIBPATH"].split(os.pathsep)
-    #for n in env["LIBS"] :
-    #    name = env["LIBPREFIX"] + n + env["SHLIBSUFFIX"]
-    #    for i in dirs : 
-    #        if fileInDir(name, i) :
-    #            shutil.copyfile( os.path.join(i, name), os.path.join("build", "javalib", "native", name ) )
-    
+
     # build Jar and create Jar Index
     targets.append( env.Command("buildjar", "", "jar cf " + os.path.join(os.curdir, "build", "machinelearning.jar") + " -C " + os.path.join("build", "javalib" ) + " .") )
 
