@@ -134,11 +134,6 @@ namespace machinelearning { namespace tools {
     
     
     
-    #ifdef MACHINELEARNING_RANDOMDEVICE
-    boost::random_device random::m_random;
-    #endif
-    
-    
     /** constructor with creating a own number generator
      * for multithrading. Read thread-id and create xor
      * with time (and add MPI support, for creating different start values)

@@ -434,7 +434,7 @@ def target_genetic(env, framework) :
     createTarget(env, "ga", path, sources, framework)
 
     
-def target_javac(env, vars) :
+def target_javac(env, vars, framework) :
     # build Java classes
     targets = env.Java(target=os.path.join("#build", "javalib"), source=os.path.join(os.curdir, "java"))
     
@@ -453,6 +453,7 @@ def target_javac(env, vars) :
                                 
     # build SharedLibrary
     sources = getRekusivFiles( os.path.join(os.curdir, "java"), ".cpp")
+    sources.extend(framework)
     targets.append( env.SharedLibrary( target=os.path.join("#build", "javalib", "native", "machinelearning"), source=sources ) )
     
     #read with otool -L linked libs and change them with install_name_tool -id / -change depencies and local names on OSX
@@ -531,15 +532,15 @@ files.extend( getRekusivFiles(os.curdir, ".jar") )
 env.Clean("clean", files)
 
 
-# catch all cpps within the framework directories and compile them to objectfiles into the builddir
+# catch all cpps within the framework directories and compile them to objectfiles into the builddir (manual set for static initializations)
 #framework = getRekusivFiles(os.curdir, ".cpp", ["examples"])
-framework = []
+framework = [ os.path.join( os.curdir, "machinelearning.cpp" ) ]
 
 # create building targets
 target_language( env )
 target_documentation( env )
 
-target_javac( env, vars )
+target_javac( env, vars, framework )
 target_javaexamples( env )
 
 target_sources( env, framework )
