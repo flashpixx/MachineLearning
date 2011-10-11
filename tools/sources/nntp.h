@@ -408,7 +408,7 @@ namespace machinelearning { namespace tools { namespace sources {
      * @param p_articleid std::vector with article IDs within the group (not message id)
      * @return std::vector with string content
      **/
-    std::vector<std::string> nntp::getArticle( const std::string& p_group, const std::vector<std::string>& p_articleid )
+    inline std::vector<std::string> nntp::getArticle( const std::string& p_group, const std::vector<std::string>& p_articleid )
     {
         send("group "+p_group);
         
@@ -459,7 +459,7 @@ namespace machinelearning { namespace tools { namespace sources {
      * @param p_messageid message ID
      * @return bool if exists
      **/
-    bool nntp::existArticle( const std::string& p_messageid )
+    inline bool nntp::existArticle( const std::string& p_messageid )
     {
         const unsigned int l_stat = send("stat "+p_messageid, false);
         switch (l_stat) {
@@ -476,7 +476,7 @@ namespace machinelearning { namespace tools { namespace sources {
      * @param p_articleid article ID
      * @return bool if exists
      **/
-    bool nntp::existArticle( const std::string& p_group, const std::string& p_articleid )
+    inline bool nntp::existArticle( const std::string& p_group, const std::string& p_articleid )
     {
         send("group "+p_group);
         

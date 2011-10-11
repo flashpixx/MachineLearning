@@ -917,7 +917,7 @@ namespace machinelearning { namespace tools { namespace sources {
     /** returns the message id
      * @return message id
      **/
-    unsigned long long twitter::searchtweet::getMessageID( void ) const { return m_msgid; }
+    inline unsigned long long twitter::searchtweet::getMessageID( void ) const { return m_msgid; }
     
     
     /** returns the "create at" field
@@ -1028,7 +1028,7 @@ namespace machinelearning { namespace tools { namespace sources {
     /** returns the message id
      * @return message id
      **/
-    unsigned long long twitter::timelinetweet::getMessageID( void ) const { return m_msgid; }
+    inline unsigned long long twitter::timelinetweet::getMessageID( void ) const { return m_msgid; }
     
     
     /** returns the "create at" field

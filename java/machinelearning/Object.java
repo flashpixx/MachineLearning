@@ -57,8 +57,12 @@ public abstract class Object {
         } catch (UnsatisfiedLinkError e_link1) {
             
             // library can not load, so define all used libraries
-            // in the order that are loaded
+            // in the order that are loaded and mask them with the
+            // c++ style preprocessor commands. The Scons script
+            // sets the correct source line like
+            // final String[] l_libraries = {...};
             
+            //#loadLibrary#
             
             // OSX Snow Leopard order
             final String[] l_libraries = {"tatlas", "hdf5.7", "hdf5_cpp.7", "boost_system", "boost_iostreams", "boost_thread", "boost_regex", "boost_random", "machinelearning"};

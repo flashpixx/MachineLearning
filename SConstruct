@@ -79,7 +79,7 @@ def configuration_macosx(config, vars, version, architecture) :
 
     if vars["withsources"] :
         config["compileflags"]      += " -D MACHINELEARNING_SOURCES -D MACHINELEARNING_SOURCES_TWITTER"
-        config["linkto"].extend( ["xml2", "libjson"] )
+        config["linkto"].extend( ["xml2", "json"] )
 
     if vars["withfiles"] :
         config["compileflags"]      += " -D MACHINELEARNING_FILES -D MACHINELEARNING_FILES_HDF"
@@ -133,7 +133,7 @@ def configuration_posix(config, vars, version, architecture) :
 
     if vars["withsources"] :
         config["compileflags"]      += " -D MACHINELEARNING_SOURCES -D MACHINELEARNING_SOURCES_TWITTER"
-        config["linkto"].extend( ["xml2", "libjson"] )
+        config["linkto"].extend( ["xml2", "json"] )
 
     if vars["withfiles"] :
         config["compileflags"]      += " -D MACHINELEARNING_FILES -D MACHINELEARNING_FILES_HDF"
@@ -205,7 +205,7 @@ def configuration_cygwin(config, vars, version, architecture) :
 
     if vars["withsources"] :
         config["compileflags"]      += " -D MACHINELEARNING_SOURCES -D MACHINELEARNING_SOURCES_TWITTER -D __USE_W32_SOCKETS"
-        config["linkto"].extend( ["cygxml2-2", "ws2_32", "libjson"] )
+        config["linkto"].extend( ["cygxml2-2", "ws2_32", "json"] )
 
     if vars["withfiles"] :
         config["compileflags"]      += " -D MACHINELEARNING_FILES -D MACHINELEARNING_FILES_HDF"
@@ -460,6 +460,8 @@ def target_javac(env, vars, framework) :
             copyfiles.append( Copy(os.path.join("build", "javalib", "native", name), libfiles.path) )
     targets.append( env.Command("copyexternallib", "", copyfiles) )
 
+    #loadlibjava = env["LIBS"].join("\", ")
+    #print loadlibjava
     
     #read with otool -L linked libs and change them with install_name_tool -id / -change depencies and local names on OSX
     
