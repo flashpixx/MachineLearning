@@ -419,7 +419,7 @@ def java_libraryload(target, source, env) :
         javaloadlib = javaloadlib + ", \"satlas\""
     
     if env["withfiles"] :
-        javaloadlib = javaloadlib + ", \"hdf5\", \"hdf5_cpp\" 
+        javaloadlib = javaloadlib + ", \"hdf5\", \"hdf5_cpp\""
     
     javaloadlib = javaloadlib + ", \"machinelearning\"};"
     
@@ -440,8 +440,10 @@ def java_libraryload(target, source, env) :
 # target for building java package    
 def target_javac(env, framework) :
     targets = []
-    
+
+    # running the prebuild process for the native part 
     targets.append( env.Command("precompile", "", java_libraryload) )
+    
     
     # build Java classes
     targets.extend( env.Java(target=os.path.join("#build", "javalib", "binary"), source=os.path.join(os.curdir, "java")) )
