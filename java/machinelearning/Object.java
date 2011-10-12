@@ -64,6 +64,8 @@ public abstract class Object {
             
             //#loadLibrary#
             
+            final String[] l_libraries = {"xxx"};
+            
             // create first a temp directory for setting the native libraries
             File l_temp = new File(  System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + "machinelearning" );
             if (!l_temp.isDirectory())

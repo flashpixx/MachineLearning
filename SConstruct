@@ -400,29 +400,51 @@ def target_cpp(env, framework) :
     createTarget(env, "sources", os.path.join(".", "examples", "sources"), srcSources, framework)
     
     
+    
+# function for setting the library call within the Object.java
+def java_libraryload(target, source, env) :
 
-# target for building java package    
-def target_javac(env, framework) :
-   
     # modify the class Object.java with the names of linked libraries
     jFile = open( os.path.join(os.curdir, "java", "machinelearning", "Object.java"), "r" )
     javasource = jFile.read()
     jFile.close()
     
     javaloadlib = "final String[] l_libraries = {\"boost_system\", \"boost_iostreams\", \"boost_thread\", \"boost_regex\""
-    #if env["withrandomdevice"] :
-    #    javaloadlib = javaloadlib + ", boost_random"
-    #if env["atlaslink"] == "multi" :
-    #    javaloadlib = javaloadlib + ", tatlas"
-    #else :
-    #    javaloadlib = javaloadlib + ", satlas"
+    if env["withrandomdevice"] :
+        javaloadlib = javaloadlib + ", \"boost_random\""
+        
+    if env["atlaslink"] == "multi" :
+        javaloadlib = javaloadlib + ", \"tatlas\""
+    else :
+        javaloadlib = javaloadlib + ", \"satlas\""
+    
+    if env["withfiles"] :
+        javaloadlib = javaloadlib + ", \"hdf5\", \"hdf5_cpp\" 
+    
     javaloadlib = javaloadlib + ", \"machinelearning\"};"
     
-    #print javasource.replace("//#loadLibrary#", javaloadlib, 1)
+    # for writing the file, alls directories must be exists, so create them
+    try :
+        os.makedirs( os.path.join(os.curdir, "build", "javalib") )
+    except Exception :
+        pass
     
+    jFile = open( os.path.join(os.curdir, "build", "javalib", "Object.java"), "w" )
+    jFile.write( javasource.replace("//#loadLibrary#", javaloadlib, 1) )
+    jFile.close()
+        
+    return []
+
+
+
+# target for building java package    
+def target_javac(env, framework) :
+    targets = []
+    
+    targets.append( env.Command("precompile", "", java_libraryload) )
     
     # build Java classes
-    targets = env.Java(target=os.path.join("#build", "javalib"), source=os.path.join(os.curdir, "java"))
+    targets.extend( env.Java(target=os.path.join("#build", "javalib", "binary"), source=os.path.join(os.curdir, "java")) )
     
     # list with Java classes that are used for the JavaP command
     javaplist = []
@@ -435,12 +457,12 @@ def target_javac(env, framework) :
         parts = i.replace("$", "_").split(".") 
         headerfile = (os.sep.join(parts) + ".h").lower()
         
-        targets.append( env.Command( headerfile, "", "javah -classpath " + os.path.join(os.curdir, "build", "javalib") + " -o " + os.path.join(os.curdir, "java", headerfile) + " " + i  ) )
+        targets.append( env.Command( headerfile, "", "javah -classpath " + os.path.join(os.curdir, "build", "javalib", "binary") + " -o " + os.path.join(os.curdir, "java", headerfile) + " " + i  ) )
         
     # build SharedLibrary
     sources = getRekusivFiles( os.path.join(os.curdir, "java"), ".cpp")
     sources.extend(framework)
-    targets.append( env.SharedLibrary( target=os.path.join("#build", "javalib", "native", "machinelearning"), source=sources ) )
+    targets.append( env.SharedLibrary( target=os.path.join("#build", "javalib", "binary", "native", "machinelearning"), source=sources ) )
 
     # copy external libraries in the native directory for Jar adding (copy works only if target directories exists)
     dirs      = env["LIBPATH"].split(os.pathsep)
@@ -449,7 +471,7 @@ def target_javac(env, framework) :
         name     = env["LIBPREFIX"] + n + env["SHLIBSUFFIX"]
         libfiles = env.FindFile(name, dirs)
         if libfiles <> None :
-            copyfiles.append( Copy(os.path.join("build", "javalib", "unative", name), libfiles.path) )
+            copyfiles.append( Copy(os.path.join("build", "javalib", "binary", "native", name), libfiles.path) )
     targets.append( env.Command("copyexternallib", "", copyfiles) )
 
     
@@ -457,7 +479,7 @@ def target_javac(env, framework) :
     
 
     # build Jar and create Jar Index
-    targets.append( env.Command("buildjar", "", "jar cf " + os.path.join(os.curdir, "build", "machinelearning.jar") + " -C " + os.path.join("build", "javalib" ) + " .") )
+    targets.append( env.Command("buildjar", "", "jar cf " + os.path.join(os.curdir, "build", "machinelearning.jar") + " -C " + os.path.join("build", "javalib", "binary" ) + " .") )
 
     env.Alias("javac", targets)
     
