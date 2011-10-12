@@ -5,7 +5,6 @@ import glob
 import string
 import platform
 import sys
-import shutil
 
 
 #=== CLI parameters ===================================================================================================
@@ -15,6 +14,7 @@ def createVariables(vars) :
     vars.Add(BoolVariable("withmultilanguage", "installation with multilanguage support", False))
     vars.Add(BoolVariable("withsources", "installation with source like nntp or something else", False))
     vars.Add(BoolVariable("withfiles", "installation with file reading support for CSV & HDF", True))
+    vars.Add(BoolVariable("withlogger", "use the interal logger of the framework", False))
     vars.Add(BoolVariable("withsymbolicmath", "compile for using symbolic math expression (needed by gradient descent)", False))
 
     vars.Add(BoolVariable("withdebug", "compile with debug information", False))
@@ -41,7 +41,7 @@ def configuration_macosx(config, vars, version, architecture) :
     config["linkerflags"]       = ""
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["LIBRARY_PATH"]
-    config["compileflags"]      = "-pipe -Wall -pthread -arch "+arch+" -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
+    config["compileflags"]      = "-pipe -Wall -Wextra -pthread -arch "+arch+" -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
     config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "boost_regex"]
 
 
@@ -91,6 +91,9 @@ def configuration_macosx(config, vars, version, architecture) :
         
     if vars["withoptimize"] :
         config["compileflags"]      += " -O2 -Os -s -mfpmath=sse -finline-functions -mtune="+vars["cputype"]
+        
+    if vars["withlogger"] :
+        config["compileflags"]      += " -D MACHINELEARNING_LOGGER"
 
 
 # configuration for Posix (Linux) build
@@ -99,7 +102,7 @@ def configuration_posix(config, vars, version, architecture) :
     config["linkerflags"]       = ""
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["LIBRARY_PATH"]
-    config["compileflags"]      = "-pipe -Wall -pthread -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
+    config["compileflags"]      = "-pipe -Wall -Wextra -pthread -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
     config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "boost_regex"]
 
 
@@ -145,6 +148,9 @@ def configuration_posix(config, vars, version, architecture) :
         
     if vars["withoptimize"] :
         config["compileflags"]      += " -O2 -Os -s -mfpmath=sse -finline-functions -mtune="+vars["cputype"]
+        
+    if vars["withlogger"] :
+        config["compileflags"]      += " -D MACHINELEARNING_LOGGER"
 
 
 # configuration for Windows Cygwin build
@@ -153,7 +159,7 @@ def configuration_cygwin(config, vars, version, architecture) :
     config["linkerflags"]       = "-enable-stdcall-fixup"
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["PATH"]
-    config["compileflags"]      = "-pipe -Wall -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
+    config["compileflags"]      = "-pipe -Wall -Wextra -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
     config["linkto"]            = ["cygboost_system", "cygboost_thread", "cygboost_iostreams", "cygboost_regex"]
 
 
@@ -217,6 +223,9 @@ def configuration_cygwin(config, vars, version, architecture) :
         
     if vars["withoptimize"] :
         config["compileflags"]      += " -O2 -Os -s -mfpmath=sse -finline-functions -mtune="+vars["cputype"]
+        
+    if vars["withlogger"] :
+        config["compileflags"]      += " -D MACHINELEARNING_LOGGER"
 #=======================================================================================================================================
 
 
@@ -429,6 +438,24 @@ def target_genetic(env, framework) :
 
     
 def target_javac(env, vars, framework) :
+   
+    # modify the class Object.java with the names of linked libraries
+    jFile = open( os.path.join(os.curdir, "java", "machinelearning", "Object.java"), "r" )
+    javasource = jFile.read()
+    jFile.close()
+    
+    javaloadlib = "final String[] l_libraries = {\"boost_system\", \"boost_iostreams\", \"boost_thread\", \"boost_regex\""
+    #if vars["withrandomdevice"] :
+    #    javaloadlib = javaloadlib + ", boost_random"
+    #if vars["atlaslink"] == "multi" :
+    #    javaloadlib = javaloadlib + ", tatlas"
+    #else :
+    #    javaloadlib = javaloadlib + ", satlas"
+    javaloadlib = javaloadlib + ", \"machinelearning\"};"
+    
+    #print javasource.replace("//#loadLibrary#", javaloadlib, 1)
+    
+    
     # build Java classes
     targets = env.Java(target=os.path.join("#build", "javalib"), source=os.path.join(os.curdir, "java"))
     
@@ -457,11 +484,9 @@ def target_javac(env, vars, framework) :
         name     = env["LIBPREFIX"] + n + env["SHLIBSUFFIX"]
         libfiles = env.FindFile(name, dirs)
         if libfiles <> None :
-            copyfiles.append( Copy(os.path.join("build", "javalib", "native", name), libfiles.path) )
+            copyfiles.append( Copy(os.path.join("build", "javalib", "unative", name), libfiles.path) )
     targets.append( env.Command("copyexternallib", "", copyfiles) )
 
-    #loadlibjava = env["LIBS"].join("\", ")
-    #print loadlibjava
     
     #read with otool -L linked libs and change them with install_name_tool -id / -change depencies and local names on OSX
     
@@ -469,7 +494,7 @@ def target_javac(env, vars, framework) :
     # build Jar and create Jar Index
     targets.append( env.Command("buildjar", "", "jar cf " + os.path.join(os.curdir, "build", "machinelearning.jar") + " -C " + os.path.join("build", "javalib" ) + " .") )
 
-    env.Alias("javac", targets)
+    #env.Alias("javac", targets)
     
     
 def target_javaexamples(env) :
@@ -534,7 +559,9 @@ env.Clean("clean", files)
 
 # catch all cpps within the framework directories and compile them to objectfiles into the builddir (manual set for static initializations)
 #framework = getRekusivFiles(os.curdir, ".cpp", ["examples"])
-framework = [ os.path.join( os.curdir, "machinelearning.cpp" ) ]
+framework = []
+if env["withlogger"] or env["withrandomdevice"] :
+    framework.append( os.path.join( os.curdir, "machinelearning.cpp" ) )
 
 # create building targets
 target_language( env )

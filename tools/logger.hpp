@@ -21,7 +21,7 @@
  @endcond
  **/
 
-
+#ifdef MACHINELEARNING_LOGGER
 #ifndef __MACHINELEARNING_TOOLS_LOGGER_HPP
 #define __MACHINELEARNING_TOOLS_LOGGER_HPP
 
@@ -378,4 +378,5 @@ namespace machinelearning { namespace tools {
     
     
 }}
+#endif
 #endif

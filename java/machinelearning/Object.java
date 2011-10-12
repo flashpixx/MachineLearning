@@ -64,20 +64,12 @@ public abstract class Object {
             
             //#loadLibrary#
             
-            // OSX Snow Leopard order
-            final String[] l_libraries = {"tatlas", "hdf5.7", "hdf5_cpp.7", "boost_system", "boost_iostreams", "boost_thread", "boost_regex", "boost_random", "machinelearning"};
-
-            // Ubuntu Linux
-            //final String[] l_libraries = {"satlas", "hdf5.7", "hdf5_cpp.7", "boost_system", "boost_filesystem", "boost_iostreams", "boost_thread", "boost_regex", "boost_random", "machinelearning"};
-
-            
-            
-            
             // create first a temp directory for setting the native libraries
             File l_temp = new File(  System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + "machinelearning" );
             if (!l_temp.isDirectory())
                 l_temp.mkdirs();
             
+                
             // try to load the libraries manually from the temporary directory
             try {
                 for(String i : l_libraries) {
@@ -93,6 +85,10 @@ public abstract class Object {
                     l_lib = null;
                 }
             } catch (UnsatisfiedLinkError e_link2) {
+                
+                // extract the machinelearning library first and try to load them
+                // on error extract all other libraries
+                
             
                 // extract files from the Jar
                 try {

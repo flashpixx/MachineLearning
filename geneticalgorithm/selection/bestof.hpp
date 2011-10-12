@@ -91,12 +91,10 @@ namespace machinelearning { namespace geneticalgorithm { namespace selection {
      * @param p_start start value of the elite values
      * @param p_end end value of the elite values ([start, end) elite elements must be created)
      * @param p_population const reference to the population
-     * @param p_fitness vector with fitnss values (index is equal to the index of the population)
      * @param p_rankIndex rank index (first index has the position of the population element, that has the smalles fitness value)
-     * @param p_rank rank values (first element equal to polulation index has the rank value of the first individual)
      * @param p_elite vector with elite individual
      **/
-    template<typename T, typename L> inline void bestof<T,L>::getElite( const std::size_t& p_start, const std::size_t& p_end, const std::vector< boost::shared_ptr< individual::individual<L> > >& p_population, const ublas::vector<T>& p_fitness, const ublas::vector<std::size_t>& p_rankIndex, const ublas::vector<std::size_t>& p_rank, std::vector< boost::shared_ptr< individual::individual<L> > >& p_elite )
+    template<typename T, typename L> inline void bestof<T,L>::getElite( const std::size_t& p_start, const std::size_t& p_end, const std::vector< boost::shared_ptr< individual::individual<L> > >& p_population, const ublas::vector<T>&, const ublas::vector<std::size_t>& p_rankIndex, const ublas::vector<std::size_t>&, std::vector< boost::shared_ptr< individual::individual<L> > >& p_elite )
     {
         const std::size_t l_end = std::min(p_end, m_number);
 

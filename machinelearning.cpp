@@ -37,7 +37,9 @@ namespace machinelearning {
     #endif
     
     /** initialization of the logger instance **/
+    #ifdef MACHINELEARNING_LOGGER
     tools::logger::logger* tools::logger::m_instance = NULL;
+    #endif
     
 }
 

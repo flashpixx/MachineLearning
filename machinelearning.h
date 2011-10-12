@@ -65,7 +65,7 @@
  *
  * @section def definition / style guide
  * <ul>
- * <li>the framework is only header-based so you don't need compile any files</li>
+ * <li>the framework is only header-based so you don't need compile any files (except logger or random device support is needed, than the <dfn>machinelearnig.cpp</dfn> must compiled and linked)</li>
  * <li>data points should be matrix data and the matrix is row-orientated, so for K data points with every point dimension P, we have a K x P matrix (prototype matrices are equal)</li>
  * <li>all template classes / algorithms must have a floating point datatype on instantiation, because the datastructurs need this types for correct value calculating. The (base) classes use a static 
  * assertion for checking the value type</li>
@@ -99,6 +99,7 @@
  * <ul>
  * <li><dfn>MACHINELEARNING_RANDOMDEVICE</dfn> for using the Boost Device Random support (requires Boost Random Device Support), otherwise a Mersenne Twister is used</li>
  * <li><dfn>MACHINELEARNING_MULTILANGUAGE</dfn> option for compiling the framework with multilanguage support (uses gettext)</li>
+ * <li><dfn>MACHINELEARNING_LOGGER</dfn> option for using a own logger</li>
  * <li><dfn>MACHINELEARNING_FILES</dfn> adds the support for file reading and writing (default CSV). Special file support can be set with the following flags<ul>
  * <li><dfn>MACHINELEARNING_FILES_HDF</dfn> Hierarchical Data Format support</li>
  * </ul></li>
@@ -125,6 +126,7 @@
  * <li><dfn>withrandomdevice</dfn> adds the compilerflag for random device support</li>
  * <li><dfn>withmpi</dfn> adds the compilerflag for cluster / MPI support</li>
  * <li><dfn>withmultilanguage</dfn> adds the multilanguage support with gettext</li>
+ * <li><dfn>withlogger</li> compiles a own logger class within the framework</li>
  * <li><dfn>withsources</dfn> support for the namespace machinelearning::tools::sources</li>
  * <li><dfn>withfiles</dfn> support for the namespace machinelearning::tools::files</li>
  * <li><dfn>withsymbolicmath</dfn> support for symbolic math (eg: gradient descent)</li>
