@@ -546,7 +546,8 @@ namespace machinelearning { namespace tools { namespace sources {
         boost::asio::streambuf l_response;
         std::istream l_response_stream(&l_response);
         
-        while (boost::asio::read(m_socket, l_response, boost::asio::transfer_at_least(1), l_error));
+        while (boost::asio::read(m_socket, l_response, boost::asio::transfer_at_least(1), l_error))
+            ;
         
         if (l_error != boost::asio::error::eof)
             throw exception::runtime(_("data can not be received"), *this);

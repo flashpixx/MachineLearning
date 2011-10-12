@@ -679,7 +679,8 @@ namespace machinelearning { namespace tools { namespace sources {
         // read each headerline, because on the socket can be more data than the header
         // so we read them until the header ends
         std::string l_header;
-        while (std::getline(l_response_stream, l_header) && l_header != "\r");
+        while (std::getline(l_response_stream, l_header) && l_header != "\r")
+            ;
         
         // read content data into a string stream
         std::ostringstream l_content( std::stringstream::binary );
@@ -688,7 +689,8 @@ namespace machinelearning { namespace tools { namespace sources {
             l_content << &l_response;
         
         boost::system::error_code l_error;
-        while (boost::asio::read(p_socket, l_response, boost::asio::transfer_at_least(1), l_error));
+        while (boost::asio::read(p_socket, l_response, boost::asio::transfer_at_least(1), l_error))
+            ;
         
         if (l_error != boost::asio::error::eof)
             throw exception::runtime(_("data can not be received"), *this);

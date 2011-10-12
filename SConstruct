@@ -345,7 +345,7 @@ def getRekusivFiles(startdir, ending, pdontuse=[], pShowPath=True, pAbsPath=Fals
 
 #=== build targets =====================================================================================================================
 
-# create compiling options
+# create target
 def createTarget(env, alias, path, sources, framework) :
     lst = []
     if sources.count == 0 :
@@ -361,83 +361,48 @@ def createTarget(env, alias, path, sources, framework) :
 
 
 
-
-def target_sources(env, framework) :
-    path = os.path.join(".", "examples", "sources")
-    sources = []
-
-    if env["withsources"] :
-        sources.extend( ["twitter.cpp", "newsgroup.cpp", "wikipedia.cpp"] )
-
-    if env["withfiles"] :
-        sources.append( "cloud.cpp" )
-
-    createTarget(env, "sources", path, sources, framework)
-
-
-def target_clustering(env, framework) :
-    path = os.path.join(".", "examples", "clustering")
-    sources = []
-
-    if env["withfiles"] :
-        sources.extend( ["rlvq.cpp", "kmeans.cpp", "neuralgas.cpp", "patch_neuralgas.cpp", "relational_neuralgas.cpp", "spectral.cpp"] )
-
-    createTarget(env, "clustering", path, sources, framework)
-
-
-def target_reducing(env, framework) :
-    path = os.path.join(".", "examples", "reducing")
-    sources = []
-
-    if env["withfiles"] :
-        sources.extend( ["lda.cpp", "mds.cpp", "pca.cpp"] )
-
-    createTarget(env, "reducing", path, sources, framework)
-
-
-def target_distance(env, framework) :
-    path = os.path.join(".", "examples", "distance")
-    sources = []
-
-    if env["withfiles"] :
-        sources.extend( ["ncd.cpp"] )
-
-    createTarget(env, "distance", path, sources, framework)
-
-
-def target_classifier(env, framework) :
-    path = os.path.join(".", "examples", "classifier")
-    sources = []
-
-    if env["withfiles"] :
-        sources.extend( ["lazy.cpp"] )
-
-    createTarget(env, "classifier", path, sources, framework)
-
-
-def target_other(env, framework) :
-    path = os.path.join(".", "examples", "other")
-    sources = []
-
-    if env["withfiles"] and env["withsources"] :
-        sources.extend( ["mds_nntp.cpp", "mds_wikipedia.cpp", "mds_twitter.cpp"] )
-
-    if env["withfiles"] :
-        sources.append("mds_file.cpp")
-
-    createTarget(env, "other", path, sources, framework)
-
-
-def target_genetic(env, framework) :
-    path = os.path.join(".", "examples", "geneticalgorithm")
-    sources = []
-
-    sources.extend( ["knapsack.cpp"] )
-
-    createTarget(env, "ga", path, sources, framework)
-
+# target for building CPP examples
+def target_cpp(env, framework) :
+    createTarget(env, "ga", os.path.join(".", "examples", "geneticalgorithm"), ["knapsack.cpp"], framework)
     
-def target_javac(env, vars, framework) :
+    srcOther = []
+    if env["withfiles"] and env["withsources"] :
+        srcOther.extend( ["mds_nntp.cpp", "mds_wikipedia.cpp", "mds_twitter.cpp"] )
+    if env["withfiles"] :
+        srcOther.append("mds_file.cpp")
+    createTarget(env, "other", os.path.join(".", "examples", "other"), srcOther, framework)
+    
+    srcClassifier = []
+    if env["withfiles"] :
+        srcClassifier.extend( ["lazy.cpp"] )
+    createTarget(env, "classifier", os.path.join(".", "examples", "classifier"), srcClassifier, framework)
+    
+    srcDistance = []
+    if env["withfiles"] :
+        srcDistance.extend( ["ncd.cpp"] )
+    createTarget(env, "distance", os.path.join(".", "examples", "distance"), srcDistance, framework)
+    
+    srcReduce = []
+    if env["withfiles"] :
+        srcReduce.extend( ["lda.cpp", "mds.cpp", "pca.cpp"] )
+    createTarget(env, "reducing", os.path.join(".", "examples", "reducing"), srcReduce, framework)
+    
+    srcCluster = []
+    if env["withfiles"] :
+        srcCluster.extend( ["rlvq.cpp", "kmeans.cpp", "neuralgas.cpp", "patch_neuralgas.cpp", "relational_neuralgas.cpp", "spectral.cpp"] )
+    createTarget(env, "clustering", os.path.join(".", "examples", "clustering"), srcCluster, framework)
+    
+    srcSources = []
+    if env["withsources"] :
+        srcSources.extend( ["twitter.cpp", "newsgroup.cpp", "wikipedia.cpp"] )
+    if env["withfiles"] :
+        srcSources.append( "cloud.cpp" )
+    createTarget(env, "sources", os.path.join(".", "examples", "sources"), srcSources, framework)
+    
+    
+
+# target for building java package    
+def target_javac(env, framework) :
    
     # modify the class Object.java with the names of linked libraries
     jFile = open( os.path.join(os.curdir, "java", "machinelearning", "Object.java"), "r" )
@@ -445,9 +410,9 @@ def target_javac(env, vars, framework) :
     jFile.close()
     
     javaloadlib = "final String[] l_libraries = {\"boost_system\", \"boost_iostreams\", \"boost_thread\", \"boost_regex\""
-    #if vars["withrandomdevice"] :
+    #if env["withrandomdevice"] :
     #    javaloadlib = javaloadlib + ", boost_random"
-    #if vars["atlaslink"] == "multi" :
+    #if env["atlaslink"] == "multi" :
     #    javaloadlib = javaloadlib + ", tatlas"
     #else :
     #    javaloadlib = javaloadlib + ", satlas"
@@ -494,14 +459,18 @@ def target_javac(env, vars, framework) :
     # build Jar and create Jar Index
     targets.append( env.Command("buildjar", "", "jar cf " + os.path.join(os.curdir, "build", "machinelearning.jar") + " -C " + os.path.join("build", "javalib" ) + " .") )
 
-    #env.Alias("javac", targets)
+    env.Alias("javac", targets)
     
     
+    
+# targets for building java examples
 def target_javaexamples(env) :
     # set classpath only for example compiling (jar file must be set within the build directory)
     env.Alias("javareduce", env.Java(target=os.path.join("#build", "java", "reduce"), source=os.path.join(os.curdir, "examples", "java", "reducing"), JAVACLASSPATH = [os.path.join(os.curdir, "build", "machinelearning.jar")]) )
     
     
+    
+# target for building language files
 def target_language(env) :
     sources = []
     for i in env["CPPSUFFIXES"] :
@@ -567,14 +536,7 @@ if env["withlogger"] or env["withrandomdevice"] :
 target_language( env )
 target_documentation( env )
 
-target_javac( env, vars, framework )
+target_javac( env, framework )
 target_javaexamples( env )
 
-target_sources( env, framework )
-target_clustering( env, framework )
-target_reducing( env, framework )
-target_distance(env, framework )
-target_classifier(env, framework )
-target_other(env, framework )
-target_genetic(env, framework )
-
+target_cpp(env, framework )
