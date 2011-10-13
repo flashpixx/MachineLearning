@@ -50,7 +50,7 @@ def configuration_macosx(config, vars, version, architecture) :
         config["linkto"].extend(["boost_program_options", "boost_exception", "boost_filesystem"])
     else :
         # on the java target the installed name of the library must be set
-        config["shlinkerflags"] = "-install_name ${TARGET.file}"
+        config["shlinkerflags"] = "-install_name ${TARGET.file} -headerpad_max_install_name"
 
     if vars["atlaslink"] == "multi" :
         config["linkto"].extend( ["tatlas"] )
@@ -407,48 +407,31 @@ def target_cpp(env, framework) :
     createTarget(env, "sources", os.path.join(".", "examples", "sources"), srcSources, framework)
     
     
-    
-# function for setting the library call within the Object.java
-def java_libraryload(target, source, env) :
+# change the library calls under OSX    
+def java_osxlinkedlibs(target, source, env) :
+    global otoolChange
 
-    # modify the class Object.java with the names of linked libraries
-    jFile = open( os.path.join(os.curdir, "java", "machinelearning", "Object.tmp"), "r" )
-    javasource = jFile.read()
-    jFile.close()
+    oFile = open( os.path.join(os.curdir, "build", "linkedlibs.txt"), "r" )
+    libs = oFile.read()
+    oFile.close()
+
+    # split string on each space
+    names = []
+    lines = libs.split()
     
-    # create library list
-    javaloadlib = [ "\"boost_system\"", "\"boost_iostreams\"", "\"boost_thread\"", "\"boost_regex\"" ]
-    if env["withrandomdevice"] :
-        javaloadlib.append("\"boost_random\"")
-        
-    if env["atlaslink"] == "multi" :
-        javaloadlib.append("\"tatlas\"")
-    else :
-        javaloadlib.append("\"satlas\"")
+    # test each linked library to the otool results
+    for n in env["LIBS"] :
+        for i in lines :
+            if n in i :
+                names.append(i)
     
-    if env["withfiles"] :
-        javaloadlib.extend( ["\"hdf5\"", "\"hdf5_cpp\""] )
-        
-    if env["withsymbolicmath"] :
-        javaloadlib.append("\"ginac\"")
-        
-    if env["withsources"] :
-        javaloadlib.append("\"json\"")
+    # build change list
+    change = []
+    for i in names :
+        change.append("-change " + i + " @loader_path" + os.path.sep + i.split(os.sep)[-1])
     
-    javaloadlib.append("\"machinelearning\"")
-    
-    
-    # for writing the file, alls directories must be exists, so create them
-    try :
-        os.makedirs( os.path.join(os.curdir, "build", "javalib") )
-    except Exception :
-        pass
-    
-    # replacing "//#loadLibrary#" with the correct Java code and save the file within the build directory
-    jFile = open( os.path.join(os.curdir, "java", "machinelearning", "Object.java"), "w" )
-    jFile.write( javasource.replace("//#loadLibrary#", "final String[] l_libraries = {" + ", ".join(javaloadlib) + "};", 1) )
-    jFile.close()
-        
+    # run the build command on a system shell
+    os.system( "install_name_tool " + " ".join(change) + " " + os.path.join("build", "javalib", "native", env["LIBPREFIX"]+"machinelearning"+env["SHLIBSUFFIX"]) )
     return []
 
 
@@ -457,18 +440,8 @@ def java_libraryload(target, source, env) :
 def target_javac(env, framework) :
     targets = []
 
-    # move original Object.java into a temp name
-    targets.append( env.Command("Object.tmp", "", Move(os.path.join(os.curdir, "java", "machinelearning", "Object.tmp"), os.path.join(os.curdir, "java", "machinelearning", "Object.java")) ) )
-
-    # running the prebuild process for the native part (it creates a new Object.java)
-    targets.append( targets.append( env.Command("precompile", "", java_libraryload) ) )
-    
     # compile Java classes
     targets.append( targets.extend( env.Java(target=os.path.join("#build", "javalib"), source=os.path.join(os.curdir, "java")) ) )
-    
-    # delete temp file and move original class back
-    targets.append( env.Command("Object.java", "", Delete(os.path.join(os.curdir, "java", "machinelearning", "Object.java")) ) )
-    targets.append( env.Command("Object.java", "", Move( os.path.join(os.curdir, "java", "machinelearning", "Object.java"), os.path.join(os.curdir, "java", "machinelearning", "Object.tmp")) ) )
 
     # list with Java classes that are used for the JavaP command
     javaplist = []
@@ -487,6 +460,13 @@ def target_javac(env, framework) :
     sources = getRekusivFiles( os.path.join(os.curdir, "java"), ".cpp")
     sources.extend(framework)
     targets.append( env.SharedLibrary( target=os.path.join("#build", "javalib", "native", "machinelearning"), source=sources ) )
+    
+    # on OSX the path of the linked libraries within the libmachinelearning.dylib must be changed to @loader_path/<library>
+    if env['PLATFORM'].lower() == "darwin" :
+        targets.append( env.Command("createlibrarynames", "", "otool -L " + os.path.join("build", "javalib", "native", env["LIBPREFIX"]+"machinelearning"+env["SHLIBSUFFIX"]) + " > " + os.path.join("build", "linkedlibs.txt") ) )
+        targets.append( env.Command("linkedlibs", "", java_osxlinkedlibs) ) 
+        targets.append( env.Command("libnames.txt", "", Delete(os.path.join(os.curdir, "build", "linkedlibs.txt")) ) )
+        
 
     # copy external libraries in the native directory for Jar adding (copy works only if target directories exists)
     dirs      = env["LIBPATH"].split(os.pathsep)
@@ -497,11 +477,7 @@ def target_javac(env, framework) :
         if libfiles <> None :
             copyfiles.append( Copy(os.path.join("build", "javalib", "native", name), libfiles.path) )
     targets.append( env.Command("copyexternallib", "", copyfiles) )
-
     
-    #read with otool -L linked libs and change them with install_name_tool -id / -change depencies and local names on OSX
-    
-
     # build Jar and create Jar Index
     targets.append( env.Command("buildjar", "", "jar cf " + os.path.join(os.curdir, "build", "machinelearning.jar") + " -C " + os.path.join("build", "javalib" ) + " .") )
     

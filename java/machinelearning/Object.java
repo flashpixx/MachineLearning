@@ -69,27 +69,17 @@ public abstract class Object {
             File l_temp = new File(  System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + "machinelearning" );
             if (!l_temp.isDirectory())
                 l_temp.mkdirs();
+                
+            String l_lib = l_temp + System.getProperty("file.separator") + System.mapLibraryName("machinelearning");
+            // OSX adds *.jnilib but switch to *.dylib
+            if (System.getProperty("os.name").toLowerCase().indexOf( "mac" ) >= 0)
+                l_lib = l_lib.substring(0, l_lib.indexOf(".jnilib")) + ".dylib";
             
                 
             // try to load the libraries manually from the temporary directory
             try {
-                for(String i : l_libraries) {
-                    // create manually path
-                    String l_lib = l_temp + System.getProperty("file.separator") + System.mapLibraryName(i);
-                    
-                    // OSX adds *.jnilib but switch to *.dylib
-                    if (System.getProperty("os.name").toLowerCase().indexOf( "mac" ) >= 0)
-                        l_lib = l_lib.substring(0, l_lib.indexOf(".jnilib")) + ".dylib";
-        
-                    // load library
-                    System.load(l_lib);
-                    l_lib = null;
-                }
+                System.load(l_lib);
             } catch (UnsatisfiedLinkError e_link2) {
-                
-                // extract the machinelearning library first and try to load them
-                // on error extract all other libraries
-                
             
                 // extract files from the Jar
                 try {
@@ -136,25 +126,11 @@ public abstract class Object {
                     l_jar     = null;
                     l_jarfile = null;
                 } catch(Exception e_file) { e_file.printStackTrace(); } finally {
-                
-                    // try to load libraries manually
-                    for(String i : l_libraries) {
-                        // create manually path
-                        String l_lib = l_temp + System.getProperty("file.separator") + System.mapLibraryName(i);
-                    
-                        // OSX adds *.jnilib but switch to *.dylib
-                        if (System.getProperty("os.name").toLowerCase().indexOf( "mac" ) >= 0)
-                            l_lib = l_lib.substring(0, l_lib.indexOf(".jnilib")) + ".dylib";
-                          
-                        // load library
-                        System.load(l_lib);
-                        l_lib = null;
-                    }
+                    System.load(l_lib);
                 }
             }
-                
+            l_lib = null;
             l_temp = null;
-            
         }
     }
 
