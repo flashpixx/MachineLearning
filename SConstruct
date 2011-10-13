@@ -428,7 +428,11 @@ def java_osxlinkedlibs(target, source, env) :
     # build change list
     change = []
     for i in names :
-        change.append("-change " + i + " @loader_path" + os.path.sep + i.split(os.sep)[-1])
+        name = i.split(os.sep)[-1]
+        # remove all other dotsparts
+        parts = name.split(".")
+        change.append("-change " + i + " @loader_path" + os.path.sep + ".".join([parts[0], parts[-1]]))
+    change = unique(change)
     
     # run the build command on a system shell
     os.system( "install_name_tool " + " ".join(change) + " " + os.path.join("build", "javalib", "native", env["LIBPREFIX"]+"machinelearning"+env["SHLIBSUFFIX"]) )
@@ -480,6 +484,7 @@ def target_javac(env, framework) :
     
     # build Jar and create Jar Index
     targets.append( env.Command("buildjar", "", "jar cf " + os.path.join(os.curdir, "build", "machinelearning.jar") + " -C " + os.path.join("build", "javalib" ) + " .") )
+    targets.append( env.Command("buildjarindex", "", "jar i " + os.path.join(os.curdir, "build", "machinelearning.jar") ) )
     
     env.Alias("javac", targets)
     
