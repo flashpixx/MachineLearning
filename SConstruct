@@ -428,6 +428,12 @@ def java_libraryload(target, source, env) :
     
     if env["withfiles"] :
         javaloadlib.extend( ["\"hdf5\"", "\"hdf5_cpp\""] )
+        
+    if env["withsymbolicmath"] :
+        javaloadlib.append("\"ginac\"")
+        
+    if env["withsources"] :
+        javaloadlib.append("\"json\"")
     
     javaloadlib.append("\"machinelearning\"")
     
