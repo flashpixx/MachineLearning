@@ -475,13 +475,19 @@ def target_javac(env, framework) :
     # copy external libraries in the native directory for Jar adding (copy works only if target directories exists)
     dirs      = env["LIBPATH"].split(os.pathsep)
     copyfiles = []
+    fqnname   = []
     for n in env["LIBS"] :
-        name     = env["LIBPREFIX"] + n + env["SHLIBSUFFIX"]
-        libfiles = env.FindFile(name, dirs)
+        libfiles = env.FindFile(env["LIBPREFIX"] + n + env["SHLIBSUFFIX"], dirs)
         if libfiles <> None :
             # remove any symbolic names, so the file in the native directory becomes the original filename
-            copyfiles.append( Copy(os.path.join("build", "javalib", "native", os.path.realpath(libfiles.path).split(os.path.sep)[-1]), libfiles.path) )
+            name = os.path.realpath(libfiles.path).split(os.path.sep)[-1]
+            fqnname.append(name)
+            copyfiles.append( Copy(os.path.join("build", "javalib", "native", name), libfiles.path) )
     targets.append( env.Command("copyexternallib", "", copyfiles) )
+    
+    # on Linux all libraries must use the filename, that is set with the "soname" within the library or filename must be changed to "soname"
+    if env['PLATFORM'].lower() == "posix" :
+	print fqnname
     
     # build Jar and create Jar Index
     targets.append( env.Command("buildjar", "", "jar cf " + os.path.join(os.curdir, "build", "machinelearning.jar") + " -C " + os.path.join("build", "javalib" ) + " .") )
