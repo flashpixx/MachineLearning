@@ -109,6 +109,8 @@ def configuration_posix(config, vars, version, architecture) :
     # Java target must not linked again different boost libs
     if not("javac" in COMMAND_LINE_TARGETS) :
         config["linkto"].extend(["boost_program_options", "boost_exception", "boost_filesystem"])
+    else :
+	config["linkerflags"] += " -Wl,-rpath,./"
 
     if vars["atlaslink"] == "multi" :
         config["linkto"].extend( ["tatlas"] )
