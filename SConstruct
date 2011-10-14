@@ -429,9 +429,7 @@ def java_osxlinkedlibs(target, source, env) :
     change = []
     for i in names :
         name = i.split(os.sep)[-1]
-        # remove all other dotsparts
-        parts = name.split(".")
-        change.append("-change " + i + " @loader_path" + os.path.sep + ".".join([parts[0], parts[-1]]))
+        change.append("-change " + i + " @loader_path" + os.path.sep + name)
     change = unique(change)
     
     # run the build command on a system shell
@@ -479,7 +477,8 @@ def target_javac(env, framework) :
         name     = env["LIBPREFIX"] + n + env["SHLIBSUFFIX"]
         libfiles = env.FindFile(name, dirs)
         if libfiles <> None :
-            copyfiles.append( Copy(os.path.join("build", "javalib", "native", name), libfiles.path) )
+            # remove any symbolic names, so the file in the native directory becomes the original filename
+            copyfiles.append( Copy(os.path.join("build", "javalib", "native", os.path.realpath(libfiles.path).split(os.path.sep)[-1]), libfiles.path) )
     targets.append( env.Command("copyexternallib", "", copyfiles) )
     
     # build Jar and create Jar Index
