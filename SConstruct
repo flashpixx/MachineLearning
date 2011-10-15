@@ -444,8 +444,9 @@ def java_osxlinkedlibs(target, source, env) :
 def java_linuxsonames(target, source, env) :
 
     # read all files within the native directory and get the SONAME of each library and change the filename
-    for root, dirs, filenames in os.walk( os.path.join(os.curdir, "build", "javalib", "native") ) :
-        os.system( "objdump -p " + filenames + " | grep -i soname | awk '{print \"mv " + filenames + " \"$2}'" )
+    for root, dirs, filenames in os.walk(os.path.join("build", "javalib", "native")) :
+        for filename in filenames :
+    	    os.system( "objdump -p build/javalib/native/" + filename + " | grep -i soname | awk '{system(\"mv build/javalib/native/" + filename + " build/javalib/native/\"$2)}'" )
 
     return []
 
