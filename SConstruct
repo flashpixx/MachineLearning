@@ -440,8 +440,23 @@ def java_osxlinkedlibs(target, source, env) :
 
 
 
+# changes the library calls under Linux (sonames)
+def java_linuxsonames(target, source, env) :
+
+    # read all files within the native directory and get the SONAME of each library and change the filename
+    for root, dirs, filenames in os.walk( os.path.join(os.curdir, "build", "javalib", "native") ) :
+        os.system( "objdump -p " + filenames + " | grep -i soname | awk '{print \"mv " + filenames + " \"$2}'" )
+
+    return []
+
+
+
 # target for building java package    
 def target_javac(env, framework) :
+    if env["withmpi"] :
+        print "MPI build does not work with Java"
+        sys.exit(1)
+
     targets = []
 
     # compile Java classes
@@ -475,19 +490,18 @@ def target_javac(env, framework) :
     # copy external libraries in the native directory for Jar adding (copy works only if target directories exists)
     dirs      = env["LIBPATH"].split(os.pathsep)
     copyfiles = []
-    fqnname   = []
     for n in env["LIBS"] :
         libfiles = env.FindFile(env["LIBPREFIX"] + n + env["SHLIBSUFFIX"], dirs)
         if libfiles <> None :
             # remove any symbolic names, so the file in the native directory becomes the original filename
             name = os.path.realpath(libfiles.path).split(os.path.sep)[-1]
-            fqnname.append(name)
+
             copyfiles.append( Copy(os.path.join("build", "javalib", "native", name), libfiles.path) )
     targets.append( env.Command("copyexternallib", "", copyfiles) )
     
     # on Linux all libraries must use the filename, that is set with the "soname" within the library or filename must be changed to "soname"
     if env['PLATFORM'].lower() == "posix" :
-	print fqnname
+        targets.append( env.Command("sonames", "", java_linuxsonames) ) 
     
     # build Jar and create Jar Index
     targets.append( env.Command("buildjar", "", "jar cf " + os.path.join(os.curdir, "build", "machinelearning.jar") + " -C " + os.path.join("build", "javalib" ) + " .") )
