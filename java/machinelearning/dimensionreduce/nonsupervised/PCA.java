@@ -28,12 +28,14 @@ package machinelearning.dimensionreduce.nonsupervised;
 /** create the principal component analysis (PCA)
  * $LastChangedDate$
  **/
-public class PCA<T extends Number> extends machinelearning.Object implements Reduce<T> {
+public class PCA<T extends Number> extends machinelearning.Object implements Reduce<T>
+{
     
     /** inner class interface for using the delegate pattern
      * with the conrect type binding of the native class
      **/
-    private interface Strategy<L extends Number> extends Reduce<L> {
+    private interface Strategy<L extends Number> extends Reduce<L>
+    {
         
         /** returning dimensions **/
         public int getDimension();
@@ -56,7 +58,8 @@ public class PCA<T extends Number> extends machinelearning.Object implements Red
     
     
     /** delegate class for float datatype **/
-    private class DelegateFloat implements Strategy<Float> {
+    private class DelegateFloat implements Strategy<Float>
+    {
         
         /** private pointer member **/
         private final long cpp_ptr;
@@ -96,7 +99,8 @@ public class PCA<T extends Number> extends machinelearning.Object implements Red
     
     
     /** delegate class for double datatype **/
-    private class DelegateDouble implements Strategy<Double> {
+    private class DelegateDouble implements Strategy<Double>
+    {
         
         /** private pointer member **/
         private final long cpp_ptr;
@@ -144,7 +148,8 @@ public class PCA<T extends Number> extends machinelearning.Object implements Red
      * @param p_type reference to the generic type of the class
      * @param p_dim number of target dimensions
      **/
-    public PCA( Class p_type, int p_dim ) {
+    public PCA( Class p_type, int p_dim )
+    {
         if (p_type == Float.class)
             m_delegate = (Strategy<T>)(new DelegateFloat(p_dim));
         else

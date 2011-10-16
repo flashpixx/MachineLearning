@@ -21,24 +21,14 @@
  @endcond
  **/
 
-package machinelearning.dimensionreduce.nonsupervised;
+package machinelearning.util;
 
 
-/** abstract class for nonsupervised project algorithms
+
+/** mathematic algorithms
  * $LastChangedDate$
  **/
-interface Reduce<T extends Number>
+public class Math extends machinelearning.Object
 {
-    
-    /** map method that reduce the data
-     * @param p_data input data
-     * @return project data
-     **/
-    abstract public T[][] map( T[][] p_data );
-    
-    /** returns the number of target dimension
-     * @return number of dimension
-     **/
-    abstract int getDimension();
 
 }

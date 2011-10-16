@@ -33,7 +33,8 @@ import java.util.jar.*;
  * clearing memory management and loading native library
  * $LastChangedDate$
  **/
-public abstract class Object {
+public abstract class Object
+{
 
 
     /** static call of the external library, each class that uses the native
