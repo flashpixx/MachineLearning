@@ -514,8 +514,11 @@ def target_javac(env, framework) :
     
 # targets for building java examples
 def target_javaexamples(env) :
+
     # set classpath only for example compiling (jar file must be set within the build directory)
+
     env.Alias("javareduce", env.Java(target=os.path.join("#build", "java", "reduce"), source=os.path.join(os.curdir, "examples", "java", "reducing"), JAVACLASSPATH = [os.path.join(os.curdir, "build", "machinelearning.jar")]) )
+    env.Alias("javautil", env.Java(target=os.path.join("#build", "java", "util"), source=os.path.join(os.curdir, "examples", "java", "util"), JAVACLASSPATH = [os.path.join(os.curdir, "build", "machinelearning.jar")]) )
     
     
     
