@@ -28,7 +28,51 @@ package machinelearning.util;
 /** mathematic algorithms
  * $LastChangedDate$
  **/
-public class Math extends machinelearning.Object
+public class Math
 {
 
+    /** creates eigenvalues and -vectors of a squared matrix for float types
+     * @param p_matrix input matrix
+     * @param p_eigenvalues return eigenvalues
+     * @param p_eigenvectors return 2D array with eigenvectors (array elements p_eigenvector[i][0..n-1] is the i-th eigenvector)
+     **/
+    public static native void eigen( Float[][] p_matrix, Float[] p_eigenvalues, Float[][] p_eigenvectors );
+    
+    /** creates eigenvalues and -vectors of a squared matrix for double types
+     * @param p_matrix input matrix
+     * @param p_eigenvalues return eigenvalues
+     * @param p_eigenvectors return 2D array with eigenvectors (array elements p_eigenvector[i][0..n-1] is the i-th eigenvector)
+     **/
+    public static native void eigen( Double[][] p_matrix, Double[] p_eigenvalues, Double[][] p_eigenvectors );
+    
+    /** creates the singular value decomposition for float types
+     * @param p_matrix input matrix
+     * @param p_svdval eigenvalues
+     * @param p_svdvec1 eigenvectors (equal to eigen)
+     * @param p_svdvec2 eigenvectors (equal to eigen)
+     **/
+    public static native void svd( Float[][] p_matrix, Float[] p_svdval, Float[][] p_svdvec1, Float[][] p_svdvec2 );
+    
+    /** creates the singular value decomposition for double types
+     * @param p_matrix input matrix
+     * @param p_svdval eigenvalues
+     * @param p_svdvec1 eigenvectors (equal to eigen)
+     * @param p_svdvec2 eigenvectors (equal to eigen)
+     **/
+    public static native void svd( Double[][] p_matrix, Double[] p_svdval, Double[][] p_svdvec1, Double[][] p_svdvec2 );
+    
+    /** returns the largest eigenvector with perron-frobenius algorithm for float types
+     * @param p_matrix input matrix
+     * @param p_iteration number of iterations
+     * @return eigenvector 
+     **/
+    public static native Float[] perronfrobenius( Float[][] p_matrix, int p_iteration );
+    
+    /** returns the largest eigenvector with perron-frobenius algorithm for double types
+     * @param p_matrix input matrix
+     * @param p_iteration number of iterations
+     * @return eigenvector 
+     **/
+    public static native Double[] perronfrobenius( Double[][] p_matrix, int p_iteration );
+    
 }
