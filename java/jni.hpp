@@ -24,6 +24,7 @@
 #ifndef __MACHINELEARNING_JAVA_JNI_HPP
 #define __MACHINELEARNING_JAVA_JNI_HPP
 
+#include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 
 #include <jni.h>
@@ -53,6 +54,8 @@ namespace machinelearning { namespace java {
                 static ublas::matrix<float> getFloatMatrixFrom2DArray( JNIEnv*, const jobjectArray& );
                 static jobjectArray getJObjectArrayFromMatrix( JNIEnv*, const ublas::matrix<double>& );
                 static jobjectArray getJObjectArrayFromMatrix( JNIEnv*, const ublas::matrix<float>& );
+                static jobjectArray getJObjectArrayFromVector( JNIEnv*, const ublas::vector<double>& );
+                static jobjectArray getJObjectArrayFromVector( JNIEnv*, const ublas::vector<float>& );
                 static std::size_t getEnumOrdinalValue( JNIEnv*, const jobject& );
             
         };
@@ -377,6 +380,50 @@ namespace machinelearning { namespace java {
         inline std::size_t jni::getEnumOrdinalValue( JNIEnv* p_env, const jobject& p_object )
         {
             return static_cast<std::size_t>(p_env->CallIntMethod(p_object, jni::getMethodID(p_env, p_object, "ordinal", "()I")));
+        }
+    
+    
+        /** converts a ublas::vector to a java array
+         * @param p_env JNI environment
+         * @param p_data vector
+         * @return java array
+         **/
+        inline jobjectArray jni::getJObjectArrayFromVector( JNIEnv* p_env, const ublas::vector<double>& p_data )
+        {
+            if (p_data.size() == 0)
+                return (jobjectArray)p_env->NewGlobalRef(NULL);
+            
+            jclass l_elementclass   = NULL;
+            jmethodID l_elementctor = NULL;
+            java::jni::getCtor(p_env, "java/lang/Double", "(D)V", l_elementclass, l_elementctor);
+            
+            jobjectArray l_vec = p_env->NewObjectArray( static_cast<jint>(p_data.size()), l_elementclass, NULL );
+            for(std::size_t i=0; i < p_data.size(); ++i)
+                p_env->SetObjectArrayElement(l_vec, i, p_env->NewObject(l_elementclass, l_elementctor, p_data(i)) );
+            
+            return l_vec;
+        }
+    
+    
+        /** converts a ublas::vector to a java array
+         * @param p_env JNI environment
+         * @param p_data vector
+         * @return java array
+         **/
+        inline jobjectArray jni::getJObjectArrayFromVector( JNIEnv* p_env, const ublas::vector<float>& p_data )
+        {
+            if (p_data.size() == 0)
+                return (jobjectArray)p_env->NewGlobalRef(NULL);
+            
+            jclass l_elementclass   = NULL;
+            jmethodID l_elementctor = NULL;
+            java::jni::getCtor(p_env, "java/lang/Float", "(F)V", l_elementclass, l_elementctor);
+            
+            jobjectArray l_vec = p_env->NewObjectArray( static_cast<jint>(p_data.size()), l_elementclass, NULL );
+            for(std::size_t i=0; i < p_data.size(); ++i)
+                p_env->SetObjectArrayElement(l_vec, i, p_env->NewObject(l_elementclass, l_elementctor, p_data(i)) );
+            
+            return l_vec;
         }
     
 }}

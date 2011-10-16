@@ -46,7 +46,22 @@ namespace ublas = boost::numeric::ublas;
  **/
 JNIEXPORT void JNICALL Java_machinelearning_util_Math_eigen___3_3Ljava_lang_Float_2_3Ljava_lang_Float_2_3_3Ljava_lang_Float_2(JNIEnv* p_env, jclass, jobjectArray p_matrix, jobjectArray p_eigenvalues, jobjectArray p_eigenvectors)
 {
+    const ublas::matrix<float> l_data = java::jni::getFloatMatrixFrom2DArray( p_env, p_matrix ); 
     
+    ublas::vector<float> l_eigenval;
+    ublas::matrix<float> l_eigenvec;
+    try {
+        tools::lapack::eigen( l_data, l_eigenval, l_eigenvec );
+    }  catch (const std::exception& e) {
+        p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
+        
+        p_eigenvalues  = (jobjectArray)p_env->NewGlobalRef(NULL);
+        p_eigenvectors = (jobjectArray)p_env->NewGlobalRef(NULL);
+        return;
+    }
+    
+    p_eigenvalues  = java::jni::getJObjectArrayFromVector( p_env, tools::vector::setNumericalZero(l_eigenval) );
+    p_eigenvectors = java::jni::getJObjectArrayFromMatrix( p_env, tools::matrix::setNumericalZero(l_eigenvec) );
 }
 
 
@@ -58,7 +73,22 @@ JNIEXPORT void JNICALL Java_machinelearning_util_Math_eigen___3_3Ljava_lang_Floa
  **/
 JNIEXPORT void JNICALL Java_machinelearning_util_Math_eigen___3_3Ljava_lang_Double_2_3Ljava_lang_Double_2_3_3Ljava_lang_Double_2(JNIEnv* p_env, jclass, jobjectArray p_matrix, jobjectArray p_eigenvalues, jobjectArray p_eigenvectors)
 {
+    const ublas::matrix<double> l_data = java::jni::getDoubleMatrixFrom2DArray( p_env, p_matrix ); 
     
+    ublas::vector<double> l_eigenval;
+    ublas::matrix<double> l_eigenvec;
+    try {
+        tools::lapack::eigen( l_data, l_eigenval, l_eigenvec );
+    }  catch (const std::exception& e) {
+        p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
+        
+        p_eigenvalues  = (jobjectArray)p_env->NewGlobalRef(NULL);
+        p_eigenvectors = (jobjectArray)p_env->NewGlobalRef(NULL);
+        return;
+    }
+    
+    p_eigenvalues  = java::jni::getJObjectArrayFromVector( p_env, tools::vector::setNumericalZero(l_eigenval) );
+    p_eigenvectors = java::jni::getJObjectArrayFromMatrix( p_env, tools::matrix::setNumericalZero(l_eigenvec) );
 }
 
 
@@ -96,7 +126,17 @@ JNIEXPORT void JNICALL Java_machinelearning_util_Math_svd___3_3Ljava_lang_Double
  **/
 JNIEXPORT jobjectArray JNICALL Java_machinelearning_util_Math_perronfrobenius___3_3Ljava_lang_Float_2I(JNIEnv* p_env, jclass, jobjectArray p_matrix, jint p_iteration)
 {
+    const ublas::matrix<float> l_data = java::jni::getFloatMatrixFrom2DArray( p_env, p_matrix ); 
     
+    ublas::vector<float> l_vec;
+    try {
+        l_vec = tools::vector::setNumericalZero( tools::lapack::perronfrobenius(l_data, static_cast<std::size_t>(p_iteration)) );
+    }  catch (const std::exception& e) {
+        p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
+        return (jobjectArray)p_env->NewGlobalRef(NULL);
+    }
+    
+    return java::jni::getJObjectArrayFromVector( p_env, l_vec );
 }
 
 
@@ -108,5 +148,15 @@ JNIEXPORT jobjectArray JNICALL Java_machinelearning_util_Math_perronfrobenius___
  **/
 JNIEXPORT jobjectArray JNICALL Java_machinelearning_util_Math_perronfrobenius___3_3Ljava_lang_Double_2I(JNIEnv* p_env, jclass, jobjectArray p_matrix, jint p_iteration)
 {
+    const ublas::matrix<double> l_data = java::jni::getDoubleMatrixFrom2DArray( p_env, p_matrix ); 
     
+    ublas::vector<double> l_vec;
+    try {
+        l_vec = tools::vector::setNumericalZero( tools::lapack::perronfrobenius(l_data, static_cast<std::size_t>(p_iteration)) );
+    }  catch (const std::exception& e) {
+        p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
+        return (jobjectArray)p_env->NewGlobalRef(NULL);
+    }
+    
+    return java::jni::getJObjectArrayFromVector( p_env, l_vec );
 }

@@ -34,14 +34,14 @@ public class Math
     /** creates eigenvalues and -vectors of a squared matrix for float types
      * @param p_matrix input matrix
      * @param p_eigenvalues return eigenvalues
-     * @param p_eigenvectors return 2D array with eigenvectors (array elements p_eigenvector[i][0..n-1] is the i-th eigenvector)
+     * @param p_eigenvectors return 2D array with eigenvectors (array elements p_eigenvector[0..n-1][i] is the i-th eigenvector)
      **/
     public static native void eigen( Float[][] p_matrix, Float[] p_eigenvalues, Float[][] p_eigenvectors );
     
     /** creates eigenvalues and -vectors of a squared matrix for double types
      * @param p_matrix input matrix
      * @param p_eigenvalues return eigenvalues
-     * @param p_eigenvectors return 2D array with eigenvectors (array elements p_eigenvector[i][0..n-1] is the i-th eigenvector)
+     * @param p_eigenvectors return 2D array with eigenvectors (array elements p_eigenvector[0..n-1][i] is the i-th eigenvector)
      **/
     public static native void eigen( Double[][] p_matrix, Double[] p_eigenvalues, Double[][] p_eigenvectors );
     
