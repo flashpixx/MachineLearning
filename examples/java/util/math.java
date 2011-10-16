@@ -37,7 +37,7 @@ public class math {
         // generates random datapoints
 		Random l_rand = new Random();
 		
-		Double[][] l_data = new Double[10][10];
+		Double[][] l_data = new Double[6][6];
 		for(int i=0; i < l_data.length; i++) {
 			for (int j=0; j < l_data[i].length; j++) {
 				l_data[i][j] = l_rand.nextDouble() * 500;

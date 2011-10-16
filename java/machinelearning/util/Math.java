@@ -28,7 +28,7 @@ package machinelearning.util;
 /** mathematic algorithms
  * $LastChangedDate$
  **/
-public class Math
+public class Math extends machinelearning.Object
 {
 
     /** creates eigenvalues and -vectors of a squared matrix for float types
@@ -74,5 +74,8 @@ public class Math
      * @return eigenvector 
      **/
     public static native Double[] perronfrobenius( Double[][] p_matrix, int p_iteration );
+    
+    /** dispose must exists, because of derivating object, but all calls are static, so it does nothing **/
+    public void dispose() {}
     
 }

@@ -57,15 +57,6 @@ public abstract class Object
             System.loadLibrary("machinelearning");
         } catch (UnsatisfiedLinkError e_link1) {
             
-            // library can not load, so define all used libraries
-            // in the order that are loaded and mask them with the
-            // c++ style preprocessor commands. The Scons script
-            // sets the correct source line like
-            // final String[] l_libraries = {...};
-            
-            //#loadLibrary#
-            
-            
             // create first a temp directory for setting the native libraries
             File l_temp = new File(  System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + "machinelearning" );
             if (!l_temp.isDirectory())
