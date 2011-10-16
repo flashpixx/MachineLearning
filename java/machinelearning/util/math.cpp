@@ -36,3 +36,77 @@ namespace ublas = boost::numeric::ublas;
 
 
 /* $LastChangedDate$ */
+
+
+/** returns eigenvalues and -vectors for a float matrix
+ * @param p_env JNI environment
+ * @param p_matrix input matrix
+ * @param p_eigenvalues returning eigenvalues
+ * @param p_eigenvectors returning eigenvectors
+ **/
+JNIEXPORT void JNICALL Java_machinelearning_util_Math_eigen___3_3Ljava_lang_Float_2_3Ljava_lang_Float_2_3_3Ljava_lang_Float_2(JNIEnv* p_env, jclass, jobjectArray p_matrix, jobjectArray p_eigenvalues, jobjectArray p_eigenvectors)
+{
+    
+}
+
+
+/** returns eigenvalues and -vectors for a double matrix
+ * @param p_env JNI environment
+ * @param p_matrix input matrix
+ * @param p_eigenvalues returning eigenvalues
+ * @param p_eigenvectors returning eigenvectors
+ **/
+JNIEXPORT void JNICALL Java_machinelearning_util_Math_eigen___3_3Ljava_lang_Double_2_3Ljava_lang_Double_2_3_3Ljava_lang_Double_2(JNIEnv* p_env, jclass, jobjectArray p_matrix, jobjectArray p_eigenvalues, jobjectArray p_eigenvectors)
+{
+    
+}
+
+
+/** returns the singular-value-decomposition for float values
+ * @param p_env JNI environment
+ * @param p_matrix input matrix
+ * @param p_eigenvalues returning eigenvalues
+ * @param p_eigenvec1 returning eigenvectors
+ * @param p_eigenvec2 returning eigenvectors
+ **/
+JNIEXPORT void JNICALL Java_machinelearning_util_Math_svd___3_3Ljava_lang_Float_2_3Ljava_lang_Float_2_3_3Ljava_lang_Float_2_3_3Ljava_lang_Float_2(JNIEnv* p_env, jclass, jobjectArray p_matrix, jobjectArray p_eigenvalues, jobjectArray p_eigenvec1, jobjectArray p_eigenvec2)
+{
+    
+}
+
+
+/** returns the singular-value-decomposition for double values
+ * @param p_env JNI environment
+ * @param p_matrix input matrix
+ * @param p_eigenvalues returning eigenvalues
+ * @param p_eigenvec1 returning eigenvectors
+ * @param p_eigenvec2 returning eigenvectors
+ **/
+JNIEXPORT void JNICALL Java_machinelearning_util_Math_svd___3_3Ljava_lang_Double_2_3Ljava_lang_Double_2_3_3Ljava_lang_Double_2_3_3Ljava_lang_Double_2(JNIEnv* p_env, jclass, jobjectArray p_matrix, jobjectArray p_eigenvalues, jobjectArray p_eigenvec1, jobjectArray p_eigenvec2)
+{
+    
+}
+
+
+/** creates the largest eigenvector for float type with perron-frobenius-algorithm
+ * @param p_env JNI environment
+ * @param p_matrix input matrix
+ * @param p_iteration number of iterations
+ * @return eigenvector
+ **/
+JNIEXPORT jobjectArray JNICALL Java_machinelearning_util_Math_perronfrobenius___3_3Ljava_lang_Float_2I(JNIEnv* p_env, jclass, jobjectArray p_matrix, jint p_iteration)
+{
+    
+}
+
+
+/** creates the largest eigenvector for double type with perron-frobenius-algorithm
+ * @param p_env JNI environment
+ * @param p_matrix input matrix
+ * @param p_iteration number of iterations
+ * @return eigenvector
+ **/
+JNIEXPORT jobjectArray JNICALL Java_machinelearning_util_Math_perronfrobenius___3_3Ljava_lang_Double_2I(JNIEnv* p_env, jclass, jobjectArray p_matrix, jint p_iteration)
+{
+    
+}
