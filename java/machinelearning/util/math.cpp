@@ -117,7 +117,16 @@ JNIEXPORT jobject JNICALL Java_machinelearning_util_Math_svd___3_3Ljava_lang_Flo
         return p_env->NewGlobalRef(NULL);
     }
     
-
+    // set zero values
+    l_eigenval  = tools::vector::setNumericalZero(l_eigenval);
+    l_eigenvec1 = tools::matrix::setNumericalZero(l_eigenvec1);
+    l_eigenvec2 = tools::matrix::setNumericalZero(l_eigenvec2);
+    
+    jclass l_elementclass   = NULL;
+    jmethodID l_elementctor = NULL;
+    java::jni::getCtor(p_env, "machinelearning/util/SVD", "([Ljava/lang/Number;[[Ljava/lang/Number;[[Ljava/lang/Number;)V", l_elementclass, l_elementctor);
+    
+    return p_env->NewObject( l_elementclass, l_elementctor, java::jni::getJObjectArrayFromVector(p_env, l_eigenval), java::jni::getJObjectArrayFromMatrix(p_env, l_eigenvec1, java::jni::column), java::jni::getJObjectArrayFromMatrix(p_env, l_eigenvec2, java::jni::column) );
 }
 
 
@@ -140,6 +149,16 @@ JNIEXPORT jobject JNICALL Java_machinelearning_util_Math_svd___3_3Ljava_lang_Dou
         return p_env->NewGlobalRef(NULL);
     }
 
+    // set zero values
+    l_eigenval  = tools::vector::setNumericalZero(l_eigenval);
+    l_eigenvec1 = tools::matrix::setNumericalZero(l_eigenvec1);
+    l_eigenvec2 = tools::matrix::setNumericalZero(l_eigenvec2);
+    
+    jclass l_elementclass   = NULL;
+    jmethodID l_elementctor = NULL;
+    java::jni::getCtor(p_env, "machinelearning/util/SVD", "([Ljava/lang/Number;[[Ljava/lang/Number;[[Ljava/lang/Number;)V", l_elementclass, l_elementctor);
+    
+    return p_env->NewObject( l_elementclass, l_elementctor, java::jni::getJObjectArrayFromVector(p_env, l_eigenval), java::jni::getJObjectArrayFromMatrix(p_env, l_eigenvec1, java::jni::column), java::jni::getJObjectArrayFromMatrix(p_env, l_eigenvec2, java::jni::column) );
 }
 
 
