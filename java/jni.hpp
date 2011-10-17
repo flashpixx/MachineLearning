@@ -323,6 +323,7 @@ namespace machinelearning { namespace java {
         /** creates a 2D java array of an ublas double matrix
          * @param p_env JNI environment
          * @param p_data input data matrix
+         * @param p_rowtype row type
          * @return java array / or a null object if the matrix is empty
          **/
         inline jobjectArray jni::getJObjectArrayFromMatrix( JNIEnv* p_env, const ublas::matrix<double>& p_data, const rowtype& p_rowtype )
