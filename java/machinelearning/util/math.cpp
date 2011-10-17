@@ -101,11 +101,9 @@ JNIEXPORT jobject JNICALL Java_machinelearning_util_Math_eigen___3_3Ljava_lang_D
 /** returns the singular-value-decomposition for float values
  * @param p_env JNI environment
  * @param p_matrix input matrix
- * @param p_eigenvalues returning eigenvalues
- * @param p_eigenvec1 returning eigenvectors
- * @param p_eigenvec2 returning eigenvectors
+ * @return object with SVD values
  **/
-JNIEXPORT void JNICALL Java_machinelearning_util_Math_svd___3_3Ljava_lang_Float_2_3Ljava_lang_Float_2_3_3Ljava_lang_Float_2_3_3Ljava_lang_Float_2(JNIEnv* p_env, jclass, jobjectArray p_matrix, jobjectArray p_eigenvalues, jobjectArray p_eigenvec1, jobjectArray p_eigenvec2)
+JNIEXPORT jobject JNICALL Java_machinelearning_util_Math_svd___3_3Ljava_lang_Float_2(JNIEnv* p_env, jclass, jobjectArray p_matrix )
 {
     const ublas::matrix<float> l_data = java::jni::getFloatMatrixFrom2DArray( p_env, p_matrix ); 
     
@@ -116,27 +114,19 @@ JNIEXPORT void JNICALL Java_machinelearning_util_Math_svd___3_3Ljava_lang_Float_
         tools::lapack::svd( l_data, l_eigenval, l_eigenvec1, l_eigenvec2 );
     }  catch (const std::exception& e) {
         p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-        
-        p_eigenvalues  = (jobjectArray)p_env->NewGlobalRef(NULL);
-        p_eigenvec1    = (jobjectArray)p_env->NewGlobalRef(NULL);
-        p_eigenvec2    = (jobjectArray)p_env->NewGlobalRef(NULL);
-        return;
+        return p_env->NewGlobalRef(NULL);
     }
     
-    p_eigenvalues  = java::jni::getJObjectArrayFromVector( p_env, tools::vector::setNumericalZero(l_eigenval) );
-    p_eigenvec1    = java::jni::getJObjectArrayFromMatrix( p_env, tools::matrix::setNumericalZero(l_eigenvec1) );
-    p_eigenvec2    = java::jni::getJObjectArrayFromMatrix( p_env, tools::matrix::setNumericalZero(l_eigenvec2) );
+
 }
 
 
 /** returns the singular-value-decomposition for double values
  * @param p_env JNI environment
  * @param p_matrix input matrix
- * @param p_eigenvalues returning eigenvalues
- * @param p_eigenvec1 returning eigenvectors
- * @param p_eigenvec2 returning eigenvectors
+ * @return object with SVD values
  **/
-JNIEXPORT void JNICALL Java_machinelearning_util_Math_svd___3_3Ljava_lang_Double_2_3Ljava_lang_Double_2_3_3Ljava_lang_Double_2_3_3Ljava_lang_Double_2(JNIEnv* p_env, jclass, jobjectArray p_matrix, jobjectArray p_eigenvalues, jobjectArray p_eigenvec1, jobjectArray p_eigenvec2)
+JNIEXPORT jobject JNICALL Java_machinelearning_util_Math_svd___3_3Ljava_lang_Double_2(JNIEnv* p_env, jclass, jobjectArray p_matrix)
 {
     const ublas::matrix<double> l_data = java::jni::getDoubleMatrixFrom2DArray( p_env, p_matrix ); 
     
@@ -147,16 +137,9 @@ JNIEXPORT void JNICALL Java_machinelearning_util_Math_svd___3_3Ljava_lang_Double
         tools::lapack::svd( l_data, l_eigenval, l_eigenvec1, l_eigenvec2 );
     }  catch (const std::exception& e) {
         p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-        
-        p_eigenvalues  = (jobjectArray)p_env->NewGlobalRef(NULL);
-        p_eigenvec1    = (jobjectArray)p_env->NewGlobalRef(NULL);
-        p_eigenvec2    = (jobjectArray)p_env->NewGlobalRef(NULL);
-        return;
+        return p_env->NewGlobalRef(NULL);
     }
-    
-    p_eigenvalues  = java::jni::getJObjectArrayFromVector( p_env, tools::vector::setNumericalZero(l_eigenval) );
-    p_eigenvec1    = java::jni::getJObjectArrayFromMatrix( p_env, tools::matrix::setNumericalZero(l_eigenvec1) );
-    p_eigenvec2    = java::jni::getJObjectArrayFromMatrix( p_env, tools::matrix::setNumericalZero(l_eigenvec2) );
+
 }
 
 

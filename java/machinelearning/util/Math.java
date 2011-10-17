@@ -45,19 +45,15 @@ public class Math extends machinelearning.Object
     
     /** creates the singular value decomposition for float types
      * @param p_matrix input matrix
-     * @param p_svdval eigenvalues
-     * @param p_svdvec1 eigenvectors (equal to eigen)
-     * @param p_svdvec2 eigenvectors (equal to eigen)
+     * @return SVD object
      **/
-    public static native void svd( Float[][] p_matrix, Float[] p_svdval, Float[][] p_svdvec1, Float[][] p_svdvec2 );
+    public static native SVD<Float> svd( Float[][] p_matrix );
     
     /** creates the singular value decomposition for double types
      * @param p_matrix input matrix
-     * @param p_svdval eigenvalues
-     * @param p_svdvec1 eigenvectors (equal to eigen)
-     * @param p_svdvec2 eigenvectors (equal to eigen)
+     * @return SVD object
      **/
-    public static native void svd( Double[][] p_matrix, Double[] p_svdval, Double[][] p_svdvec1, Double[][] p_svdvec2 );
+    public static native SVD<Double> svd( Double[][] p_matrix );
     
     /** returns the largest eigenvector with perron-frobenius algorithm for float types
      * @param p_matrix input matrix
