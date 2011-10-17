@@ -10,18 +10,18 @@ extern "C" {
 /*
  * Class:     machinelearning_util_Math
  * Method:    eigen
- * Signature: ([[Ljava/lang/Float;[Ljava/lang/Float;[[Ljava/lang/Float;)V
+ * Signature: ([[Ljava/lang/Float;)Lmachinelearning/util/Eigen;
  */
-JNIEXPORT void JNICALL Java_machinelearning_util_Math_eigen___3_3Ljava_lang_Float_2_3Ljava_lang_Float_2_3_3Ljava_lang_Float_2
-  (JNIEnv *, jclass, jobjectArray, jobjectArray, jobjectArray);
+JNIEXPORT jobject JNICALL Java_machinelearning_util_Math_eigen___3_3Ljava_lang_Float_2
+  (JNIEnv *, jclass, jobjectArray);
 
 /*
  * Class:     machinelearning_util_Math
  * Method:    eigen
- * Signature: ([[Ljava/lang/Double;[Ljava/lang/Double;[[Ljava/lang/Double;)V
+ * Signature: ([[Ljava/lang/Double;)Lmachinelearning/util/Eigen;
  */
-JNIEXPORT void JNICALL Java_machinelearning_util_Math_eigen___3_3Ljava_lang_Double_2_3Ljava_lang_Double_2_3_3Ljava_lang_Double_2
-  (JNIEnv *, jclass, jobjectArray, jobjectArray, jobjectArray);
+JNIEXPORT jobject JNICALL Java_machinelearning_util_Math_eigen___3_3Ljava_lang_Double_2
+  (JNIEnv *, jclass, jobjectArray);
 
 /*
  * Class:     machinelearning_util_Math

@@ -51,6 +51,7 @@ namespace machinelearning { namespace tools {
     
         public :
     
+            /** row type **/
             enum rowtype
             {
                 row     = 0,

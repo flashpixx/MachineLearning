@@ -48,17 +48,35 @@ public class math {
         
         Double[] l_eigenvalues    = null;
         Double[][] l_eigenvectors = null;
-        machinelearning.util.Math.eigen(l_data, l_eigenvalues, l_eigenvectors);
         
-        if ( (l_eigenvalues == null) || (l_eigenvectors == null) )
-            System.out.println("no data is returned");
-        else {
+        machinelearning.util.Eigen<Double> l_eigen = machinelearning.util.Math.eigen(l_data);
+        
+        if (l_eigen != null) {
             
+            System.out.println("\neigenvalues:");
+            
+            Double[] l_vals = l_eigen.getValues();
+            for(int i=0; i < l_vals.length; i++)
+                System.out.print(l_vals[i] + "\t");
+            System.out.println("");
+            l_vals = null;
+            
+            
+            
+            System.out.println("\neigenvectors:\n");
+            
+            Double[][] l_vecs = l_eigen.getVectors();
+            for(int j=0; j < l_vecs.length; j++) {
+                System.out.print( (j+1) + " eigenvector:\t");
+                for(int i=0; i < l_vecs[j].length; i++)
+                    System.out.print(l_vecs[j][i] + "\t");
+                System.out.println("\n");
+            }
+            l_vecs = null;
         }
         
+        l_eigen        = null;
         l_data         = null;
-        l_eigenvalues  = null;
-        l_eigenvectors = null;
         l_rand         = null;
 	}
 	

@@ -23,8 +23,6 @@
 
 package machinelearning.dimensionreduce.nonsupervised;
 
-import java.lang.reflect.*;
-
 
 /** create the principal component analysis (PCA)
  * $LastChangedDate$

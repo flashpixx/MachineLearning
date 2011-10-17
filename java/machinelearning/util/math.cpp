@@ -41,10 +41,9 @@ namespace ublas = boost::numeric::ublas;
 /** returns eigenvalues and -vectors for a float matrix
  * @param p_env JNI environment
  * @param p_matrix input matrix
- * @param p_eigenvalues returning eigenvalues
- * @param p_eigenvectors returning eigenvectors
+ * @return object with eigenvectors and -values
  **/
-JNIEXPORT void JNICALL Java_machinelearning_util_Math_eigen___3_3Ljava_lang_Float_2_3Ljava_lang_Float_2_3_3Ljava_lang_Float_2(JNIEnv* p_env, jclass, jobjectArray p_matrix, jobjectArray p_eigenvalues, jobjectArray p_eigenvectors)
+JNIEXPORT jobject JNICALL Java_machinelearning_util_Math_eigen___3_3Ljava_lang_Float_2(JNIEnv* p_env, jclass, jobjectArray p_matrix)
 {
     const ublas::matrix<float> l_data = java::jni::getFloatMatrixFrom2DArray( p_env, p_matrix ); 
     
@@ -54,24 +53,27 @@ JNIEXPORT void JNICALL Java_machinelearning_util_Math_eigen___3_3Ljava_lang_Floa
         tools::lapack::eigen( l_data, l_eigenval, l_eigenvec );
     }  catch (const std::exception& e) {
         p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-        
-        p_eigenvalues  = (jobjectArray)p_env->NewGlobalRef(NULL);
-        p_eigenvectors = (jobjectArray)p_env->NewGlobalRef(NULL);
-        return;
+        return p_env->NewGlobalRef(NULL);
     }
     
-    p_eigenvalues  = java::jni::getJObjectArrayFromVector( p_env, tools::vector::setNumericalZero(l_eigenval) );
-    p_eigenvectors = java::jni::getJObjectArrayFromMatrix( p_env, tools::matrix::setNumericalZero(l_eigenvec) );
+    // set zero values
+    l_eigenval = tools::vector::setNumericalZero(l_eigenval);
+    l_eigenvec = tools::matrix::setNumericalZero(l_eigenvec);
+    
+    jclass l_elementclass   = NULL;
+    jmethodID l_elementctor = NULL;
+    java::jni::getCtor(p_env, "machinelearning/util/Eigen", "([Ljava/lang/Number;[[Ljava/lang/Number;)V", l_elementclass, l_elementctor);
+    
+    return p_env->NewObject( l_elementclass, l_elementctor, java::jni::getJObjectArrayFromVector(p_env, l_eigenval), java::jni::getJObjectArrayFromMatrix(p_env, l_eigenvec, java::jni::column) );
 }
 
 
 /** returns eigenvalues and -vectors for a double matrix
  * @param p_env JNI environment
  * @param p_matrix input matrix
- * @param p_eigenvalues returning eigenvalues
- * @param p_eigenvectors returning eigenvectors
+ * @return object with eigenvectors (transpose the returning matrix for the java array so [i][:] results the i-th eigenvector  ) and -values
  **/
-JNIEXPORT void JNICALL Java_machinelearning_util_Math_eigen___3_3Ljava_lang_Double_2_3Ljava_lang_Double_2_3_3Ljava_lang_Double_2(JNIEnv* p_env, jclass, jobjectArray p_matrix, jobjectArray p_eigenvalues, jobjectArray p_eigenvectors)
+JNIEXPORT jobject JNICALL Java_machinelearning_util_Math_eigen___3_3Ljava_lang_Double_2(JNIEnv* p_env, jclass, jobjectArray p_matrix)
 {
     const ublas::matrix<double> l_data = java::jni::getDoubleMatrixFrom2DArray( p_env, p_matrix ); 
     
@@ -81,14 +83,18 @@ JNIEXPORT void JNICALL Java_machinelearning_util_Math_eigen___3_3Ljava_lang_Doub
         tools::lapack::eigen( l_data, l_eigenval, l_eigenvec );
     }  catch (const std::exception& e) {
         p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-        
-        p_eigenvalues  = (jobjectArray)p_env->NewGlobalRef(NULL);
-        p_eigenvectors = (jobjectArray)p_env->NewGlobalRef(NULL);
-        return;
+        return p_env->NewGlobalRef(NULL);
     }
     
-    p_eigenvalues  = java::jni::getJObjectArrayFromVector( p_env, tools::vector::setNumericalZero(l_eigenval) );
-    p_eigenvectors = java::jni::getJObjectArrayFromMatrix( p_env, tools::matrix::setNumericalZero(l_eigenvec) );
+    // set zero values
+    l_eigenval = tools::vector::setNumericalZero(l_eigenval);
+    l_eigenvec = tools::matrix::setNumericalZero(l_eigenvec);
+    
+    jclass l_elementclass   = NULL;
+    jmethodID l_elementctor = NULL;
+    java::jni::getCtor(p_env, "machinelearning/util/Eigen", "([Ljava/lang/Number;[[Ljava/lang/Number;)V", l_elementclass, l_elementctor);
+
+    return p_env->NewObject( l_elementclass, l_elementctor, java::jni::getJObjectArrayFromVector(p_env, l_eigenval), java::jni::getJObjectArrayFromMatrix(p_env, l_eigenvec, java::jni::column) );
 }
 
 

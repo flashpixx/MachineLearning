@@ -44,6 +44,14 @@ namespace machinelearning { namespace java {
             
             public :
             
+                /** row type **/
+                enum rowtype
+                {
+                    row     = 0,
+                    column  = 1
+                };
+            
+            
                 template<typename T> static T* getObjectPointer(JNIEnv*, const jobject&, const jfieldID&);
                 template<typename T> static jlong createObjectPointer(JNIEnv*, const jobject&, jfieldID&, T*);
                 template<typename T> static void disposeObjectPointer(JNIEnv*, const jobject&, const jfieldID&);
@@ -52,8 +60,8 @@ namespace machinelearning { namespace java {
                 static void getCtor(JNIEnv*, const char*, const char*, jclass&, jmethodID&);
                 static ublas::matrix<double> getDoubleMatrixFrom2DArray( JNIEnv*, const jobjectArray& );
                 static ublas::matrix<float> getFloatMatrixFrom2DArray( JNIEnv*, const jobjectArray& );
-                static jobjectArray getJObjectArrayFromMatrix( JNIEnv*, const ublas::matrix<double>& );
-                static jobjectArray getJObjectArrayFromMatrix( JNIEnv*, const ublas::matrix<float>& );
+                static jobjectArray getJObjectArrayFromMatrix( JNIEnv*, const ublas::matrix<double>&, const rowtype& = row );
+                static jobjectArray getJObjectArrayFromMatrix( JNIEnv*, const ublas::matrix<float>&, const rowtype& = row );
                 static jobjectArray getJObjectArrayFromVector( JNIEnv*, const ublas::vector<double>& );
                 static jobjectArray getJObjectArrayFromVector( JNIEnv*, const ublas::vector<float>& );
                 static std::size_t getEnumOrdinalValue( JNIEnv*, const jobject& );
@@ -317,7 +325,7 @@ namespace machinelearning { namespace java {
          * @param p_data input data matrix
          * @return java array / or a null object if the matrix is empty
          **/
-        inline jobjectArray jni::getJObjectArrayFromMatrix( JNIEnv* p_env, const ublas::matrix<double>& p_data )
+        inline jobjectArray jni::getJObjectArrayFromMatrix( JNIEnv* p_env, const ublas::matrix<double>& p_data, const rowtype& p_rowtype )
         {
             if ( (p_data.size1() == 0) || (p_data.size2() == 0) )
                 return (jobjectArray)p_env->NewGlobalRef(NULL);
@@ -326,28 +334,53 @@ namespace machinelearning { namespace java {
             jmethodID l_elementctor = NULL;
             java::jni::getCtor(p_env, "java/lang/Double", "(D)V", l_elementclass, l_elementctor);
             
-            // create the row array
-            jobjectArray l_row = p_env->NewObjectArray( static_cast<jint>(p_data.size1()), p_env->FindClass("[Ljava/lang/Double;"), NULL );
-            for(std::size_t i=0; i < p_data.size1(); ++i) {
-                
-                // create column array and fill data into the double java object
-                jobjectArray l_col = p_env->NewObjectArray( static_cast<jint>(p_data.size2()), l_elementclass, NULL );
-                for(std::size_t j=0; j < p_data.size2(); ++j)
-                    p_env->SetObjectArrayElement(l_col, j, p_env->NewObject(l_elementclass, l_elementctor, p_data(i,j)) );
-                
-                p_env->SetObjectArrayElement(l_row, i, l_col);
+            switch (p_rowtype) {
+                    
+                case row: {
+                    // create the row array
+                    jobjectArray l_row = p_env->NewObjectArray( static_cast<jint>(p_data.size1()), p_env->FindClass("[Ljava/lang/Double;"), NULL );
+                    for(std::size_t i=0; i < p_data.size1(); ++i) {
+                        
+                        // create column array and fill data into the double java object
+                        jobjectArray l_col = p_env->NewObjectArray( static_cast<jint>(p_data.size2()), l_elementclass, NULL );
+                        for(std::size_t j=0; j < p_data.size2(); ++j)
+                            p_env->SetObjectArrayElement(l_col, j, p_env->NewObject(l_elementclass, l_elementctor, p_data(i,j)) );
+                        
+                        p_env->SetObjectArrayElement(l_row, i, l_col);
+                    }
+                    
+                    return l_row;
+                }
+                    
+                    
+                case column: {
+                    // create the row array
+                    jobjectArray l_row = p_env->NewObjectArray( static_cast<jint>(p_data.size2()), p_env->FindClass("[Ljava/lang/Double;"), NULL );
+                    for(std::size_t i=0; i < p_data.size2(); ++i) {
+                        
+                        // create column array and fill data into the double java object
+                        jobjectArray l_col = p_env->NewObjectArray( static_cast<jint>(p_data.size1()), l_elementclass, NULL );
+                        for(std::size_t j=0; j < p_data.size1(); ++j)
+                            p_env->SetObjectArrayElement(l_col, j, p_env->NewObject(l_elementclass, l_elementctor, p_data(j, i)) );
+                        
+                        p_env->SetObjectArrayElement(l_row, i, l_col);
+                    }
+                    
+                    return l_row;
+                }
             }
             
-            return l_row;
+            return (jobjectArray)p_env->NewGlobalRef(NULL);
         }
     
     
         /** creates a 2D java array of an ublas float matrix
          * @param p_env JNI environment
          * @param p_data input data matrix
+         * @param p_rowtype row type
          * @return java array / or a null object if the matrix is empty
          **/
-        inline jobjectArray jni::getJObjectArrayFromMatrix( JNIEnv* p_env, const ublas::matrix<float>& p_data )
+        inline jobjectArray jni::getJObjectArrayFromMatrix( JNIEnv* p_env, const ublas::matrix<float>& p_data, const rowtype& p_rowtype )
         {
             if ( (p_data.size1() == 0) || (p_data.size2() == 0) )
                 return (jobjectArray)p_env->NewGlobalRef(NULL);
@@ -356,19 +389,43 @@ namespace machinelearning { namespace java {
             jmethodID l_elementctor = NULL;
             java::jni::getCtor(p_env, "java/lang/Float", "(F)V", l_elementclass, l_elementctor);
             
-            // create the row array
-            jobjectArray l_row = p_env->NewObjectArray( static_cast<jint>(p_data.size1()), p_env->FindClass("[Ljava/lang/Float;"), NULL );
-            for(std::size_t i=0; i < p_data.size1(); ++i) {
+            switch (p_rowtype) {
                 
-                // create column array and fill data into the double java object
-                jobjectArray l_col = p_env->NewObjectArray( static_cast<jint>(p_data.size2()), l_elementclass, NULL );
-                for(std::size_t j=0; j < p_data.size2(); ++j)
-                    p_env->SetObjectArrayElement(l_col, j, p_env->NewObject(l_elementclass, l_elementctor, p_data(i,j)) );
+                case row: {
+                    // create the row array
+                    jobjectArray l_row = p_env->NewObjectArray( static_cast<jint>(p_data.size1()), p_env->FindClass("[Ljava/lang/Float;"), NULL );
+                    for(std::size_t i=0; i < p_data.size1(); ++i) {
+                        
+                        // create column array and fill data into the double java object
+                        jobjectArray l_col = p_env->NewObjectArray( static_cast<jint>(p_data.size2()), l_elementclass, NULL );
+                        for(std::size_t j=0; j < p_data.size2(); ++j)
+                            p_env->SetObjectArrayElement(l_col, j, p_env->NewObject(l_elementclass, l_elementctor, p_data(i,j)) );
+                        
+                        p_env->SetObjectArrayElement(l_row, i, l_col);
+                    }
+                    
+                    return l_row;
+                }
+                    
                 
-                p_env->SetObjectArrayElement(l_row, i, l_col);
+                case column : {
+                    // create the column array
+                    jobjectArray l_row = p_env->NewObjectArray( static_cast<jint>(p_data.size2()), p_env->FindClass("[Ljava/lang/Float;"), NULL );
+                    for(std::size_t i=0; i < p_data.size2(); ++i) {
+                        
+                        // create row array and fill data into the double java object
+                        jobjectArray l_col = p_env->NewObjectArray( static_cast<jint>(p_data.size1()), l_elementclass, NULL );
+                        for(std::size_t j=0; j < p_data.size1(); ++j)
+                            p_env->SetObjectArrayElement(l_col, j, p_env->NewObject(l_elementclass, l_elementctor, p_data(j,i)) );
+                        
+                        p_env->SetObjectArrayElement(l_row, i, l_col);
+                    }
+                    
+                    return l_row;
+                }
             }
             
-            return l_row;
+            return (jobjectArray)p_env->NewGlobalRef(NULL);
         }
     
         
@@ -425,6 +482,7 @@ namespace machinelearning { namespace java {
             
             return l_vec;
         }
+
     
 }}
 #endif

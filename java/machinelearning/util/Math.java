@@ -30,20 +30,18 @@ package machinelearning.util;
  **/
 public class Math extends machinelearning.Object
 {
-
+    
     /** creates eigenvalues and -vectors of a squared matrix for float types
      * @param p_matrix input matrix
-     * @param p_eigenvalues return eigenvalues
-     * @param p_eigenvectors return 2D array with eigenvectors (array elements p_eigenvector[0..n-1][i] is the i-th eigenvector)
+     * @return eigenobject
      **/
-    public static native void eigen( Float[][] p_matrix, Float[] p_eigenvalues, Float[][] p_eigenvectors );
+    public static native Eigen<Float> eigen( Float[][] p_matrix );
     
     /** creates eigenvalues and -vectors of a squared matrix for double types
      * @param p_matrix input matrix
-     * @param p_eigenvalues return eigenvalues
-     * @param p_eigenvectors return 2D array with eigenvectors (array elements p_eigenvector[0..n-1][i] is the i-th eigenvector)
+     * @return eigenobject
      **/
-    public static native void eigen( Double[][] p_matrix, Double[] p_eigenvalues, Double[][] p_eigenvectors );
+    public static native Eigen<Double> eigen( Double[][] p_matrix );
     
     /** creates the singular value decomposition for float types
      * @param p_matrix input matrix
