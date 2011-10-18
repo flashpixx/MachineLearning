@@ -694,6 +694,7 @@
  * @file examples/java/reducing/mds.java example java program for using MDS
  * @file examples/java/util/eigen.java example for eigenvalue algorithms
  * @file examples/java/util/svd.java example for SVD algorithms
+ * @file examples/java/util/random.java example for distribution algorithms
  *
  * @file java/java.h main include for all JNI functions
  * @file java/jni.hpp register class for connect object data between C++ and Java objects
