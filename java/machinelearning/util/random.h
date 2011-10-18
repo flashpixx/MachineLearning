@@ -17,10 +17,10 @@ JNIEXPORT void JNICALL Java_machinelearning_util_Random_dispose
 
 /*
  * Class:     machinelearning_util_Random
- * Method:    get
+ * Method:    getFloat
  * Signature: (Lmachinelearning/util/Random/Distribution;)Ljava/lang/Float;
  */
-JNIEXPORT jobject JNICALL Java_machinelearning_util_Random_get__Lmachinelearning_util_Random_Distribution_2
+JNIEXPORT jobject JNICALL Java_machinelearning_util_Random_getFloat
   (JNIEnv *, jobject, jobject);
 
 /*
@@ -45,6 +45,38 @@ JNIEXPORT jobject JNICALL Java_machinelearning_util_Random_get__Lmachinelearning
  * Signature: (Lmachinelearning/util/Random/Distribution;Ljava/lang/Float;Ljava/lang/Float;Ljava/lang/Float;)Ljava/lang/Float;
  */
 JNIEXPORT jobject JNICALL Java_machinelearning_util_Random_get__Lmachinelearning_util_Random_Distribution_2Ljava_lang_Float_2Ljava_lang_Float_2Ljava_lang_Float_2
+  (JNIEnv *, jobject, jobject, jobject, jobject, jobject);
+
+/*
+ * Class:     machinelearning_util_Random
+ * Method:    getDouble
+ * Signature: (Lmachinelearning/util/Random/Distribution;)Ljava/lang/Double;
+ */
+JNIEXPORT jobject JNICALL Java_machinelearning_util_Random_getDouble
+  (JNIEnv *, jobject, jobject);
+
+/*
+ * Class:     machinelearning_util_Random
+ * Method:    get
+ * Signature: (Lmachinelearning/util/Random/Distribution;Ljava/lang/Double;)Ljava/lang/Double;
+ */
+JNIEXPORT jobject JNICALL Java_machinelearning_util_Random_get__Lmachinelearning_util_Random_Distribution_2Ljava_lang_Double_2
+  (JNIEnv *, jobject, jobject, jobject);
+
+/*
+ * Class:     machinelearning_util_Random
+ * Method:    get
+ * Signature: (Lmachinelearning/util/Random/Distribution;Ljava/lang/Double;Ljava/lang/Double;)Ljava/lang/Double;
+ */
+JNIEXPORT jobject JNICALL Java_machinelearning_util_Random_get__Lmachinelearning_util_Random_Distribution_2Ljava_lang_Double_2Ljava_lang_Double_2
+  (JNIEnv *, jobject, jobject, jobject, jobject);
+
+/*
+ * Class:     machinelearning_util_Random
+ * Method:    get
+ * Signature: (Lmachinelearning/util/Random/Distribution;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;)Ljava/lang/Double;
+ */
+JNIEXPORT jobject JNICALL Java_machinelearning_util_Random_get__Lmachinelearning_util_Random_Distribution_2Ljava_lang_Double_2Ljava_lang_Double_2Ljava_lang_Double_2
   (JNIEnv *, jobject, jobject, jobject, jobject, jobject);
 
 /*

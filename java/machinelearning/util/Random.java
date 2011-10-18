@@ -51,7 +51,7 @@ public class Random extends machinelearning.Object
      * @param p_distribution distribution
      * @return random value
      **/
-    public native Float get( Distribution p_distribution );
+    public native Float getFloat( Distribution p_distribution );
     
     
     /** creates a float value of the distribution
@@ -85,7 +85,7 @@ public class Random extends machinelearning.Object
      * @param p_distribution distribution
      * @return random value
      **/
-    public native Double get( Distribution p_distribution );
+    public native Double getDouble( Distribution p_distribution );
     
     
     /** creates a double value of the distribution

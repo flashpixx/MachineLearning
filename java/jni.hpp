@@ -304,7 +304,7 @@ namespace machinelearning { namespace java {
             if (l_cols == 0)
                 return l_data;
             
-            // each element in the array is a "java.lang.Double" value, for reading the value the method "double doubleValue()" must be called, so get the ID
+            // each element in the array is a "java.lang.Float" value, for reading the value the method "float floatValue()" must be called, so get the ID
             const jmethodID l_valueof = java::jni::getMethodID(p_env, "java/lang/Float", "floatValue", "()F"); 
             
             // read array data
