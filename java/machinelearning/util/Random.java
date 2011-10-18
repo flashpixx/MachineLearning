@@ -42,18 +42,81 @@ public class Random extends machinelearning.Object
     
     public Random() { cpp_ptr = cppCtor(); }
     
+    
     /** release objects **/
     public native void dispose();
     
-    public native Float get( Distribution p_dist );
-    public native Float get( Distribution p_dist, Float p_first );
-    public native Float get( Distribution p_dist, Float p_first, Float p_second );
-    public native Float get( Distribution p_dist, Float p_first, Float p_second, Float p_third );
     
-    
-    /** JNI constructor call
-     * @param p_dim nuber of dimension
+    /** creates a float value of the distribution with default parameter
+     * @param p_distribution distribution
+     * @return random value
      **/
+    public native Float get( Distribution p_distribution );
+    
+    
+    /** creates a float value of the distribution
+     * @param p_distribution distribution
+     * @param p_first first configuration value of the distribution
+     * @return random value
+     **/
+    public native Float get( Distribution p_distribution, Float p_first );
+    
+    
+    /** creates a float value of the distribution
+     * @param p_distribution distribution
+     * @param p_first first configuration value of the distribution
+     * @param p_second first configuration value of the distribution
+     * @return random value
+     **/
+    public native Float get( Distribution p_distribution, Float p_first, Float p_second );
+    
+    
+    /** creates a float value of the distribution
+     * @param p_distribution distribution
+     * @param p_first first configuration value of the distribution
+     * @param p_second first configuration value of the distribution
+     * @param p_third first configuration value of the distribution
+     * @return random value
+     **/
+    public native Float get( Distribution p_distribution, Float p_first, Float p_second, Float p_third );
+    
+    
+    /** creates a double value of the distribution with default parameter
+     * @param p_distribution distribution
+     * @return random value
+     **/
+    public native Double get( Distribution p_distribution );
+    
+    
+    /** creates a double value of the distribution
+     * @param p_distribution distribution
+     * @param p_first first configuration value of the distribution
+     * @return random value
+     **/
+    public native Double get( Distribution p_distribution, Double p_first );
+    
+    
+    /** creates a double value of the distribution
+     * @param p_distribution distribution
+     * @param p_first first configuration value of the distribution
+     * @param p_second first configuration value of the distribution
+     * @return random value
+     **/
+    public native Double get( Distribution p_distribution, Double p_first, Double p_second );
+    
+    
+    /** creates a double value of the distribution
+     * @param p_distribution distribution
+     * @param p_first first configuration value of the distribution
+     * @param p_second first configuration value of the distribution
+     * @param p_third first configuration value of the distribution
+     * @return random value
+     **/
+    public native Double get( Distribution p_distribution, Double p_first, Double p_second, Double p_third );
+    
+    
+    
+    /** JNI constructor call **/
     private native long cppCtor();
     
     /** finalizer **/

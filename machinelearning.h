@@ -692,10 +692,20 @@
  * @file examples/other/mds_twitter.cpp program for reading Twitter data and calculating plot with MDS
  * @file examples/java/reducing/pca.java example java program for using PCA
  * @file examples/java/reducing/mds.java example java program for using MDS
+ * @file examples/java/util/eigen.java example for eigenvalue algorithms
+ * @file examples/java/util/svd.java example for SVD algorithms
  *
  * @file java/java.h main include for all JNI functions
  * @file java/jni.hpp register class for connect object data between C++ and Java objects
  * @file java/machinelearning/Object.java main abstract interface for JNI interfaces of each object
+ * @file java/machinelearning/util/SVD.java class for storing SVD results
+ * @file java/machinelearning/util/Eigen.java class for storing eigen results
+ * @file java/machinelearning/util/Math.java class with different math / numeric algorithms
+ * @file java/machinelearning/util/math.h JNI stub class of the math implementation
+ * @file java/machinelearning/util/math.cpp implementation of the math algorithms
+ * @file java/machinelearning/util/Random.java class with different distribution algorithms
+ * @file java/machinelearning/util/random.h JNI stub class of the distribution / random implementation
+ * @file java/machinelearning/util/random.cpp implementation of the random algorithms 
  * @file java/machinelearning/exception/Runtime.java runtime exception (see C++ exception)
  * @file java/machinelearning/exception/Classmethod.java classmethod exception (see C++ exception)
  * @file java/machinelearning/exception/Unknowntype.java exception if the generic datatype can not be used
