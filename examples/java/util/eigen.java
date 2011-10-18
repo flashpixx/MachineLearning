@@ -72,6 +72,16 @@ public class eigen {
                 System.out.println("\n");
             }
             l_vecs = null;
+            
+            
+            // get the largest eigenvector with perron-frobenius
+            Double[] l_perron = machinelearning.util.Math.perronfrobenius( l_data, l_data.length );
+            
+            System.out.println("\nlargest eigenvector with perron-frobenius-theorem:\n");
+            for(int i=0; i < l_perron.length; i++)
+                System.out.print(l_perron[i] + "\t");
+            System.out.println("");
+            l_perron = null;
         }
         
         l_eigen        = null;
