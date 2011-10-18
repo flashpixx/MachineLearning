@@ -500,26 +500,271 @@ JNIEXPORT jobject JNICALL Java_machinelearning_util_Random_get__Lmachinelearning
 }
 
 
-
-
-
+/** generates a random value
+ * @param p_env JNI environment
+ * @param p_object JNI object
+ * @param p_distribution distribution object
+ * @param p_first first value for the distribution
+ * @return random value
+ **/
 JNIEXPORT jobject JNICALL Java_machinelearning_util_Random_get__Lmachinelearning_util_Random_Distribution_2Ljava_lang_Double_2(JNIEnv* p_env, jobject p_object, jobject p_distribution, jobject p_first)
 {
     tools::random* l_ptr = java::jni::getObjectPointer< tools::random >(p_env, p_object, fidx_machinelearning_util_random);
     if (!l_ptr)
         return p_env->NewGlobalRef(NULL);
+    
+    const jmethodID l_valueof = java::jni::getMethodID(p_env, "java/lang/Double", "doubleValue", "()D");
+    
+    // create random value
+    double l_val = 0;
+    switch (java::jni::getEnumOrdinalValue(p_env, p_distribution)) {
+            
+        case 0 :
+            l_val = l_ptr->get<double>( tools::random::uniform, p_env->CallDoubleMethod( p_first, l_valueof ) );
+            break;
+            
+        case 1 :
+            l_val = l_ptr->get<double>( tools::random::bernoulli, p_env->CallDoubleMethod( p_first, l_valueof ) );
+            break;
+            
+        case 2 :
+            l_val = l_ptr->get<double>( tools::random::cauchy, p_env->CallDoubleMethod( p_first, l_valueof ) );
+            break;
+            
+        case 3 :
+            l_val = l_ptr->get<double>( tools::random::gamma, p_env->CallDoubleMethod( p_first, l_valueof ) );
+            break;
+            
+        case 4 :
+            l_val = l_ptr->get<double>( tools::random::poisson, p_env->CallDoubleMethod( p_first, l_valueof ) );
+            break;
+            
+        case 5 :
+            l_val = l_ptr->get<double>( tools::random::exponential, p_env->CallDoubleMethod( p_first, l_valueof ) );
+            break;
+            
+        case 6 :
+            l_val = l_ptr->get<double>( tools::random::normal, p_env->CallDoubleMethod( p_first, l_valueof ) );
+            break;
+            
+        case 7 :
+            l_val = l_ptr->get<double>( tools::random::student, p_env->CallDoubleMethod( p_first, l_valueof ) );
+            break;
+            
+        case 8 :
+            l_val = l_ptr->get<double>( tools::random::weibull, p_env->CallDoubleMethod( p_first, l_valueof ) );
+            break;
+            
+        case 9 :
+            l_val = l_ptr->get<double>( tools::random::rayleigh, p_env->CallDoubleMethod( p_first, l_valueof ) );
+            break;
+            
+        case 10 :
+            l_val = l_ptr->get<double>( tools::random::chisquared, p_env->CallDoubleMethod( p_first, l_valueof ) );
+            break;
+            
+        case 11 :
+            l_val = l_ptr->get<double>( tools::random::pareto, p_env->CallDoubleMethod( p_first, l_valueof ) );
+            break;
+            
+        case 12 :
+            l_val = l_ptr->get<double>( tools::random::triangular, p_env->CallDoubleMethod( p_first, l_valueof ) );
+            break;
+            
+        case 13 :
+            l_val = l_ptr->get<double>( tools::random::beta, p_env->CallDoubleMethod( p_first, l_valueof ) );
+            break;
+            
+        default:
+            p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), _("option value is unkown") );
+            return p_env->NewGlobalRef(NULL);
+    }
+    
+    // create java object
+    jclass l_elementclass   = NULL;
+    jmethodID l_elementctor = NULL;
+    java::jni::getCtor(p_env, "java/lang/Double", "(D)V", l_elementclass, l_elementctor);
+    
+    return p_env->NewObject( l_elementclass, l_elementctor, l_val );  
 }
 
+
+/** generates a random value
+ * @param p_env JNI environment
+ * @param p_object JNI object
+ * @param p_distribution distribution object
+ * @param p_first first value for the distribution
+ * @param p_second second value for the distribution
+ * @return random value
+ **/
 JNIEXPORT jobject JNICALL Java_machinelearning_util_Random_get__Lmachinelearning_util_Random_Distribution_2Ljava_lang_Double_2Ljava_lang_Double_2(JNIEnv* p_env, jobject p_object, jobject p_distribution, jobject p_first, jobject p_second)
 {
     tools::random* l_ptr = java::jni::getObjectPointer< tools::random >(p_env, p_object, fidx_machinelearning_util_random);
     if (!l_ptr)
         return p_env->NewGlobalRef(NULL);
+    
+    const jmethodID l_valueof = java::jni::getMethodID(p_env, "java/lang/Double", "doubleValue", "()D");
+    
+    // create random value
+    double l_val = 0;
+    switch (java::jni::getEnumOrdinalValue(p_env, p_distribution)) {
+            
+        case 0 :
+            l_val = l_ptr->get<double>( tools::random::uniform, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ) );
+            break;
+            
+        case 1 :
+            l_val = l_ptr->get<double>( tools::random::bernoulli, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ) );
+            break;
+            
+        case 2 :
+            l_val = l_ptr->get<double>( tools::random::cauchy, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ) );
+            break;
+            
+        case 3 :
+            l_val = l_ptr->get<double>( tools::random::gamma, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ) );
+            break;
+            
+        case 4 :
+            l_val = l_ptr->get<double>( tools::random::poisson, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ) );
+            break;
+            
+        case 5 :
+            l_val = l_ptr->get<double>( tools::random::exponential, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ) );
+            break;
+            
+        case 6 :
+            l_val = l_ptr->get<double>( tools::random::normal, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ) );
+            break;
+            
+        case 7 :
+            l_val = l_ptr->get<double>( tools::random::student, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ) );
+            break;
+            
+        case 8 :
+            l_val = l_ptr->get<double>( tools::random::weibull, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ) );
+            break;
+            
+        case 9 :
+            l_val = l_ptr->get<double>( tools::random::rayleigh, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ) );
+            break;
+            
+        case 10 :
+            l_val = l_ptr->get<double>( tools::random::chisquared, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ) );
+            break;
+            
+        case 11 :
+            l_val = l_ptr->get<double>( tools::random::pareto, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ) );
+            break;
+            
+        case 12 :
+            l_val = l_ptr->get<double>( tools::random::triangular, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ) );
+            break;
+            
+        case 13 :
+            l_val = l_ptr->get<double>( tools::random::beta, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ) );
+            break;
+            
+        default:
+            p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), _("option value is unkown") );
+            return p_env->NewGlobalRef(NULL);
+    }
+    
+    // create java object
+    jclass l_elementclass   = NULL;
+    jmethodID l_elementctor = NULL;
+    java::jni::getCtor(p_env, "java/lang/Double", "(D)V", l_elementclass, l_elementctor);
+    
+    return p_env->NewObject( l_elementclass, l_elementctor, l_val );  
 }
 
+
+/** generates a random value
+ * @param p_env JNI environment
+ * @param p_object JNI object
+ * @param p_distribution distribution object
+ * @param p_first first value for the distribution
+ * @param p_second second value for the distribution
+ * @param p_third third value for the distribution
+ * @return random value
+ **/
 JNIEXPORT jobject JNICALL Java_machinelearning_util_Random_get__Lmachinelearning_util_Random_Distribution_2Ljava_lang_Double_2Ljava_lang_Double_2Ljava_lang_Double_2(JNIEnv* p_env, jobject p_object, jobject p_distribution, jobject p_first, jobject p_second, jobject p_third)
 {
     tools::random* l_ptr = java::jni::getObjectPointer< tools::random >(p_env, p_object, fidx_machinelearning_util_random);
     if (!l_ptr)
         return p_env->NewGlobalRef(NULL);
+    
+    const jmethodID l_valueof = java::jni::getMethodID(p_env, "java/lang/Double", "doubleValue", "()D");
+    
+    // create random value
+    double l_val = 0;
+    switch (java::jni::getEnumOrdinalValue(p_env, p_distribution)) {
+            
+        case 0 :
+            l_val = l_ptr->get<double>( tools::random::uniform, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ), p_env->CallDoubleMethod( p_third, l_valueof ) );
+            break;
+            
+        case 1 :
+            l_val = l_ptr->get<double>( tools::random::bernoulli, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ), p_env->CallDoubleMethod( p_third, l_valueof ) );
+            break;
+            
+        case 2 :
+            l_val = l_ptr->get<double>( tools::random::cauchy, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ), p_env->CallDoubleMethod( p_third, l_valueof ) );
+            break;
+            
+        case 3 :
+            l_val = l_ptr->get<double>( tools::random::gamma, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ), p_env->CallDoubleMethod( p_third, l_valueof ) );
+            break;
+            
+        case 4 :
+            l_val = l_ptr->get<double>( tools::random::poisson, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ), p_env->CallDoubleMethod( p_third, l_valueof ) );
+            break;
+            
+        case 5 :
+            l_val = l_ptr->get<double>( tools::random::exponential, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ), p_env->CallDoubleMethod( p_third, l_valueof ) );
+            break;
+            
+        case 6 :
+            l_val = l_ptr->get<double>( tools::random::normal, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ), p_env->CallDoubleMethod( p_third, l_valueof ) );
+            break;
+            
+        case 7 :
+            l_val = l_ptr->get<double>( tools::random::student, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ), p_env->CallDoubleMethod( p_third, l_valueof ) );
+            break;
+            
+        case 8 :
+            l_val = l_ptr->get<double>( tools::random::weibull, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ), p_env->CallDoubleMethod( p_third, l_valueof ) );
+            break;
+            
+        case 9 :
+            l_val = l_ptr->get<double>( tools::random::rayleigh, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ), p_env->CallDoubleMethod( p_third, l_valueof ) );
+            break;
+            
+        case 10 :
+            l_val = l_ptr->get<double>( tools::random::chisquared, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ), p_env->CallDoubleMethod( p_third, l_valueof ) );
+            break;
+            
+        case 11 :
+            l_val = l_ptr->get<double>( tools::random::pareto, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ), p_env->CallDoubleMethod( p_third, l_valueof ) );
+            break;
+            
+        case 12 :
+            l_val = l_ptr->get<double>( tools::random::triangular, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ), p_env->CallDoubleMethod( p_third, l_valueof ) );
+            break;
+            
+        case 13 :
+            l_val = l_ptr->get<double>( tools::random::beta, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ), p_env->CallDoubleMethod( p_third, l_valueof ) );
+            break;
+            
+        default:
+            p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), _("option value is unkown") );
+            return p_env->NewGlobalRef(NULL);
+    }
+    
+    // create java object
+    jclass l_elementclass   = NULL;
+    jmethodID l_elementctor = NULL;
+    java::jni::getCtor(p_env, "java/lang/Double", "(D)V", l_elementclass, l_elementctor);
+    
+    return p_env->NewObject( l_elementclass, l_elementctor, l_val );  
 }
