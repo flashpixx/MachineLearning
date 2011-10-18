@@ -194,8 +194,8 @@ namespace machinelearning { namespace tools {
             case weibull     :       return getWeibull(    (function::isNumericalZero<T>(p_first) ? 0 : p_first),   (function::isNumericalZero<T>(p_second) ? 1 : p_second)  );
             case rayleigh    :       return getRayleigh(   (function::isNumericalZero<T>(p_first) ? 1 : p_first)  );
             case chisquared  :       return getChiSquared( (function::isNumericalZero<T>(p_first) ? 1 : p_first)  );
-            case pareto      :       return getPareto(     (function::isNumericalZero<T>(p_first) ? 0 : p_first),   (function::isNumericalZero<T>(p_second) ? 1 : p_second)  );
-            case beta        :       return getBeta(       (function::isNumericalZero<T>(p_first) ? 0 : p_first),   (function::isNumericalZero<T>(p_second) ? 1 : p_second) );
+            case pareto      :       return getPareto(     p_first,                                                 (function::isNumericalZero<T>(p_second) ? 1 : p_second)  );
+            case beta        :       return getBeta(       p_first,                                                 (function::isNumericalZero<T>(p_second) ? 1 : p_second) );
             case triangular  :       return getTriangular( (function::isNumericalZero<T>(p_first) ? 0 : p_first),   (function::isNumericalZero<T>(p_second) ? static_cast<T>(0.5) : p_second),  (function::isNumericalZero<T>(p_third) ? 1 : p_third) );
         }
         

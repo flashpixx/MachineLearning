@@ -33,7 +33,7 @@ public class mds {
     /** main method
      * @param p_args input arguments
      **/
-	public static void main(String [] p_args)
+	public static void main(String[] p_args)
 	{
         // generates random datapoints
 		Random l_rand = new Random();
