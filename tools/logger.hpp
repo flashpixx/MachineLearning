@@ -71,6 +71,7 @@ namespace machinelearning { namespace tools {
         MPI::Finalize())
      * @endcode
      * The MPI libraries must be compiled with multithread support
+     * @todo adding stream operator for writing data to logger
      **/
     class logger
     {
