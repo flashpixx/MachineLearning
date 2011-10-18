@@ -58,10 +58,18 @@ JNIEXPORT jlong JNICALL Java_machinelearning_util_Random_cppCtor(JNIEnv* p_env, 
 }
 
 
+/** creates a random float value
+ * @param p_env JNI environment
+ * @param p_object JNI object
+ * @param p_distribution distribution object
+ * @return float random value
+ **/
 JNIEXPORT jobject JNICALL Java_machinelearning_util_Random_getFloat(JNIEnv* p_env, jobject p_object, jobject p_distribution)
 {
     tools::random* l_ptr = java::jni::getObjectPointer< tools::random >(p_env, p_object, fidx_machinelearning_util_random);
-        
+    if (!l_ptr)
+        return p_env->NewGlobalRef(NULL);
+    
     // create random value
     float l_val = 0;
     switch (java::jni::getEnumOrdinalValue(p_env, p_distribution)) {
@@ -127,7 +135,6 @@ JNIEXPORT jobject JNICALL Java_machinelearning_util_Random_getFloat(JNIEnv* p_en
             return p_env->NewGlobalRef(NULL);
     }
     
-    
     // create java object
     jclass l_elementclass   = NULL;
     jmethodID l_elementctor = NULL;
@@ -137,9 +144,17 @@ JNIEXPORT jobject JNICALL Java_machinelearning_util_Random_getFloat(JNIEnv* p_en
 }
 
 
+/** creates a random double value
+ * @param p_env JNI environment
+ * @param p_object JNI object
+ * @param p_distribution distribution object
+ * @return double random value
+ **/
 JNIEXPORT jobject JNICALL Java_machinelearning_util_Random_getDouble(JNIEnv* p_env, jobject p_object, jobject p_distribution)
 {
     tools::random* l_ptr = java::jni::getObjectPointer< tools::random >(p_env, p_object, fidx_machinelearning_util_random);
+    if (!l_ptr)
+        return p_env->NewGlobalRef(NULL);
     
     // create random value
     double l_val = 0;
@@ -205,7 +220,6 @@ JNIEXPORT jobject JNICALL Java_machinelearning_util_Random_getDouble(JNIEnv* p_e
             p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), _("option value is unkown") );
             return p_env->NewGlobalRef(NULL);
     }
-    
     
     // create java object
     jclass l_elementclass   = NULL;
