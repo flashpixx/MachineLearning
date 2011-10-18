@@ -48,7 +48,7 @@ public abstract class Object
      * references to each object that use native calls, so a main classloader call
      * runs each dispose-method on the native objects for cleaning memory
      * @todo the memory management can be worked with addShutDownHook(), so on this
-     * event objects can be destroyed
+     * event objects can be destroyed ( http://download.oracle.com/javase/1.4.2/docs/api/java/lang/Runtime.html#addShutdownHook%28java.lang.Thread%29 )
      **/
     static {
 
