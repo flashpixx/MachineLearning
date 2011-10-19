@@ -75,7 +75,6 @@ template<typename T> T getRandomValue( JNIEnv* p_env, const jobject& p_object, c
         p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
     }
         
-        
     return l_val;
 }
 
