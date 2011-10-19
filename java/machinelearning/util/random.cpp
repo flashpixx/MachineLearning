@@ -50,123 +50,31 @@ template<typename T> T getRandomValue( JNIEnv* p_env, const jobject& p_object, c
     tools::random* l_ptr = java::jni::getObjectPointer< tools::random >(p_env, p_object, fidx_machinelearning_util_random);
     T l_val              = static_cast<T>(0);
     
-    switch (java::jni::getEnumOrdinalValue(p_env, p_distribution)) {
-            
-        case 0 :
-            try {
-                l_val = l_ptr->get<T>( tools::random::uniform, p_first, p_second, p_third );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 1 :
-            try {
-                l_val = l_ptr->get<T>( tools::random::bernoulli, p_first, p_second, p_third );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 2 :
-            try {
-                l_val = l_ptr->get<T>( tools::random::cauchy, p_first, p_second, p_third );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 3 :
-            try {
-                l_val = l_ptr->get<T>( tools::random::gamma, p_first, p_second, p_third );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 4 :
-            try {
-                l_val = l_ptr->get<T>( tools::random::poisson, p_first, p_second, p_third );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 5 :
-            try {
-                l_val = l_ptr->get<T>( tools::random::exponential, p_first, p_second, p_third );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 6 :
-            try {
-                l_val = l_ptr->get<T>( tools::random::normal, p_first, p_second, p_third );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 7 :
-            try {
-                l_val = l_ptr->get<T>( tools::random::student, p_first, p_second, p_third );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 8 :
-            try {
-                l_val = l_ptr->get<T>( tools::random::weibull, p_first, p_second, p_third );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 9 :
-            try {
-                l_val = l_ptr->get<T>( tools::random::rayleigh, p_first, p_second, p_third );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 10 :
-            try {
-                l_val = l_ptr->get<T>( tools::random::chisquared, p_first, p_second, p_third );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 11 :
-            try {
-                l_val = l_ptr->get<T>( tools::random::pareto, p_first, p_second, p_third );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 12 :
-            try {
-                l_val = l_ptr->get<T>( tools::random::triangular, p_first, p_second, p_third );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 13 :
-            try {
-                l_val = l_ptr->get<T>( tools::random::beta, p_first, p_second, p_third );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        default:
-            p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), _("option value is unkown") );
+    try {
+        switch (java::jni::getEnumOrdinalValue(p_env, p_distribution)) {
+                
+            case 0  : l_val = l_ptr->get<T>( tools::random::uniform, p_first, p_second, p_third ); break;
+            case 1  : l_val = l_ptr->get<T>( tools::random::bernoulli, p_first, p_second, p_third ); break;
+            case 2  : l_val = l_ptr->get<T>( tools::random::cauchy, p_first, p_second, p_third ); break;
+            case 3  : l_val = l_ptr->get<T>( tools::random::gamma, p_first, p_second, p_third ); break;
+            case 4  : l_val = l_ptr->get<T>( tools::random::poisson, p_first, p_second, p_third ); break;
+            case 5  : l_val = l_ptr->get<T>( tools::random::exponential, p_first, p_second, p_third ); break;
+            case 6  : l_val = l_ptr->get<T>( tools::random::normal, p_first, p_second, p_third ); break;
+            case 7  : l_val = l_ptr->get<T>( tools::random::student, p_first, p_second, p_third ); break;
+            case 8  : l_val = l_ptr->get<T>( tools::random::weibull, p_first, p_second, p_third ); break;
+            case 9  : l_val = l_ptr->get<T>( tools::random::rayleigh, p_first, p_second, p_third ); break;
+            case 10 : l_val = l_ptr->get<T>( tools::random::chisquared, p_first, p_second, p_third ); break;
+            case 11 : l_val = l_ptr->get<T>( tools::random::pareto, p_first, p_second, p_third ); break;
+            case 12 : l_val = l_ptr->get<T>( tools::random::triangular, p_first, p_second, p_third ); break;
+            case 13 : l_val = l_ptr->get<T>( tools::random::beta, p_first, p_second, p_third ); break;
+                
+            default :
+                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), _("option value is unkown") );
+        }
+    } catch (const std::exception& e) {
+        p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
     }
+        
         
     return l_val;
 }
