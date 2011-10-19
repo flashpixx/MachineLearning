@@ -813,6 +813,7 @@
  * @todo adding voronoi tessellation
  * @todo thinking about Corba support for algorithms
  * @todo thinking about abstract middleware for Boinc support (eg patch clustering) http://boinc.berkeley.edu/
+ * @todo create a PHP modul ( http://devzone.zend.com/article/4486 / http://devzone.zend.com/node/view/id/1021 )
  **/
 namespace machinelearning {}
 
