@@ -36,6 +36,141 @@ namespace tools = machinelearning::tools;
 static jfieldID fidx_machinelearning_util_random    = NULL;
 
 
+/** generate a random value
+ * @param p_env JNI environment
+ * @param p_object JNI object
+ * @param p_distribution java distribution object
+ * @param p_first first random option value
+ * @param p_second second random option value
+ * @param p_thirs third random option value
+ * @return random value
+ **/
+template<typename T> T getRandomValue( JNIEnv* p_env, const jobject& p_object, const jobject& p_distribution,  const T& p_first, const T& p_second, const T& p_third )
+{
+    tools::random* l_ptr = java::jni::getObjectPointer< tools::random >(p_env, p_object, fidx_machinelearning_util_random);
+    T l_val              = static_cast<T>(0);
+    
+    switch (java::jni::getEnumOrdinalValue(p_env, p_distribution)) {
+            
+        case 0 :
+            try {
+                l_val = l_ptr->get<T>( tools::random::uniform, p_first, p_second, p_third );
+            } catch (const std::exception& e) {
+                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
+            }
+            break;
+            
+        case 1 :
+            try {
+                l_val = l_ptr->get<T>( tools::random::bernoulli, p_first, p_second, p_third );
+            } catch (const std::exception& e) {
+                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
+            }
+            break;
+            
+        case 2 :
+            try {
+                l_val = l_ptr->get<T>( tools::random::cauchy, p_first, p_second, p_third );
+            } catch (const std::exception& e) {
+                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
+            }
+            break;
+            
+        case 3 :
+            try {
+                l_val = l_ptr->get<T>( tools::random::gamma, p_first, p_second, p_third );
+            } catch (const std::exception& e) {
+                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
+            }
+            break;
+            
+        case 4 :
+            try {
+                l_val = l_ptr->get<T>( tools::random::poisson, p_first, p_second, p_third );
+            } catch (const std::exception& e) {
+                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
+            }
+            break;
+            
+        case 5 :
+            try {
+                l_val = l_ptr->get<T>( tools::random::exponential, p_first, p_second, p_third );
+            } catch (const std::exception& e) {
+                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
+            }
+            break;
+            
+        case 6 :
+            try {
+                l_val = l_ptr->get<T>( tools::random::normal, p_first, p_second, p_third );
+            } catch (const std::exception& e) {
+                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
+            }
+            break;
+            
+        case 7 :
+            try {
+                l_val = l_ptr->get<T>( tools::random::student, p_first, p_second, p_third );
+            } catch (const std::exception& e) {
+                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
+            }
+            break;
+            
+        case 8 :
+            try {
+                l_val = l_ptr->get<T>( tools::random::weibull, p_first, p_second, p_third );
+            } catch (const std::exception& e) {
+                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
+            }
+            break;
+            
+        case 9 :
+            try {
+                l_val = l_ptr->get<T>( tools::random::rayleigh, p_first, p_second, p_third );
+            } catch (const std::exception& e) {
+                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
+            }
+            break;
+            
+        case 10 :
+            try {
+                l_val = l_ptr->get<T>( tools::random::chisquared, p_first, p_second, p_third );
+            } catch (const std::exception& e) {
+                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
+            }
+            break;
+            
+        case 11 :
+            try {
+                l_val = l_ptr->get<T>( tools::random::pareto, p_first, p_second, p_third );
+            } catch (const std::exception& e) {
+                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
+            }
+            break;
+            
+        case 12 :
+            try {
+                l_val = l_ptr->get<T>( tools::random::triangular, p_first, p_second, p_third );
+            } catch (const std::exception& e) {
+                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
+            }
+            break;
+            
+        case 13 :
+            try {
+                l_val = l_ptr->get<T>( tools::random::beta, p_first, p_second, p_third );
+            } catch (const std::exception& e) {
+                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
+            }
+            break;
+            
+        default:
+            p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), _("option value is unkown") );
+    }
+        
+    return l_val;
+}
+
 
 /** destructor call for the random object 
  * @param p_env JNI environment
@@ -66,131 +201,9 @@ JNIEXPORT jlong JNICALL Java_machinelearning_util_Random_cppCtor(JNIEnv* p_env, 
  **/
 JNIEXPORT jobject JNICALL Java_machinelearning_util_Random_getFloat(JNIEnv* p_env, jobject p_object, jobject p_distribution)
 {
-    tools::random* l_ptr = java::jni::getObjectPointer< tools::random >(p_env, p_object, fidx_machinelearning_util_random);
-    if (!l_ptr)
-        return p_env->NewGlobalRef(NULL);
-    
     // create random value
-    float l_val = 0;
-    switch (java::jni::getEnumOrdinalValue(p_env, p_distribution)) {
-            
-        case 0 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::uniform );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 1 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::bernoulli );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 2 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::cauchy );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 3 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::gamma );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 4 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::poisson );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 5 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::exponential );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 6 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::normal );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 7 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::student );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 8 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::weibull );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 9 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::rayleigh );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 10 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::chisquared );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 11 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::pareto );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 12 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::triangular );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 13 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::beta );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        default:
-            p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), _("option value is unkown") );
-            return p_env->NewGlobalRef(NULL);
-    }
-    
+    const float l_val = getRandomValue( p_env, p_object, p_distribution, std::numeric_limits<float>::epsilon(), std::numeric_limits<float>::epsilon(), std::numeric_limits<float>::epsilon() );
+        
     // create java object
     jclass l_elementclass   = NULL;
     jmethodID l_elementctor = NULL;
@@ -208,130 +221,8 @@ JNIEXPORT jobject JNICALL Java_machinelearning_util_Random_getFloat(JNIEnv* p_en
  **/
 JNIEXPORT jobject JNICALL Java_machinelearning_util_Random_getDouble(JNIEnv* p_env, jobject p_object, jobject p_distribution)
 {
-    tools::random* l_ptr = java::jni::getObjectPointer< tools::random >(p_env, p_object, fidx_machinelearning_util_random);
-    if (!l_ptr)
-        return p_env->NewGlobalRef(NULL);
-        
     // create random value
-    double l_val = 0;
-    switch (java::jni::getEnumOrdinalValue(p_env, p_distribution)) {
-            
-        case 0 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::uniform );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 1 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::bernoulli );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 2 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::cauchy );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 3 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::gamma );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 4 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::poisson );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 5 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::exponential );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 6 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::normal );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 7 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::student );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 8 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::weibull );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 9 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::rayleigh );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 10 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::chisquared );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 11 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::pareto );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 12 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::triangular );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 13 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::beta );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        default:
-            p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), _("option value is unkown") );
-            return p_env->NewGlobalRef(NULL);
-    }
+    const double l_val = getRandomValue( p_env, p_object, p_distribution, std::numeric_limits<double>::epsilon(), std::numeric_limits<double>::epsilon(), std::numeric_limits<double>::epsilon() );
     
     // create java object
     jclass l_elementclass   = NULL;
@@ -351,132 +242,8 @@ JNIEXPORT jobject JNICALL Java_machinelearning_util_Random_getDouble(JNIEnv* p_e
  **/
 JNIEXPORT jobject JNICALL Java_machinelearning_util_Random_get__Lmachinelearning_util_Random_Distribution_2Ljava_lang_Float_2(JNIEnv* p_env, jobject p_object, jobject p_distribution, jobject p_first)
 {
-    tools::random* l_ptr = java::jni::getObjectPointer< tools::random >(p_env, p_object, fidx_machinelearning_util_random);
-    if (!l_ptr)
-        return p_env->NewGlobalRef(NULL);
-    
-    const jmethodID l_valueof = java::jni::getMethodID(p_env, "java/lang/Float", "floatValue", "()F");
-    
     // create random value
-    float l_val = 0;
-    switch (java::jni::getEnumOrdinalValue(p_env, p_distribution)) {
-            
-        case 0 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::uniform, p_env->CallFloatMethod( p_first, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 1 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::bernoulli, p_env->CallFloatMethod( p_first, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 2 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::cauchy, p_env->CallFloatMethod( p_first, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 3 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::gamma, p_env->CallFloatMethod( p_first, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 4 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::poisson, p_env->CallFloatMethod( p_first, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 5 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::exponential, p_env->CallFloatMethod( p_first, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 6 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::normal, p_env->CallFloatMethod( p_first, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 7 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::student, p_env->CallFloatMethod( p_first, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 8 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::weibull, p_env->CallFloatMethod( p_first, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 9 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::rayleigh, p_env->CallFloatMethod( p_first, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 10 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::chisquared, p_env->CallFloatMethod( p_first, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 11 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::pareto, p_env->CallFloatMethod( p_first, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 12 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::triangular, p_env->CallFloatMethod( p_first, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 13 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::beta, p_env->CallFloatMethod( p_first, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        default:
-            p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), _("option value is unkown") );
-            return p_env->NewGlobalRef(NULL);
-    }
+    const float l_val = getRandomValue( p_env, p_object, p_distribution,  p_env->CallFloatMethod( p_first, java::jni::getMethodID(p_env, "java/lang/Float", "floatValue", "()F") ), std::numeric_limits<float>::epsilon(), std::numeric_limits<float>::epsilon() );
     
     // create java object
     jclass l_elementclass   = NULL;
@@ -497,132 +264,9 @@ JNIEXPORT jobject JNICALL Java_machinelearning_util_Random_get__Lmachinelearning
  **/
 JNIEXPORT jobject JNICALL Java_machinelearning_util_Random_get__Lmachinelearning_util_Random_Distribution_2Ljava_lang_Float_2Ljava_lang_Float_2(JNIEnv* p_env, jobject p_object, jobject p_distribution, jobject p_first, jobject p_second)
 {
-    tools::random* l_ptr = java::jni::getObjectPointer< tools::random >(p_env, p_object, fidx_machinelearning_util_random);
-    if (!l_ptr)
-        return p_env->NewGlobalRef(NULL);
-    
-    const jmethodID l_valueof = java::jni::getMethodID(p_env, "java/lang/Float", "floatValue", "()F");
-    
     // create random value
-    float l_val = 0;
-    switch (java::jni::getEnumOrdinalValue(p_env, p_distribution)) {
-            
-        case 0 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::uniform, p_env->CallFloatMethod( p_first, l_valueof ), p_env->CallFloatMethod( p_second, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 1 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::bernoulli, p_env->CallFloatMethod( p_first, l_valueof ), p_env->CallFloatMethod( p_second, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 2 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::cauchy, p_env->CallFloatMethod( p_first, l_valueof ), p_env->CallFloatMethod( p_second, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 3 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::gamma, p_env->CallFloatMethod( p_first, l_valueof ), p_env->CallFloatMethod( p_second, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 4 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::poisson, p_env->CallFloatMethod( p_first, l_valueof ), p_env->CallFloatMethod( p_second, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 5 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::exponential, p_env->CallFloatMethod( p_first, l_valueof ), p_env->CallFloatMethod( p_second, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 6 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::normal, p_env->CallFloatMethod( p_first, l_valueof ), p_env->CallFloatMethod( p_second, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 7 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::student, p_env->CallFloatMethod( p_first, l_valueof ), p_env->CallFloatMethod( p_second, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 8 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::weibull, p_env->CallFloatMethod( p_first, l_valueof ), p_env->CallFloatMethod( p_second, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 9 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::rayleigh, p_env->CallFloatMethod( p_first, l_valueof ), p_env->CallFloatMethod( p_second, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 10 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::chisquared, p_env->CallFloatMethod( p_first, l_valueof ), p_env->CallFloatMethod( p_second, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 11 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::pareto, p_env->CallFloatMethod( p_first, l_valueof ), p_env->CallFloatMethod( p_second, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 12 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::triangular, p_env->CallFloatMethod( p_first, l_valueof ), p_env->CallFloatMethod( p_second, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 13 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::beta, p_env->CallFloatMethod( p_first, l_valueof ), p_env->CallFloatMethod( p_second, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        default:
-            p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), _("option value is unkown") );
-            return p_env->NewGlobalRef(NULL);
-    }
+    const jmethodID l_valueof = java::jni::getMethodID(p_env, "java/lang/Float", "floatValue", "()F");
+    const float l_val         = getRandomValue( p_env, p_object, p_distribution,  p_env->CallFloatMethod( p_first, l_valueof ), p_env->CallFloatMethod( p_second, l_valueof ), std::numeric_limits<float>::epsilon() );
     
     // create java object
     jclass l_elementclass   = NULL;
@@ -644,132 +288,9 @@ JNIEXPORT jobject JNICALL Java_machinelearning_util_Random_get__Lmachinelearning
  **/
 JNIEXPORT jobject JNICALL Java_machinelearning_util_Random_get__Lmachinelearning_util_Random_Distribution_2Ljava_lang_Float_2Ljava_lang_Float_2Ljava_lang_Float_2(JNIEnv* p_env, jobject p_object, jobject p_distribution, jobject p_first, jobject p_second, jobject p_third)
 {
-    tools::random* l_ptr = java::jni::getObjectPointer< tools::random >(p_env, p_object, fidx_machinelearning_util_random);
-    if (!l_ptr)
-        return p_env->NewGlobalRef(NULL);
-    
-    const jmethodID l_valueof = java::jni::getMethodID(p_env, "java/lang/Float", "floatValue", "()F");
-    
     // create random value
-    float l_val = 0;
-    switch (java::jni::getEnumOrdinalValue(p_env, p_distribution)) {
-            
-        case 0 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::uniform, p_env->CallFloatMethod( p_first, l_valueof ), p_env->CallFloatMethod( p_second, l_valueof ), p_env->CallFloatMethod( p_third, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 1 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::bernoulli, p_env->CallFloatMethod( p_first, l_valueof ), p_env->CallFloatMethod( p_second, l_valueof ), p_env->CallFloatMethod( p_third, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 2 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::cauchy, p_env->CallFloatMethod( p_first, l_valueof ), p_env->CallFloatMethod( p_second, l_valueof ), p_env->CallFloatMethod( p_third, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 3 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::gamma, p_env->CallFloatMethod( p_first, l_valueof ), p_env->CallFloatMethod( p_second, l_valueof ), p_env->CallFloatMethod( p_third, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 4 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::poisson, p_env->CallFloatMethod( p_first, l_valueof ), p_env->CallFloatMethod( p_second, l_valueof ), p_env->CallFloatMethod( p_third, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 5 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::exponential, p_env->CallFloatMethod( p_first, l_valueof ), p_env->CallFloatMethod( p_second, l_valueof ), p_env->CallFloatMethod( p_third, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 6 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::normal, p_env->CallFloatMethod( p_first, l_valueof ), p_env->CallFloatMethod( p_second, l_valueof ), p_env->CallFloatMethod( p_third, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 7 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::student, p_env->CallFloatMethod( p_first, l_valueof ), p_env->CallFloatMethod( p_second, l_valueof ), p_env->CallFloatMethod( p_third, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 8 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::weibull, p_env->CallFloatMethod( p_first, l_valueof ), p_env->CallFloatMethod( p_second, l_valueof ), p_env->CallFloatMethod( p_third, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 9 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::rayleigh, p_env->CallFloatMethod( p_first, l_valueof ), p_env->CallFloatMethod( p_second, l_valueof ), p_env->CallFloatMethod( p_third, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 10 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::chisquared, p_env->CallFloatMethod( p_first, l_valueof ), p_env->CallFloatMethod( p_second, l_valueof ), p_env->CallFloatMethod( p_third, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 11 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::pareto, p_env->CallFloatMethod( p_first, l_valueof ), p_env->CallFloatMethod( p_second, l_valueof ), p_env->CallFloatMethod( p_third, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 12 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::triangular, p_env->CallFloatMethod( p_first, l_valueof ), p_env->CallFloatMethod( p_second, l_valueof ), p_env->CallFloatMethod( p_third, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 13 :
-            try {
-                l_val = l_ptr->get<float>( tools::random::beta, p_env->CallFloatMethod( p_first, l_valueof ), p_env->CallFloatMethod( p_second, l_valueof ), p_env->CallFloatMethod( p_third, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        default:
-            p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), _("option value is unkown") );
-            return p_env->NewGlobalRef(NULL);
-    }
+    const jmethodID l_valueof = java::jni::getMethodID(p_env, "java/lang/Float", "floatValue", "()F");
+    const float l_val         = getRandomValue( p_env, p_object, p_distribution,  p_env->CallFloatMethod( p_first, l_valueof ), p_env->CallFloatMethod( p_second, l_valueof ), p_env->CallFloatMethod( p_third, l_valueof ) );
     
     // create java object
     jclass l_elementclass   = NULL;
@@ -789,133 +310,9 @@ JNIEXPORT jobject JNICALL Java_machinelearning_util_Random_get__Lmachinelearning
  **/
 JNIEXPORT jobject JNICALL Java_machinelearning_util_Random_get__Lmachinelearning_util_Random_Distribution_2Ljava_lang_Double_2(JNIEnv* p_env, jobject p_object, jobject p_distribution, jobject p_first)
 {
-    tools::random* l_ptr = java::jni::getObjectPointer< tools::random >(p_env, p_object, fidx_machinelearning_util_random);
-    if (!l_ptr)
-        return p_env->NewGlobalRef(NULL);
-    
-    const jmethodID l_valueof = java::jni::getMethodID(p_env, "java/lang/Double", "doubleValue", "()D");
-    
     // create random value
-    double l_val = 0;
-    switch (java::jni::getEnumOrdinalValue(p_env, p_distribution)) {
-            
-        case 0 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::uniform, p_env->CallDoubleMethod( p_first, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 1 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::bernoulli, p_env->CallDoubleMethod( p_first, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 2 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::cauchy, p_env->CallDoubleMethod( p_first, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 3 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::gamma, p_env->CallDoubleMethod( p_first, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 4 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::poisson, p_env->CallDoubleMethod( p_first, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 5 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::exponential, p_env->CallDoubleMethod( p_first, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 6 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::normal, p_env->CallDoubleMethod( p_first, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 7 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::student, p_env->CallDoubleMethod( p_first, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 8 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::weibull, p_env->CallDoubleMethod( p_first, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 9 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::rayleigh, p_env->CallDoubleMethod( p_first, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 10 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::chisquared, p_env->CallDoubleMethod( p_first, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 11 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::pareto, p_env->CallDoubleMethod( p_first, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 12 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::triangular, p_env->CallDoubleMethod( p_first, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 13 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::beta, p_env->CallDoubleMethod( p_first, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        default:
-            p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), _("option value is unkown") );
-            return p_env->NewGlobalRef(NULL);
-    }
-    
+    const double l_val = getRandomValue( p_env, p_object, p_distribution, p_env->CallDoubleMethod( p_first, java::jni::getMethodID(p_env, "java/lang/Double", "doubleValue", "()D") ), std::numeric_limits<double>::epsilon(), std::numeric_limits<double>::epsilon() );
+
     // create java object
     jclass l_elementclass   = NULL;
     jmethodID l_elementctor = NULL;
@@ -935,132 +332,9 @@ JNIEXPORT jobject JNICALL Java_machinelearning_util_Random_get__Lmachinelearning
  **/
 JNIEXPORT jobject JNICALL Java_machinelearning_util_Random_get__Lmachinelearning_util_Random_Distribution_2Ljava_lang_Double_2Ljava_lang_Double_2(JNIEnv* p_env, jobject p_object, jobject p_distribution, jobject p_first, jobject p_second)
 {
-    tools::random* l_ptr = java::jni::getObjectPointer< tools::random >(p_env, p_object, fidx_machinelearning_util_random);
-    if (!l_ptr)
-        return p_env->NewGlobalRef(NULL);
-    
-    const jmethodID l_valueof = java::jni::getMethodID(p_env, "java/lang/Double", "doubleValue", "()D");
-    
     // create random value
-    double l_val = 0;
-    switch (java::jni::getEnumOrdinalValue(p_env, p_distribution)) {
-            
-        case 0 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::uniform, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 1 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::bernoulli, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 2 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::cauchy, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 3 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::gamma, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 4 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::poisson, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 5 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::exponential, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 6 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::normal, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 7 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::student, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 8 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::weibull, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 9 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::rayleigh, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 10 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::chisquared, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 11 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::pareto, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 12 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::triangular, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 13 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::beta, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        default:
-            p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), _("option value is unkown") );
-            return p_env->NewGlobalRef(NULL);
-    }
+    const jmethodID l_valueof = java::jni::getMethodID(p_env, "java/lang/Double", "doubleValue", "()D");
+    const double l_val        = getRandomValue( p_env, p_object, p_distribution, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ), std::numeric_limits<double>::epsilon() );
     
     // create java object
     jclass l_elementclass   = NULL;
@@ -1082,132 +356,9 @@ JNIEXPORT jobject JNICALL Java_machinelearning_util_Random_get__Lmachinelearning
  **/
 JNIEXPORT jobject JNICALL Java_machinelearning_util_Random_get__Lmachinelearning_util_Random_Distribution_2Ljava_lang_Double_2Ljava_lang_Double_2Ljava_lang_Double_2(JNIEnv* p_env, jobject p_object, jobject p_distribution, jobject p_first, jobject p_second, jobject p_third)
 {
-    tools::random* l_ptr = java::jni::getObjectPointer< tools::random >(p_env, p_object, fidx_machinelearning_util_random);
-    if (!l_ptr)
-        return p_env->NewGlobalRef(NULL);
-    
-    const jmethodID l_valueof = java::jni::getMethodID(p_env, "java/lang/Double", "doubleValue", "()D");
-    
     // create random value
-    double l_val = 0;
-    switch (java::jni::getEnumOrdinalValue(p_env, p_distribution)) {
-            
-        case 0 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::uniform, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ), p_env->CallDoubleMethod( p_third, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 1 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::bernoulli, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ), p_env->CallDoubleMethod( p_third, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 2 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::cauchy, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ), p_env->CallDoubleMethod( p_third, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 3 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::gamma, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ), p_env->CallDoubleMethod( p_third, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 4 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::poisson, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ), p_env->CallDoubleMethod( p_third, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 5 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::exponential, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ), p_env->CallDoubleMethod( p_third, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 6 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::normal, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ), p_env->CallDoubleMethod( p_third, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 7 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::student, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ), p_env->CallDoubleMethod( p_third, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 8 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::weibull, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ), p_env->CallDoubleMethod( p_third, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 9 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::rayleigh, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ), p_env->CallDoubleMethod( p_third, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 10 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::chisquared, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ), p_env->CallDoubleMethod( p_third, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 11 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::pareto, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ), p_env->CallDoubleMethod( p_third, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 12 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::triangular, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ), p_env->CallDoubleMethod( p_third, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        case 13 :
-            try {
-                l_val = l_ptr->get<double>( tools::random::beta, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ), p_env->CallDoubleMethod( p_third, l_valueof ) );
-            } catch (const std::exception& e) {
-                p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), e.what() );
-            }
-            break;
-            
-        default:
-            p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), _("option value is unkown") );
-            return p_env->NewGlobalRef(NULL);
-    }
+    const jmethodID l_valueof = java::jni::getMethodID(p_env, "java/lang/Double", "doubleValue", "()D");
+    const double l_val        = getRandomValue( p_env, p_object, p_distribution, p_env->CallDoubleMethod( p_first, l_valueof ), p_env->CallDoubleMethod( p_second, l_valueof ), p_env->CallDoubleMethod( p_third, l_valueof ) );
     
     // create java object
     jclass l_elementclass   = NULL;
