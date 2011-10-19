@@ -42,7 +42,7 @@ static jfieldID fidx_machinelearning_util_random    = NULL;
  * @param p_distribution java distribution object
  * @param p_first first random option value
  * @param p_second second random option value
- * @param p_thirs third random option value
+ * @param p_third third random option value
  * @return random value
  **/
 template<typename T> T getRandomValue( JNIEnv* p_env, const jobject& p_object, const jobject& p_distribution,  const T& p_first, const T& p_second, const T& p_third )
