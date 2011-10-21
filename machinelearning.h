@@ -211,7 +211,22 @@
  * @code configure --dylibs --with-netlib-lapack-tarfile=-path to lapack.tgz- @endcode
  * In some cases the pointer bitwidth (<dfn>-b</dfn>) must be set. The flag <dfn>--nof77</dfn> should not be set, because some LAPack routines are not built (a full LAPack support is required).
  * The configure call must be run into a temporary directory, so in the first step the temporary directory must be created. It is recommend that you take a look into the Atlas errata for more
- * information about installing Atlas under Windows (see http://math-atlas.sourceforge.net/errata.html ).
+ * information about installing Atlas under Windows (see http://math-atlas.sourceforge.net/errata.html ). 
+ * @subsubsection nixsoname Linux library with soname
+ * If you want build the Java packages with the Atlas and LAPack library, you must compile the library and after compiling you should change the line in <dfn>working directory/lib/Makefile</dfn>
+ * @code
+    (LD) $(LDFLAGS) -shared -soname $(LIBINSTdir)/$(outso) -o $(outso) \
+ * @endcode
+ * to
+ * @code
+    (LD) $(LDFLAGS) -shared -soname $(outso) -o $(outso) \
+ * @endcode
+ * for setting the internal soname of the library. After changing you should run on the working directory
+ * @code
+    make shared
+ * @endcode
+ * Now the library can installed with the default option.
+ * 
  *
  * @subsection nixpath path under Linux
  * Under Linux some environmantal variables must be set, if the libraries are installed into a non-default directory. The variable <dfn>CPATH</dfn> and <dfn>CPPPATH</dfn> must be set to the include
