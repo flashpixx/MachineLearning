@@ -58,6 +58,7 @@
  * <li><i>optional GetText</i> ( http://www.gnu.org/software/gettext/ ) (used by multilanguage support)</li>
  * <li><i>optional LibXML2</i> ( http://xmlsoft.org/ ) (used by wikipedia support)</li>
  * <li><i>optional LibJSONCPP</i> ( http://sourceforge.net/projects/jsoncpp/ ) (used by twitter support)</li>
+ * <li><i>optional Java Developer Kit (JDK)</i> ( http://www.oracle.com/technetwork/java/javase/downloads/index.html ) </li>
  * <li><i>optional Scons</i> ( http://www.scons.org/ )</li>
  * <li><i>optional Doxygen</i> ( http://www.doxygen.org/ ) with Graphviz support ( http://www.graphviz.org )</li>
  * </ul>
@@ -313,6 +314,23 @@
  * <li><dfn>w2000</dfn> Windows 2000</li>
  * </ul>
  * The description and hexdecimal values can be found on http://msdn.microsoft.com/en-us/library/aa383745%28v=vs.85%29.aspx
+ *
+ * @subsection winjavac using Java builds under Cygwin
+ * For using the Java builds all libraries must be installed and the JDK must be installed also and within the path directory. The include directory must be expanded with the subdirectory
+ * <dfn>include</dfn> and <dfn>include/win32</dfn>. The GCC compiler under Cygwin does not have a buildin type <dfn>__int64</dfn>, so within the file <dfn>include/win32/jni_md.h</dfn> 
+ * the line 
+ * @code
+    typedef long long jlong;
+ * @endcode
+ * must be changed to
+ * @code
+    #ifdef __GNUC__
+    typedef long long jlong;
+    #else
+    typedef __int64 jlong;
+    #endif
+ * @endcode
+ * Also the package <dfn>devel/libgcj</dfn> must be installed from the Cygwin repository.
  *
  * @subsection winscons Error with Scons
  * In some cases if Scons is running, the python would be create a memory error like:

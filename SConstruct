@@ -187,10 +187,9 @@ def configuration_cygwin(config, vars, version, architecture) :
     elif vars["winver"] == "w2000" :
         config["compileflags"] += " -D _WIN32_WINNT=0x0500"
 
-    if vars["atlaslink"] == "multi" :
-        config["linkto"].extend( ["tatlas", "lapack", "cblas", "f77blas", "atlas", "gfortran"] )
-    else :
-        config["linkto"].extend( ["satlas", "lapack", "cblas", "f77blas", "atlas", "gfortran"] )
+	# Atlas build creates a static library under Cygwin, so we link directly without the "atlaslink" option 
+    # Library sequence must be preserved !!
+    config["linkto"].extend( ["lapack", "cblas", "f77blas", "atlas", "gfortran"] )
 
     if vars["withdebug"] :
         config["compileflags"]      += " -g"

@@ -113,7 +113,7 @@ namespace machinelearning { namespace java {
                     //p_env->DeleteLocalRef(l_class);
                     delete(p_ptr);
                     p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), _("can not find associated java class") );
-                    return NULL;
+                    return 0;
                 }
                     
                 // check if the object is in a thread-safe content and lock it
@@ -121,7 +121,7 @@ namespace machinelearning { namespace java {
                     //p_env->DeleteLocalRef(l_class);
                     delete(p_ptr);
                     p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), _("call is not within a thread-safe content") );
-                    return NULL;
+                    return 0;
                 }
                 
                 // set the field index to the parameter
@@ -132,7 +132,7 @@ namespace machinelearning { namespace java {
                     //p_env->DeleteLocalRef(l_class);
                     delete(p_ptr);
                     p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), _("release thread can not be determine correctly") );
-                    return NULL;
+                    return 0;
                 }
             }
 
@@ -140,7 +140,7 @@ namespace machinelearning { namespace java {
             if (!p_idx) {
                 delete(p_ptr);
                 p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), _("pointer field can not detected") );
-                return NULL;
+                return 0;
             }
             
             // return casted pointer to the call
@@ -185,14 +185,14 @@ namespace machinelearning { namespace java {
             if (!l_class) {
                 //p_env->DeleteLocalRef(l_class);
                 p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), _("can not find associated java class") );
-                return NULL;
+                return 0;
             }
             
             jmethodID l_id = p_env->GetMethodID(l_class, p_name, p_signatur);
             if (!l_id) {
                 //p_env->DeleteLocalRef(l_class);
                 p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), _("can not find method with signature") );
-                return NULL;
+                return 0;
             }
 
             p_env->DeleteLocalRef(l_class);
@@ -214,14 +214,14 @@ namespace machinelearning { namespace java {
             if (!l_class) {
                 //p_env->DeleteLocalRef(l_class);
                 p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), _("can not find associated java class") );
-                return NULL;
+                return 0;
             }
             
             jmethodID l_id = p_env->GetMethodID(l_class, p_methodname, p_signatur);
             if (!l_id) {
                 //p_env->DeleteLocalRef(l_class);
                 p_env->ThrowNew( p_env->FindClass("machinelearning/exception/Runtime"), _("can not find method with signature") );
-                return NULL;
+                return 0;
             }
             
             //p_env->DeleteLocalRef(l_class);
