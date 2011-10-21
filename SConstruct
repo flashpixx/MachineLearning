@@ -103,14 +103,14 @@ def configuration_posix(config, vars, version, architecture) :
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["LIBRARY_PATH"]
     config["compileflags"]      = "-pipe -Wall -Wextra -pthread -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
-    config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "boost_regex"]
+    config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "boost_regex", "gfortran"]
 
 
     # Java target must not linked again different boost libs
     if not("javac" in COMMAND_LINE_TARGETS) :
         config["linkto"].extend(["boost_program_options", "boost_exception", "boost_filesystem"])
     else :
-        config["linkerflags"] = "-Wl,--rpath=\\$$ORIGIN -lgfortran"
+        config["linkerflags"] = "-Wl,--rpath=\\$$ORIGIN"
 
     if vars["atlaslink"] == "multi" :
         config["linkto"].extend( ["tatlas"] )
