@@ -110,7 +110,7 @@ def configuration_posix(config, vars, version, architecture) :
     if not("javac" in COMMAND_LINE_TARGETS) :
         config["linkto"].extend(["boost_program_options", "boost_exception", "boost_filesystem"])
     else :
-        config["linkerflags"] = "-Wl,--rpath=\\$$ORIGIN"
+        config["linkerflags"] = "-Wl,--rpath=\\$$ORIGIN -lgfortran"
 
     if vars["atlaslink"] == "multi" :
         config["linkto"].extend( ["tatlas"] )
