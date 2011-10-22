@@ -26,6 +26,7 @@ package machinelearning;
 import java.io.*;
 import java.util.*;
 import java.util.jar.*;
+import java.net.*;
 
 
 /** class that must derviated in each object in the package, that uses
@@ -76,7 +77,7 @@ public abstract class Object
                 // extract files from the Jar
                 try {
                     // extract from the classname the location of the JAR (remove URL prefix jar:file: and suffix after .jar)
-                    String l_jarfile = Class.forName("machinelearning.Object").getResource("").toString();
+                    String l_jarfile = URLDecoder.decode(Class.forName("machinelearning.Object").getResource("").toString(),"UTF-8");
                     l_jarfile        = l_jarfile.substring(9, l_jarfile.lastIndexOf(".jar!")) + ".jar";
                     
                     // open the Jar file to get all Jar entries and extract the "native" subdirectory
