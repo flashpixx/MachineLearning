@@ -330,7 +330,7 @@
     typedef __int64 jlong;
     #endif
  * @endcode
- * Also the package <dfn>devel/libgcj</dfn> must be installed from the Cygwin repository.
+ * Now the Java parts can be compiled with the Cygwin G++
  *
  * @subsection winscons Error with Scons
  * In some cases if Scons is running, the python would be create a memory error like:
