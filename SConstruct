@@ -38,10 +38,10 @@ def configuration_macosx(config, vars, version, architecture) :
         arch = "x86_64"
 
     config["shlinkerflags"]     = ""
-    config["linkerflags"]       = ""
+    config["linkerflags"]       = "-pthread"
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["LIBRARY_PATH"]
-    config["compileflags"]      = "-pipe -Wall -Wextra -pthread -arch "+arch+" -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
+    config["compileflags"]      = "-pipe -Wall -Wextra -arch "+arch+" -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
     config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "boost_regex"]
 
 
@@ -99,10 +99,10 @@ def configuration_macosx(config, vars, version, architecture) :
 # configuration for Posix (Linux) build
 def configuration_posix(config, vars, version, architecture) :
     config["shlinkerflags"]     = ""
-    config["linkerflags"]       = ""
+    config["linkerflags"]       = "-pthread"
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["LIBRARY_PATH"]
-    config["compileflags"]      = "-pipe -Wall -Wextra -pthread -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
+    config["compileflags"]      = "-pipe -Wall -Wextra -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
     config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "boost_regex", "gfortran"]
 
 
@@ -158,7 +158,7 @@ def configuration_posix(config, vars, version, architecture) :
 # configuration for Windows Cygwin build
 def configuration_cygwin(config, vars, version, architecture) :
     config["shlinkerflags"]     = ""
-    config["linkerflags"]       = "-enable-stdcall-fixup"
+    config["linkerflags"]       = "-enable-stdcall-fixup -mthread"
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["PATH"]
     config["compileflags"]      = "-pipe -Wall -Wextra -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
@@ -167,6 +167,7 @@ def configuration_cygwin(config, vars, version, architecture) :
 
     # Java target must not linked again different boost libs
     if not("javac" in COMMAND_LINE_TARGETS) :
+        config["linkerflags"]  += " -mconsole"
         config["linkto"].extend(["cygboost_program_options", "boost_exception", "cygboost_filesystem"])
 
     #Windows Version options see http://msdn.microsoft.com/en-us/library/aa383745%28v=vs.85%29.aspx
