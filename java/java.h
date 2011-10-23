@@ -29,6 +29,10 @@ namespace machinelearning {
     
     /** namespace for JNI / JAVA wrapper code 
      * $LastChangedDate$
+     * @todo adding full clustering algorithms to package
+     * @todo adding genetic algorithms to package
+     * @todo adding file / sources support to package
+     * @todo adding distance & neigborhood support to package
      **/
     namespace java {}
     
