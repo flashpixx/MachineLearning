@@ -1,4 +1,4 @@
-/** 
+/**
  @cond
  ############################################################################
  # LGPL License                                                             #
@@ -33,6 +33,11 @@
 #include <boost/mpi.hpp>
 #endif
 
+#if defined(_WIN32) || defined(__CYGWIN__)
+#include <windows.h>
+#endif
+
+
 namespace po        = boost::program_options;
 namespace ublas     = boost::numeric::ublas;
 namespace dim       = machinelearning::dimensionreduce::nonsupervised;
@@ -57,53 +62,53 @@ std::vector<std::string> createGroupList( tools::sources::nntp& p_nntp, const st
         try {
             l_num = boost::lexical_cast<std::size_t>(p_groups[0]);
         } catch (...) {}
-        
+
         if (l_num > 0) {
             std::vector<std::string> l_groups;
             std::map<std::string, std::size_t> l_ingroup = p_nntp.getGroupList();
-            
+
             // create vector with n elements (frequency itemset)
             std::vector< std::pair<std::string, std::size_t> > l_max;
             for(std::size_t i=0; i < l_num; ++i)
                 l_max.push_back( std::pair<std::string, std::size_t>("", 0) );
-            
+
             // we read the group list and get the the groups with the most entries (frequent itemsets)
             for(std::map<std::string, std::size_t>::iterator it = l_ingroup.begin(); it != l_ingroup.end(); it++)
                 if ((*it).second > l_max[0].second) {
                     l_max.push_back( std::pair<std::string, std::size_t>( (*it).first, (*it).second) );
                     l_max.erase( l_max.begin(), l_max.begin()+1 );
                 }
-            
+
             for(std::size_t i=0; i < l_max.size(); ++i)
-                l_groups.push_back( l_max[i].first );	
-            
+                l_groups.push_back( l_max[i].first );
+
             return l_groups;
         }
     }
-    
+
     // check if the first element "rand" and the second a number
     if ((p_groups.size() == 2) && (p_groups[0] == "rand")) {
         std::size_t l_num = 0;
         try {
             l_num = boost::lexical_cast<std::size_t>(p_groups[1]);
         } catch (...) {}
-        
+
         if (l_num > 0) {
             tools::random l_rand;
             std::vector<std::string> l_groups;
             std::map<std::string, std::size_t> l_ingroup = p_nntp.getGroupList();
-            
+
             for(std::size_t i=0; i < l_num; ++i) {
                 const unsigned int id = static_cast<std::size_t>(l_rand.get<double>(tools::random::uniform, 0, l_ingroup.size()-1));
                 std::map<std::string, std::size_t>::iterator it = l_ingroup.begin();
-                
+
                 std::advance(it, id);
                 l_groups.push_back( (*it).first );
             }
             return l_groups;
         }
     }
-    
+
     // otherwise return list
     return p_groups;
 }
@@ -121,7 +126,7 @@ void getArticles( tools::sources::nntp& p_nntp, const std::size_t& p_numarticles
     // read group size
     std::map<std::string, std::size_t> l_numarticles;
     std::size_t l_allcount = 0;
-    
+
     for(std::size_t i=0; i < p_groups.size(); ++i) {
         std::map<std::string, std::size_t> l_groupcount = p_nntp.getGroupList( p_groups[i] );
         l_numarticles[p_groups[i]] =  l_groupcount[p_groups[i]];
@@ -129,18 +134,18 @@ void getArticles( tools::sources::nntp& p_nntp, const std::size_t& p_numarticles
     }
 
     if (l_allcount < 2*p_numarticles)
-        throw std::runtime_error("not enough articles within the groups");	
-		
+        throw std::runtime_error("not enough articles within the groups");
+
     // determine percent articles for each group in conclusion with their size
     std::size_t l_count = 0;
     for(std::map<std::string, std::size_t>::iterator it = l_numarticles.begin(); it != l_numarticles.end(); it++) {
         (*it).second = static_cast<std::size_t>(static_cast<double>((*it).second) / l_allcount * p_numarticles);
         l_count += (*it).second;
     }
-	
+
     if (l_count != p_numarticles)
         (*l_numarticles.begin()).second += p_numarticles - l_count;
-		
+
     // read articles
     p_article.clear();
     p_articlegroup.clear();
@@ -150,22 +155,22 @@ void getArticles( tools::sources::nntp& p_nntp, const std::size_t& p_numarticles
         for(std::map<std::string, std::size_t>::iterator it = l_numarticles.begin(); it != l_numarticles.end(); it++) {
             if ((*it).second == 0)
                 continue;
-		
+
             std::size_t n=0;
             p_nntp.setGroup( (*it).first );
             while ((n < (*it).second) && p_nntp.nextArticle()) {
                 const std::string l_text = p_nntp.getArticle();
-                
+
                 if ( (!p_nntp.isArticleCanceled()) && (l_rand.get<double>(tools::random::uniform) < 0.5) && (!l_text.empty()) ) {
                     p_article.push_back( l_text );
                     p_articlegroup.push_back( (*it).first );
                     n++;
-					
+
                     if (p_article.size() >= p_numarticles)
                         break;
                 }
             }
-			
+
             if (p_article.size() >= p_numarticles)
                 break;
 	}
@@ -173,14 +178,14 @@ void getArticles( tools::sources::nntp& p_nntp, const std::size_t& p_numarticles
 
 
 
-/** main program, that reads a subset of newsgroup articles, calculate the distance between articles 
+/** main program, that reads a subset of newsgroup articles, calculate the distance between articles
  * and create the plot via MDS.
  * @param argc number of arguments
  * @param argv arguments
 **/
 int main(int argc, char* argv[])
 {
-    
+
     // default values
     std::size_t l_dimension;
     std::size_t l_iteration;
@@ -188,8 +193,8 @@ int main(int argc, char* argv[])
     std::string l_compress;
     std::string l_algorithm;
     std::string l_mapping;
-    
-    
+
+
     // create CML options with description
     po::options_description l_description("allowed options");
     l_description.add_options()
@@ -210,49 +215,49 @@ int main(int argc, char* argv[])
         ("mapping", po::value<std::string>(&l_mapping)->default_value("hit"), "mapping type (values: metric, sammon, hit [default])")
         ("stopword", po::value< std::vector<double> >()->multitoken(), "minimal and maximal value of the stopword reduction (value within the range [0,1])")
     ;
-    
+
     po::variables_map l_map;
     po::positional_options_description l_input;
     po::store(po::command_line_parser(argc, argv).options(l_description).positional(l_input).run(), l_map);
     po::notify(l_map);
-    
+
     if (l_map.count("help")) {
         std::cout << l_description << std::endl;
         return EXIT_SUCCESS;
     }
-    
+
     if ( (!l_map.count("outfile")) || (!l_map.count("articles")) || (!l_map.count("groups")) || (!l_map.count("server")) )  {
         std::cerr << "[--server], [--outfile], [--groups] and [--articles] option must be set" << std::endl;
         return EXIT_FAILURE;
     }
-    
-    
-    
+
+
+
     // connect to server
     tools::sources::nntp l_nntp( l_map["server"].as<std::string>() );
 
     // read group list
-    #ifdef MACHINELEARNING_MPI 
+    #ifdef MACHINELEARNING_MPI
     loMPICom.barrier();
     std::cout << "CPU " << loMPICom.rank() << ": ";
     #endif
     std::cout << "getting group data..." << std::endl;
     std::vector<std::string> l_groups = createGroupList(l_nntp, l_map["groups"].as< std::vector<std::string> >());
-	
-    // read article data 
-    #ifdef MACHINELEARNING_MPI 
+
+    // read article data
+    #ifdef MACHINELEARNING_MPI
     loMPICom.barrier();
     std::cout << "CPU " << loMPICom.rank() << ": ";
     #endif
     std::cout << "read article data..." << std::endl;
     std::vector<std::string> l_article;
     std::vector<std::string> l_articlegroup;
-	
+
     #ifdef MACHINELEARNING_MPI
     std::vector<std::size_t> l_artnum = l_map["articles"].as< std::vector<std::size_t> >();
     if (l_artnum.size() != static_cast<std::size_t>(loMPICom.size()))
         throw std::runtime_error("number of articles and used CPUs are not equal");
-		
+
     getArticles( l_nntp, l_artnum[loMPICom.rank()], l_groups, l_article, l_articlegroup );
     #else
     getArticles( l_nntp, l_map["articles"].as<std::size_t>(), l_groups, l_article, l_articlegroup );
@@ -260,68 +265,68 @@ int main(int argc, char* argv[])
 
     if (l_article.size() == 0)
         throw std::runtime_error("no articles are readed");
-    
-    
+
+
     #ifdef MACHINELEARNING_MPI
     // each process must get the article data
     std::vector< std::vector<std::string> > l_processarticles;
     std::vector< std::vector<std::string> > l_processarticlegroups;
     mpi::all_gather(loMPICom, l_article, l_processarticles);
     mpi::all_gather(loMPICom, l_articlegroup, l_processarticlegroups);
-    
+
     std::vector<std::string> l_allarticles;
     std::vector<std::string> l_allarticlegroups;
     std::size_t startcol = 0;
     for(std::size_t i=0; i < l_processarticles.size(); ++i) {
         if (i < static_cast<std::size_t>(loMPICom.rank()))
             startcol += l_processarticles[i].size();
-        
+
         for(std::size_t n=0; n < l_processarticles[i].size(); ++n) {
             l_allarticles.push_back( l_processarticles[i][n] );
             l_allarticlegroups.push_back( l_processarticlegroups[i][n] );
         }
     }
     #endif
-    
-    
+
+
     // do stopword reduction
     if (l_map.count("stopword")) {
-        #ifdef MACHINELEARNING_MPI 
+        #ifdef MACHINELEARNING_MPI
         loMPICom.barrier();
         std::cout << "CPU " << loMPICom.rank() << ": ";
         #endif
         std::cout << "stopword reduction..." << std::endl;
-        
+
         const std::vector<double> l_val = l_map["stopword"].as< std::vector<double> >();
         if (l_val.size() >= 2) {
             text::termfrequency tfc;
-            
-            #ifdef MACHINELEARNING_MPI 
+
+            #ifdef MACHINELEARNING_MPI
             tfc.add(l_allarticles);
             text::stopwordreduction stopword( tfc.getTerms(l_val[0], l_val[1] ), tfc.iscaseinsensitivity() );
             for(std::size_t i=0; i < l_allarticles.size(); ++i)
                 l_allarticles[i] = stopword.remove( l_allarticles[i] );
-            
+
             #else
             tfc.add(l_article);
             text::stopwordreduction stopword( tfc.getTerms(l_val[0], l_val[1] ), tfc.iscaseinsensitivity() );
-            #endif    
+            #endif
             for(std::size_t i=0; i < l_article.size(); ++i)
                 l_article[i] = stopword.remove( l_article[i] );
         }
     }
 
-    
-    
+
+
     // create ncd object and calculate the distances
-    #ifdef MACHINELEARNING_MPI 
+    #ifdef MACHINELEARNING_MPI
     loMPICom.barrier();
     std::cout << "CPU " << loMPICom.rank() << ": ";
     #endif
     std::cout << "calculate normalized compression distance..." << std::endl;
-    
+
     distances::ncd<double> ncd( (l_algorithm == "gzip") ? distances::ncd<double>::gzip : distances::ncd<double>::bzip2 );
-    
+
     if (l_compress == "bestspeed")
         ncd.setCompressionLevel( distances::ncd<double>::bestspeed );
     if (l_compress == "bestcompression")
@@ -329,10 +334,10 @@ int main(int argc, char* argv[])
 
     #ifdef MACHINELEARNING_MPI
     ublas::matrix<double> distancematrix = ncd.unsquare( l_allarticles, l_article );
-    
+
     for(std::size_t j=0; j < distancematrix.size2(); ++j)
         distancematrix(j+startcol, j) = 0;
-    
+
     l_allarticles.clear();
     #else
     ublas::matrix<double> distancematrix = ncd.unsymmetric( l_article );
@@ -343,42 +348,42 @@ int main(int argc, char* argv[])
 
 
     // run hit mds over the distance matrix
-    #ifdef MACHINELEARNING_MPI 
+    #ifdef MACHINELEARNING_MPI
     loMPICom.barrier();
     std::cout << "CPU " << loMPICom.rank() << ": ";
     #endif
     std::cout << "run mds projection..." << std::endl;
-    
+
     dim::mds<double>::project l_project = dim::mds<double>::hit;
     if (l_mapping == "metric")
         l_project = dim::mds<double>::metric;
     if (l_mapping == "sammon")
         l_project = dim::mds<double>::sammon;
-    
+
     dim::mds<double> mds( l_dimension, l_project );
     mds.setIteration( l_iteration );
     mds.setRate( l_rate );
 
     #ifdef MACHINELEARNING_MPI
     ublas::matrix<double> project = mds.map( loMPICom, distancematrix );
-    
+
     std::vector< ublas::matrix<double> > l_allproject;
     mpi::all_gather(loMPICom, project, l_allproject);
-    
+
     project = l_allproject[0];
     for(std::size_t i=1; i < l_allproject.size(); ++i) {
         project.resize( project.size1()+l_allproject[i].size1(), project.size2() );
         ublas::matrix_range< ublas::matrix<double> > l_range( project, ublas::range(project.size1()-l_allproject[i].size1(), project.size1()), ublas::range(0, project.size2()) );
         l_range.assign( l_allproject[i] );
     }
-    
+
     #else
     ublas::matrix<double> project = mds.map( distancematrix );
     #endif
-    
 
-    
-    
+
+
+
     // create file and write data to hdf
     #ifdef MACHINELEARNING_MPI
     if (loMPICom.rank() == 0) {
@@ -392,12 +397,12 @@ int main(int argc, char* argv[])
     target.writeStringVector( "/group",  l_articlegroup );
     target.writeStringVector( "/uniquegroup",  tools::vector::unique(l_articlegroup) );
     #endif
-    
+
     std::cout << "within the target file there are three datasets: /project = projected data, /group = newsgroup label of each dataset, /uniquegroup = list of unique newsgroups" << std::endl;
     #ifdef MACHINELEARNING_MPI
     }
     #endif
-    
-    
+
+
     return EXIT_SUCCESS;
 }

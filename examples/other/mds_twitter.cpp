@@ -1,4 +1,4 @@
-/** 
+/**
  @cond
  ############################################################################
  # LGPL License                                                             #
@@ -33,6 +33,11 @@
 #include <boost/mpi.hpp>
 #endif
 
+#if defined(_WIN32) || defined(__CYGWIN__)
+#include <windows.h>
+#endif
+
+
 namespace po        = boost::program_options;
 namespace ublas     = boost::numeric::ublas;
 namespace dim       = machinelearning::dimensionreduce::nonsupervised;
@@ -43,9 +48,9 @@ namespace text      = machinelearning::textprocess;
 namespace mpi       = boost::mpi;
 #endif
 
-    
-    
-/** main program, that reads twitter tweets, calculate the distance between tweet 
+
+
+/** main program, that reads twitter tweets, calculate the distance between tweet
  * and create the plot via MDS.
  * @param argc number of arguments
  * @param argv arguments
@@ -53,7 +58,7 @@ namespace mpi       = boost::mpi;
 int main(int argc, char* argv[])
 {
 
-     
+
     // default values
     std::size_t l_dimension;
     std::size_t l_iteration;
@@ -61,7 +66,7 @@ int main(int argc, char* argv[])
     std::string l_compress;
     std::string l_algorithm;
     std::string l_mapping;
-    
+
     // create CML options with description
     po::options_description l_description("allowed options");
     l_description.add_options()
@@ -79,25 +84,25 @@ int main(int argc, char* argv[])
         ("iteration", po::value<std::size_t>(&l_iteration)->default_value(0), "number of iterations (detected automatically)")
         ("mapping", po::value<std::string>(&l_mapping)->default_value("hit"), "mapping type (values: metric, sammon, hit [default])")
     ;
-    
+
     po::variables_map l_map;
     po::positional_options_description l_input;
     po::store(po::command_line_parser(argc, argv).options(l_description).positional(l_input).run(), l_map);
     po::notify(l_map);
-    
+
     if (l_map.count("help")) {
         std::cout << l_description << std::endl;
         return EXIT_SUCCESS;
     }
-    
+
     if ( (!l_map.count("outfile")) || (!l_map.count("search")) )  {
         std::cerr << "[--outfile] and [--search] option must be set" << std::endl;
         return EXIT_FAILURE;
     }
-    
 
-    
-    
+
+
+
     // create basis data and twitter objects
     const std::vector<std::string> l_tweet    = l_map["search"].as< std::vector<std::string> >();
     std::vector<std::size_t> l_tweetmax = l_map["max"].as< std::vector<std::size_t> >();
@@ -106,40 +111,40 @@ int main(int argc, char* argv[])
     if (l_tweet.size() != static_cast<std::size_t>(loMPICom.size()))
         throw std::runtime_error("number of tweet searches and used CPUs are not equal");
     #endif
-   
+
     for(std::size_t i=l_tweetmax.size(); i < l_tweet.size(); ++i)
         l_tweetmax.push_back(0);
-    
-    
-    
+
+
+
     tools::sources::twitter l_twitter;
     tools::sources::twitter::searchparameter l_params;
-    
+
     if (l_map.count("lang"))
         try {
-            l_params.setLanguage( tools::language::fromString(l_map["lang"].as<std::string>()) ); 
+            l_params.setLanguage( tools::language::fromString(l_map["lang"].as<std::string>()) );
         } catch (...) {}
-    
+
     if (l_map.count("geo")) {
         const std::vector<std::string> l_geoparam = l_map["geo"].as< std::vector<std::string> >();
-        
+
         if (l_geoparam.size() >= 4)
             try {
                 tools::sources::twitter::searchparameter::geoposition l_geo;
-                
+
                 l_geo.latitude      = boost::lexical_cast<double>(l_geoparam[0]);
                 l_geo.longitude     = boost::lexical_cast<double>(l_geoparam[1]);
                 l_geo.radius        = boost::lexical_cast<double>(l_geoparam[2]);
                 if (l_geoparam[3] == "mi")
                     l_geo.length  = tools::sources::twitter::searchparameter::miles;
-                
+
                 l_params.setGeoPosition( l_geo );
             } catch (...) {}
     }
-    
+
     if (l_map.count("until")) {
         const std::vector<std::string> l_dateparam = l_map["until"].as< std::vector<std::string> >();
-        
+
         if (l_dateparam.size() >= 3)
             try {
                 boost::gregorian::date l_until(
@@ -150,10 +155,10 @@ int main(int argc, char* argv[])
                 l_params.setUntilDate( l_until );
             } catch (...) {}
     }
-    
-    
-    
-    
+
+
+
+
     // get tweets
     #ifdef MACHINELEARNING_MPI
     loMPICom.barrier();
@@ -162,17 +167,17 @@ int main(int argc, char* argv[])
     std::cout << "read tweets..." << std::endl;
     std::vector<std::string> l_tweetdata;
     std::vector<std::string> l_tweetlabel;
-    
-    #ifdef MACHINELEARNING_MPI 
+
+    #ifdef MACHINELEARNING_MPI
     std::vector<tools::sources::twitter::searchtweet> l_data = l_twitter.search( l_tweet[static_cast<std::size_t>(loMPICom.size())], l_params, l_tweetmax[static_cast<std::size_t>(loMPICom.size())] );
-    
+
     for(std::size_t i=0; i < l_data.size(); ++i) {
         l_tweetdata.push_back( l_data.getText() );
         l_tweetlabel.push_back( l_tweet[static_cast<std::size_t>(loMPICom.size())] );
     }
-    
+
     #else
-    
+
     for(std::size_t n=0; n < l_tweet.size(); ++n) {
         std::vector<tools::sources::twitter::searchtweet> l_data = l_twitter.search( l_tweet[n], l_params, l_tweetmax[n] );
 
@@ -181,61 +186,61 @@ int main(int argc, char* argv[])
             l_tweetlabel.push_back( l_tweet[n] );
         }
     }
-    
+
     #endif
-    
-    
-    
-    
+
+
+
+
     // create ncd object and calculate the distances
-    #ifdef MACHINELEARNING_MPI 
+    #ifdef MACHINELEARNING_MPI
     loMPICom.barrier();
     std::cout << "CPU " << loMPICom.rank() << ": ";
     #endif
     std::cout << "calculate normalized compression distance..." << std::endl;
-    
+
     distances::ncd<double> ncd( (l_algorithm == "gzip") ? distances::ncd<double>::gzip : distances::ncd<double>::bzip2 );
-    
+
     ncd.setCompressionLevel( distances::ncd<double>::defaultcompression );
     if (l_compress == "bestspeed")
         ncd.setCompressionLevel( distances::ncd<double>::bestspeed );
     if (l_compress == "bestcompression")
         ncd.setCompressionLevel( distances::ncd<double>::bestcompression );
-    
-    #ifdef MACHINELEARNING_MPI 
+
+    #ifdef MACHINELEARNING_MPI
     geht nicht
     #else
     ublas::matrix<double> distancematrix = ncd.unsymmetric( l_tweetdata );
     #endif
     l_tweetdata.clear();
-    
-    
-    
-    
+
+
+
+
     // run hit mds over the distance matrix
-    #ifdef MACHINELEARNING_MPI 
+    #ifdef MACHINELEARNING_MPI
     loMPICom.barrier();
     std::cout << "CPU " << loMPICom.rank() << ": ";
     #endif
     std::cout << "run mds projection..." << std::endl;
-    
+
     dim::mds<double>::project l_project = dim::mds<double>::hit;
     if (l_mapping == "metric")
         l_project = dim::mds<double>::metric;
     if (l_mapping == "sammon")
         l_project = dim::mds<double>::sammon;
-    
+
     dim::mds<double> mds( l_dimension, l_project );
     mds.setIteration( l_iteration );
     mds.setRate( l_rate );
-    
-    #ifdef MACHINELEARNING_MPI 
+
+    #ifdef MACHINELEARNING_MPI
     ?????
     ublas::matrix<double> project = mds.map( loMPICom, distancematrix );
-    
+
     std::vector< ublas::matrix<double> > l_allproject;
     mpi::all_gather(loMPICom, project, l_allproject);
-    
+
     project = l_allproject[0];
     for(std::size_t i=1; i < l_allproject.size(); ++i) {
         project.resize( project.size1()+l_allproject[i].size1(), project.size2() );
@@ -245,15 +250,15 @@ int main(int argc, char* argv[])
     #else
     ublas::matrix<double> project = mds.map( distancematrix );
     #endif
-    
-    
-    
-    
+
+
+
+
     // create file and write data to hdf
     #ifdef MACHINELEARNING_MPI
     if (loMPICom.rank() == 0) {
     #endif
-    tools::files::hdf target(l_map["outfile"].as<std::string>(), true); 
+    tools::files::hdf target(l_map["outfile"].as<std::string>(), true);
     target.writeBlasMatrix<double>( "/project",  project, H5::PredType::NATIVE_DOUBLE );
     #ifndef MACHINELEARNING_MPI
     target.writeStringVector( "/label",  l_tweetlabel );
@@ -263,12 +268,12 @@ int main(int argc, char* argv[])
     target.writeStringVector( "/label",  l_alllabel );
     target.writeStringVector( "/uniquegroup",  l_tweet );
     #endif
-        
+
     std::cout << "within the target file there are three datasets: /project = projected data, /label = datapoint label, /uniquegroup = list of unique newsgroups" << std::endl;
     #ifdef MACHINELEARNING_MPI
     }
     #endif
-    
-        
+
+
     return EXIT_SUCCESS;
 }

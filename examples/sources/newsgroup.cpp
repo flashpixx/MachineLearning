@@ -1,4 +1,4 @@
-/** 
+/**
  @cond
  ############################################################################
  # LGPL License                                                             #
@@ -27,6 +27,11 @@
 #include <boost/program_options/variables_map.hpp>
 #include <boost/program_options/options_description.hpp>
 
+#if defined(_WIN32) || defined(__CYGWIN__)
+#include <windows.h>
+#endif
+
+
 using namespace machinelearning;
 namespace po = boost::program_options;
 
@@ -37,10 +42,10 @@ namespace po = boost::program_options;
  **/
 int main(int argc, char* argv[])
 {
-  
+
     std::string l_content;
     bool l_cancel;
-    
+
     // create CML options with description
     po::options_description l_description("allowed options");
     l_description.add_options()
@@ -50,25 +55,25 @@ int main(int argc, char* argv[])
         ("content", po::value<std::string>(&l_content)->default_value("body"), "content of articles (values: full, body [default], header)")
         ("canceled", po::value<bool>(&l_cancel)->default_value(false), "show canceled articles (values: false / 0 [default], true)")
     ;
-    
+
     po::variables_map l_map;
     po::positional_options_description l_input;
     po::store(po::command_line_parser(argc, argv).options(l_description).positional(l_input).run(), l_map);
     po::notify(l_map);
-    
+
     if (l_map.count("help")) {
         std::cout << l_description << std::endl;
         return EXIT_SUCCESS;
     }
-    
+
     if (!l_map.count("server")) {
         std::cerr << "[--server] option must be set" << std::endl;
         return EXIT_FAILURE;
     }
-    
-    
-    
-            
+
+
+
+
     // connect to server
     tools::sources::nntp news( l_map["server"].as<std::string>() );
 
@@ -78,31 +83,31 @@ int main(int argc, char* argv[])
         std::map<std::string, std::size_t> groups = news.getGroupList();
         for (std::map<std::string, std::size_t>::iterator it = groups.begin(); it != groups.end(); ++it)
             std::cout << it->first << "     (" << it->second << ")" << std::endl;
-    
+
     } else {
-    
+
         news.setContent( tools::sources::nntp::body );
         if (l_content == "full")
             news.setContent( tools::sources::nntp::full );
         if (l_content == "header")
             news.setContent( tools::sources::nntp::header );
-        
+
 
         const std::vector<std::string> l_groups = l_map["groups"].as< std::vector<std::string> >();
-    
+
         for(std::size_t i=0; i < l_groups.size(); ++i) {
-            // sets the newsgroup for browsing 
+            // sets the newsgroup for browsing
             news.setGroup( l_groups[i] );
-    
+
             // browse each article in the group
             for(tools::sources::nntp::iterator it=news.begin(); it != news.end(); ++it) {
                 if ( (it->isArticleCanceled()) && l_cancel )
                     continue;
-                
+
                 std::cout << it->getArticle()  << "\n===================================================================================" << std::endl;
             }
         }
     }
-    
+
     return EXIT_SUCCESS;
 }

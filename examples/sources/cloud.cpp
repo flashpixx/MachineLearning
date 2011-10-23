@@ -1,4 +1,4 @@
-/** 
+/**
  @cond
  ############################################################################
  # LGPL License                                                             #
@@ -27,6 +27,11 @@
 #include <boost/program_options/variables_map.hpp>
 #include <boost/program_options/options_description.hpp>
 
+#if defined(_WIN32) || defined(__CYGWIN__)
+#include <windows.h>
+#endif
+
+
 using namespace machinelearning;
 namespace ublas = boost::numeric::ublas;
 namespace po    = boost::program_options;
@@ -38,7 +43,7 @@ namespace po    = boost::program_options;
  **/
 int main(int argc, char* argv[])
 {
-    
+
     // default values
     std::size_t l_dimension;
     std::size_t l_sampling;
@@ -51,8 +56,8 @@ int main(int argc, char* argv[])
     double l_probability;
     bool l_shuffle;
     std::string l_create;
-    
-    
+
+
     // create CML options with description
     po::options_description l_description("allowed options");
     l_description.add_options()
@@ -71,48 +76,48 @@ int main(int argc, char* argv[])
         ("shuffel", po::value<bool>(&l_shuffle)->default_value(false), "shuffle the vectors of the clouds (default: false / 0)")
         ("create", po::value<std::string>(&l_create)->default_value("all"), "type for creating clouds (values are: all [default], alternate, random)")
     ;
-    
+
     po::variables_map l_map;
     po::store(po::parse_command_line(argc, argv, l_description), l_map);
     po::notify(l_map);
-    
+
     if (l_map.count("help")) {
         std::cout << l_description << std::endl;
         return EXIT_SUCCESS;
     }
-    
+
     if ( (!l_map.count("outfile")) || (!l_map.count("outpath"))) {
         std::cerr << "[--outfile] and [--outpath] option must be set" << std::endl;
         return EXIT_FAILURE;
     }
-    
-    
-    
-    
+
+
+
+
     // create cloud object and set the data
     tools::sources::cloud<double> cloud( l_dimension );
-    
+
     // set range of the points
     cloud.setPoints( l_pointsmin, l_pointsmax );
-    
+
     // set variance, range and samples
     cloud.setVariance( l_variancemin, l_variancemax );
     for(std::size_t i=0; i < l_dimension; ++i)
-        cloud.setRange(i, l_rangemin, l_rangemax, l_sampling);   
-    
+        cloud.setRange(i, l_rangemin, l_rangemax, l_sampling);
+
     // create file and write data to hdf
     tools::sources::cloud<double>::cloudcreate l_typecreate = tools::sources::cloud<double>::all;
     if (l_create == "alternate")
         l_typecreate = tools::sources::cloud<double>::alternate;
     if (l_create == "random")
         l_typecreate = tools::sources::cloud<double>::random;
-    
-    
+
+
     tools::files::hdf target( l_map["outfile"].as<std::string>(), true);
-    target.writeBlasMatrix<double>( 
-                l_map["outpath"].as<std::string>(), 
-                cloud.generate( l_typecreate, l_probability, l_shuffle ), 
+    target.writeBlasMatrix<double>(
+                l_map["outpath"].as<std::string>(),
+                cloud.generate( l_typecreate, l_probability, l_shuffle ),
                 H5::PredType::NATIVE_DOUBLE );
-    
+
     return EXIT_SUCCESS;
 }

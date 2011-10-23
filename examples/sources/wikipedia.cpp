@@ -1,4 +1,4 @@
-/** 
+/**
  @cond
  ############################################################################
  # LGPL License                                                             #
@@ -27,6 +27,11 @@
 #include <boost/program_options/variables_map.hpp>
 #include <boost/program_options/options_description.hpp>
 
+#if defined(_WIN32) || defined(__CYGWIN__)
+#include <windows.h>
+#endif
+
+
 using namespace machinelearning;
 namespace po = boost::program_options;
 
@@ -42,8 +47,8 @@ void output( tools::sources::wikipedia& p_wiki ) {
         label = p_wiki.getArticleLabel();
     } else
         label = p_wiki.getArticleAcronym();
-    
-    
+
+
     // show label data
     for(std::size_t i=0; i < label.size(); ++i)
         std::cout << label[i] << std::endl;
@@ -59,7 +64,7 @@ int main(int argc, char* argv[])
 {
 
     std::string l_lang;
-    
+
     // create CML options with description
     po::options_description l_description("allowed options");
     l_description.add_options()
@@ -67,21 +72,21 @@ int main(int argc, char* argv[])
         ("search", po::value< std::vector<std::string> >()->multitoken(), "returns the artice of the keyword / returns list of articles / if empty, you will get a random article")
         ("lang", po::value<std::string>(&l_lang)->default_value("en"), "language code (iso 639-1 or -3) [default: en]")
     ;
-    
+
     po::variables_map l_map;
     po::positional_options_description l_input;
     po::store(po::command_line_parser(argc, argv).options(l_description).positional(l_input).run(), l_map);
     po::notify(l_map);
-    
+
     if (l_map.count("help")) {
         std::cout << l_description << std::endl;
         return EXIT_SUCCESS;
     }
 
-    
+
     // create wikipedia object
     tools::sources::wikipedia wiki( tools::language::fromString(l_lang)  );
-    
+
     if (!l_map.count("search")) {
         wiki.getRandomArticle();
         output(wiki);
@@ -94,6 +99,6 @@ int main(int argc, char* argv[])
             std::cout << "\n===================================================================================" << std::endl;
         }
     }
-    
+
     return EXIT_SUCCESS;
 }

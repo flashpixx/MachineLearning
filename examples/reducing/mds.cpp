@@ -1,4 +1,4 @@
-/** 
+/**
  @cond
  ############################################################################
  # LGPL License                                                             #
@@ -28,6 +28,11 @@
 #include <boost/program_options/variables_map.hpp>
 #include <boost/program_options/options_description.hpp>
 
+#if defined(_WIN32) || defined(__CYGWIN__)
+#include <windows.h>
+#endif
+
+
 namespace po    = boost::program_options;
 namespace ublas = boost::numeric::ublas;
 namespace dim   = machinelearning::dimensionreduce::nonsupervised;
@@ -41,7 +46,7 @@ namespace tools = machinelearning::tools;
  **/
 int main(int argc, char* argv[])
 {
-    
+
     // default values
     std::size_t l_dimension;
     std::size_t l_iteration;
@@ -50,7 +55,7 @@ int main(int argc, char* argv[])
     std::string l_center;
     std::string l_mapping;
     double l_rate;
-    
+
     // create CML options with description
     po::options_description l_description("allowed options");
     l_description.add_options()
@@ -66,41 +71,41 @@ int main(int argc, char* argv[])
         ("rate", po::value<double>(&l_rate)->default_value(1), "rate for hit mapping [default: 1]")
         ("center", po::value<std::string>(&l_center)->default_value("none"), "centering the data (values: none [default], single, double)")
     ;
-    
+
     po::variables_map l_map;
     po::positional_options_description l_input;
     po::store(po::command_line_parser(argc, argv).options(l_description).positional(l_input).run(), l_map);
     po::notify(l_map);
-    
+
     if (l_map.count("help")) {
         std::cout << l_description << std::endl;
         return EXIT_SUCCESS;
     }
-    
+
     if ( (!l_map.count("infile")) || (!l_map.count("inpath")) || (!l_map.count("outfile")) ) {
         std::cerr << "[--infile], [--inpath] and [--outfile] option must be set" << std::endl;
         return EXIT_FAILURE;
     }
-    
-    
-    
+
+
+
     // read source hdf file
     tools::files::hdf source( l_map["infile"].as<std::string>() );
-    
+
     // create mds object and map the data
     dim::mds<double> mds( l_dimension, (l_mapping == "metric") ? dim::mds<double>::metric : (l_mapping == "sammon") ? dim::mds<double>::sammon : dim::mds<double>::hit );
-    
+
     mds.setIteration( l_iteration );
     mds.setStep( l_step );
     mds.setRate( l_rate );
-    
+
     if (l_center == "single")
         mds.setCentering( dim::mds<double>::singlecenter );
     if (l_center == "double")
         mds.setCentering( dim::mds<double>::doublecenter );
-    
+
     const ublas::matrix<double> project = mds.map( source.readBlasMatrix<double>(l_map["inpath"].as<std::string>(), H5::PredType::NATIVE_DOUBLE) );
-    
+
     // create file and write data to hdf
     tools::files::hdf target(l_map["outfile"].as<std::string>(), true);
     target.writeBlasMatrix<double>( l_outpath,  project, H5::PredType::NATIVE_DOUBLE );

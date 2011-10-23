@@ -1,4 +1,4 @@
-/** 
+/**
  @cond
  ############################################################################
  # LGPL License                                                             #
@@ -28,6 +28,11 @@
 #include <boost/program_options/variables_map.hpp>
 #include <boost/program_options/options_description.hpp>
 
+#if defined(_WIN32) || defined(__CYGWIN__)
+#include <windows.h>
+#endif
+
+
 namespace po = boost::program_options;
 using namespace boost::numeric;
 using namespace machinelearning;
@@ -37,14 +42,14 @@ using namespace machinelearning;
  * @param argc number of arguments
  * @param argv arguments
  **/
-int main(int argc, char* argv[]) 
+int main(int argc, char* argv[])
 {
-    
+
     // default values
     std::string l_compress;
     std::string l_algorithm;
     std::string l_matrix;
-    
+
     // create CML options with description
     po::options_description l_description("allowed options");
     l_description.add_options()
@@ -55,32 +60,32 @@ int main(int argc, char* argv[])
         ("algorithm", po::value<std::string>(&l_algorithm)->default_value("gzip"), "compression algorithm (allowed values are: gzip [default], bzip)")
         ("matrix", po::value<std::string>(&l_matrix)->default_value("symmetric"), "structure of the matrix (allowed values are: symmetric [default] or unsymmetric")
     ;
-    
+
     po::variables_map l_map;
     po::positional_options_description l_input;
     po::store(po::command_line_parser(argc, argv).options(l_description).positional(l_input).run(), l_map);
     po::notify(l_map);
-    
+
     if (l_map.count("help")) {
         std::cout << l_description << std::endl;
         return EXIT_SUCCESS;
     }
-    
+
     if (!l_map.count("sources"))  {
         std::cerr << "[--sources] must be set" << std::endl;
         return EXIT_FAILURE;
     }
-    
-    
-    
+
+
+
     // create ncd object
     distances::ncd<double> ncd( (l_algorithm == "gzip") ? distances::ncd<double>::gzip : distances::ncd<double>::bzip2 );
     if (l_compress == "bestspeed")
         ncd.setCompressionLevel( distances::ncd<double>::bestspeed );
     if (l_compress == "bestcompression")
         ncd.setCompressionLevel( distances::ncd<double>::bestcompression );
-    
-    
+
+
     // create the distance matrix and use the each element of the vector as a filename
     ublas::matrix<double> distancematrix;
     if (l_matrix == "unsymmetric")
@@ -88,7 +93,7 @@ int main(int argc, char* argv[])
     else
         distancematrix = ncd.symmetric( l_map["sources"].as< std::vector<std::string> >(), true);
 
-    
+
     if (!l_map.count("outfile"))
         std::cout << distancematrix << std::endl;
     else {
@@ -98,6 +103,6 @@ int main(int argc, char* argv[])
         std::cout << "structure of the output file" << std::endl;
         std::cout << "/ncd" << "\t\t" << "distance matrix" << std::endl;
     }
-    
+
     return EXIT_SUCCESS;
 }

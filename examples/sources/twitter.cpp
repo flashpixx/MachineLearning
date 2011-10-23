@@ -1,4 +1,4 @@
-/** 
+/**
  @cond
  ############################################################################
  # LGPL License                                                             #
@@ -27,6 +27,11 @@
 #include <boost/program_options/variables_map.hpp>
 #include <boost/program_options/options_description.hpp>
 
+#if defined(_WIN32) || defined(__CYGWIN__)
+#include <windows.h>
+#endif
+
+
 using namespace machinelearning;
 namespace po = boost::program_options;
 
@@ -41,7 +46,7 @@ int main(int argc, char* argv[])
     std::size_t l_rpp  = 10;
     std::size_t l_max  = 0;
     std::size_t l_page = 1;
-    
+
     // create CML options with description
     po::options_description l_description("allowed options");
     l_description.add_options()
@@ -59,37 +64,37 @@ int main(int argc, char* argv[])
     po::positional_options_description l_input;
     po::store(po::command_line_parser(argc, argv).options(l_description).positional(l_input).run(), l_map);
     po::notify(l_map);
-    
+
     if (l_map.count("help")) {
         std::cout << l_description << std::endl;
         return EXIT_SUCCESS;
     }
-    
+
     if (!l_map.count("search")) {
         std::cerr << "[--search] option must be set" << std::endl;
         return EXIT_FAILURE;
     }
-    
-    
-    
-    
-    // create search parameters 
+
+
+
+
+    // create search parameters
     tools::sources::twitter::searchparameter l_params;
     l_params.setNumberResults(l_rpp, l_page);
 
-    
+
     if (l_map.count("lang"))
         try {
-            l_params.setLanguage( tools::language::fromString(l_map["lang"].as<std::string>()) ); 
+            l_params.setLanguage( tools::language::fromString(l_map["lang"].as<std::string>()) );
         } catch (...) {}
-    
+
     if (l_map.count("geo")) {
         const std::vector<std::string> l_geoparam = l_map["geo"].as< std::vector<std::string> >();
 
         if (l_geoparam.size() >= 4)
             try {
                 tools::sources::twitter::searchparameter::geoposition l_geo;
-        
+
                 l_geo.latitude      = boost::lexical_cast<double>(l_geoparam[0]);
                 l_geo.longitude     = boost::lexical_cast<double>(l_geoparam[1]);
                 l_geo.radius        = boost::lexical_cast<double>(l_geoparam[2]);
@@ -99,10 +104,10 @@ int main(int argc, char* argv[])
                 l_params.setGeoPosition( l_geo );
             } catch (...) {}
     }
-    
+
     if (l_map.count("until")) {
         const std::vector<std::string> l_dateparam = l_map["until"].as< std::vector<std::string> >();
-        
+
         if (l_dateparam.size() >= 3)
             try {
                 boost::gregorian::date l_until(
@@ -113,14 +118,14 @@ int main(int argc, char* argv[])
                 l_params.setUntilDate( l_until );
             } catch (...) {}
     }
- 
-    
+
+
 
     // do twitter run
     tools::sources::twitter l_twitter;
-    
+
     const std::vector<std::string> l_search = l_map["search"].as< std::vector<std::string> >();
-       
+
     std::string l_searchfirst = l_search[0];
     boost::to_lower(l_searchfirst);
     if (l_searchfirst == "tm") {
@@ -130,12 +135,12 @@ int main(int argc, char* argv[])
     } else
         for(std::size_t i=0; i < l_search.size(); ++i) {
             std::vector<tools::sources::twitter::searchtweet> l_data = l_twitter.search( l_search[i], l_params, l_max );
-        
+
             for(std::size_t j=0; j < l_data.size(); ++j)
                 std::cout << l_data[j] << std::endl;
-        
+
             std::cout << "===================================================================================" << std::endl;
         }
-  
+
     return EXIT_SUCCESS;
 }
