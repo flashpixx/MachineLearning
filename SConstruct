@@ -23,7 +23,7 @@ def createVariables(vars) :
     vars.Add(EnumVariable("winver", "value of the Windows version", "win7", allowed_values=("win7", "srv2008", "vista", "srv2003sp1", "xpsp2", "srv2003", "xp", "w2000")))
 
     vars.Add(EnumVariable("atlaslink", "value of the atlas threadding (multi = tatlas, single = satlas)", "multi", allowed_values=("multi", "single")))
-    
+
     vars.Add(EnumVariable("cputype", "value of the cpu type [see: http://gcc.gnu.org/onlinedocs/gcc/i386-and-x86_002d64-Options.html]", "native", allowed_values=("native", "generic", "i386", "i486", "i586", "i686", "pentium-mmx", "pentiumpro", "pentium2", "pentium3", "pentium-m", "pentium4", "prescott", "nocona", "core2", "corei7", "corei7-avx", "core-avx-i", "atom", "k6", "k6-2", "athlon", "athlon-4", "k8", "k8-sse3", "amdfam10", "winchip-c6", "winchip2", "c3", "c3-2", "geode" )))
 
 
@@ -88,10 +88,10 @@ def configuration_macosx(config, vars, version, architecture) :
     if vars["withsymbolicmath"] :
         config["compileflags"]      += " -D MACHINELEARNING_SYMBOLICMATH"
         config["linkto"].append("ginac")
-        
+
     if vars["withoptimize"] :
         config["compileflags"]      += " -O2 -Os -s -mfpmath=sse -finline-functions -mtune="+vars["cputype"]
-        
+
     if vars["withlogger"] :
         config["compileflags"]      += " -D MACHINELEARNING_LOGGER"
 
@@ -147,10 +147,10 @@ def configuration_posix(config, vars, version, architecture) :
     if vars["withsymbolicmath"] :
         config["compileflags"]      += " -D MACHINELEARNING_SYMBOLICMATH"
         config["linkto"].append("ginac")
-        
+
     if vars["withoptimize"] :
         config["compileflags"]      += " -O2 -Os -s -mfpmath=sse -finline-functions -mtune="+vars["cputype"]
-        
+
     if vars["withlogger"] :
         config["compileflags"]      += " -D MACHINELEARNING_LOGGER"
 
@@ -158,7 +158,7 @@ def configuration_posix(config, vars, version, architecture) :
 # configuration for Windows Cygwin build
 def configuration_cygwin(config, vars, version, architecture) :
     config["shlinkerflags"]     = ""
-    config["linkerflags"]       = "-enable-stdcall-fixup -mthread"
+    config["linkerflags"]       = "-enable-stdcall-fixup -mthread -mconsole"
     config["include"]           = os.environ["CPPPATH"]
     config["librarypath"]       = os.environ["PATH"]
     config["compileflags"]      = "-pipe -Wall -Wextra -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
@@ -167,7 +167,6 @@ def configuration_cygwin(config, vars, version, architecture) :
 
     # Java target must not linked again different boost libs
     if not("javac" in COMMAND_LINE_TARGETS) :
-        config["linkerflags"]  += " -mconsole"
         config["linkto"].extend(["cygboost_program_options", "boost_exception", "cygboost_filesystem"])
 
     #Windows Version options see http://msdn.microsoft.com/en-us/library/aa383745%28v=vs.85%29.aspx
@@ -188,7 +187,7 @@ def configuration_cygwin(config, vars, version, architecture) :
     elif vars["winver"] == "w2000" :
         config["compileflags"] += " -D _WIN32_WINNT=0x0500"
 
-	# Atlas build creates a static library under Cygwin, so we link directly without the "atlaslink" option 
+	# Atlas build creates a static library under Cygwin, so we link directly without the "atlaslink" option
     # Library sequence must be preserved !!
     config["linkto"].extend( ["lapack", "cblas", "f77blas", "atlas", "gfortran"] )
 
@@ -222,10 +221,10 @@ def configuration_cygwin(config, vars, version, architecture) :
     if vars["withsymbolicmath"] :
         config["compileflags"]      += " -D MACHINELEARNING_SYMBOLICMATH"
         config["linkto"].append("ginac")
-        
+
     if vars["withoptimize"] :
         config["compileflags"]      += " -O2 -Os -s -mfpmath=sse -finline-functions -mtune="+vars["cputype"]
-        
+
     if vars["withlogger"] :
         config["compileflags"]      += " -D MACHINELEARNING_LOGGER"
 #=======================================================================================================================================
@@ -238,18 +237,18 @@ def configuration_cygwin(config, vars, version, architecture) :
 def getConfig(vars):
     env = Environment(variables=vars)
     config = {}
-    
+
     # read path and add environment path values
     syspath = [env["ENV"]["PATH"], os.environ["PATH"]]
 
     if env['PLATFORM'].lower() == "darwin" :
         configuration_macosx(config, env, platform.mac_ver()[0], platform.machine())
         env["ENV"]["PATH"] = ":".join(syspath)
-        
+
     elif env['PLATFORM'].lower() == "cygwin" :
         configuration_cygwin(config, env, "", platform.machine())
         env["ENV"]["PATH"] = ":".join(syspath)
-        
+
     elif env['PLATFORM'].lower() == "posix" :
         configuration_posix(config, env, "", platform.machine())
         env["ENV"]["PATH"] = ":".join(syspath)
@@ -293,7 +292,7 @@ def getConfig(vars):
     env.Replace(LIBPATH     = config["librarypath"])
     env.Replace(CPPSUFFIXES = [".hpp", ".h", ".cpp"])
     env.Append(SHLINKFLAGS  = config["shlinkerflags"])
-    
+
     # Scons < 2: env.BuildDir("build", ".", duplicate=0)
     env.VariantDir("build", ".", duplicate=0)
     env.Append(CPPPATH=["."])
@@ -336,13 +335,13 @@ def getRekusivFiles(startdir, ending, pdontuse=[], pShowPath=True, pAbsPath=Fals
 
             for n in ldontuse :
                 lladd = lladd and not(i.startswith(n));
-                
+
             if lladd :
                 clst.append(i)
 
     return clst
 
-# creates a list with unique entries    
+# creates a list with unique entries
 def unique(seq):
     keys = {}
     for e in seq:
@@ -373,43 +372,43 @@ def createTarget(env, alias, path, sources, framework) :
 # target for building CPP examples
 def target_cpp(env, framework) :
     createTarget(env, "ga", os.path.join(".", "examples", "geneticalgorithm"), ["knapsack.cpp"], framework)
-    
+
     srcOther = []
     if env["withfiles"] and env["withsources"] :
         srcOther.extend( ["mds_nntp.cpp", "mds_wikipedia.cpp", "mds_twitter.cpp"] )
     if env["withfiles"] :
         srcOther.append("mds_file.cpp")
     createTarget(env, "other", os.path.join(".", "examples", "other"), srcOther, framework)
-    
+
     srcClassifier = []
     if env["withfiles"] :
         srcClassifier.extend( ["lazy.cpp"] )
     createTarget(env, "classifier", os.path.join(".", "examples", "classifier"), srcClassifier, framework)
-    
+
     srcDistance = []
     if env["withfiles"] :
         srcDistance.extend( ["ncd.cpp"] )
     createTarget(env, "distance", os.path.join(".", "examples", "distance"), srcDistance, framework)
-    
+
     srcReduce = []
     if env["withfiles"] :
         srcReduce.extend( ["lda.cpp", "mds.cpp", "pca.cpp"] )
     createTarget(env, "reducing", os.path.join(".", "examples", "reducing"), srcReduce, framework)
-    
+
     srcCluster = []
     if env["withfiles"] :
         srcCluster.extend( ["rlvq.cpp", "kmeans.cpp", "neuralgas.cpp", "patch_neuralgas.cpp", "relational_neuralgas.cpp", "spectral.cpp"] )
     createTarget(env, "clustering", os.path.join(".", "examples", "clustering"), srcCluster, framework)
-    
+
     srcSources = []
     if env["withsources"] :
         srcSources.extend( ["twitter.cpp", "newsgroup.cpp", "wikipedia.cpp"] )
     if env["withfiles"] :
         srcSources.append( "cloud.cpp" )
     createTarget(env, "sources", os.path.join(".", "examples", "sources"), srcSources, framework)
-    
-    
-# change the library calls under OSX    
+
+
+# change the library calls under OSX
 def java_osxlinkedlibs(target, source, env) :
     global otoolChange
 
@@ -420,20 +419,20 @@ def java_osxlinkedlibs(target, source, env) :
     # split string on each space
     names = []
     lines = libs.split()
-    
+
     # test each linked library to the otool results
     for n in env["LIBS"] :
         for i in lines :
             if n in i :
                 names.append(i)
-    
+
     # build change list
     change = []
     for i in names :
         name = i.split(os.sep)[-1]
         change.append("-change " + i + " @loader_path" + os.path.sep + name)
     change = unique(change)
-    
+
     # run the build command on a system shell
     os.system( "install_name_tool " + " ".join(change) + " " + os.path.join("build", "javalib", "native", env["LIBPREFIX"]+"machinelearning"+env["SHLIBSUFFIX"]) )
     return []
@@ -452,7 +451,7 @@ def java_linuxsonames(target, source, env) :
 
 
 
-# target for building java package    
+# target for building java package
 def target_javac(env, framework) :
     if env["withmpi"] :
         print "MPI build does not work with Java"
@@ -471,22 +470,22 @@ def target_javac(env, framework) :
     stubs = ["machinelearning.dimensionreduce.nonsupervised.PCA", "machinelearning.dimensionreduce.nonsupervised.MDS", "machinelearning.util.Math", "machinelearning.util.Random"]
     for i in stubs :
         # split file and directory parts and substitute $ to _ and create the headerfile
-        parts = i.replace("$", "_").split(".") 
+        parts = i.replace("$", "_").split(".")
         headerfile = (os.sep.join(parts) + ".h").lower()
-        
+
         targets.append( env.Command( headerfile, "", "javah -classpath " + os.path.join(os.curdir, "build", "javalib") + " -o " + os.path.join(os.curdir, "java", headerfile) + " " + i  ) )
-        
+
     # build SharedLibrary
     sources = getRekusivFiles( os.path.join(os.curdir, "java"), ".cpp")
     sources.extend(framework)
     targets.append( env.SharedLibrary( target=os.path.join("#build", "javalib", "native", "machinelearning"), source=sources ) )
-    
+
     # on OSX the path of the linked libraries within the libmachinelearning.dylib must be changed to @loader_path/<library>
     if env['PLATFORM'].lower() == "darwin" :
         targets.append( env.Command("createlibrarynames", "", "otool -L " + os.path.join("build", "javalib", "native", env["LIBPREFIX"]+"machinelearning"+env["SHLIBSUFFIX"]) + " > " + os.path.join("build", "linkedlibs.txt") ) )
-        targets.append( env.Command("linkedlibs", "", java_osxlinkedlibs) ) 
+        targets.append( env.Command("linkedlibs", "", java_osxlinkedlibs) )
         targets.append( env.Command("libnames.txt", "", Delete(os.path.join(os.curdir, "build", "linkedlibs.txt")) ) )
-        
+
 
     # copy external libraries in the native directory for Jar adding (copy works only if target directories exists)
     dirs      = env["LIBPATH"].split(os.pathsep)
@@ -499,19 +498,19 @@ def target_javac(env, framework) :
 
             copyfiles.append( Copy(os.path.join("build", "javalib", "native", name), libfiles.path) )
     targets.append( env.Command("copyexternallib", "", copyfiles) )
-    
+
     # on Linux all libraries must use the filename, that is set with the "soname" within the library or filename must be changed to "soname"
     if env['PLATFORM'].lower() == "posix" :
-        targets.append( env.Command("sonames", "", java_linuxsonames) ) 
-    
+        targets.append( env.Command("sonames", "", java_linuxsonames) )
+
     # build Jar and create Jar Index
     targets.append( env.Command("buildjar", "", "jar cf " + os.path.join(os.curdir, "build", "machinelearning.jar") + " -C " + os.path.join("build", "javalib" ) + " .") )
     targets.append( env.Command("buildjarindex", "", "jar i " + os.path.join(os.curdir, "build", "machinelearning.jar") ) )
-    
+
     env.Alias("javac", targets)
-    
-    
-    
+
+
+
 # targets for building java examples
 def target_javaexamples(env) :
 
@@ -519,9 +518,9 @@ def target_javaexamples(env) :
 
     env.Alias("javareduce", env.Java(target=os.path.join("#build", "java", "reduce"), source=os.path.join(os.curdir, "examples", "java", "reducing"), JAVACLASSPATH = [os.path.join(os.curdir, "build", "machinelearning.jar")]) )
     env.Alias("javautil", env.Java(target=os.path.join("#build", "java", "util"), source=os.path.join(os.curdir, "examples", "java", "util"), JAVACLASSPATH = [os.path.join(os.curdir, "build", "machinelearning.jar")]) )
-    
-    
-    
+
+
+
 # target for building language files
 def target_language(env) :
     sources = []
@@ -540,18 +539,18 @@ def target_language(env) :
     for i in po :
         updatetargets.append( env.Command("msmerge", "", "msgmerge --no-wrap --update " + i + " "+os.path.join("tools", "language", "language.po") ) )
         createtargets.append( env.Command("msmerge", "", "msgmerge --no-wrap --update " + i + " "+os.path.join("tools", "language", "language.po") ) )
-        
+
     createtargets.append( env.Command("deletelang", "", [Delete(os.path.join("tools", "language", "language.po"))] ) )
     updatetargets.append( env.Command("deletelang", "", [Delete(os.path.join("tools", "language", "language.po"))] ) )
 
     # compiling all files
     for i in po :
         updatetargets.append( env.Command("msgfmt", "", "msgfmt -v -o " + os.path.join(os.path.dirname(i),"ml.mo") +" "+ i ) )
-    
+
     env.Alias("updatelanguage", updatetargets)
-    env.Alias("createlanguage", createtargets)            
-    
-    
+    env.Alias("createlanguage", createtargets)
+
+
 def target_documentation(env) :
     env.Alias("documentation", env.Command("doxygen", "", "doxygen documentation.doxyfile"))
 #=======================================================================================================================================
