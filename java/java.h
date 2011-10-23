@@ -33,6 +33,7 @@ namespace machinelearning {
      * @todo adding genetic algorithms to package
      * @todo adding file / sources support to package
      * @todo adding distance & neigborhood support to package
+     * @bug library does not work under Windows / restructure Scons script and library calls with Cygwin libraries
      **/
     namespace java {}
     
