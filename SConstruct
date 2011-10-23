@@ -573,6 +573,8 @@ files.extend( getRekusivFiles(os.curdir, env["SHLIBSUFFIX"]) )
 files.extend( getRekusivFiles(os.curdir, ".jnilib") )
 files.extend( getRekusivFiles(os.curdir, ".po~") )
 files.extend( getRekusivFiles(os.curdir, ".jar") )
+files.extend( getRekusivFiles(os.curdir, ".stackdump") )
+files.extend( getRekusivFiles(os.curdir, ".core") )
 
 env.Clean("clean", files)
 
