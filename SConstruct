@@ -597,6 +597,8 @@ files.extend( getRekusivFiles(os.curdir, ".po~") )
 files.extend( getRekusivFiles(os.curdir, ".jar") )
 files.extend( getRekusivFiles(os.curdir, ".stackdump") )
 files.extend( getRekusivFiles(os.curdir, ".core") )
+
+# don't ad the current path, because scons run the directories until "/"
 files.extend( ["build", "documentation"] )
 
 env.Clean("clean", files)
