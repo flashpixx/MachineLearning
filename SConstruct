@@ -566,7 +566,7 @@ def target_language(env) :
 
     # compiling all files
     for i in po :
-        updatetargets.append( env.Command("msgfmt", "", "msgfmt -v -o " + os.path.join(os.path.dirname(i),"ml.mo") +" "+ i ) )
+        updatetargets.append( env.Command("msgfmt", "", "msgfmt -v -o " + os.path.join(os.path.dirname(i),"machinelearning.mo") +" "+ i ) )
 
     env.Alias("updatelanguage", updatetargets)
     env.Alias("createlanguage", createtargets)

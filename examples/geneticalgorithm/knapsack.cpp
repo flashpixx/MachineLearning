@@ -89,7 +89,10 @@ template<typename T, typename L> class fitness : public ga::fitness::fitness<T,L
  **/
 int main(int argc, char* argv[])
 {
-
+    #ifdef MACHINELEARNING_MULTILANGUAGE
+    tools::language::bindings::bind("machinelearning", "language");
+    #endif
+    
     std::size_t l_populationsize;
     std::size_t l_elitesize;
     std::size_t l_iteration;

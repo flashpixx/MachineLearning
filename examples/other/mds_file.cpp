@@ -52,6 +52,9 @@ namespace text      = machinelearning::textprocess;
  **/
 int main(int argc, char* argv[])
 {
+    #ifdef MACHINELEARNING_MULTILANGUAGE
+    tools::language::bindings::bind("machinelearning", "language");
+    #endif
 
     // default values
     std::size_t l_dimension;

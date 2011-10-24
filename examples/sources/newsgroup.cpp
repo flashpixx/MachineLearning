@@ -42,6 +42,9 @@ namespace po = boost::program_options;
  **/
 int main(int argc, char* argv[])
 {
+    #ifdef MACHINELEARNING_MULTILANGUAGE
+    tools::language::bindings::bind("machinelearning", "language");
+    #endif
 
     std::string l_content;
     bool l_cancel;

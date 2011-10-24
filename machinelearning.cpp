@@ -40,7 +40,7 @@ namespace machinelearning {
     #ifdef MACHINELEARNING_LOGGER
     tools::logger::logger* tools::logger::m_instance = NULL;
     #endif
-    
+
 }
 
 

@@ -58,6 +58,10 @@ int main(int argc, char* argv[])
     mpi::environment loMPIenv(argc, argv);
     mpi::communicator loMPICom;
     #endif
+    
+    #ifdef MACHINELEARNING_MULTILANGUAGE
+    tools::language::bindings::bind("machinelearning", "language");
+    #endif
 
 
 

@@ -59,6 +59,9 @@ int main(int argc, char* argv[])
     mpi::communicator loMPICom;
     #endif
 
+    #ifdef MACHINELEARNING_MULTILANGUAGE
+    tools::language::bindings::bind("machinelearning", "language");
+    #endif
 
     // default values
     bool l_log;

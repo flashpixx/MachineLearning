@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-10-03 11:30+0200\n"
-"PO-Revision-Date: 2011-10-03 14:17+0100\n"
+"POT-Creation-Date: 2011-10-24 20:43+0200\n"
+"PO-Revision-Date: 2011-10-24 20:46+0100\n"
 "Last-Translator: Philipp Kraus <philipp.kraus@flashpixx.de>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -109,10 +109,10 @@ msgstr "Methode ist nicht in der Klasse implementiert"
 #: clustering/nonsupervised/spectralclustering.hpp:169
 #: dimensionreduce/nonsupervised/mds.hpp:185
 #: dimensionreduce/nonsupervised/mds.hpp:499
-#: tools/lapack.hpp:86
-#: tools/lapack.hpp:128
-#: tools/lapack.hpp:235
-#: tools/matrix.hpp:247
+#: tools/lapack.hpp:87
+#: tools/lapack.hpp:129
+#: tools/lapack.hpp:236
+#: tools/matrix.hpp:248
 msgid "matrix must be square"
 msgstr "Matrix muss quadratisch sein"
 
@@ -132,7 +132,7 @@ msgid "data points are less than target dimension"
 msgstr "Datenpunkte sind weniger als Zieldimensionen"
 
 #: dimensionreduce/nonsupervised/mds.hpp:187
-#: dimensionreduce/nonsupervised/pca.hpp:101
+#: dimensionreduce/nonsupervised/pca.hpp:105
 msgid "datapoint dimension are less than target dimension"
 msgstr "Datenpunkt Dimension ist kleiner als Zieldimension"
 
@@ -161,6 +161,19 @@ msgstr "Centering kann mit MPI nicht verwendet werden"
 #: dimensionreduce/nonsupervised/mds.hpp:509
 msgid "MPI project option is unkown"
 msgstr "MPI Projektionsioption nicht bekannt"
+
+#: dimensionreduce/nonsupervised/pca.hpp:101
+#: tools/matrix.hpp:134
+#: tools/matrix.hpp:372
+#: tools/files/csv.hpp:164
+msgid "row size must be greater than zero"
+msgstr "Zeilenanzahl muss größer Null sein"
+
+#: dimensionreduce/nonsupervised/pca.hpp:103
+#: tools/matrix.hpp:136
+#: tools/files/csv.hpp:162
+msgid "column size must be greater than zero"
+msgstr "Spaltenanzahl muss größer Null sein"
 
 #: dimensionreduce/supervised/lda.hpp:112
 msgid "target dimension must be less than unique data classes"
@@ -263,32 +276,48 @@ msgstr "Index außerhalb des Definitionsbereiches"
 msgid "number must be greater than zero"
 msgstr "Anzahl muss größer Null sein"
 
-#: geneticalgorithm/selection/roulettewheel.hpp:99
+#: geneticalgorithm/selection/roulettewheel.hpp:97
 msgid "fitness values are all zero"
 msgstr "alle Fitnesswerte sind Null"
 
-#: java/jniregister.hpp:56
-#: java/jniregister.hpp:78
+#: java/jni.hpp:82
+#: java/jni.hpp:105
 msgid "pointer to object is empty"
 msgstr "Zeiger auf das Objekt ist leer"
 
-#: java/jniregister.hpp:61
+#: java/jni.hpp:87
 msgid "pointer to object is not empty"
 msgstr "Zeiger auf das Objekt ist nicht leer"
 
-#: java/jniregister.hpp:86
-#: java/jniregister.hpp:120
+#: java/jni.hpp:115
+#: java/jni.hpp:187
+#: java/jni.hpp:216
+#: java/jni.hpp:244
+msgid "can not find associated java class"
+msgstr "Konnte assoziierte Javaklasse nicht ermitteln"
+
+#: java/jni.hpp:123
+#: java/jni.hpp:160
 msgid "call is not within a thread-safe content"
 msgstr "Aufruf ist nicht in einem thread-sicheren Bereich"
 
-#: java/jniregister.hpp:94
-#: java/jniregister.hpp:130
+#: java/jni.hpp:134
+#: java/jni.hpp:170
 msgid "release thread can not be determine correctly"
 msgstr "Threadrelease kann nicht richtig beendet werden"
 
-#: java/jniregister.hpp:102
+#: java/jni.hpp:142
 msgid "pointer field can not detected"
 msgstr "Zeigerfeld konnte nicht ermittelt werden"
+
+#: java/jni.hpp:194
+#: java/jni.hpp:223
+msgid "can not find method with signature"
+msgstr "konnte Wikipedia Dokument nicht anhand der URL ermitteln"
+
+#: java/jni.hpp:248
+msgid "can not find constructor call"
+msgstr "Konstruktoraufruf konnte nicht gefunden werden"
 
 #: neighborhood/kapproximation.hpp:90
 msgid "number of approximate data must be greater than zero"
@@ -303,30 +332,19 @@ msgstr "kNN muss größer Null sein"
 msgid "knn is greater than datapoints"
 msgstr "kNN ist größer als Datenpunkte"
 
-#: tools/lapack.hpp:88
+#: tools/lapack.hpp:89
 msgid "both matrices have not the same size"
 msgstr "beide Matrizen haben nicht die gleiche Größe"
 
-#: tools/lapack.hpp:237
+#: tools/lapack.hpp:238
 msgid "number of rows / columns of the matrix must have the same dimension like the initialisation vector"
 msgstr "Anzahl der Zeilen / Spalten der Matrix müssen die selbe Dimension haben, wie der Initialisierungsvektor"
 
-#: tools/logger.hpp:249
+#: tools/logger.hpp:247
 msgid "log state is unkown"
 msgstr "Logging Status unbekannt"
 
-#: tools/matrix.hpp:133
-#: tools/matrix.hpp:371
-#: tools/files/csv.hpp:164
-msgid "row size must be greater than zero"
-msgstr "Zeilenanzahl muss größer Null sein"
-
-#: tools/matrix.hpp:135
-#: tools/files/csv.hpp:162
-msgid "column size must be greater than zero"
-msgstr "Spaltenanzahl muss größer Null sein"
-
-#: tools/random.hpp:205
+#: tools/random.hpp:202
 msgid "distribution is not kwon"
 msgstr "Verteilung unbekannt"
 
@@ -350,8 +368,8 @@ msgstr "Daten müssen zweidimensional sein"
 #: tools/files/hdf.hpp:211
 #: tools/files/hdf.hpp:246
 #: tools/files/hdf.hpp:279
-#: tools/files/hdf.hpp:310
-#: tools/files/hdf.hpp:353
+#: tools/files/hdf.hpp:311
+#: tools/files/hdf.hpp:354
 msgid "dataset must be a simple datatype"
 msgstr "Daten müssen einen einfachen Datentyp besitzen"
 
@@ -362,8 +380,8 @@ msgstr "Dimension darf nicht Null sein"
 
 #: tools/files/hdf.hpp:244
 #: tools/files/hdf.hpp:277
-#: tools/files/hdf.hpp:308
-#: tools/files/hdf.hpp:351
+#: tools/files/hdf.hpp:309
+#: tools/files/hdf.hpp:352
 msgid "dataset must be one-dimensional"
 msgstr "Daten müssen eindimensional sein"
 
@@ -371,30 +389,30 @@ msgstr "Daten müssen eindimensional sein"
 msgid "element is not a single value"
 msgstr "Element ist kein einfacher Wert"
 
-#: tools/files/hdf.hpp:321
+#: tools/files/hdf.hpp:322
 msgid "block size can not seperated by the string length"
 msgstr "Blockgröße kann nicht von der Stringlänge separiert werden"
 
-#: tools/files/hdf.hpp:375
-#: tools/files/hdf.hpp:402
-#: tools/files/hdf.hpp:415
-#: tools/files/hdf.hpp:445
-#: tools/files/hdf.hpp:470
+#: tools/files/hdf.hpp:376
+#: tools/files/hdf.hpp:403
+#: tools/files/hdf.hpp:416
+#: tools/files/hdf.hpp:446
+#: tools/files/hdf.hpp:471
 msgid "can not write empty data"
 msgstr "leere Daten können nicht geschrieben werden"
 
-#: tools/files/hdf.hpp:528
-#: tools/files/hdf.hpp:560
+#: tools/files/hdf.hpp:529
+#: tools/files/hdf.hpp:561
 msgid "it is at least one dimension requires"
 msgstr "es ist mindestens eine Dimension nötig"
 
-#: tools/files/hdf.hpp:539
-#: tools/files/hdf.hpp:571
-#: tools/files/hdf.hpp:600
+#: tools/files/hdf.hpp:540
+#: tools/files/hdf.hpp:572
+#: tools/files/hdf.hpp:601
 msgid "empty path is forbidden"
 msgstr "leerer Pfad ist verboten"
 
-#: tools/files/hdf.hpp:628
+#: tools/files/hdf.hpp:629
 msgid "can not create path structure"
 msgstr "Pfadstruktur konnte nicht erzeugt werden"
 
@@ -461,8 +479,8 @@ msgid "can not connect to news server"
 msgstr "Verbindung zu Newsserver nicht möglich"
 
 #: tools/sources/nntp.h:217
-#: tools/sources/twitter.h:708
-#: tools/sources/wikipedia.h:639
+#: tools/sources/twitter.h:710
+#: tools/sources/wikipedia.h:640
 msgid "error while reading socket data"
 msgstr "Fehler während Socketzugriff"
 
@@ -568,226 +586,227 @@ msgid "no result data is found"
 msgstr "keine Rückgabedaten gefunden"
 
 #: tools/sources/twitter.h:670
-#: tools/sources/wikipedia.h:619
+#: tools/sources/wikipedia.h:620
 msgid "invalid response"
 msgstr "ungültige Antwort"
 
-#: tools/sources/twitter.h:694
-#: tools/sources/wikipedia.h:552
+#: tools/sources/twitter.h:696
+#: tools/sources/wikipedia.h:553
 msgid "data can not be received"
 msgstr "Daten konnten nicht empfangen werden"
 
-#: tools/sources/twitter.h:710
-#: tools/sources/wikipedia.h:641
+#: tools/sources/twitter.h:712
+#: tools/sources/wikipedia.h:642
 msgid "Non-Authoritative Information"
 msgstr "keine Authentifizierungsinformationen"
 
-#: tools/sources/twitter.h:711
-#: tools/sources/wikipedia.h:642
+#: tools/sources/twitter.h:713
+#: tools/sources/wikipedia.h:643
 msgid "No Content"
 msgstr "kein Inhalt"
 
-#: tools/sources/twitter.h:712
-#: tools/sources/wikipedia.h:643
+#: tools/sources/twitter.h:714
+#: tools/sources/wikipedia.h:644
 msgid "Reset Content"
 msgstr "Content resettet"
 
-#: tools/sources/twitter.h:713
-#: tools/sources/wikipedia.h:644
+#: tools/sources/twitter.h:715
+#: tools/sources/wikipedia.h:645
 msgid "Partial Content"
 msgstr "Teilinhalt"
 
-#: tools/sources/twitter.h:714
-#: tools/sources/wikipedia.h:645
+#: tools/sources/twitter.h:716
+#: tools/sources/wikipedia.h:646
 msgid "Multiple Choices"
 msgstr "unterschiedliche Auswahlmöglichkeiten"
 
-#: tools/sources/twitter.h:715
-#: tools/sources/wikipedia.h:646
+#: tools/sources/twitter.h:717
+#: tools/sources/wikipedia.h:647
 msgid "Moved Permanently"
 msgstr "dauerhaft verschoben"
 
-#: tools/sources/twitter.h:716
-#: tools/sources/wikipedia.h:647
+#: tools/sources/twitter.h:718
+#: tools/sources/wikipedia.h:648
 msgid "Moved Temporarily"
 msgstr "temporär verschoben"
 
-#: tools/sources/twitter.h:717
-#: tools/sources/wikipedia.h:648
+#: tools/sources/twitter.h:719
+#: tools/sources/wikipedia.h:649
 msgid "See Other"
 msgstr "see andere"
 
-#: tools/sources/twitter.h:718
-#: tools/sources/wikipedia.h:649
+#: tools/sources/twitter.h:720
+#: tools/sources/wikipedia.h:650
 msgid "Not Modified"
 msgstr "nicht modifizert"
 
-#: tools/sources/twitter.h:719
-#: tools/sources/wikipedia.h:650
+#: tools/sources/twitter.h:721
+#: tools/sources/wikipedia.h:651
 msgid "Use Proxy"
 msgstr "Proxy benutzen"
 
-#: tools/sources/twitter.h:720
-#: tools/sources/wikipedia.h:651
+#: tools/sources/twitter.h:722
+#: tools/sources/wikipedia.h:652
 msgid "Temporary Redirect"
 msgstr "temporäre Umleitung"
 
-#: tools/sources/twitter.h:721
-#: tools/sources/wikipedia.h:652
+#: tools/sources/twitter.h:723
+#: tools/sources/wikipedia.h:653
 msgid "Bad Request"
 msgstr "ungültige Anfrage"
 
-#: tools/sources/twitter.h:722
-#: tools/sources/wikipedia.h:653
+#: tools/sources/twitter.h:724
+#: tools/sources/wikipedia.h:654
 msgid "Unauthorized"
 msgstr "nicht authorisiert"
 
-#: tools/sources/twitter.h:723
-#: tools/sources/wikipedia.h:654
+#: tools/sources/twitter.h:725
+#: tools/sources/wikipedia.h:655
 msgid "Payment Required"
 msgstr "Zahlung notwendig"
 
-#: tools/sources/twitter.h:724
-#: tools/sources/wikipedia.h:655
+#: tools/sources/twitter.h:726
+#: tools/sources/wikipedia.h:656
 msgid "Forbidden"
 msgstr "Verboten"
 
-#: tools/sources/twitter.h:725
-#: tools/sources/wikipedia.h:656
+#: tools/sources/twitter.h:727
+#: tools/sources/wikipedia.h:657
 msgid "Not Found"
 msgstr "nicht gefunden"
 
-#: tools/sources/twitter.h:726
-#: tools/sources/wikipedia.h:657
+#: tools/sources/twitter.h:728
+#: tools/sources/wikipedia.h:658
 msgid "Method Not Allowed"
 msgstr "Methode nicht erlaubt"
 
-#: tools/sources/twitter.h:727
-#: tools/sources/wikipedia.h:658
+#: tools/sources/twitter.h:729
+#: tools/sources/wikipedia.h:659
 msgid "Not Acceptable"
 msgstr "nicht akzeptiert"
 
-#: tools/sources/twitter.h:729
-#: tools/sources/wikipedia.h:660
+#: tools/sources/twitter.h:731
+#: tools/sources/wikipedia.h:661
 msgid "Proxy Authentication Required"
 msgstr "Proxyauthentifizierung notwendig"
 
-#: tools/sources/twitter.h:730
-#: tools/sources/wikipedia.h:661
+#: tools/sources/twitter.h:732
+#: tools/sources/wikipedia.h:662
 msgid "Request Time-out"
 msgstr "Anfragezeitüberschreitung"
 
-#: tools/sources/twitter.h:731
-#: tools/sources/wikipedia.h:662
+#: tools/sources/twitter.h:733
+#: tools/sources/wikipedia.h:663
 msgid "Conflict"
 msgstr "Konflikt"
 
-#: tools/sources/twitter.h:732
-#: tools/sources/wikipedia.h:663
+#: tools/sources/twitter.h:734
+#: tools/sources/wikipedia.h:664
 msgid "Gone"
 msgstr "nicht vorhanden"
 
-#: tools/sources/twitter.h:733
-#: tools/sources/wikipedia.h:664
+#: tools/sources/twitter.h:735
+#: tools/sources/wikipedia.h:665
 msgid "Length Required"
 msgstr "Länge notwendig"
 
-#: tools/sources/twitter.h:734
-#: tools/sources/wikipedia.h:665
+#: tools/sources/twitter.h:736
+#: tools/sources/wikipedia.h:666
 msgid "Precondition Failed"
 msgstr "Voraussetzung nicht erfolgt"
 
-#: tools/sources/twitter.h:735
-#: tools/sources/wikipedia.h:666
+#: tools/sources/twitter.h:737
+#: tools/sources/wikipedia.h:667
 msgid "Request Entity Too Large"
 msgstr "Requesteintrag ist zu lange"
 
-#: tools/sources/twitter.h:736
-#: tools/sources/wikipedia.h:667
+#: tools/sources/twitter.h:738
+#: tools/sources/wikipedia.h:668
 msgid "Request-URI Too Large"
 msgstr "Request-URL zu lang"
 
-#: tools/sources/twitter.h:737
-#: tools/sources/wikipedia.h:668
+#: tools/sources/twitter.h:739
+#: tools/sources/wikipedia.h:669
 msgid "Unsupported Media Type"
 msgstr "ungültiger Medientyp"
 
-#: tools/sources/twitter.h:738
-#: tools/sources/wikipedia.h:669
+#: tools/sources/twitter.h:740
+#: tools/sources/wikipedia.h:670
 msgid "Requested range not satisfiable"
 msgstr "angefragter Bereich nicht erfüllbar"
 
-#: tools/sources/twitter.h:739
-#: tools/sources/wikipedia.h:670
+#: tools/sources/twitter.h:741
+#: tools/sources/wikipedia.h:671
 msgid "Expectation Failed"
 msgstr "Erwartung nicht erfüllt"
 
-#: tools/sources/twitter.h:740
-#: tools/sources/wikipedia.h:671
+#: tools/sources/twitter.h:742
+#: tools/sources/wikipedia.h:672
 msgid "Internal Server Error"
 msgstr "interner Serverfehler"
 
-#: tools/sources/twitter.h:741
-#: tools/sources/wikipedia.h:672
+#: tools/sources/twitter.h:743
+#: tools/sources/wikipedia.h:673
 msgid "Not Implemented"
 msgstr "nicht implementiert"
 
-#: tools/sources/twitter.h:742
-#: tools/sources/wikipedia.h:673
+#: tools/sources/twitter.h:744
+#: tools/sources/wikipedia.h:674
 msgid "Bad Gateway"
 msgstr "ungültiger Gateway"
 
-#: tools/sources/twitter.h:743
-#: tools/sources/wikipedia.h:674
+#: tools/sources/twitter.h:745
+#: tools/sources/wikipedia.h:675
 msgid "Service Unavailable"
 msgstr "Service nicht erreichbar"
 
-#: tools/sources/twitter.h:744
-#: tools/sources/wikipedia.h:675
+#: tools/sources/twitter.h:746
+#: tools/sources/wikipedia.h:676
 msgid "Gateway Time-out"
 msgstr "Gateway Zeitüberschreibung"
 
-#: tools/sources/twitter.h:745
-#: tools/sources/wikipedia.h:676
+#: tools/sources/twitter.h:747
+#: tools/sources/wikipedia.h:677
 msgid "HTTP Version not supported"
 msgstr "HTTP Version wird nicht unterstützt"
 
-#: tools/sources/twitter.h:784
+#: tools/sources/twitter.h:786
+#: java/machinelearning/util/random.cpp:72
 msgid "option value is unkown"
 msgstr "Optionswert nicht bekannt"
 
-#: tools/sources/twitter.h:795
+#: tools/sources/twitter.h:797
 msgid "not a valid date"
 msgstr "kein valides Datum"
 
-#: tools/sources/twitter.h:836
+#: tools/sources/twitter.h:838
 msgid "results per page must be in the range [1,100]"
 msgstr "Rückgaben pro Seite müssen innerhalb des Bereich [1,100] sein"
 
-#: tools/sources/twitter.h:838
+#: tools/sources/twitter.h:840
 msgid "maximum results are reached"
 msgstr "maximale Anzahl erreicht"
 
-#: tools/sources/twitter.h:986
-#: tools/sources/twitter.h:1092
+#: tools/sources/twitter.h:988
+#: tools/sources/twitter.h:1094
 msgid "at"
 msgstr "um"
 
-#: tools/sources/twitter.h:992
+#: tools/sources/twitter.h:994
 msgid "to"
 msgstr "von"
 
-#: tools/sources/twitter.h:997
-#: tools/sources/twitter.h:1099
+#: tools/sources/twitter.h:999
+#: tools/sources/twitter.h:1101
 msgid "geoposition"
 msgstr "Geoposition"
 
-#: tools/sources/twitter.h:1000
-#: tools/sources/twitter.h:1102
+#: tools/sources/twitter.h:1002
+#: tools/sources/twitter.h:1104
 msgid "hashtags"
 msgstr "Hashtags"
 
-#: tools/sources/twitter.h:1109
+#: tools/sources/twitter.h:1111
 msgid "urltags"
 msgstr "URL Tags"
 
@@ -821,7 +840,28 @@ msgstr "XML Daten konnten nicht verarbeitet werden"
 msgid "can not detect namespace"
 msgstr "Konnte Namespace nicht ermitteln"
 
-#: tools/sources/wikipedia.h:589
+#: tools/sources/wikipedia.h:590
 msgid "can not connect to wikipedia server"
 msgstr "Konnte Wikiepdia Server nicht erreichen"
+
+#: java/machinelearning/dimensionreduce/nonsupervised/mds.cpp:72
+#: java/machinelearning/dimensionreduce/nonsupervised/mds.cpp:158
+#: java/machinelearning/dimensionreduce/nonsupervised/mds.cpp:231
+#: java/machinelearning/dimensionreduce/nonsupervised/mds.cpp:317
+msgid "enum value is not known"
+msgstr "Sprache ist unbekannt"
+
+#: java/machinelearning/dimensionreduce/nonsupervised/mds.cpp:172
+#: java/machinelearning/dimensionreduce/nonsupervised/mds.cpp:331
+#: java/machinelearning/dimensionreduce/nonsupervised/pca.cpp:94
+#: java/machinelearning/dimensionreduce/nonsupervised/pca.cpp:186
+msgid "data matrix is null"
+msgstr "Datenmatrix hat nur Nulleinträge"
+
+#: java/machinelearning/dimensionreduce/nonsupervised/mds.cpp:179
+#: java/machinelearning/dimensionreduce/nonsupervised/mds.cpp:338
+#: java/machinelearning/dimensionreduce/nonsupervised/pca.cpp:101
+#: java/machinelearning/dimensionreduce/nonsupervised/pca.cpp:193
+msgid "data matrix is empty"
+msgstr "Datenmatrix hat nur Nulleinträge"
 

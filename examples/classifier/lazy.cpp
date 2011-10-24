@@ -47,7 +47,10 @@ namespace tools      = machinelearning::tools;
  **/
 int main(int argc, char* argv[])
 {
-
+    #ifdef MACHINELEARNING_MULTILANGUAGE
+    tools::language::bindings::bind("machinelearning", "language");
+    #endif
+    
     // default values
     bool l_log;
     std::size_t l_knn;
