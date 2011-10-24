@@ -62,7 +62,7 @@ namespace machinelearning { namespace functionaloptimization {
      * To detect the problem the optimization values are jumping between a range during
      * iteration, so if the values are jumping the optimization process must be switched
      * in two processes or all multiplication / exponents must be cut and each thread
-     * must be create internal processes for the iteration
+     * must be create internal processes for the iteration (see batch parameter within the optimization method)
      **/
     template<typename T, std::size_t D=1> class gradientdescent
     {
@@ -76,7 +76,7 @@ namespace machinelearning { namespace functionaloptimization {
             void setOptimizeVar( const std::string&, const T&, const T& );
             void setOptimizeVar( const std::string&, const T& );
             void setStaticVar( const std::string&, const boost::multi_array<T,D>& );
-            std::map<std::string, T> optimize( const std::size_t&, const T&, const std::vector<std::string>& = std::vector<std::string>() ) const;
+            std::map<std::string, T> optimize( const std::size_t&, const std::size_t&, const std::vector<std::string>& = std::vector<std::string>() ) const;
         
         
         private :
@@ -108,7 +108,7 @@ namespace machinelearning { namespace functionaloptimization {
                 public :
                 
                     worker( const std::size_t&, 
-                        const T&,
+                        const std::size_t&,
                         const std::string&,
                         const std::string&,
                         const std::vector<std::string>&, 
@@ -126,8 +126,8 @@ namespace machinelearning { namespace functionaloptimization {
                 
                     /** maximum iterations **/
                     std::size_t m_iteration;
-                    /** init stepsize **/
-                    T m_stepsize;
+                    /** sampling value **/
+                    std::size_t m_sampling;
                     /** map with lower & upper initialisation values **/
                     std::map<std::string, std::pair<T,T> > m_initvalues;
                     /** map with static values **/
@@ -296,13 +296,17 @@ namespace machinelearning { namespace functionaloptimization {
     }
     
     
-    
-    
-    template<typename T, std::size_t D> inline std::map<std::string, T> gradientdescent<T,D>::optimize( const std::size_t& p_iteration, const T& p_stepsize, const std::vector<std::string>& p_batch ) const
+    /** optimization method
+     * @param p_iteration number of iterations
+     * @param p_sampling number of samples for each static range
+     * @return map with name and value
+     * @todo adding parameter for setting number of start points and creating the correct thread group
+     **/
+    template<typename T, std::size_t D> inline std::map<std::string, T> gradientdescent<T,D>::optimize( const std::size_t& p_iteration, const std::size_t& p_sampling, const std::vector<std::string>& p_batch ) const
     {
         if (p_iteration == 0)
             throw exception::runtime(_("iterations must be greater than zero"), *this);
-        if ( (p_stepsize < 0 ) || (tools::function::isNumericalZero(p_stepsize)) )
+        if (p_sampling == 0 )
             throw exception::runtime(_("stepsize must be greater than zero"), *this);
         
         // all variables must be set to a numerical value, so we check it
@@ -315,12 +319,12 @@ namespace machinelearning { namespace functionaloptimization {
         
         // if only one thread is used, we create the worker object directly and run it
         if (boost::thread::hardware_concurrency() == 1) {
-            l_worker.push_back(  worker(p_iteration, p_stepsize, expression2string(m_expression), expression2string(m_full), m_derivationvars, m_optimize, m_static, p_batch)  );
+            l_worker.push_back(  worker(p_iteration, p_sampling, expression2string(m_expression), expression2string(m_full), m_derivationvars, m_optimize, m_static, p_batch)  );
             l_worker[0].optimize();
         } else { 
             boost::thread_group l_threadgroup;
             for(std::size_t i=0; i < boost::thread::hardware_concurrency(); ++i) {
-                l_worker.push_back( worker(p_iteration, p_stepsize, expression2string(m_expression), expression2string(m_full), m_derivationvars, m_optimize, m_static, p_batch)  );
+                l_worker.push_back( worker(p_iteration, p_sampling, expression2string(m_expression), expression2string(m_full), m_derivationvars, m_optimize, m_static, p_batch)  );
                 l_threadgroup.create_thread(  boost::bind( &worker::optimize, &l_worker[i] )  );
             }
         
@@ -350,7 +354,7 @@ namespace machinelearning { namespace functionaloptimization {
      **/
     template<typename T, std::size_t D> inline gradientdescent<T,D>::worker::worker(  
         const std::size_t& p_iteration, 
-        const T& p_stepsize, 
+        const std::size_t& p_sampling, 
         const std::string& p_function,
         const std::string& p_errorfunction,
         const std::vector<std::string>& p_derivationvars, 
@@ -359,7 +363,7 @@ namespace machinelearning { namespace functionaloptimization {
         const std::vector<std::string>& p_batch  
     ) :
     m_iteration( p_iteration ),
-    m_stepsize( p_stepsize ),
+    m_sampling( p_stepsize ),
     m_initvalues( p_initvalues ),
     m_staticvalues( p_staticvalues ),
     m_batch( p_batch ),
