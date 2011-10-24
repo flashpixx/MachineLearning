@@ -56,6 +56,13 @@ namespace machinelearning { namespace functionaloptimization {
      * GiNaC is not thread-safe, so for the thread we create only std::string vars
      * $LastChangedDate$
      * @bug uncomplete, so doesn't work
+     * @todo adding detection of numerical instability eg x*exp(x) the optimization of the
+     * multiplication x is uncomplicated that the exp(x) (in the exponent). One solution to
+     * optimize this function is to optimize for the multiplication and next the exponent.
+     * To detect the problem the optimization values are jumping between a range during
+     * iteration, so if the values are jumping the optimization process must be switched
+     * in two processes or all multiplication / exponents must be cut and each thread
+     * must be create internal processes for the iteration
      **/
     template<typename T, std::size_t D=1> class gradientdescent
     {
