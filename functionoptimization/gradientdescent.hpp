@@ -65,7 +65,7 @@ namespace machinelearning { namespace functionaloptimization {
         public :
 
             gradientdescent( const std::string& );
-            void setErrorFunction( const std::string&, const std::string& = "0.5 * (target-(function))^2", const std::string& = "function", const std::string& = " ,;" );
+            void setErrorFunction( const std::string&, const std::string& = "0.5 * (target-(function))^2", const std::string& = "function", const std::string& = " ,;\t\n-" );
             void setOptimizeVar( const std::string&, const T&, const T& );
             void setOptimizeVar( const std::string&, const T& );
             void setStaticVar( const std::string&, const boost::multi_array<T,D>& );
@@ -188,7 +188,7 @@ namespace machinelearning { namespace functionaloptimization {
     
     
     /** creates the gradient function (default sum-of-squared-error / SSE)
-     * @param p_optimizevars is a list of variables in the original formula which will be optimized (vars musst be separated with spaces, comma or semicolon, see separator)
+     * @param p_optimizevars is a list of variables in the original formula which will be optimized (vars musst be separated with spaces, comma, semicolon, return or tabulator, see separator)
      * @param p_errfunc error function in wich must be set the name from p_funcname
      * @param p_funcname string name in which will be set the function
      * @param p_separator separator charaters (default space, comma and semicolon)
