@@ -37,10 +37,17 @@ def configuration_macosx(config, vars, version, architecture) :
     if ver[0] == "10" and ver[1] == "6" :
         arch = "x86_64"
 
+
     config["shlinkerflags"]     = ""
     config["linkerflags"]       = "-pthread"
-    config["include"]           = os.environ["CPPPATH"]
-    config["librarypath"]       = os.environ["LIBRARY_PATH"]
+    config["include"]           = ""
+    config["librarypath"]       = ""
+    
+    if os.environ.has_key("CPPPATH") :
+        config["include"]       = os.environ["CPPPATH"]
+    if os.environ.has_key("LIBRARY_PATH") :
+        config["librarypath"]   = os.environ["LIBRARY_PATH"]
+        
     config["compileflags"]      = "-pipe -Wall -Wextra -arch "+arch+" -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
     config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "boost_regex"]
 
@@ -100,8 +107,14 @@ def configuration_macosx(config, vars, version, architecture) :
 def configuration_posix(config, vars, version, architecture) :
     config["shlinkerflags"]     = ""
     config["linkerflags"]       = "-pthread"
-    config["include"]           = os.environ["CPPPATH"]
-    config["librarypath"]       = os.environ["LIBRARY_PATH"]
+    config["include"]           = ""
+    config["librarypath"]       = ""
+    
+    if os.environ.has_key("CPPPATH") :
+        config["include"]       = os.environ["CPPPATH"]
+    if os.environ.has_key("LIBRARY_PATH") :
+        config["librarypath"]   = os.environ["LIBRARY_PATH"]
+    
     config["compileflags"]      = "-pipe -Wall -Wextra -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
     config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "boost_regex", "gfortran"]
 
@@ -159,8 +172,14 @@ def configuration_posix(config, vars, version, architecture) :
 def configuration_cygwin(config, vars, version, architecture) :
     config["shlinkerflags"]     = ""
     config["linkerflags"]       = "-enable-stdcall-fixup -mthread -mconsole"
-    config["include"]           = os.environ["CPPPATH"]
-    config["librarypath"]       = os.environ["PATH"]
+    config["include"]           = ""
+    config["librarypath"]       = ""
+    
+    if os.environ.has_key("CPPPATH") :
+        config["include"]       = os.environ["CPPPATH"]
+    if os.environ.has_key("PATH") :
+        config["librarypath"]   = os.environ["PATH"]
+    
     config["compileflags"]      = "-pipe -Wall -Wextra -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
     config["linkto"]            = ["cygboost_system", "cygboost_thread", "cygboost_iostreams", "cygboost_regex"]
 
@@ -237,21 +256,23 @@ def configuration_cygwin(config, vars, version, architecture) :
 def getConfig(vars):
     env = Environment(variables=vars)
     config = {}
-
+    
     # read path and add environment path values
-    syspath = [env["ENV"]["PATH"], os.environ["PATH"]]
+    syspath = []
+    if os.environ.has_key("PATH") :
+        syspath = [env["ENV"]["PATH"], os.environ["PATH"]]
 
     if env['PLATFORM'].lower() == "darwin" :
         configuration_macosx(config, env, platform.mac_ver()[0], platform.machine())
-        env["ENV"]["PATH"] = ":".join(syspath)
+        env["ENV"]["PATH"] = os.pathsep.join(syspath)
 
     elif env['PLATFORM'].lower() == "cygwin" :
         configuration_cygwin(config, env, "", platform.machine())
-        env["ENV"]["PATH"] = ":".join(syspath)
+        env["ENV"]["PATH"] = os.pathsep.join(syspath)
 
     elif env['PLATFORM'].lower() == "posix" :
         configuration_posix(config, env, "", platform.machine())
-        env["ENV"]["PATH"] = ":".join(syspath)
+        env["ENV"]["PATH"] = os.pathsep.join(syspath)
 
     else :
         print "configuration for ["+env['PLATFORM']+"] not exists"
