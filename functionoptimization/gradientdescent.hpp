@@ -72,7 +72,7 @@ namespace machinelearning { namespace functionaloptimization {
         public :
 
             gradientdescent( const std::string& );
-            void setErrorFunction( const std::string&, const std::string& = "0.5 * (target-(function))^2", const std::string& = "function", const std::string& = " ,;\t\n-" );
+            void setErrorFunction( const std::string&, const std::string& = "0.5 * (target-(function))^2", const std::string& = "target", const std::string& = "function", const std::string& = " ,;\t\n-" );
             void setOptimizeVar( const std::string&, const T&, const T& );
             void setOptimizeVar( const std::string&, const T& );
             void setStaticVar( const std::string&, const boost::multi_array<T,D>& );
@@ -196,12 +196,14 @@ namespace machinelearning { namespace functionaloptimization {
     
     /** creates the gradient function (default sum-of-squared-error / SSE)
      * @param p_optimizevars is a list of variables in the original formula which will be optimized (vars musst be separated with spaces, comma, semicolon, return or tabulator, see separator)
-     * @param p_errfunc error function in wich must be set the name from p_funcname
+     * @param p_errfunc error function in which must be set the name from p_funcname
+     * @param p_targetname name of the variable name in which the dataset will be stored
      * @param p_funcname string name in which will be set the function
      * @param p_separator separator charaters (default space, comma and semicolon)
      * @todo check errorfunction if convex (2nd derivation must be >= 0 for all values)
+     * @todo adding target value name
      **/
-    template<typename T, std::size_t D> inline void gradientdescent<T,D>::setErrorFunction( const std::string& p_optimizevars, const std::string& p_errfunc, const std::string& p_funcname, const std::string& p_separator )
+    template<typename T, std::size_t D> inline void gradientdescent<T,D>::setErrorFunction( const std::string& p_optimizevars, const std::string& p_errfunc, const std::string& p_targetname, const std::string& p_funcname, const std::string& p_separator )
     {
         if (p_errfunc.empty())
             throw exception::runtime(_("error function need not be empty"), *this);
