@@ -597,6 +597,7 @@ files.extend( getRekusivFiles(os.curdir, ".po~") )
 files.extend( getRekusivFiles(os.curdir, ".jar") )
 files.extend( getRekusivFiles(os.curdir, ".stackdump") )
 files.extend( getRekusivFiles(os.curdir, ".core") )
+files.extend( ["build", "documentation"] )
 
 env.Clean("clean", files)
 
