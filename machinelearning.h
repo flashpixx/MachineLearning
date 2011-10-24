@@ -569,7 +569,7 @@
  *
  *
  *
- * @page other Examples (other)
+ * @page other Examples Other
  *
  * @section toc Table of contents
  * <ul>
