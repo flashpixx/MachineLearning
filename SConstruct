@@ -775,7 +775,7 @@ def build_atlaslapack(target, source, env) :
         sys.exit(1)
     atlasversion = found.group(1).split("/")[1]
 
-    print( "cd "+os.path.join("install", "atlasbuild")+"; ../ATLAS/configure --dylibs --with-netlib-lapack-tarfile=../lapack.tgz --prefix="+os.path.abspath(os.path.join("install", "build", "atlas", atlasversion))+ "; make" )
+    os.system( "cd "+os.path.join("install", "atlasbuild")+"; ../ATLAS/configure -b 32 --dylibs --with-netlib-lapack-tarfile=../lapack.tgz --prefix="+os.path.abspath(os.path.join("install", "build", "atlas", atlasversion))+ "; make" )
     
     return []
     
@@ -851,8 +851,8 @@ def target_libraryinstall(env) :
     lst.append( env.Command("mkbuilddir", "", Mkdir(os.path.join("install", "build"))) )
 
     #download LAPack & ATLAS, extract & install
-    lst.append( env.Command("downloadlapackatlas", "", download_atlaslapack) )
-    lst.append( env.Command("mkatlasbuilddir", "", Mkdir(os.path.join("install", "atlasbuild"))) )
+    #lst.append( env.Command("downloadlapackatlas", "", download_atlaslapack) )
+    #lst.append( env.Command("mkatlasbuilddir", "", Mkdir(os.path.join("install", "atlasbuild"))) )
     lst.append( env.Command("buildatlaslapack", "", build_atlaslapack) )
     
     
