@@ -138,6 +138,7 @@
  * show a build target, but some targets will be build first if different parameters are set
  * <ul>
  * <li><dfn>documentation</dfn> create the documentation with Doxygen (Doxygen must be installed and be reached within the path)</li>
+ * <li><dfn>librarybuild</dfn> download the librarys and compile each library with the default option. Compiled libraries are installed under <dfn>install/build</dfn></li>
  * <li><dfn>createlanguage</dfn> creates the language files / adds new messages to the existing files (xgettext must be called, so it should be within the path)</li>
  * <li><dfn>updatelanguage</dfn> compiles all language files (msgfmt must be called, so it should be within the path)</li>
  * <li><dfn>clean / -c</dfn> target that cleans framework files</li>

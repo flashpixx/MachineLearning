@@ -5,6 +5,8 @@ import glob
 import string
 import platform
 import sys
+import urllib2
+import re
 
 
 #=== CLI parameters ===================================================================================================
@@ -464,6 +466,7 @@ def target_cpp(env, framework) :
 
 
 
+
 # change the library calls under OSX
 def java_osxlinkedlibs(target, source, env) :
     oFile = open( os.path.join(os.curdir, "build", "linkedlibs.txt"), "r" )
@@ -605,9 +608,135 @@ def target_language(env) :
     env.Alias("createlanguage", createtargets)
 
 
+
+
 # target for creating documentation
 def target_documentation(env) :
     env.Alias("documentation", env.Command("doxygen", "", "doxygen documentation.doxyfile"))
+    
+    
+    
+    
+def download_boost(target, source, env)  :
+    # read download path of the Boost (latest version)
+    f = urllib2.urlopen("http://www.boost.org/users/download/")
+    html = f.read()
+    f.close()
+    
+    found = re.search("<a href=\"http://sourceforge.net/projects/boost/files/(.*)\">Download</a>", html)
+    if found == None :
+        print "Boost Download URL not found"
+        sys.exit(1)
+    downloadurl = found.group(0)
+    downloadurl = downloadurl.replace("<a href=\"", "")
+    downloadurl = downloadurl.replace("\">Download</a>", "")
+   
+    # read url of the tar.bz2
+    f = urllib2.urlopen(downloadurl)
+    html = f.read()
+    f.close()
+
+    found = re.search("<a href=\"http://sourceforge.net/projects/boost/files/boost(.*).tar.bz2/download", html)
+    if found == None :
+        print "Boost Download URL not found"
+        sys.exit(1)
+    downloadurl = found.group(0)
+    downloadurl = downloadurl.replace("<a href=\"", "")
+    
+    # saves the boost into "boost.tar.bz2"
+    target = open( os.path.join(os.curdir, "install", "boost.tar.bz2"), "w" )
+    f = urllib2.urlopen(downloadurl)
+    target.write(f.read())
+    target.close()
+    f.close()
+    
+    return []
+    
+    
+def build_boost(target, source, env)  :
+    boostpath = glob.glob(os.path.join("install", "boost_*"))
+    if boostpath == None or not(boostpath) :
+        print "Boost Build Directory not found"
+        sys.exit(1)
+    boostpath     = boostpath[0]
+    
+    # extract the version part
+    boostversion  = boostpath.replace(os.path.join("install", "boost_"), "")
+    boostversion  = boostversion.replace("_", ".")
+
+    # for calling bootstrap.sh change the current work directory
+    os.system( "cd "+boostpath+"; ./bootstrap.sh" )
+    
+    # call the bjam command
+    toolset = "gcc"
+    if env['PLATFORM'].lower() == "darwin" :
+        toolset = "darwin"
+    
+    # build the Boost
+    os.system( "cd "+boostpath+"; ./b2 --with-exception --with-filesystem --with-math --with-random --with-regex --with-date_time --with-thread --with-system --with-program_options --with-serialization --with-iostreams --disable-filesystem2 threading=multi runtime-link=shared variant=release toolset="+toolset+" install --prefix="+os.path.abspath(os.path.join(os.curdir, "install", "build", "boost", boostversion)) )
+
+    # checkout the numerical binding
+    os.system("svn checkout http://svn.boost.org/svn/boost/sandbox/numeric_bindings/ "+os.path.abspath(os.path.join(os.curdir, "install", "build", "boost", "sandbox", "numeric_bindings")) )
+
+    return []
+    
+    
+def download_hdf(target, source, env) :
+    # read download path of the Boost (latest version)
+    f = urllib2.urlopen("http://www.hdfgroup.org/ftp/HDF5/current/src/")
+    html = f.read()
+    f.close()
+    
+    found = re.search("<a href=\"(.*)tar.bz2\">", html)
+    if found == None :
+        print "HDF Download URL not found"
+        sys.exit(1)
+    downloadurl = found.group(0)
+
+    downloadurl = downloadurl.replace("<a href=\"", "")
+    downloadurl = downloadurl.replace("\">", "")
+
+    # download the package
+    target = open( os.path.join(os.curdir, "install", "hdf.tar.bz2"), "w" )
+    f = urllib2.urlopen("http://www.hdfgroup.org/ftp/HDF5/current/src/"+downloadurl)
+    target.write(f.read())
+    target.close()
+    f.close()
+
+    return []
+    
+    
+def build_hdf(target, source, env) :
+    hdfpath = glob.glob(os.path.join("install", "hdf?-*"))
+    if hdfpath == None or not(hdfpath) :
+        print "HDF Build Directory not found"
+        sys.exit(1)
+    hdfpath     = hdfpath[0]
+    hdfversion  = hdfpath.replace(os.path.join("install", "hdf"), "")
+    
+    os.system( "cd "+hdfpath+"; ./configure --enable-cxx --prefix="+os.path.abspath(os.path.join("install", "build", "hdf", hdfversion))+ "; make; make install" )
+    return []
+    
+    
+
+def target_libraryinstall(env) :
+    #build into a temp dir
+    lst = env.Command("mkinstalldir", "", Mkdir("install"))
+    lst.append( env.Command("mkbuilddir", "", Mkdir(os.path.join("install", "build"))) )
+    
+    # download Boost, extract & install
+    lst.append( env.Command("boost", "", download_boost) )
+    lst.append( env.Command("boost", "", "tar xfvj install/boost.tar.bz2 -C install/") )
+    lst.append( env.Command("boost", "", build_boost) )
+    
+    # download HDF, extract & install
+    lst.append( env.Command("hdf", "", download_hdf) )
+    lst.append( env.Command("hdf", "", "tar xfvj install/hdf.tar.bz2 -C install/") )
+    lst.append( env.Command("hdf", "", build_hdf) )
+
+    #Download: <a href="http://www.netlib.org/lapack/lapack-3.3.1.tgz">lapack-3.3.1.tgz</a>
+
+    env.Alias("librarybuild", lst)
 #=======================================================================================================================================
 
 
@@ -633,7 +762,7 @@ files.extend( getRekusivFiles(os.curdir, ".stackdump") )
 files.extend( getRekusivFiles(os.curdir, ".core") )
 
 # don't ad the current path, because scons run the directories until "/"
-files.extend( ["build", "documentation"] )
+files.extend( ["build", "documentation", "install"] )
 
 env.Clean("clean", files)
 
@@ -645,6 +774,7 @@ if env["withlogger"] or env["withrandomdevice"] :
     framework.append( os.path.join( os.curdir, "machinelearning.cpp" ) )
 
 # create building targets
+target_libraryinstall( env )
 target_language( env )
 target_documentation( env )
 
