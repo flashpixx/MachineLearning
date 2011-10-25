@@ -758,6 +758,25 @@ def download_atlaslapack(target, source, env) :
     target.close()
     f.close()
     
+    # extract ATLAS tar here, because errors are ignored
+    os.system("tar xfvj "+os.path.join("install", "atlas.tar.bz2")+" -C install")
+    
+    return []
+    
+    
+def build_atlaslapack(target, source, env) :
+    f = urllib2.urlopen("http://sourceforge.net/projects/math-atlas/files/")
+    html = f.read()
+    f.close()
+    
+    found = re.search("<a href=\"http://sourceforge.net/projects/math-atlas/files/Developer(.*)\" title=\"Download(.*)\" class=\"sfdl\">", html)
+    if found == None :
+        print "ATLAS Download URL not found"
+        sys.exit(1)
+    atlasversion = found.group(1).split("/")[1]
+
+    print( "cd "+os.path.join("install", "atlasbuild")+"; ../ATLAS/configure --dylibs --with-netlib-lapack-tarfile=../lapack.tgz --prefix="+os.path.abspath(os.path.join("install", "build", "atlas", atlasversion))+ "; make" )
+    
     return []
     
     
@@ -830,6 +849,12 @@ def target_libraryinstall(env) :
     #build into a temp dir
     lst = env.Command("mkinstalldir", "", Mkdir("install"))
     lst.append( env.Command("mkbuilddir", "", Mkdir(os.path.join("install", "build"))) )
+
+    #download LAPack & ATLAS, extract & install
+    lst.append( env.Command("downloadlapackatlas", "", download_atlaslapack) )
+    lst.append( env.Command("mkatlasbuilddir", "", Mkdir(os.path.join("install", "atlasbuild"))) )
+    lst.append( env.Command("buildatlaslapack", "", build_atlaslapack) )
+    
     
     # download Boost, extract & install
     #lst.append( env.Command("downloadboost", "", download_boost) )
@@ -841,16 +866,14 @@ def target_libraryinstall(env) :
     #lst.append( env.Command("extracthdf", "", "tar xfvj "+os.path.join("install", "hdf.tar.bz2")+" -C install") )
     #lst.append( env.Command("buildhdf", "", build_hdf) )
 
-    #download LAPack & ATLAS, extract & install
-    #lst.append( env.Command("downloadlapackatlas", "", download_atlaslapack) )
-    #lst.append( env.Command("mkatlasbuilddir", "", Mkdir(os.path.join("install", "atlasbuild"))) )
-    #lst.append( env.Command("extractlapackatlas", "", "tar xfvj "+os.path.join("install", "atlas.tar.bz2")+" -C install") )
-
     #download GiNaC & CLN, extract & install
     #lst.append( env.Command("downloadginaccln", "", download_ginaccln) )
     #lst.append( env.Command("extractginac", "", "tar xfvj "+os.path.join("install", "ginac.tar.bz2")+" -C install") )
     #lst.append( env.Command("extractcln", "", "tar xfvj "+os.path.join("install", "cln.tar.bz2")+" -C install") )
-    lst.append( env.Command("buildhdf", "", build_ginaccln) )
+    #lst.append( env.Command("buildhdf", "", build_ginaccln) )
+    
+    #http://sourceforge.net/projects/jsoncpp/
+    #<a href="http://sourceforge.net/projects/jsoncpp/files/jsoncpp/0.5.0/jsoncpp-src-0.5.0.tar.gz/download?_test=goal" title="Download /jsoncpp/0.5.0/jsoncpp-src-0.5.0.tar.gz from SourceForge -  - 107.5 kB" class="sfdl">
 
     env.Alias("librarybuild", lst)
 #=======================================================================================================================================
