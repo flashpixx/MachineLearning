@@ -682,7 +682,7 @@ def build_boost(target, source, env)  :
     
     
 def download_hdf(target, source, env) :
-    # read download path of the Boost (latest version)
+    # read download path of the HDF
     f = urllib2.urlopen("http://www.hdfgroup.org/ftp/HDF5/current/src/")
     html = f.read()
     f.close()
@@ -718,6 +718,113 @@ def build_hdf(target, source, env) :
     return []
     
     
+def download_atlaslapack(target, source, env) :
+    
+    # read download path of the LAPack (latest version)
+    f = urllib2.urlopen("http://www.netlib.org/lapack/")
+    html = f.read()
+    f.close()
+    
+    found = re.search("<a href=\"http://www.netlib.org/lapack/(.*)tgz\">", html)
+    if found == None :
+        print "LAPack Download URL not found"
+        sys.exit(1)
+    downloadurl = found.group(0)
+    downloadurl = downloadurl.replace("<a href=\"", "")
+    downloadurl = downloadurl.replace("\">", "")
+    
+    target = open( os.path.join(os.curdir, "install", "lapack.tgz"), "w" )
+    f = urllib2.urlopen(downloadurl)
+    target.write(f.read())
+    target.close()
+    f.close()
+    
+    
+    # read ATLAS
+    f = urllib2.urlopen("http://sourceforge.net/projects/math-atlas/files/")
+    html = f.read()
+    f.close()
+    
+    found = re.search("<a href=\"http://sourceforge.net/projects/math-atlas/files/Developer(.*)\" title=\"Download(.*)\" class=\"sfdl\">", html)
+    if found == None :
+        print "ATLAS Download URL not found"
+        sys.exit(1)
+    downloadurl = "http://sourceforge.net/projects/math-atlas/files/Developer" + found.group(1)
+    
+    
+    target = open( os.path.join(os.curdir, "install", "atlas.tar.bz2"), "w" )
+    f = urllib2.urlopen(downloadurl)
+    target.write(f.read())
+    target.close()
+    f.close()
+    
+    return []
+    
+    
+def download_ginaccln(target, source, env) :
+
+    # read download path of the GiNaC (latest version)
+    f = urllib2.urlopen("http://www.ginac.de/Download.html")
+    html = f.read()
+    f.close()
+    
+    found = re.search("<a href=\"http://www.ginac.de/(.*).tar.bz2\">this link</a>", html)
+    if found == None :
+        print "GiNaC Download URL not found"
+        sys.exit(1)
+    downloadurl = found.group(0)
+    downloadurl = downloadurl.replace("<a href=\"", "")
+    downloadurl = downloadurl.replace("\">this link</a>", "")
+    
+    target = open( os.path.join(os.curdir, "install", "ginac.tar.bz2"), "w" )
+    f = urllib2.urlopen(downloadurl)
+    target.write(f.read())
+    target.close()
+    f.close()
+    
+    
+    # read download path of the CLN (latest version)
+    f = urllib2.urlopen("http://www.ginac.de/CLN/")
+    html = f.read()
+    f.close()
+    
+    found = re.search("<a href=\"(.*).tar.bz2\">from here</a>", html)
+    if found == None :
+        print "CLN Download URL not found"
+        sys.exit(1)
+    downloadurl = found.group(0)
+    downloadurl = downloadurl.replace("<a href=\"", "")
+    downloadurl = "http://www.ginac.de/CLN/" + downloadurl.replace("\">from here</a>", "")
+    
+    target = open( os.path.join(os.curdir, "install", "cln.tar.bz2"), "w" )
+    f = urllib2.urlopen(downloadurl)
+    target.write(f.read())
+    target.close()
+    f.close()
+    
+    
+    return []
+
+def build_ginaccln(target, source, env) :
+    clnpath = glob.glob(os.path.join("install", "cln-*"))
+    if clnpath == None or not(clnpath) :
+        print "CLN Build Directory not found"
+        sys.exit(1)
+    clnpath     = clnpath[0]
+    clnversion  = clnpath.replace(os.path.join("install", "cln-"), "")
+    
+    ginacpath = glob.glob(os.path.join("install", "ginac-*"))
+    if ginacpath == None or not(ginacpath) :
+        print "GiNaC Build Directory not found"
+        sys.exit(1)
+    ginacpath     = ginacpath[0]
+    ginacversion  = ginacpath.replace(os.path.join("install", "ginac-"), "")
+
+    os.system( "cd "+clnpath+"; ./configure --prefix="+os.path.abspath(os.path.join("install", "build", "cln", clnversion))+ "; make; make install" )
+    os.system( "cd "+ginacpath+"; export CLN_CFLAGS=-I"+os.path.abspath(os.path.join("install", "build", "cln", clnversion, "include"))+"; export CLN_LIBS=\"-L"+os.path.abspath(os.path.join("install", "build", "cln", clnversion, "lib"))+" -lcln\"; ./configure --prefix="+os.path.abspath(os.path.join("install", "build", "ginac", ginacversion))+ "; make; make install" )
+    return []
+
+
 
 def target_libraryinstall(env) :
     #build into a temp dir
@@ -725,16 +832,25 @@ def target_libraryinstall(env) :
     lst.append( env.Command("mkbuilddir", "", Mkdir(os.path.join("install", "build"))) )
     
     # download Boost, extract & install
-    lst.append( env.Command("downloadboost", "", download_boost) )
-    lst.append( env.Command("extractboost", "", "tar xfvj install/boost.tar.bz2 -C install/") )
-    lst.append( env.Command("buildboost", "", build_boost) )
+    #lst.append( env.Command("downloadboost", "", download_boost) )
+    #lst.append( env.Command("extractboost", "", "tar xfvj "+os.path.join("install", "boost.tar.bz2")+" -C install") )
+    #lst.append( env.Command("buildboost", "", build_boost) )
     
     # download HDF, extract & install
-    lst.append( env.Command("downloadhdf", "", download_hdf) )
-    lst.append( env.Command("extracthdf", "", "tar xfvj install/hdf.tar.bz2 -C install/") )
-    lst.append( env.Command("buildhdf", "", build_hdf) )
+    #lst.append( env.Command("downloadhdf", "", download_hdf) )
+    #lst.append( env.Command("extracthdf", "", "tar xfvj "+os.path.join("install", "hdf.tar.bz2")+" -C install") )
+    #lst.append( env.Command("buildhdf", "", build_hdf) )
 
-    #Download: <a href="http://www.netlib.org/lapack/lapack-3.3.1.tgz">lapack-3.3.1.tgz</a>
+    #download LAPack & ATLAS, extract & install
+    #lst.append( env.Command("downloadlapackatlas", "", download_atlaslapack) )
+    #lst.append( env.Command("mkatlasbuilddir", "", Mkdir(os.path.join("install", "atlasbuild"))) )
+    #lst.append( env.Command("extractlapackatlas", "", "tar xfvj "+os.path.join("install", "atlas.tar.bz2")+" -C install") )
+
+    #download GiNaC & CLN, extract & install
+    #lst.append( env.Command("downloadginaccln", "", download_ginaccln) )
+    #lst.append( env.Command("extractginac", "", "tar xfvj "+os.path.join("install", "ginac.tar.bz2")+" -C install") )
+    #lst.append( env.Command("extractcln", "", "tar xfvj "+os.path.join("install", "cln.tar.bz2")+" -C install") )
+    lst.append( env.Command("buildhdf", "", build_ginaccln) )
 
     env.Alias("librarybuild", lst)
 #=======================================================================================================================================
