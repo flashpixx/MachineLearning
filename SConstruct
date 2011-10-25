@@ -956,7 +956,7 @@ def target_libraryinstall(env) :
     lst.append( env.Command("downloadginaccln", "", download_ginaccln) )
     lst.append( env.Command("extractginac", "", "tar xfvj "+os.path.join("install", "ginac.tar.bz2")+" -C install") )
     lst.append( env.Command("extractcln", "", "tar xfvj "+os.path.join("install", "cln.tar.bz2")+" -C install") )
-    lst.append( env.Command("buildhdf", "", build_ginaccln) )
+    lst.append( env.Command("buildginaccln", "", build_ginaccln) )
     
     #download JSON library, extract & install
     lst.append( env.Command("downloadjsoncpp", "", download_jsoncpp) )
