@@ -27,6 +27,8 @@ def createVariables(vars) :
     vars.Add(EnumVariable("atlaslink", "value of the atlas threadding (multi = tatlas, single = satlas)", "multi", allowed_values=("multi", "single")))
 
     vars.Add(EnumVariable("cputype", "value of the cpu type [see: http://gcc.gnu.org/onlinedocs/gcc/i386-and-x86_002d64-Options.html]", "native", allowed_values=("native", "generic", "i386", "i486", "i586", "i686", "pentium-mmx", "pentiumpro", "pentium2", "pentium3", "pentium-m", "pentium4", "prescott", "nocona", "core2", "corei7", "corei7-avx", "core-avx-i", "atom", "k6", "k6-2", "athlon", "athlon-4", "k8", "k8-sse3", "amdfam10", "winchip-c6", "winchip2", "c3", "c3-2", "geode" )))
+    
+    vars.Add(EnumVariable("atlasbuildptrwidth", "pointer width for compiling ATLAS (empty = system default, 32 = 32 Bit, 64 = 64 Bit)", "", allowed_values=("", "32", "64")))
 
 
 #=== function for os configuration ===================================================================================================
@@ -615,8 +617,9 @@ def target_documentation(env) :
     env.Alias("documentation", env.Command("doxygen", "", "doxygen documentation.doxyfile"))
     
     
+
     
-    
+#=== building depend libraries =======================================================================================================
 def download_boost(target, source, env)  :
     # read download path of the Boost (latest version)
     f = urllib2.urlopen("http://www.boost.org/users/download/")
@@ -775,7 +778,13 @@ def build_atlaslapack(target, source, env) :
         sys.exit(1)
     atlasversion = found.group(1).split("/")[1]
 
-    os.system( "cd "+os.path.join("install", "atlasbuild")+"; ../ATLAS/configure -b 32 --dylibs --with-netlib-lapack-tarfile=../lapack.tgz --prefix="+os.path.abspath(os.path.join("install", "build", "atlas", atlasversion))+ "; make" )
+    ptrwidth = ""
+    if env["atlasbuildptrwidth"] == "32" :
+        ptrwidth = "-b 32"
+    elif env["atlasbuildptrwidth"] == "64" :
+        ptrwidth = "-b 64"
+
+    os.system( "cd "+os.path.join("install", "atlasbuild")+"; ../ATLAS/configure --dylibs "+ptrwidth+" --with-netlib-lapack-tarfile=../lapack.tgz --prefix="+os.path.abspath(os.path.join("install", "build", "atlas", atlasversion))+ "; make" )
     
     return []
     
