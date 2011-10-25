@@ -29,7 +29,7 @@ def createVariables(vars) :
 
     vars.Add(EnumVariable("cputype", "value of the cpu type [see: http://gcc.gnu.org/onlinedocs/gcc/i386-and-x86_002d64-Options.html]", "native", allowed_values=("native", "generic", "i386", "i486", "i586", "i686", "pentium-mmx", "pentiumpro", "pentium2", "pentium3", "pentium-m", "pentium4", "prescott", "nocona", "core2", "corei7", "corei7-avx", "core-avx-i", "atom", "k6", "k6-2", "athlon", "athlon-4", "k8", "k8-sse3", "amdfam10", "winchip-c6", "winchip2", "c3", "c3-2", "geode" )))
     
-    vars.Add(EnumVariable("atlasbuildptrwidth", "pointer width for compiling ATLAS (empty = system default, 32 = 32 Bit, 64 = 64 Bit)", "", allowed_values=("", "32", "64")))
+    vars.Add(EnumVariable("atlaspointerwidth", "pointer width for compiling ATLAS (empty = system default, 32 = 32 Bit, 64 = 64 Bit)", "", allowed_values=("", "32", "64")))
 
 
 #=== function for os configuration ===================================================================================================
@@ -780,9 +780,9 @@ def build_atlaslapack(target, source, env) :
     atlasversion = found.group(1).split("/")[1]
 
     ptrwidth = ""
-    if env["atlasbuildptrwidth"] == "32" :
+    if env["atlaspointerwidth"] == "32" :
         ptrwidth = "-b 32"
-    elif env["atlasbuildptrwidth"] == "64" :
+    elif env["atlaspointerwidth"] == "64" :
         ptrwidth = "-b 64"
 
     os.system( "cd "+os.path.join("install", "atlasbuild")+"; ../ATLAS/configure --dylibs "+ptrwidth+" --with-netlib-lapack-tarfile=../lapack.tgz --prefix="+os.path.abspath(os.path.join("install", "build", "atlas", atlasversion))+ "; make" )
@@ -935,37 +935,34 @@ def target_libraryinstall(env) :
     lst.append( env.Command("mkbuilddir", "", Mkdir(os.path.join("install", "build"))) )
 
     #download LAPack & ATLAS, extract & install
-    #lst.append( env.Command("downloadlapackatlas", "", download_atlaslapack) )
-    #lst.append( env.Command("mkatlasbuilddir", "", Mkdir(os.path.join("install", "atlasbuild"))) )
-    #lst.append( env.Command("buildatlaslapack", "", build_atlaslapack) )
+    lst.append( env.Command("downloadlapackatlas", "", download_atlaslapack) )
+    lst.append( env.Command("mkatlasbuilddir", "", Mkdir(os.path.join("install", "atlasbuild"))) )
+    lst.append( env.Command("buildatlaslapack", "", build_atlaslapack) )
     if env['PLATFORM'].lower() == "posix" or env['PLATFORM'].lower() == "cygwin" :
-	lst.append( env.Command("sonameatlaslapack", "", soname_atlaslapack) )
-    lst.append( env.Command("installatlaslapack", "", install_atlaslapack) )
-    
-    
+        lst.append( env.Command("sonameatlaslapack", "", soname_atlaslapack) )
+        lst.append( env.Command("installatlaslapack", "", install_atlaslapack) )
     
     # download Boost, extract & install
-    #lst.append( env.Command("downloadboost", "", download_boost) )
-    #lst.append( env.Command("extractboost", "", "tar xfvj "+os.path.join("install", "boost.tar.bz2")+" -C install") )
-    #lst.append( env.Command("buildboost", "", build_boost) )
+    lst.append( env.Command("downloadboost", "", download_boost) )
+    lst.append( env.Command("extractboost", "", "tar xfvj "+os.path.join("install", "boost.tar.bz2")+" -C install") )
+    lst.append( env.Command("buildboost", "", build_boost) )
     
     # download HDF, extract & install
-    #lst.append( env.Command("downloadhdf", "", download_hdf) )
-    #lst.append( env.Command("extracthdf", "", "tar xfvj "+os.path.join("install", "hdf.tar.bz2")+" -C install") )
-    #lst.append( env.Command("buildhdf", "", build_hdf) )
+    lst.append( env.Command("downloadhdf", "", download_hdf) )
+    lst.append( env.Command("extracthdf", "", "tar xfvj "+os.path.join("install", "hdf.tar.bz2")+" -C install") )
+    lst.append( env.Command("buildhdf", "", build_hdf) )
 
     #download GiNaC & CLN, extract & install
-    #lst.append( env.Command("downloadginaccln", "", download_ginaccln) )
-    #lst.append( env.Command("extractginac", "", "tar xfvj "+os.path.join("install", "ginac.tar.bz2")+" -C install") )
-    #lst.append( env.Command("extractcln", "", "tar xfvj "+os.path.join("install", "cln.tar.bz2")+" -C install") )
-    #lst.append( env.Command("buildhdf", "", build_ginaccln) )
+    lst.append( env.Command("downloadginaccln", "", download_ginaccln) )
+    lst.append( env.Command("extractginac", "", "tar xfvj "+os.path.join("install", "ginac.tar.bz2")+" -C install") )
+    lst.append( env.Command("extractcln", "", "tar xfvj "+os.path.join("install", "cln.tar.bz2")+" -C install") )
+    lst.append( env.Command("buildhdf", "", build_ginaccln) )
     
     #download JSON library, extract & install
-    #lst.append( env.Command("downloadjsoncpp", "", download_jsoncpp) )
-    #lst.append( env.Command("extractjsoncpp", "", "tar xfvz "+os.path.join("install", "jsoncpp.tar.gz")+" -C install") )
-    #lst.append( env.Command("buildjsoncpp", "", build_jsoncpp) )
+    lst.append( env.Command("downloadjsoncpp", "", download_jsoncpp) )
+    lst.append( env.Command("extractjsoncpp", "", "tar xfvz "+os.path.join("install", "jsoncpp.tar.gz")+" -C install") )
+    lst.append( env.Command("buildjsoncpp", "", build_jsoncpp) )
     
-
     env.Alias("librarybuild", lst)
 #=======================================================================================================================================
 
