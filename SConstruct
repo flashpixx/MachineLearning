@@ -630,7 +630,7 @@ def download_boost(target, source, env)  :
     downloadurl = found.group(0)
     downloadurl = downloadurl.replace("<a href=\"", "")
     downloadurl = downloadurl.replace("\">Download</a>", "")
-   
+    
     # read url of the tar.bz2
     f = urllib2.urlopen(downloadurl)
     html = f.read()
@@ -725,14 +725,14 @@ def target_libraryinstall(env) :
     lst.append( env.Command("mkbuilddir", "", Mkdir(os.path.join("install", "build"))) )
     
     # download Boost, extract & install
-    lst.append( env.Command("boost", "", download_boost) )
-    lst.append( env.Command("boost", "", "tar xfvj install/boost.tar.bz2 -C install/") )
-    lst.append( env.Command("boost", "", build_boost) )
+    lst.append( env.Command("downloadboost", "", download_boost) )
+    lst.append( env.Command("extractboost", "", "tar xfvj install/boost.tar.bz2 -C install/") )
+    lst.append( env.Command("buildboost", "", build_boost) )
     
     # download HDF, extract & install
-    lst.append( env.Command("hdf", "", download_hdf) )
-    lst.append( env.Command("hdf", "", "tar xfvj install/hdf.tar.bz2 -C install/") )
-    lst.append( env.Command("hdf", "", build_hdf) )
+    lst.append( env.Command("downloadhdf", "", download_hdf) )
+    lst.append( env.Command("extracthdf", "", "tar xfvj install/hdf.tar.bz2 -C install/") )
+    lst.append( env.Command("buildhdf", "", build_hdf) )
 
     #Download: <a href="http://www.netlib.org/lapack/lapack-3.3.1.tgz">lapack-3.3.1.tgz</a>
 
