@@ -940,7 +940,7 @@ def target_libraryinstall(env) :
     lst.append( env.Command("buildatlaslapack", "", build_atlaslapack) )
     if env['PLATFORM'].lower() == "posix" or env['PLATFORM'].lower() == "cygwin" :
         lst.append( env.Command("sonameatlaslapack", "", soname_atlaslapack) )
-        lst.append( env.Command("installatlaslapack", "", install_atlaslapack) )
+    lst.append( env.Command("installatlaslapack", "", install_atlaslapack) )
     
     # download Boost, extract & install
     lst.append( env.Command("downloadboost", "", download_boost) )
