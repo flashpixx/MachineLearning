@@ -790,6 +790,25 @@ def build_atlaslapack(target, source, env) :
     return []
     
     
+def soname_atlaslapack(target, source, env) :
+    oFile = open( os.path.join(os.curdir, "install", "atlasbuild", "lib", "Makefile"), "r" )
+    makefile = oFile.read()
+    oFile.close()
+    
+    makefile = makefile.replace("(LD) $(LDFLAGS) -shared -soname $(LIBINSTdir)/$(outso) -o $(outso)", "(LD) $(LDFLAGS) -shared -soname $(outso) -o $(outso)")
+
+    oFile = open( os.path.join(os.curdir, "install", "atlasbuild", "lib", "Makefile"), "w" )
+    oFile.write(makefile)
+    oFile.close()
+
+    return []
+
+
+def install_atlaslapack(target, source, env) :
+    os.system( "cd "+os.path.join("install", "atlasbuild")+"; make install" )
+    return []
+
+        
 def download_ginaccln(target, source, env) :
 
     # read download path of the GiNaC (latest version)
@@ -916,31 +935,35 @@ def target_libraryinstall(env) :
     lst.append( env.Command("mkbuilddir", "", Mkdir(os.path.join("install", "build"))) )
 
     #download LAPack & ATLAS, extract & install
-    lst.append( env.Command("downloadlapackatlas", "", download_atlaslapack) )
-    lst.append( env.Command("mkatlasbuilddir", "", Mkdir(os.path.join("install", "atlasbuild"))) )
-    lst.append( env.Command("buildatlaslapack", "", build_atlaslapack) )
+    #lst.append( env.Command("downloadlapackatlas", "", download_atlaslapack) )
+    #lst.append( env.Command("mkatlasbuilddir", "", Mkdir(os.path.join("install", "atlasbuild"))) )
+    #lst.append( env.Command("buildatlaslapack", "", build_atlaslapack) )
+    if env['PLATFORM'].lower() == "posix" or env['PLATFORM'].lower() == "cygwin" :
+	lst.append( env.Command("sonameatlaslapack", "", soname_atlaslapack) )
+    lst.append( env.Command("installatlaslapack", "", install_atlaslapack) )
+    
     
     
     # download Boost, extract & install
-    lst.append( env.Command("downloadboost", "", download_boost) )
-    lst.append( env.Command("extractboost", "", "tar xfvj "+os.path.join("install", "boost.tar.bz2")+" -C install") )
-    lst.append( env.Command("buildboost", "", build_boost) )
+    #lst.append( env.Command("downloadboost", "", download_boost) )
+    #lst.append( env.Command("extractboost", "", "tar xfvj "+os.path.join("install", "boost.tar.bz2")+" -C install") )
+    #lst.append( env.Command("buildboost", "", build_boost) )
     
     # download HDF, extract & install
-    lst.append( env.Command("downloadhdf", "", download_hdf) )
-    lst.append( env.Command("extracthdf", "", "tar xfvj "+os.path.join("install", "hdf.tar.bz2")+" -C install") )
-    lst.append( env.Command("buildhdf", "", build_hdf) )
+    #lst.append( env.Command("downloadhdf", "", download_hdf) )
+    #lst.append( env.Command("extracthdf", "", "tar xfvj "+os.path.join("install", "hdf.tar.bz2")+" -C install") )
+    #lst.append( env.Command("buildhdf", "", build_hdf) )
 
     #download GiNaC & CLN, extract & install
-    lst.append( env.Command("downloadginaccln", "", download_ginaccln) )
-    lst.append( env.Command("extractginac", "", "tar xfvj "+os.path.join("install", "ginac.tar.bz2")+" -C install") )
-    lst.append( env.Command("extractcln", "", "tar xfvj "+os.path.join("install", "cln.tar.bz2")+" -C install") )
-    lst.append( env.Command("buildhdf", "", build_ginaccln) )
+    #lst.append( env.Command("downloadginaccln", "", download_ginaccln) )
+    #lst.append( env.Command("extractginac", "", "tar xfvj "+os.path.join("install", "ginac.tar.bz2")+" -C install") )
+    #lst.append( env.Command("extractcln", "", "tar xfvj "+os.path.join("install", "cln.tar.bz2")+" -C install") )
+    #lst.append( env.Command("buildhdf", "", build_ginaccln) )
     
     #download JSON library, extract & install
-    lst.append( env.Command("downloadjsoncpp", "", download_jsoncpp) )
-    lst.append( env.Command("extractjsoncpp", "", "tar xfvz "+os.path.join("install", "jsoncpp.tar.gz")+" -C install") )
-    lst.append( env.Command("buildjsoncpp", "", build_jsoncpp) )
+    #lst.append( env.Command("downloadjsoncpp", "", download_jsoncpp) )
+    #lst.append( env.Command("extractjsoncpp", "", "tar xfvz "+os.path.join("install", "jsoncpp.tar.gz")+" -C install") )
+    #lst.append( env.Command("buildjsoncpp", "", build_jsoncpp) )
     
 
     env.Alias("librarybuild", lst)
