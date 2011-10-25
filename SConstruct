@@ -434,18 +434,16 @@ def target_cpp(env, framework) :
         lang = getRekusivFiles( os.path.join(os.curdir, "tools", "language"), ".po")
         for i in lang :
             lst.append( env.Command("msgfmt", "", "msgfmt -v -o " + os.path.join(os.path.dirname(i),"machinelearning.mo") +" "+ i ) )
-            langfiles     = i.split(os.path.sep)[3:]
-            langfiles[-1] = "machinelearning.mo"
-            
             src      = i.split(os.path.sep)[1:]
             src[-1]  = "machinelearning.mo"
-            
+
+            langfiles     = i.split(os.path.sep)[3:]
+            langfiles[-1] = "machinelearning.mo"            
             target = ["build", "language"]
             target.extend(langfiles)
             
             lst.append( env.Command("mkdirlang", "", Mkdir(os.path.dirname(os.path.sep.join(target)))) )
             lst.append( env.Command("copylang", "", Copy(os.path.sep.join(target), os.path.sep.join(src))) )
-            
             
         listGA.extend( lst )
         listOther.extend( lst )
