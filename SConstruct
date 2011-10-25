@@ -375,7 +375,7 @@ def unique(seq):
 #=== build targets =====================================================================================================================
 
 # create target
-def createTarget(env, alias, path, sources, framework) :
+def createTarget(env, path, sources, framework) :
     lst = []
     if sources.count == 0 :
         return
@@ -386,53 +386,88 @@ def createTarget(env, alias, path, sources, framework) :
 
         lst.append( env.Program( target=os.path.join("#build", os.path.splitext(i)[0]), source=compilesource ) )
 
-    env.Alias(alias, lst)
+    return lst
 
 
 
 # target for building CPP examples
 def target_cpp(env, framework) :
-    createTarget(env, "ga", os.path.join(".", "examples", "geneticalgorithm"), ["knapsack.cpp"], framework)
+    listGA = createTarget(env, os.path.join(".", "examples", "geneticalgorithm"), ["knapsack.cpp"], framework)
 
     srcOther = []
     if env["withfiles"] and env["withsources"] :
         srcOther.extend( ["mds_nntp.cpp", "mds_wikipedia.cpp", "mds_twitter.cpp"] )
     if env["withfiles"] :
         srcOther.append("mds_file.cpp")
-    createTarget(env, "other", os.path.join(".", "examples", "other"), srcOther, framework)
+    listOther = createTarget(env, os.path.join(".", "examples", "other"), srcOther, framework)
 
     srcClassifier = []
     if env["withfiles"] :
         srcClassifier.extend( ["lazy.cpp"] )
-    createTarget(env, "classifier", os.path.join(".", "examples", "classifier"), srcClassifier, framework)
+    listClassifier = createTarget(env, os.path.join(".", "examples", "classifier"), srcClassifier, framework)
 
     srcDistance = []
     if env["withfiles"] :
         srcDistance.extend( ["ncd.cpp"] )
-    createTarget(env, "distance", os.path.join(".", "examples", "distance"), srcDistance, framework)
+    listDistance = createTarget(env, os.path.join(".", "examples", "distance"), srcDistance, framework)
 
     srcReduce = []
     if env["withfiles"] :
         srcReduce.extend( ["lda.cpp", "mds.cpp", "pca.cpp"] )
-    createTarget(env, "reducing", os.path.join(".", "examples", "reducing"), srcReduce, framework)
+    listReduce = createTarget(env, os.path.join(".", "examples", "reducing"), srcReduce, framework)
 
     srcCluster = []
     if env["withfiles"] :
         srcCluster.extend( ["rlvq.cpp", "kmeans.cpp", "neuralgas.cpp", "patch_neuralgas.cpp", "relational_neuralgas.cpp", "spectral.cpp"] )
-    createTarget(env, "clustering", os.path.join(".", "examples", "clustering"), srcCluster, framework)
+    listCluster = createTarget(env, os.path.join(".", "examples", "clustering"), srcCluster, framework)
 
     srcSources = []
     if env["withsources"] :
         srcSources.extend( ["twitter.cpp", "newsgroup.cpp", "wikipedia.cpp"] )
     if env["withfiles"] :
         srcSources.append( "cloud.cpp" )
-    createTarget(env, "sources", os.path.join(".", "examples", "sources"), srcSources, framework)
+    listSources = createTarget(env, os.path.join(".", "examples", "sources"), srcSources, framework)
+    
+    # create language files if multilanguage is used
+    if env["withmultilanguage"] :
+        lst = []
+        lang = getRekusivFiles( os.path.join(os.curdir, "tools", "language"), ".po")
+        for i in lang :
+            lst.append( env.Command("msgfmt", "", "msgfmt -v -o " + os.path.join(os.path.dirname(i),"machinelearning.mo") +" "+ i ) )
+            langfiles     = i.split(os.path.sep)[3:]
+            langfiles[-1] = "machinelearning.mo"
+            
+            src      = i.split(os.path.sep)[1:]
+            src[-1]  = "machinelearning.mo"
+            
+            target = ["build", "language"]
+            target.extend(langfiles)
+            
+            lst.append( env.Command("mkdirlang", "", Mkdir(os.path.dirname(os.path.sep.join(target)))) )
+            lst.append( env.Command("copylang", "", Copy(os.path.sep.join(target), os.path.sep.join(src))) )
+            
+            
+        listGA.extend( lst )
+        listOther.extend( lst )
+        listClassifier.extend( lst )
+        listDistance.extend( lst )
+        listReduce.extend( lst )
+        listCluster.extend( lst )
+        listSources.extend( lst )
+    
+    # adding targets
+    env.Alias("ga", listGA)
+    env.Alias("other", listOther)
+    env.Alias("classifier", listClassifier)
+    env.Alias("distance", listDistance)
+    env.Alias("reducing", listReduce)
+    env.Alias("clustering", listCluster)
+    env.Alias("sources", listSources)
+
 
 
 # change the library calls under OSX
 def java_osxlinkedlibs(target, source, env) :
-    global otoolChange
-
     oFile = open( os.path.join(os.curdir, "build", "linkedlibs.txt"), "r" )
     libs = oFile.read()
     oFile.close()
