@@ -805,7 +805,7 @@ def soname_atlaslapack(target, source, env) :
 
 
 def install_atlaslapack(target, source, env) :
-    os.system( "cd "+os.path.join("install", "atlasbuild")+"; make install" )
+    os.system( "cd "+os.path.join("install", "atlasbuild")+"; make shared; make install" )
     return []
 
         
