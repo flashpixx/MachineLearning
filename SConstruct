@@ -7,6 +7,7 @@ import platform
 import sys
 import urllib2
 import re
+import shutil
 
 
 #=== CLI parameters ===================================================================================================
@@ -853,6 +854,61 @@ def build_ginaccln(target, source, env) :
     return []
 
 
+def download_jsoncpp(target, source, env) :
+    # read download path of the JSONCPP (latest version)
+    f = urllib2.urlopen("http://sourceforge.net/projects/jsoncpp/")
+    html = f.read()
+    f.close()
+    
+    found = re.search("<a href=\"http://sourceforge.net/projects/jsoncpp/files/jsoncpp/(.*).tar.gz(.*)\" title=\"Download(.*)\" class=\"sfdl\">", html)
+    if found == None :
+        print "JSON CPP Download URL not found"
+        sys.exit(1)
+    downloadurl = found.group(0)
+    downloadurl = downloadurl.replace("<a href=\"", "").split(" ")[0]
+    downloadurl = downloadurl.replace("\"", "")
+    
+    target = open( os.path.join(os.curdir, "install", "jsoncpp.tar.gz"), "w" )
+    f = urllib2.urlopen(downloadurl)
+    target.write(f.read())
+    target.close()
+    f.close()
+
+    return []
+    
+    
+def build_jsoncpp(target, source, env) :
+    jsonpath = glob.glob(os.path.join("install", "jsoncpp-src-*"))
+    if jsonpath == None or not(jsonpath) :
+        print "JSON CPP Build Directory not found"
+        sys.exit(1)
+    jsonpath     = jsonpath[0]
+    jsonversion  = jsonpath.replace(os.path.join("install", "jsoncpp-src-"), "")
+    
+    os.system("cd "+jsonpath+"; scons platform=linux-gcc")
+    
+    # manual copy of the data
+    try :
+        os.makedirs(os.path.join("install", "build", "jsoncpp", jsonversion))
+    except :
+        pass
+    try :
+        os.makedirs(os.path.join("install", "build", "jsoncpp", jsonversion, "lib"))
+    except :
+        pass
+    try :
+        shutil.copytree(os.path.join(jsonpath, "include"), os.path.join("install", "build", "jsoncpp", jsonversion, "include"))
+    except :
+        pass
+
+    files = []
+    files.extend( getRekusivFiles(os.path.join(jsonpath, "libs"), env["SHLIBSUFFIX"]) )
+    files.extend( getRekusivFiles(os.path.join(jsonpath, "libs"), env["LIBSUFFIX"]) )
+    for i in files :
+        shutil.copy(i, os.path.join("install", "build", "jsoncpp", jsonversion, "lib", os.path.split(i)[-1]))
+
+    return []
+
 
 def target_libraryinstall(env) :
     #build into a temp dir
@@ -860,29 +916,32 @@ def target_libraryinstall(env) :
     lst.append( env.Command("mkbuilddir", "", Mkdir(os.path.join("install", "build"))) )
 
     #download LAPack & ATLAS, extract & install
-    #lst.append( env.Command("downloadlapackatlas", "", download_atlaslapack) )
-    #lst.append( env.Command("mkatlasbuilddir", "", Mkdir(os.path.join("install", "atlasbuild"))) )
+    lst.append( env.Command("downloadlapackatlas", "", download_atlaslapack) )
+    lst.append( env.Command("mkatlasbuilddir", "", Mkdir(os.path.join("install", "atlasbuild"))) )
     lst.append( env.Command("buildatlaslapack", "", build_atlaslapack) )
     
     
     # download Boost, extract & install
-    #lst.append( env.Command("downloadboost", "", download_boost) )
-    #lst.append( env.Command("extractboost", "", "tar xfvj "+os.path.join("install", "boost.tar.bz2")+" -C install") )
-    #lst.append( env.Command("buildboost", "", build_boost) )
+    lst.append( env.Command("downloadboost", "", download_boost) )
+    lst.append( env.Command("extractboost", "", "tar xfvj "+os.path.join("install", "boost.tar.bz2")+" -C install") )
+    lst.append( env.Command("buildboost", "", build_boost) )
     
     # download HDF, extract & install
-    #lst.append( env.Command("downloadhdf", "", download_hdf) )
-    #lst.append( env.Command("extracthdf", "", "tar xfvj "+os.path.join("install", "hdf.tar.bz2")+" -C install") )
-    #lst.append( env.Command("buildhdf", "", build_hdf) )
+    lst.append( env.Command("downloadhdf", "", download_hdf) )
+    lst.append( env.Command("extracthdf", "", "tar xfvj "+os.path.join("install", "hdf.tar.bz2")+" -C install") )
+    lst.append( env.Command("buildhdf", "", build_hdf) )
 
     #download GiNaC & CLN, extract & install
-    #lst.append( env.Command("downloadginaccln", "", download_ginaccln) )
-    #lst.append( env.Command("extractginac", "", "tar xfvj "+os.path.join("install", "ginac.tar.bz2")+" -C install") )
-    #lst.append( env.Command("extractcln", "", "tar xfvj "+os.path.join("install", "cln.tar.bz2")+" -C install") )
-    #lst.append( env.Command("buildhdf", "", build_ginaccln) )
+    lst.append( env.Command("downloadginaccln", "", download_ginaccln) )
+    lst.append( env.Command("extractginac", "", "tar xfvj "+os.path.join("install", "ginac.tar.bz2")+" -C install") )
+    lst.append( env.Command("extractcln", "", "tar xfvj "+os.path.join("install", "cln.tar.bz2")+" -C install") )
+    lst.append( env.Command("buildhdf", "", build_ginaccln) )
     
-    #http://sourceforge.net/projects/jsoncpp/
-    #<a href="http://sourceforge.net/projects/jsoncpp/files/jsoncpp/0.5.0/jsoncpp-src-0.5.0.tar.gz/download?_test=goal" title="Download /jsoncpp/0.5.0/jsoncpp-src-0.5.0.tar.gz from SourceForge -  - 107.5 kB" class="sfdl">
+    #download JSON library, extract & install
+    lst.append( env.Command("downloadjsoncpp", "", download_jsoncpp) )
+    lst.append( env.Command("extractjsoncpp", "", "tar xfvz "+os.path.join("install", "jsoncpp.tar.gz")+" -C install") )
+    lst.append( env.Command("buildjsoncpp", "", build_jsoncpp) )
+    
 
     env.Alias("librarybuild", lst)
 #=======================================================================================================================================
@@ -902,7 +961,6 @@ files = []
 files.extend( getRekusivFiles(os.curdir, env["OBJSUFFIX"]) )
 files.extend( getRekusivFiles(os.curdir, env["SHOBJSUFFIX"]) )
 files.extend( getRekusivFiles(os.curdir, env["SHLIBSUFFIX"]) )
-files.extend( getRekusivFiles(os.curdir, ".jnilib") )
 files.extend( getRekusivFiles(os.curdir, ".po~") )
 files.extend( getRekusivFiles(os.curdir, ".mo") )
 files.extend( getRekusivFiles(os.curdir, ".jar") )

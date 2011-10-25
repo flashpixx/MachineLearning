@@ -131,6 +131,8 @@
  * <li><dfn>withsources</dfn> support for the namespace machinelearning::tools::sources</li>
  * <li><dfn>withfiles</dfn> support for the namespace machinelearning::tools::files</li>
  * <li><dfn>withsymbolicmath</dfn> support for symbolic math (eg: gradient descent)</li>
+ * </ul><ul>
+ * <li><dfn>atlasbuildptrwidth</dfn> parameter for setting the pointer width during the library build target (default empty for system default)</li>
  * </ul>
  *
  * @subsection targets build targets
@@ -139,7 +141,7 @@
  * <ul>
  * <li><dfn>documentation</dfn> create the documentation with Doxygen (Doxygen must be installed and be reached within the path)</li>
  * <li><dfn>librarybuild</dfn> download the librarys and compile each library with the default option. Compiled libraries are installed under the subdirectory <dfn>install/build</dfn>
- * [tar, make, gfortran, gcc & c++ must be installed and within the search path]</li>
+ * [tar, make, gfortran, gcc & g++ must be installed and within the search path]</li>
  * <li><dfn>createlanguage</dfn> creates the language files / adds new messages to the existing files (xgettext must be called, so it should be within the path)</li>
  * <li><dfn>updatelanguage</dfn> compiles all language files (msgfmt must be called, so it should be within the path)</li>
  * <li><dfn>clean / -c</dfn> target that cleans framework files</li>
