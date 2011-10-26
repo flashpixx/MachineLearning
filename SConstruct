@@ -769,12 +769,14 @@ def build_atlaslapack(target, source, env) :
     f = urllib2.urlopen("http://sourceforge.net/projects/math-atlas/files/")
     html = f.read()
     f.close()
-    
-    found = re.search("<a href=\"http://sourceforge.net/projects/math-atlas/files/Developer(.*)\" title=\"Download(.*)\" class=\"sfdl\">", html)
+
+    found = re.search("<small title=\"(.*)tar.bz2\">(.*)</small>", html)
     if found == None :
         print "ATLAS Download URL not found"
         sys.exit(1)
-    atlasversion = found.group(1).split("/")[1]
+    atlasversion = found.group(2)
+    atlasversion = atlasversion.replace("atlas", "")
+    atlasversion = atlasversion.replace(".tar.bz2", "")
 
     ptrwidth = ""
     if env["atlaspointerwidth"] == "32" :
