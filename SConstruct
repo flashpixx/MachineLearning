@@ -790,7 +790,7 @@ def build_atlaslapack(target, source, env) :
     if not(env["atlascputhrottle"]) :
         cputhrottle = "-Si cputhrchk 0"
     
-    os.system( "cd "+os.path.join("install", "atlasbuild")+"; ../ATLAS/configure --dylibs "+ptrwidth+" "+cputhrottle+"--with-netlib-lapack-tarfile=../lapack.tgz --prefix="+os.path.abspath(os.path.join("install", "build", "atlas", atlasversion))+ "; make" )
+    os.system( "cd "+os.path.join("install", "atlasbuild")+"; ../ATLAS/configure --dylibs "+ptrwidth+" "+cputhrottle+" --with-netlib-lapack-tarfile=../lapack.tgz --prefix="+os.path.abspath(os.path.join("install", "build", "atlas", atlasversion))+ "; make" )
     
     return []
     
