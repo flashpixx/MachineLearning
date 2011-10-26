@@ -68,7 +68,7 @@
  * </ul>
  * For manual installation of the library you can follow the short @subpage installationnotes / A default library installation can be created with the command <dfn>scons librarybuild</dfn>
  * with the optional ATLAS building parameters. After compiling the directory <dfn>install/build</dfn> must be moved to a directory in that all libraries should be stored, because
- * a clean-target removes this directory.
+ * a clean-target removes the <dfn>install</dfn> directory.
  *
  * @section def definition / style guide
  * <ul>
