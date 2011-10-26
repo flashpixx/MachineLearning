@@ -66,7 +66,9 @@
  * <li><i>optional Scons</i> ( http://www.scons.org/ )</li>
  * <li><i>optional Doxygen</i> ( http://www.doxygen.org/ ) with Graphviz support ( http://www.graphviz.org )</li>
  * </ul>
- * For manual installation of the library you can follow the short @subpage installationnotes
+ * For manual installation of the library you can follow the short @subpage installationnotes / A default library installation can be created with the command <dfn>scons librarybuild</dfn>
+ * with the optional ATLAS building parameters. After compiling the directory <dfn>install/build</dfn> must be moved to a directory in that all libraries should be stored, because
+ * a clean-target removes this directory.
  *
  * @section def definition / style guide
  * <ul>
