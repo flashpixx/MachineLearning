@@ -623,6 +623,9 @@ def target_documentation(env) :
     
 #=== building depend libraries =======================================================================================================
 def download_boost(target, source, env)  :
+    if os.path.exists(os.path.join(os.curdir, "install", "boost.tar.bz2")) :
+        return []
+
     # read download path of the Boost (latest version)
     f = urllib2.urlopen("http://www.boost.org/users/download/")
     html = f.read()
@@ -687,6 +690,9 @@ def build_boost(target, source, env)  :
     
     
 def download_hdf(target, source, env) :
+    if os.path.exists(os.path.join(os.curdir, "install", "hdf.tar.bz2")) :
+        return []
+
     # read download path of the HDF
     f = urllib2.urlopen("http://www.hdfgroup.org/ftp/HDF5/current/src/")
     html = f.read()
@@ -725,43 +731,45 @@ def build_hdf(target, source, env) :
     
 def download_atlaslapack(target, source, env) :
     
-    # read download path of the LAPack (latest version)
-    f = urllib2.urlopen("http://www.netlib.org/lapack/")
-    html = f.read()
-    f.close()
-    
-    found = re.search("<a href=\"http://www.netlib.org/lapack/(.*)tgz\">", html)
-    if found == None :
-        print "LAPack Download URL not found"
-        sys.exit(1)
-    downloadurl = found.group(0)
-    downloadurl = downloadurl.replace("<a href=\"", "")
-    downloadurl = downloadurl.replace("\">", "")
-    
-    target = open( os.path.join(os.curdir, "install", "lapack.tgz"), "w" )
-    f = urllib2.urlopen(downloadurl)
-    target.write(f.read())
-    target.close()
-    f.close()
-    
-    
-    # read ATLAS
-    f = urllib2.urlopen("http://sourceforge.net/projects/math-atlas/files/")
-    html = f.read()
-    f.close()
-    
-    found = re.search("<a href=\"http://sourceforge.net/projects/math-atlas/files/Developer(.*)\" title=\"Download(.*)\" class=\"sfdl\">", html)
-    if found == None :
-        print "ATLAS Download URL not found"
-        sys.exit(1)
-    downloadurl = "http://sourceforge.net/projects/math-atlas/files/Developer" + found.group(1)
+    if not(os.path.exists(os.path.join(os.curdir, "install", "lapack.tgz")) ) :
+        # read download path of the LAPack (latest version)
+        f = urllib2.urlopen("http://www.netlib.org/lapack/")
+        html = f.read()
+        f.close()
+        
+        found = re.search("<a href=\"http://www.netlib.org/lapack/(.*)tgz\">", html)
+        if found == None :
+            print "LAPack Download URL not found"
+            sys.exit(1)
+        downloadurl = found.group(0)
+        downloadurl = downloadurl.replace("<a href=\"", "")
+        downloadurl = downloadurl.replace("\">", "")
+        
+        target = open( os.path.join(os.curdir, "install", "lapack.tgz"), "w" )
+        f = urllib2.urlopen(downloadurl)
+        target.write(f.read())
+        target.close()
+        f.close()
     
     
-    target = open( os.path.join(os.curdir, "install", "atlas.tar.bz2"), "w" )
-    f = urllib2.urlopen(downloadurl)
-    target.write(f.read())
-    target.close()
-    f.close()
+    if not(os.path.exists(os.path.join(os.curdir, "install", "atlas.tar.bz2")) ) :
+        # read ATLAS
+        f = urllib2.urlopen("http://sourceforge.net/projects/math-atlas/files/")
+        html = f.read()
+        f.close()
+        
+        found = re.search("<a href=\"http://sourceforge.net/projects/math-atlas/files/Developer(.*)\" title=\"Download(.*)\" class=\"sfdl\">", html)
+        if found == None :
+            print "ATLAS Download URL not found"
+            sys.exit(1)
+        downloadurl = "http://sourceforge.net/projects/math-atlas/files/Developer" + found.group(1)
+        
+        
+        target = open( os.path.join(os.curdir, "install", "atlas.tar.bz2"), "w" )
+        f = urllib2.urlopen(downloadurl)
+        target.write(f.read())
+        target.close()
+        f.close()
     
     # extract ATLAS tar here, because errors are ignored
     os.system("tar xfvj "+os.path.join("install", "atlas.tar.bz2")+" -C install")
@@ -816,44 +824,46 @@ def install_atlaslapack(target, source, env) :
         
 def download_ginaccln(target, source, env) :
 
-    # read download path of the GiNaC (latest version)
-    f = urllib2.urlopen("http://www.ginac.de/Download.html")
-    html = f.read()
-    f.close()
+    if not(os.path.exists(os.path.join(os.curdir, "install", "ginac.tar.bz2"))) :
+        # read download path of the GiNaC (latest version)
+        f = urllib2.urlopen("http://www.ginac.de/Download.html")
+        html = f.read()
+        f.close()
+        
+        found = re.search("<a href=\"http://www.ginac.de/(.*).tar.bz2\">this link</a>", html)
+        if found == None :
+            print "GiNaC Download URL not found"
+            sys.exit(1)
+        downloadurl = found.group(0)
+        downloadurl = downloadurl.replace("<a href=\"", "")
+        downloadurl = downloadurl.replace("\">this link</a>", "")
+        
+        target = open( os.path.join(os.curdir, "install", "ginac.tar.bz2"), "w" )
+        f = urllib2.urlopen(downloadurl)
+        target.write(f.read())
+        target.close()
+        f.close()
     
-    found = re.search("<a href=\"http://www.ginac.de/(.*).tar.bz2\">this link</a>", html)
-    if found == None :
-        print "GiNaC Download URL not found"
-        sys.exit(1)
-    downloadurl = found.group(0)
-    downloadurl = downloadurl.replace("<a href=\"", "")
-    downloadurl = downloadurl.replace("\">this link</a>", "")
     
-    target = open( os.path.join(os.curdir, "install", "ginac.tar.bz2"), "w" )
-    f = urllib2.urlopen(downloadurl)
-    target.write(f.read())
-    target.close()
-    f.close()
-    
-    
-    # read download path of the CLN (latest version)
-    f = urllib2.urlopen("http://www.ginac.de/CLN/")
-    html = f.read()
-    f.close()
-    
-    found = re.search("<a href=\"(.*).tar.bz2\">from here</a>", html)
-    if found == None :
-        print "CLN Download URL not found"
-        sys.exit(1)
-    downloadurl = found.group(0)
-    downloadurl = downloadurl.replace("<a href=\"", "")
-    downloadurl = "http://www.ginac.de/CLN/" + downloadurl.replace("\">from here</a>", "")
-    
-    target = open( os.path.join(os.curdir, "install", "cln.tar.bz2"), "w" )
-    f = urllib2.urlopen(downloadurl)
-    target.write(f.read())
-    target.close()
-    f.close()
+    if not(os.path.exists(os.path.join(os.curdir, "install", "cln.tar.bz2"))) :
+        # read download path of the CLN (latest version)
+        f = urllib2.urlopen("http://www.ginac.de/CLN/")
+        html = f.read()
+        f.close()
+        
+        found = re.search("<a href=\"(.*).tar.bz2\">from here</a>", html)
+        if found == None :
+            print "CLN Download URL not found"
+            sys.exit(1)
+        downloadurl = found.group(0)
+        downloadurl = downloadurl.replace("<a href=\"", "")
+        downloadurl = "http://www.ginac.de/CLN/" + downloadurl.replace("\">from here</a>", "")
+        
+        target = open( os.path.join(os.curdir, "install", "cln.tar.bz2"), "w" )
+        f = urllib2.urlopen(downloadurl)
+        target.write(f.read())
+        target.close()
+        f.close()
     
     
     return []
@@ -879,6 +889,9 @@ def build_ginaccln(target, source, env) :
 
 
 def download_jsoncpp(target, source, env) :
+    if os.path.exists(os.path.join(os.curdir, "install", "json.tar.gz")) :
+        return []
+
     # read download path of the JSONCPP (latest version)
     f = urllib2.urlopen("http://sourceforge.net/projects/jsoncpp/")
     html = f.read()
