@@ -131,8 +131,10 @@ def configuration_posix(config, vars, version, architecture) :
     else :
         config["linkerflags"] = "-Wl,--rpath=\\$$ORIGIN"
 
-    # static link for ATLAS
-    config["linkto"].extend( ["atlas"] )
+    if vars["atlaslink"] == "multi" :
+        config["linkto"].extend( ["atlas", "lapack", "ptcblas", "ptf77blas"] )
+    else :
+        config["linkto"].extend( ["atlas", "lapack", "cblas", "f77blas"] )
 
     if vars["withdebug"] :
         config["compileflags"]      += " -g"
