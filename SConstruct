@@ -753,20 +753,8 @@ def download_atlaslapack(target, source, env) :
     
     
     if not(os.path.exists(os.path.join(os.curdir, "install", "atlas.tar.bz2")) ) :
-        # read ATLAS
-        f = urllib2.urlopen("http://sourceforge.net/projects/math-atlas/files/")
-        html = f.read()
-        f.close()
-        
-        found = re.search("<a href=\"http://sourceforge.net/projects/math-atlas/files/Developer(.*)\" title=\"Download(.*)\" class=\"sfdl\">", html)
-        if found == None :
-            print "ATLAS Download URL not found"
-            sys.exit(1)
-        downloadurl = "http://sourceforge.net/projects/math-atlas/files/Developer" + found.group(1)
-        
-        
         target = open( os.path.join(os.curdir, "install", "atlas.tar.bz2"), "w" )
-        f = urllib2.urlopen(downloadurl)
+        f = urllib2.urlopen("http://sourceforge.net/projects/math-atlas/files/latest/download?source=files")
         target.write(f.read())
         target.close()
         f.close()
