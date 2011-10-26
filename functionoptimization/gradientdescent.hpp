@@ -301,6 +301,7 @@ namespace machinelearning { namespace functionaloptimization {
     /** optimization method
      * @param p_iteration number of iterations
      * @param p_sampling number of samples for each static range
+     * @param p_batch batch call of fotting
      * @return map with name and value
      * @todo adding parameter for setting number of start points and creating the correct thread group
      **/
@@ -346,7 +347,7 @@ namespace machinelearning { namespace functionaloptimization {
     /** The constructor is only called by the gradient class, so we must not check
      * the parameter
      * @param p_iteration maximum iterations
-     * @param p_stepsize initializsation stepsize
+     * @param p_sampling initializsation stepsize
      * @param p_function function string
      * @param p_errorfunction error function
      * @param p_derivationvars map with all derivations
