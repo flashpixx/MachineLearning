@@ -514,7 +514,7 @@ def java_linuxsonames(target, source, env) :
 
 # target for building java package
 def target_javac(env, framework) :
-    if env["withmpi"] :
+    if env["withmpi"] and ("javac" in COMMAND_LINE_TARGETS) :
         print "MPI build does not work with Java"
         sys.exit(1)
 
