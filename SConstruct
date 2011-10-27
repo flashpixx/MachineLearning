@@ -683,7 +683,7 @@ def build_boost(target, source, env)  :
     # if MPI is set, compile Boost with MPI support
     mpi = ""
     if env["withmpi"] :
-        oFile = open(ospath.join(boostpath, "tools", "build", "v2", "user-config.jam"), "a+")
+        oFile = open(os.path.join(boostpath, "tools", "build", "v2", "user-config.jam"), "a+")
         oFile.write("\n using mpi ;\n")
         oFile.close()
             
@@ -937,28 +937,28 @@ def target_libraryinstall(env) :
     lst.append( env.Command("mkbuilddir", "", Mkdir(os.path.join("install", "build"))) )
 
     #download LAPack & ATLAS, extract & install
-    lst.append( env.Command("downloadlapackatlas", "", download_atlaslapack) )
-    lst.append( env.Command("mkatlasbuilddir", "", Mkdir(os.path.join("install", "atlasbuild"))) )
-    lst.append( env.Command("buildatlaslapack", "", build_atlaslapack) )
-    if env['PLATFORM'].lower() == "posix" or env['PLATFORM'].lower() == "cygwin" :
-        lst.append( env.Command("sonameatlaslapack", "", soname_atlaslapack) )
-    lst.append( env.Command("installatlaslapack", "", install_atlaslapack) )
+    #lst.append( env.Command("downloadlapackatlas", "", download_atlaslapack) )
+    #lst.append( env.Command("mkatlasbuilddir", "", Mkdir(os.path.join("install", "atlasbuild"))) )
+    #lst.append( env.Command("buildatlaslapack", "", build_atlaslapack) )
+    #if env['PLATFORM'].lower() == "posix" or env['PLATFORM'].lower() == "cygwin" :
+    #    lst.append( env.Command("sonameatlaslapack", "", soname_atlaslapack) )
+    #lst.append( env.Command("installatlaslapack", "", install_atlaslapack) )
     
     # download Boost, extract & install
-    lst.append( env.Command("downloadboost", "", download_boost) )
-    lst.append( env.Command("extractboost", "", "tar xfvj "+os.path.join("install", "boost.tar.bz2")+" -C install") )
-    lst.append( env.Command("buildboost", "", build_boost) )
+    #lst.append( env.Command("downloadboost", "", download_boost) )
+    #lst.append( env.Command("extractboost", "", "tar xfvj "+os.path.join("install", "boost.tar.bz2")+" -C install") )
+    #lst.append( env.Command("buildboost", "", build_boost) )
     
     # download HDF, extract & install
-    lst.append( env.Command("downloadhdf", "", download_hdf) )
-    lst.append( env.Command("extracthdf", "", "tar xfvj "+os.path.join("install", "hdf.tar.bz2")+" -C install") )
-    lst.append( env.Command("buildhdf", "", build_hdf) )
+    #lst.append( env.Command("downloadhdf", "", download_hdf) )
+    #lst.append( env.Command("extracthdf", "", "tar xfvj "+os.path.join("install", "hdf.tar.bz2")+" -C install") )
+    #lst.append( env.Command("buildhdf", "", build_hdf) )
 
     #download GiNaC & CLN, extract & install
-    lst.append( env.Command("downloadginaccln", "", download_ginaccln) )
-    lst.append( env.Command("extractginac", "", "tar xfvj "+os.path.join("install", "ginac.tar.bz2")+" -C install") )
-    lst.append( env.Command("extractcln", "", "tar xfvj "+os.path.join("install", "cln.tar.bz2")+" -C install") )
-    lst.append( env.Command("buildginaccln", "", build_ginaccln) )
+    #lst.append( env.Command("downloadginaccln", "", download_ginaccln) )
+    #lst.append( env.Command("extractginac", "", "tar xfvj "+os.path.join("install", "ginac.tar.bz2")+" -C install") )
+    #lst.append( env.Command("extractcln", "", "tar xfvj "+os.path.join("install", "cln.tar.bz2")+" -C install") )
+    #lst.append( env.Command("buildginaccln", "", build_ginaccln) )
     
     #download JSON library, extract & install
     lst.append( env.Command("downloadjsoncpp", "", download_jsoncpp) )
