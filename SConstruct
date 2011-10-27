@@ -686,6 +686,7 @@ def build_boost(target, source, env)  :
         oFile = open(os.path.join(boostpath, "tools", "build", "v2", "user-config.jam"), "a+")
         oFile.write("\n using mpi ;\n")
         oFile.close()
+        mpi = "--with-mpi"
             
     # build the Boost
     os.system( "cd "+boostpath+"; ./b2 "+mpi+" --with-exception --with-filesystem --with-math --with-random --with-regex --with-date_time --with-thread --with-system --with-program_options --with-serialization --with-iostreams --disable-filesystem2 threading=multi runtime-link=shared variant=release toolset="+toolset+" install --prefix="+os.path.abspath(os.path.join(os.curdir, "install", "build", "boost", boostversion)) )
