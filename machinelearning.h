@@ -131,7 +131,7 @@
  * <ul>
  * <li><dfn>atlaslink</dfn> adds the option which ATLAS library is linked (multi = multithreadding [tatlas] or single = singlethreadding [satlas] [on Cygwin the option is not used])
  * <li><dfn>withrandomdevice</dfn> adds the compilerflag for random device support</li>
- * <li><dfn>withmpi</dfn> adds the compilerflag for cluster / MPI support</li>
+ * <li><dfn>withmpi</dfn> adds the compilerflag for cluster / MPI support (on the target <dfn>librarybuild</dfn> MPI support is compiled into the Boost)</li>
  * <li><dfn>withmultilanguage</dfn> adds the multilanguage support with gettext</li>
  * <li><dfn>withlogger</dfn> compiles a own logger class within the framework</li>
  * <li><dfn>withsources</dfn> support for the namespace machinelearning::tools::sources</li>

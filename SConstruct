@@ -679,9 +679,16 @@ def build_boost(target, source, env)  :
     toolset = "gcc"
     if env['PLATFORM'].lower() == "darwin" :
         toolset = "darwin"
-    
+        
+    # if MPI is set, compile Boost with MPI support
+    mpi = ""
+    if env["withmpi"] :
+        oFile = open(ospath.join(boostpath, "tools", "build", "v2", "user-config.jam"), "a+")
+        oFile.write("\n using mpi ;\n")
+        oFile.close()
+            
     # build the Boost
-    os.system( "cd "+boostpath+"; ./b2 --with-exception --with-filesystem --with-math --with-random --with-regex --with-date_time --with-thread --with-system --with-program_options --with-serialization --with-iostreams --disable-filesystem2 threading=multi runtime-link=shared variant=release toolset="+toolset+" install --prefix="+os.path.abspath(os.path.join(os.curdir, "install", "build", "boost", boostversion)) )
+    os.system( "cd "+boostpath+"; ./b2 "+mpi+" --with-exception --with-filesystem --with-math --with-random --with-regex --with-date_time --with-thread --with-system --with-program_options --with-serialization --with-iostreams --disable-filesystem2 threading=multi runtime-link=shared variant=release toolset="+toolset+" install --prefix="+os.path.abspath(os.path.join(os.curdir, "install", "build", "boost", boostversion)) )
 
     # checkout the numerical binding
     os.system("svn checkout http://svn.boost.org/svn/boost/sandbox/numeric_bindings/ "+os.path.abspath(os.path.join(os.curdir, "install", "build", "boost", "sandbox", "numeric_bindings")) )
