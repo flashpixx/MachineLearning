@@ -148,7 +148,8 @@
  * <ul>
  * <li><dfn>documentation</dfn> create the documentation with Doxygen (Doxygen must be installed and be reached within the path)</li>
  * <li><dfn>librarybuild</dfn> download the librarys and compile each library with the default option. Compiled libraries are installed under the subdirectory <dfn>install/build</dfn>
- * [tar, make, gfortran, gcc & g++ must be installed and within the search path]</li>
+ * [tar, make, gfortran, gcc & g++ must be installed and within the search path. If a file (boost.tar.bz2, hdf.tar.bz2, ginac.tar.bz2, cln.tar.bz2, json.tar.gz,
+ * atlas.tar.bz2, lapack.tgz) exists within the <dfn>install</dfn> directory, the existing file is used otherwise the file will be downloaded]</li>
  * <li><dfn>createlanguage</dfn> creates the language files / adds new messages to the existing files (xgettext must be called, so it should be within the path)</li>
  * <li><dfn>updatelanguage</dfn> compiles all language files (msgfmt must be called, so it should be within the path)</li>
  * <li><dfn>clean / -c</dfn> target that cleans framework files</li>
