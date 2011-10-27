@@ -692,7 +692,7 @@ def build_boost(target, source, env)  :
     os.system( "cd "+boostpath+"; ./b2 "+mpi+" --with-exception --with-filesystem --with-math --with-random --with-regex --with-date_time --with-thread --with-system --with-program_options --with-serialization --with-iostreams --disable-filesystem2 threading=multi runtime-link=shared variant=release toolset="+toolset+" install --prefix="+os.path.abspath(os.path.join(os.curdir, "install", "build", "boost", boostversion)) )
 
     # checkout the numerical binding
-    os.system("svn checkout http://svn.boost.org/svn/boost/sandbox/numeric_bindings/ "+os.path.abspath(os.path.join(os.curdir, "install", "build", "boost", "sandbox", "numeric_bindings")) )
+    os.system("svn checkout http://svn.boost.org/svn/boost/sandbox/numeric_bindings/ "+os.path.join(os.curdir, "install", "build", "boost", "sandbox", "numeric_bindings") )
 
     return []
     
