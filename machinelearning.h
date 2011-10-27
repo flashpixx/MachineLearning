@@ -136,7 +136,7 @@
  * <li><dfn>withlogger</dfn> compiles a own logger class within the framework</li>
  * <li><dfn>withsources</dfn> support for the namespace machinelearning::tools::sources</li>
  * <li><dfn>withfiles</dfn> support for the namespace machinelearning::tools::files</li>
- * <li><dfn>withsymbolicmath</dfn> support for symbolic math (eg: gradient descent)</li>
+ * <li><dfn>withsymbolicmath</dfn> support for symbolic math (eg: machinelearning::functionaloptimization::gradientdescent )</li>
  * </ul><ul>
  * <li><dfn>atlaspointerwidth</dfn> parameter for setting the ATLAS pointer width during running the library build target (default empty for system default)</li>
  * <li><dfn>atlascputhrottle</dfn> enable / disable detection of ATLAS CPU throtteling during runngin the library build target (default disable)</li>
