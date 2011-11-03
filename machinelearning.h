@@ -181,6 +181,7 @@
  * <li>@subpage logger</li>
  * <li>@subpage lang</li>
  * <li>@subpage other</li>
+ * <li>@subpage java</li>
  * </ul>
  *
  *
@@ -715,6 +716,36 @@
          end
  * @endcode
  * 
+ *
+ *
+ * @page java Java Examples
+ * The Java examples can use with the <dfn>machinelearning.jar</dfn> only. So first the Jar must be build with the <dfn>javac</dfn> build target and stored under the <dfn>build</dfn> directory.
+ * After that the Java targets can be build or the Jar file can be used for own projects. For using the Jar file in a own project, compile your classes with the Java compiler and add the
+ * Jar to your classpath. Take a look to the examples to use the algorithms and data structures or see the documentation
+ *
+ * @section toc Table of contents
+ * <ul>
+ * <li>@ref javaeigen</li>
+ * <li>@ref javasvd</li>
+ * <li>@ref javarandom</li>
+ * <li>@ref javapca</li>
+ * <li>@ref javamds</li>
+ * </ul>
+ *
+ * @section javaeigen Eigenvalues
+ * @include examples/java/util/eigen.java
+ *
+ * @section javasvd Singular Value Decomposition
+ * @include examples/java/util/svd.java
+ *
+ * @section javarandom Random Java Distribution
+ * @include examples/java/util/random.java
+ *
+ * @section javapca Principal Component Analysis (PCA)
+ * @include examples/java/reducing/pca.java
+ *
+ * @section javamds Multidimensional Scaling (MDS)
+ * @include examples/java/reducing/mds.java
  *
  *
  *

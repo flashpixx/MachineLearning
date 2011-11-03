@@ -43,6 +43,8 @@ def configuration_macosx(config, vars, version, architecture) :
 
     if ver[0] == "10" and ver[1] == "6" :
         arch = "x86_64"
+    elif ver[0] == "10" and ver[1] == "7" :
+        arch = "x86_64"
 
 
     config["shlinkerflags"]     = ""
