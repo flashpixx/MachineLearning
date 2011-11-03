@@ -31,6 +31,7 @@ def createVariables(vars) :
     
     vars.Add(EnumVariable("atlaspointerwidth", "pointer width for compiling ATLAS (empty = system default, 32 = 32 Bit, 64 = 64 Bit)", "", allowed_values=("", "32", "64")))
     vars.Add(BoolVariable("atlascputhrottle", "enable / disable detection of CPU throtteling", False))
+    vars.Add(ListVariable("skipbuild", "skipping library builds", "", ["atlas", "boost", "hdf", "ginac", "json"]))
 
 
 #=== function for os configuration ===================================================================================================
@@ -959,39 +960,50 @@ def clearbuilddir(target, source, env) :
 
 
 def target_libraryinstall(env) :
+    skiplist = str(env["skipbuild"]).split(",")
+
+    if "all" in skiplist :
+        print "nothing to build"
+        sys.exit(1)
+
     #build into a temp dir
     lst = []
     lst.append( env.Command("mkinstalldir", "", Mkdir("install")) )
     lst.append( env.Command("mkbuilddir", "", Mkdir(os.path.join("install", "build"))) )
 
     #download LAPack & ATLAS, extract & install
-    lst.append( env.Command("downloadlapackatlas", "", download_atlaslapack) )
-    lst.append( env.Command("mkatlasbuilddir", "", Mkdir(os.path.join("install", "atlasbuild"))) )
-    lst.append( env.Command("buildatlaslapack", "", build_atlaslapack) )
-    if env['PLATFORM'].lower() == "posix" or env['PLATFORM'].lower() == "cygwin" :
-        lst.append( env.Command("sonameatlaslapack", "", soname_atlaslapack) )
-    lst.append( env.Command("installatlaslapack", "", install_atlaslapack) )
+    if not("atlas" in skiplist) :
+        lst.append( env.Command("downloadlapackatlas", "", download_atlaslapack) )
+        lst.append( env.Command("mkatlasbuilddir", "", Mkdir(os.path.join("install", "atlasbuild"))) )
+        lst.append( env.Command("buildatlaslapack", "", build_atlaslapack) )
+        if env['PLATFORM'].lower() == "posix" or env['PLATFORM'].lower() == "cygwin" :
+            lst.append( env.Command("sonameatlaslapack", "", soname_atlaslapack) )
+        lst.append( env.Command("installatlaslapack", "", install_atlaslapack) )
     
     # download Boost, extract & install
-    lst.append( env.Command("downloadboost", "", download_boost) )
-    lst.append( env.Command("extractboost", "", "tar xfvj "+os.path.join("install", "boost.tar.bz2")+" -C install") )
-    lst.append( env.Command("buildboost", "", build_boost) )
+    if not("boost" in skiplist) :
+        lst.append( env.Command("downloadboost", "", download_boost) )
+        lst.append( env.Command("extractboost", "", "tar xfvj "+os.path.join("install", "boost.tar.bz2")+" -C install") )
+        lst.append( env.Command("buildboost", "", build_boost) )
     
     # download HDF, extract & install
-    lst.append( env.Command("downloadhdf", "", download_hdf) )
-    lst.append( env.Command("extracthdf", "", "tar xfvj "+os.path.join("install", "hdf.tar.bz2")+" -C install") )
-    lst.append( env.Command("buildhdf", "", build_hdf) )
+    if not("hdf" in skiplist) :
+        lst.append( env.Command("downloadhdf", "", download_hdf) )
+        lst.append( env.Command("extracthdf", "", "tar xfvj "+os.path.join("install", "hdf.tar.bz2")+" -C install") )
+        lst.append( env.Command("buildhdf", "", build_hdf) )
 
     #download GiNaC & CLN, extract & install
-    lst.append( env.Command("downloadginaccln", "", download_ginaccln) )
-    lst.append( env.Command("extractginac", "", "tar xfvj "+os.path.join("install", "ginac.tar.bz2")+" -C install") )
-    lst.append( env.Command("extractcln", "", "tar xfvj "+os.path.join("install", "cln.tar.bz2")+" -C install") )
-    lst.append( env.Command("buildginaccln", "", build_ginaccln) )
+    if not("ginac" in skiplist) :
+        lst.append( env.Command("downloadginaccln", "", download_ginaccln) )
+        lst.append( env.Command("extractginac", "", "tar xfvj "+os.path.join("install", "ginac.tar.bz2")+" -C install") )
+        lst.append( env.Command("extractcln", "", "tar xfvj "+os.path.join("install", "cln.tar.bz2")+" -C install") )
+        lst.append( env.Command("buildginaccln", "", build_ginaccln) )
     
     #download JSON library, extract & install
-    lst.append( env.Command("downloadjsoncpp", "", download_jsoncpp) )
-    lst.append( env.Command("extractjsoncpp", "", "tar xfvz "+os.path.join("install", "jsoncpp.tar.gz")+" -C install") )
-    lst.append( env.Command("buildjsoncpp", "", build_jsoncpp) )
+    if not("json" in skiplist) :
+        lst.append( env.Command("downloadjsoncpp", "", download_jsoncpp) )
+        lst.append( env.Command("extractjsoncpp", "", "tar xfvz "+os.path.join("install", "jsoncpp.tar.gz")+" -C install") )
+        lst.append( env.Command("buildjsoncpp", "", build_jsoncpp) )
     
     #clear install directories
     lst.append( env.Command("cleanbuilddir", "", clearbuilddir) )
