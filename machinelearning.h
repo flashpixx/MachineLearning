@@ -172,6 +172,7 @@
  *
  * @section ex examples
  * <ul>
+ * <li>@subpage lang</li>
  * <li>@subpage classifier</li>
  * <li>@subpage clustering</li>
  * <li>@subpage sources</li>
@@ -179,7 +180,6 @@
  * <li>@subpage dimreduce</li>
  * <li>@subpage files</li>
  * <li>@subpage logger</li>
- * <li>@subpage lang</li>
  * <li>@subpage other</li>
  * <li>@subpage java</li>
  * </ul>
@@ -718,7 +718,7 @@
  * 
  *
  *
- * @page java Java Examples
+ * @page java Examples Java
  * The Java examples can use with the <dfn>machinelearning.jar</dfn> only. So first the Jar must be build with the <dfn>javac</dfn> build target and stored under the <dfn>build</dfn> directory.
  * After that the Java targets can be build or the Jar file can be used for own projects. For using the Jar file in a own project, compile your classes with the Java compiler and add the
  * Jar to your classpath. Take a look to the examples to use the algorithms and data structures or see the documentation
