@@ -27,24 +27,24 @@ import java.util.Random;
 
 /** java testprogram for using svd algorithms **/
 public class svd {
-	
-	
+    
+    
     /** main method
      * @param p_args input arguments
      **/
-	public static void main(String[] p_args)
-	{
+    public static void main(String[] p_args)
+    {
         // generates random datapoints
-		Random l_rand = new Random();
-		
-		Double[][] l_data = new Double[4][8];
-		for(int i=0; i < l_data.length; i++) {
-			for (int j=0; j < l_data[i].length; j++) {
-				l_data[i][j] = l_rand.nextDouble() * 500;
-				System.out.print(l_data[i][j] + "\t");
-			}
-			System.out.println("");
-		}
+        Random l_rand = new Random();
+        
+        Double[][] l_data = new Double[4][8];
+        for(int i=0; i < l_data.length; i++) {
+            for (int j=0; j < l_data[i].length; j++) {
+                l_data[i][j] = l_rand.nextDouble() * 500;
+                System.out.print(l_data[i][j] + "\t");
+            }
+            System.out.println("");
+        }
         
 
         // create SVD
@@ -90,6 +90,6 @@ public class svd {
         l_svd          = null;
         l_data         = null;
         l_rand         = null;
-	}
-	
+    }
+    
 }

@@ -28,34 +28,34 @@ import java.util.Random;
 
 /** java testprogram for using PCA **/
 public class mds {
-	
-	
+    
+    
     /** main method
      * @param p_args input arguments
      **/
-	public static void main(String[] p_args)
-	{
+    public static void main(String[] p_args)
+    {
         // generates random datapoints
-		Random l_rand = new Random();
-		
-		Double[][] l_data = new Double[8][8];
-		for(int i=0; i < l_data.length; i++) {
-			for (int j=0; j < l_data[i].length; j++) {
+        Random l_rand = new Random();
+        
+        Double[][] l_data = new Double[8][8];
+        for(int i=0; i < l_data.length; i++) {
+            for (int j=0; j < l_data[i].length; j++) {
                 if (i==j)
                     l_data[i][j] = new Double(0);
                 else
                     l_data[i][j] = l_rand.nextDouble();
-				System.out.print(l_data[i][j] + "\t");
-			}
-			System.out.println("");
-		}
+                System.out.print(l_data[i][j] + "\t");
+            }
+            System.out.println("");
+        }
         
         // create MDS object for Double datatypes with metric projection
         MDS<Double> l_mds = new MDS<Double>(Double.class, 3, MDS.Project.METRIC);
         
         
         // maps the random data points
-		Double[][] l_result = l_mds.map(l_data);
+        Double[][] l_result = l_mds.map(l_data);
         System.out.println("\nproject data:");
         if (l_result == null)
             System.out.println("no data is returned");
@@ -69,12 +69,12 @@ public class mds {
         
         // release data for avoid memory leaks
         l_mds.dispose();
-		
+        
         // set objects to null for gc removing
         l_mds    = null;
-		l_result = null;
-		l_data   = null;  
+        l_result = null;
+        l_data   = null;  
         l_rand   = null;
-	}
-	
+    }
+    
 }

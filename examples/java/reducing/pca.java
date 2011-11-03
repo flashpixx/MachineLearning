@@ -28,31 +28,31 @@ import java.util.Random;
 
 /** java testprogram for using PCA **/
 public class pca {
-	
-	
+    
+    
     /** main method
      * @param p_args input arguments
      **/
-	public static void main(String[] p_args)
-	{
+    public static void main(String[] p_args)
+    {
         // generates random datapoints
-		Random l_rand = new Random();
-		
-		Double[][] l_data = new Double[15][8];
-		for(int i=0; i < l_data.length; i++) {
-			for (int j=0; j < l_data[i].length; j++) {
-				l_data[i][j] = l_rand.nextDouble() * 500;
-				System.out.print(l_data[i][j] + "\t");
-			}
-			System.out.println("");
-		}
+        Random l_rand = new Random();
+        
+        Double[][] l_data = new Double[15][8];
+        for(int i=0; i < l_data.length; i++) {
+            for (int j=0; j < l_data[i].length; j++) {
+                l_data[i][j] = l_rand.nextDouble() * 500;
+                System.out.print(l_data[i][j] + "\t");
+            }
+            System.out.println("");
+        }
 
         // create PCA object for Double datatypes
         PCA<Double> l_pca = new PCA<Double>(Double.class, 3);
         
         
         // maps the random data points
-		Double[][] l_result = l_pca.map(l_data);
+        Double[][] l_result = l_pca.map(l_data);
         System.out.println("\nproject data:");
         if (l_result == null)
             System.out.println("no data is returned");
@@ -77,13 +77,13 @@ public class pca {
         
         // release data for avoid memory leaks
         l_pca.dispose();
-		
+        
         // set objects to null for gc removing
         l_pca    = null;
-		l_result = null;
-		l_data   = null;
+        l_result = null;
+        l_data   = null;
         l_eig    = null;        
         l_rand   = null;
-	}
-	
+    }
+    
 }
