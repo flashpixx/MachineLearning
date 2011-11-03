@@ -930,11 +930,38 @@ def build_jsoncpp(target, source, env) :
         shutil.copy(i, os.path.join("install", "build", "jsoncpp", jsonversion, "lib", os.path.split(i)[-1]))
 
     return []
+    
+    
+def clearbuilddir(target, source, env) :
+    clearlist = []
+    for i in os.listdir("install") :
+        if os.path.isfile(os.path.join("install", i)) :
+            continue
+        if i <> "build" :
+            clearlist.append(i)
+    
+    for i in clearlist :
+        for pathentry in os.walk(os.path.join("install", i), False):
+            for dir in pathentry[1]:
+                path = os.path.join(pathentry[0], dir)
+                if os.path.islink(path):
+                    os.unlink(path)
+                else:
+                    os.rmdir(path)
+
+            for file in pathentry[2]:
+                path = os.path.join(pathentry[0], file)
+                os.unlink(path)
+       
+        os.removedirs(os.path.join("install", i))
+    
+    return []
 
 
 def target_libraryinstall(env) :
     #build into a temp dir
-    lst = env.Command("mkinstalldir", "", Mkdir("install"))
+    lst = []
+    lst.append( env.Command("mkinstalldir", "", Mkdir("install")) )
     lst.append( env.Command("mkbuilddir", "", Mkdir(os.path.join("install", "build"))) )
 
     #download LAPack & ATLAS, extract & install
@@ -965,6 +992,9 @@ def target_libraryinstall(env) :
     lst.append( env.Command("downloadjsoncpp", "", download_jsoncpp) )
     lst.append( env.Command("extractjsoncpp", "", "tar xfvz "+os.path.join("install", "jsoncpp.tar.gz")+" -C install") )
     lst.append( env.Command("buildjsoncpp", "", build_jsoncpp) )
+    
+    #clear install directories
+    lst.append( env.Command("cleanbuilddir", "", clearbuilddir) )
     
     env.Alias("librarybuild", lst)
 #=======================================================================================================================================
