@@ -8,6 +8,7 @@ import sys
 import urllib2
 import re
 import shutil
+import subprocess
 
 
 #=== CLI parameters ===================================================================================================
@@ -32,6 +33,7 @@ def createVariables(vars) :
     vars.Add(EnumVariable("atlaspointerwidth", "pointer width for compiling ATLAS (empty = system default, 32 = 32 Bit, 64 = 64 Bit)", "", allowed_values=("", "32", "64")))
     vars.Add(BoolVariable("atlascputhrottle", "enable / disable detection of CPU throtteling", False))
     vars.Add(ListVariable("skipbuild", "skipping library builds", "", ["atlas", "boost", "hdf", "ginac", "json"]))
+    vars.Add(BoolVariable("skipbuilderror", "ignore / skip build errors", False))
 
 
 #=== function for os configuration ===================================================================================================
@@ -645,6 +647,17 @@ def target_documentation(env) :
 
     
 #=== building depend libraries =======================================================================================================
+def runsyscmd(cmd, env) :
+    ret = subprocess.call( cmd, shell=True )
+    if ret <> 0 and not(env["skipbuilderror"]) :
+        print "\nan error occurred during building"
+        res = ""
+        while res != "a" and res != "c" :
+            res = raw_input("(a)bort or (c)ontinue: ")
+            if res == "a" :
+                sys.exit(1)
+                
+
 def download_boost(target, source, env)  :
     if os.path.exists(os.path.join(os.curdir, "install", "boost.tar.bz2")) :
         return []
@@ -696,7 +709,7 @@ def build_boost(target, source, env)  :
     boostversion  = boostversion.replace("_", ".")
 
     # for calling bootstrap.sh change the current work directory
-    os.system( "cd "+boostpath+"; ./bootstrap.sh" )
+    runsyscmd("cd "+boostpath+"; ./bootstrap.sh", env)
     
     # call the bjam command
     toolset = "gcc"
@@ -712,10 +725,10 @@ def build_boost(target, source, env)  :
         mpi = "--with-mpi"
             
     # build the Boost
-    os.system( "cd "+boostpath+"; ./b2 "+mpi+" --with-exception --with-filesystem --with-math --with-random --with-regex --with-date_time --with-thread --with-system --with-program_options --with-serialization --with-iostreams --disable-filesystem2 threading=multi runtime-link=shared variant=release toolset="+toolset+" install --prefix="+os.path.abspath(os.path.join(os.curdir, "install", "build", "boost", boostversion)) )
+    runsyscmd("cd "+boostpath+"; ./b2 "+mpi+" --with-exception --with-filesystem --with-math --with-random --with-regex --with-date_time --with-thread --with-system --with-program_options --with-serialization --with-iostreams --disable-filesystem2 threading=multi runtime-link=shared variant=release toolset="+toolset+" install --prefix="+os.path.abspath(os.path.join(os.curdir, "install", "build", "boost", boostversion)), env)
 
     # checkout the numerical binding
-    os.system("svn checkout http://svn.boost.org/svn/boost/sandbox/numeric_bindings/ "+os.path.join(os.curdir, "install", "build", "boost", "sandbox", "numeric_bindings") )
+    runsyscmd("svn checkout http://svn.boost.org/svn/boost/sandbox/numeric_bindings/ "+os.path.join(os.curdir, "install", "build", "boost", "sandbox", "numeric_bindings"), env )
 
     return []
     
@@ -755,8 +768,8 @@ def build_hdf(target, source, env) :
         sys.exit(1)
     hdfpath     = hdfpath[0]
     hdfversion  = hdfpath.replace(os.path.join("install", "hdf"), "")
-    
-    os.system( "cd "+hdfpath+"; ./configure --enable-cxx --prefix="+os.path.abspath(os.path.join("install", "build", "hdf", hdfversion))+ "; make; make install" )
+
+    runsyscmd( "cd "+hdfpath+"; ./configure --enable-cxx --prefix="+os.path.abspath(os.path.join("install", "build", "hdf", hdfversion))+ "; make; make install", env )
     return []
     
     
@@ -819,8 +832,7 @@ def build_atlaslapack(target, source, env) :
     if not(env["atlascputhrottle"]) :
         cputhrottle = "-Si cputhrchk 0"
     
-    os.system( "cd "+os.path.join("install", "atlasbuild")+"; ../ATLAS/configure --dylibs "+ptrwidth+" "+cputhrottle+" --with-netlib-lapack-tarfile=../lapack.tgz --prefix="+os.path.abspath(os.path.join("install", "build", "atlas", atlasversion))+ "; make" )
-    
+    runsyscmd( "cd "+os.path.join("install", "atlasbuild")+"; ../ATLAS/configure --dylibs "+ptrwidth+" "+cputhrottle+" --with-netlib-lapack-tarfile=../lapack.tgz --prefix="+os.path.abspath(os.path.join("install", "build", "atlas", atlasversion))+ "; make", env )
     return []
     
     
@@ -839,7 +851,7 @@ def soname_atlaslapack(target, source, env) :
 
 
 def install_atlaslapack(target, source, env) :
-    os.system( "cd "+os.path.join("install", "atlasbuild")+"; make shared; make install" )
+    runsyscmd( "cd "+os.path.join("install", "atlasbuild")+"; make shared; make install", env )
     return []
 
         
@@ -904,8 +916,8 @@ def build_ginaccln(target, source, env) :
     ginacpath     = ginacpath[0]
     ginacversion  = ginacpath.replace(os.path.join("install", "ginac-"), "")
 
-    os.system( "cd "+clnpath+"; ./configure --prefix="+os.path.abspath(os.path.join("install", "build", "cln", clnversion))+ "; make; make install" )
-    os.system( "cd "+ginacpath+"; export CLN_CFLAGS=-I"+os.path.abspath(os.path.join("install", "build", "cln", clnversion, "include"))+"; export CLN_LIBS=\"-L"+os.path.abspath(os.path.join("install", "build", "cln", clnversion, "lib"))+" -lcln\"; ./configure --prefix="+os.path.abspath(os.path.join("install", "build", "ginac", ginacversion))+ "; make; make install" )
+    runsyscmd( "cd "+clnpath+"; ./configure --prefix="+os.path.abspath(os.path.join("install", "build", "cln", clnversion))+ "; make; make install", env )
+    runsyscmd( "cd "+ginacpath+"; export CLN_CFLAGS=-I"+os.path.abspath(os.path.join("install", "build", "cln", clnversion, "include"))+"; export CLN_LIBS=\"-L"+os.path.abspath(os.path.join("install", "build", "cln", clnversion, "lib"))+" -lcln\"; ./configure --prefix="+os.path.abspath(os.path.join("install", "build", "ginac", ginacversion))+ "; make; make install", env )
     return []
 
 
@@ -930,7 +942,7 @@ def build_jsoncpp(target, source, env) :
     jsonpath     = jsonpath[0]
     jsonversion  = jsonpath.replace(os.path.join("install", "jsoncpp-src-"), "")
     
-    os.system("cd "+jsonpath+"; scons platform=linux-gcc")
+    runsyscmd("cd "+jsonpath+"; scons platform=linux-gcc", env)
     
     # manual copy of the data
     try :
@@ -983,9 +995,7 @@ def clearbuilddir(target, source, env) :
 
 def target_libraryinstall(env) :
     skiplist = str(env["skipbuild"]).split(",")
-    difflist = list(set(skiplist).intersection(set(["atlas", "boost", "hdf", "ginac", "json"])))
-
-    if ("librarybuild" in COMMAND_LINE_TARGETS) and ("all" in skiplist or difflist == []) :
+    if ("librarybuild" in COMMAND_LINE_TARGETS) and ("all" in skiplist) :
         print "nothing to build"
         sys.exit(1)
 
