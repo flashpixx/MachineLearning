@@ -69,6 +69,14 @@
  * For manual installation of the library you can follow the short @subpage installationnotes / A default library installation can be created with the command <dfn>scons librarybuild</dfn>
  * with the optional ATLAS building parameters. After compiling the directory <dfn>install/build</dfn> must be moved to a directory in that all libraries should be stored, because
  * a clean-target removes the <dfn>install</dfn> directory.
+ * <p>
+ * The framework was tested under
+ * <ul>
+ * <li>Mac OS X Leopard (10.5), Snow Leopard (10.6) and Lion (10.7)</li>
+ * <li>Ubuntu Lucid Lynx (10.04)</li>
+ * <li>Gentoo Linux (stable / unstable)</li>
+ * <li>Microsoft Windows 7 (with Cygwin)</li>
+ * </ul></p>
  *
  * @section def definition / style guide
  * <ul>
