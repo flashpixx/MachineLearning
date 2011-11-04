@@ -985,7 +985,7 @@ def target_libraryinstall(env) :
     skiplist = str(env["skipbuild"]).split(",")
     difflist = list(set(skiplist).intersection(set(["atlas", "boost", "hdf", "ginac", "json"])))
 
-    if "all" in skiplist or difflist == [] :
+    if ("librarybuild" in COMMAND_LINE_TARGETS) and ("all" in skiplist or difflist == []) :
         print "nothing to build"
         sys.exit(1)
 
