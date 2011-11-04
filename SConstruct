@@ -963,8 +963,9 @@ def clearbuilddir(target, source, env) :
 
 def target_libraryinstall(env) :
     skiplist = str(env["skipbuild"]).split(",")
+    difflist = list(set(skiplist).intersection(set(["atlas", "boost", "hdf", "ginac", "json"])))
 
-    if "all" in skiplist :
+    if "all" in skiplist or difflist == [] :
         print "nothing to build"
         sys.exit(1)
 
@@ -972,6 +973,9 @@ def target_libraryinstall(env) :
     lst = []
     lst.append( env.Command("mkinstalldir", "", Mkdir("install")) )
     lst.append( env.Command("mkbuilddir", "", Mkdir(os.path.join("install", "build"))) )
+    
+    #clear install directories before compiling
+    lst.append( env.Command("cleanbeforebuilddir", "", clearbuilddir) )
 
     #download LAPack & ATLAS, extract & install
     if not("atlas" in skiplist) :
@@ -1007,8 +1011,8 @@ def target_libraryinstall(env) :
         lst.append( env.Command("extractjsoncpp", "", "tar xfvz "+os.path.join("install", "jsoncpp.tar.gz")+" -C install") )
         lst.append( env.Command("buildjsoncpp", "", build_jsoncpp) )
     
-    #clear install directories
-    lst.append( env.Command("cleanbuilddir", "", clearbuilddir) )
+    #clear install directories after compiling
+    lst.append( env.Command("cleanafterbuilddir", "", clearbuilddir) )
     
     env.Alias("librarybuild", lst)
 #=======================================================================================================================================
