@@ -973,8 +973,11 @@ def build_jsoncpp(target, source, env) :
     files = []
     files.extend( getRekusivFiles(os.path.join(jsonpath, "libs"), env["SHLIBSUFFIX"]) )
     files.extend( getRekusivFiles(os.path.join(jsonpath, "libs"), env["LIBSUFFIX"]) )
+    installpath = os.path.join("install", "build", "jsoncpp", jsonversion, "lib")
     for i in files :
-        shutil.copy(i, os.path.join("install", "build", "jsoncpp", jsonversion, "lib", os.path.split(i)[-1]))
+        filename =os.path.split(i)[-1]
+        shutil.copy(i, os.path.join(installpath, filename))
+        os.symlink(os.path.join("./", filename), os.path.join(installpath, "libjson" + os.path.splitext(filename)[1]))
 
     return []
     
