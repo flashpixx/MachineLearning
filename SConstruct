@@ -575,9 +575,21 @@ def target_javac(env, framework) :
 
     # copy external libraries in the native directory for Jar adding (copy works only if target directories exists)
     dirs      = env["LIBPATH"].split(os.pathsep)
+    libs      = []
     copyfiles = []
-    for n in env["LIBS"] :
-        libfiles = env.FindFile(env["LIBPREFIX"] + n + env["SHLIBSUFFIX"], dirs)
+    
+    libs.extend(env["LIBS"])
+    if env['PLATFORM'].lower() == "cygwin" :
+        libs.extend(["cygwin1", "cyggcc_s-1", "cyggfortran-3", "cygstdc++-6"])
+    
+    for n in libs :
+        libname = ""
+        if env['PLATFORM'].lower() == "darwin" or env['PLATFORM'].lower() == "postfix" :
+            libname = env["LIBPREFIX"] + n + env["SHLIBSUFFIX"]
+        elif env['PLATFORM'].lower() == "cygwin" :
+            libname = n + env["SHLIBSUFFIX"]
+
+        libfiles = env.FindFile(libname, dirs)
         if libfiles <> None :
             # remove any symbolic names, so the file in the native directory becomes the original filename
             name = os.path.realpath(libfiles.path).split(os.path.sep)[-1]
