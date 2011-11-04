@@ -54,8 +54,16 @@ def configuration_macosx(config, vars, version, architecture) :
     
     if os.environ.has_key("CPPPATH") :
         config["include"]       = os.environ["CPPPATH"]
-    if os.environ.has_key("LIBRARY_PATH") :
+    elif os.environ.has_key("CPATH") :
+        config["include"]       = os.environ["CPATH"]
+        
+    if os.environ.has_key("DYLD_LIBRARY_PATH") :
+        config["librarypath"]   = os.environ["DYLD_LIBRARY_PATH"]
+    elif os.environ.has_key("LD_LIBRARY_PATH") :
+        config["librarypath"]   = os.environ["LD_LIBRARY_PATH"]
+    elif os.environ.has_key("LIBRARY_PATH") :
         config["librarypath"]   = os.environ["LIBRARY_PATH"]
+    
         
     config["compileflags"]      = "-pipe -Wall -Wextra -arch "+arch+" -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
     config["linkto"]            = ["boost_system", "boost_thread", "boost_iostreams", "boost_regex"]
@@ -121,7 +129,12 @@ def configuration_posix(config, vars, version, architecture) :
     
     if os.environ.has_key("CPPPATH") :
         config["include"]       = os.environ["CPPPATH"]
-    if os.environ.has_key("LIBRARY_PATH") :
+    elif os.environ.has_key("CPATH") :
+        config["include"]       = os.environ["CPATH"]
+    
+    if os.environ.has_key("LD_LIBRARY_PATH") :
+        config["librarypath"]   = os.environ["LD_LIBRARY_PATH"]
+    elif os.environ.has_key("LIBRARY_PATH") :
         config["librarypath"]   = os.environ["LIBRARY_PATH"]
     
     config["compileflags"]      = "-pipe -Wall -Wextra -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
@@ -186,8 +199,15 @@ def configuration_cygwin(config, vars, version, architecture) :
     
     if os.environ.has_key("CPPPATH") :
         config["include"]       = os.environ["CPPPATH"]
+    elif os.environ.has_key("CPATH") :
+        config["include"]       = os.environ["CPATH"]
+        
     if os.environ.has_key("PATH") :
         config["librarypath"]   = os.environ["PATH"]
+    elif os.environ.has_key("LD_LIBRARY_PATH") :
+        config["librarypath"]   = os.environ["LD_LIBRARY_PATH"]
+    elif os.environ.has_key("LIBRARY_PATH") :
+        config["librarypath"]   = os.environ["LIBRARY_PATH"]
     
     config["compileflags"]      = "-pipe -Wall -Wextra -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"
     config["linkto"]            = ["cygboost_system", "cygboost_thread", "cygboost_iostreams", "cygboost_regex"]
