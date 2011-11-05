@@ -195,7 +195,7 @@ def configuration_posix(config, vars, version, architecture) :
 # configuration for Windows Cygwin build
 def configuration_cygwin(config, vars, version, architecture) :
     config["shlinkerflags"]     = ""
-    config["linkerflags"]       = "-enable-stdcall-fixup -mthread -mconsole"
+    config["linkerflags"]       = "-enable-stdcall-fixup -mthread"
     config["include"]           = ""
     config["librarypath"]       = ""
     
@@ -337,6 +337,8 @@ def getConfig(vars):
     else :
         env.Replace(CXX         = config["compiler"])
 
+    if config.has_key("javac") and config["javac"] <> "" :
+        env.Replace(JAVAC   = config["javac"])
     env.Replace(CXXFLAGS    = config["compileflags"])
     env.Replace(CPPPATH     = config["include"].split(os.pathsep))
     env.Replace(LINKFLAGS   = config["linkerflags"])
