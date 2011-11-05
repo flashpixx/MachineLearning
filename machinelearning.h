@@ -190,6 +190,8 @@
  *
  *
  * @page installationnotes Installation Notes
+ * For building all libraries with a set of default options the target <dfn>librarybuild</dfn> with the parameters <dfn>atlaspointerwidth</dfn>, <dfn>atlascputhrottle</dfn>, <dfn>skipbuild</dfn>
+ * and <dfn>skipbuilderror</dfn> can be used.<br/>
  * All configure scripts have a <dfn>--prefix=</dfn> option for setting a target installation directory. It is recommand to use this option for seperating the manually installation
  * in contrast to the system libraries. This steps discribe the manually compilation of each library, but you can use the devel packages of your distribution (and precompiled libraries).
  * This tutorial is a short excerpt for the install process only, so it is recommand, that you know the system details for installing. 
@@ -248,25 +250,21 @@
  * 
  *
  * @subsection nixpath path under Linux
- * Under Linux some environmantal variables must be set, if the libraries are installed into a non-default directory. The variable <dfn>CPATH</dfn> and <dfn>CPPPATH</dfn> must be set to the include
+ * Under Linux some environmantal variables must be set, if the libraries are installed into a non-default directory. The variable <dfn>CPPPATH</dfn> must be set to the include
  * directories and <dfn>LD_LIBRARY_PATH</dfn> and <dfn>LIBRARY_PATH</dfn> must be pointed to the library path. The variables can be set within the <dfn>/etc/profile</dfn> or <dfn>~/.profile</dfn> with
  * @code
     export CPPPATH=first_path:second_path
-    export CPATH=$CPPPATH
     export LIBRARY_PATH=first_path:second_path
     export LD_LIBRARY_PATH=$LIBRARY_PATH
  * @endcode
  *
  * @subsection macpath path under Mac OS X
  * The path data should be set in the same way as in Linux, but OS X needs a own configuration file to use the variables in all OSX programs. Create a blank file in the hidden directory <dfn>~/.MacOSX</dfn>
- * with the name <dfn>environment.plist</dfn> and set the variables with data. If you run a program a variable <dfn>DYLD_LIBRARY_PATH</dfn> is also needed, but it can't set with the environmental file so
- * it is recommand that the following line is added to the <dfn>/etc/profile</dfn>:
+ * with the name <dfn>environment.plist</dfn> and set the variable <dfn>CPPPATH</dfn> to the include directories and  <dfn>LIBRARY_PATH</dfn> to the library subdirectories. If you run a program a variable
+ * <dfn>DYLD_LIBRARY_PATH</dfn> is also needed, but it can't set with the environmental file (because of security reasons) so it is recommand that the following line is added to the <dfn>/etc/profile</dfn>:
  * @code
     export DYLD_LIBRARY_PATH=$LIBRARY_PATH
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$LIBRARY_PATH
-    export CPATH=$CPATH:$CPPPATH
  * @endcode
- * The last two lines are optional, because so only the values <dfn>LIBRARY_PATH</dfn> and <dfn>CPPPATH</dfn> must be set in the file.
  *
  *
  * <hr>
@@ -280,27 +278,27 @@
  * <li><dfn>devel/gcc4-gfortran</dfn></li>
  * <li><dfn>python/python</dfn></li>
  * </ul>
- * Here all libraries are installed under <dfn>C:\\opt\\library</dfn> and the tools under <dfn>C:\\opt</dfn> and the version number of the library is set to a subdirectory. On Windows the 
+ * Here all libraries are installed under <dfn>C:\\opt\\library</dfn> with the version number of the library is set to a subdirectory, other the tools under <dfn>C:\\opt</dfn>. On Windows the 
  * <a href="http://www.bzip.org/">BZip2</a> and <a href="http://www.zlib.net/">ZLib</a> must be installed for using in the Boost.Iostreams. BZip2 sources must be extracted and run the commands
  * @code
     make
-    make install PREFIX=/cygdrive/c/opt/library/bzip2/1.0.6
+    make install PREFIX=/cygdrive/c/opt/library/bzip2/<version>
  * @endcode
  * The ZLib library is installed with
  * @code
-    configure --prefix=/cygdrive/c/opt/library/zlib/1.2.5
+    configure --prefix=/cygdrive/c/opt/library/zlib/<version>
     make
     make install
  * @endcode
  * For Boost.Iostreams in the Cygwin install directory in the file <dfn>etc/profile</dfn> or <dfn>~/.bashrc</dfn> the following variables must be set:
  * @code
     export BZIP2_BINARY=bz2
-    export BZIP2_INCLUDE=/cygdrive/c/opt/library/bzip2/1.0.6/include
-    export BZIP2_LIBPATH=/cygdrive/c/opt/library/bzip2/1.0.6/lib
+    export BZIP2_INCLUDE=/cygdrive/c/opt/library/bzip2/<version>/include
+    export BZIP2_LIBPATH=/cygdrive/c/opt/library/bzip2/<version>/lib
  
     export ZLIB_BINARY=z
-    export ZLIB_INCLUDE=/cygdrive/c/opt/library/zlib/1.2.5/include
-    export ZLIB_LIBPATH=/cygdrive/c/opt/library/zlib/1.2.5/lib
+    export ZLIB_INCLUDE=/cygdrive/c/opt/library/zlib/<version>/include
+    export ZLIB_LIBPATH=/cygdrive/c/opt/library/zlib/<version>/lib
  * @endcode
  * It is also recommend, that the linker flag is set with, because all examples are console applications
  * @code
@@ -309,9 +307,9 @@
  *
  * The libraries can be installed with the same steps as in Linux.
  * The path to the libraries directories must be set / added to the system or user path variable <dfn>PATH</dfn> (the Cygwin <dfn>bin</dfn> directory must be added, because all libraries are linked to the
- * <dfn>cygwin.dll</dfn>, which is stored in the <dfn>bin</dfn> directory)
+ * <dfn>cygwin.dll</dfn>, which is stored in the <dfn>bin</dfn> directory), eg:
  * @code
-    C:\opt\cygwin\bin;C:\opt\library\atlas\3.9.43\lib;C:\opt\library\hdf\1.8.7\lib;C:\opt\library\xml2\2.7.8\bin;C:\opt\library\boost\1.47.0\bin;C:\opt\library\boost\1.47.0\lib
+    C:\opt\cygwin\bin;C:\opt\library\atlas\<version>\lib;C:\opt\library\hdf\<version>\lib;C:\opt\library\xml2\<version>\bin;C:\opt\library\boost\<version>\bin;C:\opt\library\boost\<version>\lib
  * @endcode
  * Scons can be installed under Cygwin with the command within the extracted source:
  * @code
@@ -320,7 +318,7 @@
  * The variable <dfn>CPPPATH</dfn> of the include directories is set in the file within the Cygwin install directory <dfn>etc/profile</dfn> (and to the path variable is added the scons directory)
  * @code
     PATH=$PATH:/cygdrive/c/opt/scons/bin
-    export CPPPATH=/cygdrive/c/opt/library/atlas/3.9.43/include:/cygdrive/c/opt/library/boost/1.47.0/include:/cygdrive/c/opt/library/boost/sandbox/numeric_bindings:/cygdrive/c/opt/library/hdf/1.8.7/include:/cygdrive/c/opt/library/xml2/2.7.8/include/libxml2
+    export CPPPATH=/cygdrive/c/opt/library/atlas/<version>/include:/cygdrive/c/opt/library/boost/<version>/include:/cygdrive/c/opt/library/boost/sandbox/numeric_bindings:/cygdrive/c/opt/library/hdf/<version>/include:/cygdrive/c/opt/library/xml2/<version>/include/libxml2
  * @endcode
  * 
  * @subsection winversion Windows Version
