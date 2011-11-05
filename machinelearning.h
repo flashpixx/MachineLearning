@@ -272,7 +272,7 @@
  * <hr>
  * @section windows Microsoft Windows
  * The building process with Windows is very difficult, because not all libraries support native Windows building scripts. It is recommand to use <a href="http://www.cygwin.com/">Cygwin</a> for building.  
- * Install Cygwin with the tools:
+ * Install Cygwin with the tools (but in some cases dependend libraries are needed, Cygwin creates errors if the libraries not exist):
  * <ul>
  * <li><dfn>devel/make</dfn></li>
  * <li><dfn>devel/gcc4-core</dfn></li>
