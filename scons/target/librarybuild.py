@@ -330,8 +330,8 @@ def build_jsoncpp(target, source, env) :
         pass
 
     files = []
-    files.extend( getRekusivFiles(os.path.join(jsonpath, "libs"), env["SHLIBSUFFIX"]) )
-    files.extend( getRekusivFiles(os.path.join(jsonpath, "libs"), env["LIBSUFFIX"]) )
+    files.extend( glob.glob(os.path.join(jsonpath, "libs", "*"+env["SHLIBSUFFIX"])) )
+    files.extend( glob.glob(os.path.join(jsonpath, "libs", "*"+env["LIBSUFFIX"])) )
     installpath = os.path.join("install", "build", "jsoncpp", jsonversion, "lib")
     for i in files :
         filename =os.path.split(i)[-1]
