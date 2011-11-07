@@ -10,28 +10,29 @@ if os.environ.has_key("CPPPATH") :
 elif os.environ.has_key("CPATH") :
     flags["CPPPATH"] = os.environ["CPATH"].split(os.pathsep)
     
-if os.environ.has_key("DYLD_LIBRARY_PATH") :
+if os.environ.has_key("LD_LIBRARY_PATH") :
     flags["LIBPATH"] = os.environ["DYLD_LIBRARY_PATH"].split(os.pathsep)
-elif os.environ.has_key("LD_LIBRARY_PATH") :
-    flags["LIBPATH"] = os.environ["LD_LIBRARY_PATH"].split(os.pathsep)
 elif os.environ.has_key("LIBRARY_PATH") :
     flags["LIBPATH"] = os.environ["LIBRARY_PATH"].split(os.pathsep)
     
 
     
-flags["LIBS"]         = ["boost_system", "boost_thread", "boost_iostreams", "boost_regex"]
-flags["CXXFLAGS"]     = ["-pipe", "-Wall", "-Wextra", "-D BOOST_FILESYSTEM_NO_DEPRECATED", "-D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"]
-flags["SHLINKFLAGS"]  = ["-install_name ${TARGET.file} -headerpad_max_install_name"]
+flags["LIBS"]        = ["boost_system", "boost_thread", "boost_iostreams", "boost_regex"]
+flags["CXXFLAGS"]    = ["-pipe", "-Wall", "-Wextra", "-D BOOST_FILESYSTEM_NO_DEPRECATED", "-D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"]
+flags["LINKKFLAGS"]  = ["-pthread"]
 
 
 
 if not("javac" in COMMAND_LINE_TARGETS) :
     flags["LIBS"].extend(["boost_program_options", "boost_exception", "boost_filesystem"])
+else :
+    flags["LINKKFLAGS"].append("-Wl,--rpath=\\$$ORIGIN")
+    
     
 if env["atlaslink"] == "multi" :
-    flags["LIBS"].append("tatlas")
+    flags["LIBS"].extend(["lapack", "ptcblas", "ptf77blas", "atlas"])
 else :
-    flags["LIBS"].append("satlas")
+    flags["LIBS"].append(["lapack", "cblas", "f77blas", "atlas"])
 
 if env["withdebug"] :
     flags["CXXFLAGS"].append("-g")
