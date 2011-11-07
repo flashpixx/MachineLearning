@@ -18,6 +18,9 @@
 ############################################################################
 
 # -*- coding: utf-8 -*-
+import sys
+sys.path.append("..")
+import help
 import os
 Import("*")
 
@@ -91,30 +94,25 @@ if env["withfiles"] :
     srcSources.append( "cloud.cpp" )
 listSources = createTarget(env, "sources", srcSources, framework)
 
-# create language files if multilanguage is used
-#if env["withmultilanguage"] :
-#    lst = []
-#    lang = getRekusivFiles( os.path.join(os.curdir, "tools", "language"), ".po")
-#    for i in lang :
-#        lst.append( env.Command("msgfmt", "", "msgfmt -v -o " + os.path.join(os.path.dirname(i),"machinelearning.mo") +" "+ i ) )
-#        src      = i.split(os.path.sep)[1:]
-#        src[-1]  = "machinelearning.mo"
-
-#        langfiles     = i.split(os.path.sep)[3:]
-#        langfiles[-1] = "machinelearning.mo"            
-#        target = ["build", "language"]
-#        target.extend(langfiles)
+# create language files if multilanguage is used and copy to the builddir
+if env["withmultilanguage"] :
+    lst = []
+    lang = help.getRekusivFiles( os.path.join("..", "..", "tools", "language"), ".mo")
+    
+    for i in lang :
+        langfile = os.path.sep.join(i.split(os.path.sep)[4:])
+        langpath = os.path.dirname(os.path.sep.join(i.split(os.path.sep)[4:]))
+       
+        lst.append( env.Command("mkdirlang", "", Mkdir(os.path.join("build", "language", langpath))) )
+        lst.append( env.Command("copylang", "", Copy(os.path.join("build", "language", langfile), os.path.join("tools", "language", langfile))) )
         
-#        lst.append( env.Command("mkdirlang", "", Mkdir(os.path.dirname(os.path.sep.join(target)))) )
-#        lst.append( env.Command("copylang", "", Copy(os.path.sep.join(target), os.path.sep.join(src))) )
-        
-#    listGA.extend( lst )
-#    listOther.extend( lst )
-#    listClassifier.extend( lst )
-#    listDistance.extend( lst )
-#    listReduce.extend( lst )
-#    listCluster.extend( lst )
-#    listSources.extend( lst )
+    listGA.extend( lst )
+    listOther.extend( lst )
+    listClassifier.extend( lst )
+    listDistance.extend( lst )
+    listReduce.extend( lst )
+    listCluster.extend( lst )
+    listSources.extend( lst )
 
 # adding targets
 env.Alias("ga", listGA)
