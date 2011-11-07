@@ -18,8 +18,34 @@
 ############################################################################
 
 # -*- coding: utf-8 -*-
-Import("*")
+import os
 
+# get rekursiv all files
+def getRekusivFiles(startdir, ending, pdontuse=[], pShowPath=True, pAbsPath=False) :
+    lst = []
+    for root, dirs, filenames in os.walk(startdir) :
+        for filename in filenames :
+            if filename.endswith(ending) :
+                if pShowPath :
+                    if pAbsPath :
+                        lst.append( os.path.abspath(os.path.join(root, filename)) )
+                    else :
+                        lst.append( os.path.join(root, filename) )
+                else :
+                    if pAbsPath :
+                        lst.append(os.path.abspath(filename))
+                    else :
+                        lst.append(filename)
+    clst = []
+    if not pdontuse :
+        clst.extend(lst)
+    else :
+        ldontuse = [os.path.join(startdir, i) for i in pdontuse]
+        for i in lst :
+            lladd = True;
+            for n in ldontuse :
+                lladd = lladd and not(i.startswith(n));
+            if lladd :
+                clst.append(i)
 
-env.Alias("documentation", env.Command("doxygen", "", "doxygen documentation.doxyfile"))
-
+    return clst
