@@ -41,7 +41,7 @@ elif os.environ.has_key("LD_LIBRARY_PATH") :
 flags["LIBS"]         = ["boost_system", "boost_thread", "boost_iostreams", "boost_regex"]
 flags["CXXFLAGS"]     = ["-pipe", "-Wall", "-Wextra", "-D BOOST_FILESYSTEM_NO_DEPRECATED", "-D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"]
 flags["SHLINKFLAGS"]  = ["-install_name ${TARGET.file} -headerpad_max_install_name"]
-
+flags["LINKFLAGS"]    = ["-pthread"]
 
 
 if not("javac" in COMMAND_LINE_TARGETS) :
