@@ -30,9 +30,9 @@ elif os.environ.has_key("CPATH") :
     flags["CPPPATH"] = os.environ["CPATH"].split(os.pathsep)
     
 if os.environ.has_key("LIBRARY_PATH") :
-    flags["LIBPATH"] = os.environ["DYLD_LIBRARY_PATH"].split(os.pathsep)
-elif os.environ.has_key("LD_LIBRARY_PATH") :
     flags["LIBPATH"] = os.environ["LIBRARY_PATH"].split(os.pathsep)
+elif os.environ.has_key("LD_LIBRARY_PATH") :
+    flags["LIBPATH"] = os.environ["LD_LIBRARY_PATH"].split(os.pathsep)
     
 
     
