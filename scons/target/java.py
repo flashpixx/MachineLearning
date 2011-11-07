@@ -78,14 +78,18 @@ targets.append( targets.extend( env.Java(target=os.path.join("#build", "javalib"
 javaplist = []
 javaplist.extend(targets)
 
+
+
 # create JNI stubs and JavaP command (so we add the classes manually)
 stubs = ["machinelearning.dimensionreduce.nonsupervised.PCA", "machinelearning.dimensionreduce.nonsupervised.MDS", "machinelearning.util.Math", "machinelearning.util.Random"]
 for i in stubs :
     # split file and directory parts and substitute $ to _ and create the headerfile
     parts = i.replace("$", "_").split(".")
-    headerfile = (os.sep.join(parts) + ".h").lower()
+    headerfile = os.path.join( os.sep.join(parts[0:-1]), (parts[-1] + ".h").lower() )
+    cmd = ["-o "+os.path.join("java", headerfile), " -classpath "+os.path.join("build", "javalib"), i]
+    targets.append( env.Command( headerfile, "", "javah "  + " ".join(cmd)  ) )
 
-    targets.append( env.Command( headerfile, "", "javah -classpath " + os.path.join("build", "javalib") + " -o " + os.path.join("java", headerfile) + " " + i  ) )
+# the javah command creates empty subdirectories within scons/target, so the "clean" target must be cleared
 
 # build SharedLibrary
 # default cpps that must be compiled on each run

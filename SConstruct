@@ -45,7 +45,7 @@ def cleantarget(env) :
     files.extend( help.getRekusivFiles(os.curdir, ".pyc") )
     
     # don't ad the current path, because scons run the directories until "/"
-    files.extend( ["build", "documentation", "install"] )
+    files.extend( ["build", "documentation", "install", os.path.join("scons", "target", "machinelearning")] )
 
     env.Clean("clean", files)
 
