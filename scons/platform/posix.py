@@ -45,7 +45,7 @@ flags["LINKKFLAGS"]  = ["-pthread"]
 if not("javac" in COMMAND_LINE_TARGETS) :
     flags["LIBS"].extend(["boost_program_options", "boost_exception", "boost_filesystem"])
 else :
-    flags["LINKKFLAGS"].append("-Wl,--rpath=\\$$ORIGIN")
+    flags["LINKFLAGS"].append("-Wl,--rpath=\\$$ORIGIN")
     
     
 if env["atlaslink"] == "multi" :
