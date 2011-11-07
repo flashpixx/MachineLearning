@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import sys
 sys.path.append("scons")
 import help
 
@@ -93,7 +94,7 @@ if not(os.path.isfile(os.path.join("scons", "platform", platformconfig+".py"))) 
 
 
 env.SConscript( os.path.join("scons", "platform", platformconfig+".py"), exports="env" )
-env.SConscript( os.path.join("scons", "target", "documentation"), exports="env")
-env.SConscript( os.path.join("scons", "target", "cppexample"), exports="env")
-env.SConscript( os.path.join("scons", "target", "librarybuild"), exports="env")
+env.SConscript( os.path.join("scons", "target", "documentation.py"), exports="env")
+env.SConscript( os.path.join("scons", "target", "cppexample.py"), exports="env")
+env.SConscript( os.path.join("scons", "target", "librarybuild.py"), exports="env")
 env.SConscript( os.path.join("scons", "target", "language.py"), exports="env")
