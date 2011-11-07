@@ -40,7 +40,7 @@ elif os.environ.has_key("LD_LIBRARY_PATH") :
 
 flags["LIBS"]         = ["cygboost_system", "cygboost_thread", "cygboost_iostreams", "cygboost_regex"]
 flags["CXXFLAGS"]     = ["-pipe", "-Wall", "-Wextra", "-D BOOST_FILESYSTEM_NO_DEPRECATED", "-D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"]
-
+flags["LINKFLAGS"]    = ["-enable-stdcall-fixup", "-mthread"]
 
 
 if not("javac" in COMMAND_LINE_TARGETS) :
