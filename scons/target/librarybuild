@@ -4,6 +4,7 @@ import urllib2
 import re
 import shutil
 import subprocess
+import glob
 Import("*")
 
 
@@ -124,6 +125,10 @@ def download_atlaslapack(target, source, env) :
     
     downloadfile(downloadurl, os.path.join("install", "lapack.tgz"))
     downloadfile("http://sourceforge.net/projects/math-atlas/files/latest/download?source=files", os.path.join("install", "atlas.tar.bz2"))
+    
+    # extract ATLAS tar here, because errors are ignored
+    os.system("tar xfvj "+os.path.join("install", "atlas.tar.bz2")+" -C install")
+    
     return []
 
 
@@ -135,8 +140,8 @@ def download_ginaccln(target, source, env) :
     
     found = re.search("<a href=\"http://www.ginac.de/(.*).tar.bz2\">this link</a>", html)
     if found == None :
-        print "GiNaC Download URL not found"
-        sys.exit(1)
+        raise RuntimeError("GiNaC Download URL not found")
+    
     downloadurl = found.group(0)
     downloadurl = downloadurl.replace("<a href=\"", "")
     downloadurl = downloadurl.replace("\">this link</a>", "")
@@ -151,8 +156,8 @@ def download_ginaccln(target, source, env) :
     
     found = re.search("<a href=\"(.*).tar.bz2\">from here</a>", html)
     if found == None :
-        print "CLN Download URL not found"
-        sys.exit(1)
+        raise RuntimeError("CLN Download URL not found")
+    
     downloadurl = found.group(0)
     downloadurl = downloadurl.replace("<a href=\"", "")
     downloadurl = "http://www.ginac.de/CLN/" + downloadurl.replace("\">from here</a>", "")
@@ -166,6 +171,155 @@ def download_jsoncpp(target, source, env) :
     return []
 
 
+#=== building libraries ==============================================================================================================
+def build_boost(target, source, env)  :
+    boostpath = glob.glob(os.path.join("install", "boost_*"))
+    if boostpath == None or not(boostpath) :
+        raise RuntimeError("Boost Build Directory not found")
+
+    boostpath     = boostpath[0]
+    
+    # extract the version part
+    boostversion  = boostpath.replace(os.path.join("install", "boost_"), "")
+    boostversion  = boostversion.replace("_", ".")
+
+    # for calling bootstrap.sh change the current work directory
+    runsyscmd("cd "+boostpath+"; ./bootstrap.sh", env)
+    
+    # call the bjam command
+    toolset = "gcc"
+    if env["PLATFORM"].lower() == "darwin" :
+        toolset = "darwin"
+        
+    # if MPI is set, compile Boost with MPI support
+    mpi = ""
+    if env["withmpi"] :
+        oFile = open(os.path.join(boostpath, "tools", "build", "v2", "user-config.jam"), "a+")
+        oFile.write("\n using mpi ;\n")
+        oFile.close()
+        mpi = "--with-mpi"
+            
+    # build the Boost
+    runsyscmd("cd "+boostpath+"; ./b2 "+mpi+" --with-exception --with-filesystem --with-math --with-random --with-regex --with-date_time --with-thread --with-system --with-program_options --with-serialization --with-iostreams --disable-filesystem2 threading=multi runtime-link=shared variant=release toolset="+toolset+" install --prefix="+os.path.abspath(os.path.join(os.curdir, "install", "build", "boost", boostversion)), env)
+
+    # checkout the numerical binding
+    runsyscmd("svn checkout http://svn.boost.org/svn/boost/sandbox/numeric_bindings/ "+os.path.join("install", "build", "boost", "sandbox", "numeric_bindings"), env )
+
+    return []
+    
+    
+def build_hdf(target, source, env) :
+    hdfpath = glob.glob(os.path.join("install", "hdf?-*"))
+    if hdfpath == None or not(hdfpath) :
+        raise RuntimeError("HDF Build Directory not found")
+
+    hdfpath     = hdfpath[0]
+    hdfversion  = hdfpath.replace(os.path.join("install", "hdf"), "")
+
+    runsyscmd( "cd "+hdfpath+"; ./configure --enable-cxx --prefix="+os.path.abspath(os.path.join("install", "build", "hdf", hdfversion))+ "; make; make install", env )
+    return []
+    
+
+def build_atlaslapack(target, source, env) :
+    f = urllib2.urlopen("http://sourceforge.net/projects/math-atlas/files/")
+    html = f.read()
+    f.close()
+
+    found = re.search("<small title=\"(.*)tar.bz2\">(.*)</small>", html)
+    if found == None :
+        raise RuntimeError("ATLAS Version can not be detected")
+
+    atlasversion = found.group(2)
+    atlasversion = atlasversion.replace("atlas", "")
+    atlasversion = atlasversion.replace(".tar.bz2", "")
+
+    ptrwidth = ""
+    if env["atlaspointerwidth"] == "32" :
+        ptrwidth = "-b 32"
+    elif env["atlaspointerwidth"] == "64" :
+        ptrwidth = "-b 64"
+
+    cputhrottle = ""
+    if not(env["atlascputhrottle"]) :
+        cputhrottle = "-Si cputhrchk 0"
+    
+    runsyscmd( "cd "+os.path.join("install", "atlasbuild")+"; ../ATLAS/configure --dylibs "+ptrwidth+" "+cputhrottle+" --with-netlib-lapack-tarfile=../lapack.tgz --prefix="+os.path.abspath(os.path.join("install", "build", "atlas", atlasversion))+ "; make", env )
+    return []
+    
+    
+def soname_atlaslapack(target, source, env) :
+    oFile = open( os.path.join("install", "atlasbuild", "lib", "Makefile"), "r" )
+    makefile = oFile.read()
+    oFile.close()
+    
+    makefile = makefile.replace("(LD) $(LDFLAGS) -shared -soname $(LIBINSTdir)/$(outso) -o $(outso)", "(LD) $(LDFLAGS) -shared -soname $(outso) -o $(outso)")
+
+    oFile = open( os.path.join(os.curdir, "install", "atlasbuild", "lib", "Makefile"), "w" )
+    oFile.write(makefile)
+    oFile.close()
+
+    return []
+
+
+def install_atlaslapack(target, source, env) :
+    runsyscmd( "cd "+os.path.join("install", "atlasbuild")+"; make shared; make install", env )
+    return []
+    
+    
+def build_ginaccln(target, source, env) :
+    clnpath = glob.glob(os.path.join("install", "cln-*"))
+    if clnpath == None or not(clnpath) :
+        raise RuntimeError("CLN Build Directory not found")
+    
+    clnpath     = clnpath[0]
+    clnversion  = clnpath.replace(os.path.join("install", "cln-"), "")
+    
+    ginacpath = glob.glob(os.path.join("install", "ginac-*"))
+    if ginacpath == None or not(ginacpath) :
+        raise RuntimeError("GiNaC Build Directory not found")
+    
+    ginacpath     = ginacpath[0]
+    ginacversion  = ginacpath.replace(os.path.join("install", "ginac-"), "")
+
+    runsyscmd( "cd "+clnpath+"; ./configure --prefix="+os.path.abspath(os.path.join("install", "build", "cln", clnversion))+ "; make; make install", env )
+    runsyscmd( "cd "+ginacpath+"; export CLN_CFLAGS=-I"+os.path.abspath(os.path.join("install", "build", "cln", clnversion, "include"))+"; export CLN_LIBS=\"-L"+os.path.abspath(os.path.join("install", "build", "cln", clnversion, "lib"))+" -lcln\"; ./configure --prefix="+os.path.abspath(os.path.join("install", "build", "ginac", ginacversion))+ "; make; make install", env )
+    return []
+
+
+def build_jsoncpp(target, source, env) :
+    jsonpath = glob.glob(os.path.join("install", "jsoncpp-src-*"))
+    if jsonpath == None or not(jsonpath) :
+        raise RuntimeError("JSON CPP Build Directory not found")
+
+    jsonpath     = jsonpath[0]
+    jsonversion  = jsonpath.replace(os.path.join("install", "jsoncpp-src-"), "")
+    
+    runsyscmd("cd "+jsonpath+"; scons platform=linux-gcc", env)
+    
+    # manual copy of the data
+    try :
+        os.makedirs(os.path.join("install", "build", "jsoncpp", jsonversion))
+    except :
+        pass
+    try :
+        os.makedirs(os.path.join("install", "build", "jsoncpp", jsonversion, "lib"))
+    except :
+        pass
+    try :
+        shutil.copytree(os.path.join(jsonpath, "include"), os.path.join("install", "build", "jsoncpp", jsonversion, "include"))
+    except :
+        pass
+
+    files = []
+    files.extend( getRekusivFiles(os.path.join(jsonpath, "libs"), env["SHLIBSUFFIX"]) )
+    files.extend( getRekusivFiles(os.path.join(jsonpath, "libs"), env["LIBSUFFIX"]) )
+    installpath = os.path.join("install", "build", "jsoncpp", jsonversion, "lib")
+    for i in files :
+        filename =os.path.split(i)[-1]
+        shutil.copy(i, os.path.join(installpath, filename))
+        os.symlink(os.path.join("./", filename), os.path.join(installpath, "libjson" + os.path.splitext(filename)[1]))
+
+    return []
 
 
 #=== target structure ================================================================================================================
@@ -184,39 +338,39 @@ lst.append( env.Command("cleanbeforebuilddir", "", clearbuilddir) )
 #download LAPack & ATLAS, extract & install
 if not("atlas" in skiplist) :
     lst.append( env.Command("downloadlapackatlas", "", download_atlaslapack) )
-#    lst.append( env.Command("mkatlasbuilddir", "", Mkdir(os.path.join("install", "atlasbuild"))) )
-#    lst.append( env.Command("buildatlaslapack", "", build_atlaslapack) )
-#    if env['PLATFORM'].lower() == "posix" or env['PLATFORM'].lower() == "cygwin" :
-#        lst.append( env.Command("sonameatlaslapack", "", soname_atlaslapack) )
-#    lst.append( env.Command("installatlaslapack", "", install_atlaslapack) )
+    lst.append( env.Command("mkatlasbuilddir", "", Mkdir(os.path.join("install", "atlasbuild"))) )
+    lst.append( env.Command("buildatlaslapack", "", build_atlaslapack) )
+    if env['PLATFORM'].lower() == "posix" or env['PLATFORM'].lower() == "cygwin" :
+        lst.append( env.Command("sonameatlaslapack", "", soname_atlaslapack) )
+    lst.append( env.Command("installatlaslapack", "", install_atlaslapack) )
 
 # download Boost, extract & install
 if not("boost" in skiplist) :
     lst.append( env.Command("downloadboost", "", download_boost) )
     lst.append( env.Command("extractboost", "", "tar xfvj "+os.path.join("install", "boost.tar.bz2")+" -C install") )
-#    lst.append( env.Command("buildboost", "", build_boost) )
+    lst.append( env.Command("buildboost", "", build_boost) )
 
 # download HDF, extract & install
 if not("hdf" in skiplist) :
     lst.append( env.Command("downloadhdf", "", download_hdf) )
     lst.append( env.Command("extracthdf", "", "tar xfvj "+os.path.join("install", "hdf.tar.bz2")+" -C install") )
-#    lst.append( env.Command("buildhdf", "", build_hdf) )
+    lst.append( env.Command("buildhdf", "", build_hdf) )
 
 #download GiNaC & CLN, extract & install
 if not("ginac" in skiplist) :
     lst.append( env.Command("downloadginaccln", "", download_ginaccln) )
     lst.append( env.Command("extractginac", "", "tar xfvj "+os.path.join("install", "ginac.tar.bz2")+" -C install") )
     lst.append( env.Command("extractcln", "", "tar xfvj "+os.path.join("install", "cln.tar.bz2")+" -C install") )
-#    lst.append( env.Command("buildginaccln", "", build_ginaccln) )
+    lst.append( env.Command("buildginaccln", "", build_ginaccln) )
 
 #download JSON library, extract & install
 if not("json" in skiplist) :
     lst.append( env.Command("downloadjsoncpp", "", download_jsoncpp) )
     lst.append( env.Command("extractjsoncpp", "", "tar xfvz "+os.path.join("install", "jsoncpp.tar.gz")+" -C install") )
-#    lst.append( env.Command("buildjsoncpp", "", build_jsoncpp) )
+    lst.append( env.Command("buildjsoncpp", "", build_jsoncpp) )
 
 #clear install directories after compiling
-#lst.append( env.Command("cleanafterbuilddir", "", clearbuilddir) )
+lst.append( env.Command("cleanafterbuilddir", "", clearbuilddir) )
 
 env.Alias("librarybuild", lst)
 
