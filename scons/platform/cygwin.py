@@ -23,11 +23,11 @@ Import("*")
 
 flags = {}
 
-
+flags["CPPPATH"] = ["."]
 if os.environ.has_key("CPPPATH") :
-    flags["CPPPATH"] = os.environ["CPPPATH"].split(os.pathsep)
+    flags["CPPPATH"].extend( os.environ["CPPPATH"].split(os.pathsep) )
 elif os.environ.has_key("CPATH") :
-    flags["CPPPATH"] = os.environ["CPATH"].split(os.pathsep)
+    flags["CPPPATH"].extend( os.environ["CPATH"].split(os.pathsep) )
     
 if os.environ.has_key("PATH") :
     flags["LIBPATH"] = os.environ["PATH"].split(os.pathsep)
