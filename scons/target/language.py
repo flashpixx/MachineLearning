@@ -37,7 +37,6 @@ for i in env["CPPSUFFIXES"] :
 # get all strings out of the sources
 updatetargets  = []
 createtargets  = []
-compiletargets = []
 updatetargets.append( env.Command("xgettext", "", "xgettext --output="+os.path.join("tools", "language", "language.po")+" --keyword=_ --language=c++ " + " ".join(sources)) )
 createtargets.extend( updatetargets )
 
@@ -57,9 +56,7 @@ for i in po :
     updatefile = os.path.sep.join(updatefile.split(os.path.sep)[2:]) 
     
     updatetargets.append( env.Command("msgfmt", "", "msgfmt -v -o " + updatefile +" "+ os.path.sep.join(i.split(os.path.sep)[2:]) ) )
-    compiletargets.append( env.Command("msgfmt", "", "msgfmt -v -o " + updatefile +" "+ os.path.sep.join(i.split(os.path.sep)[2:]) ) )
     
 
 env.Alias("updatelanguage", updatetargets)
 env.Alias("createlanguage", createtargets)
-env.Alias("compilelanguage", compiletargets)
