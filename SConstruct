@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import os
-import sys
+sys.path.append("scons")
+import help
 
 #=== CLI parameters ====================================================================================================================
 def createVariables(vars) :
@@ -32,14 +33,15 @@ def createVariables(vars) :
 def cleantarget(env) :
     files = []
     
-    #files.extend( getRekusivFiles(os.curdir, env["OBJSUFFIX"]) )
-    #files.extend( getRekusivFiles(os.curdir, env["SHOBJSUFFIX"]) )
-    #files.extend( getRekusivFiles(os.curdir, env["SHLIBSUFFIX"]) )
-    #files.extend( getRekusivFiles(os.curdir, ".po~") )
-    #files.extend( getRekusivFiles(os.curdir, ".mo") )
-    #files.extend( getRekusivFiles(os.curdir, ".jar") )
-    #files.extend( getRekusivFiles(os.curdir, ".stackdump") )
-    #files.extend( getRekusivFiles(os.curdir, ".core") )
+    files.extend( help.getRekusivFiles(os.curdir, env["OBJSUFFIX"]) )
+    files.extend( help.getRekusivFiles(os.curdir, env["SHOBJSUFFIX"]) )
+    files.extend( help.getRekusivFiles(os.curdir, env["SHLIBSUFFIX"]) )
+    files.extend( help.getRekusivFiles(os.curdir, ".po~") )
+    files.extend( help.getRekusivFiles(os.curdir, ".mo") )
+    files.extend( help.getRekusivFiles(os.curdir, ".jar") )
+    files.extend( help.getRekusivFiles(os.curdir, ".stackdump") )
+    files.extend( help.getRekusivFiles(os.curdir, ".core") )
+    files.extend( help.getRekusivFiles(os.curdir, ".pyc") )
     
     # don't ad the current path, because scons run the directories until "/"
     files.extend( ["build", "documentation", "install"] )
@@ -86,11 +88,11 @@ cleantarget(env)
 
 # adding target scripts
 platformconfig = env["PLATFORM"].lower()
-if not(os.path.isfile(os.path.join("scons", "platform", platformconfig))) :
+if not(os.path.isfile(os.path.join("scons", "platform", platformconfig+".py"))) :
     raise ImportError("platform configuration script ["+platformconfig+"] not found")
 
 
-env.SConscript( os.path.join("scons", "platform", platformconfig), exports="env" )
+env.SConscript( os.path.join("scons", "platform", platformconfig+".py"), exports="env" )
 env.SConscript( os.path.join("scons", "target", "documentation"), exports="env")
 env.SConscript( os.path.join("scons", "target", "cppexample"), exports="env")
 env.SConscript( os.path.join("scons", "target", "librarybuild"), exports="env")

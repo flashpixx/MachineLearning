@@ -18,10 +18,12 @@
 ############################################################################
 
 # -*- coding: utf-8 -*-
+
+import os
 import sys
 sys.path.append("..")
 import help
-import os
+
 Import("*")
  
  
