@@ -49,3 +49,11 @@ def getRekusivFiles(startdir, ending, pdontuse=[], pShowPath=True, pAbsPath=Fals
                 clst.append(i)
 
     return clst
+    
+    
+# creates a list with unique entries
+def unique(seq):
+    keys = {}
+    for e in seq:
+        keys[e] = 1
+    return keys.keys()

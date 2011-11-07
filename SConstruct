@@ -98,3 +98,4 @@ env.SConscript( os.path.join("scons", "target", "documentation.py"), exports="en
 env.SConscript( os.path.join("scons", "target", "cppexample.py"), exports="env")
 env.SConscript( os.path.join("scons", "target", "librarybuild.py"), exports="env")
 env.SConscript( os.path.join("scons", "target", "language.py"), exports="env")
+env.SConscript( os.path.join("scons", "target", "java.py"), exports="env")
