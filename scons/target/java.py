@@ -116,7 +116,7 @@ if env["PLATFORM"].lower() == "cygwin" :
 for n in libs :
     libname = ""
     if env["PLATFORM"].lower() == "darwin" or env["PLATFORM"].lower() == "posix" :
-        libname = env["LIBPREFIX"] + n + env["SHLIBSUFFIX"]
+        libname = str(env["LIBPREFIX"]) + str(n) + str(env["SHLIBSUFFIX"])
     elif env["PLATFORM"].lower() == "cygwin" :
         libname = n + env["SHLIBSUFFIX"]
 
