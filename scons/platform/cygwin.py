@@ -22,3 +22,79 @@ import os
 Import("*")
 
 flags = {}
+
+
+if os.environ.has_key("CPPPATH") :
+    flags["CPPPATH"] = os.environ["CPPPATH"].split(os.pathsep)
+elif os.environ.has_key("CPATH") :
+    flags["CPPPATH"] = os.environ["CPATH"].split(os.pathsep)
+    
+if os.environ.has_key("PATH") :
+    flags["LIBPATH"] = os.environ["PATH"].split(os.pathsep)
+elif os.environ.has_key("LIBRARY_PATH") :
+    flags["LIBPATH"] = os.environ["LIBRARY_PATH"].split(os.pathsep)
+elif os.environ.has_key("LD_LIBRARY_PATH") :
+    flags["LIBPATH"] = os.environ["LD_LIBRARY_PATH"].split(os.pathsep)
+
+
+
+flags["LIBS"]         = ["cygboost_system", "cygboost_thread", "cygboost_iostreams", "cygboost_regex"]
+flags["CXXFLAGS"]     = ["-pipe", "-Wall", "-Wextra", "-D BOOST_FILESYSTEM_NO_DEPRECATED", "-D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"]
+
+
+
+if not("javac" in COMMAND_LINE_TARGETS) :
+    flags["LIBS"].extend(["cygboost_program_options", "boost_exception", "cygboost_filesystem"])
+    
+#Windows Version options see http://msdn.microsoft.com/en-us/library/aa383745%28v=vs.85%29.aspx
+if env["winver"] == "win7" :
+    flags["CXXFLAGS"].append("-D _WIN32_WINNT=0x0601")
+elif env["winver"] == "srv2008" :
+    flags["CXXFLAGS"].append("-D _WIN32_WINNT=0x0600")
+elif env["winver"] == "vista" :
+    flags["CXXFLAGS"].append("-D _WIN32_WINNT=0x0600")
+elif env["winver"] == "srv2003sp1" :
+    flags["CXXFLAGS"].append("-D _WIN32_WINNT=0x0502")
+elif env["winver"] == "xpsp2" :
+    flags["CXXFLAGS"].append("-D _WIN32_WINNT=0x0502")
+elif env["winver"] == "srv2003" :
+    flags["CXXFLAGS"].append("-D _WIN32_WINNT=0x0501")
+elif env["winver"] == "xp" :
+    flags["CXXFLAGS"].append("-D _WIN32_WINNT=0x0501")
+elif env["winver"] == "w2000" :
+    flags["CXXFLAGS"].append("-D _WIN32_WINNT=0x0500")
+    
+# Atlas build creates a static library under Cygwin, so we link directly without the "atlaslink" option
+# Library sequence must be preserved !!
+flags["LIBS"].extend(["lapack", "cblas", "f77blas", "atlas", "gfortran"])
+    
+if env["withdebug"] :
+    flags["CXXFLAGS"].append("-g")
+else :
+    flags["CXXFLAGS"].extend(["-D NDEBUG", "-D BOOST_UBLAS_NDEBUG"])
+
+if env["withrandomdevice"] :
+    flags["CXXFLAGS"].append("-D MACHINELEARNING_RANDOMDEVICE")
+    flags["LIBS"].append("cygboost_random");
+
+if env["withsources"] :
+    flags["CXXFLAGS"].extend(["-D MACHINELEARNING_SOURCES", "-D MACHINELEARNING_SOURCES_TWITTER", "-D __USE_W32_SOCKETS"])
+    flags["LIBS"].extend( ["cygxml2-2", "ws2_32", "json"] )
+
+if env["withfiles"] :
+    flags["CXXFLAGS"].extend(["-D MACHINELEARNING_FILES", "-D MACHINELEARNING_FILES_HDF"])
+    flags["LIBS"].extend( ["hdf5_cpp", "hdf5"] )
+
+if env["withsymbolicmath"] :
+    flags["CXXFLAGS"].append("-D MACHINELEARNING_SYMBOLICMATH")
+    flags["LIBS"].append("ginac")
+
+if env["withoptimize"] :
+    flags["CXXFLAGS"].extend(["-O2", "-Os", "-s", "-mfpmath=sse", "-finline-functions", "-mtune="+env["cputype"]])
+
+if env["withlogger"] :
+    flags["CXXFLAGS"].append("-D MACHINELEARNING_LOGGER")
+
+
+
+env.MergeFlags(flags)
