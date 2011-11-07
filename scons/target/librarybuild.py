@@ -24,6 +24,7 @@ import re
 import shutil
 import subprocess
 import glob
+import sys
 Import("*")
 
 
