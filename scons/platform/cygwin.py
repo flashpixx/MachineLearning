@@ -23,7 +23,9 @@ Import("*")
 
 flags = {}
 
-flags["CPPPATH"] = ["."]
+
+# add the framework path to the CPPPATH, because the machinelearning.h can not be found
+flags["CPPPATH"] = [os.path.join("..", "..")]
 if os.environ.has_key("CPPPATH") :
     flags["CPPPATH"].extend( os.environ["CPPPATH"].split(os.pathsep) )
 elif os.environ.has_key("CPATH") :
