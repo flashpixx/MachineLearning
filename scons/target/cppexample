@@ -1,0 +1,107 @@
+# -*- coding: utf-8 -*-
+import os
+Import("*")
+
+
+# create target of a list of sources
+def createTarget(env, path, sources, framework) :
+    lst = []
+    if sources.count == 0 :
+        return
+
+    add = []
+    for i in framework :
+        add.append( os.path.join("..", "..", i) )
+
+    for i in sources :
+        compilesource = [os.path.join("..", "..", "examples", path, i)]
+        compilesource.extend(add)
+
+        lst.append( env.Program( target=os.path.join("#build", os.path.splitext(i)[0]), source=compilesource ) )
+
+    return lst
+    
+    
+#=====================================================================================================================================
+# default cpps that must be compiled on each run
+framework = []
+if env["withlogger"] or env["withrandomdevice"] :
+    framework.append( "machinelearning.cpp" )
+
+
+
+# genetic algorithm examples
+listGA = createTarget(env, "geneticalgorithm", ["knapsack.cpp"], framework)
+
+# other examples
+srcOther = []
+if env["withfiles"] and env["withsources"] :
+    srcOther.extend( ["mds_nntp.cpp", "mds_wikipedia.cpp", "mds_twitter.cpp"] )
+if env["withfiles"] :
+    srcOther.append("mds_file.cpp")
+listOther = createTarget(env, "other", srcOther, framework)
+
+# classifier examples
+srcClassifier = []
+if env["withfiles"] :
+    srcClassifier.extend( ["lazy.cpp"] )
+listClassifier = createTarget(env, "classifier", srcClassifier, framework)
+
+# distance examples
+srcDistance = []
+if env["withfiles"] :
+    srcDistance.extend( ["ncd.cpp"] )
+listDistance = createTarget(env, "distance", srcDistance, framework)
+
+# reduce examples
+srcReduce = []
+if env["withfiles"] :
+    srcReduce.extend( ["lda.cpp", "mds.cpp", "pca.cpp"] )
+listReduce = createTarget(env, "reducing", srcReduce, framework)
+
+#clustering examples
+srcCluster = []
+if env["withfiles"] :
+    srcCluster.extend( ["rlvq.cpp", "kmeans.cpp", "neuralgas.cpp", "patch_neuralgas.cpp", "relational_neuralgas.cpp", "spectral.cpp"] )
+listCluster = createTarget(env, "clustering", srcCluster, framework)
+
+srcSources = []
+if env["withsources"] :
+    srcSources.extend( ["twitter.cpp", "newsgroup.cpp", "wikipedia.cpp"] )
+if env["withfiles"] :
+    srcSources.append( "cloud.cpp" )
+listSources = createTarget(env, "sources", srcSources, framework)
+
+# create language files if multilanguage is used
+#if env["withmultilanguage"] :
+#    lst = []
+#    lang = getRekusivFiles( os.path.join(os.curdir, "tools", "language"), ".po")
+#    for i in lang :
+#        lst.append( env.Command("msgfmt", "", "msgfmt -v -o " + os.path.join(os.path.dirname(i),"machinelearning.mo") +" "+ i ) )
+#        src      = i.split(os.path.sep)[1:]
+#        src[-1]  = "machinelearning.mo"
+
+#        langfiles     = i.split(os.path.sep)[3:]
+#        langfiles[-1] = "machinelearning.mo"            
+#        target = ["build", "language"]
+#        target.extend(langfiles)
+        
+#        lst.append( env.Command("mkdirlang", "", Mkdir(os.path.dirname(os.path.sep.join(target)))) )
+#        lst.append( env.Command("copylang", "", Copy(os.path.sep.join(target), os.path.sep.join(src))) )
+        
+#    listGA.extend( lst )
+#    listOther.extend( lst )
+#    listClassifier.extend( lst )
+#    listDistance.extend( lst )
+#    listReduce.extend( lst )
+#    listCluster.extend( lst )
+#    listSources.extend( lst )
+
+# adding targets
+env.Alias("ga", listGA)
+env.Alias("other", listOther)
+env.Alias("classifier", listClassifier)
+env.Alias("distance", listDistance)
+env.Alias("reducing", listReduce)
+env.Alias("clustering", listCluster)
+env.Alias("sources", listSources)

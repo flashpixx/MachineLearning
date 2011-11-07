@@ -1,0 +1,6 @@
+# -*- coding: utf-8 -*-
+Import("*")
+
+
+env.Alias("documentation", env.Command("doxygen", "", "doxygen documentation.doxyfile"))
+
