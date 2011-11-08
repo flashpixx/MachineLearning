@@ -218,6 +218,11 @@ def download_ginaccln(target, source, env) :
 def download_jsoncpp(target, source, env) :
     downloadfile("http://sourceforge.net/projects/jsoncpp/files/latest/download?source=files", os.path.join("install", "jsoncpp.tar.gz"))
     return []
+    
+
+def download_xml(target, source, env) :
+    downloadfile("ftp://xmlsoft.org/libxml2/LATEST_LIBXML2", os.path.join("install", "xml.tar.gz"))
+    return []
 
 
 #=== building libraries ==============================================================================================================
@@ -443,6 +448,19 @@ def build_jsoncpp(target, source, env) :
         os.symlink(os.path.join("./", filename), os.path.join(installpath, "libjson" + os.path.splitext(filename)[1]))
 
     return []
+    
+    
+def build_xml(target, source, env) :
+    xmlpath = glob.glob(os.path.join("install", "libxml2-*"))
+    if xmlpath == None or not(xmlpath) :
+        raise RuntimeError("XML Build Directory not found")
+    
+    xmlpath     = xmlpath[0]
+    xmlversion  = xmlpath.replace(os.path.join("install", "libxml2-"), "")
+    
+    runsyscmd( "cd "+xmlpath+"; ./configure --prefix="+os.path.abspath(os.path.join("install", "build", "xml2", xmlversion))+ "; make; make install", env )
+    return []
+
 
 
 #=== target structure ================================================================================================================
@@ -496,6 +514,13 @@ if not("json" in skiplist) :
     lst.append( env.Command("downloadjsoncpp", "", download_jsoncpp) )
     lst.append( env.Command("extractjsoncpp", "", "tar xfvz "+os.path.join("install", "jsoncpp.tar.gz")+" -C install") )
     lst.append( env.Command("buildjsoncpp", "", build_jsoncpp) )
+    
+# download libxml2, extract & install (only cygwin)
+if env["PLATFORM"].lower() == "cygwin" and not("xml" in skiplist) :
+    lst.append( env.Command("downloadxml", "", download_xml) )
+    lst.append( env.Command("extractjsoncpp", "", "tar xfvz "+os.path.join("install", "xml.tar.gz")+" -C install") )
+    lst.append( env.Command("buildxml", "", build_xml) )
+
 
 #clear install directories after compiling
 lst.append( env.Command("cleanafterbuilddir", "", clearbuilddir) )
