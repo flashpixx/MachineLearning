@@ -24,17 +24,19 @@ Import("*")
 flags = {}
 
 
+flags["CPPPATH"] = []
 if os.environ.has_key("CPPPATH") :
-    flags["CPPPATH"] = os.environ["CPPPATH"].split(os.pathsep)
+    flags["CPPPATH"].extend(os.environ["CPPPATH"].split(os.pathsep))
 elif os.environ.has_key("CPATH") :
-    flags["CPPPATH"] = os.environ["CPATH"].split(os.pathsep)
+    flags["CPPPATH"].extend(os.environ["CPATH"].split(os.pathsep))
     
+flags["LIBPATH"] = []
 if os.environ.has_key("DYLD_LIBRARY_PATH") :
-    flags["LIBPATH"] = os.environ["DYLD_LIBRARY_PATH"].split(os.pathsep)
+    flags["LIBPATH"].extend(os.environ["DYLD_LIBRARY_PATH"].split(os.pathsep))
 elif os.environ.has_key("LIBRARY_PATH") :
-    flags["LIBPATH"] = os.environ["LIBRARY_PATH"].split(os.pathsep)
+    flags["LIBPATH"].extend(os.environ["LIBRARY_PATH"].split(os.pathsep))
 elif os.environ.has_key("LD_LIBRARY_PATH") :
-    flags["LIBPATH"] = os.environ["LD_LIBRARY_PATH"].split(os.pathsep)
+    flags["LIBPATH"].extend(os.environ["LD_LIBRARY_PATH"].split(os.pathsep))
     
 
     
