@@ -95,11 +95,11 @@ if env["withsources"] :
 
 if env["withfiles"] :
     flags["CXXFLAGS"].extend(["-D MACHINELEARNING_FILES", "-D MACHINELEARNING_FILES_HDF"])
-    flags["LIBS"].extend( ["hdf5_cpp", "hdf5"] )
+    flags["LIBS"].extend( ["libhdf5_cpp", "libhdf5"] )
 
 if env["withsymbolicmath"] :
     flags["CXXFLAGS"].append("-D MACHINELEARNING_SYMBOLICMATH")
-    flags["LIBS"].append("ginac")
+    flags["LIBS"].append("libginac")
 
 if env["withoptimize"] :
     flags["CXXFLAGS"].extend(["-O2", "-Os", "-s", "-mfpmath=sse", "-finline-functions", "-mtune="+env["cputype"]])
