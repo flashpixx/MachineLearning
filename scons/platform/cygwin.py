@@ -41,11 +41,11 @@ elif os.environ.has_key("LD_LIBRARY_PATH") :
 
 flags["CXXFLAGS"] = []
 if os.environ.has_key("CXXFLAGS") :
-    flags.extend(os.environ["CXXFLAGS"].split(os.pathsep))
+    flags["CXXFLAGS"].extend(os.environ["CXXFLAGS"].split(" "))
 
 flags["LINKFLAGS"] = []
 if os.environ.has_key("LDFLAGS") :
-    flags.extend(os.environ["LDFLAGS"].split(os.pathsep))
+    flags["LINKFLAGS"].extend(os.environ["LDFLAGS"].split(" "))
 
 
 

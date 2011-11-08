@@ -87,13 +87,21 @@ if os.environ.has_key("PATH") :
     env["ENV"]["PATH"] = [env["ENV"]["PATH"], os.environ["PATH"]]
 cleantarget(env)
 
-# adding target scripts
+# adding platform scripts
 platformconfig = env["PLATFORM"].lower()
 if not(os.path.isfile(os.path.join("scons", "platform", platformconfig+".py"))) :
     raise ImportError("platform configuration script ["+platformconfig+"] not found")
-
-
+    
 env.SConscript( os.path.join("scons", "platform", platformconfig+".py"), exports="env" )
+    
+# uniquify each option, that is setup with data of the system environment
+env["CXXFLAGS"]   = help.unique(env["CXXFLAGS"])
+env["LINKFLAGS"]  = help.unique(env["LINKFLAGS"])
+env["LIBS"]       = help.unique(env["LIBS"])
+env["LIBPATH"]    = help.unique(env["LIBPATH"])
+env["CPPPATH"]    = help.unique(env["CPPPATH"])
+
+# call target scripts
 env.SConscript( os.path.join("scons", "target", "documentation.py"), exports="env")
 env.SConscript( os.path.join("scons", "target", "cppexample.py"), exports="env")
 env.SConscript( os.path.join("scons", "target", "librarybuild.py"), exports="env")
