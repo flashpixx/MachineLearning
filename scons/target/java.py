@@ -109,11 +109,17 @@ if env["PLATFORM"].lower() == "darwin" :
 
 
 # copy external libraries in the native directory for Jar adding (copy works only if target directories exists)
-dirs      = env["LIBPATH"]
+dirs      = []
+if env.has_key("LIBPATH")
+    dirs.extend(env["LIBPATH"])
+
 libs      = []
+if env.has_key("LIBS")
+    libs.extend(env["LIBS"])
+
 copyfiles = []
 
-libs.extend(env["LIBS"])
+
 if env["PLATFORM"].lower() == "cygwin" :
     libs.extend(["cygwin1", "cyggcc_s-1", "cyggfortran-3", "cygstdc++-6"])
 
