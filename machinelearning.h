@@ -126,7 +126,7 @@
  * <li><dfn>BOOST_FILESYSTEM_NO_DEPRECATED</dfn> disabled deprecated code</li>
  * </ul>
  *
- * @subsection scons compiling with scons
+ * @subsection scons scons build environment
  * The framework supports Scons for compiling. The script reads the environment (Linux, OS X & Microsoft) and uses the
  * plattform specified options for compiling the sources. For compiling the test cpp files in the test directory the following option can
  * be set (Hierarchical Data Format is needed) [see options and default values with <dfn>scons -Q -h</dfn>]
@@ -145,6 +145,9 @@
  * <li><dfn>skipbuild</dfn> disables / skips the automatic build of a library [allowd values: all, none, atlas, boost, hdf, ginac, json]</li> 
  * <li><dfn>skipbuilderror</dfn> if an error occures during the building process, a commandline input for aborting or continuing is needed, with this option the input can be suppressed (default disable)</li>
  * </ul>
+ * The <dfn>SConstruct</dfn> script, which is the entry point to the compiler calls, is stored in the framework main directory. Under the <dfn>scons</dfn> directory all other script (target, helper, platform)
+ * are stored. For each target a own script exists under <dfn>scons/target</dfn>, eg all Java buildsteps are created with the script <dfn>scons/target/java.py</dfn>. For each platform a own script is stored
+ * under <dfn>scons/platform</dfn> that is used for setting the platform default compile option like linked libraries, pathes, ...
  *
  * @subsection targets build targets
  * The scons script supports different targets for building the examples. The call can be supplemented with the parameters above. Each subdirectory within the example directory
