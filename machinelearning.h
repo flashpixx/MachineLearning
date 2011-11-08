@@ -68,7 +68,7 @@
  * </ul>
  * For manual installation of the library you can follow the short @subpage installationnotes / A default library installation can be created with the command <dfn>scons librarybuild</dfn>
  * with the optional ATLAS building parameters. After compiling the directory <dfn>install/build</dfn> must be moved to a directory in that all libraries should be stored, because
- * a clean-target removes the <dfn>install</dfn> directory.
+ * a clean-target removes the <dfn>install</dfn> directory. The default installation need the make-tools (make), gcc / g++ (C and C++ compiler) and gfortran (Fortran compiler).
  * The framework was tested under: Mac OS X Leopard (10.5), Mac OS X Snow Leopard (10.6), Mac OS X Lion (10.7), Ubuntu Lucid Lynx (10.04), Gentoo Linux (stable / unstable) and Microsoft
  * Windows 7 (with Cygwin)
  *
