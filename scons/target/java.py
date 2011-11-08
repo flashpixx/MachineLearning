@@ -110,11 +110,11 @@ if env["PLATFORM"].lower() == "darwin" :
 
 # copy external libraries in the native directory for Jar adding (copy works only if target directories exists)
 dirs      = []
-if env.has_key("LIBPATH")
+if env.has_key("LIBPATH") :
     dirs.extend(env["LIBPATH"])
 
 libs      = []
-if env.has_key("LIBS")
+if env.has_key("LIBS") :
     libs.extend(env["LIBS"])
 
 copyfiles = []
