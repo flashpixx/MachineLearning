@@ -95,7 +95,7 @@ if not(os.path.isfile(os.path.join("scons", "platform", platformconfig+".py"))) 
 env.SConscript( os.path.join("scons", "platform", platformconfig+".py"), exports="env" )
 
 # adding the main path to the CPPPATH
-env["CPPPATH"].append(".")
+env["CPPPATH"].append(os.path.abspath(os.curdir))
     
 # uniquify each option, that is setup with data of the system environment
 env["CXXFLAGS"]   = help.unique(env["CXXFLAGS"])
