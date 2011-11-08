@@ -220,7 +220,7 @@ def build_boost(target, source, env)  :
         mpi = "--with-mpi"
             
     # build the Boost
-    runsyscmd("cd "+boostpath+"; ./b2 "+mpi+" --with-exception --with-filesystem --with-math --with-random --with-regex --with-date_time --with-thread --with-system --with-program_options --with-serialization --with-iostreams --disable-filesystem2 threading=multi runtime-link=shared variant=release toolset="+toolset+" install --prefix="+os.path.abspath(os.path.join(os.curdir, "install", "build", "boost", boostversion)), env)
+    runsyscmd("cd "+boostpath+"; ./b2 "+mpi+" --with-exception --with-filesystem --with-math --with-random --with-regex --with-date_time --with-thread --with-system --with-program_options --with-serialization --with-iostreams --disable-filesystem2 threading=multi runtime-link=shared variant=release toolset="+toolset+" install --prefix="+os.path.abspath(os.path.join("install", "build", "boost", boostversion)), env)
 
     # checkout the numerical binding
     runsyscmd("svn checkout http://svn.boost.org/svn/boost/sandbox/numeric_bindings/ "+os.path.join("install", "build", "boost", "sandbox", "numeric_bindings"), env )
@@ -274,7 +274,7 @@ def soname_atlaslapack(target, source, env) :
     
     makefile = makefile.replace("(LD) $(LDFLAGS) -shared -soname $(LIBINSTdir)/$(outso) -o $(outso)", "(LD) $(LDFLAGS) -shared -soname $(outso) -o $(outso)")
 
-    oFile = open( os.path.join(os.curdir, "install", "atlasbuild", "lib", "Makefile"), "w" )
+    oFile = open( os.path.join("install", "atlasbuild", "lib", "Makefile"), "w" )
     oFile.write(makefile)
     oFile.close()
 
@@ -313,6 +313,21 @@ def build_jsoncpp(target, source, env) :
 
     jsonpath     = jsonpath[0]
     jsonversion  = jsonpath.replace(os.path.join("install", "jsoncpp-src-"), "")
+    
+    #on cygwin the SConstruct file must be changed, otherwise it creates a build error
+    if env['PLATFORM'].lower() == "cygwin" :
+        oFile = open( os.path.join(jsonpath, "SConstruct"), "r" )
+        makefile = oFile.read()
+        oFile.close()
+    
+        makefile = makefile.replace("buildProjectInDirectory( 'src/jsontestrunner' )", "")
+        makefile = makefile.replace("buildProjectInDirectory( 'src/test_lib_json' )", "")
+
+        oFile = open( os.path.join(jsonpath, "SConstruct"), "w" )
+        oFile.write(makefile)
+        oFile.close()
+    
+
     
     runsyscmd("cd "+jsonpath+"; scons platform=linux-gcc", env)
     
