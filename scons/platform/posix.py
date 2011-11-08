@@ -35,6 +35,14 @@ if os.environ.has_key("LIBRARY_PATH") :
 elif os.environ.has_key("LD_LIBRARY_PATH") :
     flags["LIBPATH"].extend(os.environ["LD_LIBRARY_PATH"].split(os.pathsep))
     
+flags["CXXFLAGS"] = []
+if os.environ.has_key("CXXFLAGS") :
+    flags.extend(os.environ["CXXFLAGS"].split(os.pathsep))
+
+flags["LINKFLAGS"] = []
+if os.environ.has_key("LDFLAGS") :
+    flags.extend(os.environ["LDFLAGS"].split(os.pathsep))
+    
 
     
 flags["LIBS"]        = ["boost_system", "boost_thread", "boost_iostreams", "boost_regex"]
