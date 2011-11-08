@@ -80,6 +80,35 @@ def clearbuilddir(target, source, env) :
 
 #=== download packages ===============================================================================================================
 def download_boost(target, source, env)  :
+    # under Cygwin the BZip2 and ZLib must be installed so we do this first
+    if env["PLATFORM"].lower() == "cygwin" :
+        # get ZLib
+        f = urllib2.urlopen("http://www.zlib.net/")
+        html = f.read()
+        f.close()
+
+        found = re.search("http://zlib.net/zlib-(.*).tar.gz", html)
+        if found == None :
+            raise RuntimeError("ZLib Download URL not found")
+        downloadfile(found.group(0), os.path.join("install", "zlib.tar.gz"))
+       
+        # get BZip2
+        f = urllib2.urlopen("http://www.bzip.org/downloads.html")
+        html = f.read()
+        f.close()
+        
+        found = re.search("<a href=\"/(.*)/bzip2-(.*).tar.gz\">", html)
+        if found == None :
+            raise RuntimeError("BZip2 Download URL not found")
+        
+        downloadurl = found.group(0)
+        downloadurl = downloadurl.replace("<a href=\"", "")
+        downloadurl = downloadurl.replace("\">", "")
+        downloadurl = "http://www.bzip.org" + downloadurl
+        
+        downloadfile(downloadurl, os.path.join("install", "bzip2.tar.gz"))
+        
+
     # read download path of the Boost (latest version)
     f = urllib2.urlopen("http://www.boost.org/users/download/")
     html = f.read()
@@ -219,12 +248,71 @@ def build_boost(target, source, env)  :
         oFile.close()
         mpi = "--with-mpi"
             
-    # build the Boost
-    runsyscmd("cd "+boostpath+"; ./b2 "+mpi+" --with-exception --with-filesystem --with-math --with-random --with-regex --with-date_time --with-thread --with-system --with-program_options --with-serialization --with-iostreams --disable-filesystem2 threading=multi runtime-link=shared variant=release toolset="+toolset+" install --prefix="+os.path.abspath(os.path.join("install", "build", "boost", boostversion)), env)
+    # build the Boost (on Cygwin the path to BZip2 and ZLib ist set manually)
+    zipprefix = ""
+    if env["PLATFORM"].lower() == "cygwin" :
+        zipprefix += "export BZIP2_BINARY=bz2; export ZLIB_BINARY=z; "
+        
+        zlibpath = glob.glob(os.path.join("install", "build", "zlib", "*"))
+        if zlibpath == None or not(zlibpath) :
+            raise RuntimeError("ZLib Install Directory not found")
+        zlibpath = zlibpath[0]
+            
+        zipprefix += "export ZLIB_INCLUDE="+os.path.abspath(os.path.join(zlibpath, "include"))+"; "
+        zipprefix += "export ZLIB_LIBPATH="+os.path.abspath(os.path.join(zlibpath, "lib"))+"; "
+        
+        bzippath = glob.glob(os.path.join("install", "build", "bzip2", "*"))
+        if bzippath == None or not(bzippath) :
+            raise RuntimeError("ZLib Install Directory not found")
+        bzippath = bzippath[0]
+
+        zipprefix += "export BZIP2_INCLUDE="+os.path.abspath(os.path.join(bzippath, "include"))+"; "
+        zipprefix += "export BZIP2_LIBPATH="+os.path.abspath(os.path.join(bzippath, "lib"))+"; "
+    
+    runsyscmd(zipprefix+"cd "+boostpath+"; ./b2 "+mpi+" --with-exception --with-filesystem --with-math --with-random --with-regex --with-date_time --with-thread --with-system --with-program_options --with-serialization --with-iostreams --disable-filesystem2 threading=multi runtime-link=shared variant=release toolset="+toolset+" install --prefix="+os.path.abspath(os.path.join("install", "build", "boost", boostversion)), env)
 
     # checkout the numerical binding
     runsyscmd("svn checkout http://svn.boost.org/svn/boost/sandbox/numeric_bindings/ "+os.path.join("install", "build", "boost", "sandbox", "numeric_bindings"), env )
 
+    return []
+    
+    
+def build_zlib(target, source, env) :
+    zlibpath = glob.glob(os.path.join("install", "zlib-*"))
+    if zlibpath == None or not(zlibpath) :
+        raise RuntimeError("ZLib Build Directory not found")
+
+    zlibpath     = zlibpath[0]
+    zlibversion  = zlibpath.replace(os.path.join("install", "zlib-"), "")
+
+    # the "make install" creates problems under Cygwin so do it manually
+    runsyscmd( "cd "+zlibpath+"; ./configure --prefix="+os.path.abspath(os.path.join("install", "build", "zlib", zlibversion))+ "; make", env )
+    
+    # do install and copy headerfiles
+    os.system( "cd "+zlibpath+"; make install" )
+    
+    try :
+        os.makedirs(os.path.join("install", "build", "zlib", zlibversion, "include"))
+    except :
+        pass
+    try :
+        headerfiles = glob.glob(os.path.join(zlibpath, "*.h"))
+        for i in headerfiles :
+            shutil.copyfile(i, os.path.join("install", "build", "zlib", zlibversion, "include", os.path.basename(i)))
+    except :
+        pass
+    return []
+    
+
+def build_bzip2(target, source, env) :
+    bzippath = glob.glob(os.path.join("install", "bzip2-*"))
+    if bzippath == None or not(bzippath) :
+        raise RuntimeError("BZip2 Build Directory not found")
+
+    bzippath     = bzippath[0]
+    bzipversion  = bzippath.replace(os.path.join("install", "bzip2-"), "")
+
+    runsyscmd( "cd "+bzippath+"; make; make install PREFIX="+os.path.abspath(os.path.join("install", "build", "bzip2", bzipversion)), env )
     return []
     
     
@@ -315,7 +403,7 @@ def build_jsoncpp(target, source, env) :
     jsonversion  = jsonpath.replace(os.path.join("install", "jsoncpp-src-"), "")
     
     #on cygwin the SConstruct file must be changed, otherwise it creates a build error
-    if env['PLATFORM'].lower() == "cygwin" :
+    if env["PLATFORM"].lower() == "cygwin" :
         oFile = open( os.path.join(jsonpath, "SConstruct"), "r" )
         makefile = oFile.read()
         oFile.close()
@@ -368,20 +456,25 @@ lst.append( env.Command("mkinstalldir", "", Mkdir("install")) )
 lst.append( env.Command("mkbuilddir", "", Mkdir(os.path.join("install", "build"))) )
 
 #clear install directories before compiling
-lst.append( env.Command("cleanbeforebuilddir", "", clearbuilddir) )
+#lst.append( env.Command("cleanbeforebuilddir", "", clearbuilddir) )
 
 #download LAPack & ATLAS, extract & install
 if not("atlas" in skiplist) :
     lst.append( env.Command("downloadlapackatlas", "", download_atlaslapack) )
     lst.append( env.Command("mkatlasbuilddir", "", Mkdir(os.path.join("install", "atlasbuild"))) )
     lst.append( env.Command("buildatlaslapack", "", build_atlaslapack) )
-    if env['PLATFORM'].lower() == "posix" or env['PLATFORM'].lower() == "cygwin" :
+    if env["PLATFORM"].lower() == "posix" or env["PLATFORM"].lower() == "cygwin" :
         lst.append( env.Command("sonameatlaslapack", "", soname_atlaslapack) )
     lst.append( env.Command("installatlaslapack", "", install_atlaslapack) )
 
 # download Boost, extract & install
 if not("boost" in skiplist) :
     lst.append( env.Command("downloadboost", "", download_boost) )
+    if env["PLATFORM"].lower() == "cygwin" :
+        lst.append( env.Command("extractzlib", "", "tar xfvz "+os.path.join("install", "zlib.tar.gz")+" -C install") )
+        lst.append( env.Command("buildzlib", "", build_zlib) )
+        lst.append( env.Command("extractbzip2", "", "tar xfvz "+os.path.join("install", "bzip2.tar.gz")+" -C install") )
+        lst.append( env.Command("buildbzip2", "", build_bzip2) )
     lst.append( env.Command("extractboost", "", "tar xfvj "+os.path.join("install", "boost.tar.bz2")+" -C install") )
     lst.append( env.Command("buildboost", "", build_boost) )
 
@@ -408,9 +501,3 @@ if not("json" in skiplist) :
 lst.append( env.Command("cleanafterbuilddir", "", clearbuilddir) )
 
 env.Alias("librarybuild", lst)
-
-
-
-
-
-

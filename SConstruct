@@ -94,15 +94,20 @@ if not(os.path.isfile(os.path.join("scons", "platform", platformconfig+".py"))) 
     
 env.SConscript( os.path.join("scons", "platform", platformconfig+".py"), exports="env" )
 
-# adding the main path to the CPPPATH
-env["CPPPATH"].append(os.path.abspath(os.curdir))
-    
-# uniquify each option, that is setup with data of the system environment
-env["CXXFLAGS"]   = help.unique(env["CXXFLAGS"])
-env["LINKFLAGS"]  = help.unique(env["LINKFLAGS"])
-env["LIBS"]       = help.unique(env["LIBS"])
-env["LIBPATH"]    = help.unique(env["LIBPATH"])
-env["CPPPATH"]    = help.unique(env["CPPPATH"])
+# adding the main path to the CPPPATH and uniquify each option, 
+# that is setup with data of the system environment
+if env.has_key("CPPPATH") :
+    env["CPPPATH"].append(os.path.abspath(os.curdir))
+    env["CPPPATH"]    = help.unique(env["CPPPATH"])
+if env.has_key("CXXFLAGS") :
+    env["CXXFLAGS"]   = help.unique(env["CXXFLAGS"])
+if env.has_key("LINKFLAGS") :    
+    env["LINKFLAGS"]  = help.unique(env["LINKFLAGS"])
+if env.has_key("LIBS") :
+    env["LIBS"]       = help.unique(env["LIBS"])
+if env.has_key("LIBPATH") :
+    env["LIBPATH"]    = help.unique(env["LIBPATH"])
+
 
 # call target scripts
 env.SConscript( os.path.join("scons", "target", "documentation.py"), exports="env")
