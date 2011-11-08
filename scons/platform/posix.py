@@ -60,7 +60,7 @@ else :
 if env["atlaslink"] == "multi" :
     flags["LIBS"].extend(["lapack", "ptcblas", "ptf77blas", "atlas"])
 else :
-    flags["LIBS"].append(["lapack", "cblas", "f77blas", "atlas"])
+    flags["LIBS"].extend(["lapack", "cblas", "f77blas", "atlas"])
 
 if env["withdebug"] :
     flags["CXXFLAGS"].append("-g")
