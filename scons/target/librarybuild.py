@@ -456,7 +456,7 @@ lst.append( env.Command("mkinstalldir", "", Mkdir("install")) )
 lst.append( env.Command("mkbuilddir", "", Mkdir(os.path.join("install", "build"))) )
 
 #clear install directories before compiling
-#lst.append( env.Command("cleanbeforebuilddir", "", clearbuilddir) )
+lst.append( env.Command("cleanbeforebuilddir", "", clearbuilddir) )
 
 #download LAPack & ATLAS, extract & install
 if not("atlas" in skiplist) :
