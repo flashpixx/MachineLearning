@@ -32,7 +32,7 @@ Import("*")
 def runsyscmd(cmd, env) :
     ret = subprocess.call( cmd, shell=True )
     if ret <> 0 and not(env["skipbuilderror"]) :
-        print "\nan error occurred during building"
+        print colorama.Style.BRIGHT + colorama.Fore.RED + "\nan error occurred during building" + colorama.Style.RESET_ALL
         res = ""
         while res != "a" and res != "c" :
             res = raw_input("(a)bort or (c)ontinue: ")

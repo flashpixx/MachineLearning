@@ -4,6 +4,8 @@ import os
 import sys
 sys.path.append("scons")
 import help
+import colorama
+
 
 #=== CLI parameters ====================================================================================================================
 def createVariables(vars) :
@@ -74,12 +76,12 @@ def showlicence() :
 
 
 #=== create environment and compiling ==================================================================================================
+colorama.init()
 showlicence()
 
 #detect if a space is within the current path
 if " " in os.path.abspath(os.curdir) : 
-    print "Warning: The path contains spaces, it is recommand to use a path without spaces\n"
-
+    print colorama.Style.BRIGHT + "Warning: The path contains spaces, it is recommand to use a path without spaces\n" + colorama.Style.RESET_ALL
 
 vars = Variables()
 createVariables(vars)
@@ -115,8 +117,8 @@ if env.has_key("LIBPATH") :
 
 
 # call target scripts
-env.SConscript( os.path.join("scons", "target", "documentation.py"), exports="env")
-env.SConscript( os.path.join("scons", "target", "cppexample.py"), exports="env")
-env.SConscript( os.path.join("scons", "target", "librarybuild.py"), exports="env")
-env.SConscript( os.path.join("scons", "target", "language.py"), exports="env")
-env.SConscript( os.path.join("scons", "target", "java.py"), exports="env")
+env.SConscript( os.path.join("scons", "target", "documentation.py"), exports="env colorama")
+env.SConscript( os.path.join("scons", "target", "cppexample.py"), exports="env colorama")
+env.SConscript( os.path.join("scons", "target", "librarybuild.py"), exports="env colorama")
+env.SConscript( os.path.join("scons", "target", "language.py"), exports="env colorama")
+env.SConscript( os.path.join("scons", "target", "java.py"), exports="env colorama")
