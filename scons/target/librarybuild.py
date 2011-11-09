@@ -492,10 +492,10 @@ def showconfig(target, source, env) :
     
         
     print "--------------------------------------------------------------------------"
-    print "Warning: move the install/build directory out of the framework directory,"
-    print "because the a clean target remove the compiled libraries"
-    print "add the following variables / content to your environment and replace"
-    print "<installation dir> to the directory path whitch stores the build directory"
+    print "Warning: move the install/build directory outside of the framework directory,"
+    print "because the a clean target remove the compiled libraries.\n"
+    print "Add the following variables / content to your environment and replace"
+    print "<installation dir> to the directory path that stores the build directory"
     print "\n"
     print "CPPPATH="+os.pathsep.join(cpppath)
     print ""
