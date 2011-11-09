@@ -76,6 +76,11 @@ def showlicence() :
 #=== create environment and compiling ==================================================================================================
 showlicence()
 
+#detect if a space is within the current path
+if " " in os.path.abspath(os.curdir) : 
+    print "Warning: The path contains spaces, it is recommand to use a path without spaces\n"
+
+
 vars = Variables()
 createVariables(vars)
 
