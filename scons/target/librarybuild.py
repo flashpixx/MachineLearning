@@ -462,6 +462,55 @@ def build_xml(target, source, env) :
     return []
 
 
+#=== configuration ===================================================================================================================
+def showconfig(target, source, env) :
+    #detect builded packages and shows PATH, CPPPATH, LIBRARY_PATH for installation
+    includes = glob.glob(os.path.join("install", "build", "**", "**", "include"))
+    
+    #replace "install/build" to "<installation dir>"
+    cpppath = []
+    for i in includes :
+        cpppath.append( os.path.join("<installation dir>", os.path.sep.join(i.split(os.path.sep)[2:])) )
+        
+    # detect Boost Numeric Bindings
+    if os.path.isdir( os.path.join("install", "build", "boost", "sandbox", "numeric_bindings") ) :
+        cpppath.append( os.path.join("boost", "sandbox", "numeric_bindings") )
+        
+        
+    libs = glob.glob(os.path.join("install", "build", "**", "**", "lib"))
+    libpath = []
+    for i in libs :
+        libpath.append( os.path.join("<installation dir>", os.path.sep.join(i.split(os.path.sep)[2:])) )
+    
+    # on Cygwin some "bin" directories must be added to the library path
+    if env["PLATFORM"].lower() == "cygwin" :
+        libs = glob.glob(os.path.join("install", "build", "**", "**", "bin"))
+        for i in libs :
+            path = i.split(os.path.sep)[2:];
+            if path[0] == "boost" or path[0] == "xml2" :
+                path.append( os.path.join("<installation dir>", os.path.sep.join(path)) )
+    
+        
+    print "--------------------------------------------------------------------------"
+    print "Warning: move the install/build directory out of the framework directory,"
+    print "because the a clean target remove the compiled libraries"
+    print "add the following variables / content to your environment and replace"
+    print "<installation dir> to the directory path whitch stores the build directory"
+    print "\n"
+    print "CPPPATH="+os.pathsep.join(cpppath)
+    print ""
+    
+    if env["PLATFORM"].lower() == "cygwin" :
+        print "PATH="+os.pathsep.join(libpath)
+    else :
+        print "LIBRARY_PATH="+os.pathsep.join(libpath)
+    
+    if env["PLATFORM"].lower() == "darwin" :
+        print ""
+        print "it is recommand to add the following line to your /etc/profile or ~/.profile"
+        print "export DYLD_LIBRARY_PATH=$LIBRARY_PATH"
+    print "--------------------------------------------------------------------------"
+    return []
 
 #=== target structure ================================================================================================================
 skiplist = str(env["skipbuild"]).split(",")
@@ -499,8 +548,8 @@ if not("boost" in skiplist) :
 # download HDF, extract & install
 if not("hdf" in skiplist) :
     lst.append( env.Command("downloadhdf", "", download_hdf) )
-    lst.append( env.Command("extracthdf", "", "tar xfvj "+os.path.join("install", "hdf.tar.bz2")+" -C install") )
-    lst.append( env.Command("buildhdf", "", build_hdf) )
+    #lst.append( env.Command("extracthdf", "", "tar xfvj "+os.path.join("install", "hdf.tar.bz2")+" -C install") )
+    #lst.append( env.Command("buildhdf", "", build_hdf) )
 
 #download GiNaC & CLN, extract & install
 if not("ginac" in skiplist) :
@@ -512,8 +561,8 @@ if not("ginac" in skiplist) :
 #download JSON library, extract & install
 if not("json" in skiplist) :
     lst.append( env.Command("downloadjsoncpp", "", download_jsoncpp) )
-    lst.append( env.Command("extractjsoncpp", "", "tar xfvz "+os.path.join("install", "jsoncpp.tar.gz")+" -C install") )
-    lst.append( env.Command("buildjsoncpp", "", build_jsoncpp) )
+    #lst.append( env.Command("extractjsoncpp", "", "tar xfvz "+os.path.join("install", "jsoncpp.tar.gz")+" -C install") )
+    #lst.append( env.Command("buildjsoncpp", "", build_jsoncpp) )
     
 # download libxml2, extract & install (only cygwin)
 if env["PLATFORM"].lower() == "cygwin" and not("xml" in skiplist) :
@@ -524,5 +573,9 @@ if env["PLATFORM"].lower() == "cygwin" and not("xml" in skiplist) :
 
 #clear install directories after compiling
 lst.append( env.Command("cleanafterbuilddir", "", clearbuilddir) )
+
+#show the config path
+lst.append( env.Command("showconfig", "", showconfig) )
+
 
 env.Alias("librarybuild", lst)
