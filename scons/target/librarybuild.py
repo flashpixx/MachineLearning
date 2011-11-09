@@ -474,7 +474,7 @@ def showconfig(target, source, env) :
         
     # detect Boost Numeric Bindings
     if os.path.isdir( os.path.join("install", "build", "boost", "sandbox", "numeric_bindings") ) :
-        cpppath.append( os.path.join("boost", "sandbox", "numeric_bindings") )
+        cpppath.append( os.path.join("<installation dir>", "boost", "sandbox", "numeric_bindings") )
         
         
     libs = glob.glob(os.path.join("install", "build", "**", "**", "lib"))
@@ -488,7 +488,7 @@ def showconfig(target, source, env) :
         for i in libs :
             path = i.split(os.path.sep)[2:];
             if path[0] == "boost" or path[0] == "xml2" :
-                path.append( os.path.join("<installation dir>", os.path.sep.join(path)) )
+                libpath.append( os.path.join("<installation dir>", os.path.sep.join(path)) )
     
         
     print "--------------------------------------------------------------------------"
@@ -509,6 +509,9 @@ def showconfig(target, source, env) :
         print ""
         print "it is recommand to add the following line to your /etc/profile or ~/.profile"
         print "export DYLD_LIBRARY_PATH=$LIBRARY_PATH"
+    elif env["PLATFORM"].lower() == "cygwin" :
+        print ""
+        print "add also Cygwin bin directory to the path for using compiled program outside of Cygwin"
     print "--------------------------------------------------------------------------"
     return []
 
@@ -548,8 +551,8 @@ if not("boost" in skiplist) :
 # download HDF, extract & install
 if not("hdf" in skiplist) :
     lst.append( env.Command("downloadhdf", "", download_hdf) )
-    #lst.append( env.Command("extracthdf", "", "tar xfvj "+os.path.join("install", "hdf.tar.bz2")+" -C install") )
-    #lst.append( env.Command("buildhdf", "", build_hdf) )
+    lst.append( env.Command("extracthdf", "", "tar xfvj "+os.path.join("install", "hdf.tar.bz2")+" -C install") )
+    lst.append( env.Command("buildhdf", "", build_hdf) )
 
 #download GiNaC & CLN, extract & install
 if not("ginac" in skiplist) :
@@ -561,8 +564,8 @@ if not("ginac" in skiplist) :
 #download JSON library, extract & install
 if not("json" in skiplist) :
     lst.append( env.Command("downloadjsoncpp", "", download_jsoncpp) )
-    #lst.append( env.Command("extractjsoncpp", "", "tar xfvz "+os.path.join("install", "jsoncpp.tar.gz")+" -C install") )
-    #lst.append( env.Command("buildjsoncpp", "", build_jsoncpp) )
+    lst.append( env.Command("extractjsoncpp", "", "tar xfvz "+os.path.join("install", "jsoncpp.tar.gz")+" -C install") )
+    lst.append( env.Command("buildjsoncpp", "", build_jsoncpp) )
     
 # download libxml2, extract & install (only cygwin)
 if env["PLATFORM"].lower() == "cygwin" and not("xml" in skiplist) :
