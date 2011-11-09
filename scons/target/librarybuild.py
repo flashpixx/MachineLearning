@@ -512,6 +512,7 @@ def showconfig(target, source, env) :
     elif env["PLATFORM"].lower() == "cygwin" :
         print ""
         print "add also Cygwin bin directory to the path for using compiled program outside of Cygwin"
+    
     print "--------------------------------------------------------------------------"
     return []
 
