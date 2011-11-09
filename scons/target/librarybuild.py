@@ -502,16 +502,15 @@ def showconfig(target, source, env) :
     
     if env["PLATFORM"].lower() == "cygwin" :
         print "PATH="+os.pathsep.join(libpath)
-    else :
-        print "LIBRARY_PATH="+os.pathsep.join(libpath)
+        print "\nadd also Cygwin bin directory to the path for using compiled program outside of Cygwin"
+        
+    elif env["PLATFORM"].lower() == "posix" :
+        print "LD_LIBRARY_PATH="+os.pathsep.join(libpath)
     
-    if env["PLATFORM"].lower() == "darwin" :
-        print ""
-        print "it is recommand to add the following line to your /etc/profile or ~/.profile"
+    elif env["PLATFORM"].lower() == "darwin" :
+        print "LIBRARY_PATH="+os.pathsep.join(libpath)
+        print "\nit is recommand to add the following line to your /etc/profile or ~/.profile"
         print "export DYLD_LIBRARY_PATH=$LIBRARY_PATH"
-    elif env["PLATFORM"].lower() == "cygwin" :
-        print ""
-        print "add also Cygwin bin directory to the path for using compiled program outside of Cygwin"
     
     print "--------------------------------------------------------------------------"
     return []
