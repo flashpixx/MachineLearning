@@ -142,7 +142,7 @@
  * </ul><ul>
  * <li><dfn>atlaspointerwidth</dfn> parameter for setting the ATLAS pointer width during running the library build target (default empty for system default)</li>
  * <li><dfn>atlascputhrottle</dfn> enable / disable detection of ATLAS CPU throtteling during runngin the library build target (default disable)</li>
- * <li><dfn>skipbuild</dfn> disables / skips the automatic build of a library [allowd values: all, none, atlas, boost, hdf, ginac, json]</li> 
+ * <li><dfn>skipbuild</dfn> disables / skips the automatic build of a library [allowd values: all, none, atlas, boost, hdf, ginac, json , xml (only available on Cygwin)]</li> 
  * <li><dfn>skipbuilderror</dfn> if an error occures during the building process, a commandline input for aborting or continuing is needed, with this option the input can be suppressed (default disable)</li>
  * </ul>
  * The <dfn>SConstruct</dfn> script, which is the entry point to the compiler calls, is stored in the framework main directory. Under the <dfn>scons</dfn> directory all other script (target, helper, platform)
@@ -154,10 +154,12 @@
  * show a build target, but some targets will be build first if different parameters are set
  * <ul>
  * <li><dfn>documentation</dfn> create the documentation with Doxygen (Doxygen must be installed and be reached within the path)</li>
- * <li><dfn>librarybuild</dfn> download the librarys and compile each library with the default option. Compiled libraries are installed under the subdirectory <dfn>install/build</dfn>
- * [tar, make, gfortran, gcc & g++ must be installed and within the search path. If a file (<dfn>boost.tar.bz2</dfn>, <dfn>hdf.tar.bz2</dfn>, <dfn>ginac.tar.bz2</dfn>, <dfn>cln.tar.bz2</dfn>, <dfn>json.tar.gz</dfn>,
- * <dfn>atlas.tar.bz2</dfn>, <dfn>lapack.tgz</dfn>) exists within the <dfn>install</dfn> directory, the existing file is used otherwise the file will be downloaded]. This framework must be stored in a directory
- * without any spaces, spaces create errors on the build process</li>
+ * <li><dfn>librarybuild</dfn> download the librarys and compile each library with the default option. Compiled libraries are installed under the subdirectory <dfn>install/build</dfn>.
+ * Requirements for the automatic build installation process: <ul>
+ * <li>tar, make, gfortran, gcc & g++ must be installed and within the search path</li>
+ * <li>all files are downloaded under <dfn>install/</dfn>, each file can be replaced with another version, so the script downloads the packages only, if the file does not exists</li>
+ * <li>the framework must be stored in a directory without any spaces, spaces create errors on the build process</li>
+ * </ul>
  * <li><dfn>createlanguage</dfn> creates the language files / adds new messages to the existing files (xgettext must be called, so it should be within the path)</li>
  * <li><dfn>updatelanguage</dfn> compiles all language files (msgfmt must be called, so it should be within the path)</li>
  * <li><dfn>clean / -c</dfn> target that cleans framework files</li>

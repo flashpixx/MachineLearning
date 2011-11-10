@@ -2,6 +2,7 @@
 
 import os
 import sys
+import platform
 sys.path.append("scons")
 import help
 import colorama
@@ -28,7 +29,11 @@ def createVariables(vars) :
     
     vars.Add(EnumVariable("atlaspointerwidth", "pointer width for compiling ATLAS (empty = system default, 32 = 32 Bit, 64 = 64 Bit)", "", allowed_values=("", "32", "64")))
     vars.Add(BoolVariable("atlascputhrottle", "enable / disable detection of CPU throtteling", False))
-    vars.Add(ListVariable("skipbuild", "skipping library builds (xml build is available under Cygwin only)", "", ["atlas", "boost", "hdf", "ginac", "json", "xml"]))
+    
+    libs = ["atlas", "boost", "hdf", "ginac", "json"]
+    if platform.system().lower() == "cygwin" :
+        libs.append("xml")
+    vars.Add(ListVariable("skipbuild", "skipping library builds", "", libs))
     vars.Add(BoolVariable("skipbuilderror", "ignore / skip build errors", False))
     
 
