@@ -31,7 +31,7 @@ def createVariables(vars) :
     vars.Add(BoolVariable("atlascputhrottle", "enable / disable detection of CPU throtteling", False))
     
     libs = ["atlas", "boost", "hdf", "ginac", "json"]
-    if platform.system().lower() == "cygwin" :
+    if "cygwin" in platform.system().lower() :
         libs.append("xml")
     vars.Add(ListVariable("skipbuild", "skipping library builds", "", libs))
     vars.Add(BoolVariable("skipbuilderror", "ignore / skip build errors", False))
