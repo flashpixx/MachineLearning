@@ -176,7 +176,7 @@ def download_atlaslapack(target, source, env) :
     downloadfile("http://sourceforge.net/projects/math-atlas/files/latest/download?source=files", os.path.join("install", "atlas.tar.bz2"))
     
     # extract ATLAS tar here, because errors are ignored
-    os.system("tar xfvj "+os.path.join("install", "atlas.tar.bz2")+" -C install")
+    os.system("tar oxfvj "+os.path.join("install", "atlas.tar.bz2")+" -C install")
     
     return []
 
@@ -491,28 +491,33 @@ def showconfig(target, source, env) :
                 libpath.append( os.path.join("<installation dir>", os.path.sep.join(path)) )
     
         
-    print "--------------------------------------------------------------------------"
+    print colorama.Style.BRIGHT
+    print "-------------------------------------------------------------------------------------"
     print "Warning: move the install/build directory outside of the framework directory,"
-    print "because the a clean target remove the compiled libraries.\n"
+    print "because the a clean target remove the compiled libraries."
+    print ""
     print "Add the following variables / content to your environment and replace"
     print "<installation dir> to the directory path that stores the build directory"
-    print "\n"
+    print ""
     print "CPPPATH="+os.pathsep.join(cpppath)
     print ""
     
     if env["PLATFORM"].lower() == "cygwin" :
         print "PATH="+os.pathsep.join(libpath)
-        print "\nadd also Cygwin bin directory to the path for using compiled program outside of Cygwin"
+        print ""
+        print "add also Cygwin bin directory to the path for using compiled program outside of Cygwin"
         
     elif env["PLATFORM"].lower() == "posix" :
         print "LD_LIBRARY_PATH="+os.pathsep.join(libpath)
     
     elif env["PLATFORM"].lower() == "darwin" :
         print "LIBRARY_PATH="+os.pathsep.join(libpath)
-        print "\nit is recommand to add the following line to your /etc/profile or ~/.profile"
+        print ""
+        print "it is recommand to add the following line to your /etc/profile or ~/.profile"
         print "export DYLD_LIBRARY_PATH=$LIBRARY_PATH"
     
-    print "--------------------------------------------------------------------------"
+    print "-------------------------------------------------------------------------------------" 
+    print colorama.Style.RESET_ALL
     return []
 
 #=== target structure ================================================================================================================
@@ -541,36 +546,36 @@ if not("atlas" in skiplist) :
 if not("boost" in skiplist) :
     lst.append( env.Command("downloadboost", "", download_boost) )
     if env["PLATFORM"].lower() == "cygwin" :
-        lst.append( env.Command("extractzlib", "", "tar xfvz "+os.path.join("install", "zlib.tar.gz")+" -C install") )
+        lst.append( env.Command("extractzlib", "", "tar oxfvz "+os.path.join("install", "zlib.tar.gz")+" -C install") )
         lst.append( env.Command("buildzlib", "", build_zlib) )
-        lst.append( env.Command("extractbzip2", "", "tar xfvz "+os.path.join("install", "bzip2.tar.gz")+" -C install") )
+        lst.append( env.Command("extractbzip2", "", "tar oxfvz "+os.path.join("install", "bzip2.tar.gz")+" -C install") )
         lst.append( env.Command("buildbzip2", "", build_bzip2) )
-    lst.append( env.Command("extractboost", "", "tar xfvj "+os.path.join("install", "boost.tar.bz2")+" -C install") )
+    lst.append( env.Command("extractboost", "", "tar oxfvj "+os.path.join("install", "boost.tar.bz2")+" -C install") )
     lst.append( env.Command("buildboost", "", build_boost) )
 
 # download HDF, extract & install
 if not("hdf" in skiplist) :
     lst.append( env.Command("downloadhdf", "", download_hdf) )
-    lst.append( env.Command("extracthdf", "", "tar xfvj "+os.path.join("install", "hdf.tar.bz2")+" -C install") )
+    lst.append( env.Command("extracthdf", "", "tar oxfvj "+os.path.join("install", "hdf.tar.bz2")+" -C install") )
     lst.append( env.Command("buildhdf", "", build_hdf) )
 
 #download GiNaC & CLN, extract & install
 if not("ginac" in skiplist) :
     lst.append( env.Command("downloadginaccln", "", download_ginaccln) )
-    lst.append( env.Command("extractginac", "", "tar xfvj "+os.path.join("install", "ginac.tar.bz2")+" -C install") )
-    lst.append( env.Command("extractcln", "", "tar xfvj "+os.path.join("install", "cln.tar.bz2")+" -C install") )
+    lst.append( env.Command("extractginac", "", "tar oxfvj "+os.path.join("install", "ginac.tar.bz2")+" -C install") )
+    lst.append( env.Command("extractcln", "", "tar oxfvj "+os.path.join("install", "cln.tar.bz2")+" -C install") )
     lst.append( env.Command("buildginaccln", "", build_ginaccln) )
 
 #download JSON library, extract & install
 if not("json" in skiplist) :
     lst.append( env.Command("downloadjsoncpp", "", download_jsoncpp) )
-    lst.append( env.Command("extractjsoncpp", "", "tar xfvz "+os.path.join("install", "jsoncpp.tar.gz")+" -C install") )
+    lst.append( env.Command("extractjsoncpp", "", "tar oxfvz "+os.path.join("install", "jsoncpp.tar.gz")+" -C install") )
     lst.append( env.Command("buildjsoncpp", "", build_jsoncpp) )
     
 # download libxml2, extract & install (only cygwin)
 if env["PLATFORM"].lower() == "cygwin" and not("xml" in skiplist) :
     lst.append( env.Command("downloadxml", "", download_xml) )
-    lst.append( env.Command("extractjsoncpp", "", "tar xfvz "+os.path.join("install", "xml.tar.gz")+" -C install") )
+    lst.append( env.Command("extractjsoncpp", "", "tar oxfvz "+os.path.join("install", "xml.tar.gz")+" -C install") )
     lst.append( env.Command("buildxml", "", build_xml) )
 
 
