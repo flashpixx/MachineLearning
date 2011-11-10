@@ -898,7 +898,7 @@
  * @todo thinking about CILK support http://supertech.csail.mit.edu/cilk/
  * @todo adding support to OpenMP http://openmp.org/wp/
  * @todo adding simulated annealing (see GSL)
- * @todo adding voronoi tessellation
+ * @todo adding voronoi tessellation (with CGAL http://http://www.cgal.org/ )
  * @todo thinking about Corba support for algorithms
  * @todo thinking about abstract middleware for Boinc support (eg patch clustering) http://boinc.berkeley.edu/
  * @todo create a PHP modul ( http://devzone.zend.com/article/4486 / http://devzone.zend.com/node/view/id/1021 )
