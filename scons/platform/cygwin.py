@@ -50,12 +50,12 @@ if os.environ.has_key("LDFLAGS") :
 
 flags["CXXFLAGS"].extend(["-pipe", "-Wall", "-Wextra", "-D BOOST_FILESYSTEM_NO_DEPRECATED", "-D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"])
 flags["LINKFLAGS"].extend(["-enable-stdcall-fixup", "-mthread"])
-flags["LIBS"]         = ["cygboost_system", "cygboost_thread", "cygboost_iostreams", "cygboost_regex"]
+flags["LIBS"]         = ["boost_system", "boost_thread", "boost_iostreams", "boost_regex"]
 
 
 
 if not("javac" in COMMAND_LINE_TARGETS) :
-    flags["LIBS"].extend(["cygboost_program_options", "boost_exception", "cygboost_filesystem"])
+    flags["LIBS"].extend(["boost_program_options", "boost_exception", "boost_filesystem"])
     
 #Windows Version options see http://msdn.microsoft.com/en-us/library/aa383745%28v=vs.85%29.aspx
 if env["winver"] == "win7" :
@@ -86,11 +86,11 @@ else :
 
 if env["withrandomdevice"] :
     flags["CXXFLAGS"].append("-D MACHINELEARNING_RANDOMDEVICE")
-    flags["LIBS"].append("cygboost_random");
+    flags["LIBS"].append("boost_random");
 
 if env["withsources"] :
     flags["CXXFLAGS"].extend(["-D MACHINELEARNING_SOURCES", "-D MACHINELEARNING_SOURCES_TWITTER", "-D __USE_W32_SOCKETS"])
-    flags["LIBS"].extend( ["cygxml2-2", "ws2_32", "json"] )
+    flags["LIBS"].extend( ["xml2-2", "ws2_32", "json"] )
 
 if env["withfiles"] :
     flags["CXXFLAGS"].extend(["-D MACHINELEARNING_FILES", "-D MACHINELEARNING_FILES_HDF"])
