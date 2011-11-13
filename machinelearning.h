@@ -307,7 +307,7 @@
  * @endcode
  * It is also recommend, that the linker flag is set with, because all examples are console applications
  * @code
-    export LDFLAG="-mconsole"
+    export LDFLAGS="-mconsole"
  * @endcode
  *
  * The libraries can be installed with the same steps as in Linux.
