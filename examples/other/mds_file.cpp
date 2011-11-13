@@ -178,7 +178,7 @@ int main(int argc, char* argv[])
 
     ublas::matrix<double> distancematrix;
     if ( (l_map.count("stopwordmin")) && (l_map.count("stopwordmax")) )
-         distancematrix = ncd.unsymmetric( l_content );
+        distancematrix = ncd.unsymmetric( l_content );
     else
         distancematrix = ncd.unsymmetric( l_files, true );
 
