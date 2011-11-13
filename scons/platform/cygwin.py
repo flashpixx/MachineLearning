@@ -49,7 +49,7 @@ if os.environ.has_key("LDFLAGS") :
 
 
 flags["CXXFLAGS"].extend(["-pipe", "-Wall", "-Wextra", "-D BOOST_FILESYSTEM_NO_DEPRECATED", "-D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"])
-flags["LINKFLAGS"].extend(["-enable-stdcall-fixup", "-mthread"])
+flags["LINKFLAGS"].extend(["-mconsole", "-enable-stdcall-fixup", "-mthread"])
 flags["LIBS"]         = ["boost_system", "boost_thread", "boost_iostreams", "boost_regex"]
 
 
@@ -94,18 +94,17 @@ if env["withsources"] :
 
 if env["withfiles"] :
     flags["CXXFLAGS"].extend(["-D MACHINELEARNING_FILES", "-D MACHINELEARNING_FILES_HDF"])
-    flags["LIBS"].extend( ["libhdf5_cpp", "libhdf5"] )
+    flags["LIBS"].extend( ["hdf5_cpp", "hdf5"] )
 
 if env["withsymbolicmath"] :
     flags["CXXFLAGS"].append("-D MACHINELEARNING_SYMBOLICMATH")
-    flags["LIBS"].append("libginac")
+    flags["LIBS"].append("ginac")
 
 if env["withoptimize"] :
     flags["CXXFLAGS"].extend(["-O2", "-Os", "-s", "-mfpmath=sse", "-finline-functions", "-mtune="+env["cputype"]])
 
 if env["withlogger"] :
     flags["CXXFLAGS"].append("-D MACHINELEARNING_LOGGER")
-
 
 
 env.MergeFlags(flags)
