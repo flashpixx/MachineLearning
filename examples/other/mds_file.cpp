@@ -167,6 +167,7 @@ int main(int argc, char* argv[])
 
 
     // run NCD
+    
     std::cout << "calculate normalized compression distance..." << std::endl;
     distances::ncd<double> ncd( (l_algorithm == "gzip") ? distances::ncd<double>::gzip : distances::ncd<double>::bzip2 );
 
@@ -181,7 +182,7 @@ int main(int argc, char* argv[])
         distancematrix = ncd.unsymmetric( l_content );
     else
         distancematrix = ncd.unsymmetric( l_files, true );
-
+    
 
 
     // run hit mds over the distance matrix
@@ -193,19 +194,19 @@ int main(int argc, char* argv[])
         l_project = dim::mds<double>::metric;
     if (l_mapping == "sammon")
         l_project = dim::mds<double>::sammon;
-
+    
     dim::mds<double> mds( l_dimension, l_project );
     mds.setIteration( l_iteration );
     mds.setRate( l_rate );
 
     ublas::matrix<double> project = mds.map( distancematrix );
-
+    
 
     // write data
     target.writeBlasMatrix<double>( "/project",  project, H5::PredType::NATIVE_DOUBLE );
     target.writeStringVector("/files", l_files);
 
     std::cout << "within the target file there are four datasets: /project = projected data (first row = first input file ...), /files = filename list, /stopwords = list with stopwords (if enable)" << std::endl;
-
+    
     return EXIT_SUCCESS;
 }
