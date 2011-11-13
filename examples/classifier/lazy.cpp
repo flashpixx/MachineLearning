@@ -28,10 +28,6 @@
 #include <boost/program_options/variables_map.hpp>
 #include <boost/program_options/options_description.hpp>
 
-#if defined(_WIN32) || defined(__CYGWIN__)
-#include <windows.h>
-#endif
-
 
 namespace po         = boost::program_options;
 namespace ublas      = boost::numeric::ublas;

@@ -53,7 +53,7 @@ flags["LINKFLAGS"].extend(["-mconsole", "-enable-stdcall-fixup", "-mthread"])
 flags["LIBS"]         = ["boost_system", "boost_thread", "boost_iostreams", "boost_regex"]
 
 
-
+# linker command -mdll can be used
 if not("javac" in COMMAND_LINE_TARGETS) :
     flags["LIBS"].extend(["boost_program_options", "boost_exception", "boost_filesystem"])
     
