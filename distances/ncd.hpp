@@ -210,7 +210,7 @@ namespace machinelearning { namespace distances {
         l_cache(p_strvec.size()-1) = deflate(p_isfile, p_strvec[p_strvec.size()-1]);
         
         // create wavefront index position
-        std::multimap<std::size_t, std::pair<std::size_t,std::size_t> > l_wavefront = getWavefrontIndex(p_strvec.size(), omp_get_num_threads());
+        std::multimap<std::size_t, std::pair<std::size_t,std::size_t> > l_wavefront = getWavefrontIndex(p_strvec.size(), omp_get_max_threads());
         
         #pragma omp parallel shared(l_cache, l_result)
         {
@@ -276,7 +276,7 @@ namespace machinelearning { namespace distances {
         l_cache(p_strvec.size()-1) = deflate(p_isfile, p_strvec[p_strvec.size()-1]);
         
         // create wavefront index position
-        std::multimap<std::size_t, std::pair<std::size_t,std::size_t> > l_wavefront = getWavefrontIndex(p_strvec.size(), omp_get_num_threads());
+        std::multimap<std::size_t, std::pair<std::size_t,std::size_t> > l_wavefront = getWavefrontIndex(p_strvec.size(), omp_get_max_threads());
         
         #pragma omp parallel shared(l_cache, l_result)
         {
@@ -316,6 +316,7 @@ namespace machinelearning { namespace distances {
                              0.5 * (static_cast<T>(deflate(p_isfile, p_strvec[it->second.first], p_strvec[it->second.second]) - l_min) / l_max + 
                                     static_cast<T>(deflate(p_isfile, p_strvec[it->second.second], p_strvec[it->second.first]) - l_min) / l_max)
                              );
+
             }
         }
         
@@ -354,14 +355,14 @@ namespace machinelearning { namespace distances {
                 #pragma omp for
                 for(std::size_t j=0; j < p_strvec1.size(); ++j)
                     for(std::size_t i=0; i < p_strvec2.size(); ++i)
-                        l_map.insert(  std::pair<std::size_t, std::pair<std::size_t,std::size_t> >(i % omp_get_num_threads(), std::pair<std::size_t,std::size_t>(j,i))  );
+                        l_map.insert(  std::pair<std::size_t, std::pair<std::size_t,std::size_t> >(i % omp_get_max_threads(), std::pair<std::size_t,std::size_t>(j,i))  );
             
             else
                 
                 #pragma omp for
                 for(std::size_t j=0; j < p_strvec2.size(); ++j)
                     for(std::size_t i=0; i < p_strvec1.size(); ++i)
-                        l_map.insert(  std::pair<std::size_t, std::pair<std::size_t,std::size_t> >(i % omp_get_num_threads(), std::pair<std::size_t,std::size_t>(i,j))  );
+                        l_map.insert(  std::pair<std::size_t, std::pair<std::size_t,std::size_t> >(i % omp_get_max_threads(), std::pair<std::size_t,std::size_t>(i,j))  );
         }
 
         
