@@ -206,7 +206,7 @@ namespace machinelearning { namespace distances {
         
         // the first and last element are calculated in a single run, because
         // the first two thread are used the data directly
-        l_cache(0) = deflate(p_isfile, p_strvec[0]);
+        l_cache(0)                 = deflate(p_isfile, p_strvec[0]);
         l_cache(p_strvec.size()-1) = deflate(p_isfile, p_strvec[p_strvec.size()-1]);
         
         // create wavefront index position
@@ -272,7 +272,7 @@ namespace machinelearning { namespace distances {
         
         // the first and last element are calculated in a single run, because
         // the first two thread are used the data directly
-        l_cache(0) = deflate(p_isfile, p_strvec[0]);
+        l_cache(0)                 = deflate(p_isfile, p_strvec[0]);
         l_cache(p_strvec.size()-1) = deflate(p_isfile, p_strvec[p_strvec.size()-1]);
         
         // create wavefront index position
