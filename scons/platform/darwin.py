@@ -48,8 +48,8 @@ if os.environ.has_key("LDFLAGS") :
     
 
 
-flags["CXXFLAGS"].extend(["-pipe", "-Wall", "-Wextra", "-D BOOST_FILESYSTEM_NO_DEPRECATED", "-D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"])    
-flags["LINKFLAGS"].extend(["-pthread"])
+flags["CXXFLAGS"].extend(["-fopenmp", "-pipe", "-Wall", "-Wextra", "-D BOOST_FILESYSTEM_NO_DEPRECATED", "-D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"])    
+flags["LINKFLAGS"].extend(["-pthread", "-fopenmp"])
 flags["LIBS"]         = ["boost_system", "boost_thread", "boost_iostreams", "boost_regex"]
 flags["SHLINKFLAGS"]  = ["-install_name ${TARGET.file} -headerpad_max_install_name"]
 

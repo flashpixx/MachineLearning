@@ -48,8 +48,8 @@ if os.environ.has_key("LDFLAGS") :
 
 
 
-flags["CXXFLAGS"].extend(["-pipe", "-Wall", "-Wextra", "-D BOOST_FILESYSTEM_NO_DEPRECATED", "-D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"])
-flags["LINKFLAGS"].extend(["-mconsole", "-enable-stdcall-fixup", "-mthread"])
+flags["CXXFLAGS"].extend(["-fopenmp", "-pipe", "-Wall", "-Wextra", "-D BOOST_FILESYSTEM_NO_DEPRECATED", "-D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"])
+flags["LINKFLAGS"].extend(["-fopenmp", "-mconsole", "-enable-stdcall-fixup", "-mthread"])
 flags["LIBS"]         = ["boost_system", "boost_thread", "boost_iostreams", "boost_regex"]
 
 

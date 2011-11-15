@@ -50,6 +50,7 @@
  * </li>
  * <li>Boost Bindings ( SVN http://svn.boost.org/svn/boost/sandbox/numeric_bindings/ )</li>
  * <li>Linear Algebra PACKage ( http://www.netlib.org/lapack/ ) [Version newer 3.3]</li>
+ * <li>OpenMP ( http://www.openmp.org )</li>
  * <li><i>optional Hierarchical Data Format (HDF)</i> ( http://www.hdfgroup.org/ ) [version newer or equal 5.1.8.4]</li>
  * <li><i>optional Message-Passing-Interface-Support</i>
  *      <ul>

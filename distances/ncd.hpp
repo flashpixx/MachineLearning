@@ -26,6 +26,7 @@
 #ifndef __MACHINELEARNING_DISTANCES_NCD_HPP
 #define __MACHINELEARNING_DISTANCES_NCD_HPP
 
+#include <omp.h>
 #include <string>
 #include <sstream>
 #include <iostream>
@@ -43,10 +44,8 @@
 #include <boost/iostreams/filtering_streambuf.hpp>
 #include <boost/iostreams/filter/counter.hpp>
 
-#include <boost/thread.hpp>
-#include <boost/ref.hpp>
-
 #include "../exception/exception.h"
+
 
 
 
@@ -98,25 +97,9 @@ namespace machinelearning { namespace distances {
         bio::gzip_params m_gzipparam;
         /** parameter for bzip2 **/
         bio::bzip2_params m_bzip2param;
-        /** boost mutex for determine read/write access of the cache **/
-        boost::shared_mutex m_cachelock;
-        /** boost mutex for determine read/write access of the matrix **/
-        boost::shared_mutex m_matrixlock;
-        /** boost mutex for running **/
-        boost::mutex m_running;
-        
         
         std::size_t deflate ( const bool&, const std::string&, const std::string& = "" ) const;        
         std::multimap<std::size_t, std::pair<std::size_t,std::size_t> > getWavefrontIndex( const std::size_t&, const std::size_t& );
-        void multithread_deflate_symmetric( std::multimap<std::size_t, std::pair<std::size_t,std::size_t> >&, const std::vector<std::string>&, const std::size_t&, const bool&, ublas::symmetric_matrix<T, ublas::upper>&, ublas::vector<std::size_t>& );
-        void multithread_deflate_unsymmetric( std::multimap<std::size_t, std::pair<std::size_t,std::size_t> >&, const std::vector<std::string>&, const std::size_t&, const bool&, ublas::matrix<T>&, ublas::vector<std::size_t>& );
-        void multithread_deflate_unsquare( std::multimap<std::size_t, std::pair<std::size_t,std::size_t> >&, const std::vector<std::string>&, const std::vector<std::string>&, const std::size_t&, const bool&, ublas::matrix<T>&, ublas::vector<std::size_t>& );
-        
-        void setCache( ublas::vector<std::size_t>&, const std::size_t&, const std::size_t& );
-        void getCache( const ublas::vector<std::size_t>&, const std::size_t&, const std::size_t&, std::size_t&, std::size_t& );
-        void setUnsymmetric( ublas::matrix<T>&, const std::size_t&, const std::size_t&, const T&, const T& );
-        void setSymmetric( ublas::symmetric_matrix<T, ublas::upper>&, const std::size_t&, const std::size_t&, const T& );
-        void setUnsquare( ublas::matrix<T>&, const std::size_t&, const std::size_t&, const T& );
     };
     
     
@@ -126,10 +109,7 @@ namespace machinelearning { namespace distances {
     template<typename T> inline ncd<T>::ncd( void ) :
         m_compress ( gzip ),
         m_gzipparam( bio::gzip::default_compression ),
-        m_bzip2param( 6 ),
-        m_cachelock(),
-        m_matrixlock(),
-        m_running()
+        m_bzip2param( 6 )
     {}
     
     
@@ -139,16 +119,8 @@ namespace machinelearning { namespace distances {
     template<typename T> inline ncd<T>::ncd( const compresstype& p_compress ) :
         m_compress ( p_compress ),
         m_gzipparam( bio::gzip::default_compression ),
-        m_bzip2param( 6 ),
-        m_cachelock(),
-        m_matrixlock(),
-        m_running()
+        m_bzip2param( 6 )
     {}
-    
-    
-    
-    
-    //--- multithread methods ---------------------------------------------------------------------------------------------------------------------------------
     
     
     /** creates wavefront index pairs for using on multithreaded systems
@@ -163,221 +135,18 @@ namespace machinelearning { namespace distances {
         // create wavefront in this case: (0,n) = 0, (0,n-1) = 1, (1,n) = 2 ...
         // we must create only the upper or lower index position, the other one can be created of swapping the index position
         std::size_t n=0;
+
+        //#pragma omp parallel for shared(n, l_wavefront)
         for(std::size_t i=p_size-1; i > 0; --i)
             for(std::size_t j=0; (i+j) < p_size; ++j)
+                
+                //#pragma omp critical
                 l_wavefront.insert(  std::pair<std::size_t, std::pair<std::size_t,std::size_t> >(n++ % p_threads, std::pair<std::size_t,std::size_t>(j, i+j))  );
+
         return l_wavefront;
     }
     
-    
-    /** writing cache data must be implementated thread-safe so we do writing-option in a own method
-     * @param p_cache cache vector
-     * @param p_id index position in the cache vector
-     * @param p_data data which should be write
-     **/
-    template<typename T> inline void ncd<T>::setCache( ublas::vector<std::size_t>& p_cache, const std::size_t& p_id, const std::size_t& p_data )
-    {
-        // upgrade lock for writing
-        boost::unique_lock<boost::shared_mutex> l_lock( m_cachelock ); 
-        
-        p_cache(p_id) = p_data;
-    }
-    
-    
-    /** reading cache data must be implementated thread-safe so we had created a own method for reading on one
-     * access two data, because on the NCD calulation we need everytime two entries
-     * @param p_cache cache vector
-     * @param p_idfirst index position of the first element
-     * @param p_idsecond index position of the second element
-     * @param p_first reference for writing the first element
-     * @param p_second reference for writing the second element
-     **/
-    template<typename T> inline void ncd<T>::getCache( const ublas::vector<std::size_t>& p_cache, const std::size_t& p_idfirst, const std::size_t& p_idsecond, std::size_t& p_first, std::size_t& p_second )
-    {
-        // shared access for reading
-        boost::shared_lock<boost::shared_mutex> l_lock( m_cachelock );
-        
-        p_first  = p_cache(p_idfirst);
-        p_second = p_cache(p_idsecond);
-    }
-    
-    
-    /** write method for unsquare matrix data
-     * @param p_matrix matrix with data
-     * @param p_row row index
-     * @param p_col col index
-     * @param p_val value
-     **/
-    template<typename T> inline void ncd<T>::setUnsquare( ublas::matrix<T>& p_matrix, const std::size_t& p_row, const std::size_t& p_col, const T& p_val )
-    {
-        // upgrade lock for writing
-        boost::unique_lock<boost::shared_mutex> l_lock( m_matrixlock ); 
-        
-        // because of deflate algorithms there can be values greater than 1, so we check and set it to 1
-        p_matrix(p_row, p_col) = std::min( static_cast<T>(1), p_val );
-    }
-    
-    
-    /** write method for unsymmetric matrix data, which sets two values into the positions 
-     * @param p_matrix matrix with data
-     * @param p_row row index
-     * @param p_col col index
-     * @param p_val1 value for (p_row/p_col)
-     * @param p_val2 value for (p_col/p_row)
-     **/
-    template<typename T> inline void ncd<T>::setUnsymmetric( ublas::matrix<T>& p_matrix, const std::size_t& p_row, const std::size_t& p_col, const T& p_val1, const T& p_val2 )
-    {
-        // upgrade lock for writing
-        boost::unique_lock<boost::shared_mutex> l_lock( m_matrixlock ); 
-        
-        // because of deflate algorithms there can be values greater than 1, so we check and set it to 1
-        p_matrix(p_row, p_col) = std::min( static_cast<T>(1), p_val1 );
-        p_matrix(p_col, p_row) = std::min( static_cast<T>(1), p_val2 );
-    }
-    
-    
-    /** write method for symmetric matrix data, which sets the values into the position
-     * @param p_matrix matrix with data
-     * @param p_row row index
-     * @param p_col col index
-     * @param p_val value for (p_row/p_col)
-     **/
-     template<typename T> inline void ncd<T>::setSymmetric( ublas::symmetric_matrix<T, ublas::upper>& p_matrix, const std::size_t& p_row, const std::size_t& p_col, const T& p_val )
-     {
-         // upgrade lock for writing
-         boost::unique_lock<boost::shared_mutex> l_lock( m_matrixlock ); 
-     
-         // because of deflate algorithms there can be values greater than 1, so we check and set it to 1
-         p_matrix(p_row, p_col) = std::min( static_cast<T>(1), p_val );
-     }
-    
-    
-    
-    /** creates the thread and calculates the NCD symmetric 
-     * @param p_wavefront map with indices
-     * @param p_sources vector with source data
-     * @param p_id thread id for reading pairs in wavefront
-     * @param p_isfile bool if data is interpretated as filenames
-     * @param p_matrix result matrix
-     * @param p_cache cache vector
-     **/
-     template<typename T> inline void ncd<T>::multithread_deflate_symmetric( std::multimap<std::size_t, std::pair<std::size_t,std::size_t> >& p_wavefront, const std::vector<std::string>& p_sources, const std::size_t& p_id, const bool& p_isfile, ublas::symmetric_matrix<T, ublas::upper>& p_matrix, ublas::vector<std::size_t>& p_cache )
-     {
-         for(std::multimap<std::size_t, std::pair<std::size_t,std::size_t> >::iterator it=p_wavefront.lower_bound(p_id); it != p_wavefront.upper_bound(p_id); ++it) {
-             // read cache data
-             std::size_t l_first=0, l_second=0;
-             getCache( p_cache, it->second.first, it->second.second, l_first, l_second);
-
-             // check for both index positions the cache and adds the data
-             if (l_first == 0) {
-                 l_first = deflate(p_isfile, p_sources[it->second.first]);
-                 setCache( p_cache, it->second.first, l_first );
-             }
-             
-             if (l_second == 0) {
-                 l_second = deflate(p_isfile, p_sources[it->second.second]);
-                 setCache( p_cache, it->second.second, l_second );
-             }
-             
-             
-             // determin min and max
-             const std::size_t l_min = std::min(l_first, l_second);
-             const std::size_t l_max = std::max(l_first, l_second);
-             
-             // calculate NCD for both parts and create the arithmetic mean
-             setSymmetric( p_matrix, it->second.first, it->second.second, 
-                           0.5 * (static_cast<T>(deflate(p_isfile, p_sources[it->second.first], p_sources[it->second.second]) - l_min) / l_max + 
-                                  static_cast<T>(deflate(p_isfile, p_sources[it->second.second], p_sources[it->second.first]) - l_min) / l_max)
-                         );
-         }
-     }
-    
-    
-    
-    /** creates the thread and calculates the NCD unsymmetric 
-     * @param p_wavefront map with indices
-     * @param p_sources vector with source data
-     * @param p_id thread id for reading pairs in wavefront
-     * @param p_isfile bool if data is interpretated as filenames
-     * @param p_matrix result matrix
-     * @param p_cache cache vector
-     **/
-    template<typename T> inline void ncd<T>::multithread_deflate_unsymmetric( std::multimap<std::size_t, std::pair<std::size_t,std::size_t> >& p_wavefront, const std::vector<std::string>& p_sources, const std::size_t& p_id, const bool& p_isfile, ublas::matrix<T>& p_matrix, ublas::vector<std::size_t>& p_cache )
-    {
-        for(std::multimap<std::size_t, std::pair<std::size_t,std::size_t> >::iterator it=p_wavefront.lower_bound(p_id); it != p_wavefront.upper_bound(p_id); ++it) {
-            
-            // read cache data
-            std::size_t l_first=0, l_second=0;
-            getCache( p_cache, it->second.first, it->second.second, l_first, l_second );
-            
-            // check for both index positions the cache and adds the data
-            if (l_first == 0) {
-                l_first = deflate(p_isfile, p_sources[it->second.first]);
-                setCache( p_cache, it->second.first, l_first );
-            }
-            
-            if (l_second == 0) {
-                l_second = deflate(p_isfile, p_sources[it->second.second]);
-                setCache( p_cache, it->second.second, l_second );
-            }
-            
-            
-            // determin min and max
-            const std::size_t l_min = std::min(l_first, l_second);
-            const std::size_t l_max = std::max(l_first, l_second);
-            
-            // calculate NCD
-            setUnsymmetric( p_matrix, it->second.first, it->second.second, 
-                            static_cast<T>(deflate(p_isfile, p_sources[it->second.first], p_sources[it->second.second]) - l_min) / l_max,
-                            static_cast<T>(deflate(p_isfile, p_sources[it->second.second], p_sources[it->second.first]) - l_min) / l_max
-                          );
-        }
-    }
-    
-    
-    /** creates the thread and calculates the NCD unsymmetric 
-     * @param p_map map with indices
-     * @param p_sources1 vector with row data
-     * @param p_sources2 vector with column data
-     * @param p_id thread id for reading pairs in the map
-     * @param p_isfile bool if data is interpretated as filenames
-     * @param p_matrix result matrix
-     * @param p_cache cache vector
-     **/
-    template<typename T> inline void ncd<T>::multithread_deflate_unsquare( std::multimap<std::size_t, std::pair<std::size_t,std::size_t> >& p_map, const std::vector<std::string>& p_sources1, const std::vector<std::string>& p_sources2, const std::size_t& p_id, const bool& p_isfile, ublas::matrix<T>& p_matrix, ublas::vector<std::size_t>& p_cache )
-    {
-        for(std::multimap<std::size_t, std::pair<std::size_t,std::size_t> >::iterator it=p_map.lower_bound(p_id); it != p_map.upper_bound(p_id); ++it) {
-            
-            // read cache data
-            std::size_t l_first=0, l_second=0;
-            getCache( p_cache, it->second.first, p_sources1.size()+it->second.second, l_first, l_second );
-            
-            // check for both index positions the cache and adds the data
-            if (l_first == 0) {
-                l_first = deflate(p_isfile, p_sources1[it->second.first]);
-                setCache( p_cache, it->second.first, l_first );
-            }
-            
-            if (l_second == 0) {
-                l_second = deflate(p_isfile, p_sources2[it->second.second]);
-                setCache( p_cache, p_sources1.size()+it->second.second, l_second );
-            }
-            
-            
-            // determin min and max
-            const std::size_t l_min = std::min(l_first, l_second);
-            const std::size_t l_max = std::max(l_first, l_second);
-            
-            setUnsquare( p_matrix, it->second.first, it->second.second,
-                         static_cast<T>(deflate(p_isfile, p_sources1[it->second.first], p_sources2[it->second.second]) - l_min) / l_max
-                        );
-        }
-    }
-    
-    
-    //---------------------------------------------------------------------------------------------------------------------------------------------------------
-    
-    
+      
     /** sets the compression level
      * @param  p_level compression level
      **/
@@ -421,7 +190,7 @@ namespace machinelearning { namespace distances {
     
     
     /** calculate all distances of the string vector (first item in the vector is
-     * first row and colum in the returning matrix
+     * first row and colum in the returning matrix)
      * @param p_strvec string vector
      * @param p_isfile parameter for interpreting the string as a file with path
      * @return dissimilarity matrix with std::vector x std::vector elements
@@ -435,55 +204,59 @@ namespace machinelearning { namespace distances {
         ublas::vector<std::size_t> l_cache(p_strvec.size(), 0);
         ublas::matrix<T> l_result(p_strvec.size(), p_strvec.size(), static_cast<T>(0));
         
-        // if we can use multithreads 
-        if (boost::thread::hardware_concurrency() > 1) {
-            
-            // we set a lock during calculation, because the object can't handle different local states
-            boost::unique_lock<boost::mutex> l_lock( m_running );
-            
-            // the first and last element are calculated in a single run, because
-            // the first two thread are used the data directly
-            l_cache(0) = deflate(p_isfile, p_strvec[0]);
-            l_cache(p_strvec.size()-1) = deflate(p_isfile, p_strvec[p_strvec.size()-1]);
-            
-            // create wavefront index position
-            std::multimap<std::size_t, std::pair<std::size_t,std::size_t> > l_wavefront = getWavefrontIndex(p_strvec.size(), boost::thread::hardware_concurrency());
-            
-            // create threads
-            boost::thread_group l_threadgroup;
-            for(std::size_t i=0; i < boost::thread::hardware_concurrency(); ++i)
-                l_threadgroup.create_thread(  boost::bind( &ncd<T>::multithread_deflate_unsymmetric, this, boost::ref(l_wavefront), boost::ref(p_strvec), i, p_isfile, boost::ref(l_result), boost::ref(l_cache) )  );
-            
-            // run threads and wait during all finished
-            l_threadgroup.join_all();
-            
-        } else // otherwise (we can't use threads)
-            for (std::size_t i = 0; i < p_strvec.size(); ++i) {
-                // create deflate to cache
-                if (i==0)
-                    l_cache(i) = deflate(p_isfile, p_strvec[i]);
+        // the first and last element are calculated in a single run, because
+        // the first two thread are used the data directly
+        l_cache(0) = deflate(p_isfile, p_strvec[0]);
+        l_cache(p_strvec.size()-1) = deflate(p_isfile, p_strvec[p_strvec.size()-1]);
+        
+        // create wavefront index position
+        std::multimap<std::size_t, std::pair<std::size_t,std::size_t> > l_wavefront = getWavefrontIndex(p_strvec.size(), omp_get_num_threads());
+        
+        #pragma omp parallel shared(l_cache, l_result)
+        {
+            for(std::multimap<std::size_t, std::pair<std::size_t,std::size_t> >::iterator it=l_wavefront.lower_bound(omp_get_thread_num()); it != l_wavefront.upper_bound(omp_get_thread_num()); ++it) {
                 
-                for (std::size_t j = i+1; j < p_strvec.size(); ++j) {
-                    if (i==0)
-                        l_cache(j) = deflate(p_isfile, p_strvec[j]);
-                    
-                    const std::size_t l_min = std::min(l_cache(i), l_cache(j));
-                    const std::size_t l_max = std::max(l_cache(i), l_cache(j));
-                    
-                    setUnsymmetric( l_result, i, j,  
-                                    static_cast<T>(deflate(p_isfile, p_strvec[i], p_strvec[j]) - l_min) / l_max, 
-                                    static_cast<T>(deflate(p_isfile, p_strvec[j], p_strvec[i]) - l_min) / l_max
-                                  );
-
+                // read cache data
+                std::size_t l_first=0, l_second=0;
+                
+                #pragma omp critical
+                {
+                    l_first  = l_cache(it->second.first);
+                    l_second = l_cache(it->second.second);
                 }
+                
+                // check for both index positions the cache and adds the data
+                if (l_first == 0) {
+                    l_first = deflate(p_isfile, p_strvec[it->second.first]);
+                    
+                    #pragma omp critical
+                    l_cache(it->second.first) = l_first;
+                }
+                
+                if (l_second == 0) {
+                    l_second = deflate(p_isfile, p_strvec[it->second.second]);
+                    
+                    #pragma omp critical 
+                    l_cache(it->second.second) = l_second;
+                }
+                
+                
+                // determin min and max
+                const std::size_t l_min = std::min(l_first, l_second);
+                const std::size_t l_max = std::max(l_first, l_second);
+                
+                // calculate NCD
+                l_result(it->second.first, it->second.second) = std::min( static_cast<T>(1), static_cast<T>(deflate(p_isfile, p_strvec[it->second.first], p_strvec[it->second.second]) - l_min) / l_max );
+                l_result(it->second.second, it->second.first) = std::min( static_cast<T>(1), static_cast<T>(deflate(p_isfile, p_strvec[it->second.second], p_strvec[it->second.first]) - l_min) / l_max );
             }
+        }
         
         return l_result;
     }
     
     
     /** calculate all distances of the string vector (first item in the vector is
-     * first row and colum in the returning matrix
+     * first row and colum in the returning matrix)
      * @param p_strvec string vector
      * @param p_isfile parameter for interpreting the string as a file with path
      * @return dissimilarity matrix with std::vector x std::vector elements
@@ -496,51 +269,58 @@ namespace machinelearning { namespace distances {
          // init data
          ublas::vector<std::size_t> l_cache(p_strvec.size(), 0);
          ublas::symmetric_matrix<T, ublas::upper> l_result(p_strvec.size(), p_strvec.size());
-         
-         // if we can use multithreads 
-         if (boost::thread::hardware_concurrency() > 1) {
-             
-             // we set a lock during calculation, because the object can't handle different local states
-             boost::unique_lock<boost::mutex> l_lock( m_running );
-             
-             // the first and last element are calculated in a single run, because
-             // the first two thread are used the data directly
-             l_cache(0) = deflate(p_isfile, p_strvec[0]);
-             l_cache(p_strvec.size()-1) = deflate(p_isfile, p_strvec[p_strvec.size()-1]);
-             
-             // create wavefront index position
-             std::multimap<std::size_t, std::pair<std::size_t,std::size_t> > l_wavefront = getWavefrontIndex(p_strvec.size(), boost::thread::hardware_concurrency());
-             
-             // create threads
-             boost::thread_group l_threadgroup;
-             for(std::size_t i=0; i < boost::thread::hardware_concurrency(); ++i)
-                 l_threadgroup.create_thread(  boost::bind( &ncd<T>::multithread_deflate_symmetric, this, boost::ref(l_wavefront), boost::ref(p_strvec), i, p_isfile, boost::ref(l_result), boost::ref(l_cache) )  );
-             
-             // run threads and wait during all finished
-             l_threadgroup.join_all();
-             
-         } else // otherwise (we can't use threads)
-             for (std::size_t i = 0; i < p_strvec.size(); ++i) {
-                 // create deflate to cache
-                 if (i==0)
-                     l_cache(i) = deflate(p_isfile, p_strvec[i]);
-                 
-                 for (std::size_t j = i+1; j < p_strvec.size(); ++j) {
-                     if (i==0)
-                         l_cache(j) = deflate(p_isfile, p_strvec[j]);
-                     
-                     const std::size_t l_min = std::min(l_cache(i), l_cache(j));
-                     const std::size_t l_max = std::max(l_cache(i), l_cache(j));
-                     
-                     setSymmetric( l_result, i, j,  
-                                   0.5 * (static_cast<T>(deflate(p_isfile, p_strvec[i], p_strvec[j]) - l_min) / l_max + 
-                                          static_cast<T>(deflate(p_isfile, p_strvec[j], p_strvec[i]) - l_min) / l_max)
-                                 );
-                     
-                 }
-             }
-         
+        
+        // the first and last element are calculated in a single run, because
+        // the first two thread are used the data directly
+        l_cache(0) = deflate(p_isfile, p_strvec[0]);
+        l_cache(p_strvec.size()-1) = deflate(p_isfile, p_strvec[p_strvec.size()-1]);
+        
+        // create wavefront index position
+        std::multimap<std::size_t, std::pair<std::size_t,std::size_t> > l_wavefront = getWavefrontIndex(p_strvec.size(), omp_get_num_threads());
+        
+        #pragma omp parallel shared(l_cache, l_result)
+        {
+            for(std::multimap<std::size_t, std::pair<std::size_t,std::size_t> >::iterator it=l_wavefront.lower_bound(omp_get_thread_num()); it != l_wavefront.upper_bound(omp_get_thread_num()); ++it) {
+                
+                // read cache data
+                std::size_t l_first=0, l_second=0;
+                
+                #pragma omp critical
+                {
+                    l_first  = l_cache(it->second.first);
+                    l_second = l_cache(it->second.second);
+                }
+                
+                // check for both index positions the cache and adds the data
+                if (l_first == 0) {
+                    l_first = deflate(p_isfile, p_strvec[it->second.first]);
+                    
+                    #pragma omp critical
+                    l_cache(it->second.first) = l_first;
+                }
+                
+                if (l_second == 0) {
+                    l_second = deflate(p_isfile, p_strvec[it->second.second]);
+                    
+                    #pragma omp critical 
+                    l_cache(it->second.second) = l_second;
+                }
+                
+                
+                // determin min and max
+                const std::size_t l_min = std::min(l_first, l_second);
+                const std::size_t l_max = std::max(l_first, l_second);
+                
+                // calculate NCD
+                l_result(it->second.first, it->second.second) = std::min( static_cast<T>(1),
+                             0.5 * (static_cast<T>(deflate(p_isfile, p_strvec[it->second.first], p_strvec[it->second.second]) - l_min) / l_max + 
+                                    static_cast<T>(deflate(p_isfile, p_strvec[it->second.second], p_strvec[it->second.first]) - l_min) / l_max)
+                             );
+            }
+        }
+        
          // we set the diagonal elements to zero, because constructor has no parameter for initialization value
+         #pragma omp for
          for(std::size_t i=0; i < l_result.size1(); ++i)
              l_result(i,i) = static_cast<T>(0);
          
@@ -554,7 +334,7 @@ namespace machinelearning { namespace distances {
      * @param p_isfile parameter for interpreting the string as a file with path
      * @return dissimilarity matrix with std::vector1 x std::vector2 elements (deflating order: element first vector concat with element second vector )
      **/
-    template<typename T> inline ublas::matrix<T> ncd<T>::unsquare ( const std::vector<std::string>& p_strvec1, const std::vector<std::string>& p_strvec2, const bool& p_isfile )
+    template<typename T> inline ublas::matrix<T> ncd<T>::unsquare( const std::vector<std::string>& p_strvec1, const std::vector<std::string>& p_strvec2, const bool& p_isfile )
     {
         if ( (p_strvec1.size() == 0) || (p_strvec2.size() == 0) )
             throw exception::runtime(_("vector size must be greater than zero"), *this);
@@ -562,53 +342,67 @@ namespace machinelearning { namespace distances {
         // init data
         ublas::vector<std::size_t> l_cache(p_strvec1.size() + p_strvec2.size(), 0);
         ublas::matrix<T> l_result( p_strvec1.size(), p_strvec2.size() );
+    
+        // we create the map for threads (on the contrary to wavefront we cut patches for each thread, because we must calculate each element without any topographical order)
+        // The map element has in the std::pair within the first position the index of the first vector
+        std::multimap<std::size_t, std::pair<std::size_t,std::size_t> > l_map;
         
-        // if we can use multithreads 
-        if (boost::thread::hardware_concurrency() > 1) {
-            
-            // we set a lock during calculation, because the object can't handle different local states
-            boost::unique_lock<boost::mutex> l_lock( m_running );
-            
-            // we create the map for threads (on the contrary to wavefront we cut patches for each thread, because we must calculate each element without any topographical order)
-            // The map element has in the std::pair within the first position the index of the first vector
-            std::multimap<std::size_t, std::pair<std::size_t,std::size_t> > l_map;
-            
+        #pragma omp parallel shared(l_map)
+        {
             if (p_strvec1.size() < p_strvec2.size())
+                
+                #pragma omp for
                 for(std::size_t j=0; j < p_strvec1.size(); ++j)
                     for(std::size_t i=0; i < p_strvec2.size(); ++i)
-                        l_map.insert(  std::pair<std::size_t, std::pair<std::size_t,std::size_t> >(i % boost::thread::hardware_concurrency(), std::pair<std::size_t,std::size_t>(j,i))  );
-                
+                        l_map.insert(  std::pair<std::size_t, std::pair<std::size_t,std::size_t> >(i % omp_get_num_threads(), std::pair<std::size_t,std::size_t>(j,i))  );
+            
             else
+                
+                #pragma omp for
                 for(std::size_t j=0; j < p_strvec2.size(); ++j)
                     for(std::size_t i=0; i < p_strvec1.size(); ++i)
-                        l_map.insert(  std::pair<std::size_t, std::pair<std::size_t,std::size_t> >(i % boost::thread::hardware_concurrency(), std::pair<std::size_t,std::size_t>(i,j))  );
+                        l_map.insert(  std::pair<std::size_t, std::pair<std::size_t,std::size_t> >(i % omp_get_num_threads(), std::pair<std::size_t,std::size_t>(i,j))  );
+        }
 
-            // create threads
-            boost::thread_group l_threadgroup;
-            for(std::size_t i=0; i < boost::thread::hardware_concurrency(); ++i)
-                l_threadgroup.create_thread(  boost::bind( &ncd<T>::multithread_deflate_unsquare, this, boost::ref(l_map), boost::ref(p_strvec1), boost::ref(p_strvec2), i, p_isfile, boost::ref(l_result), boost::ref(l_cache) )  );
-            
-            // run threads and wait during all finished
-            l_threadgroup.join_all();
-            
-            
-            
-            
-        } else // otherwise (we can't use threads)
-            for (std::size_t i = 0; i < p_strvec1.size(); ++i) {
-                l_cache(i) = deflate(p_isfile, p_strvec1[i]);
-                
-                for (std::size_t j = 0; j < p_strvec2.size(); ++j) {
-                    if (i == 0)
-                        l_cache(p_strvec1.size()+j) = deflate(p_isfile, p_strvec2[j]);
-                    
-                    const std::size_t l_min = std::min(l_cache(i), l_cache(p_strvec1.size()+j));
-                    const std::size_t l_max = std::max(l_cache(i), l_cache(p_strvec1.size()+j));
-                    
-                    setUnsquare( l_result, i, j, static_cast<T>(deflate(p_isfile, p_strvec1[i], p_strvec2[j]) - l_min) / l_max );
-                }
-            }
         
+        #pragma omp parallel shared(l_cache, l_result)
+        {
+            for(std::multimap<std::size_t, std::pair<std::size_t,std::size_t> >::iterator it=l_map.lower_bound(omp_get_thread_num()); it != l_map.upper_bound(omp_get_thread_num()); ++it) {
+        
+                // read cache data
+                std::size_t l_first=0, l_second=0;
+                
+                #pragma omp critical
+                {
+                    l_first  = l_cache(it->second.first);
+                    l_second = l_cache(p_strvec1.size()+it->second.second);
+                }
+                
+                // check for both index positions the cache and adds the data
+                if (l_first == 0) {
+                    l_first = deflate(p_isfile, p_strvec1[it->second.first]);
+                    
+                    #pragma omp critical
+                    l_cache(it->second.first) = l_first;
+                }
+                
+                if (l_second == 0) {
+                    l_second = deflate(p_isfile, p_strvec2[it->second.second]);
+                    
+                    #pragma omp critical 
+                    l_cache(p_strvec1.size()+it->second.second) = l_second;
+                }
+                
+                
+                // determin min and max
+                const std::size_t l_min = std::min(l_first, l_second);
+                const std::size_t l_max = std::max(l_first, l_second);
+        
+                // calculate NCD
+                l_result(it->second.first, it->second.second) = std::min( static_cast<T>(1), static_cast<T>(deflate(p_isfile, p_strvec1[it->second.first], p_strvec2[it->second.second]) - l_min) / l_max );
+            }
+        }
+                
         return l_result;
     }
     
