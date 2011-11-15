@@ -355,6 +355,8 @@ namespace machinelearning { namespace distances {
                 #pragma omp for
                 for(std::size_t j=0; j < p_strvec1.size(); ++j)
                     for(std::size_t i=0; i < p_strvec2.size(); ++i)
+                        
+                        #pragma omp critical
                         l_map.insert(  std::pair<std::size_t, std::pair<std::size_t,std::size_t> >(i % omp_get_max_threads(), std::pair<std::size_t,std::size_t>(j,i))  );
             
             else
@@ -362,6 +364,8 @@ namespace machinelearning { namespace distances {
                 #pragma omp for
                 for(std::size_t j=0; j < p_strvec2.size(); ++j)
                     for(std::size_t i=0; i < p_strvec1.size(); ++i)
+                        
+                        #pragma omp critical
                         l_map.insert(  std::pair<std::size_t, std::pair<std::size_t,std::size_t> >(i % omp_get_max_threads(), std::pair<std::size_t,std::size_t>(i,j))  );
 
             
