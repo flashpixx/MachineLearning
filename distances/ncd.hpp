@@ -348,7 +348,7 @@ namespace machinelearning { namespace distances {
         // The map element has in the std::pair within the first position the index of the first vector
         std::multimap<std::size_t, std::pair<std::size_t,std::size_t> > l_map;
         
-        #pragma omp parallel shared(l_map)
+        #pragma omp parallel shared(l_map, l_cache, l_result)
         {
             if (p_strvec1.size() < p_strvec2.size())
                 
@@ -363,11 +363,10 @@ namespace machinelearning { namespace distances {
                 for(std::size_t j=0; j < p_strvec2.size(); ++j)
                     for(std::size_t i=0; i < p_strvec1.size(); ++i)
                         l_map.insert(  std::pair<std::size_t, std::pair<std::size_t,std::size_t> >(i % omp_get_max_threads(), std::pair<std::size_t,std::size_t>(i,j))  );
-        }
 
-        
-        #pragma omp parallel shared(l_cache, l_result)
-        {
+            
+            #pragma omp barrier
+            
             for(std::multimap<std::size_t, std::pair<std::size_t,std::size_t> >::iterator it=l_map.lower_bound(omp_get_thread_num()); it != l_map.upper_bound(omp_get_thread_num()); ++it) {
         
                 // read cache data
