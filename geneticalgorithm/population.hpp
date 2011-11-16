@@ -47,6 +47,7 @@ namespace machinelearning { namespace geneticalgorithm {
 
     /** class for the population / optimization structure
      * $LastChangedDate$
+     * @todo check memory allocation on big datasets
      **/
     template<typename T, typename L> class population
     {
@@ -272,17 +273,18 @@ namespace machinelearning { namespace geneticalgorithm {
                 #pragma omp for
                 for(std::size_t i=0; i < m_population.size(); ++i) {
                     l_fitness(i) = l_fitnessfunction->getFitness( *m_population[i] );
+                    
                     if (l_fitnessfunction->isOptimumReached())
                         #pragma omp critical
                         l_optimumreached = true;
                 }
             }
-            
 
         
             // scales the fitness values to [0,x]
             const T l_min = tools::vector::min( l_fitness );
             
+            // scales the fitness values to zero
             #pragma omp parallel for shared(l_fitness)
             for(std::size_t i=0; i < l_fitness.size(); ++i)
                 l_fitness(i) -= l_min;
@@ -310,12 +312,11 @@ namespace machinelearning { namespace geneticalgorithm {
                     std::copy( l_elite.begin(), l_elite.end(), std::back_inserter(m_elite));
             }
             
-            // updateing elite size
+            // updateing elite size and break if optimum is found
             m_elitesize = m_elite.size();
-
-            // break if optimum is found
             if (l_optimumreached)
                 break;
+
             
             // build the new population
             switch (m_buildoption) {
