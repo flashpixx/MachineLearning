@@ -338,13 +338,12 @@ def build_atlaslapack(target, source, env) :
     html = f.read()
     f.close()
 
-    found = re.search("<small title=\"(.*)tar.bz2\">(.*)</small>", html)
+    found = re.search("<span>Download atlas(.*).tar.bz2 \((.*)\)</span>", html)
     if found == None :
         raise RuntimeError("ATLAS Version can not be detected")
 
-    atlasversion = found.group(2)
-    atlasversion = atlasversion.replace("atlas", "")
-    atlasversion = atlasversion.replace(".tar.bz2", "")
+    atlasversion = found.group(1)
+
 
     ptrwidth = ""
     if env["atlaspointerwidth"] == "32" :
