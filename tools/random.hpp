@@ -25,12 +25,11 @@
 #ifndef __MACHINELEARNING_TOOLS_RANDOM_HPP
 #define __MACHINELEARNING_TOOLS_RANDOM_HPP
 
-
+#include <omp.h>
 #include <ctime>
 #include <limits>
 #include <sstream>
 #include <boost/static_assert.hpp>
-#include <boost/thread/thread.hpp>
 #include <boost/random.hpp>
 
 #ifdef MACHINELEARNING_RANDOMDEVICE
@@ -126,10 +125,6 @@ namespace machinelearning { namespace tools {
             template<typename T> T getChiSquared( const T& );
             template<typename T> T getTriangular( const T&, const T&, const T& );
         
-            #ifndef MACHINELEARNING_RANDOMDEVICE
-            static std::time_t getThreadID( void );
-            #endif
-        
     };
     
     
@@ -141,28 +136,13 @@ namespace machinelearning { namespace tools {
     #ifndef MACHINELEARNING_RANDOMDEVICE
     inline random::random( void )
         #ifndef MACHINELEARNING_MPI
-        : m_random(  boost::mt19937(getThreadID() ^ time(NULL))  )
+        : m_random(  boost::mt19937(omp_get_thread_num() ^ time(NULL))  )
         #endif
     {
         #ifdef MACHINELEARNING_MPI
         mpi::communicator l_mpi;
-        m_random = boost::mt19937( (getThreadID() ^ time(NULL)) * (l_mpi.rank()+1) );
+        m_random = boost::mt19937( (omp_get_thread_num() ^ time(NULL)) * (l_mpi.rank()+1) );
         #endif
-    }
-   
-    
-    /** reads the thread object id and converts it to numeric value
-     * @return thread id as time value for combination
-     **/
-    inline std::time_t random::getThreadID( void )
-    {
-        std::size_t l_val = 1;
-         
-        std::stringstream l_sstream;
-        l_sstream << std::hex << boost::this_thread::get_id();
-        l_sstream >> l_val;
-
-        return l_val;
     }
     #endif
         

@@ -25,12 +25,11 @@
 #ifndef __MACHINELEARNING_GENETICALGORITHM_POPULATION_HPP
 #define __MACHINELEARNING_GENETICALGORITHM_POPULATION_HPP
 
+#include <omp.h>
 #include <limits>
 #include <boost/numeric/ublas/vector.hpp>
 
 #include <boost/shared_ptr.hpp>
-#include <boost/thread.hpp>
-#include <boost/ref.hpp>
 
 #include "../exception/exception.h"
 #include "../tools/tools.h"
@@ -103,19 +102,8 @@ namespace machinelearning { namespace geneticalgorithm {
             buildoption m_buildoption;
             /** mutation probability **/
             probability m_mutateprobility;
-            /** boost mutex for running **/
-            boost::mutex m_running;
-            /** boost mutex for lock during fitting **/
-            boost::mutex m_iterationlock;
             /** elite size **/
             std::size_t m_elitesize;
-        
-        
-            void fitness( const std::size_t&, const std::size_t&, fitness::fitness<T,L>&, ublas::vector<T>&, bool& );
-            void mutate( const std::size_t&, const std::size_t& );
-            void buildelite( const std::size_t&, const std::size_t&, selection::selection<T,L>&, const ublas::vector<T>&, const ublas::vector<std::size_t>&, const ublas::vector<std::size_t>& );
-            void buildpopulation( const std::size_t&, const std::size_t&, crossover::crossover<L>&, const ublas::vector<std::size_t>& );
-        
     };
     
     
@@ -131,8 +119,6 @@ namespace machinelearning { namespace geneticalgorithm {
         m_elite(),
         m_buildoption( eliteonly ),
         m_mutateprobility(),
-        m_running(),
-        m_iterationlock(),
         m_elitesize(p_elite)
     {
         if (p_size < 3)
@@ -249,27 +235,9 @@ namespace machinelearning { namespace geneticalgorithm {
     {
         if (p_iteration == 0)
             throw exception::runtime(_("iterations must be greater than zero"), *this);
-
-        // we set a lock during calculation, because the object can't handle different local states
-        boost::unique_lock<boost::mutex> l_lock( m_running );
         
-        
-        
-        // create element ranges of the population and elite for multithreadding
-        std::size_t l_inc = m_population.size() / boost::thread::hardware_concurrency();
-        l_inc = l_inc == 0 ? m_population.size() : l_inc;
-        std::vector< std::pair<std::size_t, std::size_t> > l_populationparts;
-        for( std::size_t i=0; i < m_population.size()-1; i+=l_inc )
-            l_populationparts.push_back( std::pair<std::size_t, std::size_t>(i, i+l_inc) );
-        
-        if (l_populationparts.size() == 0)
-            l_populationparts.push_back( std::pair<std::size_t, std::size_t>(0, m_population.size()) );
-        else
-            l_populationparts[l_populationparts.size()-1].second += m_population.size() % boost::thread::hardware_concurrency();
-        l_populationparts[l_populationparts.size()-1].second = std::min( l_populationparts[l_populationparts.size()-1].second, m_population.size() );
-        
-        
-        l_inc = m_elitesize / boost::thread::hardware_concurrency();
+        // create a map with the parts of the elites that are build on each thread (eg: elites [0,k) on thread 0, [k,n) on thread 1, ...)
+        std::size_t l_inc = m_elitesize / omp_get_max_threads();
         l_inc = l_inc == 0 ? m_elitesize : l_inc;
         std::vector< std::pair<std::size_t, std::size_t> > l_eliteparts;
         for( std::size_t i=0; i < m_elitesize-1; i+=l_inc )
@@ -278,32 +246,47 @@ namespace machinelearning { namespace geneticalgorithm {
         if (l_eliteparts.size() == 0)
             l_eliteparts.push_back( std::pair<std::size_t, std::size_t>(0, m_elitesize) );
         else
-            l_eliteparts[l_eliteparts.size()-1].second += m_elitesize % boost::thread::hardware_concurrency();
+            l_eliteparts[l_eliteparts.size()-1].second += m_elitesize % omp_get_max_threads();
         l_eliteparts[l_eliteparts.size()-1].second = std::min( l_eliteparts[l_eliteparts.size()-1].second, m_elitesize );
 
-
+        // create local random generator
+        tools::random l_random;
+        
         
         // run iteration process (each thread group must be recreated on the iteration, because after the join_all() the threads are "out-of-range")
         for(std::size_t i=0; i < p_iteration; ++i) {
             
             // vector with fitness values and thread object
             ublas::vector<T> l_fitness(m_population.size(), 0);
-            boost::thread_group l_threads;
-            
-            
             
             // create and run fitness threads
             bool l_optimumreached = false;
-            for(std::size_t j=0; j < l_populationparts.size(); ++j)
-                l_threads.create_thread(  boost::bind( &population<T,L>::fitness, this, l_populationparts[j].first, l_populationparts[j].second, boost::ref(p_fitness), boost::ref(l_fitness), boost::ref(l_optimumreached) )  );
-            l_threads.join_all();
+            
+            // OpenMP can't break the thread loop, so we run over all elements within the population
+            // and if the optimum is reached we don't break the loop
+            #pragma omp parallel shared(l_optimumreached, l_fitness)
+            {
+                boost::shared_ptr< fitness::fitness<T,L> > l_fitnessfunction;
+                p_fitness.clone( l_fitnessfunction );
+            
+                #pragma omp for
+                for(std::size_t i=0; i < m_population.size(); ++i) {
+                    l_fitness(i) = l_fitnessfunction->getFitness( *m_population[i] );
+                    if (l_fitnessfunction->isOptimumReached())
+                        #pragma omp critical
+                        l_optimumreached = true;
+                }
+            }
             
 
         
-            // scales the fitness values to [0,x] (not multithread)
-            const T l_min = tools::vector::min( l_fitness);
-            BOOST_FOREACH( T& p, l_fitness )
-                p -= l_min;
+            // scales the fitness values to [0,x]
+            const T l_min = tools::vector::min( l_fitness );
+            
+            #pragma omp parallel for shared(l_fitness)
+            for(std::size_t i=0; i < l_fitness.size(); ++i)
+                l_fitness(i) -= l_min;
+
              
             // rank the fitness values (not multithread)
             const ublas::vector<std::size_t> l_rankIndex( tools::vector::rankIndexVector(l_fitness) );
@@ -313,9 +296,19 @@ namespace machinelearning { namespace geneticalgorithm {
             
             // create elite multithreaded
             m_elite.clear();
-            for(std::size_t j=0; j < l_eliteparts.size(); ++j)
-                l_threads.create_thread(  boost::bind( &population<T,L>::buildelite, this, l_eliteparts[j].first, l_eliteparts[j].second, boost::ref(p_elite), boost::ref(l_fitness), boost::ref(l_rankIndex), boost::ref(l_rank) )  );
-            l_threads.join_all();
+            
+            #pragma omp parallel shared(l_fitness, l_rank, l_rankIndex)
+            {
+                boost::shared_ptr< selection::selection<T,L> > l_selection;
+                p_elite.clone( l_selection );
+                
+                std::vector< boost::shared_ptr< individual::individual<L> > > l_elite;
+                l_selection->getElite(l_eliteparts[omp_get_thread_num()].first, l_eliteparts[omp_get_thread_num()].second, m_population, l_fitness, l_rankIndex, l_rank, l_elite);
+
+                if (l_elite.size() > 0)
+                    #pragma omp critical
+                    std::copy( l_elite.begin(), l_elite.end(), std::back_inserter(m_elite));
+            }
             
             // updateing elite size
             m_elitesize = m_elite.size();
@@ -324,32 +317,67 @@ namespace machinelearning { namespace geneticalgorithm {
             if (l_optimumreached)
                 break;
             
-
-            
-            // create build new population threads and run
-            switch (  ((m_buildoption == eliteonly) || (m_buildoption == random)) ? 0 : 1  ) {
+            // build the new population
+            switch (m_buildoption) {
                     
-                case 0 :
-                    for(std::size_t j=0; j < l_populationparts.size(); ++j)
-                        l_threads.create_thread(  boost::bind( &population<T,L>::buildpopulation, this, l_populationparts[j].first, l_populationparts[j].second, boost::ref(p_crossover), boost::ref(l_rankIndex) )  );
+                case eliteonly :
+                    #pragma omp parallel shared(l_random)
+                    {
+                        boost::shared_ptr< crossover::crossover<L> > l_crossover;
+                        p_crossover.clone( l_crossover );
+                
+                        #pragma omp for 
+                        for(std::size_t i=0; i < m_population.size(); ++i) {
+                            for(std::size_t j=0; j < l_crossover->getNumberOfIndividuals(); ++j)
+                                l_crossover->setIndividual( m_elite[static_cast<std::size_t>(l_random.get<T>(tools::random::uniform, 0, m_elite.size()))] );
+                        
+                            m_population[i] = l_crossover->combine();
+                        }
+                    }
                     break;
                     
-                case 1 :
-                    for(std::size_t j=0; j < l_eliteparts.size(); ++j)
-                        l_threads.create_thread(  boost::bind( &population<T,L>::buildpopulation, this, l_eliteparts[j].first, l_eliteparts[j].second, boost::ref(p_crossover), boost::ref(l_rankIndex) )  );
+                    
+                case steadystates :
+                    #pragma omp parallel shared(l_random, l_rankIndex)
+                    {
+                        boost::shared_ptr< crossover::crossover<L> > l_crossover;
+                        p_crossover.clone( l_crossover );
+                        
+                        #pragma omp for 
+                        for(std::size_t i=0; i < m_elite.size(); ++i) {
+                            for(std::size_t j=0; j < l_crossover->getNumberOfIndividuals(); ++j)
+                                l_crossover->setIndividual( m_elite[static_cast<std::size_t>(l_random.get<T>(tools::random::uniform, 0, m_elite.size()))] );
+                            
+                            m_population[l_rankIndex(i)] = l_crossover->combine();
+                        }
+                    }
                     break;
                     
+                    
+                case random :
+                    #pragma omp parallel shared(l_random)
+                    {
+                        boost::shared_ptr< crossover::crossover<L> > l_crossover;
+                        p_crossover.clone( l_crossover );
+                        
+                        #pragma omp for
+                        for(std::size_t i=0; i < m_population.size(); ++i) {
+                            for(std::size_t j=0; j < l_crossover->getNumberOfIndividuals(); ++j)
+                                l_crossover->setIndividual( m_elite[static_cast<std::size_t>(l_random.get<T>(tools::random::uniform, 0, m_elite.size()))] );
+                            
+                            #pragma omp critical
+                            m_population[static_cast<std::size_t>(l_random.get<T>(tools::random::uniform, 0, m_elite.size()))] = l_crossover->combine();
+                        }
+                    }
+                    break;
             }
-            l_threads.join_all();
-
             
             
             // create and run mutation threads
-            for(std::size_t j=0; j < l_populationparts.size(); ++j)
-                l_threads.create_thread(  boost::bind( &population<T,L>::mutate, this, l_populationparts[j].first, l_populationparts[j].second )  );
-            l_threads.join_all();
-            
-            
+            #pragma omp parallel for shared(l_random)
+            for(std::size_t i=0; i < m_population.size(); ++i)
+                if (l_random.get<T>( m_mutateprobility.distribution, m_mutateprobility.first, m_mutateprobility.second, m_mutateprobility.third ) <= m_mutateprobility.probabilityvalue)
+                    m_population[i]->mutate();
             
             // call the "eachIteration" method of each object for updating local object properties (not multithreaded, because of synchronization)
             p_fitness.onEachIteration( m_population );
@@ -357,121 +385,6 @@ namespace machinelearning { namespace geneticalgorithm {
             p_crossover.onEachIteration( m_population );
         }
     }
-    
-    
-    /** multithread method for calculating fitness values (start & end values must be disjuct over all threads)
-     * @param p_start start value of the population values
-     * @param p_end end value of the population values
-     * @param p_fitnessfunction fitness function object
-     * @param p_fitness reference to the fitness vector
-     * @param p_optimumreached bool reference for stop calculation immediately
-     **/
-    template<typename T, typename L> inline void population<T,L>::fitness( const std::size_t& p_start, const std::size_t& p_end, fitness::fitness<T,L>& p_fitnessfunction, ublas::vector<T>& p_fitness, bool& p_optimumreached )
-    {
-        // create local selection object
-        boost::shared_ptr< fitness::fitness<T,L> > l_fitness;
-        p_fitnessfunction.clone( l_fitness );
-        
-        for(std::size_t i=p_start; (i < p_end) && (!p_optimumreached); ++i) {
-            p_fitness(i) = l_fitness->getFitness( *m_population[i] );
-            if (l_fitness->isOptimumReached()) {
-                boost::unique_lock<boost::mutex> l_lock( m_iterationlock );
-                p_optimumreached = true;
-            }
-        }
-    }
-    
-    
-    /** multithread method for mutating some population elements (start & end values must be disjuct over all threads)
-     * @param p_start start value of the population values
-     * @param p_end end value of the population values
-     **/
-    template<typename T, typename L> inline void population<T,L>::mutate( const std::size_t& p_start, const std::size_t& p_end )
-    {
-        tools::random l_rand;
-        for(std::size_t i=p_start; i < p_end; ++i)
-            if (l_rand.get<T>( m_mutateprobility.distribution, m_mutateprobility.first, m_mutateprobility.second, m_mutateprobility.third ) <= m_mutateprobility.probabilityvalue)
-                m_population[i]->mutate();
-    }
-    
-    
-    /** multithread method for building new population elements (start & end values must be disjuct over all threads)
-     * @param p_start start value of the population / elite values
-     * @param p_end end value of the population  / elite 
-     * @param p_crossover crossover function object
-     * @param p_rankIdx ublas vector with rank index values of population elements
-     **/
-    template<typename T, typename L> inline void population<T,L>::buildpopulation( const std::size_t& p_start, const std::size_t& p_end, crossover::crossover<L>& p_crossover, const ublas::vector<std::size_t>& p_rankIdx ) 
-    {
-        if (m_elite.size() == 0)
-            return;
-        
-        // create local selection object
-        boost::shared_ptr< crossover::crossover<L> > l_crossover;
-        p_crossover.clone( l_crossover );
-        
-        tools::random l_rand;
-        
-        switch (m_buildoption) {
-                
-            case eliteonly :
-                for(std::size_t i=p_start; i < p_end; ++i) {
-                    for(std::size_t j=0; j < l_crossover->getNumberOfIndividuals(); ++j)
-                        l_crossover->setIndividual( m_elite[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, 0, m_elite.size()))] );
-                    
-                    m_population[i] = l_crossover->combine();
-                }
-                break;
-                
-                
-            case steadystates :
-                for(std::size_t i=p_start; i < p_end; ++i) {
-                    for(std::size_t j=0; j < l_crossover->getNumberOfIndividuals(); ++j)
-                        l_crossover->setIndividual( m_elite[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, 0, m_elite.size()))] );
-
-                    m_population[p_rankIdx(i)] = l_crossover->combine();
-                }
-                break;
-                
-                
-            case random :
-                for(std::size_t i=p_start; i < p_end; ++i) {
-                    for(std::size_t j=0; j < l_crossover->getNumberOfIndividuals(); ++j)
-                        l_crossover->setIndividual( m_elite[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, 0, m_elite.size()))] );
-                    
-                    m_population[static_cast<std::size_t>(l_rand.get<T>(tools::random::uniform, p_start, p_end))] = l_crossover->combine();
-                }
-                break;
-        }
-    }
-    
-    
-    /** multithread for building the elite data
-     * @param p_start start value of the elite values
-     * @param p_end end value of the elite
-     * @param p_eliteselection elite selection object
-     * @param p_fitness fitness values
-     * @param p_rankIndex vector with index values in ascending order (0. element has the index of the smalles fitness value within the population)
-     * @param p_rank rank index (0. elements = 0. element within the population has the rank value (position) within the population )
-     **/
-    template<typename T, typename L> inline void population<T,L>::buildelite( const std::size_t& p_start, const std::size_t& p_end, selection::selection<T,L>& p_eliteselection, const ublas::vector<T>& p_fitness, const ublas::vector<std::size_t>& p_rankIndex, const ublas::vector<std::size_t>& p_rank )
-    {
-        // create local selection object
-        boost::shared_ptr< selection::selection<T,L> > l_selection;
-        p_eliteselection.clone( l_selection );
-        
-        // build elite
-        std::vector< boost::shared_ptr< individual::individual<L> > > l_elite;
-        l_selection->getElite( p_start, p_end, m_population, p_fitness, p_rankIndex, p_rank, l_elite );
-        
-        if (l_elite.size() == 0)
-            return;
-        
-        // we need a mutex, because different threads modify the elite property, so we must create a lock during resizing
-        boost::unique_lock<boost::mutex> l_lock( m_iterationlock );
-        std::copy( l_elite.begin(), l_elite.end(), std::back_inserter(m_elite));
-    }
-    
     
     
 }}
