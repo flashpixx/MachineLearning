@@ -47,7 +47,7 @@ namespace machinelearning { namespace geneticalgorithm {
 
     /** class for the population / optimization structure
      * $LastChangedDate$
-     * @todo check memory allocation on big datasets
+     * @todo check memory allocation and clearing on big datasets
      **/
     template<typename T, typename L> class population
     {
