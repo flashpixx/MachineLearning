@@ -159,6 +159,7 @@ namespace machinelearning { namespace textprocess {
         std::vector<std::string> l_data;
         boost::split( l_data, p_text, boost::is_any_of(m_seperators) );
         
+        #pragma omp parallel for
         for(std::size_t i=0; i < l_data.size(); ++i) {
             std::string lc = l_data[i];
             if (!m_remove.empty())
@@ -168,15 +169,18 @@ namespace machinelearning { namespace textprocess {
             if ( (lc.length() < p_minlen) || (lc.empty()) )
                 continue;
                 
-            m_wordcount++;
             if (m_caseinsensitive)
                 boost::to_lower(lc);
             
             std::map<std::string, std::size_t>::iterator it = m_map.find(lc);
-            if (it == m_map.end())
-                m_map[lc] = 1;
-            else
-                it->second++;
+            #pragma omp critical
+            {
+                m_wordcount++;
+                if (it == m_map.end())
+                    m_map[lc] = 1;
+                else
+                    it->second++;
+            }
         }
     }
     

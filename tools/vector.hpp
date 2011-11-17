@@ -26,6 +26,7 @@
 #ifndef __MACHINELEARNING_TOOLS_VECTOR_HPP
 #define __MACHINELEARNING_TOOLS_VECTOR_HPP
 
+#include <omp.h>
 #include <limits>
 #include <algorithm>
 #include <boost/foreach.hpp>
@@ -113,8 +114,10 @@ namespace machinelearning { namespace tools {
         // initialisation of prototypes
         tools::random l_rand;
         ublas::vector<T> l_vec(p_length);
-        BOOST_FOREACH( T& i, l_vec)
-            i = l_rand.get<T>( p_distribution, p_a, p_b, p_c );
+        
+        #pragma omp parallel for shared(l_vec, l_rand)
+        for(std::size_t i=0; i < p_length; ++i)
+            l_vec(i) = l_rand.get<T>( p_distribution, p_a, p_b, p_c );
         
         return l_vec;
     }
@@ -128,8 +131,10 @@ namespace machinelearning { namespace tools {
     template<typename T> inline ublas::vector<T> vector::pow( const ublas::vector<T>& p_vec, const T& p_exponent )
     {
         ublas::vector<T> l_vec(p_vec);
-        BOOST_FOREACH( T& i, l_vec)
-            i = std::pow(i, p_exponent);
+        
+        #pragma omp parallel for shared(l_vec)
+        for(std::size_t i=0; i < l_vec.size(); ++i)
+            l_vec(i) = std::pow(l_vec(i), p_exponent);
         
         return l_vec;
     }    
@@ -155,6 +160,7 @@ namespace machinelearning { namespace tools {
     {
         ublas::vector<T> l_vec(p_vec.size());
         
+        #pragma omp parallel for shared(l_vec)
         for(std::size_t i=0; i < p_vec.size(); ++i)
             l_vec(i) = p_vec[i];
         
@@ -275,9 +281,10 @@ namespace machinelearning { namespace tools {
     {
         ublas::vector<T> l_vec(p_vec);
         
-        BOOST_FOREACH( T& i, l_vec)
-            if (tools::function::isNumericalZero(i))
-                i = p_val;
+        #pragma omp parallel for shared(l_vec)
+        for(std::size_t i=0; i < l_vec.size(); ++i)
+            if ( tools::function::isNumericalZero(l_vec(i)) )
+                l_vec(i) = p_val;
         
         return l_vec;
     }    

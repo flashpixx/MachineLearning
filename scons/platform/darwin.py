@@ -98,6 +98,7 @@ if env["withoptimize"] :
 
 if env["withlogger"] :
     flags["CXXFLAGS"].append("-D MACHINELEARNING_LOGGER")
+    flags["LIBS"].append("boost_thread")
 
 
 

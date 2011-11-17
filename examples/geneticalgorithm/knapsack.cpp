@@ -108,10 +108,10 @@ int main(int argc, char* argv[])
         ("packs", po::value< std::vector<double> >()->multitoken(), "weights / costs of the different packs")
         ("maxpacksize", po::value<double>(&l_packsize), "maximum pack size")
         ("population", po::value<std::size_t>(&l_populationsize)->default_value(100), "population size / number of individuals")
-        ("elite", po::value<std::size_t>(&l_elitesize)->default_value(3), "elite size / number of individuals that are elite")
-        ("crossover", po::value<std::size_t>(&l_cuts)->default_value(1), "cut point of the crossover")
+        ("elite", po::value<std::size_t>(&l_elitesize)->default_value(5), "elite size / number of individuals that are elite")
+        ("crossover", po::value<std::size_t>(&l_cuts)->default_value(2), "cut point of the crossover")
         ("selection", po::value< std::vector<std::string> >()->multitoken(), "type of selection (values: bestof <number = 3> [default], roulette)")
-        ("iteration", po::value<std::size_t>(&l_iteration)->default_value(24), "number of iterations")
+        ("iteration", po::value<std::size_t>(&l_iteration)->default_value(25), "number of iterations")
         ("mutation", po::value<double>(&l_mutation)->default_value(0.65), "mutation probability")
     ;
 

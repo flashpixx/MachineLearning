@@ -36,13 +36,13 @@
  *         <li>IOStreams with ZLib and BZip2 support</li>
  *         <li>Exception support</li>
  *         <li>Date-Time support</li>
- *         <li>Thread support</li>
  *         <li>Math support</li>
  *         <li>Program Options</li>
  *         <li>Regular Expression support</li>
  *         <li>Filesystem support</li>
  *         <li>System support</li>
- *         <li><i>optional Serialization</i> (only used be MPI use)</li>
+ *         <li><i>optional Thread support</i> (only used by the framework logger)</li>
+ *         <li><i>optional Serialization</i> (only used by MPI use)</li>
  *         <li><i>optional Program options</i> (only used by the examples)</li>
  *         <li><i>optional Random Device support</i></li>
  *         <li><i>optional MPI support</i></li>

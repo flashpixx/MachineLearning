@@ -25,11 +25,12 @@
 #ifndef __MACHINELEARNING_TOOLS_MATRIX_HPP
 #define __MACHINELEARNING_TOOLS_MATRIX_HPP
 
+#include <omp.h>
+
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix_proxy.hpp>
 #include <boost/numeric/ublas/matrix_sparse.hpp>
-
 
 #include "../exception/exception.h"
 #include "vector.hpp"
@@ -100,6 +101,8 @@ namespace machinelearning { namespace tools {
         // initialisation of prototypes
         tools::random l_rand;
         ublas::matrix<T> l_matrix(p_row, p_col);
+        
+        #pragma omp parallel for shared(l_matrix, l_rand)
         for (std::size_t i=0; i < p_row; ++i)
             for (std::size_t j=0; j < p_col; ++j)
                 l_matrix(i,j) = l_rand.get<T>( p_distribution, p_a, p_b, p_c );
@@ -139,6 +142,7 @@ namespace machinelearning { namespace tools {
         
         // initialisation of prototypes
         ublas::mapped_matrix<T> l_matrix(p_row, p_col, l_diag);
+        #pragma omp parallel for shared(l_matrix)
         for (std::size_t i=0; i < l_diag; ++i)
             l_matrix(i,i) = p_val;
         
@@ -168,11 +172,13 @@ namespace machinelearning { namespace tools {
         
         switch (p_which) {                
             case row :
+                #pragma omp parallel for shared(l_min)
                 for(std::size_t i=0; i < p_matrix.size1(); ++i)
                     l_min(i) = tools::vector::min( static_cast< ublas::vector<T> >(ublas::row(p_matrix, i)) );
                 break;
                 
             case column :
+                #pragma omp parallel for shared(l_min)
                 for(std::size_t i=0; i < p_matrix.size2(); ++i)
                     l_min(i) = tools::vector::min( static_cast< ublas::vector<T> >(ublas::column(p_matrix, i)) );
                 break;
@@ -193,11 +199,13 @@ namespace machinelearning { namespace tools {
         
         switch (p_which) {                
             case row :
+                #pragma omp parallel for shared(l_min)
                 for(std::size_t i=0; i < p_matrix.size1(); ++i)
                     l_min(i) = tools::vector::mean( static_cast< ublas::vector<T> >(ublas::row(p_matrix, i)) );
                 break;
                 
-                case column :
+            case column :
+                #pragma omp parallel for shared(l_min)
                 for(std::size_t i=0; i < p_matrix.size2(); ++i)
                     l_min(i) = tools::vector::mean( static_cast< ublas::vector<T> >(ublas::column(p_matrix, i)) );
                 break;
@@ -217,15 +225,17 @@ namespace machinelearning { namespace tools {
         ublas::matrix<T> l_center(p_data);
         
         switch (p_which) { 
-                case row :
-                    for(std::size_t i=0; i < l_center.size1(); ++i) {
-                        T l_mean = tools::vector::mean( static_cast< ublas::vector<T> >(ublas::row(p_data,i)) );
-                        for(std::size_t j=0; j < l_center.size2(); ++j)
-                            l_center(i,j) -= l_mean;
-                    }
-                    break;
+            case row :
+                #pragma omp parallel for shared(l_center)
+                for(std::size_t i=0; i < l_center.size1(); ++i) {
+                    T l_mean = tools::vector::mean( static_cast< ublas::vector<T> >(ublas::row(p_data,i)) );
+                    for(std::size_t j=0; j < l_center.size2(); ++j)
+                        l_center(i,j) -= l_mean;
+                }
+                break;
                 
             case column :
+                #pragma omp parallel for shared(l_center)
                 for(std::size_t i=0; i < l_center.size2(); ++i) {
                     T l_mean = tools::vector::mean( static_cast< ublas::vector<T> >(ublas::column(p_data,i)) );
                     for(std::size_t j=0; j < l_center.size1(); ++j)
@@ -248,7 +258,8 @@ namespace machinelearning { namespace tools {
             throw exception::runtime( _("matrix must be square") );
         
         ublas::matrix<T> l_center(p_data.size1(), p_data.size2());
-
+        
+        #pragma omp parallel for shared(l_center)
         for(std::size_t i=0; i < p_data.size1(); ++i)
             for(std::size_t j=0; j < p_data.size2(); ++j)
                 l_center(i,j) = p_data(i,i) + p_data(j,j) - (p_data(i,j)+p_data(j,i));
@@ -288,6 +299,8 @@ namespace machinelearning { namespace tools {
     template<typename T> inline ublas::mapped_matrix<T> matrix::diag( const ublas::vector<T>& p_vec )
     {
         ublas::mapped_matrix<T> l_mat(p_vec.size(), p_vec.size(), p_vec.size());
+        
+        #pragma omp parallel for shared(l_mat)
         for(std::size_t i=0; i < p_vec.size(); ++i)
             l_mat(i,i) = p_vec(i);
         return l_mat;
@@ -302,6 +315,7 @@ namespace machinelearning { namespace tools {
     {
         ublas::vector<T> l_diag( std::min(p_matrix.size1(), p_matrix.size2()) );
     
+        #pragma omp parallel for shared(l_diag)
         for(std::size_t i=0; i < l_diag.size(); ++i)
             l_diag(i) = p_matrix(i,i);
         
@@ -328,6 +342,7 @@ namespace machinelearning { namespace tools {
     {
         ublas::matrix<T> l_mat(p_mat);
         
+        #pragma omp parallel for shared(l_mat)
         for(std::size_t i=0; i < l_mat.size1(); ++i)
             for(std::size_t j=0; j < l_mat.size2(); ++j)
                 l_mat(i,j) = std::pow(l_mat(i,j), p_ex);
@@ -347,11 +362,13 @@ namespace machinelearning { namespace tools {
         
         switch (p_which) {                
             case row :
+                #pragma omp parallel for shared(l_sum)
                 for(std::size_t i=0; i < p_matrix.size1(); ++i)
                     l_sum(i) = ublas::sum( static_cast< ublas::vector<T> >(ublas::row(p_matrix, i)) );
                 break;
                 
             case column :
+                #pragma omp parallel for shared(l_sum)
                 for(std::size_t i=0; i < p_matrix.size2(); ++i)
                     l_sum(i) = ublas::sum( static_cast< ublas::vector<T> >(ublas::column(p_matrix, i)) );
                 break;
@@ -385,6 +402,7 @@ namespace machinelearning { namespace tools {
     {
         ublas::matrix<T> l_mat( p_mat );
         
+        #pragma omp parallel for shared(l_mat)
         for(std::size_t i=0; i < l_mat.size1(); ++i)
             for(std::size_t j=0; j < l_mat.size2(); ++j)
                 if (tools::function::isNumericalZero(l_mat(i,j)))
@@ -402,6 +420,7 @@ namespace machinelearning { namespace tools {
     {
         ublas::matrix<T> l_mat( p_matrix.size1(), p_matrix.size2(), 0 );
         
+        #pragma omp parallel for shared(l_mat)
         for(std::size_t i=0; i < l_mat.size1(); ++i)
             for(std::size_t j=0; j < l_mat.size2(); ++j)
                 if (!tools::function::isNumericalZero(p_matrix(i,j)))
@@ -422,11 +441,13 @@ namespace machinelearning { namespace tools {
         
         switch (p_which) {                
             case row :
+                #pragma omp parallel for shared(l_mat)
                 for(std::size_t i=0; i < p_vec.size(); ++i)
                     ublas::row(l_mat, i) = p_vec;
                 break;
                 
             case column :
+                #pragma omp parallel for shared(l_mat)
                 for(std::size_t i=0; i < p_vec.size(); ++i)
                     ublas::column(l_mat, i) = p_vec;
                 break;                
@@ -448,11 +469,13 @@ namespace machinelearning { namespace tools {
         
         switch (p_which) {                
             case row :
+                #pragma omp parallel for shared(l_mat)
                 for(std::size_t i=0; i < p_num; ++i)
                     ublas::row(l_mat, i) = p_vec;
                 break;
                 
             case column :
+                #pragma omp parallel for shared(l_mat)
                 for(std::size_t i=0; i < p_num; ++i)
                     ublas::column(l_mat, i) = p_vec;
                 break;                
