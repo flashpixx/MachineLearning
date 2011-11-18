@@ -25,6 +25,9 @@
 #ifndef __MACHINELEARNING_CLUSTERING_NONSUPERVISED_NG_HPP
 #define __MACHINELEARNING_CLUSTERING_NONSUPERVISED_NG_HPP
 
+
+#include <omp.h>
+
 #include <numeric>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
@@ -291,6 +294,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             
             
             // calculate for every prototype the distance
+            #pragma omp parallel for shared(l_adaptmatrix)
             for(std::size_t n=0; n < m_prototypes.size1(); ++n)
                 ublas::row(l_adaptmatrix, n)  = m_distance.getDistance( p_data, ublas::row(m_prototypes, n) ) ;
             
@@ -298,6 +302,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             // we need rank and not randIndex, because we 
             // use the value of the ranking for calculate the 
             // adapt value
+            #pragma omp parallel for shared(l_adaptmatrix)
             for(std::size_t n=0; n < l_adaptmatrix.size2(); ++n) {
                 ublas::vector<T> l_rank = ublas::column(l_adaptmatrix, n);
                 l_rank = tools::vector::rank( l_rank );
@@ -315,6 +320,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             m_prototypes = ublas::prod( l_adaptmatrix, p_data );
             
             // normalize prototypes
+            #pragma omp parallel for
             for(std::size_t n=0; n < m_prototypes.size1(); ++n) {
                 const T l_norm = ublas::sum( ublas::row(l_adaptmatrix, n) );
                 
@@ -340,6 +346,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     {
         ublas::matrix<T> l_distances( p_prototypes.size1(), p_data.size1() );
         
+        #pragma omp parallel for shared(l_distances)
         for(std::size_t i=0; i < p_prototypes.size1(); ++i)
             ublas::row(l_distances, i) = m_distance.getDistance( p_data, ublas::row(p_prototypes, i) );
         
@@ -363,10 +370,12 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         ublas::matrix<T> l_distance(m_prototypes.size1(), p_data.size1());
         
         // calculate distance for every prototype
+        #pragma omp parallel for shared(l_distance)
         for(std::size_t i=0; i < m_prototypes.size1(); ++i)
             ublas::row(l_distance, i)  = m_distance.getDistance( p_data,  ublas::row(m_prototypes, i) );
         
         // determine nearest prototype
+        #pragma omp parallel for shared(l_idx)
         for(std::size_t i=0; i < l_distance.size2(); ++i) {
             ublas::vector<T> l_col                = ublas::column(l_distance, i);
             const ublas::indirect_array<> l_rank  = tools::vector::rankIndex( l_col );
@@ -444,6 +453,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             
             
             // calculate for every prototype the distance
+            #pragma omp parallel for shared(l_adaptmatrix)
             for(std::size_t n=0; n < m_prototypes.size1(); ++n)
                 ublas::row(l_adaptmatrix, n)  = m_distance.getDistance( l_data, ublas::row(m_prototypes, n) ) ;
             
@@ -451,6 +461,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             // we need rank and not randIndex, because we 
             // use the value of the ranking for calculate the 
             // adapt value
+            #pragma omp parallel for shared(l_adaptmatrix)
             for(std::size_t n=0; n < l_adaptmatrix.size2(); ++n) {
                 ublas::vector<T> l_rank = ublas::column(l_adaptmatrix, n);
                 l_rank = tools::vector::rank( l_rank );
@@ -465,6 +476,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             
             
             // add multiplier
+            #pragma omp parallel for shared(l_adaptmatrix)
             for(std::size_t n=0; n < l_adaptmatrix.size1(); ++n)
                 ublas::row(l_adaptmatrix, n) = ublas::element_prod( ublas::row(l_adaptmatrix, n), l_multiplier );
             
@@ -472,6 +484,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             m_prototypes = ublas::prod( l_adaptmatrix, l_data );
             
             // normalize prototypes
+            #pragma omp parallel for
             for(std::size_t n=0; n < m_prototypes.size1(); ++n) {
                 const T l_norm = ublas::sum( ublas::row(l_adaptmatrix, n) );
                 
@@ -488,7 +501,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
         // determine size of receptive fields, but we use only the data points
         const ublas::indirect_array<> l_winner = use(p_data);
+        #pragma omp parallel for
         for(std::size_t i=0; i < l_winner.size(); ++i)
+            #pragma omp critical
             m_prototypeWeights( l_winner(i) )++;
         
         if (m_logging)

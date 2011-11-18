@@ -25,6 +25,7 @@
 #ifndef __MACHINELEARNING_CLUSTERING_SUPERVISED_RLVQ_HPP
 #define __MACHINELEARNING_CLUSTERING_SUPERVISED_RLVQ_HPP
 
+#include <omp.h>
 
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
@@ -275,6 +276,7 @@ namespace machinelearning { namespace clustering { namespace supervised {
     {
         ublas::matrix<T> l_distances( m_prototypes.size1(), p_data.size1() );
         
+        #pragma omp parallel for shared(l_distances)
         for(std::size_t i=0; i < m_prototypes.size1(); ++i)
             ublas::row(l_distances, i) = m_distance.getDistance( p_data, ublas::row(m_prototypes, i) );
         
@@ -293,6 +295,7 @@ namespace machinelearning { namespace clustering { namespace supervised {
             throw exception::runtime( _("data and prototype dimension are not equal"), *this );
         
         ublas::indirect_array<> l_idx(p_data.size1());
+        #pragma omp parallel for shared(l_idx)
         for(std::size_t i=0; i < p_data.size1(); ++i) {
             
             // calculate distance from datapoint to all prototyps and rank position
