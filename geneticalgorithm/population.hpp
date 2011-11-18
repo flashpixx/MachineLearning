@@ -299,7 +299,7 @@ namespace machinelearning { namespace geneticalgorithm {
             // create elite multithreaded
             m_elite.clear();
             
-            #pragma omp parallel shared(l_fitness, l_rank, l_rankIndex)
+            #pragma omp parallel shared(l_fitness)
             {
                 boost::shared_ptr< selection::selection<T,L> > l_selection;
                 p_elite.clone( l_selection );
@@ -339,7 +339,7 @@ namespace machinelearning { namespace geneticalgorithm {
                     
                     
                 case steadystates :
-                    #pragma omp parallel shared(l_random, l_rankIndex)
+                    #pragma omp parallel shared(l_random)
                     {
                         boost::shared_ptr< crossover::crossover<L> > l_crossover;
                         p_crossover.clone( l_crossover );

@@ -291,7 +291,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             
             // create adaption
             ublas::matrix<T> l_adapt(l_target.size1(), l_target.size2(), static_cast<T>(0));
-            #pragma omp parallel for shared(l_adapt, l_hesse, l_gradient)
+            #pragma omp parallel for shared(l_adapt)
             for(std::size_t n=0; n < l_adapt.size1(); ++n)
                 for(std::size_t j=0; j < l_adapt.size2(); ++j)
                     if (!tools::function::isNumericalZero(l_hesse(n,j)))
