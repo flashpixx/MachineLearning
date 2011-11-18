@@ -25,6 +25,7 @@
 #ifndef __MACHINELEARNING_DIMENSIONREDUCE_SUPERVISED_LDA_HPP
 #define __MACHINELEARNING_DIMENSIONREDUCE_SUPERVISED_LDA_HPP
 
+#include <omp.h>
 
 #include <map>
 #include <boost/numeric/ublas/matrix.hpp>
@@ -123,6 +124,7 @@ namespace machinelearning { namespace dimensionreduce { namespace supervised {
         ublas::matrix<T> l_sw(l_sb.size1(), l_sb.size2());
         const T l_classes = static_cast<T>(l_uniquelabel.size()-1);
     
+        #pragma omp parallel for shared(l_uniquelabel, l_sw)
         for(std::size_t i=0; i < l_uniquelabel.size(); ++i) {
             
             // extract index from map | typename must be first, because is a exotic structure of C++ :-)
@@ -134,6 +136,7 @@ namespace machinelearning { namespace dimensionreduce { namespace supervised {
                 ublas::row(l_cluster, n++) = ublas::row(l_center, it->second);
             
             // calculate covarianz for the cluster
+            #pragma omp critical 
             l_sw     += l_cluster.size1() / l_classes * tools::matrix::cov(l_cluster);
             
         }
