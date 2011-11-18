@@ -24,6 +24,7 @@
 #ifndef __MACHINELEARNING_DIMENSIONREDUCE_NONSUPERVISED_MDS_HPP
 #define __MACHINELEARNING_DIMENSIONREDUCE_NONSUPERVISED_MDS_HPP
 
+#include <omp.h>
 
 #include <limits>
 #include <boost/numeric/ublas/matrix.hpp>
@@ -290,6 +291,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             
             // create adaption
             ublas::matrix<T> l_adapt(l_target.size1(), l_target.size2(), static_cast<T>(0));
+            #pragma omp parallel for shared(l_adapt, l_hesse, l_gradient)
             for(std::size_t n=0; n < l_adapt.size1(); ++n)
                 for(std::size_t j=0; j < l_adapt.size2(); ++j)
                     if (!tools::function::isNumericalZero(l_hesse(n,j)))
@@ -348,6 +350,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             l_sse = l_mat + ublas::trans(l_mat) - 2*ublas::prod(p_matrix, ublas::trans(p_matrix));
             l_sse = tools::matrix::pow(l_sse, static_cast<T>(0.5));                       
         } else 
+            #pragma omp parallel for shared(l_sse)
             for(std::size_t i=0; i < l_sse.size1(); ++i)
                 for(std::size_t j=0; j < l_sse.size2(); ++j)
                     l_sse(i,j) = std::pow(ublas::sum( tools::vector::pow( static_cast< ublas::vector<T> >(ublas::row(p_matrix, j)-ublas::row(p_matrix, i)), static_cast<T>(2)) ), static_cast<T>(0.5));
@@ -369,9 +372,11 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         
         // count zero elements
         std::vector< std::pair<std::size_t, std::size_t> > l_zeros;
+        #pragma omp parallel for shared(l_zeros)
         for(std::size_t i=0; i < p_data.size1(); ++i)
             for(std::size_t j=0; j < p_data.size2(); ++j)
                 if (tools::function::isNumericalZero(p_data(i,j)))
+                    #pragma omp critical
                     l_zeros.push_back( std::pair<std::size_t, std::size_t>(i,j) );
         
         // create init matrix and values
@@ -382,6 +387,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         const T l_datainv       = static_cast<T>(1) / (l_data.size1() * l_data.size2() - l_zeros.size());
         const T l_mnD           = l_datainv * ublas::sum( tools::matrix::sum(l_data) );
         
+        #pragma omp parallel for shared(l_data)
         for(std::size_t i=0; i < l_data.size1(); ++i)
             for(std::size_t j=0; j < l_data.size2(); ++j)
                 if (i != j)
@@ -410,6 +416,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             
             const T l_mnT = l_datainv * ublas::sum( tools::matrix::sum(l_tmp) );
             
+            #pragma omp parallel for shared(l_tmp)
             for(std::size_t j=0; j < l_tmp.size1(); ++j)
                 for(std::size_t n=0; n < l_tmp.size2(); ++n)
                     l_tmp(j,n) -= l_mnT;
@@ -430,6 +437,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             // calculate update strength parts
             ublas::matrix<T> l_strength = l_tmp * l_miT - l_data * l_moT;
             
+            #pragma omp parallel for shared(l_tmp)
             for(std::size_t j=0; j < l_tmp.size1(); ++j)
                 for(std::size_t n=0; n < l_tmp.size2(); ++n)
                     l_tmp(j,n) += static_cast<T>(0.1) + l_mnT;
@@ -456,6 +464,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             // create new target points
             const T l_rate = m_rate * (m_iteration-i) * static_cast<T>(0.25) * (static_cast<T>(1) + (m_iteration-i)%2) / m_iteration;
             
+            #pragma omp parallel for shared(l_target)
             for(std::size_t j=0; j < l_target.size1(); ++j)
                 for(std::size_t n=0; n < l_target.size2(); ++n)
                     l_target(j,n) += l_rate * l_update(j,n) / std::sqrt(std::fabs(l_update(j,n))+static_cast<T>(0.001));
@@ -534,9 +543,11 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         
         // count zero elements
         std::vector< std::pair<std::size_t, std::size_t> > l_zeros;
+        #pragma omp parallel for shared(l_zeros)
         for(std::size_t i=0; i < p_data.size1(); ++i)
             for(std::size_t j=0; j < p_data.size2(); ++j)
                 if (tools::function::isNumericalZero(p_data(i,j)))
+                    #pragma omp critical
                     l_zeros.push_back( std::pair<std::size_t, std::size_t>(i,j) );
         
         // create init matrix and values
@@ -552,6 +563,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         mpi::all_reduce(p_mpi, ublas::sum( tools::matrix::sum(l_data) ), l_help, std::plus<T>());
         const T l_mnD           = l_datainv * l_help;
         
+        #pragma omp parallel for shared(l_data)
         for(std::size_t i=0; i < l_data.size1(); ++i)
             for(std::size_t j=0; j < l_data.size2(); ++j)
                 if (i != j+l_columnstart)
@@ -593,6 +605,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             mpi::all_reduce(p_mpi, ublas::sum( tools::matrix::sum(l_tmp) ), l_help, std::plus<T>());
             const T l_mnT = l_datainv * l_help;
             
+            #pragma omp parallel for shared(l_tmp)
             for(std::size_t j=0; j < l_tmp.size1(); ++j)
                 for(std::size_t n=0; n < l_tmp.size2(); ++n)
                     l_tmp(j,n) -= l_mnT;
@@ -615,6 +628,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             // calculate update strength parts
             ublas::matrix<T> l_strength = l_tmp * l_miT - l_data * l_moT;
             
+            #pragma omp parallel for shared(l_tmp)
             for(std::size_t j=0; j < l_tmp.size1(); ++j)
                 for(std::size_t n=0; n < l_tmp.size2(); ++n)
                     l_tmp(j,n) += static_cast<T>(0.1) + l_mnT;
@@ -672,6 +686,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
             // create new target points
             const T l_rate = l_rateMPI * (l_iterationsMPI-i) * static_cast<T>(0.25) * (static_cast<T>(1) + (l_iterationsMPI-i)%2) / l_iterationsMPI;
             
+            #pragma omp parallel for shared(l_target)
             for(std::size_t j=0; j < l_target.size1(); ++j)
                 for(std::size_t n=0; n < l_target.size2(); ++n)
                     l_target(j,n) += l_rate * l_update(j,n) / std::sqrt(std::fabs(l_update(j,n))+static_cast<T>(0.001));
