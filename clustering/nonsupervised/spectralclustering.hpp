@@ -24,6 +24,7 @@
 #ifndef __MACHINELEARNING_CLUSTERING_NONSUPERVISED_SPECTRALCLUSTERING_HPP
 #define __MACHINELEARNING_CLUSTERING_NONSUPERVISED_SPECTRALCLUSTERING_HPP
 
+#include <omp.h>
 
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
@@ -188,6 +189,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         ublas::matrix<T> l_eigenmatrix(m_kmeans.getPrototypeCount(), l_laplacian.size1());
         const ublas::vector<T> l_sum = tools::matrix::sum(p_similarity);
         
+        #pragma omp parallel for shared(l_eigenmatrix)
         for(std::size_t i=0; i < m_kmeans.getPrototypeCount(); ++i) {
             ublas::row(l_eigenmatrix, i)  = ublas::element_div( ublas::column(l_eigenvector, l_rank(i)), l_sum );
             ublas::row(l_eigenmatrix, i) /= blas::nrm2( static_cast< ublas::vector<T> >(ublas::row(l_eigenmatrix, i)) ); 
