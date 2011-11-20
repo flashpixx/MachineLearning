@@ -235,6 +235,8 @@ namespace machinelearning { namespace clustering { namespace supervised {
         
         
         for(std::size_t i=0; i < p_iterations; ++i) {
+            
+            #pragma omp parallel for shared(l_lambda)
             for (std::size_t j=0; j < p_data.size1(); ++j) {
                 
                 // calculate weighted distance and rank vector elements, the first element is the index of the winner prototype
@@ -242,20 +244,23 @@ namespace machinelearning { namespace clustering { namespace supervised {
                 const ublas::indirect_array<> l_rank = tools::vector::rankIndex( l_distance );
                 
                 // calculate adapt values
-                const ublas::vector<T> l_winnerdelta    = ublas::row(p_data, j) - ublas::row(m_prototypes, l_rank(0) );
-                const ublas::vector<T> l_lambdaadapt    = ublas::element_prod(ublas::row(l_lambda, l_rank(0)), m_distance.getAbs(l_winnerdelta));
+                const ublas::vector<T> l_winnerdelta    = p_lambda * (ublas::row(p_data, j) - ublas::row(m_prototypes, l_rank(0) ));
+                const ublas::vector<T> l_lambdaadapt    = p_eta    * ublas::element_prod(ublas::row(l_lambda, l_rank(0)), m_distance.getAbs(l_winnerdelta));
                 
                 // label checking and adaption for winner and lambda
-                if (  m_neuronlabels[l_rank(0)] == p_labels[j] ) {
-                    ublas::row(m_prototypes, l_rank(0) ) += p_lambda * l_winnerdelta;
-                    ublas::row(l_lambda, l_rank(0))      -= p_eta    * l_lambdaadapt;
-                } else {
-                    ublas::row(m_prototypes, l_rank(0) ) -= p_lambda * l_winnerdelta;
-                    ublas::row(l_lambda, l_rank(0))      += p_eta    * l_lambdaadapt;
+                #pragma omp critical
+                {
+                    if (  m_neuronlabels[l_rank(0)] == p_labels[j] ) {
+                        ublas::row(m_prototypes, l_rank(0) ) += l_winnerdelta;
+                        ublas::row(l_lambda, l_rank(0))      -= l_lambdaadapt;
+                    } else {
+                        ublas::row(m_prototypes, l_rank(0) ) -= l_winnerdelta;
+                        ublas::row(l_lambda, l_rank(0))      += l_lambdaadapt;
+                    }
+                    
+                    // normalize lambda (only one row, which has been changed)
+                    ublas::row(l_lambda, l_rank(0))  /= m_distance.getLength( static_cast< ublas::vector<T> >(ublas::row(l_lambda, l_rank(0))) );
                 }
-                
-                // normalize lambda (only one row, which has been changed)
-                ublas::row(l_lambda, l_rank(0))  /= m_distance.getLength( static_cast< ublas::vector<T> >(ublas::row(l_lambda, l_rank(0))) );
             }
  
             // determine quantization error for logging
