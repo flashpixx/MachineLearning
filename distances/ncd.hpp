@@ -457,7 +457,7 @@ namespace machinelearning { namespace distances {
             const std::size_t l_successor   = (static_cast<std::size_t>(p_mpi.rank())+i) % static_cast<std::size_t>(p_mpi.size());
             const std::size_t l_predecessor = (static_cast<std::size_t>(p_mpi.rank())+p_mpi.size()-i) % static_cast<std::size_t>(p_mpi.size());
             
-            // send and receive with non-blocking operation
+            // send and receive with non-blocking operation and wait for both request
             mpi::request l_req[2];
             std::vector<std::string> l_neighbourdata;
             l_req[0] = p_mpi.isend(l_successor, 0, p_strvec);
@@ -474,6 +474,7 @@ namespace machinelearning { namespace distances {
         }
         
         // set the main diagonal zero values
+        #pragma omp parallel for shared(l_result)
         for(std::size_t i = 0; i < l_result.size2(); ++i)
             l_result(l_localrow+i,i) = 0;
         
