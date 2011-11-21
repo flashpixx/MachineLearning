@@ -443,7 +443,7 @@ namespace machinelearning { namespace distances {
         
         
         // create the local distances
-        const std::size_t l_localrow = std::accumulate( p_strvec.begin(), p_strvec.begin() + static_cast<std::size_t>(p_mpi.rank()), 0 );
+        const std::size_t l_localrow = std::accumulate( l_datasize.begin(), l_datasize.begin() + static_cast<std::size_t>(p_mpi.rank()), 0 );
         ublas::matrix_range< ublas::matrix<T> > l_rangelocal(l_result, 
                                                                   ublas::range( l_localrow, l_localrow + p_strvec.size() ), 
                                                                   ublas::range( 0, l_result.size2() )
@@ -465,7 +465,7 @@ namespace machinelearning { namespace distances {
             mpi::wait_all(l_req, l_req+2);
             
             // get position within the matrix and create distance values
-            const std::size_t l_startrow = std::accumulate( p_strvec.begin(), p_strvec.begin() + l_predecessor, 0 );
+            const std::size_t l_startrow = std::accumulate( l_datasize.begin(), l_datasize.begin() + l_predecessor, 0 );
             ublas::matrix_range< ublas::matrix<T> > l_range(l_result, 
                                                                  ublas::range( l_startrow, l_startrow+l_neighbourdata.size() ), 
                                                                  ublas::range( 0, l_result.size2() )
