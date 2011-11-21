@@ -32,6 +32,10 @@
 #include <iostream>
 #include <fstream>
 
+#ifdef MACHINELEARNING_MPI
+#include <boost/mpi.hpp>
+#endif
+
 #include <boost/static_assert.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/symmetric.hpp>
@@ -53,7 +57,9 @@ namespace machinelearning { namespace distances {
     
     namespace ublas = boost::numeric::ublas;
     namespace bio   = boost::iostreams;
-    
+    #ifdef MACHINELEARNING_MPI
+    namespace mpi   = boost::mpi;
+    #endif
     
     /**
      * class for calculating the normalized compression distance (NCD)
@@ -83,11 +89,15 @@ namespace machinelearning { namespace distances {
         
         ncd ( void );
         ncd ( const compresstype& );
-        ublas::matrix<T> unsquare ( const std::vector<std::string>&, const std::vector<std::string>&, const bool& = false );
-        ublas::matrix<T> unsymmetric ( const std::vector<std::string>&, const bool& = false );
-        ublas::symmetric_matrix<T, ublas::upper> symmetric ( const std::vector<std::string>&, const bool& = false );
-        T calculate ( const std::string&, const std::string&, const bool& = false );
+        ublas::matrix<T> unsquare ( const std::vector<std::string>&, const std::vector<std::string>&, const bool& = false ) const;
+        ublas::matrix<T> unsymmetric ( const std::vector<std::string>&, const bool& = false ) const;
+        ublas::symmetric_matrix<T, ublas::upper> symmetric ( const std::vector<std::string>&, const bool& = false ) const;
+        T calculate ( const std::string&, const std::string&, const bool& = false ) const;
         void setCompressionLevel( const compresslevel& = defaultcompression );
+        
+        #ifdef MACHINELEARNING_MPI
+        ublas::matrix<T> unsquare ( const mpi::communicator&, const std::vector<std::string>&, const bool& = false ) const;
+        #endif
         
     private:
         
@@ -99,7 +109,7 @@ namespace machinelearning { namespace distances {
         bio::bzip2_params m_bzip2param;
         
         std::size_t deflate ( const bool&, const std::string&, const std::string& = "" ) const;        
-        std::multimap<std::size_t, std::pair<std::size_t,std::size_t> > getWavefrontIndex( const std::size_t&, const std::size_t& );
+        std::multimap<std::size_t, std::pair<std::size_t,std::size_t> > getWavefrontIndex( const std::size_t&, const std::size_t& ) const;
     };
     
     
@@ -128,7 +138,7 @@ namespace machinelearning { namespace distances {
      * @param p_threads number of threads
      * @return map with indices
      **/
-    template<typename T> inline std::multimap<std::size_t, std::pair<std::size_t,std::size_t> > ncd<T>::getWavefrontIndex( const std::size_t& p_size, const std::size_t& p_threads )
+    template<typename T> inline std::multimap<std::size_t, std::pair<std::size_t,std::size_t> > ncd<T>::getWavefrontIndex( const std::size_t& p_size, const std::size_t& p_threads ) const
     {
         std::multimap<std::size_t, std::pair<std::size_t,std::size_t> > l_wavefront;
         
@@ -178,7 +188,7 @@ namespace machinelearning { namespace distances {
      * @param p_isfile parameter for interpreting the string as a file with path
      * @return distance value
      **/   
-    template<typename T> inline T ncd<T>::calculate( const std::string& p_str1, const std::string& p_str2, const bool& p_isfile )
+    template<typename T> inline T ncd<T>::calculate( const std::string& p_str1, const std::string& p_str2, const bool& p_isfile ) const
     {
         const std::size_t l_first  = deflate(p_isfile, p_str1);
         const std::size_t l_second = deflate(p_isfile, p_str2);
@@ -194,7 +204,7 @@ namespace machinelearning { namespace distances {
      * @param p_isfile parameter for interpreting the string as a file with path
      * @return dissimilarity matrix with std::vector x std::vector elements
      **/
-    template<typename T> inline ublas::matrix<T> ncd<T>::unsymmetric( const std::vector<std::string>& p_strvec, const bool& p_isfile  )
+    template<typename T> inline ublas::matrix<T> ncd<T>::unsymmetric( const std::vector<std::string>& p_strvec, const bool& p_isfile  ) const
     {
         if (p_strvec.size() == 0)
             throw exception::runtime(_("vector size must be greater than zero"), *this);
@@ -260,7 +270,7 @@ namespace machinelearning { namespace distances {
      * @param p_isfile parameter for interpreting the string as a file with path
      * @return dissimilarity matrix with std::vector x std::vector elements
      **/
-    template<typename T> inline ublas::symmetric_matrix<T, ublas::upper> ncd<T>::symmetric( const std::vector<std::string>& p_strvec, const bool& p_isfile  )
+    template<typename T> inline ublas::symmetric_matrix<T, ublas::upper> ncd<T>::symmetric( const std::vector<std::string>& p_strvec, const bool& p_isfile  ) const
     {
          if (p_strvec.size() == 0)
              throw exception::runtime(_("vector size must be greater than zero"), *this);
@@ -334,7 +344,7 @@ namespace machinelearning { namespace distances {
      * @param p_isfile parameter for interpreting the string as a file with path
      * @return dissimilarity matrix with std::vector1 x std::vector2 elements (deflating order: element first vector concat with element second vector )
      **/
-    template<typename T> inline ublas::matrix<T> ncd<T>::unsquare( const std::vector<std::string>& p_strvec1, const std::vector<std::string>& p_strvec2, const bool& p_isfile )
+    template<typename T> inline ublas::matrix<T> ncd<T>::unsquare( const std::vector<std::string>& p_strvec1, const std::vector<std::string>& p_strvec2, const bool& p_isfile ) const
     {
         if ( (p_strvec1.size() == 0) || (p_strvec2.size() == 0) )
             throw exception::runtime(_("vector size must be greater than zero"), *this);
@@ -408,6 +418,68 @@ namespace machinelearning { namespace distances {
                 
         return l_result;
     }
+    
+    
+    #ifdef MACHINELEARNING_MPI
+    
+    /** creates a distance matrix with shared data
+     * @param p_mpi MPI object
+     * @param p_strvec local dataset
+     * @param p_isfile parameter for interpreting the string as a file with path
+     * @return part of distance matrix (local data size x all data size)
+     **/
+    template<typename T> inline ublas::matrix<T> ncd<T>::unsquare ( const mpi::communicator& p_mpi, const std::vector<std::string>& p_strvec, const bool& p_isfile ) const
+    {
+        if (p_strvec.size() == 0)
+            throw exception::runtime(_("vector size must be greater than zero"), *this);
+        
+        // we detect the matrix row size
+        std::vector<std::size_t> l_datasize;
+        mpi::all_gather(p_mpi, p_strvec.size(), l_datasize );
+        const std::size_t l_rowsize = std::accumulate( l_datasize.begin(), l_datasize.end(), 0 );
+        
+        // create the target matrix (rows = all data size, column local data size)
+        ublas::matrix<T> l_result( l_rowsize, p_strvec.size() );
+        
+        
+        // create the local distances
+        const std::size_t l_localrow = std::accumulate( p_strvec.begin(), p_strvec.begin() + static_cast<std::size_t>(p_mpi.rank()), 0 );
+        ublas::matrix_range< ublas::matrix<T> > l_rangelocal(l_result, 
+                                                                  ublas::range( l_localrow, l_localrow + p_strvec.size() ), 
+                                                                  ublas::range( 0, l_result.size2() )
+                                                                  );
+        l_rangelocal.assign( unsquare(p_strvec, p_strvec, p_isfile) );
+        
+        // create distance to the local articles and the articless of the neighborhood CPU
+        for(std::size_t i=1; i < static_cast<std::size_t>(p_mpi.size()); ++i)
+        {
+            // get start index on the matrix
+            const std::size_t l_successor   = (static_cast<std::size_t>(p_mpi.rank())+i) % static_cast<std::size_t>(p_mpi.size());
+            const std::size_t l_predecessor = (static_cast<std::size_t>(p_mpi.rank())+p_mpi.size()-i) % static_cast<std::size_t>(p_mpi.size());
+            
+            // send and receive with non-blocking operation
+            mpi::request l_req[2];
+            std::vector<std::string> l_neighbourdata;
+            l_req[0] = p_mpi.isend(l_successor, 0, p_strvec);
+            l_req[1] = p_mpi.irecv(l_predecessor, 0, l_neighbourdata);
+            mpi::wait_all(l_req, l_req+2);
+            
+            // get position within the matrix and create distance values
+            const std::size_t l_startrow = std::accumulate( p_strvec.begin(), p_strvec.begin() + l_predecessor, 0 );
+            ublas::matrix_range< ublas::matrix<T> > l_range(l_result, 
+                                                                 ublas::range( l_startrow, l_startrow+l_neighbourdata.size() ), 
+                                                                 ublas::range( 0, l_result.size2() )
+                                                                 );
+            l_range.assign( unsquare(l_neighbourdata, p_strvec, p_isfile) );
+        }
+        
+        // set the main diagonal zero values
+        for(std::size_t i = 0; i < l_result.size2(); ++i)
+            l_result(l_localrow+i,i) = 0;
+        
+        return l_result;
+    }
+    #endif
     
     
     /** deflate a string or file with the algorithm

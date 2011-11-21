@@ -897,7 +897,6 @@
  * @todo adding PAPI support http://icl.cs.utk.edu/papi/
  * @todo thinking about a SSE support in the framework http://en.wikipedia.org/wiki/SSE3
  * @todo thinking about CILK support http://supertech.csail.mit.edu/cilk/
- * @todo adding support for graph databases http://en.wikipedia.org/wiki/Graph_database 
  * @todo adding simulated annealing (see GSL)
  * @todo adding voronoi tessellation (with CGAL http://http://www.cgal.org/ )
  * @todo create a PHP modul ( http://devzone.zend.com/article/4486 / http://devzone.zend.com/node/view/id/1021 )

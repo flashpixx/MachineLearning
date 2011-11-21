@@ -68,7 +68,6 @@ else :
     flags["CXXFLAGS"].extend(["-D NDEBUG", "-D BOOST_UBLAS_NDEBUG"])
 
 if env["withmpi"] :
-    flags["CXXFLAGS"] = "mpic++"
     flags["CXXFLAGS"].append("-D MACHINELEARNING_MPI")
     flags["LIBS"].extend( ["boost_mpi", "boost_serialization"] )
 

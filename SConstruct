@@ -119,6 +119,10 @@ if env.has_key("LIBS") :
     env["LIBS"]       = help.unique(env["LIBS"])
 if env.has_key("LIBPATH") :
     env["LIBPATH"]    = help.unique(env["LIBPATH"])
+    
+# set manually if needed the MPI C++ compiler
+if env["withmpi"] :
+    env.Replace(CXX = "mpic++")
 
 
 # call target scripts
