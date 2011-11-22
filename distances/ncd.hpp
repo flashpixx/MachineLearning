@@ -433,7 +433,11 @@ namespace machinelearning { namespace distances {
         if (p_strvec.size() == 0)
             throw exception::runtime(_("vector size must be greater than zero"), *this);
         
-        // we detect the matrix row size
+        // synchronize the isFile parameter
+        const bool l_isfile = mpi::all_reduce(p_mpi, p_isfile, std::multiplies<bool>());
+        
+        // we detect the matrix row size (sum over each CPU data - we don't use the all_reduce,
+        // because the different datasizes of each CPU data is needed later)
         std::vector<std::size_t> l_datasize;
         mpi::all_gather(p_mpi, p_strvec.size(), l_datasize );
         const std::size_t l_rowsize = std::accumulate( l_datasize.begin(), l_datasize.end(), 0 );
@@ -448,7 +452,7 @@ namespace machinelearning { namespace distances {
                                                                   ublas::range( l_localrow, l_localrow + p_strvec.size() ), 
                                                                   ublas::range( 0, l_result.size2() )
                                                                   );
-        l_rangelocal.assign( unsquare(p_strvec, p_strvec, p_isfile) );
+        l_rangelocal.assign( unsquare(p_strvec, p_strvec, l_isfile) );
         
         // create distance to the local articles and the articless of the neighborhood CPU
         for(std::size_t i=1; i < static_cast<std::size_t>(p_mpi.size()); ++i)
@@ -470,7 +474,7 @@ namespace machinelearning { namespace distances {
                                                                  ublas::range( l_startrow, l_startrow+l_neighbourdata.size() ), 
                                                                  ublas::range( 0, l_result.size2() )
                                                                  );
-            l_range.assign( unsquare(l_neighbourdata, p_strvec, p_isfile) );
+            l_range.assign( unsquare(l_neighbourdata, p_strvec, l_isfile) );
         }
         
         // set the main diagonal zero values
