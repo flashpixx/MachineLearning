@@ -287,8 +287,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
         for(std::size_t i=0; i < p_iterations; ++i) {
             
-            std::cout << m_prototypes << std::endl;
-            
             // create adapt values
             const T l_lambda = p_lambda * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(p_iterations));
             
@@ -296,6 +294,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             #pragma omp parallel for shared(l_adaptmatrix)
             for(std::size_t n=0; n < m_prototypes.size1(); ++n)
                 ublas::row(l_adaptmatrix, n)  = m_distance.getDistance( p_data, ublas::row(m_prototypes, n) ) ;
+
             
             // for every column ranks values and create adapts
             // we need rank and not randIndex, because we 
@@ -313,15 +312,16 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
                 // return value to matrix
                 ublas::column(l_adaptmatrix, n) = l_rank;
             }
-            
+
             // create prototypes
             m_prototypes = ublas::prod( l_adaptmatrix, p_data );
+            
             
             // normalize prototypes
             #pragma omp parallel for
             for(std::size_t n=0; n < m_prototypes.size1(); ++n) {
                 const T l_norm = ublas::sum( ublas::row(l_adaptmatrix, n) );
-                
+
                 if (!tools::function::isNumericalZero(l_norm))
                     ublas::row(m_prototypes, n) /= l_norm;
             }
@@ -444,7 +444,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         const T l_multi = 0.01/p_lambda;
         ublas::matrix<T> l_adaptmatrix( m_prototypes.size1(), l_data.size1() );
         
-        for(std::size_t i=0; (i < p_iterations); ++i) {
+        for(std::size_t i=0; i < p_iterations; ++i) {
             
             // create adapt values
             const T l_lambda = p_lambda * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(p_iterations));

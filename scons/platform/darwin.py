@@ -60,8 +60,10 @@ if not("javac" in COMMAND_LINE_TARGETS) :
     
 if env["atlaslink"] == "multi" :
     flags["LIBS"].append("tatlas")
-else :
+elif env["atlaslink"] == "single"
     flags["LIBS"].append("satlas")
+else :
+    flags["LIBS"].append("atlas")
 
 if env["withdebug"] :
     flags["CXXFLAGS"].append("-g")
