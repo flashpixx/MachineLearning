@@ -59,7 +59,7 @@ else :
     
 if env["atlaslink"] == "multi" :
     flags["LIBS"].extend(["lapack", "ptcblas", "ptf77blas", "tatlas"])
-elif env["atlaslink"] == "single"
+elif env["atlaslink"] == "single" :
     flags["LIBS"].extend(["lapack", "cblas", "f77blas", "satlas"])
 else :
     flags["LIBS"].extend(["lapack", "cblas", "f77blas", "atlas"])
