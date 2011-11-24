@@ -127,7 +127,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> inline bool kmeans<T>::getLogging( void ) const
     {
-        return m_logging;
+        return m_logging && (m_logprototypes.size() > 0);
     }
     
     

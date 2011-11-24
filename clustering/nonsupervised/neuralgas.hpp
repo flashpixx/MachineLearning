@@ -156,9 +156,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     {
         if (p_prototypesize == 0)
             throw exception::runtime(_("prototype size must be greater than zero"), *this);
-            
-            // normalize the prototypes
-            m_distance.normalize( m_prototypes );
     }
     
     
@@ -188,7 +185,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> inline bool neuralgas<T>::getLogging( void ) const
     {
-        return m_logging;
+        return m_logging && (m_logprototypes.size() > 0);
     }
     
     
@@ -282,16 +279,29 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             m_quantizationerror.reserve(p_iterations);
         }
         
+        m_prototypes(0,0)  = 0.4909;     m_prototypes(0,1)  = 0.1320;
+        m_prototypes(1,0)  = 0.4893;     m_prototypes(1,1)  = 0.9421;
+        m_prototypes(2,0)  = 0.3377;     m_prototypes(2,1)  = 0.9561;
+        m_prototypes(3,0)  = 0.9001;     m_prototypes(3,1)  = 0.5752;
+        m_prototypes(4,0)  = 0.3692;     m_prototypes(4,1)  = 0.0598;
+        m_prototypes(5,0)  = 0.1112;     m_prototypes(5,1)  = 0.2348;
+        m_prototypes(6,0)  = 0.7803;     m_prototypes(6,1)  = 0.3532;
+        m_prototypes(7,0)  = 0.3897;     m_prototypes(7,1)  = 0.8212;
+        m_prototypes(8,0)  = 0.2417;     m_prototypes(8,1)  = 0.0154;
+        m_prototypes(9,0)  = 0.4039;     m_prototypes(9,1)  = 0.0430;
+        m_prototypes(10,0) = 0.0965;     m_prototypes(10,1) = 0.1690;
+        
         
         // run neural gas       
         const T l_multi = 0.01/p_lambda;
         ublas::matrix<T> l_adaptmatrix( m_prototypes.size1(), p_data.size1() );
         
-        for(std::size_t i=0; (i < p_iterations); ++i) {
+        for(std::size_t i=0; i < p_iterations; ++i) {
+            
+            std::cout << m_prototypes << std::endl;
             
             // create adapt values
             const T l_lambda = p_lambda * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(p_iterations));
-            
             
             // calculate for every prototype the distance
             #pragma omp parallel for shared(l_adaptmatrix)
@@ -314,7 +324,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
                 // return value to matrix
                 ublas::column(l_adaptmatrix, n) = l_rank;
             }
-            
             
             // create prototypes
             m_prototypes = ublas::prod( l_adaptmatrix, p_data );
@@ -445,7 +454,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         // run neural gas       
         const T l_multi = 0.01/p_lambda;
         ublas::matrix<T> l_adaptmatrix( m_prototypes.size1(), l_data.size1() );
-                
+        
         for(std::size_t i=0; (i < p_iterations); ++i) {
             
             // create adapt values

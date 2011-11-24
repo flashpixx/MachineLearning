@@ -222,7 +222,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> inline bool relational_neuralgas<T>::getLogging( void ) const
     {
-        return m_logging;
+        return m_logging && (m_logprototypes.size() > 0);
     }
     
     

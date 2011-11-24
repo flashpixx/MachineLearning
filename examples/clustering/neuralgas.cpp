@@ -199,7 +199,7 @@ int main(int argc, char* argv[])
 
     if (ng.getLogging()) {
         std::cout << "/error \t\t quantization error on each iteration" << std::endl;
-        std::cout << "/log<0 to number of iteration-1>/protosos \t\t prototypes on each iteration" << std::endl;
+        std::cout << "/log<0 to number of iteration-1>/protos \t\t prototypes on each iteration" << std::endl;
     }
 
     #ifdef MACHINELEARNING_MPI

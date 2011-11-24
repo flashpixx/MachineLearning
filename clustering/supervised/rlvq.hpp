@@ -136,7 +136,7 @@ namespace machinelearning { namespace clustering { namespace supervised {
     **/
     template<typename T, typename L> inline bool rlvq<T, L>::getLogging( void ) const
     {
-        return m_logging;
+        return m_logging && (m_logprototypes.size() > 0);
     }
     
     

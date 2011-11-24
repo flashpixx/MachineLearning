@@ -102,7 +102,7 @@ namespace machinelearning { namespace tools {
         tools::random l_rand;
         ublas::matrix<T> l_matrix(p_row, p_col);
         
-        #pragma omp parallel for shared(l_matrix, l_rand)
+        #pragma omp parallel for shared(l_matrix) firstprivate(l_rand)
         for (std::size_t i=0; i < p_row; ++i)
             for (std::size_t j=0; j < p_col; ++j)
                 l_matrix(i,j) = l_rand.get<T>( p_distribution, p_a, p_b, p_c );
