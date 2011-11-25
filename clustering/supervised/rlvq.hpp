@@ -129,6 +129,8 @@ namespace machinelearning { namespace clustering { namespace supervised {
     template<typename T, typename L> inline void rlvq<T, L>::setLogging( const bool& p )
     {
         m_logging = p;
+        m_logprototypes.clear();
+        m_quantizationerror.clear();
     }
     
     /** shows the logging status

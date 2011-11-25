@@ -115,7 +115,7 @@ namespace machinelearning { namespace tools {
         tools::random l_rand;
         ublas::vector<T> l_vec(p_length);
         
-        #pragma omp parallel for shared(l_vec) firstprivate(l_rand)
+        #pragma omp parallel for shared(l_vec, l_rand)
         for(std::size_t i=0; i < p_length; ++i)
             l_vec(i) = l_rand.get<T>( p_distribution, p_a, p_b, p_c );
         
@@ -230,8 +230,8 @@ namespace machinelearning { namespace tools {
         
         ublas::vector<std::size_t> l_ranking(temp.size());
         std::copy( boost::counting_iterator<std::size_t>(0), boost::counting_iterator<std::size_t>(p_vec.size()),
-                  boost::make_permutation_iterator(l_ranking.begin(), temp.begin())
-                  );
+                   boost::make_permutation_iterator(l_ranking.begin(), temp.begin())
+                 );
         
         return l_ranking;
     }

@@ -45,7 +45,7 @@ if os.environ.has_key("LDFLAGS") :
     
 
 
-flags["CXXFLAGS"].extend(["-fopenmp", "-pipe", "-Wall", "-Wextra", "-D BOOST_FILESYSTEM_NO_DEPRECATED", "-D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"])
+flags["CXXFLAGS"].extend(["-fopenmp", "-pipe", "-Wall", "-D BOOST_FILESYSTEM_NO_DEPRECATED", "-D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"])
 flags["LINKFLAGS"].extend(["-fopenmp", "-pthread"])
 flags["LIBS"]        = ["boost_system", "boost_iostreams", "boost_regex", "gfortran"]
 

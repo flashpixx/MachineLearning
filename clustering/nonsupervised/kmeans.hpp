@@ -118,6 +118,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     template<typename T> inline void kmeans<T>::setLogging( const bool& p )
     {
         m_logging = p;
+        m_logprototypes.clear();
+        m_quantizationerror.clear();
     }
     
     
@@ -166,8 +168,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
         // creates logging
         if (m_logging) {
-            m_logprototypes     = std::vector< ublas::matrix<T> >();
-            m_quantizationerror = std::vector< T >();
+            m_logprototypes.clear();
+            m_quantizationerror.clear();
             m_logprototypes.reserve(p_iterations);
             m_quantizationerror.reserve(p_iterations);
         }

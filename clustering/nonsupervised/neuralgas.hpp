@@ -31,7 +31,7 @@
 #include <numeric>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
-
+#include <boost/numeric/bindings/blas.hpp>
 #ifdef MACHINELEARNING_MPI
 #include <boost/mpi.hpp>
 #endif
@@ -176,6 +176,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     {
         m_logging = p;
         m_logprototypeWeights.clear();
+        m_logprototypes.clear();
+        m_quantizationerror.clear();
     }
     
     
@@ -280,6 +282,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         }
 
         
+        
         // run neural gas       
         const T l_multi = 0.01/p_lambda;
         ublas::matrix<T> l_adaptmatrix( m_prototypes.size1(), p_data.size1() );
@@ -293,7 +296,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             #pragma omp parallel for shared(l_adaptmatrix)
             for(std::size_t n=0; n < m_prototypes.size1(); ++n)
                 ublas::row(l_adaptmatrix, n)  = m_distance.getDistance( p_data, ublas::row(m_prototypes, n) ) ;
-
             
             // for every column ranks values and create adapts
             // we need rank and not randIndex, because we 
@@ -320,7 +322,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             #pragma omp parallel for
             for(std::size_t n=0; n < m_prototypes.size1(); ++n) {
                 const T l_norm = ublas::sum( ublas::row(l_adaptmatrix, n) );
-
+                
                 if (!tools::function::isNumericalZero(l_norm))
                     ublas::row(m_prototypes, n) /= l_norm;
             }

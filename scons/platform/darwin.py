@@ -48,7 +48,7 @@ if os.environ.has_key("LDFLAGS") :
     
 
 
-flags["CXXFLAGS"].extend(["-fopenmp", "-pipe", "-Wall", "-Wextra", "-D BOOST_FILESYSTEM_NO_DEPRECATED", "-D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"])    
+flags["CXXFLAGS"].extend(["-fopenmp", "-pipe", "-Wall", "-D BOOST_FILESYSTEM_NO_DEPRECATED", "-D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"])    
 flags["LINKFLAGS"].extend(["-pthread", "-fopenmp"])
 flags["LIBS"]         = ["boost_system", "boost_iostreams", "boost_regex"]
 flags["SHLINKFLAGS"]  = ["-install_name ${TARGET.file} -headerpad_max_install_name"]
@@ -59,11 +59,11 @@ if not("javac" in COMMAND_LINE_TARGETS) :
     flags["LIBS"].extend(["boost_program_options", "boost_exception", "boost_filesystem"])
     
 if env["atlaslink"] == "multi" :
-    flags["LIBS"].append("tatlas")
+    flags["LIBS"].extend( ["tatlas", "ptf77blas", "ptcblas", "lapack"] )
 elif env["atlaslink"] == "single" :
-    flags["LIBS"].append("satlas")
+    flags["LIBS"].extend( ["satlas", "f77blas", "cblas", "lapack"] )
 else :
-    flags["LIBS"].append("atlas")
+    flags["LIBS"].extend( ["atlas", "f77blas", "cblas", "lapack"] )
 
 if env["withdebug"] :
     flags["CXXFLAGS"].append("-g")

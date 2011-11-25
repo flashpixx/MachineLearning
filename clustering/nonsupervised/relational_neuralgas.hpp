@@ -213,6 +213,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     {
         m_logging = p;
         m_logprototypeWeights.clear();
+        m_logprototypes.clear();
+        m_quantizationerror.clear();
     }
     
     
