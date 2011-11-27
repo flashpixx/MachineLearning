@@ -111,12 +111,18 @@ namespace machinelearning { namespace tools {
         if (p_length == 0)
             return ublas::vector<T>(p_length);
         
+        // random object must be created within the thread, because
+        // initialization runs wrong if the pragma option private / firstprivate is used
         ublas::vector<T> l_vec(p_length);
-        tools::random l_rand;
+        #pragma omp parallel shared(l_vec)
+        {
+            tools::random l_rand;
         
-        for(std::size_t i=0; i < p_length; ++i)
-            l_vec(i) = l_rand.get<T>( p_distribution, p_a, p_b, p_c );
-        
+            #pragma omp for
+            for(std::size_t i=0; i < p_length; ++i)
+                l_vec(i) = l_rand.get<T>( p_distribution, p_a, p_b, p_c );
+        }
+            
         return l_vec;
     }
     

@@ -97,13 +97,19 @@ namespace machinelearning { namespace tools {
     {         
         if ((p_row == 0) || (p_col == 0))
             return ublas::matrix<T>(p_row, p_col);
-        
-        ublas::matrix<T> l_matrix(p_row, p_col);
-        tools::random l_rand;
 
-        for (std::size_t i=0; i < p_row; ++i)
-            for (std::size_t j=0; j < p_col; ++j)
-                l_matrix(i,j) = l_rand.get<T>( p_distribution, p_a, p_b, p_c );
+        // random object must be created within the thread, because
+        // initialization runs wrong if the pragma option private / firstprivate is used
+        ublas::matrix<T> l_matrix(p_row, p_col);
+        #pragma omp parallel shared(l_matrix)
+        {
+            tools::random l_rand;
+
+            #pragma omp for
+            for (std::size_t i=0; i < p_row; ++i)
+                for (std::size_t j=0; j < p_col; ++j)
+                    l_matrix(i,j) = l_rand.get<T>( p_distribution, p_a, p_b, p_c );
+        }
         
         return l_matrix;
     }
