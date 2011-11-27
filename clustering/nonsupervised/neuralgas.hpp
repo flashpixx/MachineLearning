@@ -304,8 +304,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             for(std::size_t n=0; n < l_lambda.size(); ++n)
                 l_lambda(n) = std::exp( -static_cast<T>(n) / l_lambdahelp );
 
-                
-                
+                                
             // calculate for every prototype the distance
             #pragma omp parallel for shared(l_adaptmatrix)
             for(std::size_t n=0; n < m_prototypes.size1(); ++n)
