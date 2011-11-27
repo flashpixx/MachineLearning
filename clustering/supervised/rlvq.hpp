@@ -238,6 +238,12 @@ namespace machinelearning { namespace clustering { namespace supervised {
         
         for(std::size_t i=0; i < p_iterations; ++i) {
             
+            // determine quantization error for logging
+            if (m_logging) {
+                m_logprototypes.push_back( m_prototypes );
+                m_quantizationerror.push_back( calculateQuantizationError(p_data) );
+            }
+            
             #pragma omp parallel for shared(l_lambda)
             for (std::size_t j=0; j < p_data.size1(); ++j) {
                 
@@ -263,12 +269,6 @@ namespace machinelearning { namespace clustering { namespace supervised {
                     // normalize lambda (only one row, which has been changed)
                     ublas::row(l_lambda, l_rank(0))  /= m_distance.getLength( static_cast< ublas::vector<T> >(ublas::row(l_lambda, l_rank(0))) );
                 }
-            }
- 
-            // determine quantization error for logging
-            if (m_logging) {
-                m_logprototypes.push_back( m_prototypes );
-                m_quantizationerror.push_back( calculateQuantizationError(p_data) );
             }
         }
     }

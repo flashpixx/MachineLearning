@@ -190,7 +190,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             // determine winner and set the winner to 1
             // iterate over the columns and ranks every column
             l_adaptmatrix.clear();
-            #pragma omp parallel for shared(l_distances, l_adaptmatrix)
+            #pragma omp parallel for shared(l_adaptmatrix)
             for(std::size_t n=0; n < l_distances.size2(); ++n) {
                 ublas::vector<T> l_vec = ublas::column(l_distances, n);
 
