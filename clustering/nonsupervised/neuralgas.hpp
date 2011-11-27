@@ -290,17 +290,22 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
         for(std::size_t i=0; i < p_iterations; ++i) {
             
-            // create adapt values (note: clear numerical-zero values, because adaption runs wrong if the values exists)
+            // determine quantization error for logging
+            if (m_logging) {
+                m_logprototypes.push_back( m_prototypes );
+                m_quantizationerror.push_back( calculateQuantizationError(p_data, m_prototypes) );
+            }
+            
+            
+            // create adapt values
             const T l_lambdahelp = p_lambda * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(p_iterations));
 
             #pragma omp parallel for shared(l_lambda)
-            for(std::size_t n=0; n < l_lambda.size(); ++n) {
+            for(std::size_t n=0; n < l_lambda.size(); ++n)
                 l_lambda(n) = std::exp( -static_cast<T>(n) / l_lambdahelp );
-                if (tools::function::isNumericalZero(l_lambda(n)))
-                    l_lambda(n) = static_cast<T>(0);
-            }
 
-            
+                
+                
             // calculate for every prototype the distance
             #pragma omp parallel for shared(l_adaptmatrix)
             for(std::size_t n=0; n < m_prototypes.size1(); ++n)
@@ -332,13 +337,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
                 
                 if (!tools::function::isNumericalZero(l_norm))
                     ublas::row(m_prototypes, n) /= l_norm;
-            }
-            
-            
-            // determine quantization error for logging
-            if (m_logging) {
-                m_logprototypes.push_back( m_prototypes );
-                m_quantizationerror.push_back( calculateQuantizationError(p_data, m_prototypes) );
             }
         }
     }
@@ -456,15 +454,19 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
         for(std::size_t i=0; i < p_iterations; ++i) {
             
-            // create adapt values (note: clear numerical-zero values, because adaption runs wrong if the values exists)
+            // determine quantization error for logging
+            if (m_logging) {
+                m_logprototypes.push_back( m_prototypes );
+                m_quantizationerror.push_back( calculateQuantizationError(l_data, m_prototypes) );
+            }
+            
+            
+            // create adapt values
             const T l_lambdahelp = p_lambda * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(p_iterations));
             
             #pragma omp parallel for shared(l_lambda)
-            for(std::size_t n=0; n < l_lambda.size(); ++n) {
+            for(std::size_t n=0; n < l_lambda.size(); ++n)
                 l_lambda(n) = std::exp( -static_cast<T>(n) / l_lambdahelp );
-                if (tools::function::isNumericalZero(l_lambda(n)))
-                    l_lambda(n) = static_cast<T>(0);
-            }
             
             
             // calculate for every prototype the distance
@@ -503,13 +505,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
                 
                 if (!tools::function::isNumericalZero(l_norm))
                     ublas::row(m_prototypes, n) /= l_norm;
-            }
-            
-            
-            // determine quantization error for logging
-            if (m_logging) {
-                m_logprototypes.push_back( m_prototypes );
-                m_quantizationerror.push_back( calculateQuantizationError(l_data, m_prototypes) );
             }
         }
         
@@ -696,19 +691,24 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
         for(std::size_t i=0; (i < l_iterationsMPI); ++i) {
             
-            // create adapt values (note: clear numerical-zero values, because adaption runs wrong if the values exists)
+            // create adapt values
             const T l_lambdahelp = l_lambdaMPI * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(l_iterationsMPI));
             
             #pragma omp parallel for shared(l_lambda)
-            for(std::size_t n=0; n < l_lambda.size(); ++n) {
+            for(std::size_t n=0; n < l_lambda.size(); ++n)
                 l_lambda(n) = std::exp( -static_cast<T>(n) / l_lambdahelp );
-                if (tools::function::isNumericalZero(l_lambda(n)))
-                    l_lambda(n) = static_cast<T>(0);
-            }
-            
+
             
             // we get all prototypes of every process
             ublas::matrix<T> l_prototypes = gatherAllPrototypes( p_mpi );
+            
+            
+            // determine quantization error for logging
+            if (m_logging) {
+                m_logprototypes.push_back( m_prototypes );
+                m_quantizationerror.push_back( calculateQuantizationError(p_data, l_prototypes) );
+            }
+            
             
             // calculate for every prototype the distance (of the actually prototypes).
             // within the adapt matrix, we must specify the position of the prototypes 
@@ -741,19 +741,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
                 l_normvec(n) = ublas::sum( ublas::row(l_adaptmatrix, n) );
             
             synchronizePrototypes(p_mpi, l_prototypes, l_normvec);
-            
-            
-            // determine quantization error for logging
-            if (m_logging) {
-                
-                // we must normalize the local prototypes (only on logging, in other cases gatherLocalPrototypes do this)
-                for(std::size_t n=0; n < l_prototypes.size1(); ++n)
-                    if (!tools::function::isNumericalZero(l_normvec(n)))
-                        ublas::row(l_prototypes, n) /= l_normvec(n);
-                
-                m_logprototypes.push_back( m_prototypes );
-                m_quantizationerror.push_back( calculateQuantizationError(p_data, l_prototypes) );
-            }
         }
     }
     
@@ -1026,19 +1013,24 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
         for(std::size_t i=0; (i < l_iterationsMPI); ++i) {
             
-            // create adapt values (note: clear numerical-zero values, because adaption runs wrong if the values exists)
+            // create adapt values
             const T l_lambdahelp = l_lambdaMPI * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(l_iterationsMPI));
             
             #pragma omp parallel for shared(l_lambda)
-            for(std::size_t n=0; n < l_lambda.size(); ++n) {
+            for(std::size_t n=0; n < l_lambda.size(); ++n)
                 l_lambda(n) = std::exp( -static_cast<T>(n) / l_lambdahelp );
-                if (tools::function::isNumericalZero(l_lambda(n)))
-                    l_lambda(n) = static_cast<T>(0);
-            }
 
             
             // we get all prototypes of every process
             ublas::matrix<T> l_prototypes = gatherAllPrototypes( p_mpi );
+            
+            
+            // determine quantization error for logging
+            if (m_logging) {
+                m_logprototypes.push_back( m_prototypes );
+                m_quantizationerror.push_back( calculateQuantizationError(l_data, m_prototypes) );
+            }
+            
             
             // calculate for every prototype the distance
             #pragma omp parallel for shared(l_adaptmatrix)
@@ -1074,13 +1066,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             for(std::size_t n=0; n < l_prototypes.size1(); ++n)
                 l_normvec(n) = ublas::sum( ublas::row(l_adaptmatrix, n) );
             synchronizePrototypes(p_mpi, l_prototypes, l_normvec);
-            
-            
-            // determine quantization error for logging
-            if (m_logging) {
-                m_logprototypes.push_back( m_prototypes );
-                m_quantizationerror.push_back( calculateQuantizationError(l_data, m_prototypes) );
-            }
         }
         
         // determine size of receptive fields, but we use only the data points

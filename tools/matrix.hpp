@@ -98,11 +98,9 @@ namespace machinelearning { namespace tools {
         if ((p_row == 0) || (p_col == 0))
             return ublas::matrix<T>(p_row, p_col);
         
-        // initialisation of prototypes
-        tools::random l_rand;
         ublas::matrix<T> l_matrix(p_row, p_col);
-        
-        #pragma omp parallel for shared(l_matrix, l_rand)
+        tools::random l_rand;
+
         for (std::size_t i=0; i < p_row; ++i)
             for (std::size_t j=0; j < p_col; ++j)
                 l_matrix(i,j) = l_rand.get<T>( p_distribution, p_a, p_b, p_c );

@@ -136,12 +136,12 @@ namespace machinelearning { namespace tools {
     #ifndef MACHINELEARNING_RANDOMDEVICE
     inline random::random( void )
         #ifndef MACHINELEARNING_MPI
-        : m_random(  boost::mt19937(omp_get_thread_num() ^ time(NULL))  )
+        : m_random(  boost::mt19937(omp_get_thread_num() * time(NULL))  )
         #endif
     {
         #ifdef MACHINELEARNING_MPI
         mpi::communicator l_mpi;
-        m_random = boost::mt19937( (omp_get_thread_num() ^ time(NULL)) * (l_mpi.rank()+1) );
+        m_random = boost::mt19937( omp_get_thread_num() * time(NULL) * (l_mpi.rank()+1) );
         #endif
     }
     #endif

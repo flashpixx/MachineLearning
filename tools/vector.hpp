@@ -111,11 +111,9 @@ namespace machinelearning { namespace tools {
         if (p_length == 0)
             return ublas::vector<T>(p_length);
         
-        // initialisation of prototypes
-        tools::random l_rand;
         ublas::vector<T> l_vec(p_length);
+        tools::random l_rand;
         
-        #pragma omp parallel for shared(l_vec, l_rand)
         for(std::size_t i=0; i < p_length; ++i)
             l_vec(i) = l_rand.get<T>( p_distribution, p_a, p_b, p_c );
         
