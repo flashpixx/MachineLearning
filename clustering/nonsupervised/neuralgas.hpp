@@ -697,7 +697,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         for(std::size_t i=0; (i < l_iterationsMPI); ++i) {
             
             // create adapt values (note: clear numerical-zero values, because adaption runs wrong if the values exists)
-            const T l_lambdahelp = p_lambda * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(l_iterationsMPI));
+            const T l_lambdahelp = l_lambdaMPI * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(l_iterationsMPI));
             
             #pragma omp parallel for shared(l_lambda)
             for(std::size_t n=0; n < l_lambda.size(); ++n) {
@@ -1027,7 +1027,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         for(std::size_t i=0; (i < l_iterationsMPI); ++i) {
             
             // create adapt values (note: clear numerical-zero values, because adaption runs wrong if the values exists)
-            const T l_lambdahelp = p_lambda * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(l_iterationsMPI));
+            const T l_lambdahelp = l_lambdaMPI * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(l_iterationsMPI));
             
             #pragma omp parallel for shared(l_lambda)
             for(std::size_t n=0; n < l_lambda.size(); ++n) {
