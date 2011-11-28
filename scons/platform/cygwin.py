@@ -101,7 +101,7 @@ if env["withsymbolicmath"] :
     flags["LIBS"].append("ginac")
 
 if env["withoptimize"] :
-    flags["CXXFLAGS"].extend(["-O2", "-Os", "-s", "-mfpmath=sse", "-finline-functions", "-mtune="+env["cputype"]])
+    flags["CXXFLAGS"].extend(["-O2", "-mfpmath=sse", "-msse3", "-fomit-frame-pointer", "-finline-functions", "-mtune="+env["cputype"]])
 
 if env["withlogger"] :
     flags["CXXFLAGS"].append("-D MACHINELEARNING_LOGGER")

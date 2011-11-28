@@ -84,7 +84,8 @@ listReduce = createTarget(env, "reducing", srcReduce, framework)
 #clustering examples
 srcCluster = []
 if env["withfiles"] :
-    srcCluster.extend( ["rlvq.cpp", "kmeans.cpp", "neuralgas.cpp", "patch_neuralgas.cpp", "relational_neuralgas.cpp", "spectral.cpp"] )
+    #srcCluster.extend( ["rlvq.cpp", "kmeans.cpp", "neuralgas.cpp", "patch_neuralgas.cpp", "relational_neuralgas.cpp", "spectral.cpp"] )
+    srcCluster.extend( ["neuralgas.cpp"] )
 listCluster = createTarget(env, "clustering", srcCluster, framework)
 
 srcSources = []

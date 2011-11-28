@@ -63,6 +63,7 @@ namespace machinelearning { namespace functionaloptimization {
      * iteration, so if the values are jumping the optimization process must be switched
      * in two processes or all multiplication / exponents must be cut and each thread
      * must be create internal processes for the iteration (see batch parameter within the optimization method)
+     * @see http://en.wikipedia.org/wiki/Frank%E2%80%93Wolfe_algorithm for optimazation
      **/
     template<typename T, std::size_t D=1> class gradientdescent
     {
