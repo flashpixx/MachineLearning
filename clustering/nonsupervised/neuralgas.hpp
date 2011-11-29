@@ -281,10 +281,10 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             m_quantizationerror.reserve(p_iterations);
         }
 
-        //m_prototypes(0,0) = 0.1062;    m_prototypes(0,1) = 0.3395;
-        //m_prototypes(1,0) = 0.3724;    m_prototypes(1,1) = 0.9516;
-        //m_prototypes(2,0) = 0.1981;    m_prototypes(2,1) = 0.9203;
-        //m_prototypes(3,0) = 0.4897;    m_prototypes(3,1) = 0.0527;
+        m_prototypes(0,0) = 0.1062;    m_prototypes(0,1) = 0.3395;
+        m_prototypes(1,0) = 0.3724;    m_prototypes(1,1) = 0.9516;
+        m_prototypes(2,0) = 0.1981;    m_prototypes(2,1) = 0.9203;
+        m_prototypes(3,0) = 0.4897;    m_prototypes(3,1) = 0.0527;
         
         
         // run neural gas       
@@ -314,6 +314,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             for(std::size_t n=0; n < m_prototypes.size1(); ++n)
                 ublas::row(l_adaptmatrix, n)  = m_distance.getDistance( p_data, ublas::row(m_prototypes, n) );
                 
+            tools::files::csv f;
+            f.write("distancecpp.txt", l_adaptmatrix);
             
             // for every column ranks values and create adapts
             // we need rank and not randIndex, because we 

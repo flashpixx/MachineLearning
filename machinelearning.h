@@ -132,7 +132,8 @@
  * plattform specified options for compiling the sources. For compiling the test cpp files in the test directory the following option can
  * be set (Hierarchical Data Format is needed) [see options and default values with <dfn>scons -Q -h</dfn>]
  * <ul>
- * <li><dfn>atlaslink</dfn> adds the option which ATLAS library is linked (multi = multithreadding [tatlas] or single = singlethreadding [satlas] [on Cygwin the option is not used])
+ * <li><dfn>atlaslink</dfn> adds the option which ATLAS library is linked (multi = multithreadding [tatlas], single = singlethreadding [satlas], static = static link [on Cygwin the option is used only])</li>
+ * <li><dfn>math</dfn> compiler math option (sse3, sse, 387 for floating-point arithmetics) (used if optimazation is enabled)</li>
  * <li><dfn>withrandomdevice</dfn> adds the compilerflag for random device support</li>
  * <li><dfn>withmpi</dfn> adds the compilerflag for cluster / MPI support (on the target <dfn>librarybuild</dfn> MPI support is compiled into the Boost)</li>
  * <li><dfn>withmultilanguage</dfn> adds the multilanguage support with gettext</li>
@@ -140,11 +141,18 @@
  * <li><dfn>withsources</dfn> support for the namespace machinelearning::tools::sources</li>
  * <li><dfn>withfiles</dfn> support for the namespace machinelearning::tools::files</li>
  * <li><dfn>withsymbolicmath</dfn> support for symbolic math (eg: machinelearning::functionaloptimization::gradientdescent )</li>
+ * <li><dfn>withdebug</dfn> compile with debug symbols</li>
+ * <li><dfn>withoptimize</dfn> optimization like O2</li>
+ * <li><dfn>cputype</dfn> cpu type, see GCC documentation http://gcc.gnu.org/onlinedocs/gcc/i386-and-x86_002d64-Options.html [default: native]</li>
  * </ul><ul>
  * <li><dfn>atlaspointerwidth</dfn> parameter for setting the ATLAS pointer width during running the library build target (default empty for system default)</li>
  * <li><dfn>atlascputhrottle</dfn> enable / disable detection of ATLAS CPU throtteling during runngin the library build target (default disable)</li>
  * <li><dfn>skipbuild</dfn> disables / skips the automatic build of a library [allowd values: all, none, atlas, boost, hdf, ginac, json , xml (only available on Cygwin)]</li> 
  * <li><dfn>skipbuilderror</dfn> if an error occures during the building process, a commandline input for aborting or continuing is needed, with this option the input can be suppressed (default disable)</li>
+ * </ul>
+ * On Cygwin the option
+ * <ul>
+ * <li><dfn>winver</dfn> is set for the Windows version [default: win7, other allowed values: srv2008, vista, srv2003sp1, xpsp2, srv2003, xp, w2000)</li>
  * </ul>
  * The <dfn>SConstruct</dfn> script, which is the entry point to the compiler calls, is stored in the framework main directory. Under the <dfn>scons</dfn> directory all other script (target, helper, platform)
  * are stored. For each target a own script exists under <dfn>scons/target</dfn>, eg all Java buildsteps are created with the script <dfn>scons/target/java.py</dfn>. For each platform a own script is stored

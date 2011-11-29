@@ -95,7 +95,13 @@ if env["withsymbolicmath"] :
     flags["LIBS"].append("ginac")
 
 if env["withoptimize"] :
-    flags["CXXFLAGS"].extend(["-O2", "-mfpmath=sse", "-msse3", "-fomit-frame-pointer", "-finline-functions", "-mtune="+env["cputype"]])
+    flags["CXXFLAGS"].extend(["-O2", "-fomit-frame-pointer", "-finline-functions", "-mtune="+env["cputype"]])
+    if env["math"] == "sse3" :
+        flags["CXXFLAGS"].extend(["-mfpmath=sse", "-msse3"])
+    elif env["math"] == "sse" :
+        flags["CXXFLAGS"].extend(["-mfpmath=sse", "-msse"])
+    else :
+        flags["CXXFLAGS"].extend(["-mfpmath=387"])
 
 if env["withlogger"] :
     flags["CXXFLAGS"].append("-D MACHINELEARNING_LOGGER")

@@ -20,8 +20,7 @@ def createVariables(vars) :
 
     vars.Add(BoolVariable("withdebug", "compile with debug information", False))
     vars.Add(BoolVariable("withoptimize", "compile with CPU optimization code", True))
-
-    vars.Add(EnumVariable("winver", "value of the Windows version", "win7", allowed_values=("win7", "srv2008", "vista", "srv2003sp1", "xpsp2", "srv2003", "xp", "w2000")))
+    vars.Add(EnumVariable("math", "optimization of math structure", "sse3", allowed_values=("sse3", "sse", "387")))
 
     vars.Add(EnumVariable("atlaslink", "value of the atlas threadding (static = atlas, multi = tatlas, single = satlas)", "static", allowed_values=("static", "multi", "single")))
 
@@ -32,6 +31,7 @@ def createVariables(vars) :
     
     libs = ["atlas", "boost", "hdf", "ginac", "json"]
     if "cygwin" in platform.system().lower() :
+        vars.Add(EnumVariable("winver", "value of the Windows version", "win7", allowed_values=("win7", "srv2008", "vista", "srv2003sp1", "xpsp2", "srv2003", "xp", "w2000")))
         libs.append("xml")
     vars.Add(ListVariable("skipbuild", "skipping library builds", "", libs))
     vars.Add(BoolVariable("skipbuilderror", "ignore / skip build errors", False))
