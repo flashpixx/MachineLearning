@@ -133,7 +133,7 @@
  * be set (Hierarchical Data Format is needed) [see options and default values with <dfn>scons -Q -h</dfn>]
  * <ul>
  * <li><dfn>atlaslink</dfn> adds the option which ATLAS library is linked (multi = multithreadding [tatlas], single = singlethreadding [satlas])</li>
- * <li><dfn>linkstatic</dfn> links all libraries static (default option yes), overrides <dfn>atlaslink</dfn> flag</li>
+ * <li><dfn>staticlink</dfn> links all libraries static (default option yes), overrides <dfn>atlaslink</dfn> flag</li>
  * <li><dfn>math</dfn> compiler math option (sse3, sse, 387 for floating-point arithmetics) (used if optimazation is enabled)</li>
  * <li><dfn>withrandomdevice</dfn> adds the compilerflag for random device support</li>
  * <li><dfn>withmpi</dfn> adds the compilerflag for cluster / MPI support (on the target <dfn>librarybuild</dfn> MPI support is compiled into the Boost)</li>

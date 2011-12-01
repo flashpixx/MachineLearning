@@ -61,7 +61,7 @@ if env["atlaslink"] == "multi" :
 elif env["atlaslink"] == "single" :
     flags["LIBS"].extend( ["lapack", "cblas", "f77blas"] )
 
-if env["linkstatic"] :
+if env["staticlink"] :
     flags["LIBS"].append("atlas")
 else :
     if env["atlaslink"] == "multi" :
@@ -93,7 +93,7 @@ if env["withsources"] :
 if env["withfiles"] :
     flags["CXXFLAGS"].extend(["-D MACHINELEARNING_FILES", "-D MACHINELEARNING_FILES_HDF"])
     flags["LIBS"].extend( ["hdf5_cpp", "hdf5"] )
-    if env["linkstatic"] :
+    if env["staticlink"] :
         flags["LIBS"].append("z")
 
 if env["withsymbolicmath"] :
@@ -115,7 +115,7 @@ if env["withlogger"] :
 
 
 # if the static option is set, replace all libraries with the static version
-if env["linkstatic"] :
+if env["staticlink"] :
     dylink = []
     for i in flags["LIBS"] :
         found = env.FindFile(env["LIBPREFIX"]+i+env["LIBSUFFIX"], flags["LIBPATH"])
