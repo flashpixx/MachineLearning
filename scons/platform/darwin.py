@@ -127,6 +127,5 @@ if env["staticlink"] :
         else :
             dylink.append(i);
     flags["LIBS"] = dylink
-            
 
 env.MergeFlags(flags)
