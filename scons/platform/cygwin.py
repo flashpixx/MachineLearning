@@ -77,13 +77,20 @@ elif env["winver"] == "w2000" :
     
 # Atlas build creates a static library under Cygwin, so we link directly without the "atlaslink" option
 # Library sequence must be preserved !!
+if env["atlaslink"] == "multi" :
+    flags["LIBS"].extend( ["lapack", "ptcblas", "ptf77blas"] )
+elif env["atlaslink"] == "single" :
+    flags["LIBS"].extend( ["lapack", "cblas", "f77blas"] )
+
 if env["linkstatic"] :
-    flags["LIBS"].extend( ["lapack", "cblas", "f77blas", "atlas", "gfortran"] )
+    flags["LIBS"].append("atlas")
 else :
     if env["atlaslink"] == "multi" :
-        flags["LIBS"].extend( ["tatlas", "ptf77blas", "ptcblas", "lapack"] )
+        flags["LIBS"].append("tatlas")
     elif env["atlaslink"] == "single" :
-        flags["LIBS"].extend( ["satlas", "f77blas", "cblas", "lapack"] )
+        flags["LIBS"].append("satlas")
+flags["LIBS"].append("gfortran")
+
     
 if env["withdebug"] :
     flags["CXXFLAGS"].append("-g")

@@ -25,6 +25,8 @@
 #ifndef __MACHINELEARNING_CLUSTERING_NONSUPERVISED_RNG_HPP
 #define __MACHINELEARNING_CLUSTERING_NONSUPERVISED_RNG_HPP
 
+#include <omp.h>
+
 #include <numeric>
 #include <boost/shared_ptr.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
@@ -326,35 +328,44 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
         // run neural gas       
         const T l_multi = 0.01/p_lambda;
+        ublas::vector<T> l_lambda(m_prototypes.size1());
         
         for(std::size_t i=0; (i < p_iterations); ++i) {
             
             // create adapt values
-            const T l_lambda                = p_lambda * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(p_iterations));
+            const T l_lambdahelp = p_lambda * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(p_iterations));
+            
+            #pragma omp parallel for shared(l_lambda)
+            for(std::size_t n=0; n < l_lambda.size(); ++n)
+                l_lambda(n) = std::exp( -static_cast<T>(n) / l_lambdahelp );
+            
+            // create adapt values
             ublas::matrix<T> l_adaptmatrix  = calcDistance( m_prototypes, p_data );
+
             
             // determine quantization error for logging (adaption matrix)
-            if (m_logging)
+            if (m_logging) {
                 m_quantizationerror.push_back( calculateQuantizationError(l_adaptmatrix) );
-
+                m_logprototypes.push_back( m_prototypes );
+            }
+            
             
             // for every column ranks values and create adapts
             // we need rank and not randIndex, because we 
             // use the value of the ranking for calculate the 
             // adapt value
+            #pragma omp parallel for shared(l_adaptmatrix)
             for(std::size_t n=0; n < l_adaptmatrix.size2(); ++n) {
-                ublas::vector<T> l_rank = ublas::column(l_adaptmatrix, n);
-                l_rank = tools::vector::rank( l_rank );
+                ublas::vector<T> l_column                = ublas::column(l_adaptmatrix, n);
+                const ublas::vector<std::size_t> l_rank  = tools::vector::rank(l_column);
                 
-                // calculate adapt value
-                BOOST_FOREACH( T& p, l_rank)
-                    p = std::exp( -p / l_lambda );
-                
-                // return value to matrix
-                ublas::column(l_adaptmatrix, n) = l_rank;
+                for(std::size_t j=0; j < l_rank.size(); ++j)
+                    l_adaptmatrix(j,n) = l_lambda(l_rank(j));
             }
+            
  
             // adapt values are the new prototypes (and run normalization)
+            #pragma omp parallel for shared(l_adaptmatrix)
             for(std::size_t i=0; i < l_adaptmatrix.size1(); ++i) {
                 const T l_sum = ublas::sum( ublas::row( l_adaptmatrix, i) );
                 
@@ -362,10 +373,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
                     ublas::row( l_adaptmatrix, i) /= l_sum;
             }
             m_prototypes = l_adaptmatrix;
-            
-            // log updated prototypes
-            if (m_logging)
-                m_logprototypes.push_back( m_prototypes );
         }
     }
     
@@ -548,6 +555,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         // D = distance, alpha = weight of the prototype for the convex combination
         ublas::matrix<T> l_adaptmatrix = ublas::prod(p_prototypes, p_data);
        
+        #pragma omp parallel for shared(l_adaptmatrix)
         for(std::size_t n=0; n < l_adaptmatrix.size1(); ++n) {
             const T l_val = 0.5 * ublas::inner_prod( ublas::row(p_prototypes, n), ublas::row(l_adaptmatrix, n) );
             

@@ -56,13 +56,18 @@ if not("javac" in COMMAND_LINE_TARGETS) :
 else :
     flags["LINKFLAGS"].append("-Wl,--rpath=\\$$ORIGIN")
     
+if env["atlaslink"] == "multi" :
+    flags["LIBS"].extend( ["lapack", "ptcblas", "ptf77blas"] )
+elif env["atlaslink"] == "single" :
+    flags["LIBS"].extend( ["lapack", "cblas", "f77blas"] )
+
 if env["linkstatic"] :
-    flags["LIBS"].extend( ["atlas", "f77blas", "cblas", "lapack"] )
+    flags["LIBS"].append("atlas")
 else :
     if env["atlaslink"] == "multi" :
-        flags["LIBS"].extend( ["tatlas", "ptf77blas", "ptcblas", "lapack"] )
+        flags["LIBS"].append("tatlas")
     elif env["atlaslink"] == "single" :
-        flags["LIBS"].extend( ["satlas", "f77blas", "cblas", "lapack"] )
+        flags["LIBS"].append("satlas")
 
 if env["withdebug"] :
     flags["CXXFLAGS"].append("-g")
