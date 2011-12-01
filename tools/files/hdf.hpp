@@ -218,8 +218,8 @@ namespace machinelearning { namespace tools { namespace files {
         if ((l_size[1]==0) || (l_size[0]==0))
             throw exception::runtime(_("dimension need not be zero"), *this);
         
-        // read data
-        ublas::matrix<T> l_mat(l_size[1],l_size[0]);
+        // read data (read column oriantated, because data order is changed)
+        ublas::matrix<T, ublas::column_major> l_mat(l_size[1],l_size[0]);
         l_dataset.read( &(l_mat.data()[0]), p_datatype );
         
         l_dataspace.close();
