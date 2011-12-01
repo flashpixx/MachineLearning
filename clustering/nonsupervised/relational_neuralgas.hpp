@@ -169,12 +169,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         if (p_prototypesize == 0)
             throw exception::runtime(_("prototype size must be greater than zero"), *this);
         
-        m_prototypes(0,0) = 0.4898;    m_prototypes(0,1) = 0.7094;    m_prototypes(0,2) = 0.6797;    m_prototypes(0,3) = 0.1190;    m_prototypes(0,4) = 0.3404;    m_prototypes(0,5) = 0.7513;    m_prototypes(0,6) = 0.6991;    m_prototypes(0,7) = 0.5472;    m_prototypes(0,8) = 0.2575;    m_prototypes(0,9) = 0.8143;    m_prototypes(0,10) = 0.3500;    m_prototypes(0,11) = 0.6160;    m_prototypes(0,12) = 0.8308;    m_prototypes(0,13) = 0.9172;    m_prototypes(0,14) = 0.7537;
-        
-        m_prototypes(1,0) = 0.4456;    m_prototypes(1,1) = 0.7547;    m_prototypes(1,2) = 0.6551;    m_prototypes(1,3) = 0.4984;    m_prototypes(1,4) = 0.5853;    m_prototypes(1,5) = 0.2551;    m_prototypes(1,6) = 0.8909;    m_prototypes(1,7) = 0.1386;    m_prototypes(1,8) = 0.8407;    m_prototypes(1,9) = 0.2435;    m_prototypes(1,10) = 0.1966;    m_prototypes(1,11) = 0.4733;    m_prototypes(1,12) = 0.5853;    m_prototypes(1,13) = 0.2858;    m_prototypes(1,14) = 0.3804;
-        
-        m_prototypes(2,0) = 0.6463;    m_prototypes(2,1) = 0.2760;    m_prototypes(2,2) = 0.1626;    m_prototypes(2,3) = 0.9597;    m_prototypes(2,4) = 0.2238;    m_prototypes(2,5) = 0.5060;    m_prototypes(2,6) = 0.9593;    m_prototypes(2,7) = 0.1493;    m_prototypes(2,8) = 0.2543;    m_prototypes(2,9) = 0.9293;    m_prototypes(2,10) = 0.2511;    m_prototypes(2,11) = 0.3517;    m_prototypes(2,12) = 0.5497;    m_prototypes(2,13) = 0.7572;    m_prototypes(2,14) = 0.5678;
-        
         // normalize the prototypes
         #pragma omp parallel for
         for(std::size_t i=0; i <  m_prototypes.size1(); ++i) {
@@ -223,7 +217,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     }
     
     
-    
     /** enabled logging for training
      * @param p bool
      **/
@@ -235,7 +228,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     }
     
     
-    
     /** shows the logging status
      * @return bool
      **/
@@ -243,7 +235,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     {
         return m_logging && (m_logprototypes.size() > 0);
     }
-    
     
     
     /** returns every prototype step during training
@@ -333,7 +324,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             // create adapt values
             const T l_lambdahelp = p_lambda * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(p_iterations));
             
-            //#pragma omp parallel for shared(l_lambda)
+            #pragma omp parallel for shared(l_lambda)
             for(std::size_t n=0; n < l_lambda.size(); ++n)
                 l_lambda(n) = std::exp( -static_cast<T>(n) / l_lambdahelp );
             
@@ -400,6 +391,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         ublas::indirect_array<> l_idx(p_data.size1());
         const ublas::matrix<T> l_distance = ublas::prod( p_data, ublas::trans(m_prototypes) );
         
+        #pragma omp parallel for shared(l_idx)
         for(std::size_t i=0; i < l_distance.size1(); ++i) {
             ublas::vector<T> l_col                = ublas::row(l_distance, i);
             const ublas::indirect_array<> l_rank  = tools::vector::rankIndex( l_col );
@@ -611,11 +603,16 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         // run neural gas 
         const T l_multi               = 0.01/l_lambdaMPI;
         ublas::matrix<T> l_prototypes = gatherAllPrototypes( p_mpi );
+        ublas::vector<T> l_lambda(l_prototypes.size1());
         
-        for(std::size_t i=0; (i < l_iterationsMPI); ++i) {
+        for(std::size_t i=0; i < l_iterationsMPI; ++i) {
             
             // create adapt values
-            const T l_lambda = l_lambdaMPI * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(p_iterations));
+            const T l_lambdahelp = l_lambdaMPI * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(l_iterationsMPI));
+            
+            #pragma omp parallel for shared(l_lambda)
+            for(std::size_t n=0; n < l_lambda.size(); ++n)
+                l_lambda(n) = std::exp( -static_cast<T>(n) / l_lambdahelp );
         
             // calculate for every prototype the distance (only the parts of the data matrix)
             // relational: (D * alpha_i)_j - 0.5 * alpha_i^t * D * alpha_i = || x^j - w^i || 
@@ -644,38 +641,35 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             
             
             // determine quantization error for logging (adaption matrix)
-            if (m_logging)
+            if (m_logging) {
                 m_quantizationerror.push_back( calculateQuantizationError(l_adaptmatrix) );
-            
+                m_logprototypes.push_back( extractLocalPrototypes(p_mpi, l_prototypes) );
+            }
             
             // for every column ranks values and create adapts
             // we need rank and not randIndex, because we 
             // use the value of the ranking for calculate the 
             // adapt value
+            #pragma omp parallel for shared(l_adaptmatrix)
             for(std::size_t n=0; n < l_adaptmatrix.size2(); ++n) {
-                ublas::vector<T> l_rank = ublas::column(l_adaptmatrix, n);
-                l_rank = tools::vector::rank( l_rank );
+                ublas::vector<T> l_column                = ublas::column(l_adaptmatrix, n);
+                const ublas::vector<std::size_t> l_rank  = tools::vector::rank(l_column);
                 
-                // calculate adapt value
-                BOOST_FOREACH( T& p, l_rank)
-                    p = std::exp( -p / l_lambda );
-                
-                // return value to matrix
-                ublas::column(l_adaptmatrix, n) = l_rank;
+                for(std::size_t j=0; j < l_rank.size(); ++j)
+                    l_adaptmatrix(j,n) = l_lambda(l_rank(j));
             }
+            
             
             // adapt values are the new prototypes (and run normalization)
             l_prototypes = synchronizePrototypes( p_mpi, l_adaptmatrix );
+            
+            #pragma omp parallel for shared(l_prototypes)
             for(std::size_t i=0; i < l_prototypes.size1(); ++i) {
                 const T l_sum = ublas::sum( ublas::row( l_prototypes, i) );
                 
                 if (!tools::function::isNumericalZero(l_sum))
                     ublas::row( l_prototypes, i) /= l_sum;
             }
-            
-            // log updated prototypes
-            if (m_logging)
-                m_logprototypes.push_back( extractLocalPrototypes(p_mpi, l_prototypes) );
         }
         
         // extract only the relevant prototypes to the member variable
