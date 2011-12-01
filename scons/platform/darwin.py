@@ -59,9 +59,9 @@ if not("javac" in COMMAND_LINE_TARGETS) :
     flags["LIBS"].extend(["boost_program_options", "boost_exception", "boost_filesystem"])
 
 if env["atlaslink"] == "multi" :
-    flags["LIBS"].extend( ["lapack", "ptcblas", "ptf77blas"] )
+    flags["LIBS"].extend( ["lapack", "ptcblas", "ptf77blas", "gfortran"] )
 elif env["atlaslink"] == "single" :
-    flags["LIBS"].extend( ["lapack", "cblas", "f77blas"] )
+    flags["LIBS"].extend( ["lapack", "cblas", "f77blas", "gfortran"] )
 
 if env["staticlink"] :
     flags["LIBS"].append("atlas")
