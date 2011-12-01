@@ -56,14 +56,13 @@ if not("javac" in COMMAND_LINE_TARGETS) :
 else :
     flags["LINKFLAGS"].append("-Wl,--rpath=\\$$ORIGIN")
     
-    
-if env["atlaslink"] == "multi" :
-    flags["LIBS"].extend(["lapack", "ptcblas", "ptf77blas", "tatlas"])
-elif env["atlaslink"] == "single" :
-    flags["LIBS"].extend(["lapack", "cblas", "f77blas", "satlas"])
+if env["linkstatic"] :
+    flags["LIBS"].extend( ["atlas", "f77blas", "cblas", "lapack"] )
 else :
-    flags["LIBS"].extend(["lapack", "cblas", "f77blas", "atlas"])
-    
+    if env["atlaslink"] == "multi" :
+        flags["LIBS"].extend( ["tatlas", "ptf77blas", "ptcblas", "lapack"] )
+    elif env["atlaslink"] == "single" :
+        flags["LIBS"].extend( ["satlas", "f77blas", "cblas", "lapack"] )
 
 if env["withdebug"] :
     flags["CXXFLAGS"].append("-g")
@@ -89,6 +88,8 @@ if env["withsources"] :
 if env["withfiles"] :
     flags["CXXFLAGS"].extend(["-D MACHINELEARNING_FILES", "-D MACHINELEARNING_FILES_HDF"])
     flags["LIBS"].extend( ["hdf5_cpp", "hdf5"] )
+    if env["linkstatic"] :
+        flags["LIBS"].append("z")
 
 if env["withsymbolicmath"] :
     flags["CXXFLAGS"].append("-D MACHINELEARNING_SYMBOLICMATH")
@@ -107,5 +108,16 @@ if env["withlogger"] :
     flags["CXXFLAGS"].append("-D MACHINELEARNING_LOGGER")
     flags["LIBS"].append("boost_thread")
 
+
+# if the static option is set, replace all libraries with the static version
+if env["linkstatic"] :
+    dylink = []
+    for i in flags["LIBS"] :
+        found = env.FindFile(env["LIBPREFIX"]+i+env["LIBSUFFIX"], flags["LIBPATH"])
+        if found <> None :
+            flags["LINKFLAGS"].append(found)
+        else :
+            dylink.append(i);
+    flags["LIBS"] = dylink
 
 env.MergeFlags(flags)

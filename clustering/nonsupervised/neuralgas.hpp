@@ -280,12 +280,12 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             m_logprototypes.reserve(p_iterations);
             m_quantizationerror.reserve(p_iterations);
         }
-
+        /*
         m_prototypes(0,0) = 0.1062;    m_prototypes(0,1) = 0.3395;
         m_prototypes(1,0) = 0.3724;    m_prototypes(1,1) = 0.9516;
         m_prototypes(2,0) = 0.1981;    m_prototypes(2,1) = 0.9203;
         m_prototypes(3,0) = 0.4897;    m_prototypes(3,1) = 0.0527;
-        
+        */
         
         // run neural gas       
         const T l_multi = 0.01/p_lambda;
