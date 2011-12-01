@@ -57,10 +57,40 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * methods must be called in the correct order, so the MPI calls must be run
      * on each process.
      * @todo thinking about relation calculating transform to a own distance class
+     * @todo add patch-clustering:
+     * @code
+         do k-approximation
+         k-nearest:
+         1. determine relational spanning set
+         1a. k = 1 / neurons.size2()
+         1b. std::vector ret
+         1b. for(i in neurons.size1()) {
+                std::vector pos
+                for(j in neurons.size2())
+                    if neurons(i,j) >= k)
+                        ret.push_back(j)
+                ret.push_back(pos);
+            }
+         2. sorting spanning set
+         2a. calculate distance data between data and neurons (matrix with neurons x data)
+         2b. std::vector newret;
+         2c. for(i in ret.size()) {
+                ublas::vector dist( ret(i).size() )
+                for(j in 0..dist.size()-1)
+                    dist(j) = distance(i, j)
+                std::vector idx = rankIndex(dist);
+         
+                std::vector pos;
+                std::vector line = ret(i);
+                for(j in 0..ret(i).size()-1)
+                    pos.push_back( line(idx(j)) );
+                newret.push_back(pos);
+            }
+     * @endcode
      **/
-    template<typename T> class relational_neuralgas : public clustering<T>, public patch<T> 
+    template<typename T> class relational_neuralgas : public clustering<T> 
         #ifdef MACHINELEARNING_MPI 
-        , public mpiclustering<T>, public mpipatch<T>
+        , public mpiclustering<T>
         #endif
     {
         BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
@@ -80,11 +110,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             std::vector<T> getLoggedQuantizationError( void ) const;
             ublas::indirect_array<> use( const ublas::matrix<T>& ) const;
         
-            // derived from patch clustering
-            ublas::vector<T> getPrototypeWeights( void ) const;
-            void trainpatch( const ublas::matrix<T>&, const std::size_t& );
-            void trainpatch( const ublas::matrix<T>&, const std::size_t&, const T& );
-            std::vector< ublas::vector<T> > getLoggedPrototypeWeights( void ) const;
         
             #ifdef MACHINELEARNING_MPI
             void train( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t& );
@@ -94,10 +119,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             std::vector<T> getLoggedQuantizationError( const mpi::communicator& ) const;
             ublas::indirect_array<> use( const mpi::communicator&, const ublas::matrix<T>& ) const;
             void use( const mpi::communicator& ) const;
-        
-            void trainpatch( const mpi::communicator&, const ublas::matrix<T>&, const std::size_t& ) { throw exception::classmethod(_("method is not implementated in this class"), *this); };
-            ublas::vector<T> getPrototypeWeights( const mpi::communicator& ) const { throw exception::classmethod(_("method is not implementated in this class"), *this); };
-            std::vector< ublas::vector<T> > getLoggedPrototypeWeights( const mpi::communicator& ) const { throw exception::classmethod(_("method is not implementated in this class"), *this); };
             #endif
         
         
@@ -105,20 +126,12 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
             /** prototypes **/
             ublas::matrix<T> m_prototypes;
-            /** k-approximation object **/
-            const boost::shared_ptr< neighborhood::kapproximation<T> > m_kapprox;
             /** bool for logging prototypes **/
             bool m_logging;
             /** std::vector for prototypes for each iteration **/
             std::vector< ublas::matrix<T> > m_logprototypes;
             /** std::vector for quantisation error in each iteration **/
             std::vector<T> m_quantizationerror;
-            /** prototype weights for patch clustering **/
-            ublas::vector<T> m_prototypeWeights;
-            /** std::vector for logging the prototype weights **/
-            std::vector< ublas::vector<T> > m_logprototypeWeights;
-            /** bool for check initialized patch **/
-            bool m_firstpatch;
         
             T calculateQuantizationError( const ublas::matrix<T>& ) const;
             ublas::matrix<T> calcDistance( const ublas::matrix<T>&, const ublas::matrix<T>& ) const;
@@ -145,13 +158,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> inline relational_neuralgas<T>::relational_neuralgas( const std::size_t& p_prototypes, const std::size_t& p_prototypesize ) :
         m_prototypes( tools::matrix::random<T>(p_prototypes, p_prototypesize) ),
-        m_kapprox(),
         m_logging( false ),
         m_logprototypes( std::vector< ublas::matrix<T> >() ),
-        m_quantizationerror( std::vector<T>() ),
-        m_prototypeWeights( p_prototypes, 0 ),
-        m_logprototypeWeights(),
-        m_firstpatch(true)
+        m_quantizationerror( std::vector<T>() )
         #ifdef MACHINELEARNING_MPI
         , m_processdatainfo(),
         m_processprototypinfo()
@@ -160,7 +169,14 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         if (p_prototypesize == 0)
             throw exception::runtime(_("prototype size must be greater than zero"), *this);
         
+        m_prototypes(0,0) = 0.4898;    m_prototypes(0,1) = 0.7094;    m_prototypes(0,2) = 0.6797;    m_prototypes(0,3) = 0.1190;    m_prototypes(0,4) = 0.3404;    m_prototypes(0,5) = 0.7513;    m_prototypes(0,6) = 0.6991;    m_prototypes(0,7) = 0.5472;    m_prototypes(0,8) = 0.2575;    m_prototypes(0,9) = 0.8143;    m_prototypes(0,10) = 0.3500;    m_prototypes(0,11) = 0.6160;    m_prototypes(0,12) = 0.8308;    m_prototypes(0,13) = 0.9172;    m_prototypes(0,14) = 0.7537;
+        
+        m_prototypes(1,0) = 0.4456;    m_prototypes(1,1) = 0.7547;    m_prototypes(1,2) = 0.6551;    m_prototypes(1,3) = 0.4984;    m_prototypes(1,4) = 0.5853;    m_prototypes(1,5) = 0.2551;    m_prototypes(1,6) = 0.8909;    m_prototypes(1,7) = 0.1386;    m_prototypes(1,8) = 0.8407;    m_prototypes(1,9) = 0.2435;    m_prototypes(1,10) = 0.1966;    m_prototypes(1,11) = 0.4733;    m_prototypes(1,12) = 0.5853;    m_prototypes(1,13) = 0.2858;    m_prototypes(1,14) = 0.3804;
+        
+        m_prototypes(2,0) = 0.6463;    m_prototypes(2,1) = 0.2760;    m_prototypes(2,2) = 0.1626;    m_prototypes(2,3) = 0.9597;    m_prototypes(2,4) = 0.2238;    m_prototypes(2,5) = 0.5060;    m_prototypes(2,6) = 0.9593;    m_prototypes(2,7) = 0.1493;    m_prototypes(2,8) = 0.2543;    m_prototypes(2,9) = 0.9293;    m_prototypes(2,10) = 0.2511;    m_prototypes(2,11) = 0.3517;    m_prototypes(2,12) = 0.5497;    m_prototypes(2,13) = 0.7572;    m_prototypes(2,14) = 0.5678;
+        
         // normalize the prototypes
+        #pragma omp parallel for
         for(std::size_t i=0; i <  m_prototypes.size1(); ++i) {
             const T l_sum = ublas::sum( ublas::row( m_prototypes, i) );
             
@@ -214,7 +230,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     template<typename T> inline void relational_neuralgas<T>::setLogging( const bool& p )
     {
         m_logging = p;
-        m_logprototypeWeights.clear();
         m_logprototypes.clear();
         m_quantizationerror.clear();
     }
@@ -265,25 +280,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     {
         return m_quantizationerror;
     }    
-    
-    
-    /** returns the weights of prototypes on patch clustering
-     * @return weights vector
-     **/
-    template<typename T> inline ublas::vector<T> relational_neuralgas<T>::getPrototypeWeights( void ) const
-    {
-        return m_prototypeWeights;
-    }
-    
-    
-    /** returns the log of the prototype weights
-     * @return std::vector with weight vector
-     **/
-    template<typename T> inline std::vector< ublas::vector<T> > relational_neuralgas<T>::getLoggedPrototypeWeights( void ) const
-    {
-        return m_logprototypeWeights;
-    }
-    
+   
     
     /** 
      * train the prototypes
@@ -326,6 +323,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         }
         
         
+        
         // run neural gas       
         const T l_multi = 0.01/p_lambda;
         ublas::vector<T> l_lambda(m_prototypes.size1());
@@ -335,7 +333,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             // create adapt values
             const T l_lambdahelp = p_lambda * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(p_iterations));
             
-            #pragma omp parallel for shared(l_lambda)
+            //#pragma omp parallel for shared(l_lambda)
             for(std::size_t n=0; n < l_lambda.size(); ++n)
                 l_lambda(n) = std::exp( -static_cast<T>(n) / l_lambdahelp );
             
@@ -409,136 +407,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         }
         
         return l_idx;
-    }
-    
-    
-    /** train a patch (input data) with the data (include the weights)
-     * @param p_data datapoints
-     * @param p_iterations iterations
-     **/
-    template<typename T> inline void relational_neuralgas<T>::trainpatch( const ublas::matrix<T>& p_data, const std::size_t& p_iterations )
-    {
-        trainpatch(p_data, p_iterations, m_prototypes.size1() * 0.5);
-    }
-    
-    /** train a patch (input data) with the data (include the weights)
-     * @param p_data datapoints
-     * @param p_iterations iterations
-     * @param p_lambda max adapet size
-     **/
-    template<typename T> inline void relational_neuralgas<T>::trainpatch( const ublas::matrix<T>& p_data, const std::size_t& p_iterations, const T& p_lambda )
-    {
-        if (m_prototypes.size1() == 0)
-            throw exception::runtime(_("number of prototypes must be greater than zero"), *this);
-        if (p_data.size1() < m_prototypes.size1())
-            throw exception::runtime(_("number of datapoints are less than prototypes"), *this);
-        if (p_iterations == 0)
-            throw exception::runtime(_("iterations must be greater than zero"), *this);
-        if (p_data.size2() != m_prototypes.size2())
-            throw exception::runtime(_("data and prototype dimension are not equal"), *this);
-        if (p_lambda <= 0)
-            throw exception::runtime(_("lambda must be greater than zero"), *this);
-        if (p_data.size1() != p_data.size2())
-            throw exception::runtime(_("matrix must be square"), *this);
-        
-        
-        // creates logging
-        if (m_logging) {
-            m_logprototypes.clear();
-            m_quantizationerror.clear();
-            m_logprototypes.reserve(p_iterations);
-            m_quantizationerror.reserve(p_iterations);
-        }
-        
-        
-        // create patch neurons
-        if (!m_firstpatch) {
-        }
-        
-        // run neural gas       
-        const T l_multi = 0.01/p_lambda;
-        
-        for(std::size_t i=0; (i < p_iterations); ++i) {
-            
-            // create adapt values
-            const T l_lambda                = p_lambda * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(p_iterations));
-            ublas::matrix<T> l_adaptmatrix  = calcDistance( m_prototypes, p_data );
-            
-            // determine quantization error for logging (adaption matrix)
-            if (m_logging)
-                m_quantizationerror.push_back( calculateQuantizationError(l_adaptmatrix) );
-            
-            
-            // for every column ranks values and create adapts
-            // we need rank and not randIndex, because we 
-            // use the value of the ranking for calculate the 
-            // adapt value
-            for(std::size_t n=0; n < l_adaptmatrix.size2(); ++n) {
-                ublas::vector<T> l_rank = ublas::column(l_adaptmatrix, n);
-                l_rank = tools::vector::rank( l_rank );
-                
-                // calculate adapt value
-                BOOST_FOREACH( T& p, l_rank)
-                    p = std::exp( -p / l_lambda );
-                
-                // return value to matrix
-                ublas::column(l_adaptmatrix, n) = l_rank;
-            }
-            
-            // adapt values are the new prototypes (and run normalization)
-            for(std::size_t i=0; i < l_adaptmatrix.size1(); ++i) {
-                const T l_sum = ublas::sum( ublas::row( l_adaptmatrix, i) );
-                
-                if (!tools::function::isNumericalZero(l_sum))
-                    ublas::row( l_adaptmatrix, i) /= l_sum;
-            }
-            m_prototypes = l_adaptmatrix;
-                        
-            // log updated prototypes
-            if (m_logging)
-                m_logprototypes.push_back( m_prototypes );
-        }        
-        
-        // determine size of receptive fields, but we use only the data points
-        const ublas::indirect_array<> l_winner = use(p_data);
-        for(std::size_t i=0; i < l_winner.size(); ++i)
-            m_prototypeWeights( l_winner(i) )++;
-        
-        // create distance between neurons and data
-        ublas::matrix<T> l_adaptmatrix  = calcDistance( m_prototypes, p_data );
-        
-        
-        
-        // do k-approximation
-        /**
-         
-         k-nearest:
-         1. determine relational spanning set
-            1a. k = 1 / neurons.size2()
-            1b. std::vector ret
-            1b. for(i in neurons.size1()) {
-                    std::vector pos
-                    for(j in neurons.size2())
-                        if neurons(i,j) >= k)
-                            ret.push_back(j)
-                    ret.push_back(pos);
-         
-         2. sorting spanning set
-            2a. calculate distance data between data and neurons (matrix with neurons x data)
-            2b. std::vector newret;
-            2c. for(i in ret.size()) {
-                    ublas::vector dist( ret(i).size() )
-                    for(j in 0..dist.size()-1)
-                        dist(j) = distance(i, j)
-                    std::vector idx = rankIndex(dist);
-         
-                    std::vector pos;
-                    std::vector line = ret(i);
-                    for(j in 0..ret(i).size()-1)
-                        pos.push_back( line(idx(j)) );
-                    newret.push_back(pos);
-                }
-        **/
     }
     
     
