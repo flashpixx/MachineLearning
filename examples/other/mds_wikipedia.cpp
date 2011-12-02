@@ -57,6 +57,11 @@ namespace mpi       = boost::mpi;
 **/
 int main(int argc, char* argv[])
 {
+	#ifdef MACHINELEARNING_MPI
+    mpi::environment loMPIenv(argc, argv);
+    mpi::communicator loMPICom;
+    #endif
+	
     #ifdef MACHINELEARNING_MULTILANGUAGE
     tools::language::bindings::bind("machinelearning", "language");
     #endif

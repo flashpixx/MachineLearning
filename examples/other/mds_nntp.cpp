@@ -185,6 +185,11 @@ void getArticles( tools::sources::nntp& p_nntp, const std::size_t& p_numarticles
 **/
 int main(int argc, char* argv[])
 {
+	#ifdef MACHINELEARNING_MPI
+    mpi::environment loMPIenv(argc, argv);
+    mpi::communicator loMPICom;
+    #endif
+	
     #ifdef MACHINELEARNING_MULTILANGUAGE
     tools::language::bindings::bind("machinelearning", "language");
     #endif
