@@ -106,16 +106,18 @@ int main(int argc, char* argv[])
 
 
     // create basis data and twitter objects
-    const std::vector<std::string> l_tweet    = l_map["search"].as< std::vector<std::string> >();
-    std::vector<std::size_t> l_tweetmax = l_map["max"].as< std::vector<std::size_t> >();
+    const std::vector<std::string> l_tweet = l_map["search"].as< std::vector<std::string> >();
     #ifdef MACHINELEARNING_MPI
-    ??
     if (l_tweet.size() != static_cast<std::size_t>(loMPICom.size()))
         throw std::runtime_error("number of tweet searches and used CPUs are not equal");
     #endif
-
+    
+    std::vector<std::size_t> l_tweetmax;
+    if (l_map.count("max"))
+        l_tweetmax    = l_map["max"].as< std::vector<std::size_t> >();
     for(std::size_t i=l_tweetmax.size(); i < l_tweet.size(); ++i)
         l_tweetmax.push_back(0);
+
 
 
 
