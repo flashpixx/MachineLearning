@@ -275,27 +275,6 @@ int main(int argc, char* argv[])
         throw std::runtime_error("no articles are readed");
 
 
-    #ifdef MACHINELEARNING_MPI
-    // each process must get the article data
-    std::vector< std::vector<std::string> > l_processarticles;
-    std::vector< std::vector<std::string> > l_processarticlegroups;
-    mpi::all_gather(loMPICom, l_article, l_processarticles);
-    mpi::all_gather(loMPICom, l_articlegroup, l_processarticlegroups);
-
-    std::vector<std::string> l_allarticles;
-    std::vector<std::string> l_allarticlegroups;
-    std::size_t startcol = 0;
-    for(std::size_t i=0; i < l_processarticles.size(); ++i) {
-        if (i < static_cast<std::size_t>(loMPICom.rank()))
-            startcol += l_processarticles[i].size();
-
-        for(std::size_t n=0; n < l_processarticles[i].size(); ++n) {
-            l_allarticles.push_back( l_processarticles[i][n] );
-            l_allarticlegroups.push_back( l_processarticlegroups[i][n] );
-        }
-    }
-    #endif
-
 
     // do stopword reduction
     if (l_map.count("stopword")) {
@@ -304,21 +283,12 @@ int main(int argc, char* argv[])
         std::cout << "CPU " << loMPICom.rank() << ": ";
         #endif
         std::cout << "stopword reduction..." << std::endl;
-
+        
         const std::vector<double> l_val = l_map["stopword"].as< std::vector<double> >();
         if (l_val.size() >= 2) {
             text::termfrequency tfc;
-
-            #ifdef MACHINELEARNING_MPI
-            tfc.add(l_allarticles);
-            text::stopwordreduction stopword( tfc.getTerms(l_val[0], l_val[1] ), tfc.iscaseinsensitivity() );
-            for(std::size_t i=0; i < l_allarticles.size(); ++i)
-                l_allarticles[i] = stopword.remove( l_allarticles[i] );
-
-            #else
             tfc.add(l_article);
             text::stopwordreduction stopword( tfc.getTerms(l_val[0], l_val[1] ), tfc.iscaseinsensitivity() );
-            #endif
             for(std::size_t i=0; i < l_article.size(); ++i)
                 l_article[i] = stopword.remove( l_article[i] );
         }
@@ -341,12 +311,7 @@ int main(int argc, char* argv[])
         ncd.setCompressionLevel( distances::ncd<double>::bestcompression );
 
     #ifdef MACHINELEARNING_MPI
-    ublas::matrix<double> distancematrix = ncd.unsquare( l_allarticles, l_article );
-
-    for(std::size_t j=0; j < distancematrix.size2(); ++j)
-        distancematrix(j+startcol, j) = 0;
-
-    l_allarticles.clear();
+    ublas::matrix<double> distancematrix = ncd.unsquare( loMPICom, l_article );
     #else
     ublas::matrix<double> distancematrix = ncd.unsymmetric( l_article );
     #endif
@@ -372,39 +337,52 @@ int main(int argc, char* argv[])
     mds.setIteration( l_iteration );
     mds.setRate( l_rate );
 
+    
     #ifdef MACHINELEARNING_MPI
     ublas::matrix<double> project = mds.map( loMPICom, distancematrix );
-
-    std::vector< ublas::matrix<double> > l_allproject;
-    mpi::all_gather(loMPICom, project, l_allproject);
-
-    project = l_allproject[0];
-    for(std::size_t i=1; i < l_allproject.size(); ++i) {
-        project.resize( project.size1()+l_allproject[i].size1(), project.size2() );
-        ublas::matrix_range< ublas::matrix<double> > l_range( project, ublas::range(project.size1()-l_allproject[i].size1(), project.size1()), ublas::range(0, project.size2()) );
-        l_range.assign( l_allproject[i] );
-    }
-
     #else
     ublas::matrix<double> project = mds.map( distancematrix );
     #endif
 
 
+    
+    
+    // send all data to CPU 0
+    #ifdef MACHINELEARNING_MPI
+    if (loMPICom.rank() != 0) {
+        mpi::gather(loMPICom, project, 0);
+        mpi::gather(loMPICom, l_articlegroup, 0);
+    } else {
+        std::vector< ublas::matrix<double> > l_allproject;
+        mpi::gather(loMPICom, project, l_allproject, 0);
+        
+        project = l_allproject[0];
+        for(std::size_t i=1; i < l_allproject.size(); ++i) {
+            project.resize( project.size1()+l_allproject[i].size1(), project.size2() );
+            ublas::matrix_range< ublas::matrix<double> > l_range( project, ublas::range(project.size1()-l_allproject[i].size1(), project.size1()), ublas::range(0, project.size2()) );
+            l_range.assign( l_allproject[i] );
+        }
+        
+        std::vector< std::vector<std::string> > l_alllabel;
+        mpi::gather(loMPICom, l_articlegroup, l_alllabel, 0);
+        
+        l_articlegroup = l_alllabel[0];
+        for(std::size_t i=1; i < l_alllabel.size(); ++i)
+            std::copy(l_alllabel[i].begin(), l_alllabel[i].end(), std::back_inserter(l_articlegroup));
+    }
+    #endif
+    
 
 
     // create file and write data to hdf
     #ifdef MACHINELEARNING_MPI
     if (loMPICom.rank() == 0) {
     #endif
+        
     tools::files::hdf target(l_map["outfile"].as<std::string>(), true);
     target.writeBlasMatrix<double>( "/project",  project, H5::PredType::NATIVE_DOUBLE );
-    #ifdef MACHINELEARNING_MPI
-    target.writeStringVector( "/group",  l_allarticlegroups );
-    target.writeStringVector( "/uniquegroup",  tools::vector::unique(l_allarticlegroups) );
-    #else
     target.writeStringVector( "/group",  l_articlegroup );
     target.writeStringVector( "/uniquegroup",  tools::vector::unique(l_articlegroup) );
-    #endif
 
     std::cout << "within the target file there are three datasets: /project = projected data, /group = newsgroup label of each dataset, /uniquegroup = list of unique newsgroups" << std::endl;
     #ifdef MACHINELEARNING_MPI
