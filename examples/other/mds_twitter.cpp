@@ -181,7 +181,7 @@ int main(int argc, char* argv[])
     std::vector<tools::sources::twitter::searchtweet> l_data = l_twitter.search( l_tweet[static_cast<std::size_t>(loMPICom.size())], l_params, l_tweetmax[static_cast<std::size_t>(loMPICom.size())] );
 
     for(std::size_t i=0; i < l_data.size(); ++i) {
-        l_tweetdata.push_back( l_data.getText() );
+        l_tweetdata.push_back( l_data[i].getText() );
         l_tweetlabel.push_back( l_tweet[static_cast<std::size_t>(loMPICom.size())] );
     }
 
@@ -272,7 +272,7 @@ int main(int argc, char* argv[])
         
         l_tweetlabel = l_alllabel[0];
         for(std::size_t i=1; i < l_alllabel.size(); ++i)
-            std::copy(l_alllabel[i].begin(), l_alllabel[i].end(), std::back_inserter(l_wikilabel));
+            std::copy(l_alllabel[i].begin(), l_alllabel[i].end(), std::back_inserter(l_tweetlabel));
     }
     #endif
     
