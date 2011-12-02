@@ -291,7 +291,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         const T l_multi = 0.01/p_lambda;
         ublas::vector<T> l_lambda(m_prototypes.size1());
         
-        for(std::size_t i=0; (i < p_iterations); ++i) {
+        for(std::size_t i=0; i < p_iterations; ++i) {
             
             // create adapt values
             const T l_lambdahelp = p_lambda * std::pow(l_multi, static_cast<T>(i)/static_cast<T>(p_iterations));
