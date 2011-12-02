@@ -1,3 +1,22 @@
+        l_target(0,0)  = -1.0891;       l_target(0,1)  = -1.4023;
+        l_target(1,0)  = 0.0326;        l_target(1,1)  = -1.4224;
+        l_target(2,0)  = 0.5525;        l_target(2,1)  = 0.4882;
+        l_target(3,0)  = 1.1006;        l_target(3,1)  = -0.1774;
+        l_target(4,0)  = 1.5442;        l_target(4,1)  = -0.1961;
+        l_target(5,0)  = 0.0859;        l_target(5,1)  = 1.4193;
+        l_target(6,0)  = -1.4916;       l_target(6,1)  = 0.2916;
+        l_target(7,0)  = -0.7423;       l_target(7,1)  = 0.1978;
+        l_target(8,0)  = -1.0616;       l_target(8,1)  = 1.5877;
+        l_target(9,0)  = 2.3505;        l_target(9,1)  = -0.8045;
+        l_target(10,0) = -0.6156;       l_target(10,1) = 0.6966;
+        l_target(11,0) = 0.7481;        l_target(11,1) = 0.8351;
+        l_target(12,0) = -0.1924;       l_target(12,1) = -0.2437;
+        l_target(13,0) = 0.8886;        l_target(13,1) = 0.2157;
+        l_target(14,0) = -0.7648;       l_target(14,1) = -1.1658;
+
+
+
+
         m_prototypes(0,0)  = 0.4909;     m_prototypes(0,1)  = 0.1320;
         m_prototypes(1,0)  = 0.4893;     m_prototypes(1,1)  = 0.9421;
         m_prototypes(2,0)  = 0.3377;     m_prototypes(2,1)  = 0.9561;
