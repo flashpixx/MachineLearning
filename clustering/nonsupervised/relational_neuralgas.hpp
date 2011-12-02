@@ -328,12 +328,12 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             // adapt values are the new prototypes (and run normalization)
             #pragma omp parallel for shared(l_adaptmatrix)
             for(std::size_t i=0; i < l_adaptmatrix.size1(); ++i) {
-                const T l_sum = ublas::sum( ublas::row( l_adaptmatrix, i) );
+                const T l_sum                = ublas::sum( ublas::row( l_adaptmatrix, i) );
+                ublas::row(m_prototypes, i ) = ublas::row( l_adaptmatrix, i );
                 
                 if (!tools::function::isNumericalZero(l_sum))
-                    ublas::row( l_adaptmatrix, i) /= l_sum;
+                    ublas::row( m_prototypes, i) /= l_sum;
             }
-            m_prototypes = l_adaptmatrix;
         }
     }
     
