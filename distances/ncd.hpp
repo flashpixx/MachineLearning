@@ -71,45 +71,45 @@ namespace machinelearning { namespace distances {
         BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
         
         
-    public:
-        
-        enum compresstype
-        {
-            gzip    = 0, 
-            bzip2   = 1
-        };
-        
-        enum compresslevel
-        {
-            defaultcompression  = 0,
-            bestspeed           = 1,
-            bestcompression     = 2
-        };
-        
-        
-        ncd ( void );
-        ncd ( const compresstype& );
-        ublas::matrix<T> unsquare ( const std::vector<std::string>&, const std::vector<std::string>&, const bool& = false ) const;
-        ublas::matrix<T> unsymmetric ( const std::vector<std::string>&, const bool& = false ) const;
-        ublas::symmetric_matrix<T, ublas::upper> symmetric ( const std::vector<std::string>&, const bool& = false ) const;
-        T calculate ( const std::string&, const std::string&, const bool& = false ) const;
-        void setCompressionLevel( const compresslevel& = defaultcompression );
-        
-        #ifdef MACHINELEARNING_MPI
-        ublas::matrix<T> unsquare ( const mpi::communicator&, const std::vector<std::string>&, const bool& = false ) const;
-        #endif
-        
-    private:
-        
-        /** type for internal compression state **/
-        const compresstype m_compress;
-        /** parameter for gzip **/
-        bio::gzip_params m_gzipparam;
-        /** parameter for bzip2 **/
-        bio::bzip2_params m_bzip2param;
-        
-        std::size_t deflate ( const bool&, const std::string&, const std::string& = "" ) const;        
-        std::multimap<std::size_t, std::pair<std::size_t,std::size_t> > getWavefrontIndex( const std::size_t&, const std::size_t& ) const;
+        public:
+            
+            enum compresstype
+            {
+                gzip    = 0, 
+                bzip2   = 1
+            };
+            
+            enum compresslevel
+            {
+                defaultcompression  = 0,
+                bestspeed           = 1,
+                bestcompression     = 2
+            };
+            
+            
+            ncd ( void );
+            ncd ( const compresstype& );
+            ublas::matrix<T> unsquare ( const std::vector<std::string>&, const std::vector<std::string>&, const bool& = false ) const;
+            ublas::matrix<T> unsymmetric ( const std::vector<std::string>&, const bool& = false ) const;
+            ublas::symmetric_matrix<T, ublas::upper> symmetric ( const std::vector<std::string>&, const bool& = false ) const;
+            T calculate ( const std::string&, const std::string&, const bool& = false ) const;
+            void setCompressionLevel( const compresslevel& = defaultcompression );
+            
+            #ifdef MACHINELEARNING_MPI
+            ublas::matrix<T> unsquare ( const mpi::communicator&, const std::vector<std::string>&, const bool& = false ) const;
+            #endif
+            
+        private:
+            
+            /** type for internal compression state **/
+            const compresstype m_compress;
+            /** parameter for gzip **/
+            bio::gzip_params m_gzipparam;
+            /** parameter for bzip2 **/
+            bio::bzip2_params m_bzip2param;
+            
+            std::size_t deflate ( const bool&, const std::string&, const std::string& = "" ) const;        
+            std::multimap<std::size_t, std::pair<std::size_t,std::size_t> > getWavefrontIndex( const std::size_t&, const std::size_t& ) const;
     };
     
     
@@ -470,10 +470,10 @@ namespace machinelearning { namespace distances {
             
             // get position within the matrix and create distance values
             const std::size_t l_startrow = std::accumulate( l_datasize.begin(), l_datasize.begin() + l_predecessor, 0 );
-            ublas::matrix_range< ublas::matrix<T> > l_range(l_result, 
-                                                                 ublas::range( l_startrow, l_startrow+l_neighbourdata.size() ), 
-                                                                 ublas::range( 0, l_result.size2() )
-                                                                 );
+            ublas::matrix_range< ublas::matrix<T> > l_range( l_result, 
+                                                             ublas::range( l_startrow, l_startrow+l_neighbourdata.size() ), 
+                                                             ublas::range( 0, l_result.size2() )
+                                                           );
             l_range.assign( unsquare(l_neighbourdata, p_strvec, l_isfile) );
         }
         
