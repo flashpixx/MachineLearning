@@ -334,7 +334,10 @@ int main(int argc, char* argv[])
         l_project = dim::mds<double>::sammon;
 
     dim::mds<double> mds( l_dimension, l_project );
-    mds.setIteration( l_iteration );
+    if (l_iteration == 0)
+        mds.setIteration( distancematrix.size1() );
+    else
+        mds.setIteration( l_iteration );
     mds.setRate( l_rate );
 
     
