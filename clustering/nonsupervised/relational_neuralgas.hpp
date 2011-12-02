@@ -326,13 +326,13 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             
  
             // adapt values are the new prototypes (and run normalization)
-            #pragma omp parallel for shared(l_adaptmatrix)
-            for(std::size_t i=0; i < l_adaptmatrix.size1(); ++i) {
-                const T l_sum                = ublas::sum( ublas::row( l_adaptmatrix, i) );
-                ublas::row(m_prototypes, i ) = ublas::row( l_adaptmatrix, i );
+            #pragma omp parallel for
+            for(std::size_t n=0; n < l_adaptmatrix.size1(); ++n) {
+                const T l_sum                = ublas::sum( ublas::row( l_adaptmatrix, n) );
+                ublas::row(m_prototypes, n ) = ublas::row( l_adaptmatrix, n );
                 
                 if (!tools::function::isNumericalZero(l_sum))
-                    ublas::row( m_prototypes, i) /= l_sum;
+                    ublas::row( m_prototypes, n ) /= l_sum;
             }
         }
     }
@@ -636,11 +636,11 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             l_prototypes = synchronizePrototypes( p_mpi, l_adaptmatrix );
             
             #pragma omp parallel for shared(l_prototypes)
-            for(std::size_t i=0; i < l_prototypes.size1(); ++i) {
-                const T l_sum = ublas::sum( ublas::row( l_prototypes, i) );
+            for(std::size_t n=0; n < l_prototypes.size1(); ++n) {
+                const T l_sum = ublas::sum( ublas::row( l_prototypes, n) );
                 
                 if (!tools::function::isNumericalZero(l_sum))
-                    ublas::row( l_prototypes, i) /= l_sum;
+                    ublas::row( l_prototypes, n ) /= l_sum;
             }
         }
         
