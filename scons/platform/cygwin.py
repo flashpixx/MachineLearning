@@ -50,7 +50,7 @@ if os.environ.has_key("LDFLAGS") :
 
 flags["CXXFLAGS"].extend(["-fopenmp", "-pipe", "-Wall", "-D BOOST_FILESYSTEM_NO_DEPRECATED", "-D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"])
 flags["LINKFLAGS"].extend(["-fopenmp", "-mconsole", "-enable-stdcall-fixup", "-mthread"])
-flags["LIBS"]         = ["boost_system", "boost_iostreams", "boost_regex"]
+flags["LIBS"]         = ["bz2", "boost_system", "boost_iostreams", "boost_regex"]
 
 
 # linker command -mdll can be used
