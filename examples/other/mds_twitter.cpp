@@ -178,11 +178,11 @@ int main(int argc, char* argv[])
     std::vector<std::string> l_tweetlabel;
 
     #ifdef MACHINELEARNING_MPI
-    std::vector<tools::sources::twitter::searchtweet> l_data = l_twitter.search( l_tweet[static_cast<std::size_t>(loMPICom.size())], l_params, l_tweetmax[static_cast<std::size_t>(loMPICom.size())] );
+    std::vector<tools::sources::twitter::searchtweet> l_data = l_twitter.search( l_tweet[static_cast<std::size_t>(loMPICom.rank())], l_params, l_tweetmax[static_cast<std::size_t>(loMPICom.rank())] );
 
     for(std::size_t i=0; i < l_data.size(); ++i) {
         l_tweetdata.push_back( l_data[i].getText() );
-        l_tweetlabel.push_back( l_tweet[static_cast<std::size_t>(loMPICom.size())] );
+        l_tweetlabel.push_back( l_tweet[static_cast<std::size_t>(loMPICom.rank())] );
     }
 
     #else
