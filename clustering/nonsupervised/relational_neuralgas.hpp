@@ -177,36 +177,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             if (!tools::function::isNumericalZero(l_sum))
                 ublas::row( m_prototypes, i) /= l_sum;
         }
-    }
+    }   
     
-    
-    
-    /** contructor for initialization the neural gas
-     * @param p_prototypes number of prototypes
-     * @param p_prototypesize size of each prototype (data dimension)
-     * @param p_kapprox k-approximation object
-     **
-    template<typename T> inline relational_neuralgas<T>::relational_neuralgas( const std::size_t& p_prototypes, const std::size_t& p_prototypesize, const neighborhood::kapproximation<T>& p_kapprox ) :
-        m_prototypes( tools::matrix::random<T>(p_prototypes, p_prototypesize) ),
-        m_kapprox( &p_kapprox ),
-        m_logging( false ),
-        m_logprototypes( std::vector< ublas::matrix<T> >() ),
-        m_quantizationerror( std::vector<T>() ),
-        m_firstpatch(true)
-    {
-        if (p_prototypesize == 0)
-            throw exception::runtime(_("prototype size must be greater than zero"), *this);
-        
-        // normalize the prototypes
-        for(std::size_t i=0; i <  m_prototypes.size1(); ++i) {
-            const T l_sum = ublas::sum( ublas::row( m_prototypes, i) );
-            
-            if (!tools::function::isNumericalZero(l_sum))
-                ublas::row( m_prototypes, i) /= l_sum;
-        }
-    }
-    */
-
     
     /** returns the prototype matrix
      * @return matrix (rows = number of prototypes)
