@@ -614,7 +614,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             
             // determine quantization error for logging (adaption matrix)
             if (m_logging) {
-                m_quantizationerror.push_back( calculateQuantizationError( extractLocalPrototypes( mpi, l_adaptmatrix)) );
+                m_quantizationerror.push_back( calculateQuantizationError( extractLocalPrototypes(p_mpi, l_adaptmatrix)) );
                 m_logprototypes.push_back( extractLocalPrototypes(p_mpi, l_prototypes) );
             }
             
