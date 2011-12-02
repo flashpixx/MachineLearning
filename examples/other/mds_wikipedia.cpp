@@ -158,27 +158,6 @@ int main(int argc, char* argv[])
         } catch (...) {}
 
 
-    #ifdef MACHINELEARNING_MPI
-    // each process must get the article data
-    std::vector< std::vector<std::string> > l_processarticles;
-    std::vector< std::vector<std::string> > l_processlabel;
-    mpi::all_gather(loMPICom, l_wikidata, l_processarticles);
-    mpi::all_gather(loMPICom, l_wikilabel, l_processlabel);
-
-    std::vector<std::string> l_allarticles;
-    std::vector<std::string> l_alllabel;
-    std::size_t startcol = 0;
-    for(std::size_t i=0; i < l_processarticles.size(); ++i) {
-        if (i < static_cast<std::size_t>(loMPICom.rank()))
-            startcol += l_processarticles[i].size();
-
-        for(std::size_t n=0; n < l_processarticles[i].size(); ++n) {
-            l_allarticles.push_back( l_processarticles[i][n] );
-            l_alllabel.push_back( l_processlabel[i][n] );
-        }
-    }
-    #endif
-
 
     // do stopword reduction
     if (l_map.count("stopword")) {
@@ -191,17 +170,8 @@ int main(int argc, char* argv[])
         const std::vector<double> l_val = l_map["stopword"].as< std::vector<double> >();
         if (l_val.size() >= 2) {
             text::termfrequency tfc;
-
-            #ifdef MACHINELEARNING_MPI
-            tfc.add(l_allarticles);
-            text::stopwordreduction stopword( tfc.getTerms(l_val[0], l_val[1] ), tfc.iscaseinsensitivity() );
-            for(std::size_t i=0; i < l_allarticles.size(); ++i)
-                l_allarticles[i] = stopword.remove( l_allarticles[i] );
-
-            #else
             tfc.add(l_wikidata);
             text::stopwordreduction stopword( tfc.getTerms(l_val[0], l_val[1] ), tfc.iscaseinsensitivity() );
-            #endif
             for(std::size_t i=0; i < l_wikidata.size(); ++i)
                 l_wikidata[i] = stopword.remove( l_wikidata[i] );
         }
@@ -225,16 +195,10 @@ int main(int argc, char* argv[])
 
 
     #ifdef MACHINELEARNING_MPI
-    ublas::matrix<double> distancematrix = ncd.unsquare( l_allarticles, l_wikidata );
-
-    for(std::size_t j=0; j < distancematrix.size2(); ++j)
-        distancematrix(j+startcol, j) = 0;
-
-    l_allarticles.clear();
+    ublas::matrix<double> distancematrix = ncd.unsquare( loMPICom, l_wikidata );
     #else
     ublas::matrix<double> distancematrix = ncd.unsymmetric( l_wikidata );
     #endif
-    l_wikidata.clear();
 
 
 
@@ -259,35 +223,47 @@ int main(int argc, char* argv[])
 
     #ifdef MACHINELEARNING_MPI
     ublas::matrix<double> project = mds.map( loMPICom, distancematrix );
-
-    std::vector< ublas::matrix<double> > l_allproject;
-    mpi::all_gather(loMPICom, project, l_allproject);
-
-    project = l_allproject[0];
-    for(std::size_t i=1; i < l_allproject.size(); ++i) {
-        project.resize( project.size1()+l_allproject[i].size1(), project.size2() );
-        ublas::matrix_range< ublas::matrix<double> > l_range( project, ublas::range(project.size1()-l_allproject[i].size1(), project.size1()), ublas::range(0, project.size2()) );
-        l_range.assign( l_allproject[i] );
-    }
     #else
     ublas::matrix<double> project = mds.map( distancematrix );
     #endif
 
 
+    
 
 
     // create file and write data to hdf
     #ifdef MACHINELEARNING_MPI
+    if (loMPICom.rank() != 0) {
+        mpi::gather(loMPICom, project, 0);
+        mpi::gather(loMPICom, l_wikilabel, 0);
+    } else {
+        std::vector< ublas::matrix<double> > l_allproject;
+        mpi::gather(loMPICom, project, l_allproject, 0);
+    
+        project = l_allproject[0];
+        for(std::size_t i=1; i < l_allproject.size(); ++i) {
+            project.resize( project.size1()+l_allproject[i].size1(), project.size2() );
+            ublas::matrix_range< ublas::matrix<double> > l_range( project, ublas::range(project.size1()-l_allproject[i].size1(), project.size1()), ublas::range(0, project.size2()) );
+            l_range.assign( l_allproject[i] );
+        }
+        
+        std::vector< std::vector<std::string> > l_alllabel;
+        mpi::gather(loMPICom, l_wikilabel, l_alllabel, 0);
+        
+        l_wikilabel = l_alllabel[0];
+        for(std::size_t i=1; i < l_alllabel.size(); ++i)
+            std::copy(l_alllabel[i].begin(), l_alllabel[i].end(), std::back_inserter(l_wikilabel));
+    }
+    #endif
+    
+    
+    #ifdef MACHINELEARNING_MPI
     if (loMPICom.rank() == 0) {
     #endif
+        
     tools::files::hdf target( l_map["outfile"].as<std::string>(), true);
     target.writeBlasMatrix<double>( "/project",  project, H5::PredType::NATIVE_DOUBLE );
-    #ifndef MACHINELEARNING_MPI
     target.writeStringVector( "/label",  l_wikilabel );
-    #else
-    target.writeStringVector( "/label",  l_alllabel );
-    #endif
-
 
     std::cout << "within the target file there are three datasets: /project = projected data, /label = datapoint label" << std::endl;
     #ifdef MACHINELEARNING_MPI
