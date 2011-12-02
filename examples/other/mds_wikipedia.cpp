@@ -199,7 +199,7 @@ int main(int argc, char* argv[])
     #else
     ublas::matrix<double> distancematrix = ncd.unsymmetric( l_wikidata );
     #endif
-
+    l_wikidata.clear();
 
 
 
@@ -229,9 +229,7 @@ int main(int argc, char* argv[])
 
 
     
-
-
-    // create file and write data to hdf
+    // send all data to CPU 0
     #ifdef MACHINELEARNING_MPI
     if (loMPICom.rank() != 0) {
         mpi::gather(loMPICom, project, 0);
@@ -257,6 +255,7 @@ int main(int argc, char* argv[])
     #endif
     
     
+    // create file and write data to hdf
     #ifdef MACHINELEARNING_MPI
     if (loMPICom.rank() == 0) {
     #endif

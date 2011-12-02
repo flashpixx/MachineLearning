@@ -217,7 +217,7 @@ int main(int argc, char* argv[])
         ncd.setCompressionLevel( distances::ncd<double>::bestcompression );
 
     #ifdef MACHINELEARNING_MPI
-    geht nicht
+    ublas::matrix<double> distancematrix = ncd.unsquare( loMPICom, l_tweetdata );
     #else
     ublas::matrix<double> distancematrix = ncd.unsymmetric( l_tweetdata );
     #endif
@@ -244,39 +244,49 @@ int main(int argc, char* argv[])
     mds.setRate( l_rate );
 
     #ifdef MACHINELEARNING_MPI
-    ?????
     ublas::matrix<double> project = mds.map( loMPICom, distancematrix );
-
-    std::vector< ublas::matrix<double> > l_allproject;
-    mpi::all_gather(loMPICom, project, l_allproject);
-
-    project = l_allproject[0];
-    for(std::size_t i=1; i < l_allproject.size(); ++i) {
-        project.resize( project.size1()+l_allproject[i].size1(), project.size2() );
-        ublas::matrix_range< ublas::matrix<double> > l_range( project, ublas::range(project.size1()-l_allproject[i].size1(), project.size1()), ublas::range(0, project.size2()) );
-        l_range.assign( l_allproject[i] );
-    }
     #else
     ublas::matrix<double> project = mds.map( distancematrix );
     #endif
 
 
 
+    // send all data to CPU 0
+    #ifdef MACHINELEARNING_MPI
+    if (loMPICom.rank() != 0) {
+        mpi::gather(loMPICom, project, 0);
+        mpi::gather(loMPICom, l_tweetlabel, 0);
+    } else {
+        std::vector< ublas::matrix<double> > l_allproject;
+        mpi::gather(loMPICom, project, l_allproject, 0);
+        
+        project = l_allproject[0];
+        for(std::size_t i=1; i < l_allproject.size(); ++i) {
+            project.resize( project.size1()+l_allproject[i].size1(), project.size2() );
+            ublas::matrix_range< ublas::matrix<double> > l_range( project, ublas::range(project.size1()-l_allproject[i].size1(), project.size1()), ublas::range(0, project.size2()) );
+            l_range.assign( l_allproject[i] );
+        }
+        
+        std::vector< std::vector<std::string> > l_alllabel;
+        mpi::gather(loMPICom, l_tweetlabel, l_alllabel, 0);
+        
+        l_tweetlabel = l_alllabel[0];
+        for(std::size_t i=1; i < l_alllabel.size(); ++i)
+            std::copy(l_alllabel[i].begin(), l_alllabel[i].end(), std::back_inserter(l_wikilabel));
+    }
+    #endif
+    
+    
 
     // create file and write data to hdf
     #ifdef MACHINELEARNING_MPI
     if (loMPICom.rank() == 0) {
     #endif
+
     tools::files::hdf target(l_map["outfile"].as<std::string>(), true);
     target.writeBlasMatrix<double>( "/project",  project, H5::PredType::NATIVE_DOUBLE );
-    #ifndef MACHINELEARNING_MPI
     target.writeStringVector( "/label",  l_tweetlabel );
     target.writeStringVector( "/uniquegroup",  l_tweet );
-    #else
-    ????
-    target.writeStringVector( "/label",  l_alllabel );
-    target.writeStringVector( "/uniquegroup",  l_tweet );
-    #endif
 
     std::cout << "within the target file there are three datasets: /project = projected data, /label = datapoint label, /uniquegroup = list of unique newsgroups" << std::endl;
     #ifdef MACHINELEARNING_MPI
