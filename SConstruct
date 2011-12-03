@@ -126,7 +126,8 @@ if env["withmpi"] :
     env.Replace(CXX = "mpic++")
 
 
-# call target scripts
+# call target scripts and set default target to empty
+Default("")
 env.SConscript( os.path.join("scons", "target", "documentation.py"), exports="env colorama")
 env.SConscript( os.path.join("scons", "target", "cppexample.py"), exports="env colorama")
 env.SConscript( os.path.join("scons", "target", "librarybuild.py"), exports="env colorama")
