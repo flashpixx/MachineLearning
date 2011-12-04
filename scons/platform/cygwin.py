@@ -50,7 +50,7 @@ if os.environ.has_key("LDFLAGS") :
 
 flags["CXXFLAGS"].extend(["-fopenmp", "-pipe", "-Wall", "-D BOOST_FILESYSTEM_NO_DEPRECATED", "-D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"])
 flags["LINKFLAGS"].extend(["-fopenmp", "-mconsole", "-enable-stdcall-fixup", "-mthread"])
-flags["LIBS"]         = ["bz2", "boost_system", "boost_iostreams", "boost_regex"]
+flags["LIBS"]         = ["z", "bz2", "boost_system", "boost_iostreams", "boost_regex"]
 
 
 # linker command -mdll can be used
@@ -107,8 +107,6 @@ if env["withsources"] :
 if env["withfiles"] :
     flags["CXXFLAGS"].extend(["-D MACHINELEARNING_FILES", "-D MACHINELEARNING_FILES_HDF"])
     flags["LIBS"].extend( ["hdf5_cpp", "hdf5"] )
-    if env["staticlink"] :
-        flags["LIBS"].append("z")
 
 if env["withsymbolicmath"] :
     flags["CXXFLAGS"].append("-D MACHINELEARNING_SYMBOLICMATH")

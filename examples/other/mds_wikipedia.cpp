@@ -232,46 +232,21 @@ int main(int argc, char* argv[])
 
 
     
-    // send all data to CPU 0
-    #ifdef MACHINELEARNING_MPI
-    if (loMPICom.rank() != 0) {
-        mpi::gather(loMPICom, project, 0);
-        mpi::gather(loMPICom, l_wikilabel, 0);
-    } else {
-        std::vector< ublas::matrix<double> > l_allproject;
-        mpi::gather(loMPICom, project, l_allproject, 0);
-    
-        project = l_allproject[0];
-        for(std::size_t i=1; i < l_allproject.size(); ++i) {
-            project.resize( project.size1()+l_allproject[i].size1(), project.size2() );
-            ublas::matrix_range< ublas::matrix<double> > l_range( project, ublas::range(project.size1()-l_allproject[i].size1(), project.size1()), ublas::range(0, project.size2()) );
-            l_range.assign( l_allproject[i] );
-        }
-        
-        std::vector< std::vector<std::string> > l_alllabel;
-        mpi::gather(loMPICom, l_wikilabel, l_alllabel, 0);
-        
-        l_wikilabel = l_alllabel[0];
-        for(std::size_t i=1; i < l_alllabel.size(); ++i)
-            std::copy(l_alllabel[i].begin(), l_alllabel[i].end(), std::back_inserter(l_wikilabel));
-    }
-    #endif
-    
-    
     // create file and write data to hdf
     #ifdef MACHINELEARNING_MPI
-    if (loMPICom.rank() == 0) {
+    tools::files::hdf target( "node_"+tools::function::toString(loMPICom.rank())+"_"+l_map["outfile"].as<std::string>(), true);
+    #else
+    tools::files::hdf target( l_map["outfile"].as<std::string>(), true);
     #endif
         
-    tools::files::hdf target( l_map["outfile"].as<std::string>(), true);
     target.writeBlasMatrix<double>( "/project",  project, H5::PredType::NATIVE_DOUBLE );
     target.writeStringVector( "/label",  l_wikilabel );
 
-    std::cout << "within the target file there are three datasets: /project = projected data, /label = datapoint label" << std::endl;
+    
     #ifdef MACHINELEARNING_MPI
-    }
+    if (loMPICom.rank() == 0)
     #endif
-
+    std::cout << "within the target file there are three datasets: /project = projected data, /label = datapoint label" << std::endl;
 
     return EXIT_SUCCESS;
 }

@@ -26,6 +26,7 @@
 #define __MACHINELEARNING_TOOLS_FUNCTION_HPP
 
 #include <fstream>
+#include <sstream>
 #include <cmath>
 #include <limits>
 #include <iterator>
@@ -57,6 +58,7 @@ namespace machinelearning { namespace tools {
             static ublas::indirect_array<> unique( const ublas::indirect_array<>& );
             static bool fileExists( const std::string& );
             static std::string urlencode( const std::string& );
+            template<typename T> static std::string toString( const T& );
     };
 
     
@@ -139,6 +141,17 @@ namespace machinelearning { namespace tools {
         return l_outstream.str();
     }
     
+    
+    /** converts a value to a string
+     * @param p_val value
+     * @return string
+     **/
+    template<typename T> inline std::string function::toString( const T& p_val )
+    {
+        std::ostringstream l_stream;
+        l_stream << p_val;
+        return l_stream.str();
+    }
     
 }}
 #endif

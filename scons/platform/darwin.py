@@ -50,7 +50,7 @@ if os.environ.has_key("LDFLAGS") :
 
 flags["CXXFLAGS"].extend(["-fopenmp", "-pipe", "-Wall", "-D BOOST_FILESYSTEM_NO_DEPRECATED", "-D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"])    
 flags["LINKFLAGS"].extend(["-pthread", "-fopenmp"])
-flags["LIBS"]         = ["bz2", "boost_system", "boost_iostreams", "boost_regex"]
+flags["LIBS"]         = ["z", "bz2", "boost_system", "boost_iostreams", "boost_regex"]
 flags["SHLINKFLAGS"]  = ["-install_name ${TARGET.file} -headerpad_max_install_name"]
 
 
@@ -96,8 +96,6 @@ if env["withsources"] :
 if env["withfiles"] :
     flags["CXXFLAGS"].extend(["-D MACHINELEARNING_FILES", "-D MACHINELEARNING_FILES_HDF"])
     flags["LIBS"].extend( ["hdf5_cpp", "hdf5"] )
-    if env["staticlink"] :
-        flags["LIBS"].append("z")
 
 if env["withsymbolicmath"] :
     flags["CXXFLAGS"].append("-D MACHINELEARNING_SYMBOLICMATH")
