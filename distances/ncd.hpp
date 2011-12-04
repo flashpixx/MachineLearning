@@ -218,10 +218,6 @@ namespace machinelearning { namespace distances {
         // create wavefront index position
         std::multimap<std::size_t, std::pair<std::size_t,std::size_t> > l_wavefront = getWavefrontIndex(p_strvec.size(), omp_get_max_threads());
         
-        for(std::multimap<std::size_t, std::pair<std::size_t,std::size_t> >::iterator it=l_wavefront.begin(); it != l_wavefront.end(); ++it)
-            std::cout << "Thread: " << it->first << "\tPosition: (" << it->second.first << ", " << it->second.second << ")" << std::endl;
-            
-        
         #pragma omp parallel shared(l_cache, l_result)
         {
             for(std::multimap<std::size_t, std::pair<std::size_t,std::size_t> >::iterator it=l_wavefront.lower_bound(omp_get_thread_num()); it != l_wavefront.upper_bound(omp_get_thread_num()); ++it) {
