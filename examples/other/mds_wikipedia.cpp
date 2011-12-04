@@ -235,7 +235,7 @@ int main(int argc, char* argv[])
     // create file and write data to hdf
     #ifdef MACHINELEARNING_MPI
     loMPICom.barrier();
-    tools::files::hdf target( "node_"+tools::function::toString(loMPICom.rank())+"_"+l_map["outfile"].as<std::string>(), true);
+    tools::files::hdf target( "node"+tools::function::toString(loMPICom.rank())+"_"+l_map["outfile"].as<std::string>(), true);
     #else
     tools::files::hdf target( l_map["outfile"].as<std::string>(), true);
     #endif

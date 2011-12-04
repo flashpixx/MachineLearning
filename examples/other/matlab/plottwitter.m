@@ -20,28 +20,45 @@
 
 % plots a HDF file that is created by the "mds_twitter" example
 % @param pcfile HDF file
-function plottwitter( pcfile )
+function plottwitter( pcfile, pnnodes )
         lmarkersize=5;
- 
-        % create colors
-        textlabel  = hdf5read( pcfile, '/uniquegroup');
+
+        % get data (if only one file is used)
+        if nargin < 2 || isempty(pnnodes)
+            textlabel  = hdf5read( pcfile, '/uniquegroup');
+            data       = hdf5read( pcfile, '/project');
+            datalabel  = hdf5read( pcfile, '/label');
+        else
+            %if files of the cluster nodes are used
+            loaddata  = cell(pnnodes,1);
+            loadlabel = cell(pnnodes,1);
+            for i=1:pnnodes
+                loaddata{i}  = hdf5read( strcat('node', num2str(i-1), '_', pcfile), '/project');
+                loadlabel{i} = hdf5read( strcat('node', num2str(i-1), '_', pcfile), '/label');
+            end
+        
+            data      = cell2mat(loaddata);
+            datalabel = cell2mat(loadlabel);
+            textlabel = hdf5read( strcat('node0_', pcfile), '/uniquegroup');
+        end
+        
+
+        
+        
+        % we create for each label group a data matrix
+        if (size(data,2) ~= 2) && (size(data,2) ~= 3)
+            error('plot only with 2D or 3D');
+        end
+        
         label      = cell(size(textlabel,1),1);
         labelcolor = cell(size(textlabel,1),1);
- 
+
         col        = jet(size(textlabel,1));
         %col       = hsv(size(textlabel,1));
         for i=1:size(labelcolor,1)
             label{i}      = char(textlabel(i).data);
             labelcolor{i} = col(i, :);
-        end
- 
-        % we create for each label group a data matrix
-        data       = hdf5read( pcfile, '/project');
-        if (size(data,2) ~= 2) && (size(data,2) ~= 3)
-            error('plot only with 2D or 3D');
-        end
- 
-        datalabel  = hdf5read( pcfile, '/label');
+        end       
  
         datacell   = cell(size(label,1),1);
         maxcount   = zeros(size(label,1),1);

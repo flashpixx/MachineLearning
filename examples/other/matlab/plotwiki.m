@@ -24,18 +24,17 @@
 function plotwiki( pcfile, pnnodes )
     lmarkersize=5;
 
-    % get data
+    % get data (if only one file is used)
     if nargin < 2 || isempty(pnnodes)
         data  = hdf5read( pcfile, '/project');
         label = hdf5read( pcfile, '/label');
     else
+        %if files of the cluster nodes are used
         loaddata  = cell(pnnodes,1);
         loadlabel = cell(pnnodes,1);
-        numel     = 0;
         for i=1:pnnodes
-            loaddata{i}  = hdf5read( strcat('node_', num2str(i-1), '_', pcfile), '/project');
-            loadlabel{i} = hdf5read( strcat('node_', num2str(i-1), '_', pcfile), '/label');
-            numel        = numel + size(loaddata{i},1);
+            loaddata{i}  = hdf5read( strcat('node', num2str(i-1), '_', pcfile), '/project');
+            loadlabel{i} = hdf5read( strcat('node', num2str(i-1), '_', pcfile), '/label');
         end
         
         data  = cell2mat(loaddata);
