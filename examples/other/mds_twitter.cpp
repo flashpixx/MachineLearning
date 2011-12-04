@@ -254,6 +254,8 @@ int main(int argc, char* argv[])
 
 
 
+    
+    
     // create file and write data to hdf
     #ifdef MACHINELEARNING_MPI
     loMPICom.barrier();
@@ -263,13 +265,14 @@ int main(int argc, char* argv[])
     #endif
     
     target.writeBlasMatrix<double>( "/project",  project, H5::PredType::NATIVE_DOUBLE );
-    target.writeStringVector( "/label",  l_wikilabel );
+    target.writeStringVector( "/label",  l_tweetlabel );
+    target.writeStringVector( "/uniquegroup",  l_tweet );
     
     
     #ifdef MACHINELEARNING_MPI
     if (loMPICom.rank() == 0)
     #endif
-    std::cout << "within the target file there are three datasets: /project = projected data, /label = datapoint label" << std::endl;
+    std::cout << "within the target file there are three datasets: /project = projected data, /label = datapoint label, /uniquegroup = list of unique labels" << std::endl;
 
 
     return EXIT_SUCCESS;
