@@ -218,7 +218,7 @@ int main(int argc, char* argv[])
 
     dim::mds<double> mds( l_dimension, l_project );
     if (l_iteration == 0)
-        mds.setIteration( distancematrix.size1() );
+        mds.setIteration( distancematrix.size2() );
     else
         mds.setIteration( l_iteration );
     mds.setRate( l_rate );
@@ -234,6 +234,7 @@ int main(int argc, char* argv[])
     
     // create file and write data to hdf
     #ifdef MACHINELEARNING_MPI
+    loMPICom.barrier();
     tools::files::hdf target( "node_"+tools::function::toString(loMPICom.rank())+"_"+l_map["outfile"].as<std::string>(), true);
     #else
     tools::files::hdf target( l_map["outfile"].as<std::string>(), true);
