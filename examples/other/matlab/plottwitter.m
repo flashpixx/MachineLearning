@@ -1,5 +1,27 @@
+% ############################################################################
+% # LGPL License                                                             #
+% #                                                                          #
+% # This file is part of the Machine Learning Framework.                     #
+% # Copyright (c) 2010, Philipp Kraus, <philipp.kraus@flashpixx.de>          #
+% # This program is free software: you can redistribute it and/or modify     #
+% # it under the terms of the GNU Lesser General Public License as           #
+% # published by the Free Software Foundation, either version 3 of the       #
+% # License, or (at your option) any later version.                          #
+% #                                                                          #
+% # This program is distributed in the hope that it will be useful,          #
+% # but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+% # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+% # GNU Lesser General Public License for more details.                      #
+% #                                                                          #
+% # You should have received a copy of the GNU Lesser General Public License #
+% # along with this program. If not, see <http://www.gnu.org/licenses/>.     #
+% ############################################################################
+
+
+% plots a HDF file that is created by the "mds_twitter" example
+% @param pcfile HDF file
 function plottwitter( pcfile )
-        pmarkersize=5;
+        lmarkersize=5;
  
         % create colors
         textlabel  = hdf5read( pcfile, '/uniquegroup');
@@ -62,9 +84,9 @@ function plottwitter( pcfile )
             point = point(1:maxcount(i), :);
  
             if size(point,2) == 2
-                phandle(i) = plot(point(:,1), point(:,2), '.', 'Color', labelcolor{i}, 'DisplayName', label{i}, 'MarkerSize',pmarkersize);
+                phandle(i) = plot(point(:,1), point(:,2), '.', 'Color', labelcolor{i}, 'DisplayName', label{i}, 'MarkerSize', lmarkersize);
             elseif size(point,2) == 3
-                phandle(i) = plot3(point(:,1), point(:,2), point(:,3), '.', 'Color', labelcolor{i}, 'DisplayName', label{i}, 'MarkerSize',pmarkersize);
+                phandle(i) = plot3(point(:,1), point(:,2), point(:,3), '.', 'Color', labelcolor{i}, 'DisplayName', label{i}, 'MarkerSize', lmarkersize);
             end
         end
         set(gca,'fontsize',8);
