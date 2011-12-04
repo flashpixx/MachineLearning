@@ -145,11 +145,8 @@ namespace machinelearning { namespace distances {
         // create wavefront in this case: (0,n) = 0, (0,n-1) = 1, (1,n) = 2 ...
         // we must create only the upper or lower index position, the other one can be created of swapping the index position
         std::size_t n=0;
-        #pragma omp parallel for shared(n, l_wavefront)
         for(std::size_t i=1; i < p_size; ++i)
             for(std::size_t j=0; (i+j) < p_size; ++j)
-                     
-                #pragma omp critical
                 l_wavefront.insert(  std::pair<std::size_t, std::pair<std::size_t,std::size_t> >(n++ % p_threads, std::pair<std::size_t,std::size_t>(j,i+j))  );
             
         return l_wavefront;
@@ -220,6 +217,10 @@ namespace machinelearning { namespace distances {
         
         // create wavefront index position
         std::multimap<std::size_t, std::pair<std::size_t,std::size_t> > l_wavefront = getWavefrontIndex(p_strvec.size(), omp_get_max_threads());
+        
+        for(std::multimap<std::size_t, std::pair<std::size_t,std::size_t> >::iterator it=l_wavefront.begin(); it != l_wavefront.end(); ++it)
+            std::cout << "Thread: " << it->first << "\tPosition: (" << it->second.first << ", " << it->second.second << ")" << std::endl;
+            
         
         #pragma omp parallel shared(l_cache, l_result)
         {
