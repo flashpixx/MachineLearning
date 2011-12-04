@@ -20,19 +20,37 @@
 
 % plots a HDF file that is created by the "mds_wikipedia" example
 % @param pcfile HDF file
-function plotwiki( pcfile )
+% @param pnnodes number of nodes
+function plotwiki( pcfile, pnnodes )
     lmarkersize=5;
 
     % get data
-    data  = hdf5read( pcfile, '/project');
+    if nargin < 2 || isempty(pnnodes)
+        data  = hdf5read( pcfile, '/project');
+        label = hdf5read( pcfile, '/label');
+    else
+        loaddata  = cell(pnnodes,1);
+        loadlabel = cell(pnnodes,1);
+        numel     = 0;
+        for i=1:pnnodes
+            loaddata{i}  = hdf5read( strcat('node_', num2str(i-1), '_', pcfile), '/project');
+            loadlabel{i} = hdf5read( strcat('node_', num2str(i-1), '_', pcfile), '/label');
+            numel        = numel + size(loaddata{i},1);
+        end
+        
+        data  = cell2mat(loaddata);
+        label = cell2mat(loadlabel);
+    end
+    
+        
     if (size(data,2) ~= 2) && (size(data,2) ~= 3)
         error('plot only with 2D or 3D');
     end
-    label = hdf5read( pcfile, '/label');
-    datatxt=cell(1,size(data,1));
-    for i=1:numel(datatxt)
+    datatxt=cell(size(label,1), 1);
+    for i=1:size(datatxt,1)
         datatxt{i} = char(label(i).data);
     end
+
     
     
     % create plot
