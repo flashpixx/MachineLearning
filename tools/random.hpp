@@ -102,7 +102,7 @@ namespace machinelearning { namespace tools {
         private :
         
             #ifdef MACHINELEARNING_RANDOMDEVICE
-            /** static random device pbject **/
+            /** static random device object **/
             static boost::random_device m_random;
             #else
             /** mersenne twister object **/
