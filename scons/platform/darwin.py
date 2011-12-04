@@ -50,7 +50,7 @@ if os.environ.has_key("LDFLAGS") :
 
 flags["CXXFLAGS"].extend(["-fopenmp", "-pipe", "-Wall", "-D BOOST_FILESYSTEM_NO_DEPRECATED", "-D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"])    
 flags["LINKFLAGS"].extend(["-pthread", "-fopenmp"])
-flags["LIBS"]         = ["z", "bz2", "boost_system", "boost_iostreams", "boost_regex"]
+flags["LIBS"]         = ["boost_system", "boost_iostreams", "boost_regex"]
 flags["SHLINKFLAGS"]  = ["-install_name ${TARGET.file} -headerpad_max_install_name"]
 
 
@@ -117,7 +117,7 @@ if env["withlogger"] :
 
 # if the static option is set, replace all libraries with the static version
 if env["staticlink"] :
-    dylink = []
+    dylink = ["z", "bz2"]
     for i in flags["LIBS"] :
         found = env.FindFile(env["LIBPREFIX"]+i+env["LIBSUFFIX"], flags["LIBPATH"])
         if found <> None :
