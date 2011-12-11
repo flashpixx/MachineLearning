@@ -334,11 +334,14 @@ def build_hdf(target, source, env) :
     
 
 def build_atlaslapack(target, source, env) :
-    f = urllib2.urlopen("http://sourceforge.net/projects/math-atlas/files/")
-    html = f.read()
+
+    # Atlas Version can be found on each c-file so, we open the file
+    # bin/atlas_install.c and extract the version
+    f = open( os.path.join("install", "ATLAS", "bin", "atlas_install.c"), "r" )
+    code = f.read()
     f.close()
 
-    found = re.search("<span>Download atlas(.*).tar.bz2 \((.*)\)</span>", html)
+    found = re.search("Automatically Tuned Linear Algebra Software v(.*)", code)
     if found == None :
         raise RuntimeError("ATLAS Version can not be detected")
 
