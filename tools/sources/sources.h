@@ -31,7 +31,7 @@ namespace machinelearning {
         
         /** namespace with classes for generating example data
          * $LastChangedDate$
-         * @todo adding support for OpenStreetMap http://wiki.openstreetmap.org/wiki/API / http://libosmscout.sourceforge.net
+         * @todo adding support for OpenStreetMap http://wiki.openstreetmap.org/wiki/API / http://wiki.openstreetmap.org/wiki/Overpass_API
          * @todo adding support for Apache Cassandra http://en.wikipedia.org/wiki/Apache_Cassandra
          * @todo adding support for Hadoop http://hadoop.apache.org/
          * @todo adding support for MangoDB http://www.mongodb.org/
