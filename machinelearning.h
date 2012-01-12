@@ -911,7 +911,7 @@
  * @todo adding voronoi tessellation (with CGAL http://http://www.cgal.org/ )
  * @todo create a PHP modul ( http://devzone.zend.com/article/4486 / http://devzone.zend.com/node/view/id/1021 )
  * @todo implementating graph algorithms (use boost graph): http://en.wikipedia.org/wiki/A*_search_algorithm / http://en.wikipedia.org/wiki/Floyd%E2%80%93Warshall_algorithm
- * @todo add celluar algorithms: http://www.heise.de/tr/artikel/Die-Chaos-Verschluesselung-1405159.html
+ * @todo add celluar algorithms: http://en.wikipedia.org/wiki/Cellular_automaton
  **/
 namespace machinelearning {}
 
