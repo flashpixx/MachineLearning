@@ -52,7 +52,7 @@ namespace machinelearning { namespace tools {
     /** class for connection LAPACK calls with numerical bindings.
      * We can handle only dense / full matrix data with LAPACK
      * $LastChangedDate$
-     * @see http://svn.boost.org/svn/boost/sandbox/numerical_bindings
+     * @see http://svn.boost.org/svn/boost/sandbox/numeric_bindings
      * @todo add Johnson Lindenstrauss Lemma for orthognal high dimensional matrices http://en.wikipedia.org/wiki/Johnson%E2%80%93Lindenstrauss_lemma
      * @todo try to change the matrix copy in eigen / svd to a better option (eg bindings::trans or traits )
      * @todo add matrix exponential via Pade approximation (shown in Matlab with expmdemo)
