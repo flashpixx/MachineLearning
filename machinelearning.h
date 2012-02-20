@@ -912,6 +912,7 @@
  * @todo create a PHP modul ( http://devzone.zend.com/article/4486 / http://devzone.zend.com/node/view/id/1021 )
  * @todo implementating graph algorithms (use boost graph): http://en.wikipedia.org/wiki/A*_search_algorithm / http://en.wikipedia.org/wiki/Floyd%E2%80%93Warshall_algorithm
  * @todo add celluar algorithms: http://en.wikipedia.org/wiki/Cellular_automaton
+ * @todo thinking about additional datatypes http://en.wikipedia.org/wiki/GNU_Multiple_Precision_Arithmetic_Library
  **/
 namespace machinelearning {}
 
