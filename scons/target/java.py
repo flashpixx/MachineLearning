@@ -93,7 +93,7 @@ for i in interfaces :
     targets.append( env.Command( package, "", Mkdir(javatarget) ) )
     
     # call swig
-    targets.append( env.Command( i, "", "swig -fvirtual -Wall -O -c++ "+ i ) )
+    targets.append( env.Command( "swig"+ifacename, "", "swig -fvirtual -Wall -O -c++ -java -package " + package + " -outdir " + javatarget + " -o " + cppname + " " + ifacename ) )
 
 
 """
