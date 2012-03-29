@@ -25,9 +25,9 @@
 %module "pcawrap"
 
 #ifdef SWIGJAVA
-%include "../../../target/java/java.i"
+%include "machinelearning/swig/target/java/java.i"
 %{
-#include "../../../target/java/java.hpp"
+#include "machinelearning/swig/target/java/java.hpp"
 %}
 #endif
 
@@ -40,5 +40,5 @@ namespace ublas = boost::numeric::ublas;
 
 
 
-%include "../../../../dimensionreduce/nonsupervised/pca.hpp"
+%include "machinelearning/dimensionreduce/nonsupervised/pca.hpp"
 %template(PCA) machinelearning::dimensionreduce::nonsupervised::pca<double>;

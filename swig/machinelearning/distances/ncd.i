@@ -25,9 +25,9 @@
 %module "ncdwrap"
 
 #ifdef SWIGJAVA
-%include "../../target/java/java.i"
+%include "machinelearning/swig/target/java/java.i"
 %{
-#include "../../target/java/java.hpp"
+#include "machinelearning/swig/target/java/java.hpp"
 %}
 #endif
 
@@ -39,5 +39,5 @@ namespace ublas = boost::numeric::ublas;
 %}
 
 
-%include "../../../distances/ncd.hpp"
+%include "machinelearning/distances/ncd.hpp"
 %template(NCD) machinelearning::distances::ncd<double>;

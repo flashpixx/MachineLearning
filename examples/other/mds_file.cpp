@@ -24,7 +24,7 @@
 
 #include <cstdlib>
 #include <fstream>
-#include <machinelearning.h>
+#include <machinelearning/machinelearning.h>
 #include <boost/filesystem.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/program_options/parsers.hpp>

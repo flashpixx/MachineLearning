@@ -26,7 +26,7 @@
 
 #include <jni.h>
 
-#include "../../../machinelearning.h"
+#include "machinelearning/machinelearning.h"
 
 
 namespace machinelearning { namespace swig {

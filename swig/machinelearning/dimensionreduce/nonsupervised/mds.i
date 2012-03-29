@@ -25,9 +25,9 @@
 %module "mdswrap"
 
 #ifdef SWIGJAVA
-%include "../../../target/java/java.i"
+%include "machinelearning/swig/target/java/java.i"
 %{
-#include "../../../target/java/java.hpp"
+#include "machinelearning/swig/target/java/java.hpp"
 %}
 #endif
 
@@ -39,5 +39,5 @@ namespace ublas = boost::numeric::ublas;
 %}
 
 
-%include "../../../../dimensionreduce/nonsupervised/mds.hpp"
+%include "machinelearning/dimensionreduce/nonsupervised/mds.hpp"
 %template(MDS) machinelearning::dimensionreduce::nonsupervised::mds<double>;

@@ -22,7 +22,7 @@
  **/
 
 #include <cstdlib>
-#include <machinelearning.h>
+#include <machinelearning/machinelearning.h>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>

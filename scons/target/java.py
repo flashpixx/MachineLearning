@@ -72,14 +72,31 @@ def java_linuxsonames(target, source, env) :
 
 # compile Java classes
 targets = []
-targets.append( targets.extend( env.Java(target=os.path.join("#build", "javalib"), source=os.path.join("..", "..", "java")) ) )
+#targets.append( targets.extend( env.Java(target=os.path.join("#build", "javalib"), source=os.path.join("..", "..", "java")) ) )
 
 # list with Java classes that are used for the JavaP command
-javaplist = []
-javaplist.extend(targets)
+#javaplist = []
+#javaplist.extend(targets)
 
 
+#read all *.i files 
+interfaces = help.getRekusivFiles( os.path.join("..", "..", "swig", "machinelearning"), ".i")
+targets.append( env.Command( "javalibdir", "", Mkdir(os.path.join("build", "javalib")) ) )
 
+for i in interfaces :
+    package    = ".".join(i.split(os.sep)[3:-1])
+    cppname    = os.path.join("build", "javalib", os.path.splitext(i.split(os.sep)[-1])[0] + ".cpp")
+    javatarget = os.path.join("build", "javalibjar", package.replace(".", os.sep))
+    ifacename  = os.sep.join(i.split(os.sep)[2:])
+    
+    #create target directories for Jar
+    targets.append( env.Command( package, "", Mkdir(javatarget) ) )
+    
+    # call swig
+    targets.append( env.Command( i, "", "swig -fvirtual -Wall -O -c++ -java -package "+package+" -outdir "+javatarget+" -o "+cppname+" "+ ifacename ) )
+
+
+"""
 # create JNI stubs and JavaP command (so we add the classes manually)
 stubs = ["machinelearning.dimensionreduce.nonsupervised.PCA", "machinelearning.dimensionreduce.nonsupervised.MDS", "machinelearning.util.Math", "machinelearning.util.Random"]
 for i in stubs :
@@ -90,6 +107,8 @@ for i in stubs :
     targets.append( env.Command( headerfile, "", "javah "  + " ".join(cmd)  ) )
 
 # the javah command creates empty subdirectories within scons/target, so the "clean" target must be cleared
+
+
 
 # build SharedLibrary
 # default cpps that must be compiled on each run
@@ -147,7 +166,7 @@ if env["PLATFORM"].lower() == "posix" :
 # build Jar and create Jar Index
 targets.append( env.Command("buildjar", "", "jar cf " + os.path.join("build", "machinelearning.jar") + " -C " + os.path.join("build", "javalib" ) + " .") )
 targets.append( env.Command("buildjarindex", "", "jar i " + os.path.join("build", "machinelearning.jar") ) )
-
+"""
 env.Alias("javac", targets)
 
 
@@ -156,5 +175,5 @@ env.Alias("javac", targets)
 
 
 # set classpath only for example compiling (jar file must be set within the build directory)
-env.Alias("javareduce", env.Java(target=os.path.join("#build", "java", "reduce"), source=os.path.join("..", "..", "examples", "java", "reducing"), JAVACLASSPATH = [os.path.join("build", "machinelearning.jar")]) )
-env.Alias("javautil", env.Java(target=os.path.join("#build", "java", "util"), source=os.path.join("..", "..", "examples", "java", "util"), JAVACLASSPATH = [os.path.join("build", "machinelearning.jar")]) )
+#env.Alias("javareduce", env.Java(target=os.path.join("#build", "java", "reduce"), source=os.path.join("..", "..", "examples", "java", "reducing"), JAVACLASSPATH = [os.path.join("build", "machinelearning.jar")]) )
+#env.Alias("javautil", env.Java(target=os.path.join("#build", "java", "util"), source=os.path.join("..", "..", "examples", "java", "util"), JAVACLASSPATH = [os.path.join("build", "machinelearning.jar")]) )

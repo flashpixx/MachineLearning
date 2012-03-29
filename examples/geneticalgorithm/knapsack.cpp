@@ -23,7 +23,7 @@
 
 #include <cstdlib>
 #include <sstream>
-#include <machinelearning.h>
+#include <machinelearning/machinelearning.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/program_options/parsers.hpp>
