@@ -21,23 +21,24 @@
  @endcond
  **/
 
-package machinelearning.exception;
+
+%module "pcawrap"
+
+#ifdef SWIGJAVA
+%include "../../../target/java/java.i"
+%{
+#include "../../../target/java/java.hpp"
+%}
+#endif
 
 
 
-/** classmethod exception class equal to the C++ exception
- * $LastChangedDate$
- **/
-public class Unknowntype extends IllegalArgumentException {
-    
-    
-    /** constructor **/
-    public Unknowntype() { super(); }
-    
-    /** constructor
-     * @param p_msg message
-     **/
-    public Unknowntype(String p_msg) { super(p_msg); }
-    
-    
-}
+%{
+namespace swig  = machinelearning::swig;
+namespace ublas = boost::numeric::ublas;
+%}
+
+
+
+%include "../../../../dimensionreduce/nonsupervised/pca.hpp"
+%template(PCA) machinelearning::dimensionreduce::nonsupervised::pca<double>;

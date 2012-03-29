@@ -27,6 +27,7 @@
 #include <omp.h>
 
 #include <limits>
+#include <boost/static_assert.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 
 #ifdef MACHINELEARNING_MPI
@@ -40,9 +41,11 @@
 
 namespace machinelearning { namespace dimensionreduce { namespace nonsupervised {
     
+    #ifndef SWIG
     namespace ublas  = boost::numeric::ublas;
     #ifdef MACHINELEARNING_MPI
     namespace mpi   = boost::mpi;
+    #endif
     #endif
     
     
@@ -54,6 +57,10 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
         , public reducempi<T>
         #endif
     {
+        #ifndef SWIG
+        BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
+        #endif
+        
         
         public :
         
@@ -369,7 +376,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     template<typename T> inline ublas::matrix<T> mds<T>::project_hit( const ublas::matrix<T>& p_data ) const
     {
         ublas::matrix<T> l_target = tools::matrix::random( p_data.size1(), m_dim, tools::random::uniform, static_cast<T>(-1), static_cast<T>(1) );
-        
+  
         // count zero elements
         std::vector< std::pair<std::size_t, std::size_t> > l_zeros;
         #pragma omp parallel for shared(l_zeros)

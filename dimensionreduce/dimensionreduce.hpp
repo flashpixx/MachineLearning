@@ -44,10 +44,11 @@ namespace machinelearning {
      **/    
     namespace dimensionreduce {
  
-        
+        #ifndef SWIG
         namespace ublas = boost::numeric::ublas;
         #ifdef MACHINELEARNING_MPI
         namespace mpi   = boost::mpi;
+        #endif
         #endif
         
         
@@ -63,7 +64,9 @@ namespace machinelearning {
              **/      
             template<typename T> class reduce
             {
+                #ifndef SWIG
                 BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
+                #endif
                 
                 
                 public :

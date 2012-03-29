@@ -24,7 +24,7 @@
 #ifndef __MACHINELEARNING_DIMENSIONREDUCE_NONSUPERVISED_PCA_HPP
 #define __MACHINELEARNING_DIMENSIONREDUCE_NONSUPERVISED_PCA_HPP
 
-
+#include <boost/static_assert.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 
 #include "../dimensionreduce.hpp"
@@ -34,7 +34,9 @@
 
 namespace machinelearning { namespace dimensionreduce { namespace nonsupervised {
     
+    #ifndef SWIG
     namespace ublas  = boost::numeric::ublas;
+    #endif
     
     
     /** create the principal component analysis (PCA)
@@ -42,6 +44,10 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
      **/
     template<typename T> class pca : public reduce<T>
     {
+        #ifndef SWIG
+        BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
+        #endif
+        
         
         public :
             

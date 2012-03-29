@@ -21,34 +21,23 @@
  @endcond
  **/
 
-package machinelearning.exception;
+
+%module "mdswrap"
+
+#ifdef SWIGJAVA
+%include "../../../target/java/java.i"
+%{
+#include "../../../target/java/java.hpp"
+%}
+#endif
 
 
 
-/** runtime exception class equal to the C++ exception
- * $LastChangedDate$
- **/
-public class Runtime extends RuntimeException {
-
-    
-    /** constructor **/
-    public Runtime() { super(); }
-    
-    /** constructor 
-     * @param p_msg message
-     **/
-    public Runtime(String p_msg) { super(p_msg); }
-    
-    /** constructor
-     * @param p_msg message
-     * @param p_cause cause
-     **/
-    public Runtime(String p_msg, Throwable p_cause) { super(p_msg, p_cause); }
-    
-    /** constructor
-     * @param p_cause
-     **/
-    public Runtime(Throwable p_cause) { super(p_cause); }
+%{
+namespace swig  = machinelearning::swig;
+namespace ublas = boost::numeric::ublas;
+%}
 
 
-}
+%include "../../../../dimensionreduce/nonsupervised/mds.hpp"
+%template(MDS) machinelearning::dimensionreduce::nonsupervised::mds<double>;

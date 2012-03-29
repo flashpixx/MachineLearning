@@ -21,49 +21,23 @@
  @endcond
  **/
 
-package machinelearning.util;
 
-/** class for storing SVD information
- * $LastChangedDate$
- **/
-public class SVD<T extends Number>
-{
-    
-    /** array with SVD values **/
-    private T[] m_values    = null;
-    /** array with SVD vectors (MxN) **/
-    private T[][] m_vectors1 = null;
-    /** array with SVD vectors (NxM) **/
-    private T[][] m_vectors2 = null;
-    
-    
-    /** constructor
-     * @param p_values array with SVD values
-     * @param p_vectors1 array with SVD vectors (MxN)
-     * @param p_vectors2 array with SVD vectors (NxM)
-     **/
-    public SVD( T[] p_values, T[][] p_vectors1, T[][] p_vectors2 )
-    {
-        if ( (p_values == null) || (p_vectors1 == null) || (p_vectors1 == null) )
-            throw new NullPointerException("array object must not be null");
-        
-        m_values   = p_values;
-        m_vectors1 = p_vectors1;
-        m_vectors2 = p_vectors2;
-    }
-    
-    /** returns array with SVD values
-     * @return array with SVD values
-     **/
-    public T[] getValues() { return m_values; }
-    
-    /** returns array with SVD vectors (MxN)
-     * @returns 2D matrix with SVD vectors (i-th row = i-th SVD vector)
-     **/
-    public T[][] getVectors1() { return m_vectors1; }
-    
-    /** returns array with SVD vectors (MxN)
-     * @returns 2D matrix with SVD vectors (i-th row = i-th SVD vector)
-     **/
-    public T[][] getVectors2() { return m_vectors2; }
-}
+%module "ncdwrap"
+
+#ifdef SWIGJAVA
+%include "../../target/java/java.i"
+%{
+#include "../../target/java/java.hpp"
+%}
+#endif
+
+
+
+%{
+namespace swig  = machinelearning::swig;
+namespace ublas = boost::numeric::ublas;
+%}
+
+
+%include "../../../distances/ncd.hpp"
+%template(NCD) machinelearning::distances::ncd<double>;

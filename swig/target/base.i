@@ -21,41 +21,41 @@
  @endcond
  **/
 
-package machinelearning.util;
 
-/** class for storing eigen information
- * $LastChangedDate$
- **/
-public class Eigen<T extends Number>
-{
-    
-    /** array with eigenvalues **/
-    private T[] m_values    = null;
-    /** array with eigenvectors **/
-    private T[][] m_vectors = null;
-    
-    
-    /** constructor
-     * @param p_values array with eigenvalues
-     * @param p_vectors array with eigenvectors (2D matrix)
-     **/
-    public Eigen( T[] p_values, T[][] p_vectors )
-    {
-        if ( (p_values == null) || (p_vectors == null) )
-            throw new NullPointerException("array object must not be null");
-        
-        m_values  = p_values;
-        m_vectors = p_vectors;
-    }
-    
-    /** returns array with eigenvalues
-     * @return array with eigenvalues
-     **/
-    public T[] getValues() { return m_values; }
-    
-    /** returns array with eigenvectors
-     * @returns 2D matrix with eigenvectors (i-th row = i-th eigenvector)
-     **/
-    public T[][] getVectors() { return m_vectors; }
-    
+// main typemaps for "return types" with code converting
+%typemap(out, optimal=1, noblock=1) ublas::matrix<double>, ublas::matrix<double>& {
+    $result = swig::convert::getArrayFromMatrix(jenv, $1);
+}
+
+%typemap(out, optimal=1, noblock=1) ublas::symmetric_matrix<double, ublas::upper>, ublas::symmetric_matrix<double, ublas::upper>& {
+    $result = swig::convert::getArrayFromMatrix(jenv, static_cast< ublas::matrix<double> >($1));
+}
+
+
+%typemap(out, optimal=1, noblock=1) std::size_t, std::size_t& {
+    $result = $1;
+}
+
+
+
+// main typemaps for "parameter types" with code converting
+%typemap(in, optimal=1) ublas::matrix<double>&, ublas::symmetric_matrix<T, ublas::upper>& {
+    ublas::matrix<double> l_arg = swig::convert::getDoubleMatrixFrom2DArray(jenv, $input);
+    $1                          = &l_arg;
+}
+
+// the return parameter must be copy into a local variable (l_param)
+// because Swig uses pointers to reference the parameter
+%typemap(in, optimal=1, noblock=1) std::string, std::string& (std::string l_param) {
+    l_param = swig::convert::getString(jenv, $input);
+    $1      = &l_param;
+}
+
+%typemap(in, optimal=1, noblock=1) std::vector<std::string>, std::vector<std::string>& (std::vector<std::string> l_param) {
+    l_param = swig::convert::getStringVectorFromArray(jenv, $input);
+    $1      = &l_param;
+}
+
+%typemap(in, optimal=1, noblock=1) std::size_t, std::size_t& {
+    $1 = ($1_ltype)& $input;
 }

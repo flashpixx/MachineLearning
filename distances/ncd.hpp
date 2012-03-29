@@ -30,6 +30,7 @@
 #include <string>
 #include <sstream>
 #include <iostream>
+#include <ostream>
 #include <fstream>
 
 #ifdef MACHINELEARNING_MPI
@@ -55,11 +56,14 @@
 
 namespace machinelearning { namespace distances {   
     
+    #ifndef SWIG
     namespace ublas = boost::numeric::ublas;
     namespace bio   = boost::iostreams;
     #ifdef MACHINELEARNING_MPI
     namespace mpi   = boost::mpi;
     #endif
+    #endif
+    
     
     /**
      * class for calculating the normalized compression distance (NCD)
@@ -68,7 +72,9 @@ namespace machinelearning { namespace distances {
      **/
     template<typename T> class ncd
     {
+        #ifndef SWIG
         BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
+        #endif
         
         
         public:
@@ -494,7 +500,7 @@ namespace machinelearning { namespace distances {
     {
         if (p_str1.empty())
             throw exception::runtime(_("string size must be greater than zero"), *this);
-        
+
         // for each compress algorithm we removed the header & footer size of the resulting count
         // @see http://en.wikipedia.org/wiki/Bzip2#File_format
         // @see http://en.wikipedia.org/wiki/Gzip#File_format
@@ -518,32 +524,28 @@ namespace machinelearning { namespace distances {
             // source and destination stream after copy is finished, so we copy only data from first
             // stream into deflate and than from second stream
             
-            std::ifstream l_file;
-            
-            l_file.open(p_str1.c_str(), std::ifstream::binary);
-            if (!l_file.is_open())
+            std::ifstream l_file1(p_str1.c_str(), std::ifstream::binary);
+            if (!l_file1.is_open())
                 throw exception::runtime(_("file can not be opened"), *this);
-            std::copy( std::istream_iterator<char>(l_file), std::istream_iterator<char>(), std::ostreambuf_iterator<char>(&l_deflate) );
-            l_file.close();
+            std::copy( std::istream_iterator<char>(l_file1), std::istream_iterator<char>(), std::ostreambuf_iterator<char>(&l_deflate) );
             
             if (!p_str2.empty()) {
-                l_file.open(p_str2.c_str(), std::ifstream::binary);
-                if (!l_file.is_open())
+                std::ifstream l_file2(p_str2.c_str(), std::ifstream::binary);
+                if (!l_file2.is_open())
                     throw exception::runtime(_("file can not be opened"), *this);
-                std::copy( std::istream_iterator<char>(l_file), std::istream_iterator<char>(), std::ostreambuf_iterator<char>(&l_deflate) );
-                l_file.close();                
+                std::copy( std::istream_iterator<char>(l_file2), std::istream_iterator<char>(), std::ostreambuf_iterator<char>(&l_deflate) );
             }
             
         } else {
+          
             // we read binary data and don't skip any whitespaces
-            std::istringstream l_sstream( p_str1+p_str2, std::stringstream::binary );
-            l_sstream >> std::noskipws;
+            std::stringstream l_sstream( std::stringstream::in | std::stringstream::out | std::stringstream::binary );
+            l_sstream << std::noskipws << p_str1 << p_str2;
             std::copy( std::istream_iterator<char>(l_sstream), std::istream_iterator<char>(), std::ostreambuf_iterator<char>(&l_deflate) );
         }
 
         // close deflate stream, cause only than counter returns correct value
         bio::close(l_deflate);
-        
         
         return (static_cast<std::size_t>(l_counter.characters()) >= l_removesize) ? l_counter.characters()-l_removesize*sizeof(char) : l_counter.characters();
     }
