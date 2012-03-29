@@ -71,7 +71,8 @@
  * with the optional ATLAS building parameters. After compiling the directory <dfn>install/build</dfn> must be moved to a directory in that all libraries should be stored, because
  * a clean-target removes the <dfn>install</dfn> directory. The default installation need the make-tools (make), gcc / g++ (C and C++ compiler) and gfortran (Fortran compiler).
  * The framework was tested under: Mac OS X Leopard (10.5), Mac OS X Snow Leopard (10.6), Mac OS X Lion (10.7), Ubuntu Lucid Lynx (10.04), Gentoo Linux (stable / unstable) and Microsoft
- * Windows 7 (with Cygwin)
+ * Windows 7 (with Cygwin). The main header file <dfn>machinelearning.h</dfn> must be added to the <dfn>CPPPATH</dfn> variable with the prefix directory <dfn>machinelearning</dfn>, if the examples
+ * external libraries (Java / Python ...) should be build.
  *
  * @section def definition / style guide
  * <ul>
@@ -793,28 +794,6 @@
  * @file examples/java/util/eigen.java example for eigenvalue algorithms
  * @file examples/java/util/svd.java example for SVD algorithms
  * @file examples/java/util/random.java example for distribution algorithms
- *
- * @file java/java.h main include for all JNI functions
- * @file java/jni.hpp register class for connect object data between C++ and Java objects
- * @file java/machinelearning/Object.java main abstract interface for JNI interfaces of each object
- * @file java/machinelearning/util/SVD.java class for storing SVD results
- * @file java/machinelearning/util/Eigen.java class for storing eigen results
- * @file java/machinelearning/util/Math.java class with different math / numeric algorithms
- * @file java/machinelearning/util/math.h JNI stub class of the math implementation
- * @file java/machinelearning/util/math.cpp implementation of the math algorithms
- * @file java/machinelearning/util/Random.java class with different distribution algorithms
- * @file java/machinelearning/util/random.h JNI stub class of the distribution / random implementation
- * @file java/machinelearning/util/random.cpp implementation of the random algorithms 
- * @file java/machinelearning/exception/Runtime.java runtime exception (see C++ exception)
- * @file java/machinelearning/exception/Classmethod.java classmethod exception (see C++ exception)
- * @file java/machinelearning/exception/Unknowntype.java exception if the generic datatype can not be used
- * @file java/machinelearning/dimensionreduce/nonsupervised/Reduce.java abstract reduce interface 
- * @file java/machinelearning/dimensionreduce/nonsupervised/PCA.java PCA implementation
- * @file java/machinelearning/dimensionreduce/nonsupervised/pca.h JNI stub class of the PCA implementation
- * @file java/machinelearning/dimensionreduce/nonsupervised/pca.cpp implementation of the PCA JNI object
- * @file java/machinelearning/dimensionreduce/nonsupervised/MDS.java MDS implementation
- * @file java/machinelearning/dimensionreduce/nonsupervised/mds.h JNI stub class of the MDS implementation
- * @file java/machinelearning/dimensionreduce/nonsupervised/mds.cpp implementation of the MDS JNI object
  *
  * @file classifier/classifier.h main header for all classifier structurs
  * @file classifier/classifier.hpp header for the abstract class implementation of the classifiers
