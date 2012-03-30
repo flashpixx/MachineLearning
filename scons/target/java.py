@@ -70,61 +70,42 @@ def java_linuxsonames(target, source, env) :
 
 
 
-# compile Java classes
+
+
 targets = []
-#targets.append( targets.extend( env.Java(target=os.path.join("#build", "javalib"), source=os.path.join("..", "..", "java")) ) )
-
-# list with Java classes that are used for the JavaP command
-#javaplist = []
-#javaplist.extend(targets)
 
 
-#read all *.i files 
+#read all *.i files and call swig for generating Java and Cpp files
+cppsources = []
 interfaces = help.getRekusivFiles( os.path.join("..", "..", "swig", "machinelearning"), ".i")
 targets.append( env.Command( "javalibdir", "", Mkdir(os.path.join("build", "javalib")) ) )
+targets.append( env.Command( "libdir", "", Mkdir(os.path.join("build", "lib")) ) )
 
 for i in interfaces :
     package    = ".".join(i.split(os.sep)[3:-1])
-    cppname    = os.path.join("build", "javalib", os.path.splitext(i.split(os.sep)[-1])[0] + ".cpp")
-    javatarget = os.path.join("build", "javalibjar", package.replace(".", os.sep))
+    cppname    = os.path.join("build", "lib", os.path.splitext(i.split(os.sep)[-1])[0] + ".cpp")
+    javatarget = os.path.join("build", "javalib", package.replace(".", os.sep))
     ifacename  = os.sep.join(i.split(os.sep)[2:])
     
-    #create target directories for Jar
-    targets.append( env.Command( package, "", Mkdir(javatarget) ) )
+    cppsources.append( os.path.join("..", "..", cppname) )
     
-    # call swig
+    #create target directories for Jar and call Swig
+    targets.append( env.Command( package, "", Mkdir(javatarget) ) )
     targets.append( env.Command( "swig"+ifacename, "", "swig -fvirtual -Wall -O -c++ -java -package " + package + " -outdir " + javatarget + " -o " + cppname + " " + ifacename ) )
 
 
-"""
-# create JNI stubs and JavaP command (so we add the classes manually)
-stubs = ["machinelearning.dimensionreduce.nonsupervised.PCA", "machinelearning.dimensionreduce.nonsupervised.MDS", "machinelearning.util.Math", "machinelearning.util.Random"]
-for i in stubs :
-    # split file and directory parts and substitute $ to _ and create the headerfile
-    parts = i.replace("$", "_").split(".")
-    headerfile = os.path.join( os.sep.join(parts[0:-1]), (parts[-1] + ".h").lower() )
-    cmd = ["-o "+os.path.join("java", headerfile), " -classpath "+os.path.join("build", "javalib"), i]
-    targets.append( env.Command( headerfile, "", "javah "  + " ".join(cmd)  ) )
-
-# the javah command creates empty subdirectories within scons/target, so the "clean" target must be cleared
-
-
-
-# build SharedLibrary
-# default cpps that must be compiled on each run
-framework = []
+#get CPPs and build library
 if env["withlogger"] or env["withrandomdevice"] :
-    framework.append( "machinelearning.cpp" )
-    
-sources = help.getRekusivFiles( os.path.join("..", "..", "java"), ".cpp")
-sources.extend(framework)
-targets.append( env.SharedLibrary( target=os.path.join("#build", "javalib", "native", "machinelearning"), source=sources ) )
+    cppsources.append( "machinelearning.cpp" )
+targets.append( env.SharedLibrary( target=os.path.join("#build", "javalib", "native", "machinelearning"), source=cppsources ) )
+
+
 
 # on OSX the path of the linked libraries within the libmachinelearning.dylib must be changed to @loader_path/<library>
 if env["PLATFORM"].lower() == "darwin" :
     targets.append( env.Command("createlibrarynames", "", "otool -L " + os.path.join("build", "javalib", "native", env["LIBPREFIX"]+"machinelearning"+env["SHLIBSUFFIX"]) + " > " + os.path.join("build", "linkedlibs.txt") ) )
     targets.append( env.Command("linkedlibs", "", java_osxlinkedlibs) )
-    targets.append( env.Command("libnames.txt", "", Delete(os.path.join("build", "linkedlibs.txt")) ) )
+    #targets.append( env.Command("libnames.txt", "", Delete(os.path.join("build", "linkedlibs.txt")) ) )
 
 
 # copy external libraries in the native directory for Jar adding (copy works only if target directories exists)
@@ -164,9 +145,9 @@ if env["PLATFORM"].lower() == "posix" :
 
 
 # build Jar and create Jar Index
-targets.append( env.Command("buildjar", "", "jar cf " + os.path.join("build", "machinelearning.jar") + " -C " + os.path.join("build", "javalib" ) + " .") )
-targets.append( env.Command("buildjarindex", "", "jar i " + os.path.join("build", "machinelearning.jar") ) )
-"""
+#targets.append( env.Command("buildjar", "", "jar cf " + os.path.join("build", "machinelearning.jar") + " -C " + os.path.join("build", "javalib" ) + " .") )
+#targets.append( env.Command("buildjarindex", "", "jar i " + os.path.join("build", "machinelearning.jar") ) )
+
 env.Alias("javac", targets)
 
 
