@@ -21,6 +21,10 @@
  @endcond
  **/
 
+/** interface file for the NCD
+ * $LastChangedDate$
+ **/
+
 
 %module "ncdwrap"
 

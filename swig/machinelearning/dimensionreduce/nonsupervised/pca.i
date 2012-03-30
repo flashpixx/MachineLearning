@@ -21,6 +21,10 @@
  @endcond
  **/
 
+/** interface file for PCA
+ * $LastChangedDate$
+ **/
+
 
 %module "pcawrap"
 
