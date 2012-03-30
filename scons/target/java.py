@@ -105,8 +105,7 @@ targets.append( env.SharedLibrary( target=os.path.join("#build", "javalib", "nat
 if env["PLATFORM"].lower() == "darwin" :
     targets.append( env.Command("createlibrarynames", "", "otool -L " + os.path.join("build", "javalib", "native", env["LIBPREFIX"]+"machinelearning"+env["SHLIBSUFFIX"]) + " > " + os.path.join("build", "linkedlibs.txt") ) )
     targets.append( env.Command("linkedlibs", "", java_osxlinkedlibs) )
-    #targets.append( env.Command("libnames.txt", "", Delete(os.path.join("build", "linkedlibs.txt")) ) )
-
+  
 
 # copy external libraries in the native directory for Jar adding (copy works only if target directories exists)
 dirs      = []
@@ -117,12 +116,10 @@ libs      = []
 if env.has_key("LIBS") :
     libs.extend(env["LIBS"])
 
-copyfiles = []
-
-
 if env["PLATFORM"].lower() == "cygwin" :
     libs.extend(["cygwin1", "cyggcc_s-1", "cyggfortran-3", "cygstdc++-6"])
 
+copyfiles = []
 for n in libs :
     libname = ""
     if env["PLATFORM"].lower() == "darwin" or env["PLATFORM"].lower() == "posix" :
@@ -142,7 +139,8 @@ targets.append( env.Command("copyexternallib", "", copyfiles) )
 if env["PLATFORM"].lower() == "posix" :
     targets.append( env.Command("sonames", "", java_linuxsonames) )
 
-
+# copy licence
+targets.append( env.Command("license", "", Copy(os.path.join("build", "javalib", "license.txt"), "license.txt")) )
 
 # build Jar and create Jar Index
 #targets.append( env.Command("buildjar", "", "jar cf " + os.path.join("build", "machinelearning.jar") + " -C " + os.path.join("build", "javalib" ) + " .") )

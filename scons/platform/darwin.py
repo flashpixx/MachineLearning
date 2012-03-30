@@ -59,9 +59,9 @@ if not("javac" in COMMAND_LINE_TARGETS) :
     flags["LIBS"].extend(["boost_program_options", "boost_exception", "boost_filesystem"])
 
 if env["atlaslink"] == "multi" :
-    flags["LIBS"].extend( ["lapack", "ptcblas", "ptf77blas", "gfortran"] )
+    flags["LIBS"].extend( ["ptcblas", "ptf77blas", "gfortran"] )
 elif env["atlaslink"] == "single" :
-    flags["LIBS"].extend( ["lapack", "cblas", "f77blas", "gfortran"] )
+    flags["LIBS"].extend( ["cblas", "f77blas", "gfortran"] )
 
 if env["staticlink"] :
     flags["LIBS"].append("atlas")
@@ -125,5 +125,10 @@ if env["staticlink"] :
         else :
             dylink.append(i);
     flags["LIBS"] = dylink
+    
+#LAPack link always static
+found = env.FindFile(env["LIBPREFIX"]+"lapack"+env["LIBSUFFIX"], flags["LIBPATH"])
+if found <> None :
+    flags["LINKFLAGS"].append(found)
 
 env.MergeFlags(flags)
