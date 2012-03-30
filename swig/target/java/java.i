@@ -22,7 +22,15 @@
  **/
 
 
+/** Java interface file for converting Java types and data into C++ 
+ * datatypes and UBlas structurs
+ * $LastChangedDate$
+ * @todo add support for other datatypes
+ **/
 
+
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------
 // type converting from C++ types to Java types (both directions)
 %typemap(jni)       ublas::matrix<double>,                          ublas::matrix<double>&                          "jobjectArray"
 %typemap(jtype)     ublas::matrix<double>,                          ublas::matrix<double>&                          "Double[][]"
@@ -46,8 +54,8 @@
 
 
 
-
-// input type, so that the value type will be passed through  to the JNI
+// ---------------------------------------------------------------------------------------------------------------------------------------------
+// input type, so that the value type will be passed through  to the JNI (connection Java proxy class to Java main class)
 %typemap(javain)    ublas::matrix<double>,                          ublas::matrix<double>&                          "$javainput"
 %typemap(javain)    ublas::symmetric_matrix<double, ublas::upper>,  ublas::symmetric_matrix<double, ublas::upper>&  "$javainput"
 %typemap(javain)    std::size_t,                                    std::size_t&                                    "$javainput"
@@ -61,16 +69,15 @@
 
 
 
-
+// ---------------------------------------------------------------------------------------------------------------------------------------------
 // main typemaps for "return types" with code converting
 %typemap(out, optimal=1, noblock=1) ublas::matrix<double>, ublas::matrix<double>& {
-    $result = swig::convert::getArrayFromMatrix(jenv, $1);
+    $result = swig::java::getArrayFromMatrix(jenv, $1);
 }
 
 %typemap(out, optimal=1, noblock=1) ublas::symmetric_matrix<double, ublas::upper>, ublas::symmetric_matrix<double, ublas::upper>& {
-    $result = swig::convert::getArrayFromMatrix(jenv, static_cast< ublas::matrix<double> >($1));
+    $result = swig::java::getArrayFromMatrix(jenv, static_cast< ublas::matrix<double> >($1));
 }
-
 
 %typemap(out, optimal=1, noblock=1) std::size_t, std::size_t& {
     $result = $1;
@@ -78,21 +85,22 @@
 
 
 
+// ---------------------------------------------------------------------------------------------------------------------------------------------
 // main typemaps for "parameter types" with code converting
 %typemap(in, optimal=1) ublas::matrix<double>&, ublas::symmetric_matrix<T, ublas::upper>& {
-    ublas::matrix<double> l_arg = swig::convert::getDoubleMatrixFrom2DArray(jenv, $input);
+    ublas::matrix<double> l_arg = swig::java::getDoubleMatrixFrom2DArray(jenv, $input);
     $1                          = &l_arg;
 }
 
 // the return parameter must be copy into a local variable (l_param)
 // because Swig uses pointers to reference the parameter
 %typemap(in, optimal=1, noblock=1) std::string, std::string& (std::string l_param) {
-    l_param = swig::convert::getString(jenv, $input);
+    l_param = swig::java::getString(jenv, $input);
     $1      = &l_param;
 }
 
 %typemap(in, optimal=1, noblock=1) std::vector<std::string>, std::vector<std::string>& (std::vector<std::string> l_param) {
-    l_param = swig::convert::getStringVectorFromArray(jenv, $input);
+    l_param = swig::java::getStringVectorFromArray(jenv, $input);
     $1      = &l_param;
 }
 
@@ -102,7 +110,17 @@
 
 
 
+// ---------------------------------------------------------------------------------------------------------------------------------------------
+// structure that is included in each cpp file
+%{
+#include "machinelearning/swig/target/java/java.hpp"
+namespace swig  = machinelearning::swig;
+namespace ublas = boost::numeric::ublas;
+%}
 
+
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------
 // Java code for loading the dynamic library
 %pragma(java) jniclasscode=%{
     

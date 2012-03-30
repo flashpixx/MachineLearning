@@ -22,7 +22,7 @@
  **/
 
 #ifndef __MACHINELEARNING_SWIG_JAVA_HPP
-#define __MACHINELEARNING_SWIG_JAVA__HPP
+#define __MACHINELEARNING_SWIG_JAVA_HPP
 
 #include <jni.h>
 
@@ -40,7 +40,7 @@ namespace machinelearning { namespace swig {
      * $LastChangedDate$
      * @todo add copy process with OpenMP
      **/
-    class convert {
+    class java {
         
         public :
         
@@ -78,7 +78,7 @@ namespace machinelearning { namespace swig {
      * @return method id
      * @todo check jmethodID use for memory leak
      **/
-    inline jmethodID convert::getMethodID(JNIEnv* p_env, const jobject& p_object, const char* p_name, const char* p_signatur)
+    inline jmethodID java::getMethodID(JNIEnv* p_env, const jobject& p_object, const char* p_name, const char* p_signatur)
     {
         jclass l_class = p_env->GetObjectClass( p_object );
         if (!l_class) {
@@ -105,7 +105,7 @@ namespace machinelearning { namespace swig {
      * @return method id
      * @todo check jmethodID use for memory leak
      **/
-    inline jmethodID convert::getMethodID(JNIEnv* p_env, const char* p_classname, const char* p_methodname, const char* p_signatur)
+    inline jmethodID java::getMethodID(JNIEnv* p_env, const char* p_classname, const char* p_methodname, const char* p_signatur)
     {
         jclass l_class = p_env->FindClass(p_classname);
         if (!l_class) {
@@ -130,7 +130,7 @@ namespace machinelearning { namespace swig {
      * @param p_classid reference to the class id
      * @param p_ctorid reference to the ctor method id
      **/
-    inline void convert::getCtor(JNIEnv* p_env, const char* p_name, const char* p_signatur, jclass& p_classid, jmethodID& p_ctorid)
+    inline void java::getCtor(JNIEnv* p_env, const char* p_name, const char* p_signatur, jclass& p_classid, jmethodID& p_ctorid)
     {
         p_ctorid  = 0;
         p_classid = p_env->FindClass(p_name);
@@ -149,7 +149,7 @@ namespace machinelearning { namespace swig {
      * @param p_data java array
      * @return ublas matrix if matrix have zero columns and/or rows the array can not be read
      **/
-    inline ublas::matrix<double> convert::getDoubleMatrixFrom2DArray( JNIEnv* p_env, const jobjectArray& p_data )
+    inline ublas::matrix<double> java::getDoubleMatrixFrom2DArray( JNIEnv* p_env, const jobjectArray& p_data )
     {
         ublas::matrix<double> l_data(0,0);
         
@@ -186,7 +186,7 @@ namespace machinelearning { namespace swig {
      * @param p_data java array
      * @return ublas matrix if matrix have zero columns and/or rows the array can not be read
      **/
-    inline ublas::matrix<float> convert::getFloatMatrixFrom2DArray( JNIEnv* p_env, const jobjectArray& p_data )
+    inline ublas::matrix<float> java::getFloatMatrixFrom2DArray( JNIEnv* p_env, const jobjectArray& p_data )
     {
         ublas::matrix<float> l_data(0,0);
         
@@ -225,7 +225,7 @@ namespace machinelearning { namespace swig {
      * @return java array / or a null object if the matrix is empty
      * @todo add numerical zero change
      **/
-    inline jobjectArray convert::getArrayFromMatrix( JNIEnv* p_env, const ublas::matrix<double>& p_data, const rowtype& p_rowtype )
+    inline jobjectArray java::getArrayFromMatrix( JNIEnv* p_env, const ublas::matrix<double>& p_data, const rowtype& p_rowtype )
     {
         if ( (p_data.size1() == 0) || (p_data.size2() == 0) )
             return (jobjectArray)p_env->NewGlobalRef(NULL);
@@ -281,7 +281,7 @@ namespace machinelearning { namespace swig {
      * @return java array / or a null object if the matrix is empty
      * @todo add numerical zero change
      **/
-    inline jobjectArray convert::getArrayFromMatrix( JNIEnv* p_env, const ublas::matrix<float>& p_data, const rowtype& p_rowtype )
+    inline jobjectArray java::getArrayFromMatrix( JNIEnv* p_env, const ublas::matrix<float>& p_data, const rowtype& p_rowtype )
     {
         if ( (p_data.size1() == 0) || (p_data.size2() == 0) )
             return (jobjectArray)p_env->NewGlobalRef(NULL);
@@ -336,7 +336,7 @@ namespace machinelearning { namespace swig {
      * @return java array
      * @todo add numerical zero change
      **/
-    inline jobjectArray convert::getArrayFromVector( JNIEnv* p_env, const ublas::vector<double>& p_data )
+    inline jobjectArray java::getArrayFromVector( JNIEnv* p_env, const ublas::vector<double>& p_data )
     {
         if (p_data.size() == 0)
             return (jobjectArray)p_env->NewGlobalRef(NULL);
@@ -359,7 +359,7 @@ namespace machinelearning { namespace swig {
      * @return java array
      * @todo add numerical zero change
      **/
-    inline jobjectArray convert::getArrayFromVector( JNIEnv* p_env, const ublas::vector<float>& p_data )
+    inline jobjectArray java::getArrayFromVector( JNIEnv* p_env, const ublas::vector<float>& p_data )
     {
         if (p_data.size() == 0)
             return (jobjectArray)p_env->NewGlobalRef(NULL);
@@ -381,11 +381,11 @@ namespace machinelearning { namespace swig {
      * @param p_data jstring
      ** @return std::string
      **/
-    inline std::string convert::getString( JNIEnv* p_env, const jstring p_data ) {
+    inline std::string java::getString( JNIEnv* p_env, const jstring p_data ) {
         return std::string(p_env->GetStringUTFChars(p_data, NULL));
     }
     
-    inline std::vector<std::string> convert::getStringVectorFromArray( JNIEnv* p_env, const jobjectArray& p_data ) {
+    inline std::vector<std::string> java::getStringVectorFromArray( JNIEnv* p_env, const jobjectArray& p_data ) {
         std::vector<std::string> l_data;
         
         // convert the java array to a ublas matrix (first read the row dimension and than read the first array element, cast it to jobjectArray and get the length)

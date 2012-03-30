@@ -24,20 +24,10 @@
 
 %module "pcawrap"
 
+
 #ifdef SWIGJAVA
 %include "../../../target/java/java.i"
-%{
-#include "machinelearning/swig/target/java/java.hpp"
-%}
 #endif
-
-
-
-%{
-namespace swig  = machinelearning::swig;
-namespace ublas = boost::numeric::ublas;
-%}
-
 
 
 %include "../../../../dimensionreduce/nonsupervised/pca.hpp"
