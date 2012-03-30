@@ -23,6 +23,7 @@ import sys
 sys.path.append("..")
 import help
 import os
+import re
 
 Import("*")
 
@@ -67,24 +68,25 @@ def java_linuxsonames(target, source, env) :
     	    os.system( "objdump -p " + pathfile + " | grep -i soname | awk '{system(\"mv " + pathfile + " "+nativepath+os.path.sep+"\"$2)}'" )
 
     return []
+    
+    
 
 
 
-
-
+# ----------------------------------------------------------------------------------------------------------------------------------------------------------
 targets = []
-
 
 #read all *.i files and call swig for generating Java and Cpp files
 cppsources = []
 interfaces = help.getRekusivFiles( os.path.join("..", "..", "swig", "machinelearning"), ".i")
 targets.append( env.Command( "javalibdir", "", Mkdir(os.path.join("build", "javalib")) ) )
+targets.append( env.Command( "javalibsrcdir", "", Mkdir(os.path.join("build", "javalibsrc")) ) )
 targets.append( env.Command( "libdir", "", Mkdir(os.path.join("build", "lib")) ) )
 
 for i in interfaces :
     package    = ".".join(i.split(os.sep)[3:-1])
     cppname    = os.path.join("build", "lib", os.path.splitext(i.split(os.sep)[-1])[0] + ".cpp")
-    javatarget = os.path.join("build", "javalib", package.replace(".", os.sep))
+    javatarget = os.path.join("build", "javalibsrc", package.replace(".", os.sep))
     ifacename  = os.sep.join(i.split(os.sep)[2:])
     
     cppsources.append( os.path.join("..", "..", cppname) )
@@ -92,12 +94,23 @@ for i in interfaces :
     #create target directories for Jar and call Swig
     targets.append( env.Command( package, "", Mkdir(javatarget) ) )
     targets.append( env.Command( "swig"+ifacename, "", "swig -fvirtual -Wall -O -c++ -java -package " + package + " -outdir " + javatarget + " -o " + cppname + " " + ifacename ) )
+    
+    # read on each interface file the %module part and remove this Java class, because it is an empty class
+    oFile     = open( os.path.join("..", "..", ifacename), "r" )
+    ifacetext = oFile.read()
+    oFile.close()
+
+    found = re.search("%module(.*)\"", ifacetext)
+    if found <> None :
+        targets.append( env.Command("delmodul"+ifacename, "", Delete(os.path.join(javatarget, found.group(1).replace("\"", "").strip() + ".java"))) )
+    
 
 
-#get CPPs and build library
+#get CPPs and build native library and Java classes
 if env["withlogger"] or env["withrandomdevice"] :
     cppsources.append( "machinelearning.cpp" )
 targets.append( env.SharedLibrary( target=os.path.join("#build", "javalib", "native", "machinelearning"), source=cppsources ) )
+targets.append( env.Java( target=os.path.join("#build", "javalib"), source=os.path.join("#build", "javalibsrc") ) )
 
 
 
@@ -142,7 +155,11 @@ if env["PLATFORM"].lower() == "posix" :
 # copy licence
 targets.append( env.Command("license", "", Copy(os.path.join("build", "javalib", "license.txt"), "license.txt")) )
 
-# build Jar and create Jar Index
+
+
+
+
+#build Jar
 #targets.append( env.Command("buildjar", "", "jar cf " + os.path.join("build", "machinelearning.jar") + " -C " + os.path.join("build", "javalib" ) + " .") )
 #targets.append( env.Command("buildjarindex", "", "jar i " + os.path.join("build", "machinelearning.jar") ) )
 
