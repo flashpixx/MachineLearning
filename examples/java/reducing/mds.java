@@ -50,8 +50,8 @@ public class mds {
             System.out.println("");
         }
         
-        // create MDS object for Double datatypes with metric projection
-        MDS<Double> l_mds = new MDS<Double>(Double.class, 3, MDS.Project.METRIC);
+        // create MDS object
+        MDS l_mds = new MDS(3, MDS.project.metric);
         
         
         // maps the random data points
@@ -65,10 +65,6 @@ public class mds {
                     System.out.print(l_result[i][j] + "\t");
                 System.out.println("");
             }
-        
-        
-        // release data for avoid memory leaks
-        l_mds.dispose();
         
         // set objects to null for gc removing
         l_mds    = null;

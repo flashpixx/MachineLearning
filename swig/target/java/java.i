@@ -91,20 +91,19 @@
             if (System.getProperty("os.name").toLowerCase().indexOf( "mac" ) >= 0)
                 l_lib = l_lib.substring(0, l_lib.indexOf(".jnilib")) + ".dylib";
             
-            
             // try to load the libraries manually from the temporary directory
             try {
                 System.load(l_lib);
             } catch (UnsatisfiedLinkError e_link2) {
-
+                
                 // try to read class name
                 if (Thread.currentThread().getStackTrace().length < 2)
                     throw new RuntimeException("can not determine class name");
-                
+                                
                 // extract files from the Jar
                 try {
                     // extract from the classname the location of the JAR (remove URL prefix jar:file: and suffix after .jar)
-                    String l_jarfile = java.net.URLDecoder.decode(Class.forName(Thread.currentThread().getStackTrace()[0].getClassName()).getResource("").toString(),"UTF-8");
+                    String l_jarfile = java.net.URLDecoder.decode(Class.forName(Thread.currentThread().getStackTrace()[1].getClassName()).getResource("").toString(),"UTF-8");
                     l_jarfile        = l_jarfile.substring(9, l_jarfile.lastIndexOf(".jar!")) + ".jar";
                     
                     // open the Jar file to get all Jar entries and extract the "native" subdirectory
@@ -114,6 +113,7 @@
                     while (l_list.hasMoreElements()) {
                         
                         String l_fileentry = l_list.nextElement().getName();
+
                         if ( (l_fileentry.startsWith("native/")) && (l_fileentry.charAt(l_fileentry.length()-1) != '/') ) {
                             
                             // copy stream with buffered stream because it's faster

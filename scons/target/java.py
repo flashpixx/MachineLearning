@@ -56,7 +56,6 @@ def java_osxlinkedlibs(target, source, env) :
     return []
 
 
-
 # changes the library calls under Linux (sonames)
 def java_linuxsonames(target, source, env) :
 
@@ -68,8 +67,7 @@ def java_linuxsonames(target, source, env) :
     	    os.system( "objdump -p " + pathfile + " | grep -i soname | awk '{system(\"mv " + pathfile + " "+nativepath+os.path.sep+"\"$2)}'" )
 
     return []
-    
-    
+
 
 
 
@@ -156,12 +154,9 @@ if env["PLATFORM"].lower() == "posix" :
 targets.append( env.Command("license", "", Copy(os.path.join("build", "javalib", "license.txt"), "license.txt")) )
 
 
-
-
-
 #build Jar
-#targets.append( env.Command("buildjar", "", "jar cf " + os.path.join("build", "machinelearning.jar") + " -C " + os.path.join("build", "javalib" ) + " .") )
-#targets.append( env.Command("buildjarindex", "", "jar i " + os.path.join("build", "machinelearning.jar") ) )
+targets.append( env.Command("buildjar", "", "jar cf " + os.path.join("build", "machinelearning.jar") + " -C " + os.path.join("build", "javalib" ) + " .") )
+targets.append( env.Command("buildjarindex", "", "jar i " + os.path.join("build", "machinelearning.jar") ) )
 
 env.Alias("javac", targets)
 
@@ -171,5 +166,5 @@ env.Alias("javac", targets)
 
 
 # set classpath only for example compiling (jar file must be set within the build directory)
-#env.Alias("javareduce", env.Java(target=os.path.join("#build", "java", "reduce"), source=os.path.join("..", "..", "examples", "java", "reducing"), JAVACLASSPATH = [os.path.join("build", "machinelearning.jar")]) )
+env.Alias("javareduce", env.Java(target=os.path.join("#build", "java", "reduce"), source=os.path.join("..", "..", "examples", "java", "reducing"), JAVACLASSPATH = [os.path.join("build", "machinelearning.jar")]) )
 #env.Alias("javautil", env.Java(target=os.path.join("#build", "java", "util"), source=os.path.join("..", "..", "examples", "java", "util"), JAVACLASSPATH = [os.path.join("build", "machinelearning.jar")]) )

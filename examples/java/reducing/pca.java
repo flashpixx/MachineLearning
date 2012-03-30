@@ -47,8 +47,8 @@ public class pca {
             System.out.println("");
         }
 
-        // create PCA object for Double datatypes
-        PCA<Double> l_pca = new PCA<Double>(Double.class, 3);
+        // create PCA object
+        PCA l_pca = new PCA(3);
         
         
         // maps the random data points
@@ -74,9 +74,6 @@ public class pca {
                     System.out.print(l_eig[i][j] + "\t");
                 System.out.println("");
             }
-        
-        // release data for avoid memory leaks
-        l_pca.dispose();
         
         // set objects to null for gc removing
         l_pca    = null;
