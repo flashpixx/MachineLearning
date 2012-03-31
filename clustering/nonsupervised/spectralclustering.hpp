@@ -75,7 +75,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
 
         private :
         
-            ublas::matrix<T> getGraphLaplacian( const ublas::matrix<T>& ) const;
+            ublas::matrix<T> getEigNormalizedGraphLaplacian( const ublas::matrix<T>& ) const;
         
             /** distance object for ng **/
             const distances::euclid<T> m_distance;
@@ -164,8 +164,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     /** creates the <strong>normalized</strong> graph laplacian
      * @param p_similarity similarity NxN matrix, needs to be squared and non-negative
      * @return graph laplacian matrix
+     * @todo moved graph laplacian to lapack
      **/
-    template<typename T> inline ublas::matrix<T> spectralclustering<T>::getGraphLaplacian( const ublas::matrix<T>& p_similarity ) const {
+    template<typename T> inline ublas::matrix<T> spectralclustering<T>::getEigNormalizedGraphLaplacian( const ublas::matrix<T>& p_similarity ) const {
         // create squared degree and normalized graph laplacian
         const ublas::matrix<T> l_sqrtdegree   = tools::matrix::pow( static_cast< ublas::matrix<T> >(tools::matrix::diag(tools::matrix::sum(p_similarity))), static_cast<T>(-0.5));
         const ublas::matrix<T> l_tmp          = ublas::prod(l_sqrtdegree, p_similarity);
@@ -206,7 +207,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             throw exception::runtime(_("data and prototype dimension are not equal"), *this);
 
         // clustering
-        m_kmeans.train( getGraphLaplacian(p_similarity), p_iterations );
+        m_kmeans.train( getEigNormalizedGraphLaplacian(p_similarity), p_iterations );
     }
     
         
