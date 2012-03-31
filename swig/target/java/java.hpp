@@ -54,13 +54,13 @@ namespace machinelearning { namespace swig {
             
             static ublas::matrix<double> getDoubleMatrixFrom2DArray( JNIEnv*, const jobjectArray& );
             
-            static jobjectArray getArrayFromMatrix( JNIEnv*, const ublas::matrix<double>&, const rowtype& = row );
-            static jobjectArray getArrayFromVector( JNIEnv*, const ublas::vector<double>& );
-            static jobjectArray getArrayFromVector( JNIEnv*, const std::vector<double>& );
+            static jobjectArray getArray( JNIEnv*, const ublas::matrix<double>&, const rowtype& = row );
+            static jobjectArray getArray( JNIEnv*, const ublas::vector<double>& );
+            static jobjectArray getArray( JNIEnv*, const std::vector<double>& );
             
-            static jobjectArray getArrayFromIndirectArray( JNIEnv*, const ublas::indirect_array<>& );
+            static jobjectArray getArray( JNIEnv*, const ublas::indirect_array<>& );
             
-            static jobject getArrayListFromMatrixVector( JNIEnv*, const std::vector< ublas::matrix<double> >&, const rowtype& = row );
+            static jobject getArrayList( JNIEnv*, const std::vector< ublas::matrix<double> >&, const rowtype& = row );
         
             static std::string getString( JNIEnv*, const jstring );
             static std::vector<std::string> getStringVectorFromArray( JNIEnv*, const jobjectArray& );
@@ -192,7 +192,7 @@ namespace machinelearning { namespace swig {
      * @param p_rowtype row type
      * @return java array / or a null object if the matrix is empty
      **/
-    inline jobjectArray java::getArrayFromMatrix( JNIEnv* p_env, const ublas::matrix<double>& p_data, const rowtype& p_rowtype )
+    inline jobjectArray java::getArray( JNIEnv* p_env, const ublas::matrix<double>& p_data, const rowtype& p_rowtype )
     {
         if ( (p_data.size1() == 0) || (p_data.size2() == 0) )
             return (jobjectArray)p_env->NewGlobalRef(NULL);
@@ -246,7 +246,7 @@ namespace machinelearning { namespace swig {
      * @param p_data vector
      * @return java array
      **/
-    inline jobjectArray java::getArrayFromVector( JNIEnv* p_env, const ublas::vector<double>& p_data )
+    inline jobjectArray java::getArray( JNIEnv* p_env, const ublas::vector<double>& p_data )
     {
         if (p_data.size() == 0)
             return (jobjectArray)p_env->NewGlobalRef(NULL);
@@ -268,7 +268,7 @@ namespace machinelearning { namespace swig {
      * @param p_data vector
      * @return java array
      **/
-    inline jobjectArray java::getArrayFromVector( JNIEnv* p_env, const std::vector<double>& p_data )
+    inline jobjectArray java::getArray( JNIEnv* p_env, const std::vector<double>& p_data )
     {
         if (p_data.size() == 0)
             return (jobjectArray)p_env->NewGlobalRef(NULL);
@@ -290,7 +290,7 @@ namespace machinelearning { namespace swig {
      * @param p_data indirect array
      * @return java array
      **/
-    inline jobjectArray java::getArrayFromIndirectArray( JNIEnv* p_env, const ublas::indirect_array<>& p_data ) {
+    inline jobjectArray java::getArray( JNIEnv* p_env, const ublas::indirect_array<>& p_data ) {
         if (p_data.size() == 0)
             return (jobjectArray)p_env->NewGlobalRef(NULL);
         
@@ -312,7 +312,7 @@ namespace machinelearning { namespace swig {
      * @param p_rowtype row type of the matrix
      * @return array list object
      **/
-    inline jobject java::getArrayListFromMatrixVector( JNIEnv* p_env, const std::vector< ublas::matrix<double> >& p_data, const rowtype& p_rowtype ) {
+    inline jobject java::getArrayList( JNIEnv* p_env, const std::vector< ublas::matrix<double> >& p_data, const rowtype& p_rowtype ) {
         if (p_data.size() == 0)
             return (jobject)p_env->NewGlobalRef(NULL);
         
@@ -321,7 +321,7 @@ namespace machinelearning { namespace swig {
         jmethodID l_elementctor = NULL;
         getCtor(p_env, "java/util/ArrayList", "(I)V", l_elementclass, l_elementctor);
         
-        jobject l_list = p_env->NewObject( static_cast<jint>(p_data.size()), l_elementclass, NULL );
+        jobject l_list = p_env->NewObject( l_elementclass, l_elementctor, static_cast<jint>(p_data.size()) );
         
         // get add method of the ArrayList        
         jmethodID l_add = getMethodID(p_env, l_list, "add", "(Ljava/lang/Object;)Z"); 

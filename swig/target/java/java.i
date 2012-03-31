@@ -85,23 +85,23 @@
 // ---------------------------------------------------------------------------------------------------------------------------------------------
 // main typemaps for "return types" with code converting
 %typemap(out, optimal=1, noblock=1) ublas::matrix<double>, ublas::matrix<double>& {
-    $result = swig::java::getArrayFromMatrix(jenv, $1);
+    $result = swig::java::getArray(jenv, $1);
 }
 
 %typemap(out, optimal=1, noblock=1) std::vector<double>, std::vector<double>& {
-    $result = swig::java::getArrayFromVector(jenv, $1);
+    $result = swig::java::getArray(jenv, $1);
 }
 
 %typemap(out, optimal=1, noblock=1) ublas::indirect_array<>, ublas::indirect_array<>& {
-    $result = swig::java::getArrayFromIndirectArray(jenv, $1);
+    $result = swig::java::getArray(jenv, $1);
 }
 
 %typemap(out, optimal=1, noblock=1) std::vector< ublas::matrix<double> >, std::vector< ublas::matrix<double> >& {
-    $result = swig::java::getArrayListFromMatrixVector(jenv, $1);
+    $result = swig::java::getArrayList(jenv, $1);
 }
 
 %typemap(out, optimal=1, noblock=1) ublas::symmetric_matrix<double, ublas::upper>, ublas::symmetric_matrix<double, ublas::upper>& {
-    $result = swig::java::getArrayFromMatrix(jenv, static_cast< ublas::matrix<double> >($1));
+    $result = swig::java::getArray(jenv, static_cast< ublas::matrix<double> >($1));
 }
 
 %typemap(out, optimal=1, noblock=1) std::size_t, std::size_t& {
