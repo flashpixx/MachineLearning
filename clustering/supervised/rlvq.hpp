@@ -39,7 +39,9 @@
 
 namespace machinelearning { namespace clustering { namespace supervised {
     
+    #ifndef SWIG
     namespace ublas   = boost::numeric::ublas;
+    #endif
     
     
     /** class for calculate relevance vector quantisation (RLVQ).

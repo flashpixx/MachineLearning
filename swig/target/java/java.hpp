@@ -54,10 +54,19 @@ namespace machinelearning { namespace swig {
             
             static ublas::matrix<double> getDoubleMatrixFrom2DArray( JNIEnv*, const jobjectArray& );
             static ublas::matrix<float> getFloatMatrixFrom2DArray( JNIEnv*, const jobjectArray& );
+            
             static jobjectArray getArrayFromMatrix( JNIEnv*, const ublas::matrix<double>&, const rowtype& = row );
             static jobjectArray getArrayFromMatrix( JNIEnv*, const ublas::matrix<float>&, const rowtype& = row );
             static jobjectArray getArrayFromVector( JNIEnv*, const ublas::vector<double>& );
             static jobjectArray getArrayFromVector( JNIEnv*, const ublas::vector<float>& );
+            static jobjectArray getArrayFromVector( JNIEnv*, const std::vector<double>& );
+            static jobjectArray getArrayFromVector( JNIEnv*, const std::vector<float>& );
+            
+            static jobjectArray getArrayFromIndirectArray( JNIEnv*, const ublas::indirect_array<>& );
+            
+            static jobject getArrayListFromMatrixVector( JNIEnv*, const std::vector< ublas::matrix<double> >&, const rowtype& = row );
+            static jobject getArrayListFromMatrixVector( JNIEnv*, const std::vector< ublas::matrix<float> >&, const rowtype& = row );
+        
             static std::string getString( JNIEnv*, const jstring );
             static std::vector<std::string> getStringVectorFromArray( JNIEnv*, const jobjectArray& );
         
@@ -223,7 +232,6 @@ namespace machinelearning { namespace swig {
      * @param p_data input data matrix
      * @param p_rowtype row type
      * @return java array / or a null object if the matrix is empty
-     * @todo add numerical zero change
      **/
     inline jobjectArray java::getArrayFromMatrix( JNIEnv* p_env, const ublas::matrix<double>& p_data, const rowtype& p_rowtype )
     {
@@ -279,7 +287,6 @@ namespace machinelearning { namespace swig {
      * @param p_data input data matrix
      * @param p_rowtype row type
      * @return java array / or a null object if the matrix is empty
-     * @todo add numerical zero change
      **/
     inline jobjectArray java::getArrayFromMatrix( JNIEnv* p_env, const ublas::matrix<float>& p_data, const rowtype& p_rowtype )
     {
@@ -334,7 +341,6 @@ namespace machinelearning { namespace swig {
      * @param p_env JNI environment
      * @param p_data vector
      * @return java array
-     * @todo add numerical zero change
      **/
     inline jobjectArray java::getArrayFromVector( JNIEnv* p_env, const ublas::vector<double>& p_data )
     {
@@ -357,7 +363,6 @@ namespace machinelearning { namespace swig {
      * @param p_env JNI environment
      * @param p_data vector
      * @return java array
-     * @todo add numerical zero change
      **/
     inline jobjectArray java::getArrayFromVector( JNIEnv* p_env, const ublas::vector<float>& p_data )
     {
@@ -376,10 +381,134 @@ namespace machinelearning { namespace swig {
     }
     
     
+    /** converts a std::vector to a java array
+     * @param p_env JNI environment
+     * @param p_data vector
+     * @return java array
+     **/
+    inline jobjectArray java::getArrayFromVector( JNIEnv* p_env, const std::vector<double>& p_data )
+    {
+        if (p_data.size() == 0)
+            return (jobjectArray)p_env->NewGlobalRef(NULL);
+        
+        jclass l_elementclass   = NULL;
+        jmethodID l_elementctor = NULL;
+        getCtor(p_env, "java/lang/Double", "(D)V", l_elementclass, l_elementctor);
+        
+        jobjectArray l_vec = p_env->NewObjectArray( static_cast<jint>(p_data.size()), l_elementclass, NULL );
+        for(std::size_t i=0; i < p_data.size(); ++i)
+            p_env->SetObjectArrayElement(l_vec, i, p_env->NewObject(l_elementclass, l_elementctor, tools::function::isNumericalZero(p_data(i)) ? static_cast<double>(0) : p_data(i)) );
+        
+        return l_vec;
+    }
+    
+    
+    /** converts a std::vector to a java array
+     * @param p_env JNI environment
+     * @param p_data vector
+     * @return java array
+     **/
+    inline jobjectArray java::getArrayFromVector( JNIEnv* p_env, const std::vector<float>& p_data )
+    {
+        if (p_data.size() == 0)
+            return (jobjectArray)p_env->NewGlobalRef(NULL);
+        
+        jclass l_elementclass   = NULL;
+        jmethodID l_elementctor = NULL;
+        getCtor(p_env, "java/lang/Float", "(F)V", l_elementclass, l_elementctor);
+        
+        jobjectArray l_vec = p_env->NewObjectArray( static_cast<jint>(p_data.size()), l_elementclass, NULL );
+        for(std::size_t i=0; i < p_data.size(); ++i)
+            p_env->SetObjectArrayElement(l_vec, i, p_env->NewObject(l_elementclass, l_elementctor, tools::function::isNumericalZero(p_data(i)) ? static_cast<float>(0) : p_data(i)) );
+        
+        return l_vec;
+    }
+    
+    
+    /** converts a ublas::indirect_array to a Long array
+     * @param p_env JNI environment
+     * @param p_data indirect array
+     * @return java array
+     **/
+    inline jobjectArray java::getArrayFromIndirectArray( JNIEnv* p_env, const ublas::indirect_array<>& p_data ) {
+        if (p_data.size() == 0)
+            return (jobjectArray)p_env->NewGlobalRef(NULL);
+        
+        jclass l_elementclass   = NULL;
+        jmethodID l_elementctor = NULL;
+        getCtor(p_env, "java/lang/Long", "(J)V", l_elementclass, l_elementctor);
+        
+        jobjectArray l_vec = p_env->NewObjectArray( static_cast<jint>(p_data.size()), l_elementclass, NULL );
+        for(std::size_t i=0; i < p_data.size(); ++i)
+            p_env->SetObjectArrayElement(l_vec, i, p_env->NewObject(l_elementclass, l_elementctor, p_data(i)) );
+        
+        return l_vec;
+    }
+    
+    
+    /** convert a std::vector of ublas::matrix to a ArrayList of Double[][]
+     * @param p_env JNI environment
+     * @param p_data vector with matrix
+     * @param p_rowtype row type of the matrix
+     * @return array list object
+     **/
+    inline jobject java::getArrayListFromMatrixVector( JNIEnv* p_env, const std::vector< ublas::matrix<double> >& p_data, const rowtype& p_rowtype ) {
+        if (p_data.size() == 0)
+            return (jobject)p_env->NewGlobalRef(NULL);
+        
+        // create ArrayList
+        jclass l_elementclass   = NULL;
+        jmethodID l_elementctor = NULL;
+        getCtor(p_env, "java/util/ArrayList", "(I)V", l_elementclass, l_elementctor);
+        
+        jobject l_list = p_env->NewObject( static_cast<jint>(p_data.size()), l_elementclass, NULL );
+        
+        // get add method of the ArrayList        
+        jmethodID l_add = getMethodID(p_env, "java/util/ArrayList", "add", "(Ljava/lang/Object;)Z"); 
+        
+        
+        for(std::size_t n=0; n < p_data.size(); ++n) {
+            
+        }
+        
+        return l_list;
+    }
+    
+    
+    /** convert a std::vector of ublas::matrix to a ArrayList of Double[][]
+     * @param p_env JNI environment
+     * @param p_data vector with matrix
+     * @param p_rowtype row type of the matrix
+     * @return array list object
+     **/
+    inline jobject java::getArrayListFromMatrixVector( JNIEnv* p_env, const std::vector< ublas::matrix<float> >& p_data, const rowtype& p_rowtype ) {
+        if (p_data.size() == 0)
+            return (jobject)p_env->NewGlobalRef(NULL);
+        
+        // create ArrayList
+        jclass l_elementclass   = NULL;
+        jmethodID l_elementctor = NULL;
+        getCtor(p_env, "java/util/ArrayList", "(I)V", l_elementclass, l_elementctor);
+        
+        jobject l_list = p_env->NewObject( static_cast<jint>(p_data.size()), l_elementclass, NULL );
+        
+        // get add method of the ArrayList        
+        jmethodID l_add = getMethodID(p_env, "java/util/ArrayList", "add", "(Ljava/lang/Object;)Z"); 
+        
+        
+        
+        for(std::size_t n=0; n < p_data.size(); ++n) {
+            
+        }
+        
+        return l_list;
+    }
+    
+    
     /** converts a jstring into a std::string
      * @param p_env JNI environment
      * @param p_data jstring
-     ** @return std::string
+     * @return std::string
      **/
     inline std::string java::getString( JNIEnv* p_env, const jstring p_data ) {
         return std::string(p_env->GetStringUTFChars(p_data, NULL));

@@ -38,7 +38,9 @@
 
 namespace machinelearning { namespace dimensionreduce { namespace supervised {
     
+    #ifndef SWIG
     namespace ublas  = boost::numeric::ublas;
+    #endif
     
     
     /** class for projection the (Fisher) lineare discriminant analysis (LDA)

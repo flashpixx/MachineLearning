@@ -45,10 +45,13 @@
 
 namespace machinelearning { namespace clustering { namespace nonsupervised {
     
+    #ifndef SWIG
     namespace ublas = boost::numeric::ublas;
     #ifdef MACHINELEARNING_MPI
     namespace mpi   = boost::mpi;
     #endif
+    #endif
+    
     
     /** class for calculate (batch) relational neural gas with pseudo-euclidian data space
      * $LastChangedDate$
@@ -93,7 +96,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         , public mpiclustering<T>
         #endif
     {
-        BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
         
         public:
         

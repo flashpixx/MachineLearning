@@ -39,8 +39,10 @@
 
 namespace machinelearning { namespace clustering { namespace nonsupervised {
     
+    #ifndef SWIG
     namespace ublas = boost::numeric::ublas;
     namespace blas  = boost::numeric::bindings::blas;
+    #endif
     
     
     /** class for normalized spectral clustering. This class calculates only the graph laplacian
@@ -53,7 +55,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> class spectralclustering : public clustering<T>
     {
-        
         
         public :
             

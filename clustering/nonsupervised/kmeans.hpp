@@ -40,7 +40,9 @@
 
 namespace machinelearning { namespace clustering { namespace nonsupervised {
     
+    #ifndef SWIG
     namespace ublas = boost::numeric::ublas;
+    #endif
     
     
     /** class for calculate (batch) k-means

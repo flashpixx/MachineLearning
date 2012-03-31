@@ -40,6 +40,14 @@
 %typemap(jtype)     ublas::symmetric_matrix<double, ublas::upper>,  ublas::symmetric_matrix<double, ublas::upper>&  "Double[][]"
 %typemap(jstype)    ublas::symmetric_matrix<double, ublas::upper>,  ublas::symmetric_matrix<double, ublas::upper>&  "Double[][]"
 
+%typemap(jni)       std::vector<double>,                            std::vector<double>&                            "jobjectArray"
+%typemap(jtype)     std::vector<double>,                            std::vector<double>&                            "Double[]"
+%typemap(jstype)    std::vector<double>,                            std::vector<double>&                            "Double[]"
+
+%typemap(jni)       std::vector< ublas::matrix<double> >,           std::vector< ublas::matrix<double> >&           "jobject"
+%typemap(jtype)     std::vector< ublas::matrix<double> >,           std::vector< ublas::matrix<double> >&           "java.util.ArrayList<Double[][]>"
+%typemap(jstype)    std::vector< ublas::matrix<double> >,           std::vector< ublas::matrix<double> >&           "java.util.ArrayList<Double[][]>"
+
 %typemap(jni)       std::vector<std::string>,                       std::vector<std::string>&                       "jobjectArray"
 %typemap(jtype)     std::vector<std::string>,                       std::vector<std::string>&                       "String[]"
 %typemap(jstype)    std::vector<std::string>,                       std::vector<std::string>&                       "String[]"
@@ -47,6 +55,10 @@
 %typemap(jni)       std::size_t,                                    std::size_t&                                    "jlong"
 %typemap(jtype)     std::size_t,                                    std::size_t&                                    "long"
 %typemap(jstype)    std::size_t,                                    std::size_t&                                    "long"
+
+%typemap(jni)       ublas::indirect_array<>,                        ublas::indirect_array<>&                        "jlong"
+%typemap(jtype)     ublas::indirect_array<>,                        ublas::indirect_array<>&                        "Long[]"
+%typemap(jstype)    ublas::indirect_array<>,                        ublas::indirect_array<>&                        "Long[]"
 
 %typemap(jni)       std::string,                                    std::string&                                    "jstring"
 %typemap(jtype)     std::string,                                    std::string&                                    "String"
@@ -73,6 +85,18 @@
 // main typemaps for "return types" with code converting
 %typemap(out, optimal=1, noblock=1) ublas::matrix<double>, ublas::matrix<double>& {
     $result = swig::java::getArrayFromMatrix(jenv, $1);
+}
+
+%typemap(out, optimal=1, noblock=1) std::vector<double>, std::vector<double>& {
+    $result = swig::java::getArrayFromVector(jenv, $1);
+}
+
+%typemap(out, optimal=1, noblock=1) ublas::indirect_array<>, ublas::indirect_array<>& {
+    $result = swig::java::getArrayFromIndirectArray(jenv, $1);
+}
+
+%typemap(out, optimal=1, noblock=1) std::vector< ublas::matrix<double> >, std::vector< ublas::matrix<double> >& {
+    $result = swig::java::getArrayListFromMatrixVector(jenv, $1);
 }
 
 %typemap(out, optimal=1, noblock=1) ublas::symmetric_matrix<double, ublas::upper>, ublas::symmetric_matrix<double, ublas::upper>& {
