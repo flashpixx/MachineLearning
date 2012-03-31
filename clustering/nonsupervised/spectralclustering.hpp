@@ -167,6 +167,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * @todo moved graph laplacian to lapack
      **/
     template<typename T> inline ublas::matrix<T> spectralclustering<T>::getEigNormalizedGraphLaplacian( const ublas::matrix<T>& p_similarity ) const {
+        if (p_similarity.size1() != p_similarity.size2())
+            throw exception::runtime(_("matrix must be square"), *this);
+        
         // create squared degree and normalized graph laplacian
         const ublas::matrix<T> l_sqrtdegree   = tools::matrix::pow( static_cast< ublas::matrix<T> >(tools::matrix::diag(tools::matrix::sum(p_similarity))), static_cast<T>(-0.5));
         const ublas::matrix<T> l_tmp          = ublas::prod(l_sqrtdegree, p_similarity);
@@ -201,8 +204,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> inline void spectralclustering<T>::train( const ublas::matrix<T>& p_similarity, const std::size_t& p_iterations )
     {
-        if (p_similarity.size1() != p_similarity.size2())
-            throw exception::runtime(_("matrix must be square"), *this);
         if (p_similarity.size2() < m_kmeans.getPrototypeCount())
             throw exception::runtime(_("data and prototype dimension are not equal"), *this);
 
