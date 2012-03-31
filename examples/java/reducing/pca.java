@@ -75,6 +75,12 @@ public class pca {
                 System.out.println("");
             }
         
+        
+        // delete manually the PCA object (call destructor), should be
+        // do the finalizer, but there is no guarantee.
+        l_pca.delete();
+        
+        
         // set objects to null for gc removing
         l_pca    = null;
         l_result = null;
