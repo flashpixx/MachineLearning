@@ -60,7 +60,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             
             spectralclustering( const std::size_t&, const std::size_t& );
             void train( const ublas::matrix<T>&, const std::size_t& );
-            void train( const ublas::matrix<T>&, const std::size_t&, const T& );
             ublas::matrix<T> getPrototypes( void ) const;
             void setLogging( const bool& );
             std::vector< ublas::matrix<T> > getLoggedPrototypes( void ) const;
@@ -75,6 +74,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
 
 
         private :
+        
+            ublas::matrix<T> getGraphLaplacian( const ublas::matrix<T>& ) const;
         
             /** distance object for ng **/
             const distances::euclid<T> m_distance;
@@ -160,19 +161,11 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     }    
     
     
-    /** cluster the graph with the <strong>normalized</strong> graph laplacian
-     * @todo copy function for matrix must be optimized
+    /** creates the <strong>normalized</strong> graph laplacian
      * @param p_similarity similarity NxN matrix, needs to be squared and non-negative
-     * @param p_iterations number of iterations
+     * @return graph laplacian matrix
      **/
-    template<typename T> inline void spectralclustering<T>::train( const ublas::matrix<T>& p_similarity, const std::size_t& p_iterations )
-    {
-        if (p_similarity.size1() != p_similarity.size2())
-            throw exception::runtime(_("matrix must be square"), *this);
-        if (p_similarity.size2() < m_kmeans.getPrototypeCount())
-            throw exception::runtime(_("data and prototype dimension are not equal"), *this);
-
-        
+    template<typename T> inline ublas::matrix<T> spectralclustering<T>::getGraphLaplacian( const ublas::matrix<T>& p_similarity ) const {
         // create squared degree and normalized graph laplacian
         const ublas::matrix<T> l_sqrtdegree   = tools::matrix::pow( static_cast< ublas::matrix<T> >(tools::matrix::diag(tools::matrix::sum(p_similarity))), static_cast<T>(-0.5));
         const ublas::matrix<T> l_tmp          = ublas::prod(l_sqrtdegree, p_similarity);
@@ -182,7 +175,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         ublas::vector<T> l_eigenvalue;
         ublas::matrix<T> l_eigenvector;
         tools::lapack::eigen( l_laplacian, l_eigenvalue, l_eigenvector );
-         
+        
         // ranking eigenvalues and get the k smallest for the eigenvectors
         const ublas::indirect_array<> l_rank = tools::vector::rankIndex<T>(l_eigenvalue);
         
@@ -195,9 +188,25 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             ublas::row(l_eigenmatrix, i)  = ublas::element_div( ublas::column(l_eigenvector, l_rank(i)), l_sum );
             ublas::row(l_eigenmatrix, i) /= blas::nrm2( static_cast< ublas::vector<T> >(ublas::row(l_eigenmatrix, i)) ); 
         }
-            
+        
+        return l_eigenmatrix;
+    }
+    
+    
+    /** cluster the graph with the <strong>normalized</strong> graph laplacian
+     * @todo copy function for matrix must be optimized
+     * @param p_similarity similarity NxN matrix, needs to be squared and non-negative
+     * @param p_iterations number of iterations
+     **/
+    template<typename T> inline void spectralclustering<T>::train( const ublas::matrix<T>& p_similarity, const std::size_t& p_iterations )
+    {
+        if (p_similarity.size1() != p_similarity.size2())
+            throw exception::runtime(_("matrix must be square"), *this);
+        if (p_similarity.size2() < m_kmeans.getPrototypeCount())
+            throw exception::runtime(_("data and prototype dimension are not equal"), *this);
+
         // clustering
-        m_kmeans.train(l_eigenmatrix, p_iterations);
+        m_kmeans.train( getGraphLaplacian(p_similarity), p_iterations );
     }
     
         
