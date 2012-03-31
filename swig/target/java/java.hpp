@@ -38,6 +38,7 @@ namespace machinelearning { namespace swig {
      * numericial structurs of Java to C++ UBlas (both ways), it is called by
      * the SWIG fragment calls
      * $LastChangedDate$
+     * @todo catching exception and pipe them to Java (use Swig calls)
      * @todo add copy process with OpenMP
      **/
     class java {
@@ -279,7 +280,7 @@ namespace machinelearning { namespace swig {
         
         jobjectArray l_vec = p_env->NewObjectArray( static_cast<jint>(p_data.size()), l_elementclass, NULL );
         for(std::size_t i=0; i < p_data.size(); ++i)
-            p_env->SetObjectArrayElement(l_vec, i, p_env->NewObject(l_elementclass, l_elementctor, tools::function::isNumericalZero(p_data(i)) ? static_cast<double>(0) : p_data(i)) );
+            p_env->SetObjectArrayElement(l_vec, i, p_env->NewObject(l_elementclass, l_elementctor, tools::function::isNumericalZero(p_data[i]) ? static_cast<double>(0) : p_data[i]) );
         
         return l_vec;
     }
@@ -327,9 +328,71 @@ namespace machinelearning { namespace swig {
         jmethodID l_add = getMethodID(p_env, l_list, "add", "(Ljava/lang/Object;)Z"); 
         
         
-        for(std::size_t n=0; n < p_data.size(); ++n) {
-            
+        // get Double object
+        jclass l_doubleelementclass   = NULL;
+        jmethodID l_doubleelementctor = NULL;
+        getCtor(p_env, "java/lang/Double", "(D)V", l_doubleelementclass, l_doubleelementctor);
+        
+        
+        switch (p_rowtype) {
+                
+            case row: {
+                
+                for(std::size_t n=0; n < p_data.size(); ++n) {
+                    
+                    if ( (p_data[n].size1() == 0) || (p_data[n].size2() == 0) ) {
+                        p_env->CallObjectMethod( l_list, l_add, p_env->NewGlobalRef(NULL) );
+                        continue;
+                    }
+                    
+                    // create the row array
+                    jobjectArray l_row = p_env->NewObjectArray( static_cast<jint>(p_data[n].size1()), p_env->FindClass("[Ljava/lang/Double;"), NULL );
+                    for(std::size_t i=0; i < p_data[n].size1(); ++i) {
+                        
+                        // create column array and fill data into the double java object
+                        jobjectArray l_col = p_env->NewObjectArray( static_cast<jint>(p_data[n].size2()), l_doubleelementclass, NULL );
+                        for(std::size_t j=0; j < p_data[n].size2(); ++j)
+                            p_env->SetObjectArrayElement(l_col, j, p_env->NewObject(l_doubleelementclass, l_doubleelementctor, tools::function::isNumericalZero(p_data[n](i,j)) ? static_cast<double>(0) : p_data[n](i,j) ) );
+                        p_env->SetObjectArrayElement(l_row, i, l_col);
+                    }
+                    
+                    p_env->CallObjectMethod( l_list, l_add, (jobject)l_row );
+                }
+                
+                break;
+            }
+                
+                
+                
+            case column: {
+                
+                for(std::size_t n=0; n < p_data.size(); ++n) {
+                    
+                    if ( (p_data[n].size1() == 0) || (p_data[n].size2() == 0) ) {
+                        p_env->CallObjectMethod( l_list, l_add, p_env->NewGlobalRef(NULL) );
+                        continue;
+                    }
+                    
+                    // create the row array
+                    jobjectArray l_row = p_env->NewObjectArray( static_cast<jint>(p_data[n].size2()), p_env->FindClass("[Ljava/lang/Double;"), NULL );
+                    for(std::size_t i=0; i < p_data[n].size2(); ++i) {
+                        
+                        // create column array and fill data into the double java object
+                        jobjectArray l_col = p_env->NewObjectArray( static_cast<jint>(p_data[n].size1()), l_doubleelementclass, NULL );
+                        for(std::size_t j=0; j < p_data[n].size1(); ++j)
+                            p_env->SetObjectArrayElement(l_col, j, p_env->NewObject(l_doubleelementclass, l_doubleelementctor,tools::function::isNumericalZero(p_data[n](i,j)) ? static_cast<double>(0) : p_data[n](i,j)) );
+                        
+                        p_env->SetObjectArrayElement(l_row, i, l_col);
+                    }
+                    
+                    p_env->CallObjectMethod( l_list, l_add, (jobject)l_row );
+                }
+                
+                break;
+            }
+                
         }
+        
         
         return l_list;
     }
