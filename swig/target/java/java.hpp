@@ -70,6 +70,7 @@ namespace machinelearning { namespace swig {
             static std::string getString( JNIEnv*, const jstring );
             static std::vector<std::string> getStringVectorFromArray( JNIEnv*, const jobjectArray& );
         
+        
         private :
         
             static jmethodID getMethodID(JNIEnv*, const jobject&, const char*, const char*);
@@ -464,7 +465,7 @@ namespace machinelearning { namespace swig {
         jobject l_list = p_env->NewObject( static_cast<jint>(p_data.size()), l_elementclass, NULL );
         
         // get add method of the ArrayList        
-        jmethodID l_add = getMethodID(p_env, "java/util/ArrayList", "add", "(Ljava/lang/Object;)Z"); 
+        jmethodID l_add = getMethodID(p_env, l_list, "add", "(Ljava/lang/Object;)Z"); 
         
         
         for(std::size_t n=0; n < p_data.size(); ++n) {
@@ -493,7 +494,7 @@ namespace machinelearning { namespace swig {
         jobject l_list = p_env->NewObject( static_cast<jint>(p_data.size()), l_elementclass, NULL );
         
         // get add method of the ArrayList        
-        jmethodID l_add = getMethodID(p_env, "java/util/ArrayList", "add", "(Ljava/lang/Object;)Z"); 
+        jmethodID l_add = getMethodID(p_env, l_list, "add", "(Ljava/lang/Object;)Z"); 
         
         
         
@@ -514,6 +515,12 @@ namespace machinelearning { namespace swig {
         return std::string(p_env->GetStringUTFChars(p_data, NULL));
     }
     
+    
+    /** converts a Java String array to a std::vector<std::string>
+     * @param p_env JNI environment
+     * @param p_data Java array
+     * @return string vector
+     **/
     inline std::vector<std::string> java::getStringVectorFromArray( JNIEnv* p_env, const jobjectArray& p_data ) {
         std::vector<std::string> l_data;
         

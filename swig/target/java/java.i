@@ -56,7 +56,7 @@
 %typemap(jtype)     std::size_t,                                    std::size_t&                                    "long"
 %typemap(jstype)    std::size_t,                                    std::size_t&                                    "long"
 
-%typemap(jni)       ublas::indirect_array<>,                        ublas::indirect_array<>&                        "jlong"
+%typemap(jni)       ublas::indirect_array<>,                        ublas::indirect_array<>&                        "jobjectArray"
 %typemap(jtype)     ublas::indirect_array<>,                        ublas::indirect_array<>&                        "Long[]"
 %typemap(jstype)    ublas::indirect_array<>,                        ublas::indirect_array<>&                        "Long[]"
 
@@ -67,12 +67,13 @@
 
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------
-// input type, so that the value type will be passed through  to the JNI (connection Java proxy class to Java main class)
+// input type, so that the value type will be passed through to the JNI (connection JNI to Java proxy class)
 %typemap(javain)    ublas::matrix<double>,                          ublas::matrix<double>&                          "$javainput"
 %typemap(javain)    ublas::symmetric_matrix<double, ublas::upper>,  ublas::symmetric_matrix<double, ublas::upper>&  "$javainput"
 %typemap(javain)    std::size_t,                                    std::size_t&                                    "$javainput"
 %typemap(javain)    std::string,                                    std::string&                                    "$javainput"
 %typemap(javain)    std::vector<std::string>,                       std::vector<std::string>&                       "$javainput"
+
 
 // swigtype will be removed by output types
 %typemap(javaout) SWIGTYPE {
