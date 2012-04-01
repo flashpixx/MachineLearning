@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
     ublas::matrix<double> data = source.readBlasMatrix<double>(l_map["inputpath"].as<std::string>(), H5::PredType::NATIVE_DOUBLE);
 
     // create spectral clustering object, set number of prototypes, data size and logging
-    cluster::spectralclustering<double> spectral(l_map["prototype"].as<std::size_t>(), data.size2());
+    cluster::spectralclustering<double> spectral( l_map["prototype"].as<std::size_t>() );
     spectral.setLogging(l_log);
 
     // do clustering
