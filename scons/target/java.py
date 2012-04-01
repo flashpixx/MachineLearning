@@ -30,7 +30,7 @@ Import("*")
 
 # change the library calls under OSX
 def java_osxlinkedlibs(target, source, env) :
-    oFile = open( os.path.join("build", "linkedlibs.txt"), "r" )
+    oFile = open( os.path.join("build", "java", "jar", "linkedlibs.txt"), "r" )
     libs = oFile.read()
     oFile.close()
 
@@ -52,7 +52,7 @@ def java_osxlinkedlibs(target, source, env) :
     change = help.unique(change)
 
     # run the build command on a system shell
-    os.system( "install_name_tool " + " ".join(change) + " " + os.path.join("build", "javalib", "native", env["LIBPREFIX"]+"machinelearning"+env["SHLIBSUFFIX"]) )
+    os.system( "install_name_tool " + " ".join(change) + " " + os.path.join("build", "java", "jar", "lib", "native", env["LIBPREFIX"]+"machinelearning"+env["SHLIBSUFFIX"]) )
     return []
 
 
@@ -60,7 +60,7 @@ def java_osxlinkedlibs(target, source, env) :
 def java_linuxsonames(target, source, env) :
 
     # read all files within the native directory and get the SONAME of each library and change the filename
-    nativepath = os.path.join("build", "javalib", "native")
+    nativepath = os.path.join("build", "java", "jar", "lib", "native")
     for root, dirs, filenames in os.walk(nativepath) :
         for filename in filenames :
             pathfile = os.path.join(nativepath, filename)
@@ -77,14 +77,14 @@ targets = []
 #read all *.i files and call swig for generating Java and Cpp files
 cppsources = []
 interfaces = help.getRekusivFiles( os.path.join("..", "..", "swig", "machinelearning"), ".i")
-targets.append( env.Command( "javalibdir", "", Mkdir(os.path.join("build", "javalib")) ) )
-targets.append( env.Command( "javalibsrcdir", "", Mkdir(os.path.join("build", "javalibsrc")) ) )
-targets.append( env.Command( "libdir", "", Mkdir(os.path.join("build", "lib")) ) )
+targets.append( env.Command( "javalibdir", "", Mkdir(os.path.join("build", "java", "jar", "lib")) ) )
+targets.append( env.Command( "javalibsrcdir", "", Mkdir(os.path.join("build", "java", "jar", "javasrc")) ) )
+targets.append( env.Command( "libdir", "", Mkdir(os.path.join("build", "java", "jar", "nativesrc")) ) )
 
 for i in interfaces :
     package    = ".".join(i.split(os.sep)[3:-1])
-    cppname    = os.path.join("build", "lib", os.path.splitext(i.split(os.sep)[-1])[0] + ".cpp")
-    javatarget = os.path.join("build", "javalibsrc", package.replace(".", os.sep))
+    cppname    = os.path.join("build", "java", "jar", "nativesrc", os.path.splitext(i.split(os.sep)[-1])[0] + ".cpp")
+    javatarget = os.path.join("build", "java", "jar", "javasrc", package.replace(".", os.sep))
     ifacename  = os.sep.join(i.split(os.sep)[2:])
     
     cppsources.append( os.path.join("..", "..", cppname) )
@@ -107,14 +107,14 @@ for i in interfaces :
 #get CPPs and build native library and Java classes
 if env["withlogger"] or env["withrandomdevice"] :
     cppsources.append( "machinelearning.cpp" )
-targets.append( env.SharedLibrary( target=os.path.join("#build", "javalib", "native", "machinelearning"), source=cppsources ) )
-targets.append( env.Java( target=os.path.join("#build", "javalib"), source=os.path.join("#build", "javalibsrc") ) )
+targets.append( env.SharedLibrary( target=os.path.join("#build", "java", "jar", "lib", "native", "machinelearning"), source=cppsources ) )
+targets.append( env.Java( target=os.path.join("#build", "java", "jar", "lib"), source=os.path.join("#build", "java", "jar", "javasrc") ) )
 
 
 
 # on OSX the path of the linked libraries within the libmachinelearning.dylib must be changed to @loader_path/<library>
 if env["PLATFORM"].lower() == "darwin" :
-    targets.append( env.Command("createlibrarynames", "", "otool -L " + os.path.join("build", "javalib", "native", env["LIBPREFIX"]+"machinelearning"+env["SHLIBSUFFIX"]) + " > " + os.path.join("build", "linkedlibs.txt") ) )
+    targets.append( env.Command("createlibrarynames", "", "otool -L " + os.path.join("build", "java", "jar", "lib", "native", env["LIBPREFIX"]+"machinelearning"+env["SHLIBSUFFIX"]) + " > " + os.path.join("build", "java", "jar", "linkedlibs.txt") ) )
     targets.append( env.Command("linkedlibs", "", java_osxlinkedlibs) )
   
 
@@ -143,7 +143,7 @@ for n in libs :
         # remove any symbolic names, so the file in the native directory becomes the original filename
         name = os.path.realpath(libfiles.path).split(os.path.sep)[-1]
 
-        copyfiles.append( Copy(os.path.join("build", "javalib", "native", name), libfiles.path) )
+        copyfiles.append( Copy(os.path.join("build", "java", "jar", "lib", "native", name), libfiles.path) )
 targets.append( env.Command("copyexternallib", "", copyfiles) )
 
 # on Linux all libraries must use the filename, that is set with the "soname" within the library or filename must be changed to "soname"
@@ -151,11 +151,11 @@ if env["PLATFORM"].lower() == "posix" :
     targets.append( env.Command("sonames", "", java_linuxsonames) )
 
 # copy licence
-targets.append( env.Command("license", "", Copy(os.path.join("build", "javalib", "license.txt"), "license.txt")) )
+targets.append( env.Command("license", "", Copy(os.path.join("build", "java", "jar", "lib", "license.txt"), "license.txt")) )
 
 
 #build Jar
-targets.append( env.Command("buildjar", "", "jar cf " + os.path.join("build", "machinelearning.jar") + " -C " + os.path.join("build", "javalib" ) + " .") )
+targets.append( env.Command("buildjar", "", "jar cf " + os.path.join("build", "machinelearning.jar") + " -C " + os.path.join("build", "java", "jar", "lib" ) + " .") )
 targets.append( env.Command("buildjarindex", "", "jar i " + os.path.join("build", "machinelearning.jar") ) )
 
 env.Alias("javac", targets)

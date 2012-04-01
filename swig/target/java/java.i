@@ -52,6 +52,10 @@
 %typemap(jtype)     std::vector<std::string>,                       std::vector<std::string>&                       "String[]"
 %typemap(jstype)    std::vector<std::string>,                       std::vector<std::string>&                       "String[]"
 
+%typemap(jni)       std::vector<std::size_t>,                       std::vector<std::size_t>&                       "jobjectArray"
+%typemap(jtype)     std::vector<std::size_t>,                       std::vector<std::size_t>&                       "long[]"
+%typemap(jstype)    std::vector<std::size_t>,                       std::vector<std::size_t>&                       "long[]"
+
 %typemap(jni)       std::size_t,                                    std::size_t&                                    "jlong"
 %typemap(jtype)     std::size_t,                                    std::size_t&                                    "long"
 %typemap(jstype)    std::size_t,                                    std::size_t&                                    "long"
@@ -73,12 +77,9 @@
 %typemap(javain)    std::size_t,                                    std::size_t&                                    "$javainput"
 %typemap(javain)    std::string,                                    std::string&                                    "$javainput"
 %typemap(javain)    std::vector<std::string>,                       std::vector<std::string>&                       "$javainput"
+%typemap(javain)    std::vector<std::size_t>,                       std::vector<std::size_t>&                       "$javainput"
 
-
-// swigtype will be removed by output types
-%typemap(javaout) SWIGTYPE {
-    return $jnicall;
-}
+%typemap(javaout) SWIGTYPE                                                                                          { return $jnicall; }
 
 
 
@@ -126,6 +127,11 @@
 
 %typemap(in, optimal=1, noblock=1) std::vector<std::string>, std::vector<std::string>& (std::vector<std::string> l_param) {
     l_param = swig::java::getStringVectorFromArray(jenv, $input);
+    $1      = &l_param;
+}
+
+%typemap(in, optimal=1, noblock=1) std::vector<std::size_t>, std::vector<std::size_t>& (std::vector<std::size_t> l_param) {
+    l_param = swig::java::getSizetVectorFromArray(jenv, $input);
     $1      = &l_param;
 }
 

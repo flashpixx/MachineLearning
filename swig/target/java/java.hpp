@@ -66,6 +66,8 @@ namespace machinelearning { namespace swig {
             static std::string getString( JNIEnv*, const jstring );
             static std::vector<std::string> getStringVectorFromArray( JNIEnv*, const jobjectArray& );
         
+            static std::vector<std::size_t> getSizetVectorFromArray( JNIEnv*, const jobjectArray& );
+        
         
         private :
         
@@ -291,7 +293,8 @@ namespace machinelearning { namespace swig {
      * @param p_data indirect array
      * @return java array
      **/
-    inline jobjectArray java::getArray( JNIEnv* p_env, const ublas::indirect_array<>& p_data ) {
+    inline jobjectArray java::getArray( JNIEnv* p_env, const ublas::indirect_array<>& p_data )
+    {
         if (p_data.size() == 0)
             return (jobjectArray)p_env->NewGlobalRef(NULL);
         
@@ -313,7 +316,8 @@ namespace machinelearning { namespace swig {
      * @param p_rowtype row type of the matrix
      * @return array list object
      **/
-    inline jobject java::getArrayList( JNIEnv* p_env, const std::vector< ublas::matrix<double> >& p_data, const rowtype& p_rowtype ) {
+    inline jobject java::getArrayList( JNIEnv* p_env, const std::vector< ublas::matrix<double> >& p_data, const rowtype& p_rowtype )
+    {
         if (p_data.size() == 0)
             return (jobject)p_env->NewGlobalRef(NULL);
         
@@ -403,7 +407,8 @@ namespace machinelearning { namespace swig {
      * @param p_data jstring
      * @return std::string
      **/
-    inline std::string java::getString( JNIEnv* p_env, const jstring p_data ) {
+    inline std::string java::getString( JNIEnv* p_env, const jstring p_data )
+    {
         return std::string(p_env->GetStringUTFChars(p_data, NULL));
     }
     
@@ -413,7 +418,8 @@ namespace machinelearning { namespace swig {
      * @param p_data Java array
      * @return string vector
      **/
-    inline std::vector<std::string> java::getStringVectorFromArray( JNIEnv* p_env, const jobjectArray& p_data ) {
+    inline std::vector<std::string> java::getStringVectorFromArray( JNIEnv* p_env, const jobjectArray& p_data )
+    {
         std::vector<std::string> l_data;
         
         // convert the java array to a ublas matrix (first read the row dimension and than read the first array element, cast it to jobjectArray and get the length)
@@ -426,6 +432,29 @@ namespace machinelearning { namespace swig {
             l_data.push_back( getString(p_env, (jstring)p_env->GetObjectArrayElement(p_data, i)) );
         
         return l_data;
+    }
+    
+    
+    /** convert a Java Long array to a std::vector<std::size_t>
+     * @param p_env JNI environment
+     * @param p_data Java array
+     * @return size_t vector
+     **/
+    inline std::vector<std::size_t> java::getSizetVectorFromArray( JNIEnv* p_env, const jobjectArray& p_data )
+    {
+        std::vector<std::size_t> l_data;
+        
+        // convert the java array to a ublas matrix (first read the row dimension and than read the first array element, cast it to jobjectArray and get the length)
+        const std::size_t l_len = p_env->GetArrayLength(p_data);
+        if (l_len == 0)
+            return l_data;
+        
+        // read array data
+        for(std::size_t i=0; i < l_len; ++i)
+            l_data.push_back( (std::size_t)p_env->GetObjectArrayElement(p_data, i) );
+        
+        return l_data;
+        
     }
     
 }}
