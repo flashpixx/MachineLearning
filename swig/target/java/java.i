@@ -112,9 +112,9 @@
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------
 // main typemaps for "parameter types" with code converting
-%typemap(in, optimal=1) ublas::matrix<double>&, ublas::symmetric_matrix<T, ublas::upper>& {
-    ublas::matrix<double> l_arg = swig::java::getDoubleMatrixFrom2DArray(jenv, $input);
-    $1                          = &l_arg;
+%typemap(in, optimal=1, noblock=1) ublas::matrix<double>& (ublas::matrix<double> l_param) {
+    l_param = swig::java::getDoubleMatrixFrom2DArray(jenv, $input);
+    $1      = &l_param;
 }
 
 // the return parameter must be copy into a local variable (l_param)

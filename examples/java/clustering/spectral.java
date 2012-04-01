@@ -26,7 +26,7 @@ import machinelearning.clustering.nonsupervised.*;
 import java.util.Random;
 
 
-/** java testprogram for using relational neural gas **/
+/** java testprogram for using Spectral Clustering **/
 public class spectral {
     
     
@@ -45,16 +45,17 @@ public class spectral {
                     l_data[i][j] = new Double(0);
                 else
                     l_data[i][j] = l_rand.nextDouble();
+                
                 System.out.print(l_data[i][j] + "\t");
             }
             System.out.println("");
         }
         
-        // create RNG object and train data
-        SpectralClustering l_spectral = new SpectralClustering(4, l_data.length);
+        // create SpectralClustering object and train data
+        SpectralClustering l_spectral = new SpectralClustering(2, l_data.length);
         l_spectral.train(l_data, 10);
         
-        // show RNG prototypes 
+        // show SpectralClustering prototypes 
         Double[][] l_proto = l_spectral.getPrototypes();
         System.out.println("\nprototypes:");
         if (l_proto == null)
@@ -67,7 +68,7 @@ public class spectral {
             }
         
         
-        // delete manually the RNG object (call destructor), should be
+        // delete manually the SpectralClustering object (call destructor), should be
         // do the finalizer, but there is no guarantee.
         l_spectral.delete();
         

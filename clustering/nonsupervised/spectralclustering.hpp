@@ -55,9 +55,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      **/
     template<typename T> class spectralclustering : public clustering<T>
     {
-        
         public :
-            
+
             spectralclustering( const std::size_t&, const std::size_t& );
             void train( const ublas::matrix<T>&, const std::size_t& );
             ublas::matrix<T> getPrototypes( void ) const;
@@ -67,7 +66,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             std::size_t getPrototypeSize( void ) const;
             std::size_t getPrototypeCount( void ) const;
             std::vector<T> getLoggedQuantizationError( void ) const;
-            ublas::indirect_array<> use( const ublas::matrix<T>& ) const { throw exception::classmethod(_("method is not implementated in this class"), *this); };
+            ublas::indirect_array<> use( const ublas::matrix<T>& ) const;
             
             //static std::size_t getEigenGap( const ublas::matrix<T>& ) const;
             //static std::size_t getEigenGap( const ublas::matrix<T>&, const ublas::matrix<T>& ) const;
@@ -75,9 +74,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
 
         private :
         
-            ublas::matrix<T> getEigNormalizedGraphLaplacian( const ublas::matrix<T>& ) const;
+            ublas::matrix<T> getEigenGraphLaplacian( const ublas::matrix<T>& ) const;
         
-            /** distance object for ng **/
+            /** distance object for clustering **/
             const distances::euclid<T> m_distance;
             /** neural gas for clustering the graph laplacian **/
             kmeans<T> m_kmeans;
@@ -161,54 +160,52 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     }    
     
     
-    /** creates the <strong>normalized</strong> graph laplacian
-     * @param p_similarity similarity NxN matrix, needs to be squared and non-negative
-     * @return graph laplacian matrix
-     * @todo moved graph laplacian to lapack
+    /** creates the eigenvectors of the graph laplacian
+     * @param p_adjacency adjacency matrix
+     * @return eigenvectors 
      **/
-    template<typename T> inline ublas::matrix<T> spectralclustering<T>::getEigNormalizedGraphLaplacian( const ublas::matrix<T>& p_similarity ) const {
-        if (p_similarity.size1() != p_similarity.size2())
-            throw exception::runtime(_("matrix must be square"), *this);
-        
-        // create squared degree and normalized graph laplacian
-        const ublas::matrix<T> l_sqrtdegree   = tools::matrix::pow( static_cast< ublas::matrix<T> >(tools::matrix::diag(tools::matrix::sum(p_similarity))), static_cast<T>(-0.5));
-        const ublas::matrix<T> l_tmp          = ublas::prod(l_sqrtdegree, p_similarity);
-        const ublas::matrix<T> l_laplacian    = tools::matrix::eye<T>(p_similarity.size1()) - ublas::prod(l_tmp, l_sqrtdegree);
-        
+    template<typename T> inline ublas::matrix<T> spectralclustering<T>::getEigenGraphLaplacian( const ublas::matrix<T>& p_adjacency ) const {
+        const ublas::matrix<T> l_laplacian = tools::matrix::normalizedGraphLaplacian( p_adjacency );
+
         // determine eigenvalues and -vector of the graph laplacian
         ublas::vector<T> l_eigenvalue;
         ublas::matrix<T> l_eigenvector;
         tools::lapack::eigen( l_laplacian, l_eigenvalue, l_eigenvector );
-        
+         
         // ranking eigenvalues and get the k smallest for the eigenvectors
         const ublas::indirect_array<> l_rank = tools::vector::rankIndex<T>(l_eigenvalue);
         
-        // extrakt the k eigenvectors, change the normalized laplacian back and normalize
+        // extrakt the k eigenvectors
         ublas::matrix<T> l_eigenmatrix(m_kmeans.getPrototypeCount(), l_laplacian.size1());
-        const ublas::vector<T> l_sum = tools::matrix::sum(p_similarity);
         
         #pragma omp parallel for shared(l_eigenmatrix)
-        for(std::size_t i=0; i < m_kmeans.getPrototypeCount(); ++i) {
-            ublas::row(l_eigenmatrix, i)  = ublas::element_div( ublas::column(l_eigenvector, l_rank(i)), l_sum );
-            ublas::row(l_eigenmatrix, i) /= blas::nrm2( static_cast< ublas::vector<T> >(ublas::row(l_eigenmatrix, i)) ); 
-        }
+        for(std::size_t i=0; i < m_kmeans.getPrototypeCount(); ++i)
+            ublas::row(l_eigenmatrix, i)  = ublas::column(l_eigenvector, l_rank(i));
         
         return l_eigenmatrix;
     }
     
     
     /** cluster the graph with the <strong>normalized</strong> graph laplacian
-     * @todo copy function for matrix must be optimized
-     * @param p_similarity similarity NxN matrix, needs to be squared and non-negative
+     * @param p_matrix adjacency / distance matrix
      * @param p_iterations number of iterations
      **/
-    template<typename T> inline void spectralclustering<T>::train( const ublas::matrix<T>& p_similarity, const std::size_t& p_iterations )
+    template<typename T> inline void spectralclustering<T>::train( const ublas::matrix<T>& p_matrix, const std::size_t& p_iterations )
     {
-        if (p_similarity.size2() < m_kmeans.getPrototypeCount())
+        if (p_matrix.size2() < m_kmeans.getPrototypeCount())
             throw exception::runtime(_("data and prototype dimension are not equal"), *this);
-
-        // clustering
-        m_kmeans.train( getEigNormalizedGraphLaplacian(p_similarity), p_iterations );
+                
+        m_kmeans.train( getEigenGraphLaplacian(p_matrix), p_iterations );
+    }
+    
+    
+    /** returns the index for each datapoint to the prototype
+     * @param p_data input matrix
+     * @return array with index values
+     **/
+    template<typename T> inline ublas::indirect_array<> spectralclustering<T>::use( const ublas::matrix<T>& p_data ) const
+    {
+        return m_kmeans.use(p_data);
     }
     
         

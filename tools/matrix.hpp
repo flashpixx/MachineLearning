@@ -65,12 +65,14 @@ namespace machinelearning { namespace tools {
             template<typename T> static ublas::mapped_matrix<T> eye( const std::size_t&, const std::size_t&, const T& = 1 );
             template<typename T> static ublas::mapped_matrix<T> eye( const std::size_t& );
             template<typename T> static ublas::matrix<T> pow( const ublas::matrix<T>&, const T& );
+            template<typename T> static ublas::vector<T> max( const ublas::matrix<T>&, const rowtype& = row );
             template<typename T> static ublas::vector<T> min( const ublas::matrix<T>&, const rowtype& = row );
             template<typename T> static ublas::vector<T> mean( const ublas::matrix<T>&, const rowtype& = row );
             template<typename T> static ublas::vector<T> sum( const ublas::matrix<T>&, const rowtype& = row );
             template<typename T> static ublas::mapped_matrix<T> diag( const ublas::vector<T>& );
             template<typename T> static ublas::vector<T> diag( const ublas::matrix<T>& );
             template<typename T> static T trace( const ublas::matrix<T>& );
+            template<typename T> static ublas::matrix<T> normalizedGraphLaplacian( const ublas::matrix<T>& );
             template<typename T> static ublas::matrix<T> doublecentering( const ublas::matrix<T>& );
             template<typename T> static ublas::matrix<T> centering( const ublas::matrix<T>&, const rowtype& = column );
             template<typename T> static ublas::matrix<T> sort( const ublas::matrix<T>&, const ublas::vector<std::size_t>&, const rowtype& p_which = row);
@@ -307,6 +309,7 @@ namespace machinelearning { namespace tools {
         #pragma omp parallel for shared(l_mat)
         for(std::size_t i=0; i < p_vec.size(); ++i)
             l_mat(i,i) = p_vec(i);
+        
         return l_mat;
     }
     
@@ -350,8 +353,57 @@ namespace machinelearning { namespace tools {
         for(std::size_t i=0; i < l_mat.size1(); ++i)
             for(std::size_t j=0; j < l_mat.size2(); ++j)
                 l_mat(i,j) = std::pow(l_mat(i,j), p_ex);
-        
+
         return l_mat;
+    }
+    
+    
+    /** returns a vector with the maximum values of each row or column
+     * @param p_matrix input matrix
+     * @param p_which row or column
+     * @return maximum vector
+     **/
+    template<typename T> inline ublas::vector<T> matrix::max( const ublas::matrix<T>& p_matrix, const rowtype& p_which )
+    {
+        ublas::vector<T> l_max( (p_which==row) ? p_matrix.size1() : p_matrix.size2() );
+        
+        switch (p_which) {                
+            case row :
+                #pragma omp parallel for shared(l_max)
+                for(std::size_t i=0; i < p_matrix.size1(); ++i)
+                    l_max(i) = vector::max( static_cast< ublas::vector<T> >(ublas::row(p_matrix, i)) );
+                break;
+                
+            case column :
+                #pragma omp parallel for shared(l_max)
+                for(std::size_t i=0; i < p_matrix.size2(); ++i)
+                    l_max(i) = vector::max( static_cast< ublas::vector<T> >(ublas::column(p_matrix, i)) );
+                break;
+        }
+        
+        return l_max;
+    }
+
+    
+    /** creates the normalized graph laplacian of a distance matrix
+     * @param p_adjacency adjacency matrix
+     * @return normalized graph laplacian
+     **/
+    template<typename T> inline ublas::matrix<T> matrix::normalizedGraphLaplacian( const ublas::matrix<T>& p_adjacency )
+    {
+        if (p_adjacency.size1() != p_adjacency.size2())
+            throw exception::runtime(_("matrix must be square"));
+        
+        // change the distance matrix to a degree matrix
+        const ublas::vector<T> l_vertexdegree       = sum(p_adjacency);
+        const ublas::matrix<T> l_degree             = diag(l_vertexdegree);
+        
+        // degree minus adjacency matrix
+        const ublas::matrix<T> l_unnormlaplacian    = l_degree - p_adjacency;
+        
+        // normalized laplacian: multiply l_degree^-1 * l_unnormlaplacian
+        // degree matrix is a diagnomal matrix, so invert the elements and do a matrix product
+        return ublas::prod( invert(l_degree), l_unnormlaplacian );
     }
     
     
@@ -377,7 +429,7 @@ namespace machinelearning { namespace tools {
                     l_sum(i) = ublas::sum( static_cast< ublas::vector<T> >(ublas::column(p_matrix, i)) );
                 break;
         }
-        
+
         return l_sum;
     }
     
