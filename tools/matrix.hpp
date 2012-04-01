@@ -72,7 +72,6 @@ namespace machinelearning { namespace tools {
             template<typename T> static ublas::mapped_matrix<T> diag( const ublas::vector<T>& );
             template<typename T> static ublas::vector<T> diag( const ublas::matrix<T>& );
             template<typename T> static T trace( const ublas::matrix<T>& );
-            template<typename T> static ublas::matrix<T> normalizedGraphLaplacian( const ublas::matrix<T>& );
             template<typename T> static ublas::matrix<T> doublecentering( const ublas::matrix<T>& );
             template<typename T> static ublas::matrix<T> centering( const ublas::matrix<T>&, const rowtype& = column );
             template<typename T> static ublas::matrix<T> sort( const ublas::matrix<T>&, const ublas::vector<std::size_t>&, const rowtype& p_which = row);
@@ -384,28 +383,6 @@ namespace machinelearning { namespace tools {
         return l_max;
     }
 
-    
-    /** creates the normalized graph laplacian of a distance matrix
-     * @param p_adjacency adjacency matrix
-     * @return normalized graph laplacian
-     **/
-    template<typename T> inline ublas::matrix<T> matrix::normalizedGraphLaplacian( const ublas::matrix<T>& p_adjacency )
-    {
-        if (p_adjacency.size1() != p_adjacency.size2())
-            throw exception::runtime(_("matrix must be square"));
-        
-        // change the distance matrix to a degree matrix
-        const ublas::vector<T> l_vertexdegree       = sum(p_adjacency);
-        const ublas::matrix<T> l_degree             = diag(l_vertexdegree);
-        
-        // degree minus adjacency matrix
-        const ublas::matrix<T> l_unnormlaplacian    = l_degree - p_adjacency;
-        
-        // normalized laplacian: multiply l_degree^-1 * l_unnormlaplacian
-        // degree matrix is a diagnomal matrix, so invert the elements and do a matrix product
-        return ublas::prod( invert(l_degree), l_unnormlaplacian );
-    }
-    
     
     /** calculates sum of rows or columns
      * @param p_matrix input matrix

@@ -43,10 +43,11 @@
 
 namespace machinelearning { namespace tools {
     
+    #ifndef SWIG
     namespace ublas     = boost::numeric::ublas;
     namespace blas      = boost::numeric::bindings::blas;
     namespace linalg    = boost::numeric::bindings::lapack;
-    
+    #endif
     
     
     /** class for connection LAPACK calls with numerical bindings.
@@ -70,6 +71,8 @@ namespace machinelearning { namespace tools {
             //template<typename T> static ublas::matrix<T> expm( const ublas::matrix<T>& );
             template<typename T> static ublas::vector<T> perronfrobenius( const ublas::matrix<T>&, const std::size_t& );
             template<typename T> static ublas::vector<T> perronfrobenius( const ublas::matrix<T>&, const std::size_t&, const ublas::vector<T>& );
+            template<typename T> static ublas::matrix<T> graphLaplacian( const ublas::matrix<T>& );
+            template<typename T> static ublas::matrix<T> normalizedGraphLaplacian( const ublas::matrix<T>& );
         
     };
 
@@ -244,6 +247,46 @@ namespace machinelearning { namespace tools {
         }
         
         return l_vec;
+    }
+    
+    
+    /** creates the graph laplacian of a distance matrix
+     * @param p_adjacency adjacency matrix
+     * @return graph laplacian
+     **/
+    template<typename T> inline ublas::matrix<T> lapack::graphLaplacian( const ublas::matrix<T>& p_adjacency )
+    {
+        if (p_adjacency.size1() != p_adjacency.size2())
+            throw exception::runtime(_("matrix must be square"));
+        
+        // change the distance matrix to a degree matrix
+        const ublas::vector<T> l_vertexdegree       = matrix::sum(p_adjacency);
+        const ublas::matrix<T> l_degree             = matrix::diag(l_vertexdegree);
+        
+        // degree minus adjacency matrix
+        return l_degree - p_adjacency;
+    }
+    
+    
+    /** creates the normalized graph laplacian of a distance matrix
+     * @param p_adjacency adjacency matrix
+     * @return normalized graph laplacian
+     **/
+    template<typename T> inline ublas::matrix<T> lapack::normalizedGraphLaplacian( const ublas::matrix<T>& p_adjacency )
+    {
+        if (p_adjacency.size1() != p_adjacency.size2())
+            throw exception::runtime(_("matrix must be square"));
+        
+        // change the distance matrix to a degree matrix
+        const ublas::vector<T> l_vertexdegree       = matrix::sum(p_adjacency);
+        const ublas::matrix<T> l_degree             = matrix::diag(l_vertexdegree);
+        
+        // degree minus adjacency matrix
+        const ublas::matrix<T> l_unnormlaplacian    = l_degree - p_adjacency;
+        
+        // normalized laplacian: multiply l_degree^-1 * l_unnormlaplacian
+        // degree matrix is a diagnomal matrix, so invert the elements and do a matrix product
+        return ublas::prod( matrix::invert(l_degree), l_unnormlaplacian );
     }
 
 }}

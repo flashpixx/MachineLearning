@@ -56,8 +56,10 @@
 
 namespace machinelearning { namespace tools {
     
+    #ifndef SWIG
     #ifdef MACHINELEARNING_MPI
     namespace mpi   = boost::mpi;
+    #endif
     #endif
 
     

@@ -164,7 +164,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     template<typename T> inline ublas::matrix<T> spectralclustering<T>::getEigenGraphLaplacian( const ublas::matrix<T>& p_adjacency ) const
     {
         // get the normalized graph laplacian
-        const ublas::matrix<T> l_laplacian = tools::matrix::normalizedGraphLaplacian( p_adjacency );
+        const ublas::matrix<T> l_laplacian = tools::lapack::normalizedGraphLaplacian( p_adjacency );
         
         // determine eigenvalues and -vector of the graph laplacian
         ublas::vector<T> l_eigenvalue;

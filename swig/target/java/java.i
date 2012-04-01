@@ -35,6 +35,10 @@
 %typemap(jtype)     ublas::matrix<double>,                          ublas::matrix<double>&                          "Double[][]"
 %typemap(jstype)    ublas::matrix<double>,                          ublas::matrix<double>&                          "Double[][]"
 
+%typemap(jni)       ublas::vector<double>,                          ublas::vector<double>&                          "jobjectArray"
+%typemap(jtype)     ublas::vector<double>,                          ublas::vector<double>&                          "Double[]"
+%typemap(jstype)    ublas::vector<double>,                          ublas::vector<double>&                          "Double[]"
+
 %typemap(jni)       ublas::symmetric_matrix<double, ublas::upper>,  ublas::symmetric_matrix<double, ublas::upper>&  "jobjectArray"
 %typemap(jtype)     ublas::symmetric_matrix<double, ublas::upper>,  ublas::symmetric_matrix<double, ublas::upper>&  "Double[][]"
 %typemap(jstype)    ublas::symmetric_matrix<double, ublas::upper>,  ublas::symmetric_matrix<double, ublas::upper>&  "Double[][]"
@@ -72,6 +76,7 @@
 // ---------------------------------------------------------------------------------------------------------------------------------------------
 // input type, so that the value type will be passed through to the JNI (connection JNI to Java proxy class)
 %typemap(javain)    ublas::matrix<double>,                          ublas::matrix<double>&                          "$javainput"
+%typemap(javain)    ublas::vector<double>,                          ublas::vector<double>&                          "$javainput"
 %typemap(javain)    ublas::symmetric_matrix<double, ublas::upper>,  ublas::symmetric_matrix<double, ublas::upper>&  "$javainput"
 %typemap(javain)    std::size_t,                                    std::size_t&                                    "$javainput"
 %typemap(javain)    std::string,                                    std::string&                                    "$javainput"
@@ -84,15 +89,10 @@
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------
 // main typemaps for "return types" with code converting
-%typemap(out, optimal=1, noblock=1) ublas::matrix<double>, ublas::matrix<double>& {
-    $result = swig::java::getArray(jenv, $1);
-}
-
-%typemap(out, optimal=1, noblock=1) std::vector<double>, std::vector<double>& {
-    $result = swig::java::getArray(jenv, $1);
-}
-
-%typemap(out, optimal=1, noblock=1) ublas::indirect_array<>, ublas::indirect_array<>& {
+%typemap(out, optimal=1, noblock=1) ublas::matrix<double>, ublas::matrix<double>&,
+                                    ublas::vector<double>, ublas::vector<double>&,
+                                    std::vector<double>, std::vector<double>&,
+                                    ublas::indirect_array<>, ublas::indirect_array<>& {
     $result = swig::java::getArray(jenv, $1);
 }
 
