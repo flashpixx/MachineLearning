@@ -35,6 +35,7 @@ public class spectral {
      **/
     public static void main(String[] p_args)
     {
+        
         // generates random datapoints
         Random l_rand = new Random();
         
@@ -49,10 +50,10 @@ public class spectral {
                 System.out.print(l_data[i][j] + "\t");
             }
             System.out.println("");
-        }
+        }        
         
         // create SpectralClustering object and train data
-        SpectralClustering l_spectral = new SpectralClustering(2, l_data.length);
+        SpectralClustering l_spectral = new SpectralClustering(3);
         l_spectral.train(l_data, 10);
         
         // show SpectralClustering prototypes 
