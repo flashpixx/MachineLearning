@@ -51,7 +51,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * $LastChangedDate$
      * @todo set all routines to sparse matrix if arpack can be used with boost
      * @todo create eigengap heurstic
-     * @bug incomplete (using not implementated)
      **/
     template<typename T> class spectralclustering : public clustering<T>
     {
