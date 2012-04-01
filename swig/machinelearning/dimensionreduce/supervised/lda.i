@@ -33,6 +33,10 @@
 %include "../../../target/java/java.i"
 #endif
 
+#ifdef SWIGPYTHON
+%include "../../../target/python/python.i"
+#endif
+
 
 %include "../../../../dimensionreduce/supervised/lda.hpp"
 %template(LDAString) machinelearning::dimensionreduce::supervised::lda<double, std::string>;

@@ -24,8 +24,10 @@
 #ifndef __MACHINELEARNING_SWIG_JAVA_HPP
 #define __MACHINELEARNING_SWIG_JAVA_HPP
 
+extern "C" {
 #include <jni.h>
-
+}
+    
 #include "machinelearning/machinelearning.h"
 
 

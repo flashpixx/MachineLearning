@@ -34,6 +34,10 @@
 %rename(Lapack) lapack;
 #endif
 
+#ifdef SWIGPYTHON
+%include "../../../target/python/python.i"
+#endif
+
 
 %include "../../../tools/lapack.hpp"
 %template(perronFrobenius) machinelearning::tools::lapack::perronfrobenius<double>;

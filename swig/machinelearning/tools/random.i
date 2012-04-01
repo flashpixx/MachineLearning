@@ -34,6 +34,10 @@
 %rename(Random) random;
 #endif
 
+#ifdef SWIGPYTHON
+%include "../../../target/python/python.i"
+#endif
+
 
 %include "../../../tools/random.hpp"
 %template(get) machinelearning::tools::random::get<double>;

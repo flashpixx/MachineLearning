@@ -33,6 +33,10 @@
 %include "../../../target/java/java.i"
 #endif
 
+#ifdef SWIGPYTHON
+%include "../../../target/python/python.i"
+#endif
+
 
 %include "../../../../clustering/nonsupervised/spectralclustering.hpp"
 %template(SpectralClustering) machinelearning::clustering::nonsupervised::spectralclustering<double>;

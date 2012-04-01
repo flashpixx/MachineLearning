@@ -33,6 +33,10 @@
 %include "../../..//target/java/java.i"
 #endif
 
+#ifdef SWIGPYTHON
+%include "../../../target/python/python.i"
+#endif
+
 
 %include "../../../../dimensionreduce/nonsupervised/mds.hpp"
 %template(MDS) machinelearning::dimensionreduce::nonsupervised::mds<double>;

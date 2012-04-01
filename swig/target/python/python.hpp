@@ -21,22 +21,40 @@
  @endcond
  **/
 
-/** interface file for the NCD
- * $LastChangedDate$
- **/
+#ifndef __MACHINELEARNING_SWIG_PYTHON_HPP
+#define __MACHINELEARNING_SWIG_PYTHON_HPP
+
+extern "C" {
+#include <Python.h>
+}
+    
+#include "machinelearning/machinelearning.h"
 
 
-%module "ncdwrap"
+namespace machinelearning { namespace swig {
+    
+    namespace ublas = boost::numeric::ublas;
+    
+    
+    /** class for generate fragment code, that is used to convert
+     * numericial structurs of Python to C++ UBlas (both ways), it is called by
+     * the SWIG fragment calls
+     * $LastChangedDate$
+     * @todo catching exception and pipe them to Java (use Swig calls)
+     * @todo add copy process with OpenMP
+     **/
+    class python {
+        
+        public :
+        
+            /** row type **/
+            enum rowtype
+            {
+                row     = 0,
+                column  = 1
+            };
 
+    }
 
-#ifdef SWIGJAVA
-%include "../../target/java/java.i"
+}}
 #endif
-
-#ifdef SWIGPYTHON
-%include "../../../target/python/python.i"
-#endif
-
-
-%include "../../../distances/ncd.hpp"
-%template(NCD) machinelearning::distances::ncd<double>;

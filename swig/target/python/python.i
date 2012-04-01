@@ -21,22 +21,8 @@
  @endcond
  **/
 
-/** interface file for the NCD
+
+/** Python interface file for converting Python types and data into C++ 
+ * datatypes and UBlas structurs
  * $LastChangedDate$
  **/
-
-
-%module "ncdwrap"
-
-
-#ifdef SWIGJAVA
-%include "../../target/java/java.i"
-#endif
-
-#ifdef SWIGPYTHON
-%include "../../../target/python/python.i"
-#endif
-
-
-%include "../../../distances/ncd.hpp"
-%template(NCD) machinelearning::distances::ncd<double>;

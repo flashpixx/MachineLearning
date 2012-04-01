@@ -33,6 +33,10 @@
 %include "../../../target/java/java.i"
 #endif
 
+#ifdef SWIGPYTHON
+%include "../../../target/python/python.i"
+#endif
+
 
 %include "../../../../dimensionreduce/nonsupervised/pca.hpp"
 %template(PCA) machinelearning::dimensionreduce::nonsupervised::pca<double>;
