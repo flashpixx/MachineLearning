@@ -69,7 +69,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
             ublas::indirect_array<> use( const ublas::matrix<T>& ) const;
             
             //static std::size_t getEigenGap( const ublas::matrix<T>& ) const;
-            //static std::size_t getEigenGap( const ublas::matrix<T>&, const ublas::matrix<T>& ) const;
 
 
         private :
