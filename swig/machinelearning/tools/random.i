@@ -26,15 +26,14 @@
  **/
 
 
-%module "randomwrap"
-
-
 #ifdef SWIGJAVA
+%module "randommodule"
 %include "../../target/java/java.i"
 %rename(Random) random;
 #endif
 
 #ifdef SWIGPYTHON
+%module "random"
 %include "../../target/python/python.i"
 #endif
 

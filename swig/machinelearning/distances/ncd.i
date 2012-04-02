@@ -1,4 +1,4 @@
-/** 
+%module "ncdwrap"/** 
  @cond
  ############################################################################
  # LGPL License                                                             #
@@ -26,14 +26,13 @@
  **/
 
 
-%module "ncdwrap"
-
-
 #ifdef SWIGJAVA
+%module "ncdmodule"
 %include "../../target/java/java.i"
 #endif
 
 #ifdef SWIGPYTHON
+%module "ncd"
 %include "../../target/python/python.i"
 #endif
 

@@ -26,14 +26,13 @@
  **/
 
 
-%module "spectralclusteringwrap"
-
-
 #ifdef SWIGJAVA
+%module "spectralclusteringmodule"
 %include "../../../target/java/java.i"
 #endif
 
 #ifdef SWIGPYTHON
+%module "spectralclustering"
 %include "../../../target/python/python.i"
 #endif
 

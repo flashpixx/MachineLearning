@@ -26,14 +26,13 @@
  **/
 
 
-%module "ldawrap"
-
-
 #ifdef SWIGJAVA
+%module "ldamodule"
 %include "../../../target/java/java.i"
 #endif
 
 #ifdef SWIGPYTHON
+%module "lda"
 %include "../../../target/python/python.i"
 #endif
 

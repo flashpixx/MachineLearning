@@ -26,14 +26,13 @@
  **/
 
 
-%module "mdswrap"
-
-
 #ifdef SWIGJAVA
+%module "mdsmodule"
 %include "../../..//target/java/java.i"
 #endif
 
 #ifdef SWIGPYTHON
+%module "mds"
 %include "../../../target/python/python.i"
 #endif
 

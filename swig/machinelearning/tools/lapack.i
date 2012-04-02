@@ -26,15 +26,14 @@
  **/
 
 
-%module "lapackwrap"
-
-
 #ifdef SWIGJAVA
+%module "lapackmodule"
 %include "../../target/java/java.i"
 %rename(Lapack) lapack;
 #endif
 
 #ifdef SWIGPYTHON
+%module "lapack"
 %include "../../target/python/python.i"
 #endif
 

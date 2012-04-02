@@ -26,14 +26,13 @@
  **/
 
 
-%module "pcawrap"
-
-
 #ifdef SWIGJAVA
+%module "pcamodule"
 %include "../../../target/java/java.i"
 #endif
 
 #ifdef SWIGPYTHON
+%module "pca"
 %include "../../../target/python/python.i"
 #endif
 

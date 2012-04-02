@@ -26,14 +26,13 @@
  **/
 
 
-%module "rngwrap"
-
-
 #ifdef SWIGJAVA
+%module "rngmodule"
 %include "../../../target/java/java.i"
 #endif
 
 #ifdef SWIGPYTHON
+%module "rng"
 %include "../../../target/python/python.i"
 #endif
 
