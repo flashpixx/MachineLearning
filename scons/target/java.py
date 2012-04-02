@@ -90,8 +90,8 @@ for i in interfaces :
     cppsources.append( os.path.join("..", "..", cppname) )
     
     #create target directories for Jar and call Swig
-    targets.append( env.Command( package, "", Mkdir(javatarget) ) )
-    targets.append( env.Command( "swig"+ifacename, "", "swig -fvirtual -Wall -O -c++ -java -package " + package + " -outdir " + javatarget + " -o " + cppname + " " + ifacename ) )
+    targets.append( env.Command( "java"+package, "", Mkdir(javatarget) ) )
+    targets.append( env.Command( "swigjava"+ifacename, "", "swig -fvirtual -Wall -O -c++ -java -package " + package + " -outdir " + javatarget + " -o " + cppname + " " + ifacename ) )
     
     # read on each interface file the %module part and remove this Java class, because it is an empty class
     oFile     = open( os.path.join("..", "..", ifacename), "r" )

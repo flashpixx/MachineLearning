@@ -47,8 +47,8 @@ for i in interfaces :
     cppsources.append( os.path.join("..", "..", cppname) )
     
     #create target directories for Jar and call Swig
-    targets.append( env.Command( package, "", Mkdir(pytarget) ) )
-    targets.append( env.Command( "swig"+ifacename, "", "swig -fvirtual -Wall -O -c++ -python -outdir " + pytarget + " -o " + cppname + " " + ifacename ) )
+    targets.append( env.Command( "swig"+package, "", Mkdir(pytarget) ) )
+    targets.append( env.Command( "swigpy"+ifacename, "", "swig -fvirtual -Wall -O -c++ -python -outdir " + pytarget + " -o " + cppname + " " + ifacename ) )
     
     # read on each interface file the %module part and remove this Python class, because it is an empty class
     oFile     = open( os.path.join("..", "..", ifacename), "r" )
@@ -64,7 +64,8 @@ for i in interfaces :
 #get CPPs and build native library
 if env["withlogger"] or env["withrandomdevice"] :
     cppsources.append( "machinelearning.cpp" )
-#targets.append( env.SharedLibrary( target=os.path.join("#build", "python", "module", "lib", "native", "machinelearning"), source=cppsources ) )
+targets.append( env.SharedLibrary( target=os.path.join("#build", "python", "module", "lib", "native", "machinelearning"), source=cppsources ) )
 
 
 env.Alias("python", targets)
+
