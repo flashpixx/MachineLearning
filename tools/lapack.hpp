@@ -71,7 +71,7 @@ namespace machinelearning { namespace tools {
             //template<typename T> static ublas::matrix<T> expm( const ublas::matrix<T>& );
             template<typename T> static ublas::vector<T> perronfrobenius( const ublas::matrix<T>&, const std::size_t& );
             template<typename T> static ublas::vector<T> perronfrobenius( const ublas::matrix<T>&, const std::size_t&, const ublas::vector<T>& );
-            template<typename T> static ublas::matrix<T> graphLaplacian( const ublas::matrix<T>& );
+            template<typename T> static ublas::matrix<T> unnormalizedGraphLaplacian( const ublas::matrix<T>& );
             template<typename T> static ublas::matrix<T> normalizedGraphLaplacian( const ublas::matrix<T>& );
         
     };
@@ -250,11 +250,11 @@ namespace machinelearning { namespace tools {
     }
     
     
-    /** creates the graph laplacian of a distance matrix
+    /** creates the unnormalized graph laplacian of a distance matrix
      * @param p_adjacency adjacency matrix
      * @return graph laplacian
      **/
-    template<typename T> inline ublas::matrix<T> lapack::graphLaplacian( const ublas::matrix<T>& p_adjacency )
+    template<typename T> inline ublas::matrix<T> lapack::unnormalizedGraphLaplacian( const ublas::matrix<T>& p_adjacency )
     {
         if (p_adjacency.size1() != p_adjacency.size2())
             throw exception::runtime(_("matrix must be square"));

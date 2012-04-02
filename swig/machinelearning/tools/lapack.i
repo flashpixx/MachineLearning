@@ -41,5 +41,5 @@
 
 %include "../../../tools/lapack.hpp"
 %template(perronFrobenius) machinelearning::tools::lapack::perronfrobenius<double>;
-%template(graphLaplacian) machinelearning::tools::lapack::graphLaplacian<double>;
+%template(unnormalizedGraphLaplacian) machinelearning::tools::lapack::unnormalizedGraphLaplacian<double>;
 %template(normalizedGraphLaplacian) machinelearning::tools::lapack::normalizedGraphLaplacian<double>;
