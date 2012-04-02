@@ -26,3 +26,22 @@
  * datatypes and UBlas structurs
  * $LastChangedDate$
  **/
+
+
+
+
+
+
+
+
+
+
+
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------
+// structure that is included in each cpp file
+%{
+#include "machinelearning/swig/target/python/python.hpp"
+namespace swig  = machinelearning::swig;
+namespace ublas = boost::numeric::ublas;
+%}

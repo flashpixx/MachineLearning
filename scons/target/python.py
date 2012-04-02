@@ -50,21 +50,15 @@ for i in interfaces :
     targets.append( env.Command( "swig"+package, "", Mkdir(pytarget) ) )
     targets.append( env.Command( "swigpy"+ifacename, "", "swig -fvirtual -Wall -O -c++ -python -outdir " + pytarget + " -o " + cppname + " " + ifacename ) )
     
-    # read on each interface file the %module part and remove this Python class, because it is an empty class
-    oFile     = open( os.path.join("..", "..", ifacename), "r" )
-    ifacetext = oFile.read()
-    oFile.close()
-
-    #found = re.search("%module(.*)\"", ifacetext)
-    #if found <> None :
-    #    targets.append( env.Command("delmodul"+ifacename, "", Delete(os.path.join(pytarget, found.group(1).replace("\"", "").strip() + ".py"))) )
-    
-
+# add to each directory in the package directory a file with name __init__.py
+for dirname, dirnames, filenames in os.walk(os.path.join("build", "python", "module", "lib")):
+    for subdirname in dirnames:
+        print os.path.join(dirname, subdirname)    
 
 #get CPPs and build native library
 if env["withlogger"] or env["withrandomdevice"] :
     cppsources.append( "machinelearning.cpp" )
-targets.append( env.SharedLibrary( target=os.path.join("#build", "python", "module", "lib", "native", "machinelearning"), source=cppsources ) )
+#targets.append( env.SharedLibrary( target=os.path.join("#build", "python", "module", "lib", "native", "machinelearning"), source=cppsources ) )
 
 
 env.Alias("python", targets)
