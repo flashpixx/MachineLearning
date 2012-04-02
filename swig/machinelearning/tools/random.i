@@ -35,7 +35,7 @@
 #endif
 
 #ifdef SWIGPYTHON
-%include "../../../target/python/python.i"
+%include "../../target/python/python.i"
 #endif
 
 
