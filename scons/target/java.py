@@ -73,7 +73,7 @@ def java_linuxsonames(target, source, env) :
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------
 targets = []
-
+"""
 #read all *.i files and call swig for generating Java and Cpp files
 cppsources = []
 interfaces = help.getRekusivFiles( os.path.join("..", "..", "swig", "machinelearning"), ".i")
@@ -91,7 +91,7 @@ for i in interfaces :
     
     #create target directories for Jar and call Swig
     targets.append( env.Command( "java"+package, "", Mkdir(javatarget) ) )
-    targets.append( env.Command( "swigjava"+ifacename, "", "swig -fvirtual -Wall -O -c++ -java -package " + package + " -outdir " + javatarget + " -o " + cppname + " " + ifacename ) )
+    targets.append( env.Command( "swigjava"+ifacename, "", "swig -Wall -O -c++ -java -package " + package + " -outdir " + javatarget + " -o " + cppname + " " + ifacename ) )
     
     # read on each interface file the %module part and remove this Java class, because it is an empty class
     oFile     = open( os.path.join("..", "..", ifacename), "r" )
@@ -157,6 +157,18 @@ targets.append( env.Command("license", "", Copy(os.path.join("build", "java", "j
 #build Jar
 targets.append( env.Command("buildjar", "", "jar cf " + os.path.join("build", "machinelearning.jar") + " -C " + os.path.join("build", "java", "jar", "lib" ) + " .") )
 targets.append( env.Command("buildjarindex", "", "jar i " + os.path.join("build", "machinelearning.jar") ) )
+"""
+
+# create directory structures and targets
+targetlists = []
+for i in help.getRekusivFiles( os.path.join("..", "..", "swig", "machinelearning"), ".i") :
+    dir = os.path.sep.join( i.split(os.path.sep)[3:-1] )
+    
+    if not(dir in targetlists) :
+        targetlists.append(dir)
+        targets.append( env.Command( "jardir"+dir, "", Mkdir(os.path.join("build", "jar", "javasource", dir)) ) )
+        targets.append( env.Java(os.path.join("build","jar","lib"), Glob(os.path.join("..", "..", "swig", dir, "*.i")), SWIGOUTDIR=os.path.join("build", "jar", "javasource", dir), SWIGCXXFILESUFFIX=".cpp", SWIGFLAGS=["-O", "-templatereduce", "-c++", "-java","-package",dir.replace(os.path.sep, ".")] ))
+
 
 env.Alias("javac", targets)
 
@@ -166,6 +178,6 @@ env.Alias("javac", targets)
 
 
 # set classpath only for example compiling (jar file must be set within the build directory)
-env.Alias("javareduce", env.Java(target=os.path.join("#build", "java", "reduce"), source=os.path.join("..", "..", "examples", "java", "reducing"), JAVACLASSPATH = [os.path.join("build", "machinelearning.jar")]) )
-env.Alias("javaclustering", env.Java(target=os.path.join("#build", "java", "clustering"), source=os.path.join("..", "..", "examples", "java", "clustering"), JAVACLASSPATH = [os.path.join("build", "machinelearning.jar")]) )
+#env.Alias("javareduce", env.Java(target=os.path.join("#build", "java", "reduce"), source=os.path.join("..", "..", "examples", "java", "reducing"), JAVACLASSPATH = [os.path.join("build", "machinelearning.jar")]) )
+#env.Alias("javaclustering", env.Java(target=os.path.join("#build", "java", "clustering"), source=os.path.join("..", "..", "examples", "java", "clustering"), JAVACLASSPATH = [os.path.join("build", "machinelearning.jar")]) )
 #env.Alias("javautil", env.Java(target=os.path.join("#build", "java", "util"), source=os.path.join("..", "..", "examples", "java", "util"), JAVACLASSPATH = [os.path.join("build", "machinelearning.jar")]) )

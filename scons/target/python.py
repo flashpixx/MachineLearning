@@ -48,7 +48,7 @@ for i in interfaces :
     
     #create target directories for Jar and call Swig
     targets.append( env.Command( "swig"+package, "", Mkdir(pytarget) ) )
-    targets.append( env.Command( "swigpy"+ifacename, "", "swig -fvirtual -Wall -O -c++ -python -outdir " + pytarget + " -o " + cppname + " " + ifacename ) )
+    targets.append( env.Command( "swigpy"+ifacename, "", "swig -Wall -O -c++ -python -outdir " + pytarget + " -o " + cppname + " " + ifacename ) )
     
 # add to each directory in the package directory a file with name __init__.py
 for dirname, dirnames, filenames in os.walk(os.path.join("build", "python", "module", "lib")):

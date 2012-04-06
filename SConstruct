@@ -129,16 +129,15 @@ env.SConscript( os.path.join("scons", "platform", platformconfig+".py"), exports
 # adding the main path (parent of the current directory) to the CPPPATH and uniquify each option, 
 # that is setup with data of the system environment
 if env.has_key("CPPPATH") :
-    env["CPPPATH"].append(os.sep.join(os.path.abspath(os.curdir).split(os.sep)[0:-1]))
-    env["CPPPATH"]    = help.unique(env["CPPPATH"])
+    env.AppendUnique(CPPPATH = [os.sep.join(os.path.abspath(os.curdir).split(os.sep)[0:-1])])
 if env.has_key("CXXFLAGS") :
-    env["CXXFLAGS"]   = help.unique(env["CXXFLAGS"])
+    env.AppendUnique(CXXFLAGS = [env["CXXFLAGS"]])
 if env.has_key("LINKFLAGS") :    
-    env["LINKFLAGS"]  = help.unique(env["LINKFLAGS"])
+    env.AppendUnique(LINKFLAGS = [env["LINKFLAGS"]])
 if env.has_key("LIBS") :
-    env["LIBS"]       = help.unique(env["LIBS"])
+    env.AppendUnique(LIBS = [env["LIBS"]])
 if env.has_key("LIBPATH") :
-    env["LIBPATH"]    = help.unique(env["LIBPATH"])
+    env.AppendUnique(LIBPATH = [env["LIBPATH"]])
     
 # set manually if needed the MPI C++ compiler
 if env["withmpi"] :
