@@ -166,9 +166,11 @@ for i in help.getRekusivFiles( os.path.join("..", "..", "swig", "machinelearning
     
     if not(dir in targetlists) :
         targetlists.append(dir)
-        targets.append( env.Command( "jardir"+dir, "", Mkdir(os.path.join("build", "jar", "javasource", dir)) ) )
-        targets.append( env.Java(os.path.join("build","jar","lib"), Glob(os.path.join("..", "..", "swig", dir, "*.i")), SWIGOUTDIR=os.path.join("build", "jar", "javasource", dir), SWIGCXXFILESUFFIX=".cpp", SWIGFLAGS=["-O", "-templatereduce", "-c++", "-java","-package",dir.replace(os.path.sep, ".")] ))
-
+        #targets.append( env.Command( "jardir"+dir, "", Mkdir(os.path.join("build", "jar", "javasource", dir)) ) )
+        jtarget = env.Java(os.path.join("..", "..", "build","jar","lib"), Glob(os.path.join("..", "..", "swig", dir, "*.i")), SWIGOUTDIR=os.path.join("..", "..", "build", "jar", "javasource", dir), SWIGCXXFILESUFFIX=".cpp", SWIGFLAGS=["-O", "-templatereduce", "-c++", "-java","-package",dir.replace(os.path.sep, ".")] )
+        for n in jtarget :
+            n._createDir()
+            targets.append(n)
 
 env.Alias("javac", targets)
 
