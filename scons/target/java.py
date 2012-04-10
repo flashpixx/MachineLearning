@@ -22,6 +22,7 @@
 import sys
 sys.path.append("..")
 import help
+import glob
 import os
 import re
 
@@ -160,20 +161,65 @@ targets.append( env.Command("buildjarindex", "", "jar i " + os.path.join("build"
 """
 
 # create directory structures and targets
-targetlists = []
-for i in help.getRekusivFiles( os.path.join("..", "..", "swig", "machinelearning"), ".i") :
+#targets.append( env.Command( "jarnativesources", "", Mkdir(os.path.join("build","jar","nativesource")) ) ) 
+
+#targetlists = []
+#for i in help.getRekusivFiles( os.path.join("..", "..", "swig", "machinelearning"), ".i") :
+
+"""
     dir = os.path.sep.join( i.split(os.path.sep)[3:-1] )
-    
     if not(dir in targetlists) :
         targetlists.append(dir)
-
-        jtargets = env.Java(os.path.join("..", "..", "build","jar","lib"), Glob(os.path.join("..", "..", "swig", dir, "*.i")), SWIGCOM='$SWIG -o '+os.path.join("build","jar","nativesource")+'/${TARGET.file} ${_SWIGOUTDIR} ${_SWIGINCFLAGS} $SWIGFLAGS $SOURCES', SWIGOUTDIR=os.path.join("..", "..", "build", "jar", "javasource", dir), SWIGCXXFILESUFFIX=".cpp", SWIGFLAGS=["-O", "-templatereduce", "-c++", "-java","-package",dir.replace(os.path.sep, ".")] )
-
-        for n in jtargets :
-            #targets.append( env.Command( "dir"+dir, "", Mkdir(os.path.join(os.path.sep.join(n.get_path().split(os.path.sep)[0:-1]), dir)) ) ) 
+        #targets.append( env.Command( "jarsources"+dir, "", Mkdir(os.path.join("build","jar","javasource", dir)) ) ) 
+        jsources = env.Java(os.path.join("..", "..", "build","jar","lib"), Glob(os.path.join("..", "..", "swig", dir, "*.i")), SWIGCOM='$SWIG -o '+os.path.join("build","jar","nativesource")+os.path.sep+'${TARGET.file} -outdir "'+os.path.join("build", "jar", "javasource", dir)+'" ${_SWIGINCFLAGS} $SWIGFLAGS $SOURCES', SWIGOUTDIR=os.path.join("..","..","build", "jar", "javasource", dir), SWIGCXXFILESUFFIX=".cpp", SWIGFLAGS=["-O", "-templatereduce", "-c++", "-java","-package",dir.replace(os.path.sep, ".")] )
+        
+        for n in jsources :
             n._createDir()
             targets.append(n)
+"""
+    
+def SwigJava(target, source, env) :
+    # create build dir path
+    builddir = os.path.join("build", "jar")
+    
+    # create all needed directories
+    try :
+        os.makedirs( os.path.join(builddir, "nativesource") )
+    except :
+        pass
 
+    # iterate over all source files
+    for i in source :
+    
+        # get target directory (Java package directories) and cpp file name
+        dir = os.path.sep.join( str(i).split(os.path.sep)[1:-1] )
+        cpp = ( str(i).split(os.path.sep)[-1] ).replace(".i", ".cpp")
+        
+        # create Java package directory
+        try :
+            os.makedirs( os.path.join(builddir, "javasource", dir) )
+        except :
+            pass
+            
+        # call swig command
+        os.system("swig -Wall -O -templatereduce -c++ -java -package " + dir.replace(os.path.sep, ".") + " -outdir " + os.path.join(builddir, "javasource", dir) + " -o " + os.path.join(builddir, "nativesource", cpp) + " " + str(i))
+        
+        # delete empty java classes
+        for n in glob.glob(os.path.join(builddir, "javasource", dir, "*wrap.java")) :
+            os.unlink(n)
+        for n in glob.glob(os.path.join(builddir, "javasource", dir, "*module.java")) :
+            os.unlink(n)
+        
+
+
+
+
+env.Append( BUILDERS = {"SwigJava" : Builder(action = SwigJava) } )
+    
+targets.append( env.SwigJava( help.getRekusivFiles( os.path.join("..", "..", "swig", "machinelearning"), ".i") ) )
+targets.append( env.Java( os.path.join("..", "..", "build", "jar", "lib"), help.getRekusivFiles( os.path.join("..", "..", "build", "jar", "javasource"), ".java") ) )
+
+    
 env.Alias("javac", targets)
 
 

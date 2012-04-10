@@ -58,6 +58,7 @@ namespace machinelearning { namespace tools {
      * @todo try to change the matrix copy in eigen / svd to a better option (eg bindings::trans or traits )
      * @todo add matrix exponential via Pade approximation (shown in Matlab with expmdemo)
      * @todo portage this class to the Intel Math Kernel Library http://software.intel.com/en-us/articles/intel-mkl/
+     * @todo adding support for PETSc http://www.mcs.anl.gov/petsc/
      **/
     class lapack
     {
