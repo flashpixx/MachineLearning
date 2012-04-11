@@ -205,22 +205,37 @@ def SwigJava(target, source, env) :
         os.system("swig -Wall -O -templatereduce -c++ -java -package " + dir.replace(os.path.sep, ".") + " -outdir " + os.path.join(builddir, "javasource", dir) + " -o " + os.path.join(builddir, "nativesource", cpp) + " " + str(i))
         
         # delete empty java classes
-        for n in glob.glob(os.path.join(builddir, "javasource", dir, "*wrap.java")) :
+        delfiles = glob.glob(os.path.join(builddir, "javasource", dir, "*wrap.java"));
+        delfiles.extend(glob.glob(os.path.join(builddir, "javasource", dir, "*module.java")))
+        for n in delfiles :
             os.unlink(n)
-        for n in glob.glob(os.path.join(builddir, "javasource", dir, "*module.java")) :
-            os.unlink(n)
-        
+
+
+
+def SwigJar(target, source, env) :
+    os.system( "jar cf " + os.path.join("build", "machinelearning.jar") + " -C " + os.path.join("build", "jar", "lib" ) + " .")
+    os.system( "jar i " + os.path.join("build", "machinelearning.jar") )
+
+
 
 
 
 
 env.Append( BUILDERS = {"SwigJava" : Builder(action = SwigJava) } )
-    
-targets.append( env.SwigJava( help.getRekusivFiles( os.path.join("..", "..", "swig", "machinelearning"), ".i") ) )
-targets.append( env.Java( os.path.join("..", "..", "build", "jar", "lib"), help.getRekusivFiles( os.path.join("..", "..", "build", "jar", "javasource"), ".java") ) )
+env.Append( BUILDERS = {"SwigJar" : Builder(action = SwigJar) } )
 
-    
-env.Alias("javac", targets)
+
+swigbuild = env.SwigJava( help.getRekusivFiles( os.path.join("..", "..", "swig", "machinelearning"), ".i") )
+Depends(env.Java( os.path.join("..", "..", "build", "jar", "lib"), os.path.join("..", "..", "build", "jar", "javasource") ), swigbuild) 
+
+cppsources = Glob(os.path.join("build", "jar", "nativesource", "*.cpp"))
+if env["withlogger"] or env["withrandomdevice"] :
+    cppsources.append( "machinelearning.cpp" )
+
+cppbuild = env.SharedLibrary( target=os.path.join("#build", "jar", "lib", "native", "machinelearning"), source=cppsources )
+Depends(cppbuild, swigbuild)
+
+env.Alias("javac", jarbuild)
 
 
 
