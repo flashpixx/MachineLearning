@@ -205,10 +205,10 @@ def SwigJava(target, source, env) :
         os.system("swig -Wall -O -templatereduce -c++ -java -package " + dir.replace(os.path.sep, ".") + " -outdir " + os.path.join(builddir, "javasource", dir) + " -o " + os.path.join(builddir, "nativesource", cpp) + " " + str(i))
         
         # delete empty java classes
-        delfiles = glob.glob(os.path.join(builddir, "javasource", dir, "*wrap.java"))
-        delfiles.extend(glob.glob(os.path.join(builddir, "javasource", dir, "*module.java")))
-        for n in delfiles :
-            os.unlink(n)
+        #delfiles = glob.glob(os.path.join(builddir, "javasource", dir, "*wrap.java"))
+        #delfiles.extend(glob.glob(os.path.join(builddir, "javasource", dir, "*module.java")))
+        #for n in delfiles :
+        #    os.unlink(n)
             
 
             
@@ -216,16 +216,30 @@ def SwigJava(target, source, env) :
 
 def SwigJavaEmitter(target, source, env) :
         # create build dir path
-        builddir = os.path.join("build", "jar")
+        #builddir = os.path.join("build", "jar")
         
-        # create alist of regex, that should be removed
-        regexreplace = re.compile( r"#ifdef SWIGPYTHON(.*)#endif", re.DOTALL )
         
-        # regex for extracting data
-        regextemplate = r"%template(.*);"
-        regexinclude  = r"%include \"(.*\.h.?.?)\""
-        regexrename   = r"%rename(.*)"
-        regexmodule   = r"%module \"(.*)\""
+        regex = {
+                  # remove expression of the interface file
+                  "remove"       : re.compile( r"#ifdef SWIGPYTHON(.*)#endif", re.DOTALL ),
+                  
+                  # regex for extracting data of the interface file
+                  "template"     : re.compile( r"%template(.*);" ),
+                  "include"      : re.compile( r"%include \"(.*\.h.?.?)\"" ),
+                  "rename"       : re.compile( r"%rename\((.*)\)(.*)" ),
+                  "module"       : re.compile( r"%module \"(.*)\"" ),
+                  
+                  # regex for C++ comments
+                  "cppcomment"   : re.compile( r"//.*?\n|/\*.*?\*/", re.DOTALL ),
+                  
+                  # regex for the C++ class name
+                  "cppclass"     : re.compile( r"class (.*)" ),
+                  "cppbaseclass" : re.compile( r":(.*)" ),
+                  
+                  # regex helpers
+                  "cppremove" : re.compile( r"(\(|\)|<(.*)>)" )
+        }
+        
         
 
         target = []
@@ -234,19 +248,39 @@ def SwigJavaEmitter(target, source, env) :
             ifacetext = oFile.read()
             oFile.close()
             
-            # remove data
-            ifacetext = re.sub(regexreplace, "", ifacetext)
+            #path of the source file
+            path = os.sep.join( str(i).split(os.sep)[0:-1] )
             
-            #getting all needed informations
+            # remove data
+            ifacetext = re.sub(regex["remove"], "", ifacetext)
+            
+            #getting all needed informations if the interface file
             data = {
-                     "template" : re.findall(regextemplate, ifacetext),
-                     "rename"   : re.findall(regexrename, ifacetext),
-                     "module"   : re.findall(regexmodule, ifacetext),
-                     "include"  : re.findall(regexinclude, ifacetext)
-                   }
-                   
+                     "template" : re.findall(regex["template"], ifacetext),
+                     "rename"   : re.findall(regex["rename"], ifacetext),
+                     "module"   : re.findall(regex["module"], ifacetext),
+                     "include"  : re.findall(regex["include"], ifacetext),
+                     "cppclass" : []
+            }
+            
+            # getting C++ class name (read the %include file name)
+            for n in data["include"] :
+                oFile = open( os.path.normpath(os.path.join(path, n)), "r" )
+                data["cppclass"].extend( re.findall(regex["cppclass"], re.sub(regex["cppcomment"], "", oFile.read())) )
+                oFile.close()
+                
+            # optimize input data
+            data["cppclass"] = [ re.sub(regex["cppbaseclass"], "", i).strip() for i in data["cppclass"] ]
+            data["rename"]   = [ {source.replace(";","").strip() : target.strip() } for target,source in data["rename"] ]
+            
+            data["template"] = [ re.sub(regex["cppremove"], "", i) for i in data["template"] ]
+            data["template"] = [ {n.split()[0] : n.split()[1].split("::")[-2:]} for n in data["template"] ]
+
+            
+            
             print data
-        
+            print "\n\n\n"
+            #return
         return target, source
 
 
