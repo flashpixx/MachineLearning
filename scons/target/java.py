@@ -179,15 +179,10 @@ targets.append( env.Command("buildjarindex", "", "jar i " + os.path.join("build"
 """
     
 def SwigJava(target, source, env) :
-    # create build dir path
+    # create build dir path and create dir for the native sources
     builddir = os.path.join("build", "jar")
+    Execute(Mkdir( os.path.join(builddir, "nativesource") ))
     
-    # create all needed directories
-    try :
-        os.makedirs( os.path.join(builddir, "nativesource") )
-    except :
-        pass
-  
     # iterate over all source files
     for i in source :
     
@@ -196,10 +191,7 @@ def SwigJava(target, source, env) :
         cpp = ( str(i).split(os.path.sep)[-1] ).replace(".i", ".cpp")
         
         # create Java package directory
-        try :
-            os.makedirs( os.path.join(builddir, "javasource", dir) )
-        except :
-            pass
+        Execute(Mkdir( os.path.join(builddir, "javasource", dir) ))
             
         # call swig command
         os.system("swig -Wall -O -templatereduce -c++ -java -package " + dir.replace(os.path.sep, ".") + " -outdir " + os.path.join(builddir, "javasource", dir) + " -o " + os.path.join(builddir, "nativesource", cpp) + " " + str(i))
@@ -216,7 +208,7 @@ def SwigJava(target, source, env) :
 
 def SwigJavaEmitter(target, source, env) :
         # create build dir path
-        #builddir = os.path.join("build", "jar")
+        jbuilddir = os.path.join("build", "jar", "javasource")
         
         
         regex = {
@@ -235,6 +227,7 @@ def SwigJavaEmitter(target, source, env) :
                   # regex for the C++ class name
                   "cppclass"     : re.compile( r"class (.*)" ),
                   "cppbaseclass" : re.compile( r":(.*)" ),
+                  "cppnamespace" : re.compile( r"namespace(.*){" ),
                   
                   # regex helpers
                   "cppremove" : re.compile( r"(\(|\)|<(.*)>)" )
@@ -242,45 +235,60 @@ def SwigJavaEmitter(target, source, env) :
         
         
 
-        target = []
+        target = ["swigbuild"]
         for i in source :
             oFile = open( str(i), "r" )
             ifacetext = oFile.read()
             oFile.close()
             
             #path of the source file
-            path = os.sep.join( str(i).split(os.sep)[0:-1] )
+            ifacepath = os.sep.join( str(i).split(os.sep)[0:-1] )
             
             # remove data
             ifacetext = re.sub(regex["remove"], "", ifacetext)
             
             #getting all needed informations if the interface file
             data = {
-                     "template" : re.findall(regex["template"], ifacetext),
-                     "rename"   : re.findall(regex["rename"], ifacetext),
-                     "module"   : re.findall(regex["module"], ifacetext),
-                     "include"  : re.findall(regex["include"], ifacetext),
-                     "cppclass" : []
+                     "template"     : re.findall(regex["template"], ifacetext),
+                     "rename"       : re.findall(regex["rename"], ifacetext),
+                     "module"       : re.findall(regex["module"], ifacetext),
+                     "include"      : re.findall(regex["include"], ifacetext),
+                     "cppnamespace" : [],
+                     "cppclass"     : []
             }
             
             # getting C++ class name (read the %include file name)
             for n in data["include"] :
-                oFile = open( os.path.normpath(os.path.join(path, n)), "r" )
-                data["cppclass"].extend( re.findall(regex["cppclass"], re.sub(regex["cppcomment"], "", oFile.read())) )
+                oFile = open( os.path.normpath(os.path.join(ifacepath, n)), "r" )
+                cpptext = oFile.read()
                 oFile.close()
+
+                data["cppclass"].extend( re.findall(regex["cppclass"], re.sub(regex["cppcomment"], "", cpptext)) )
+                data["cppnamespace"].extend( re.findall(regex["cppnamespace"], cpptext) )
+                
                 
             # optimize input data
-            data["cppclass"] = [ re.sub(regex["cppbaseclass"], "", i).strip() for i in data["cppclass"] ]
-            data["rename"]   = [ {source.replace(";","").strip() : target.strip() } for target,source in data["rename"] ]
+            data["cppclass"]       = [ re.sub(regex["cppbaseclass"], "", n).strip() for n in data["cppclass"] ]
+            data["rename"]         = [ {sourcename.replace(";","").strip() : targetname.strip()} for targetname,sourcename in data["rename"] ]
             
-            data["template"] = [ re.sub(regex["cppremove"], "", i) for i in data["template"] ]
-            data["template"] = [ {n.split()[0] : n.split()[1].split("::")[-2:]} for n in data["template"] ]
+            data["template"]       = [ re.sub(regex["cppremove"], "", i) for i in data["template"] ]
+            data["template"]       = [ {n.split()[0] : n.split()[1].split("::")[-2:]} for n in data["template"] ]
+            
+            data["cppnamespace"]   = [ n.replace("{", "").split("namespace") for n in data["cppnamespace"] ]
+            data["cppnamespace"]   = [ [ k.strip() for k in i ] for i in data["cppnamespace"] ]
+  
 
+            # remove all module classes, because this classes are empty (the path uses the namespace)
+            for n in data["module"] :
+                for k in data["cppnamespace"] :
+                    javamodule = os.path.normpath(os.path.join(Dir("#").abspath, jbuilddir, os.sep.join(k), n+".java"))
+                    env.Clean( javamodule, javamodule )
+                    #env.Clean( os.path.join(jbuilddir, os.sep.join(k), n+".java"), ".java")
+                #target.append( os.path.join(dir, n+".java")
             
-            
-            print data
-            print "\n\n\n"
-            #return
+            #print data
+            #print "\n\n\n"
+   
         return target, source
 
 
