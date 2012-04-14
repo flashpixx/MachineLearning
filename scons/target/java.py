@@ -187,7 +187,7 @@ def SwigJava(target, source, env) :
         os.makedirs( os.path.join(builddir, "nativesource") )
     except :
         pass
-
+  
     # iterate over all source files
     for i in source :
     
@@ -205,39 +205,103 @@ def SwigJava(target, source, env) :
         os.system("swig -Wall -O -templatereduce -c++ -java -package " + dir.replace(os.path.sep, ".") + " -outdir " + os.path.join(builddir, "javasource", dir) + " -o " + os.path.join(builddir, "nativesource", cpp) + " " + str(i))
         
         # delete empty java classes
-        delfiles = glob.glob(os.path.join(builddir, "javasource", dir, "*wrap.java"));
+        delfiles = glob.glob(os.path.join(builddir, "javasource", dir, "*wrap.java"))
         delfiles.extend(glob.glob(os.path.join(builddir, "javasource", dir, "*module.java")))
         for n in delfiles :
             os.unlink(n)
+            
+
+            
+            
+
+def SwigJavaEmitter(target, source, env) :
+        # create build dir path
+        builddir = os.path.join("build", "jar")
+        
+        # create alist of regex, that should be removed
+        regexreplace = re.compile( r"#ifdef SWIGPYTHON(.*)#endif", re.DOTALL )
+        
+        # regex for extracting data
+        regextemplate = r"%template(.*);"
+        regexinclude  = r"%include \"(.*\.h.?.?)\""
+        regexrename   = r"%rename(.*)"
+        regexmodule   = r"%module \"(.*)\""
+        
+
+        target = []
+        for i in source :
+            oFile = open( str(i), "r" )
+            ifacetext = oFile.read()
+            oFile.close()
+            
+            # remove data
+            ifacetext = re.sub(regexreplace, "", ifacetext)
+            
+            #getting all needed informations
+            data = {
+                     "template" : re.findall(regextemplate, ifacetext),
+                     "rename"   : re.findall(regexrename, ifacetext),
+                     "module"   : re.findall(regexmodule, ifacetext),
+                     "include"  : re.findall(regexinclude, ifacetext)
+                   }
+                   
+            print data
+        
+        return target, source
+
+
+#def SwigJar(target, source, env) :
+#    os.system( "jar cf " + os.path.join("build", "machinelearning.jar") + " -C " + os.path.join("build", "jar", "lib" ) + " .")
+#    os.system( "jar i " + os.path.join("build", "machinelearning.jar") )
+
+
+"""
+  def _swig_java_emitter(...):
+    ... # extend target list with additional files here
+
+  def _swig_java_builder(...):
+    ... # your original code from SwigJava
+
+  _swig_java = SCons.Builder.Builder(action=_swig_java_builder,
+                                     emitter=_swig_java_emitter)
+
+  env = Environment(...)
+  env['BUILDERS']['SwigJava'] = _swig_java
+
+  flib = env.SharedLibrary('foo',Glob('*.i'), SWIGFLAGS=[flags for CPP])
+
+  env.SwigJava('builddir',Glob('*.i'))
+
+  env.Jar('final.jar', ['builddir', flib])
+"""
 
 
 
-def SwigJar(target, source, env) :
-    os.system( "jar cf " + os.path.join("build", "machinelearning.jar") + " -C " + os.path.join("build", "jar", "lib" ) + " .")
-    os.system( "jar i " + os.path.join("build", "machinelearning.jar") )
 
 
+env.Append( BUILDERS = {"SwigJava" : Builder(action = SwigJava, emitter = SwigJavaEmitter) } )
+#env.Append( BUILDERS = {"SwigJar" : Builder(action = SwigJar) } )
+
+targets = []
+targets.append( env.SwigJava( "swigbuild", help.getRekusivFiles( os.path.join("..", "..", "swig", "machinelearning"), ".i") ) )
+#javabuild = env.Java( os.path.join("..", "..", "build", "jar", "lib"), os.path.join("..", "..", "build", "jar", "javasource") )
 
 
+#env.Depends("javac", "javacswig")
+
+#cppsources = Glob(os.path.join("build", "jar", "nativesource", "*.cpp"))
+#if env["withlogger"] or env["withrandomdevice"] :
+#    cppsources.append( "machinelearning.cpp" )
+
+#env.SharedLibrary( target=os.path.join("#build", "jar", "lib", "native", "machinelearning"), source=cppsources )
 
 
-env.Append( BUILDERS = {"SwigJava" : Builder(action = SwigJava) } )
-env.Append( BUILDERS = {"SwigJar" : Builder(action = SwigJar) } )
+# target list
+#targets = [swigbuild, cppbuild]
+#targets.append( env.Command("buildjar", "", "jar cf " + os.path.join("build", "machinelearning.jar") + " -C " + os.path.join("build", "java", "jar", "lib" ) + " .") )
+#targets.append( env.Command("buildjarindex", "", "jar i " + os.path.join("build", "machinelearning.jar") ) )
 
-
-swigbuild = env.SwigJava( help.getRekusivFiles( os.path.join("..", "..", "swig", "machinelearning"), ".i") )
-Depends(env.Java( os.path.join("..", "..", "build", "jar", "lib"), os.path.join("..", "..", "build", "jar", "javasource") ), swigbuild) 
-
-cppsources = Glob(os.path.join("build", "jar", "nativesource", "*.cpp"))
-if env["withlogger"] or env["withrandomdevice"] :
-    cppsources.append( "machinelearning.cpp" )
-
-cppbuild = env.SharedLibrary( target=os.path.join("#build", "jar", "lib", "native", "machinelearning"), source=cppsources )
-Depends(cppbuild, swigbuild)
-
-env.Alias("javac", jarbuild)
-
-
+env.Alias("javac", targets)
 
 
 

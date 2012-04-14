@@ -38,7 +38,7 @@
 #endif
 
 
-%include "../../../tools/lapack.hpp"
+%include "../../../tools/lapack.h"
 %template(perronFrobenius) machinelearning::tools::lapack::perronfrobenius<double>;
 %template(unnormalizedGraphLaplacian) machinelearning::tools::lapack::unnormalizedGraphLaplacian<double>;
 %template(normalizedGraphLaplacian) machinelearning::tools::lapack::normalizedGraphLaplacian<double>;
