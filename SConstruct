@@ -143,6 +143,7 @@ if env.has_key("LIBPATH") :
 if env["withmpi"] :
     env.Replace(CXX = "mpic++")
     
+#adding configuration checks http://www.scons.org/wiki/SconsAutoconf
 
 # call target scripts and set default target to empty
 env.SConscript( os.path.join("scons", "target", "documentation.py"), exports="env colorama")

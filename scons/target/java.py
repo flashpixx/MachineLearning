@@ -209,6 +209,7 @@ def SwigJava(target, source, env) :
 def SwigJavaEmitter(target, source, env) :
         # create build dir path
         jbuilddir = os.path.join("build", "jar", "javasource")
+        nbuilddir = os.path.join("build", "jar", "nativesource")
         
         
         regex = {
@@ -233,7 +234,7 @@ def SwigJavaEmitter(target, source, env) :
                   "cppremove" : re.compile( r"(\(|\)|<(.*)>)" )
         }
         
-        
+
 
         target = ["swigbuild"]
         for i in source :
@@ -249,6 +250,8 @@ def SwigJavaEmitter(target, source, env) :
             
             #getting all needed informations if the interface file
             data = {
+                     "source"       : str(i),
+                     "sourcename"   : (str(i).split(os.sep)[-1]).replace(".i", ""),
                      "template"     : re.findall(regex["template"], ifacetext),
                      "rename"       : re.findall(regex["rename"], ifacetext),
                      "module"       : re.findall(regex["module"], ifacetext),
@@ -277,17 +280,23 @@ def SwigJavaEmitter(target, source, env) :
             data["cppnamespace"]   = [ n.replace("{", "").split("namespace") for n in data["cppnamespace"] ]
             data["cppnamespace"]   = [ [ k.strip() for k in i ] for i in data["cppnamespace"] ]
   
-
+    
             # remove all module classes, because this classes are empty (the path uses the namespace)
-            for n in data["module"] :
-                for k in data["cppnamespace"] :
-                    javamodule = os.path.normpath(os.path.join(Dir("#").abspath, jbuilddir, os.sep.join(k), n+".java"))
-                    env.Clean( javamodule, javamodule )
-                    #env.Clean( os.path.join(jbuilddir, os.sep.join(k), n+".java"), ".java")
-                #target.append( os.path.join(dir, n+".java")
+            #delmodulefiles = []
+            #for n in data["module"] :
+            #    for k in data["cppnamespace"] :
+            #        delmodulefiles.append( os.path.normpath(os.path.join(Dir("#").abspath, jbuilddir, os.sep.join(k), n+".java")) )
+            #env.Clean( "delmodule_"+data["source"], delmodulefiles )
             
-            #print data
-            #print "\n\n\n"
+            
+            # change the template data to the correct classname
+            
+            
+            
+            
+            # adding target filenames with path
+            #os.path.normpath(os.path.join(Dir("#").abspath, nbuilddir, data["sourcename"]+".cpp" ))
+
    
         return target, source
 
