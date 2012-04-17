@@ -53,8 +53,7 @@ def getRekusivFiles(startdir, ending, pdontuse=[], pShowPath=True, pAbsPath=Fals
     
 # creates a list with unique entries
 def unique(seq):
-    list = []
-    for i in seq :
-        if not i in list :
-            list.append(i)
-    return list
+    noDupes = []
+    [ noDupes.append(i) for i in seq if not noDupes.count(i) ]
+    return noDupes
+    

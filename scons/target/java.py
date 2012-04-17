@@ -213,31 +213,33 @@ def SwigJavaEmitter(target, source, env) :
         
         
         regex = {
-                  # remove expression of the interface file
-                  "remove"       : re.compile( r"#ifdef SWIGPYTHON(.*)#endif", re.DOTALL ),
+                  # remove expression of the interface file (store a list with expressions)
+                  "remove"              : [ re.compile( r"#ifdef SWIGPYTHON(.*)#endif", re.DOTALL ) ],
                   
                   # regex for extracting data of the interface file
-                  "template"     : re.compile( r"%template(.*);" ),
-                  "include"      : re.compile( r"%include \"(.*\.h.?.?)\"" ),
-                  "rename"       : re.compile( r"%rename\((.*)\)(.*)" ),
-                  "module"       : re.compile( r"%module \"(.*)\"" ),
+                  "template"            : re.compile( r"%template(.*);" ),
+                  "include"             : re.compile( r"%include \"(.*\.h.?.?)\"" ),
+                  "rename"              : re.compile( r"%rename\((.*)\)(.*)" ),
+                  "module"              : re.compile( r"%module \"(.*)\"" ),
                   
                   # regex for C++ comments
-                  "cppcomment"   : re.compile( r"//.*?\n|/\*.*?\*/", re.DOTALL ),
+                  "cppcomment"          : re.compile( r"//.*?\n|/\*.*?\*/", re.DOTALL ),
                   
                   # regex for the C++ class name
-                  "cppclass"     : re.compile( r"class (.*)" ),
-                  "cppbaseclass" : re.compile( r":(.*)" ),
-                  "cppnamespace" : re.compile( r"namespace(.*){" ),
+                  "cppclass"            : re.compile( r"class (.*)" ),
+                  "cppbaseclass"        : re.compile( r":(.*)" ),
+                  "cppnamespace"        : re.compile( r"namespace(.*){" ),
+                  "cppstaticfunction"   : re.compile( r"static (.*) (.*)\(" ), 
                   
                   # regex helpers
-                  "cppremove" : re.compile( r"(\(|\)|<(.*)>)" )
+                  "cppremove"           : re.compile( r"(\(|\)|<(.*)>)" )
         }
         
 
 
         target = ["swigbuild"]
         for i in source :
+            # read source file
             oFile = open( str(i), "r" )
             ifacetext = oFile.read()
             oFile.close()
@@ -246,57 +248,109 @@ def SwigJavaEmitter(target, source, env) :
             ifacepath = os.sep.join( str(i).split(os.sep)[0:-1] )
             
             # remove data
-            ifacetext = re.sub(regex["remove"], "", ifacetext)
+            for n in regex["remove"] :
+                ifacetext = re.sub(n, "", ifacetext)
             
             #getting all needed informations if the interface file
             data = {
-                     "source"       : str(i),
-                     "sourcename"   : (str(i).split(os.sep)[-1]).replace(".i", ""),
-                     "template"     : re.findall(regex["template"], ifacetext),
-                     "rename"       : re.findall(regex["rename"], ifacetext),
-                     "module"       : re.findall(regex["module"], ifacetext),
-                     "include"      : re.findall(regex["include"], ifacetext),
-                     "cppnamespace" : [],
-                     "cppclass"     : []
+                     # stores the fill source filepath
+                     "source"            : str(i),
+                     # stores the source file name
+                     "sourcename"        : (str(i).split(os.sep)[-1]).replace(".i", ""),
+                     # stores the template parameter with a dict like { templatename : [cpp classname, namespace of the cpp class] or [ static function name, cpp class name]              
+                     "template"          : re.findall(regex["template"], ifacetext),
+                     # stores a rename structure { cpp classname : target name }
+                     "rename"            : re.findall(regex["rename"], ifacetext),
+                     # stores the module name
+                     "module"            : re.findall(regex["module"], ifacetext),
+                     # stores all %include files
+                     "include"           : re.findall(regex["include"], ifacetext),
+                     # stores a dict of cpp namespaces
+                     "cppnamespace"      : {},
+                     # stores a list of cpp classnames
+                     "cppclass"          : [],
+                     # stores a list of static function names
+                     "cppstaticfunction" : []
             }
             
             # getting C++ class name (read the %include file name)
+            # [bug: if a class with the same name exists in different namespaces, the dict stores only the last namespace entry]
+            # [bug: namespace and target directory that is extracted by the builder can be different]
             for n in data["include"] :
-                oFile = open( os.path.normpath(os.path.join(ifacepath, n)), "r" )
-                cpptext = oFile.read()
+            
+                # read cpp data
+                oFile   = open( os.path.normpath(os.path.join(ifacepath, n)), "r" )
+                cpptext = re.sub(regex["cppcomment"], "", oFile.read()) 
                 oFile.close()
+                
+                # get class names and static function
+                classnames = re.findall(regex["cppclass"], cpptext)
+                classnames = [ re.sub(regex["cppbaseclass"], "", k).strip() for k in classnames ]
+                data["cppstaticfunction"].extend( [ k[1] for k in re.findall(regex["cppstaticfunction"], cpptext) ] ) 
 
-                data["cppclass"].extend( re.findall(regex["cppclass"], re.sub(regex["cppcomment"], "", cpptext)) )
-                data["cppnamespace"].extend( re.findall(regex["cppnamespace"], cpptext) )
+                # determine class and namespace connection
+                namespaces = re.findall(regex["cppnamespace"], cpptext)
+                nslist     = [ n.replace("{", "").split("namespace") for n in namespaces ]
+                nslist     = [ [ k.strip() for k in i ] for i in nslist ]
                 
+                for k in classnames :
+                    for l,j in enumerate(namespaces) :
+                        if re.search( re.compile( r"namespace" + j + "{(.*)class " + k, re.DOTALL ), cpptext ) :
+                            data["cppnamespace"][k] = nslist[l]
                 
+                # add classnames ti the dict
+                data["cppclass"].extend( classnames  )
+
+
             # optimize input data
-            data["cppclass"]       = [ re.sub(regex["cppbaseclass"], "", n).strip() for n in data["cppclass"] ]
-            data["rename"]         = [ {sourcename.replace(";","").strip() : targetname.strip()} for targetname,sourcename in data["rename"] ]
+            data["cppclass"]          = [ re.sub(regex["cppbaseclass"], "", n).strip() for n in data["cppclass"] ]
             
-            data["template"]       = [ re.sub(regex["cppremove"], "", i) for i in data["template"] ]
-            data["template"]       = [ {n.split()[0] : n.split()[1].split("::")[-2:]} for n in data["template"] ]
+            help = {}
+            for targetname,sourcename in data["rename"] :
+                help[sourcename.replace(";","").strip()] = targetname.strip()
+            data["rename"]            = help
             
-            data["cppnamespace"]   = [ n.replace("{", "").split("namespace") for n in data["cppnamespace"] ]
-            data["cppnamespace"]   = [ [ k.strip() for k in i ] for i in data["cppnamespace"] ]
+            data["template"]          = [ re.sub(regex["cppremove"], "", i) for i in data["template"] ]
+            help = {}
+            for n in data["template"] :
+                k = n.split()
+                help[k[0]] = k[1].split("::")[-2:]
+            data["template"]          = help
+            
+            noDupes = []
+            [noDupes.append(i) for i in data["cppstaticfunction"] if not noDupes.count(i)]
+            data["cppstaticfunction"] = noDupes
   
     
-            # remove all module classes, because this classes are empty (the path uses the namespace)
-            #delmodulefiles = []
-            #for n in data["module"] :
-            #    for k in data["cppnamespace"] :
-            #        delmodulefiles.append( os.path.normpath(os.path.join(Dir("#").abspath, jbuilddir, os.sep.join(k), n+".java")) )
-            #env.Clean( "delmodule_"+data["source"], delmodulefiles )
+            # determine classname of each template parameter
+            for k,v in data["template"].items() :
+                data["template"][k] = list(set(data["cppclass"]) & set(v))[0]
+            # change the template parameter in this way, that we get a dict with { cpp class name : [target names] }
+            help = {}
+            for k,v in data["template"].items() :
+                if help.has_key(v) :
+                    help[v].append(k)
+                else :
+                    help[v] = [k]
+            data["template"] = help
+                
+                
             
-            
-            # change the template data to the correct classname
-            
-            
-            
-            
-            # adding target filenames with path
+            # adding target filenames with path (first the cpp name, second the java names)
             #os.path.normpath(os.path.join(Dir("#").abspath, nbuilddir, data["sourcename"]+".cpp" ))
+            
+            # we read the cpp classname, get the template parameter which matchs the cpp class name in the value
+            # if the rename option is not empty and matches the cpp class name, we use this result for the java class name
+            # because the template parameter points to a static function, otherwise we use the template name
+            for i in data["cppclass"] :
+                if data["rename"].has_key(i) :
+                    print os.path.normpath(os.path.join(Dir("#").abspath, jbuilddir, os.sep.join(data["cppnamespace"][i]), data["rename"][i]+".java"))
+                else :
+                    for l in data["template"][i] :
+                        print os.path.normpath(os.path.join(Dir("#").abspath, jbuilddir, os.sep.join(data["cppnamespace"][i]), l+".java"))
+                    
 
+            print "\n\n"
    
         return target, source
 
