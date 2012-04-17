@@ -324,19 +324,17 @@ def SwigJavaEmitter(target, source, env) :
   
   
     
-            # determine classname of each template parameter
-            for k,v in data["template"].items() :
-                data["template"][k] = list(set(data["cppclass"]) & set(v))[0]
-            
+            # determine classname of each template parameter and
             # change the template parameter in this way, that we get a dict with { cpp class name : [target names] }
             help = {}
             for k,v in data["template"].items() :
-                if help.has_key(v) :
-                    help[v].append(k)
+                newval = list(set(data["cppclass"]) & set(v))[0]
+                if help.has_key(newval) :
+                    help[newval].append(k)
                 else :
-                    help[v] = [k]
+                    help[newval] = [k]
             data["template"] = help
-                
+
                 
             
             # adding target filenames with path (first the cpp name, second the java names)
