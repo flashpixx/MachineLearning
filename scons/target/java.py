@@ -184,6 +184,7 @@ def SwigJava(target, source, env) :
     Execute(Mkdir( os.path.join(builddir, "nativesource") ))
     
     # iterate over all source files
+    target = []
     for i in source :
     
         # get target directory (Java package directories) and cpp file name
@@ -201,8 +202,6 @@ def SwigJava(target, source, env) :
         #delfiles.extend(glob.glob(os.path.join(builddir, "javasource", dir, "*module.java")))
         #for n in delfiles :
         #    os.unlink(n)
-            
-
             
             
 
@@ -338,7 +337,7 @@ def SwigJavaEmitter(target, source, env) :
                 
             
             # adding target filenames with path (first the cpp name, second the java names)
-            #os.path.normpath(os.path.join(Dir("#").abspath, nbuilddir, data["sourcename"]+".cpp" ))
+            target.append( os.path.normpath(os.path.join(Dir("#").abspath, nbuilddir, data["sourcename"]+".cpp" )) )
             
             # we read the cpp classname, get the template parameter which matchs the cpp class name in the value
             # if the rename option is not empty and matches the cpp class name, we use this result for the java class name
