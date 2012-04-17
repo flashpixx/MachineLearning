@@ -237,26 +237,24 @@ def SwigJavaEmitter(target, source, env) :
         
 
 
-        target = ["swigbuild"]
-        for i in source :
+        target = []
+        for input in source :
             # read source file
-            oFile = open( str(i), "r" )
+            oFile = open( str(input), "r" )
             ifacetext = oFile.read()
             oFile.close()
             
-            #path of the source file
-            ifacepath = os.sep.join( str(i).split(os.sep)[0:-1] )
-            
-            # remove data
+            #path of the source file and remove reduce the interface file for parsing
+            ifacepath = os.sep.join( str(input).split(os.sep)[0:-1] )
             for n in regex["remove"] :
                 ifacetext = re.sub(n, "", ifacetext)
             
             #getting all needed informations if the interface file
             data = {
                      # stores the fill source filepath
-                     "source"            : str(i),
+                     "source"            : str(input),
                      # stores the source file name
-                     "sourcename"        : (str(i).split(os.sep)[-1]).replace(".i", ""),
+                     "sourcename"        : (str(input).split(os.sep)[-1]).replace(".i", ""),
                      # stores the template parameter with a dict like { templatename : [cpp classname, namespace of the cpp class] or [ static function name, cpp class name]              
                      "template"          : re.findall(regex["template"], ifacetext),
                      # stores a rename structure { cpp classname : target name }
@@ -273,6 +271,8 @@ def SwigJavaEmitter(target, source, env) :
                      "cppstaticfunction" : []
             }
             
+            
+            
             # getting C++ class name (read the %include file name)
             # [bug: if a class with the same name exists in different namespaces, the dict stores only the last namespace entry]
             # [bug: namespace and target directory that is extracted by the builder can be different]
@@ -288,7 +288,7 @@ def SwigJavaEmitter(target, source, env) :
                 classnames = [ re.sub(regex["cppbaseclass"], "", k).strip() for k in classnames ]
                 data["cppstaticfunction"].extend( [ k[1] for k in re.findall(regex["cppstaticfunction"], cpptext) ] ) 
 
-                # determine class and namespace connection
+                # determine class and namespace connection (which class exists in which namespace)
                 namespaces = re.findall(regex["cppnamespace"], cpptext)
                 nslist     = [ n.replace("{", "").split("namespace") for n in namespaces ]
                 nslist     = [ [ k.strip() for k in i ] for i in nslist ]
@@ -302,14 +302,14 @@ def SwigJavaEmitter(target, source, env) :
                 data["cppclass"].extend( classnames  )
 
 
-            # optimize input data
-            data["cppclass"]          = [ re.sub(regex["cppbaseclass"], "", n).strip() for n in data["cppclass"] ]
-            
+
+            # create the remap dict { cpp class name : swig rename}
             help = {}
             for targetname,sourcename in data["rename"] :
                 help[sourcename.replace(";","").strip()] = targetname.strip()
             data["rename"]            = help
             
+            # remove template parameters <> or brackets
             data["template"]          = [ re.sub(regex["cppremove"], "", i) for i in data["template"] ]
             help = {}
             for n in data["template"] :
@@ -317,14 +317,17 @@ def SwigJavaEmitter(target, source, env) :
                 help[k[0]] = k[1].split("::")[-2:]
             data["template"]          = help
             
+            # create a unique list of the static functions
             noDupes = []
             [noDupes.append(i) for i in data["cppstaticfunction"] if not noDupes.count(i)]
             data["cppstaticfunction"] = noDupes
+  
   
     
             # determine classname of each template parameter
             for k,v in data["template"].items() :
                 data["template"][k] = list(set(data["cppclass"]) & set(v))[0]
+            
             # change the template parameter in this way, that we get a dict with { cpp class name : [target names] }
             help = {}
             for k,v in data["template"].items() :
@@ -342,16 +345,13 @@ def SwigJavaEmitter(target, source, env) :
             # we read the cpp classname, get the template parameter which matchs the cpp class name in the value
             # if the rename option is not empty and matches the cpp class name, we use this result for the java class name
             # because the template parameter points to a static function, otherwise we use the template name
-            for i in data["cppclass"] :
-                if data["rename"].has_key(i) :
-                    print os.path.normpath(os.path.join(Dir("#").abspath, jbuilddir, os.sep.join(data["cppnamespace"][i]), data["rename"][i]+".java"))
+            for n in data["cppclass"] :
+                if data["rename"].has_key(n) :
+                    target.append( os.path.normpath(os.path.join(Dir("#").abspath, jbuilddir, os.sep.join(data["cppnamespace"][n]), data["rename"][n]+".java")) )
                 else :
-                    for l in data["template"][i] :
-                        print os.path.normpath(os.path.join(Dir("#").abspath, jbuilddir, os.sep.join(data["cppnamespace"][i]), l+".java"))
-                    
-
-            print "\n\n"
-   
+                    for l in data["template"][n] :
+                        target.append( os.path.normpath(os.path.join(Dir("#").abspath, jbuilddir, os.sep.join(data["cppnamespace"][n]), l+".java")) )
+            
         return target, source
 
 
