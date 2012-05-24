@@ -7,38 +7,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-11-07 19:34+0100\n"
+"POT-Creation-Date: 2012-05-25 01:19+0200\n"
 "PO-Revision-Date: 2011-10-24 20:46+0100\n"
 "Last-Translator: Philipp Kraus <philipp.kraus@flashpixx.de>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-
-#: java/machinelearning/dimensionreduce/nonsupervised/mds.cpp:72
-#: java/machinelearning/dimensionreduce/nonsupervised/mds.cpp:158
-#: java/machinelearning/dimensionreduce/nonsupervised/mds.cpp:231
-#: java/machinelearning/dimensionreduce/nonsupervised/mds.cpp:317
-msgid "enum value is not known"
-msgstr "Sprache ist unbekannt"
-
-#: java/machinelearning/dimensionreduce/nonsupervised/mds.cpp:172
-#: java/machinelearning/dimensionreduce/nonsupervised/mds.cpp:331
-#: java/machinelearning/dimensionreduce/nonsupervised/pca.cpp:94
-#: java/machinelearning/dimensionreduce/nonsupervised/pca.cpp:186
-msgid "data matrix is null"
-msgstr "Datenmatrix hat nur Nulleinträge"
-
-#: java/machinelearning/dimensionreduce/nonsupervised/mds.cpp:179
-#: java/machinelearning/dimensionreduce/nonsupervised/mds.cpp:338
-#: java/machinelearning/dimensionreduce/nonsupervised/pca.cpp:101
-#: java/machinelearning/dimensionreduce/nonsupervised/pca.cpp:193
-msgid "data matrix is empty"
-msgstr "Datenmatrix hat nur Nulleinträge"
-
-#: java/machinelearning/util/random.cpp:72 tools/sources/twitter.h:786
-msgid "option value is unkown"
-msgstr "Optionswert nicht bekannt"
 
 #: textprocess/stopwordreduction.h:81 textprocess/stopwordreduction.h:96
 msgid "stopwordlist can not be empty"
@@ -48,11 +23,11 @@ msgstr "Stopwortliste kann nicht leer sein"
 msgid "separator can not be empty"
 msgstr "Separator darf nicht leer sein"
 
-#: textprocess/termfrequency.h:193 textprocess/termfrequency.h:218
+#: textprocess/termfrequency.h:197 textprocess/termfrequency.h:222
 msgid "ranges must be between [0,1]"
 msgstr "Bereich muss zwischen [0,1] liegen"
 
-#: textprocess/termfrequency.h:195 textprocess/termfrequency.h:220
+#: textprocess/termfrequency.h:199 textprocess/termfrequency.h:224
 msgid "no words within the map"
 msgstr "keine Worte in der Map"
 
@@ -318,6 +293,10 @@ msgstr "Gateway Zeitüberschreibung"
 msgid "HTTP Version not supported"
 msgstr "HTTP Version wird nicht unterstützt"
 
+#: tools/sources/twitter.h:786
+msgid "option value is unkown"
+msgstr "Optionswert nicht bekannt"
+
 #: tools/sources/twitter.h:797
 msgid "not a valid date"
 msgstr "kein valides Datum"
@@ -381,110 +360,96 @@ msgstr "Konnte Namespace nicht ermitteln"
 msgid "can not connect to wikipedia server"
 msgstr "Konnte Wikiepdia Server nicht erreichen"
 
-#: classifier/lazylearner.hpp:193 clustering/supervised/rlvq.hpp:215
-#: dimensionreduce/supervised/lda.hpp:105
+#: classifier/lazylearner.hpp:193 clustering/supervised/rlvq.hpp:220
+#: dimensionreduce/supervised/lda.hpp:108
 msgid "matrix rows and label size are not equal"
 msgstr "Matrixzeilenanzhal und Labelanzahl nicht gleich"
 
 #: clustering/nonsupervised/kmeans.hpp:101
-#: clustering/nonsupervised/neuralgas.hpp:155
-#: clustering/nonsupervised/relational_neuralgas.hpp:159
-#: clustering/supervised/rlvq.hpp:103
+#: clustering/nonsupervised/neuralgas.hpp:161
+#: clustering/nonsupervised/relational_neuralgas.hpp:172
+#: clustering/supervised/rlvq.hpp:106
 msgid "prototype size must be greater than zero"
 msgstr "Prototypdimension muss größer Null sein"
 
 #: clustering/nonsupervised/kmeans.hpp:103
-#: clustering/nonsupervised/neuralgas.hpp:264
-#: clustering/nonsupervised/neuralgas.hpp:358
-#: clustering/nonsupervised/neuralgas.hpp:398
-#: clustering/nonsupervised/relational_neuralgas.hpp:303
-#: clustering/nonsupervised/relational_neuralgas.hpp:389
-#: clustering/nonsupervised/relational_neuralgas.hpp:423
-#: clustering/nonsupervised/relational_neuralgas.hpp:819
+#: clustering/nonsupervised/neuralgas.hpp:269
+#: clustering/nonsupervised/neuralgas.hpp:371
+#: clustering/nonsupervised/neuralgas.hpp:413
+#: clustering/nonsupervised/relational_neuralgas.hpp:269
+#: clustering/nonsupervised/relational_neuralgas.hpp:361
+#: clustering/nonsupervised/relational_neuralgas.hpp:665
 msgid "number of prototypes must be greater than zero"
 msgstr "Prototypanzahl muss größer Null sein"
 
-#: clustering/nonsupervised/kmeans.hpp:162
-#: clustering/nonsupervised/neuralgas.hpp:268
-#: clustering/nonsupervised/neuralgas.hpp:402
-#: clustering/nonsupervised/neuralgas.hpp:640
-#: clustering/nonsupervised/neuralgas.hpp:931
-#: clustering/nonsupervised/relational_neuralgas.hpp:307
-#: clustering/nonsupervised/relational_neuralgas.hpp:427
-#: clustering/nonsupervised/relational_neuralgas.hpp:703
-#: clustering/supervised/rlvq.hpp:213
-#: dimensionreduce/nonsupervised/mds.hpp:261
-#: functionoptimization/gradientdescent.hpp:311
-#: geneticalgorithm/population.hpp:251
+#: clustering/nonsupervised/kmeans.hpp:164
+#: clustering/nonsupervised/neuralgas.hpp:273
+#: clustering/nonsupervised/neuralgas.hpp:417
+#: clustering/nonsupervised/neuralgas.hpp:665
+#: clustering/nonsupervised/neuralgas.hpp:956
+#: clustering/nonsupervised/relational_neuralgas.hpp:273
+#: clustering/nonsupervised/relational_neuralgas.hpp:547
+#: clustering/supervised/rlvq.hpp:218
+#: dimensionreduce/nonsupervised/mds.hpp:269
+#: functionoptimization/gradientdescent.hpp:312
+#: geneticalgorithm/population.hpp:238
 msgid "iterations must be greater than zero"
 msgstr "Iterationen müssen größer Null sein"
 
-#: clustering/nonsupervised/kmeans.hpp:164
-#: clustering/nonsupervised/neuralgas.hpp:270
-#: clustering/nonsupervised/neuralgas.hpp:360
-#: clustering/nonsupervised/neuralgas.hpp:404
-#: clustering/nonsupervised/neuralgas.hpp:642
-#: clustering/nonsupervised/neuralgas.hpp:799
-#: clustering/nonsupervised/neuralgas.hpp:933
-#: clustering/nonsupervised/relational_neuralgas.hpp:309
-#: clustering/nonsupervised/relational_neuralgas.hpp:391
-#: clustering/nonsupervised/relational_neuralgas.hpp:429
-#: clustering/nonsupervised/relational_neuralgas.hpp:715
-#: clustering/nonsupervised/relational_neuralgas.hpp:821
-#: clustering/nonsupervised/spectralclustering.hpp:171
-#: clustering/supervised/rlvq.hpp:217 clustering/supervised/rlvq.hpp:293
+#: clustering/nonsupervised/kmeans.hpp:166
+#: clustering/nonsupervised/neuralgas.hpp:275
+#: clustering/nonsupervised/neuralgas.hpp:373
+#: clustering/nonsupervised/neuralgas.hpp:419
+#: clustering/nonsupervised/neuralgas.hpp:667
+#: clustering/nonsupervised/neuralgas.hpp:824
+#: clustering/nonsupervised/neuralgas.hpp:958
+#: clustering/nonsupervised/relational_neuralgas.hpp:275
+#: clustering/nonsupervised/relational_neuralgas.hpp:363
+#: clustering/nonsupervised/relational_neuralgas.hpp:559
+#: clustering/nonsupervised/relational_neuralgas.hpp:667
+#: clustering/supervised/rlvq.hpp:222 clustering/supervised/rlvq.hpp:304
 msgid "data and prototype dimension are not equal"
 msgstr "Daten- und Prototypdimension nicht identisch"
 
-#: clustering/nonsupervised/kmeans.hpp:166
-#: clustering/nonsupervised/kmeans.hpp:261
-#: clustering/nonsupervised/neuralgas.hpp:266
-#: clustering/nonsupervised/neuralgas.hpp:400
-#: clustering/nonsupervised/neuralgas.hpp:638
-#: clustering/nonsupervised/neuralgas.hpp:929
-#: clustering/nonsupervised/relational_neuralgas.hpp:305
-#: clustering/nonsupervised/relational_neuralgas.hpp:425
-#: clustering/nonsupervised/relational_neuralgas.hpp:701
-#: clustering/supervised/rlvq.hpp:211
+#: clustering/nonsupervised/kmeans.hpp:168
+#: clustering/nonsupervised/kmeans.hpp:267
+#: clustering/nonsupervised/neuralgas.hpp:271
+#: clustering/nonsupervised/neuralgas.hpp:415
+#: clustering/nonsupervised/neuralgas.hpp:663
+#: clustering/nonsupervised/neuralgas.hpp:954
+#: clustering/nonsupervised/relational_neuralgas.hpp:271
+#: clustering/nonsupervised/relational_neuralgas.hpp:545
+#: clustering/supervised/rlvq.hpp:216
 msgid "number of datapoints are less than prototypes"
 msgstr "Anzahl Datenpunkte weniger als Anzahl Prototypen"
 
-#: clustering/nonsupervised/neuralgas.hpp:272
-#: clustering/nonsupervised/neuralgas.hpp:406
-#: clustering/nonsupervised/neuralgas.hpp:644
-#: clustering/nonsupervised/neuralgas.hpp:935
-#: clustering/nonsupervised/relational_neuralgas.hpp:311
-#: clustering/nonsupervised/relational_neuralgas.hpp:431
-#: clustering/nonsupervised/relational_neuralgas.hpp:705
-#: clustering/supervised/rlvq.hpp:219
+#: clustering/nonsupervised/neuralgas.hpp:277
+#: clustering/nonsupervised/neuralgas.hpp:421
+#: clustering/nonsupervised/neuralgas.hpp:669
+#: clustering/nonsupervised/neuralgas.hpp:960
+#: clustering/nonsupervised/relational_neuralgas.hpp:277
+#: clustering/nonsupervised/relational_neuralgas.hpp:549
+#: clustering/supervised/rlvq.hpp:224
 msgid "lambda must be greater than zero"
 msgstr "Lambda muss größer Null sein"
 
-#: clustering/nonsupervised/relational_neuralgas.hpp:96
-#: clustering/nonsupervised/relational_neuralgas.hpp:97
-#: clustering/nonsupervised/relational_neuralgas.hpp:98
-#: clustering/nonsupervised/spectralclustering.hpp:69
-msgid "method is not implementated in this class"
-msgstr "Methode ist nicht in der Klasse implementiert"
-
-#: clustering/nonsupervised/relational_neuralgas.hpp:313
-#: clustering/nonsupervised/relational_neuralgas.hpp:433
-#: clustering/nonsupervised/relational_neuralgas.hpp:713
-#: clustering/nonsupervised/spectralclustering.hpp:169
-#: dimensionreduce/nonsupervised/mds.hpp:185
-#: dimensionreduce/nonsupervised/mds.hpp:499 tools/lapack.hpp:87
-#: tools/lapack.hpp:129 tools/lapack.hpp:236 tools/matrix.hpp:248
+#: clustering/nonsupervised/relational_neuralgas.hpp:279
+#: clustering/nonsupervised/relational_neuralgas.hpp:557
+#: dimensionreduce/nonsupervised/mds.hpp:193
+#: dimensionreduce/nonsupervised/mds.hpp:515 tools/lapack.hpp:91
+#: tools/lapack.hpp:133 tools/lapack.hpp:240 tools/lapack.hpp:261
+#: tools/lapack.hpp:279 tools/matrix.hpp:263
 msgid "matrix must be square"
 msgstr "Matrix muss quadratisch sein"
 
-#: clustering/supervised/rlvq.hpp:221
+#: clustering/supervised/rlvq.hpp:226
 msgid "eta must be greater than zero"
 msgstr "Eta muss größer Null sein"
 
 #: dimensionreduce/nonsupervised/lle.hpp:79
-#: dimensionreduce/nonsupervised/mds.hpp:131
-#: dimensionreduce/nonsupervised/pca.hpp:73
-#: dimensionreduce/supervised/lda.hpp:74
+#: dimensionreduce/nonsupervised/mds.hpp:139
+#: dimensionreduce/nonsupervised/pca.hpp:79
+#: dimensionreduce/supervised/lda.hpp:77
 msgid "dimension must be greater than zero"
 msgstr "Dimension muss größer Null sein"
 
@@ -492,119 +457,120 @@ msgstr "Dimension muss größer Null sein"
 msgid "data points are less than target dimension"
 msgstr "Datenpunkte sind weniger als Zieldimensionen"
 
-#: dimensionreduce/nonsupervised/mds.hpp:187
-#: dimensionreduce/nonsupervised/pca.hpp:105
+#: dimensionreduce/nonsupervised/mds.hpp:195
+#: dimensionreduce/nonsupervised/pca.hpp:111
 msgid "datapoint dimension are less than target dimension"
 msgstr "Datenpunkt Dimension ist kleiner als Zieldimension"
 
-#: dimensionreduce/nonsupervised/mds.hpp:219
+#: dimensionreduce/nonsupervised/mds.hpp:227
 #: neighborhood/kapproximation.hpp:107
 msgid "project option is unkown"
 msgstr "Projektionsoption unbekannt"
 
-#: dimensionreduce/nonsupervised/mds.hpp:263
+#: dimensionreduce/nonsupervised/mds.hpp:271
 msgid "steps must be greater than zero"
 msgstr "Schritte müssen größer Null sein"
 
-#: dimensionreduce/nonsupervised/mds.hpp:310
+#: dimensionreduce/nonsupervised/mds.hpp:319
 msgid "sammon mapping may not converge"
 msgstr "Sammon-Mapping ist nicht konvergiert"
 
-#: dimensionreduce/nonsupervised/mds.hpp:379
-#: dimensionreduce/nonsupervised/mds.hpp:546
+#: dimensionreduce/nonsupervised/mds.hpp:391
+#: dimensionreduce/nonsupervised/mds.hpp:564
 msgid "data matrix has only zero entries"
 msgstr "Datenmatrix hat nur Nulleinträge"
 
-#: dimensionreduce/nonsupervised/mds.hpp:491
+#: dimensionreduce/nonsupervised/mds.hpp:507
 msgid "centering can not be used with MPI"
 msgstr "Centering kann mit MPI nicht verwendet werden"
 
-#: dimensionreduce/nonsupervised/mds.hpp:509
+#: dimensionreduce/nonsupervised/mds.hpp:525
 msgid "MPI project option is unkown"
 msgstr "MPI Projektionsioption nicht bekannt"
 
-#: dimensionreduce/nonsupervised/pca.hpp:101 tools/matrix.hpp:134
-#: tools/matrix.hpp:372 tools/files/csv.hpp:164
+#: dimensionreduce/nonsupervised/pca.hpp:107 tools/matrix.hpp:142
+#: tools/matrix.hpp:422 tools/files/csv.hpp:164
 msgid "row size must be greater than zero"
 msgstr "Zeilenanzahl muss größer Null sein"
 
-#: dimensionreduce/nonsupervised/pca.hpp:103 tools/matrix.hpp:136
+#: dimensionreduce/nonsupervised/pca.hpp:109 tools/matrix.hpp:144
 #: tools/files/csv.hpp:162
 msgid "column size must be greater than zero"
 msgstr "Spaltenanzahl muss größer Null sein"
 
-#: dimensionreduce/supervised/lda.hpp:112
+#: dimensionreduce/supervised/lda.hpp:115
 msgid "target dimension must be less than unique data classes"
 msgstr "Zieldimension muss kleiner sein als eindeutige Klassenanzahl"
 
-#: distances/ncd.hpp:432 distances/ncd.hpp:494 distances/ncd.hpp:560
+#: distances/ncd.hpp:213 distances/ncd.hpp:279 distances/ncd.hpp:353
+#: distances/ncd.hpp:437
 msgid "vector size must be greater than zero"
 msgstr "Vektordimension muss größer Null sein"
 
-#: distances/ncd.hpp:625
+#: distances/ncd.hpp:502
 msgid "string size must be greater than zero"
 msgstr "Stringlänge muss größer Null sein"
 
-#: distances/ncd.hpp:654 distances/ncd.hpp:661
+#: distances/ncd.hpp:529 distances/ncd.hpp:535
 msgid "file can not be opened"
 msgstr "Datei konnte nicht geöffnet werden"
 
-#: functionoptimization/gradientdescent.hpp:180
+#: functionoptimization/gradientdescent.hpp:181
 msgid "function need not be empty"
 msgstr "Funktion darf nicht leer sein"
 
-#: functionoptimization/gradientdescent.hpp:190
-#: functionoptimization/gradientdescent.hpp:253
-#: functionoptimization/gradientdescent.hpp:389
+#: functionoptimization/gradientdescent.hpp:191
+#: functionoptimization/gradientdescent.hpp:254
+#: functionoptimization/gradientdescent.hpp:390
 msgid "arithmetic expression could not be parsed"
 msgstr "arithmetischer Ausdruck konnte nicht verarbeitet werden"
 
-#: functionoptimization/gradientdescent.hpp:209
+#: functionoptimization/gradientdescent.hpp:210
 msgid "error function need not be empty"
 msgstr "Errorfunktion darf nicht leer sein"
 
-#: functionoptimization/gradientdescent.hpp:211
+#: functionoptimization/gradientdescent.hpp:212
 msgid "variable name for the function need not be empty"
 msgstr "Variablenname für die Funktion darf nicht leer sein"
 
-#: functionoptimization/gradientdescent.hpp:213
+#: functionoptimization/gradientdescent.hpp:214
 msgid "separators need not be empty"
 msgstr "Separatoren dürfen nicht leer sein"
 
-#: functionoptimization/gradientdescent.hpp:231
-#: functionoptimization/gradientdescent.hpp:271
+#: functionoptimization/gradientdescent.hpp:232
+#: functionoptimization/gradientdescent.hpp:272
 msgid "variable for optimization is not found in the expression symbol table"
 msgstr "Variable zur Optimierung ist nicht in der Ausdrucksymboltabelle"
 
-#: functionoptimization/gradientdescent.hpp:258
+#: functionoptimization/gradientdescent.hpp:259
 msgid "only one variable for the data must be added"
 msgstr "nur eine Variable darf für die Daten hinzugefügt werden"
 
-#: functionoptimization/gradientdescent.hpp:295
+#: functionoptimization/gradientdescent.hpp:296
 msgid "static variable is not in the symbol table or is an optimazation variable"
 msgstr "statische Variable ist nicht in der Symboltabelle oder ist keine Variablen, die optimiert wird"
 
-#: functionoptimization/gradientdescent.hpp:313
+#: functionoptimization/gradientdescent.hpp:314
 msgid "stepsize must be greater than zero"
 msgstr "Schrittgröße muss größer Null sein"
 
-#: functionoptimization/gradientdescent.hpp:317
+#: functionoptimization/gradientdescent.hpp:318
 msgid "there are unsed variables"
 msgstr "es existieren unbenutzte Variablen"
 
-#: geneticalgorithm/population.hpp:139
+#: geneticalgorithm/population.hpp:126
 msgid "population size must be greater than two"
 msgstr "Populationsgröße muss größer Zwei sein"
 
-#: geneticalgorithm/population.hpp:142 geneticalgorithm/population.hpp:172
+#: geneticalgorithm/population.hpp:129 geneticalgorithm/population.hpp:159
 msgid "elite size must be greater than one"
 msgstr "Eliteanzahl muss größer Eins sein"
 
-#: geneticalgorithm/population.hpp:145 geneticalgorithm/population.hpp:175
+#: geneticalgorithm/population.hpp:132 geneticalgorithm/population.hpp:162
 msgid "elite size must be smaller than population size"
 msgstr "Eliteanzahl muss kleiner als Populationsgröße sein"
 
-#: geneticalgorithm/population.hpp:202
+#: geneticalgorithm/population.hpp:189
 msgid "element sizes are not equal"
 msgstr "Elementanzahl nicht identisch"
 
@@ -633,38 +599,6 @@ msgstr "Anzahl muss größer Null sein"
 msgid "fitness values are all zero"
 msgstr "alle Fitnesswerte sind Null"
 
-#: java/jni.hpp:82 java/jni.hpp:105
-msgid "pointer to object is empty"
-msgstr "Zeiger auf das Objekt ist leer"
-
-#: java/jni.hpp:87
-msgid "pointer to object is not empty"
-msgstr "Zeiger auf das Objekt ist nicht leer"
-
-#: java/jni.hpp:115 java/jni.hpp:187 java/jni.hpp:216 java/jni.hpp:244
-msgid "can not find associated java class"
-msgstr "Konnte assoziierte Javaklasse nicht ermitteln"
-
-#: java/jni.hpp:123 java/jni.hpp:160
-msgid "call is not within a thread-safe content"
-msgstr "Aufruf ist nicht in einem thread-sicheren Bereich"
-
-#: java/jni.hpp:134 java/jni.hpp:170
-msgid "release thread can not be determine correctly"
-msgstr "Threadrelease kann nicht richtig beendet werden"
-
-#: java/jni.hpp:142
-msgid "pointer field can not detected"
-msgstr "Zeigerfeld konnte nicht ermittelt werden"
-
-#: java/jni.hpp:194 java/jni.hpp:223
-msgid "can not find method with signature"
-msgstr "konnte Wikipedia Dokument nicht anhand der URL ermitteln"
-
-#: java/jni.hpp:248
-msgid "can not find constructor call"
-msgstr "Konstruktoraufruf konnte nicht gefunden werden"
-
 #: neighborhood/kapproximation.hpp:90
 msgid "number of approximate data must be greater than zero"
 msgstr "Anzahl der approximierten Daten muss größer Null sein"
@@ -677,11 +611,11 @@ msgstr "kNN muss größer Null sein"
 msgid "knn is greater than datapoints"
 msgstr "kNN ist größer als Datenpunkte"
 
-#: tools/lapack.hpp:89
+#: tools/lapack.hpp:93
 msgid "both matrices have not the same size"
 msgstr "beide Matrizen haben nicht die gleiche Größe"
 
-#: tools/lapack.hpp:238
+#: tools/lapack.hpp:242
 msgid "number of rows / columns of the matrix must have the same dimension like the initialisation vector"
 msgstr "Anzahl der Zeilen / Spalten der Matrix müssen die selbe Dimension haben, wie der Initialisierungsvektor"
 
@@ -689,7 +623,7 @@ msgstr "Anzahl der Zeilen / Spalten der Matrix müssen die selbe Dimension haben
 msgid "log state is unkown"
 msgstr "Logging Status unbekannt"
 
-#: tools/random.hpp:202
+#: tools/random.hpp:185
 msgid "distribution is not kwon"
 msgstr "Verteilung unbekannt"
 
@@ -776,3 +710,39 @@ msgstr "Sampling muss größer Null sein"
 #: tools/sources/cloud.hpp:197
 msgid "random value must be between [0,1]"
 msgstr "Zufallswert muss zwischen [0,1] liegen"
+
+#~ msgid "enum value is not known"
+#~ msgstr "Sprache ist unbekannt"
+
+#~ msgid "data matrix is null"
+#~ msgstr "Datenmatrix hat nur Nulleinträge"
+
+#~ msgid "data matrix is empty"
+#~ msgstr "Datenmatrix hat nur Nulleinträge"
+
+#~ msgid "method is not implementated in this class"
+#~ msgstr "Methode ist nicht in der Klasse implementiert"
+
+#~ msgid "pointer to object is empty"
+#~ msgstr "Zeiger auf das Objekt ist leer"
+
+#~ msgid "pointer to object is not empty"
+#~ msgstr "Zeiger auf das Objekt ist nicht leer"
+
+#~ msgid "can not find associated java class"
+#~ msgstr "Konnte assoziierte Javaklasse nicht ermitteln"
+
+#~ msgid "call is not within a thread-safe content"
+#~ msgstr "Aufruf ist nicht in einem thread-sicheren Bereich"
+
+#~ msgid "release thread can not be determine correctly"
+#~ msgstr "Threadrelease kann nicht richtig beendet werden"
+
+#~ msgid "pointer field can not detected"
+#~ msgstr "Zeigerfeld konnte nicht ermittelt werden"
+
+#~ msgid "can not find method with signature"
+#~ msgstr "konnte Wikipedia Dokument nicht anhand der URL ermitteln"
+
+#~ msgid "can not find constructor call"
+#~ msgstr "Konstruktoraufruf konnte nicht gefunden werden"
