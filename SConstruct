@@ -129,7 +129,7 @@ env.SConscript( os.path.join("scons", "platform", platformconfig+".py"), exports
 # adding the main path (parent of the current directory) to the CPPPATH and uniquify each option, 
 # that is setup with data of the system environment
 if env.has_key("CPPPATH") :
-    env.AppendUnique(CPPPATH = [os.sep.join(os.path.abspath(os.curdir).split(os.sep)[0:-1])])
+    env.AppendUnique(CPPPATH = [os.path.abspath(os.curdir)])
 if env.has_key("CXXFLAGS") :
     env.AppendUnique(CXXFLAGS = [env["CXXFLAGS"]])
 if env.has_key("LINKFLAGS") :    
@@ -143,12 +143,22 @@ if env.has_key("LIBPATH") :
 if env["withmpi"] :
     env.Replace(CXX = "mpic++")
     
+# main cpp must compiled in
+defaultcpp = []
+if env["withlogger"] or env["withrandomdevice"] :
+    defaultcpp.append( "machinelearning.cpp" )
+    
 #adding configuration checks http://www.scons.org/wiki/SconsAutoconf
 
+
+for i in ["geneticalgorithm", "classifier", "clustering", "distance", "other", "reducing", "sources"] :
+    env.SConscript( os.path.join("examples", i, "SConscript"), exports="env colorama defaultcpp help" )
+
+
 # call target scripts and set default target to empty
-env.SConscript( os.path.join("scons", "target", "documentation.py"), exports="env colorama")
-env.SConscript( os.path.join("scons", "target", "cppexample.py"), exports="env colorama")
-env.SConscript( os.path.join("scons", "target", "librarybuild.py"), exports="env colorama")
-env.SConscript( os.path.join("scons", "target", "language.py"), exports="env colorama")
-env.SConscript( os.path.join("scons", "target", "java.py"), exports="env colorama")
-env.SConscript( os.path.join("scons", "target", "python.py"), exports="env colorama")
+#env.SConscript( os.path.join("scons", "target", "documentation.py"), exports="env colorama")
+#env.SConscript( os.path.join("scons", "target", "cppexample.py"), exports="env colorama")
+#env.SConscript( os.path.join("scons", "target", "librarybuild.py"), exports="env colorama")
+#env.SConscript( os.path.join("scons", "target", "language.py"), exports="env colorama")
+#env.SConscript( os.path.join("scons", "target", "java.py"), exports="env colorama")
+#env.SConscript( os.path.join("scons", "target", "python.py"), exports="env colorama")

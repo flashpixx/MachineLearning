@@ -1,0 +1,34 @@
+############################################################################
+# LGPL License                                                             #
+#                                                                          #
+# This file is part of the Machine Learning Framework.                     #
+# Copyright (c) 2010, Philipp Kraus, <philipp.kraus@flashpixx.de>          #
+# This program is free software: you can redistribute it and/or modify     #
+# it under the terms of the GNU Lesser General Public License as           #
+# published by the Free Software Foundation, either version 3 of the       #
+# License, or (at your option) any later version.                          #
+#                                                                          #
+# This program is distributed in the hope that it will be useful,          #
+# but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+# GNU Lesser General Public License for more details.                      #
+#                                                                          #
+# You should have received a copy of the GNU Lesser General Public License #
+# along with this program. If not, see <http://www.gnu.org/licenses/>.     #
+############################################################################
+ 
+# -*- coding: utf-8 -*-
+import os
+Import("*")
+
+buildlist = []
+
+if env["withfiles"] :
+    buildlist.append( env.Program( target=os.path.join("#build", "rlvq"), source=defaultcpp+["rlvq.cpp"] ) )
+    buildlist.append( env.Program( target=os.path.join("#build", "kmeans"), source=defaultcpp+["kmeans.cpp"] ) )
+    buildlist.append( env.Program( target=os.path.join("#build", "neuralgas"), source=defaultcpp+["neuralgas.cpp"] ) )
+    buildlist.append( env.Program( target=os.path.join("#build", "patch_neuralgas"), source=defaultcpp+["patch_neuralgas.cpp"] ) )
+    buildlist.append( env.Program( target=os.path.join("#build", "relational_neuralgas"), source=defaultcpp+["relational_neuralgas.cpp"] ) )
+    buildlist.append( env.Program( target=os.path.join("#build", "spectral"), source=defaultcpp+["spectral.cpp"] ) )
+    
+env.Alias( "clustering", buildlist )
