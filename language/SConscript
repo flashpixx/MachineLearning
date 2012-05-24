@@ -21,15 +21,3 @@
 
 import os
 Import("*")
-
-buildlist = []
-
-if env["withfiles"] :
-    buildlist.append( env.Program( target=os.path.join("#build", "mds_file"), source=defaultcpp+["mds_file.cpp"] ) )
-
-    if env["withsources"] :
-        buildlist.append( env.Program( target=os.path.join("#build", "mds_nntp"), source=defaultcpp+["mds_nntp.cpp"] ) )
-        buildlist.append( env.Program( target=os.path.join("#build", "mds_wikipedia"), source=defaultcpp+["mds_wikipedia.cpp"] ) )
-        buildlist.append( env.Program( target=os.path.join("#build", "mds_twitter"), source=defaultcpp+["mds_twitter.cpp"] ) )
-
-env.Alias( "other", buildlist )
