@@ -22,7 +22,7 @@
  **/
 
 #include <cstdlib>
-#include <machinelearning/machinelearning.h>
+#include <machinelearning.h>
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
 #include <boost/program_options/options_description.hpp>
