@@ -32,4 +32,4 @@ if env["withsources"] :
 if env["withfiles"] :
     buildlist.append( env.Program( target=os.path.join("#build", "cloud"), source=defaultcpp+["cloud.cpp"] ) )
     
-env.Alias( "source", buildlist )
+env.Alias( "sources", buildlist )
