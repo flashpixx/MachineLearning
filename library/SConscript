@@ -398,7 +398,7 @@ def build_ginaccln(target, source, env) :
         raise RuntimeError("GiNaC Build Directory not found")
     
     ginacpath     = ginacpath[0]
-    ginacversion  = ginacpath.replace(os.path.join("workingpath, "ginac-"), "")
+    ginacversion  = ginacpath.replace(os.path.join(workingpath, "ginac-"), "")
 
     runsyscmd( "cd "+clnpath+"; ./configure --prefix="+os.path.abspath(os.path.join(workingpath, "build", "cln", clnversion))+ "; make; make install", env )
     runsyscmd( "cd "+ginacpath+"; export CLN_CFLAGS=-I"+os.path.abspath(os.path.join(workingpath, "build", "cln", clnversion, "include"))+"; export CLN_LIBS=\"-L"+os.path.abspath(os.path.join(workingpath, "build", "cln", clnversion, "lib"))+" -lcln\"; ./configure --prefix="+os.path.abspath(os.path.join(workingpath, "build", "ginac", ginacversion))+ "; make; make install", env )
