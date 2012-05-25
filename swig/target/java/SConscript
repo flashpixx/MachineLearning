@@ -24,12 +24,7 @@ Import("*")
 
 buildlist = []
 
-if env["withsources"] :
-    buildlist.append( env.Program( target=os.path.join("#build", "twitter"), source=defaultcpp+["twitter.cpp"] ) )
-    buildlist.append( env.Program( target=os.path.join("#build", "newsgroup"), source=defaultcpp+["newsgroup.cpp"] ) )
-    buildlist.append( env.Program( target=os.path.join("#build", "wikipedia"), source=defaultcpp+["wikipedia.cpp"] ) )
-
-    if env["withfiles"] :
-        buildlist.append( env.Program( target=os.path.join("#build", "cloud"), source=defaultcpp+["cloud.cpp"] ) )
+#if env["withfiles"] :
+#    buildlist.append( env.Program( target=os.path.join("#build", "lazy"), source=defaultcpp + ["lazy.cpp"] ) )
     
-env.Alias( "sources", buildlist )
+env.Alias( "java", buildlist )

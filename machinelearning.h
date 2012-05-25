@@ -65,6 +65,7 @@
  * <li><i>optional LibJSONCPP</i> ( http://sourceforge.net/projects/jsoncpp/ ) (used by twitter support)</li>
  * <li><i>optional Java Runtime Environment (JRE) / Java Developer Kit (JDK)</i> ( http://www.java.com/ / http://www.oracle.com/technetwork/java/javase/downloads/index.html ) </li>
  * <li><i>optional Scons</i> ( http://www.scons.org/ )</li>
+ * <li><i>optional Swig</i> ( http://www.swig.org/ )</li>
  * <li><i>optional Doxygen</i> ( http://www.doxygen.org/ ) with Graphviz support ( http://www.graphviz.org )</li>
  * </ul>
  * For manual installation of the library you can follow the short @subpage installationnotes / A default library installation can be created with the command <dfn>scons librarybuild</dfn>
@@ -165,7 +166,7 @@
  * show a build target, but some targets will be build first if different parameters are set
  * <ul>
  * <li><dfn>documentation</dfn> create the documentation with Doxygen (Doxygen must be installed and be reached within the path)</li>
- * <li><dfn>librarybuild</dfn> download the librarys and compile each library with the default option. Compiled libraries are installed under the subdirectory <dfn>install/build</dfn>.
+ * <li><dfn>librarybuild</dfn> download the librarys and compile each library with the default option. Compiled libraries are installed under the subdirectory <dfn>library/build</dfn>.
  * Requirements for the automatic build installation process: <ul>
  * <li>tar, make, gfortran, gcc & g++ must be installed and within the search path</li>
  * <li>all files are downloaded under <dfn>install/</dfn>, each file can be replaced with another version, so the script downloads the packages only, if the file does not exists</li>
