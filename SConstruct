@@ -160,12 +160,3 @@ env.SConscript( os.path.join("library", "SConscript"), exports="env colorama def
 
 for i in ["geneticalgorithm", "classifier", "clustering", "distance", "other", "reducing", "sources"] :
     env.SConscript( os.path.join("examples", i, "SConscript"), exports="env colorama defaultcpp help" )
-
-
-# call target scripts and set default target to empty
-#env.SConscript( os.path.join("scons", "target", "documentation.py"), exports="env colorama")
-#env.SConscript( os.path.join("scons", "target", "cppexample.py"), exports="env colorama")
-#env.SConscript( os.path.join("scons", "target", "librarybuild.py"), exports="env colorama")
-#env.SConscript( os.path.join("scons", "target", "language.py"), exports="env colorama")
-#env.SConscript( os.path.join("scons", "target", "java.py"), exports="env colorama")
-#env.SConscript( os.path.join("scons", "target", "python.py"), exports="env colorama")
