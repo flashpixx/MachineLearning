@@ -69,7 +69,7 @@
  * <li><i>optional Doxygen</i> ( http://www.doxygen.org/ ) with Graphviz support ( http://www.graphviz.org )</li>
  * </ul>
  * For manual installation of the library you can follow the short @subpage installationnotes / A default library installation can be created with the command <dfn>scons librarybuild</dfn>
- * with the optional ATLAS building parameters. After compiling the directory <dfn>install/build</dfn> must be moved to a directory in that all libraries should be stored, because
+ * with the optional ATLAS building parameters. After compiling the directory <dfn>library/build</dfn> must be moved to a directory in that all libraries should be stored, because
  * a clean-target removes the <dfn>install</dfn> directory. The default installation need the make-tools (make), gcc / g++ (C and C++ compiler) and gfortran (Fortran compiler).
  * The framework was tested under: Mac OS X Leopard (10.5), Mac OS X Snow Leopard (10.6), Mac OS X Lion (10.7), Ubuntu Lucid Lynx (10.04), Gentoo Linux (stable / unstable) and Microsoft
  * Windows 7 (with Cygwin). The main header file <dfn>machinelearning.h</dfn> must be added to the <dfn>CPPPATH</dfn> variable with the prefix directory <dfn>machinelearning</dfn>, if the examples
@@ -169,7 +169,7 @@
  * <li><dfn>librarybuild</dfn> download the librarys and compile each library with the default option. Compiled libraries are installed under the subdirectory <dfn>library/build</dfn>.
  * Requirements for the automatic build installation process: <ul>
  * <li>tar, make, gfortran, gcc & g++ must be installed and within the search path</li>
- * <li>all files are downloaded under <dfn>install/</dfn>, each file can be replaced with another version, so the script downloads the packages only, if the file does not exists</li>
+ * <li>all files are downloaded under <dfn>library/</dfn>, each file can be replaced with another version, so the script downloads the packages only, if the file does not exists</li>
  * <li>the framework must be stored in a directory without any spaces, spaces create errors on the build process</li>
  * </ul>
  * <li><dfn>createlanguage</dfn> creates the language files / adds new messages to the existing files (xgettext must be called, so it should be within the path)</li>
