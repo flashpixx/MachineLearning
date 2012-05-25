@@ -158,7 +158,7 @@
  * <li><dfn>winver</dfn> is set for the Windows version [default: win7, other allowed values: srv2008, vista, srv2003sp1, xpsp2, srv2003, xp, w2000)</li>
  * </ul>
  * The <dfn>SConstruct</dfn> script, which is the entry point to the compiler calls, is stored in the framework main directory. Under the <dfn>scons</dfn> directory all other script (helper, platform)
- * are stored. For each target a own script exists under the directory, which should be build. For each platform a own script is stored under <dfn>scons/platform</dfn> that is used for setting the
+ * are stored. For each target a own <dfn>SConscript</dfn> script exists under the directory, which should be build. For each platform a own script is stored under <dfn>scons/platform</dfn> that is used for setting the
  * platform default compile option like linked libraries, pathes, ...
  *
  * @subsection targets build targets

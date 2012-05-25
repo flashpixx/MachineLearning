@@ -72,6 +72,7 @@ namespace machinelearning { namespace tools {
      * @endcode
      * The MPI libraries must be compiled with multithread support
      * @todo adding stream operator for writing data to logger
+     * @todo removing Boost Thread and change it to OpenMP support
      **/
     class logger
     {
