@@ -24,7 +24,4 @@ Import("*")
 
 buildlist = []
 
-#if env["withfiles"] :
-#    buildlist.append( env.Program( target=os.path.join("#build", "lazy"), source=defaultcpp + ["lazy.cpp"] ) )
-    
 env.Alias( "python", buildlist )

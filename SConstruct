@@ -154,9 +154,14 @@ if env["withlogger"] or env["withrandomdevice"] :
 #adding configuration checks http://www.scons.org/wiki/SconsAutoconf
 
 
+# setup all different sub build script
 env.SConscript( os.path.join("tools", "language", "SConscript"), exports="env colorama defaultcpp help" )
 env.SConscript( os.path.join("documentation", "SConscript"), exports="env colorama defaultcpp help" )
 env.SConscript( os.path.join("library", "SConscript"), exports="env colorama defaultcpp help" )
+
+env.SConscript( os.path.join("swig", "target", "java", "SConscript"), exports="env colorama defaultcpp help" )
+env.SConscript( os.path.join("swig", "target", "python", "SConscript"), exports="env colorama defaultcpp help" )
+#env.SConscript( os.path.join("swig", "target", "php", "SConscript"), exports="env colorama defaultcpp help" )
 
 for i in ["geneticalgorithm", "classifier", "clustering", "distance", "other", "reducing", "sources"] :
     env.SConscript( os.path.join("examples", i, "SConscript"), exports="env colorama defaultcpp help" )
