@@ -70,9 +70,12 @@ def cleantarget(env) :
     files.extend( help.getRekusivFiles(os.curdir, ".stackdump") )
     files.extend( help.getRekusivFiles(os.curdir, ".core") )
     files.extend( help.getRekusivFiles(os.curdir, ".pyc") )
-    
+    files.extend( help.getRekusivFiles(os.curdir, ".bz2") )
+    files.extend( help.getRekusivFiles(os.curdir, ".gz") )
+    files.extend( help.getRekusivFiles(os.curdir, ".tgz") )
+
     # don't add the current path, because scons run the directories until "/"
-    files.extend( ["build", "documentation", "install", os.path.join("scons", "target", "machinelearning")] )
+    files.extend( ["build", os.path.join("library", "build")] )
 
     env.Clean("clean", files)
 
