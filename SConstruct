@@ -22,6 +22,7 @@
 import os
 import sys
 import platform
+import json
 sys.path.append("scons")
 import help
 import colorama
@@ -141,6 +142,12 @@ if not env.GetOption('clean') :
 
 
     if env["showconfig"] :
+        print "\n\n\n"
+        print "==== configuration =================================================================="
+    
+        #json.dumps(data, sort_keys=True, indent=4)
+        #data = {k: env[k] for k in ("CXX", "CXXFLAGS", "ENV", "atlascputhrottle", "atlaslink", "atlaspointerwidth", "cputype", "math", "skipbuilderror") }
+        """
         print "CXX :\t\t"+env.Dump("CXX")
         print "CXXFLAGS :\t\t"+env.Dump("CXXFLAGS")
         print "ENV : \t\t"+env.Dump("ENV")
@@ -161,7 +168,10 @@ if not env.GetOption('clean') :
         print "with random device : \t\t"+env.Dump("withrandomdevice")
         print "with sources : \t\t"+env.Dump("withsources")
         print "with symbolic math : \t\t"+env.Dump("withsymbolicmath")
-
+        """
+        
+        print "====================================================================================="
+        print "\n\n\n"
 
         
 
