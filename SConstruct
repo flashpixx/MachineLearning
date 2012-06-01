@@ -114,44 +114,47 @@ if " " in os.path.abspath(os.curdir) :
 vars = Variables()
 createVariables(vars)
 
-env = Environment(variables=vars)
+env  = Environment(variables=vars)
 Help(vars.GenerateHelpText(env))
-# Scons < 2: env.BuildDir("build", ".", duplicate=0)
+#env.Append(BUILDERS = {"SwigJava" : SwigJava})
+
+
 env.VariantDir("build", ".", duplicate=0)
-if os.environ.has_key("PATH") :
-    env["ENV"]["PATH"] = [env["ENV"]["PATH"], os.environ["PATH"]]
+#if os.environ.has_key("PATH") :
+#    env["ENV"]["PATH"] = [env["ENV"]["PATH"], os.environ["PATH"]]
 cleantarget(env)
 
 # adding platform scripts
 platformconfig = env["PLATFORM"].lower()
 if not(os.path.isfile(os.path.join("scons", "platform", platformconfig+".py"))) :
     raise ImportError("platform configuration script ["+platformconfig+"] not found")
-    
-env.SConscript( os.path.join("scons", "platform", platformconfig+".py"), exports="env" )
+env.SConscript( os.path.join("scons", "platform", platformconfig+".py"), exports="env help" )
+
 
 # adding the main path (parent of the current directory) to the CPPPATH and uniquify each option, 
 # that is setup with data of the system environment
-if env.has_key("CPPPATH") :
+if "CPPPATH" in env :
     env.AppendUnique(CPPPATH = [os.path.abspath(os.curdir)])
-if env.has_key("CXXFLAGS") :
-    env.AppendUnique(CXXFLAGS = [env["CXXFLAGS"]])
-if env.has_key("LINKFLAGS") :    
-    env.AppendUnique(LINKFLAGS = [env["LINKFLAGS"]])
-if env.has_key("LIBS") :
-    env.AppendUnique(LIBS = [env["LIBS"]])
-if env.has_key("LIBPATH") :
-    env.AppendUnique(LIBPATH = [env["LIBPATH"]])
+#if env.has_key("CXXFLAGS") :
+#    env.AppendUnique(CXXFLAGS = [env["CXXFLAGS"]])
+#if env.has_key("LINKFLAGS") :    
+#    env.AppendUnique(LINKFLAGS = [env["LINKFLAGS"]])
+#if env.has_key("LIBS") :
+#    env.AppendUnique(LIBS = [env["LIBS"]])
+#if env.has_key("LIBPATH") :
+#    env.AppendUnique(LIBPATH = [env["LIBPATH"]])
     
 # set manually if needed the MPI C++ compiler
-if env["withmpi"] :
-    env.Replace(CXX = "mpic++")
-    
+#if env["withmpi"] :
+#    env.Replace(CXX = "mpic++")
+
+
+
 # main cpp must compiled in
 defaultcpp = []
 if env["withlogger"] or env["withrandomdevice"] :
     defaultcpp.append( "machinelearning.cpp" )
-    
-#adding configuration checks http://www.scons.org/wiki/SconsAutoconf
+
 
 
 # setup all different sub build script

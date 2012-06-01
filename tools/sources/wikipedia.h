@@ -26,7 +26,6 @@
 #ifndef __MACHINELEARNING_TOOLS_SOURCES_WIKIPEDIA_H
 #define __MACHINELEARNING_TOOLS_SOURCES_WIKIPEDIA_H
 
-#include <stdarg.h>
 #include <algorithm>
 #include <boost/asio.hpp>
 #include <boost/regex.hpp>

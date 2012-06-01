@@ -19,13 +19,13 @@
  
 # -*- coding: utf-8 -*-
 
-import os
-import sys
-import glob
-import re
+#import os
+#import sys
+#import glob
+#import re
 Import("*")
 
-
+"""
 def SwigJavaBuilder(target, source, env) :
     # create build dir path and create dir for the native sources
     builddir = os.path.join("build", "jar")
@@ -198,7 +198,7 @@ def SwigJavaEmitter(target, source, env) :
                         target.append( os.path.normpath(os.path.join(Dir("#").abspath, jbuilddir, os.sep.join(data["cppnamespace"][n]), l+".java")) )
             
         return target, source
-
+"""
 
 
 #def isJava(s):
@@ -210,16 +210,15 @@ def SwigJavaEmitter(target, source, env) :
 
 
 
-env.Append( BUILDERS = {"SwigJava" : Builder(action = SwigJavaBuilder, emitter = SwigJavaEmitter) } )
+#env.Append( BUILDERS = {"SwigJava" : Builder(action = SwigJavaBuilder, emitter = SwigJavaEmitter) } )
 #env.Replace( JAVASOURCEPATH = os.path.join(Dir("#").abspath, "jar", "javasource") )
 
 
 buildlist = []
 
-swiglist = env.SwigJava( "swigbuild", help.getRekusivFiles( os.path.join("..", "..", "machinelearning"), ".i") )
+#swiglist = env.SwigJava( "swigbuild", help.getRekusivFiles( os.path.join("..", "..", "machinelearning"), ".i") )
 
-buildlist.append( swiglist )
+#buildlist.append( swiglist )
 #buildlist.append( env.Java(os.path.join(Dir("#").abspath, "jar", "library"), os.path.join(Dir("#").abspath, "jar", "javasource")) )
-buildlist.append( env.Java(os.path.join(Dir("#").abspath, "build", "jar", "library"), swiglist, SOURCEPATH="/Developer" ) ) 
     
-env.Alias( "javac", buildlist )
+#env.Alias( "javac", buildlist )

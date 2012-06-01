@@ -28,7 +28,6 @@
 #include <omp.h>
 
 #include <numeric>
-#include <boost/shared_ptr.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 
