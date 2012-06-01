@@ -43,6 +43,7 @@ def createVariables(vars) :
 
     vars.Add(EnumVariable("atlaslink", "value of the atlas threadding (multi = tatlas, single = satlas)", "multi", allowed_values=("multi", "single")))
     vars.Add(BoolVariable("staticlink", "libraries will linked static", True))
+    vars.Add(BoolVariable("showconfig", "shows the environment configuration", False))
 
     vars.Add(EnumVariable("cputype", "value of the cpu type [see: http://gcc.gnu.org/onlinedocs/gcc/i386-and-x86_002d64-Options.html]", "native", allowed_values=("native", "generic", "i386", "i486", "i586", "i686", "pentium-mmx", "pentiumpro", "pentium2", "pentium3", "pentium-m", "pentium4", "prescott", "nocona", "core2", "corei7", "corei7-avx", "core-avx-i", "atom", "k6", "k6-2", "athlon", "athlon-4", "k8", "k8-sse3", "amdfam10", "winchip-c6", "winchip2", "c3", "c3-2", "geode" )))
     
@@ -59,7 +60,7 @@ def createVariables(vars) :
 
 #=== clean targets =====================================================================================================================
 def cleantarget(env) :
-    files = []
+    files = ["config.log"]
     
     files.extend( help.getRekusivFiles(os.curdir, env["OBJSUFFIX"]) )
     files.extend( help.getRekusivFiles(os.curdir, env["SHOBJSUFFIX"]) )
@@ -73,7 +74,7 @@ def cleantarget(env) :
     files.extend( help.getRekusivFiles(os.curdir, ".bz2") )
     files.extend( help.getRekusivFiles(os.curdir, ".gz") )
     files.extend( help.getRekusivFiles(os.curdir, ".tgz") )
-
+    
     # don't add the current path, because scons run the directories until "/"
     files.extend( ["build", os.path.join("library", "build")] )
 
@@ -122,37 +123,63 @@ createVariables(vars)
 env  = Environment(variables=vars)
 env.VariantDir("build", ".", duplicate=0)
 Help(vars.GenerateHelpText(env))
+cleantarget(env)
 
-#cleantarget(env)
-if "CPPPATH" in env :
+
+if not env.GetOption('clean') :
+    # adding platform scripts, create configuration and finish the configuration
+
+    print env.Dump()
+
     env.AppendUnique(CPPPATH = [os.path.abspath(os.curdir)])
-
-
-# adding platform scripts, create configuration and finish the configuration
-conf = Configure(env)
-platformconfig = env["PLATFORM"].lower()
-if not(os.path.isfile(os.path.join("scons", "platform", platformconfig+".py"))) :
-    raise ImportError("platform configuration script ["+platformconfig+"] not found")
-env.SConscript( os.path.join("scons", "platform", platformconfig+".py"), exports="conf help" )
-env = conf.Finish()
+    conf = Configure(env)
+    platformconfig = env["PLATFORM"].lower()
+    if not(os.path.isfile(os.path.join("scons", "platform", platformconfig+".py"))) :
+        raise ImportError("platform configuration script ["+platformconfig+"] not found")
+    env.SConscript( os.path.join("scons", "platform", platformconfig+".py"), exports="conf help" )
+    env = conf.Finish()
 
 
 
+    if env["showconfig"] :
+        print "CXX :\t\t"+env.Dump("CXX")
+        print "CXXFLAGS :\t\t"+env.Dump("CXXFLAGS")
+        print "ENV : \t\t"+env.Dump("ENV")
+        print ""
+        print "Atlas CPU Throttle : \t\t"+env.Dump("atlascputhrottle")
+        print "AtlasLink : \t\t"+env.Dump("atlaslink")
+        print "Atlas pointer width : \t\t"+env.Dump("atlaspointerwidth")
+        print "CPU Type : \t\t"+env.Dump("cputype")
+        print "Math : \t\t"+env.Dump("math")
+        print "Skip builderror : \t\t"+env.Dump("skipbuilderror")
+        print "static link : \t\t"+env.Dump("staticlink")
+        print "with debug : \t\t"+env.Dump("withdebug")
+        print "with files : \t\t"+env.Dump("withfiles")
+        print "with logger : \t\t"+env.Dump("withlogger")
+        print "with MPI : \t\t"+env.Dump("withmpi")
+        print "with multilanguage : \t\t"+env.Dump("withmultilanguage")
+        print "with optimize : \t\t"+env.Dump("withoptimize")
+        print "with random device : \t\t"+env.Dump("withrandomdevice")
+        print "with sources : \t\t"+env.Dump("withsources")
+        print "with symbolic math : \t\t"+env.Dump("withsymbolicmath")
 
-# main cpp must compiled in
-defaultcpp = []
-if env["withlogger"] or env["withrandomdevice"] :
-    defaultcpp.append( "machinelearning.cpp" )
+
+        
+
+    # main cpp must compiled in
+    defaultcpp = []
+    if env["withlogger"] or env["withrandomdevice"] :
+        defaultcpp.append( "machinelearning.cpp" )
 
 
-# setup all different sub build script
-env.SConscript( os.path.join("tools", "language", "SConscript"), exports="env colorama defaultcpp help" )
-env.SConscript( os.path.join("documentation", "SConscript"), exports="env colorama defaultcpp help" )
-env.SConscript( os.path.join("library", "SConscript"), exports="env colorama defaultcpp help" )
+    # setup all different sub build script
+    env.SConscript( os.path.join("tools", "language", "SConscript"), exports="env colorama defaultcpp help" )
+    env.SConscript( os.path.join("documentation", "SConscript"), exports="env colorama defaultcpp help" )
+    env.SConscript( os.path.join("library", "SConscript"), exports="env colorama defaultcpp help" )
 
-env.SConscript( os.path.join("swig", "target", "java", "SConscript"), exports="env colorama defaultcpp help" )
-#env.SConscript( os.path.join("swig", "target", "python", "SConscript"), exports="env colorama defaultcpp help" )
-#env.SConscript( os.path.join("swig", "target", "php", "SConscript"), exports="env colorama defaultcpp help" )
+    env.SConscript( os.path.join("swig", "target", "java", "SConscript"), exports="env colorama defaultcpp help" )
+    #env.SConscript( os.path.join("swig", "target", "python", "SConscript"), exports="env colorama defaultcpp help" )
+    #env.SConscript( os.path.join("swig", "target", "php", "SConscript"), exports="env colorama defaultcpp help" )
 
-for i in ["geneticalgorithm", "classifier", "clustering", "distance", "other", "reducing", "sources"] :
-    env.SConscript( os.path.join("examples", i, "SConscript"), exports="env colorama defaultcpp help" )
+    for i in ["geneticalgorithm", "classifier", "clustering", "distance", "other", "reducing", "sources"] :
+        env.SConscript( os.path.join("examples", i, "SConscript"), exports="env colorama defaultcpp help" )

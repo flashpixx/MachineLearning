@@ -18,6 +18,7 @@
 ############################################################################
 
 # -*- coding: utf-8 -*-
+
 import os
 Import("*")
 
@@ -26,7 +27,7 @@ Import("*")
 if "CXX" in os.environ:
     conf.env.Replace(CXX = os.environ["CXX"])
     print("Using compiler " + os.environ["CXX"])
-    
+
 if "CPPPATH" in os.environ :
     conf.env.AppendUnique(CPPPATH = os.environ["CPPPATH"].split(os.pathsep))
     print("Appending custom C++ path (CPPPATH)")
@@ -202,7 +203,6 @@ if conf.env["withoptimize"] :
         conf.env.AppendUnique(CXXFLAGS = "-mfpmath=387")
 
 
-
 # uniquify all lists
 cheaders   = help.unique(cheaders)
 cppheaders = help.unique(cppheaders)
@@ -231,3 +231,4 @@ libraries.append(conf.env["LIBPREFIX"]+"lapack"+conf.env["LIBSUFFIX"])
 for i in libraries :
     if not conf.CheckLib(i) :
         Exit(1)
+
