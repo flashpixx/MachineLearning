@@ -129,10 +129,9 @@ cleantarget(env)
 if not env.GetOption('clean') :
     # adding platform scripts, create configuration and finish the configuration
 
-    print env.Dump()
-
-    env.AppendUnique(CPPPATH = [os.path.abspath(os.curdir)])
+    env.Append(CPPPATH = [os.path.abspath(os.curdir)])
     conf = Configure(env)
+
     platformconfig = env["PLATFORM"].lower()
     if not(os.path.isfile(os.path.join("scons", "platform", platformconfig+".py"))) :
         raise ImportError("platform configuration script ["+platformconfig+"] not found")

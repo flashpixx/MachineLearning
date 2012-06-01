@@ -29,31 +29,31 @@ if "CXX" in os.environ:
     print("Using compiler " + os.environ["CXX"])
 
 if "CPPPATH" in os.environ :
-    conf.env.AppendUnique(CPPPATH = os.environ["CPPPATH"].split(os.pathsep))
+    conf.env.Append(CPPPATH = os.environ["CPPPATH"].split(os.pathsep))
     print("Appending custom C++ path (CPPPATH)")
 
 if "CXXFLAGS" in os.environ:
-    conf.env.AppendUnique(CXXFLAGS = os.environ["CXXFLAGS"].split(" "))
+    conf.env.Append(CXXFLAGS = os.environ["CXXFLAGS"].split(" "))
     print("Appending custom build flags (CXXFLAGS)")
  
 if "LDFLAGS" in os.environ:
-    conf.env.AppendUnique(LINKFLAGS = os.environ["LDFLAGS"].split(" "))
+    conf.env.Append(LINKFLAGS = os.environ["LDFLAGS"].split(" "))
     print("Appending custom link flags (LDFLAG)")
 
 if "DYLD_LIBRARY_PATH" in os.environ :
-    conf.env.AppendUnique(LIBPATH = os.environ["DYLD_LIBRARY_PATH"].split(os.pathsep)) 
+    conf.env.Append(LIBPATH = os.environ["DYLD_LIBRARY_PATH"].split(os.pathsep)) 
     print("Appending custom OSX dynamic library path (DYLD_LIBRARY_PATH)")
 elif "LD_LIBRARY_PATH" in os.environ :
-    conf.env.AppendUnique(LIBPATH = os.environ["LD_LIBRARY_PATH"].split(os.pathsep)) 
+    conf.env.Append(LIBPATH = os.environ["LD_LIBRARY_PATH"].split(os.pathsep)) 
     print("Appending custom library path (LD_LIBRARY_PATH)")
 elif "LIBRARY_PATH" in os.environ :
-    conf.env.AppendUnique(LIBPATH = os.environ["LIBRARY_PATH"].split(os.pathsep)) 
+    conf.env.Append(LIBPATH = os.environ["LIBRARY_PATH"].split(os.pathsep)) 
     print("Appending custom library path (LIBRARY_PATH)")
 
 
 # main configuration
-conf.env.AppendUnique(CXXFLAGS = "-fopenmp -pipe -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS")    
-conf.env.AppendUnique(LINKFLAGS = "-pthread -fopenmp")
+conf.env.Append(CXXFLAGS = "-fopenmp -pipe -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS")    
+conf.env.Append(LINKFLAGS = "-pthread -fopenmp")
 
 
 libraries  = [  "boost_system",
@@ -153,54 +153,54 @@ else :
         libraries.append("satlas")
 
 if conf.env["withdebug"] :
-    conf.env.AppendUnique(CXXFLAGS = "-g")
+    conf.env.Append(CXXFLAGS = "-g")
 else :
-    conf.env.AppendUnique(CXXFLAGS = "-D NDEBUG -D BOOST_UBLAS_NDEBUG")
+    conf.env.Append(CXXFLAGS = "-D NDEBUG -D BOOST_UBLAS_NDEBUG")
     
 if conf.env["withsources"] :
-    conf.env.AppendUnique(CXXFLAGS = "-D MACHINELEARNING_SOURCES -D MACHINELEARNING_SOURCES_TWITTER")
+    conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_SOURCES -D MACHINELEARNING_SOURCES_TWITTER")
     libraries.extend( ["xml2", "json"] )
     cppheaders.extend( ["locale", "json/json.h", "boost/asio.hpp", "boost/xpressive/xpressive.hpp", "boost/date_time/time_facet.hpp", "boost/date_time/gregorian/gregorian.hpp", "boost/date_time/local_time/local_time.hpp"] )
     cheaders.extend( ["libxml/parser.h", "libxml/tree.h", "libxml/xpath.h", "libxml/xpathInternals.h"] )
 
 if conf.env["withrandomdevice"] :
-    conf.env.AppendUnique(CXXFLAGS = "-D MACHINELEARNING_RANDOMDEVICE")
+    conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_RANDOMDEVICE")
     libraries.append("boost_random");
     cppheaders.append("boost/nondet_random.hpp")
     
 if conf.env["withmpi"] :
-    conf.env.AppendUnique(CXXFLAGS = "-D MACHINELEARNING_MPI")
+    conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_MPI")
     libraries.extend( ["boost_mpi", "boost_serialization"] )
     cppheaders.append("boost/mpi.hpp")
     conf.env.Replace(CXX = "mpic++")
     
 if conf.env["withmultilanguage"] :
-    conf.env.AppendUnique(CXXFLAGS = "-D MACHINELEARNING_MULTILANGUAGE")
+    conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_MULTILANGUAGE")
     libraries.append("intl");
     cheaders.append("libintl.h")
     
 if conf.env["withfiles"] :
-    conf.env.AppendUnique(CXXFLAGS = "-D MACHINELEARNING_FILES -D MACHINELEARNING_FILES_HDF")
+    conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_FILES -D MACHINELEARNING_FILES_HDF")
     libraries.extend( ["hdf5_cpp", "hdf5"] )
     cppheaders.append("H5Cpp.h")
     
 if conf.env["withsymbolicmath"] :
-    conf.env.AppendUnique(CXXFLAGS = "-D MACHINELEARNING_SYMBOLICMATH")
+    conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_SYMBOLICMATH")
     libraries.append("ginac")
     cppheaders.extend( ["boost/multi_array.hpp", "boost/variant.hpp", "ginac/ginac.h"] )
 
 if conf.env["withlogger"] :
-    conf.env.AppendUnique(CXXFLAGS = "-D MACHINELEARNING_LOGGER")
+    conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_LOGGER")
     libraries.append("boost_thread")
     
 if conf.env["withoptimize"] :
-    conf.env.AppendUnique(CXXFLAGS = "-O2 -fomit-frame-pointer -finline-functions")
+    conf.env.Append(CXXFLAGS = "-O2 -fomit-frame-pointer -finline-functions")
     if conf.env["math"] == "sse3" :
-        conf.env.AppendUnique(CXXFLAGS = "-mfpmath=sse -msse3")
+        conf.env.Append(CXXFLAGS = "-mfpmath=sse -msse3")
     elif conf.env["math"] == "sse" :
-        conf.env.AppendUnique(CXXFLAGS = "-mfpmath=sse -msse")
+        conf.env.Append(CXXFLAGS = "-mfpmath=sse -msse")
     else :
-        conf.env.AppendUnique(CXXFLAGS = "-mfpmath=387")
+        conf.env.Append(CXXFLAGS = "-mfpmath=387")
 
 
 # uniquify all lists
