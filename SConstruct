@@ -111,42 +111,31 @@ showlicence()
 if " " in os.path.abspath(os.curdir) : 
     print colorama.Style.BRIGHT + "Warning: The path contains spaces, it is recommand to use a path without spaces\n" + colorama.Style.RESET_ALL
 
+
+#env.Append(BUILDERS = {"SwigJava" : SwigJava})
+
+# create configuration option
 vars = Variables()
 createVariables(vars)
 
+# create environment
 env  = Environment(variables=vars)
-Help(vars.GenerateHelpText(env))
-#env.Append(BUILDERS = {"SwigJava" : SwigJava})
-
-
 env.VariantDir("build", ".", duplicate=0)
-#if os.environ.has_key("PATH") :
-#    env["ENV"]["PATH"] = [env["ENV"]["PATH"], os.environ["PATH"]]
-cleantarget(env)
+Help(vars.GenerateHelpText(env))
 
-# adding platform scripts
+#cleantarget(env)
+if "CPPPATH" in env :
+    env.AppendUnique(CPPPATH = [os.path.abspath(os.curdir)])
+
+
+# adding platform scripts, create configuration and finish the configuration
+conf = Configure(env)
 platformconfig = env["PLATFORM"].lower()
 if not(os.path.isfile(os.path.join("scons", "platform", platformconfig+".py"))) :
     raise ImportError("platform configuration script ["+platformconfig+"] not found")
-env.SConscript( os.path.join("scons", "platform", platformconfig+".py"), exports="env help" )
+env.SConscript( os.path.join("scons", "platform", platformconfig+".py"), exports="conf help" )
+env = conf.Finish()
 
-
-# adding the main path (parent of the current directory) to the CPPPATH and uniquify each option, 
-# that is setup with data of the system environment
-if "CPPPATH" in env :
-    env.AppendUnique(CPPPATH = [os.path.abspath(os.curdir)])
-#if env.has_key("CXXFLAGS") :
-#    env.AppendUnique(CXXFLAGS = [env["CXXFLAGS"]])
-#if env.has_key("LINKFLAGS") :    
-#    env.AppendUnique(LINKFLAGS = [env["LINKFLAGS"]])
-#if env.has_key("LIBS") :
-#    env.AppendUnique(LIBS = [env["LIBS"]])
-#if env.has_key("LIBPATH") :
-#    env.AppendUnique(LIBPATH = [env["LIBPATH"]])
-    
-# set manually if needed the MPI C++ compiler
-#if env["withmpi"] :
-#    env.Replace(CXX = "mpic++")
 
 
 
@@ -156,14 +145,13 @@ if env["withlogger"] or env["withrandomdevice"] :
     defaultcpp.append( "machinelearning.cpp" )
 
 
-
 # setup all different sub build script
 env.SConscript( os.path.join("tools", "language", "SConscript"), exports="env colorama defaultcpp help" )
 env.SConscript( os.path.join("documentation", "SConscript"), exports="env colorama defaultcpp help" )
 env.SConscript( os.path.join("library", "SConscript"), exports="env colorama defaultcpp help" )
 
 env.SConscript( os.path.join("swig", "target", "java", "SConscript"), exports="env colorama defaultcpp help" )
-env.SConscript( os.path.join("swig", "target", "python", "SConscript"), exports="env colorama defaultcpp help" )
+#env.SConscript( os.path.join("swig", "target", "python", "SConscript"), exports="env colorama defaultcpp help" )
 #env.SConscript( os.path.join("swig", "target", "php", "SConscript"), exports="env colorama defaultcpp help" )
 
 for i in ["geneticalgorithm", "classifier", "clustering", "distance", "other", "reducing", "sources"] :
