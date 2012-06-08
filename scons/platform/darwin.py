@@ -130,15 +130,17 @@ cppheaders = [  "map",
                 "boost/bind.hpp",
                 "boost/ref.hpp",
                 "boost/regex.hpp",
-                "boost/filesystem.hpp",
                 "boost/lexical_cast.hpp",
                 "boost/thread.hpp"
              ]
 
 
 if not("javac" in COMMAND_LINE_TARGETS) :
-    librariesWithHeader.append( {"lib" : "boost_program_options", "lang" : "CXX", "header" : ["boost/program_options/parsers.hpp", "boost/program_options/variables_map.hpp", "boost/program_options/options_description.hpp"] } )
-    libraries.extend(["boost_exception", "boost_filesystem"])
+    librariesWithHeader.extend([
+        {"lib" : "boost_program_options", "lang" : "CXX", "header" : ["boost/program_options/parsers.hpp", "boost/program_options/variables_map.hpp", "boost/program_options/options_description.hpp"] },
+        {"lib" : "boost_filesystem", "lang" : "CXX", "header" : "boost/filesystem.hpp" },
+    ])
+    libraries.extend(["boost_exception"])
     cppheaders.extend( ["cstdlib"] )
 
 if conf.env["atlaslink"] == "multi" :
@@ -161,35 +163,34 @@ else :
     
 if conf.env["withsources"] :
     conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_SOURCES -D MACHINELEARNING_SOURCES_TWITTER")
-    libraries.extend( ["xml2", "json"] )
-    cppheaders.extend( ["locale", "json/json.h", "boost/asio.hpp", "boost/xpressive/xpressive.hpp", "boost/date_time/time_facet.hpp", "boost/date_time/gregorian/gregorian.hpp", "boost/date_time/local_time/local_time.hpp"] )
-    cheaders.extend( ["libxml/parser.h", "libxml/tree.h", "libxml/xpath.h", "libxml/xpathInternals.h"] )
+    librariesWithHeader.extend([
+        {"lib" : "xm2", "lang" : "C", "header" : ["libxml/parser.h", "libxml/tree.h", "libxml/xpath.h", "libxml/xpathInternals.h"]},
+        {"lib" : "json", "lang" : "CXX", "header" : "json/json.h"}
+    ])
+    cppheaders.extend( ["locale", "boost/asio.hpp", "boost/xpressive/xpressive.hpp", "boost/date_time/time_facet.hpp", "boost/date_time/gregorian/gregorian.hpp", "boost/date_time/local_time/local_time.hpp"] )
 
 if conf.env["withrandomdevice"] :
     conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_RANDOMDEVICE")
-    libraries.append("boost_random");
-    cppheaders.append("boost/nondet_random.hpp")
+    librariesWithHeader.append({"lib" : "boost_random", "lang" : "CXX", "header" : "boost/nondet_random.hpp"})
     
 if conf.env["withmpi"] :
     conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_MPI")
-    libraries.extend( ["boost_mpi", "boost_serialization"] )
-    cppheaders.append("boost/mpi.hpp")
+    librariesWithHeader.append({"lib" : "boost_mpi", "lang" : "CXX", "header" : "boost/mpi.hpp"})
+    libraries.extend( ["boost_serialization"] )
     conf.env.Replace(CXX = "mpic++")
     
 if conf.env["withmultilanguage"] :
     conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_MULTILANGUAGE")
-    libraries.append("intl");
-    cheaders.append("libintl.h")
+    librariesWithHeader.append({"lib" : "intl", "lang" : "C", "header" : "libintl.h"})
     
 if conf.env["withfiles"] :
     conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_FILES -D MACHINELEARNING_FILES_HDF")
-    libraries.extend( ["hdf5_cpp", "hdf5"] )
-    cppheaders.append("H5Cpp.h")
+    librariesWithHeader.append({"lib" : "hdf5_cpp", "lang" : "CXX", "header" : "H5Cpp.h"})
+    libraries.append( ["hdf5"] )
     
 if conf.env["withsymbolicmath"] :
     conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_SYMBOLICMATH")
-    libraries.append("ginac")
-    cppheaders.extend( ["boost/multi_array.hpp", "boost/variant.hpp", "ginac/ginac.h"] )
+    librariesWithHeader.append({"lib" : "ginac", "lang" : "CXX", "header" : ["boost/multi_array.hpp", "boost/variant.hpp", "ginac/ginac.h"]})
 
 if conf.env["withlogger"] :
     conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_LOGGER")
@@ -214,16 +215,9 @@ libraries  = help.unique(libraries)
 if not conf.CheckCXX() :
     Exit(1)
 
-print librariesWithHeader
 for i in librariesWithHeader :
-
-    if type( i["header"] ) == type("") :
-        if not conf.CheckLibWithHeader(i["lib"], None, i["header"], i["lang"]) :
-            Exit(1)
-    elif type( i["header"] ) == type([]) :
-        for n in i["header"] :
-            if not conf.CheckLibWithHeader(i["lib"], None, n, i["lang"]) :
-                Exit(1)
+    if not conf.CheckLibWithHeader(i["lib"], i["header"], i["lang"]) :
+        Exit(1)
     
 
 Exit(1)

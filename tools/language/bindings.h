@@ -28,7 +28,9 @@
 #ifndef __MACHINELEARNING_TOOLS_LANGUAGE_BINDINGS_H
 #define __MACHINELEARNING_TOOLS_LANGUAGE_BINDINGS_H
 
+extern "C" {
 #include <libintl.h>
+}
 #include <string>
 
 #define _(string) gettext(string)
