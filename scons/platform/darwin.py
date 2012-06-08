@@ -60,6 +60,7 @@ libraries  = [  "boost_system",
                 "boost_iostreams",
                 "boost_regex"
              ]
+librariesWithHeader = [ ]
 cheaders   = [  "omp.h"
              ]
 cppheaders = [  "map",
@@ -136,8 +137,9 @@ cppheaders = [  "map",
 
 
 if not("javac" in COMMAND_LINE_TARGETS) :
-    libraries.extend(["boost_program_options", "boost_exception", "boost_filesystem"])
-    cppheaders.extend( ["cstdlib", "boost/program_options/parsers.hpp", "boost/program_options/variables_map.hpp", "boost/program_options/options_description.hpp",] )
+    librariesWithHeader.append( {"lib" : "boost_program_options", "lang" : "CXX", "header" : ["boost/program_options/parsers.hpp", "boost/program_options/variables_map.hpp", "boost/program_options/options_description.hpp"] } )
+    libraries.extend(["boost_exception", "boost_filesystem"])
+    cppheaders.extend( ["cstdlib"] )
 
 if conf.env["atlaslink"] == "multi" :
     libraries.extend( ["ptcblas", "ptf77blas", "gfortran"] )
@@ -211,6 +213,20 @@ libraries  = help.unique(libraries)
 # check C++ environment
 if not conf.CheckCXX() :
     Exit(1)
+
+print librariesWithHeader
+for i in librariesWithHeader :
+
+    if type( i["header"] ) == type("") :
+        if not conf.CheckLibWithHeader(i["lib"], None, i["header"], i["lang"]) :
+            Exit(1)
+    elif type( i["header"] ) == type([]) :
+        for n in i["header"] :
+            if not conf.CheckLibWithHeader(i["lib"], None, n, i["lang"]) :
+                Exit(1)
+    
+
+Exit(1)
 
 # check header data
 for i in cheaders :
