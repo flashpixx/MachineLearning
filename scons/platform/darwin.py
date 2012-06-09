@@ -57,11 +57,15 @@ conf.env.Append(LINKFLAGS = "-pthread -fopenmp")
 
 localconf = {
     "libraries" : [  "boost_system",
-                    "boost_iostreams",
-                    "boost_regex"
-                  ],
-    "librariesWithHeader" : [],
+                     "boost_regex"
+    ],
+                  
+    "librariesWithHeader" : [
+            { "lib" :  "boost_iostreams", "lang" : "CXX", "header" : [ "boost/iostreams/filter/gzip.hpp", "boost/iostreams/filter/bzip2.hpp", "boost/iostreams/stream.hpp", "boost/iostreams/device/null.hpp", "boost/iostreams/filtering_streambuf.hpp", "boost/iostreams/filtering_stream.hpp", "boost/iostreams/filter/counter.hpp", "boost/iostreams/concepts.hpp", "boost/iostreams/operations.hpp", "boost/iostreams/copy.hpp"] } 
+    ],
+    
     "cheaders"   :  [ "omp.h" ],
+    
     "cppheaders" :  [  "map",
                       "algorithm",
                       "limits",
@@ -95,17 +99,6 @@ localconf = {
                       "boost/numeric/bindings/lapack/driver/gesv.hpp",
                       "boost/numeric/bindings/lapack/driver/gesvd.hpp",
                       "boost/numeric/bindings/lapack/computational/hseqr.hpp",
-                
-                      "boost/iostreams/filter/gzip.hpp",
-                      "boost/iostreams/filter/bzip2.hpp",
-                      "boost/iostreams/stream.hpp",
-                      "boost/iostreams/device/null.hpp",
-                      "boost/iostreams/filtering_streambuf.hpp",
-                      "boost/iostreams/filtering_stream.hpp",
-                      "boost/iostreams/filter/counter.hpp",
-                      "boost/iostreams/concepts.hpp",
-                      "boost/iostreams/operations.hpp",
-                      "boost/iostreams/copy.hpp",
                 
                       "boost/algorithm/string.hpp", 
                       "boost/algorithm/string/erase.hpp",
