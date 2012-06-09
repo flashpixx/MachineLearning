@@ -211,14 +211,6 @@ if conf.env["withoptimize"] :
 help.checkConfiguratin( conf, localconf )
 
 
-
-
-
-
-
-
-Exit(1)
-
 # check library data (Lapack is linked always static)
 #if conf.env["staticlink"] :
 #    conf.env.Append(LINKFLAGS = "-static")

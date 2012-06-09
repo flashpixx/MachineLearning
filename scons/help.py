@@ -71,6 +71,14 @@ def checkConfiguratin( conf, data ) :
         Exit(1)
         
     # check data (header & libraries)
+    for i in data["cheaders"] :
+        if not conf.CheckCHeader(i) :
+            Exit(1)
+            
+    for i in data["cppheaders"] :
+        if not conf.CheckCXXHeader(i) :
+            Exit(1)
+    
     for i in data["librariesWithHeader"] :
 
         # the "lang" is not set, because in CXX the library is not found
@@ -95,14 +103,6 @@ def checkConfiguratin( conf, data ) :
                 if not conf.CheckCHeader(i["header"]) :
                         Exit(1)
 
-    for i in data["cheaders"] :
-        if not conf.CheckCHeader(i) :
-            Exit(1)
-            
-    for i in data["cppheaders"] :
-        if not conf.CheckCXXHeader(i) :
-            Exit(1)
-            
     for i in data["libraries"] :
         if not conf.CheckLib(i) :
             Exit(1)
