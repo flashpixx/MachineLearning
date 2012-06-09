@@ -142,18 +142,19 @@ if not("javac" in COMMAND_LINE_TARGETS) :
     localconf["libraries"].extend(["boost_exception"])
     localconf["cppheaders"].extend( ["cstdlib"] )
 
-if conf.env["atlaslink"] == "multi" :
-    localconf["libraries"].extend( ["ptcblas", "ptf77blas", "gfortran"] )
-elif conf.env["atlaslink"] == "single" :
-    localconf["libraries"].extend( ["cblas", "f77blas", "gfortran"] )
+#if conf.env["atlaslink"] == "multi" :
+#    localconf["libraries"].extend( ["ptcblas", "ptf77blas", "gfortran"] )
+#elif conf.env["atlaslink"] == "single" :
+#    localconf["libraries"].extend( ["cblas", "f77blas", "gfortran"] )
 
-if conf.env["staticlink"] :
-    localconf["libraries"].append("atlas")
-else :
-    if conf.env["atlaslink"] == "multi" :
-        localconf["libraries"].append("tatlas")
-    elif conf.env["atlaslink"] == "single" :
-        localconf["libraries"].append("satlas")
+#if conf.env["staticlink"] :
+localconf["libraries"].append("atlas")
+conf.env.Append(LINKFLAGS = "--static")
+#else :
+#   if conf.env["atlaslink"] == "multi" :
+#        localconf["libraries"].append("tatlas")
+#    elif conf.env["atlaslink"] == "single" :
+#        localconf["libraries"].append("satlas")
 
 if conf.env["withdebug"] :
     conf.env.Append(CXXFLAGS = "-g")

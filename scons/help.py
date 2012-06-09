@@ -19,6 +19,7 @@
 
 # -*- coding: utf-8 -*-
 import os
+import sys
 
 # get rekursiv all files
 def getRekusivFiles(startdir, ending, pdontuse=[], pShowPath=True, pAbsPath=False) :
@@ -68,42 +69,42 @@ def checkConfiguratin( conf, data ) :
 
     # check C++ environment
     if not conf.CheckCXX() :
-        Exit(1)
+        sys.exit(1)
         
     # check data (header & libraries)
     for i in data["cheaders"] :
         if not conf.CheckCHeader(i) :
-            Exit(1)
+            sys.exit(1)
             
     for i in data["cppheaders"] :
         if not conf.CheckCXXHeader(i) :
-            Exit(1)
+            sys.exit(1)
     
     for i in data["librariesWithHeader"] :
 
         # the "lang" is not set, because in CXX the library is not found
         if not conf.CheckLib(i["lib"], None) :
-            Exit(1)
+            sys.exit(1)
             
         if i["lang"] == "CXX" :
             if type([]) == type(i["header"]) :
                 for n in i["header"] :
                     if not conf.CheckCXXHeader(n) :
-                        Exit(1)
+                        sys.exit(1)
             elif type("") == type(i["header"]) :
                 if not conf.CheckCXXHeader(i["header"]) :
-                        Exit(1)
+                        sys.exit(1)
                     
         elif i["lang"] == "C" :
             if type([]) == type(i["header"]) :
                 for n in i["header"] :
                     if not conf.CheckCHeader(n) :
-                        Exit(1)
+                        sys.exit(1)
             elif type("") == type(i["header"]) :
                 if not conf.CheckCHeader(i["header"]) :
-                        Exit(1)
+                        sys.exit(1)
 
     for i in data["libraries"] :
         if not conf.CheckLib(i) :
-            Exit(1)
+            sys.exit(1)
     
