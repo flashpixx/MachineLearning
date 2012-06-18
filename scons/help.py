@@ -80,6 +80,11 @@ def checkConfiguratin( conf, data ) :
         if not conf.CheckCXXHeader(i) :
             sys.exit(1)
     
+    for i in data["libraries"] :
+        if not conf.CheckLib(i) :
+            sys.exit(1)
+
+"""    
     for i in data["librariesWithHeader"] :
 
         # the "lang" is not set, because in CXX the library is not found
@@ -103,8 +108,4 @@ def checkConfiguratin( conf, data ) :
             elif type("") == type(i["header"]) :
                 if not conf.CheckCHeader(i["header"]) :
                         sys.exit(1)
-
-    for i in data["libraries"] :
-        if not conf.CheckLib(i) :
-            sys.exit(1)
-    
+"""

@@ -51,21 +51,39 @@ elif "LIBRARY_PATH" in os.environ :
     print("Appending custom library path (LIBRARY_PATH)")
 
 
-conf.CheckStaticLib('boost_filesystem', language='C++') 
-Exit()
+
 
 
 # main configuration
 conf.env.Append(CXXFLAGS = "-fopenmp -pipe -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS")    
 conf.env.Append(LINKFLAGS = "-pthread -fopenmp --as-needed")
 
+
+if conf.env["staticlink"] :
+    conf.env["LIBLINKPREFIX"] = "-Bstatic -l";
+    conf.env["LIBLINKSUFFIX"] = " -Wl";
+    #conf.env.Append(LINKFLAGS = "-Bdynamic -lz -Wl -Bdynamic -lbz2 -Wl")
+    
+if conf.env["withdebug"] :
+    conf.env.Append(CXXFLAGS = "-g")
+else :
+    conf.env.Append(CXXFLAGS = "-D NDEBUG -D BOOST_UBLAS_NDEBUG")
+    
+if conf.env["withoptimize"] :
+    conf.env.Append(CXXFLAGS = "-O2 -fomit-frame-pointer -finline-functions")
+    if conf.env["math"] == "sse3" :
+        conf.env.Append(CXXFLAGS = "-mfpmath=sse -msse3")
+    elif conf.env["math"] == "sse" :
+        conf.env.Append(CXXFLAGS = "-mfpmath=sse -msse")
+    else :
+        conf.env.Append(CXXFLAGS = "-mfpmath=387")
+
+
 localconf = {
-    "libraries" : [  "boost_system",
-                     "boost_regex"
-    ],
-                  
-    "librariesWithHeader" : [
-            { "lib" :  "boost_iostreams", "lang" : "CXX", "header" : [ "boost/iostreams/filter/gzip.hpp", "boost/iostreams/filter/bzip2.hpp", "boost/iostreams/stream.hpp", "boost/iostreams/device/null.hpp", "boost/iostreams/filtering_streambuf.hpp", "boost/iostreams/filtering_stream.hpp", "boost/iostreams/filter/counter.hpp", "boost/iostreams/concepts.hpp", "boost/iostreams/operations.hpp", "boost/iostreams/copy.hpp"] } 
+    "libraries" : [  "boost_exception",
+                     "boost_system",
+                     "boost_regex",
+                     "boost_iostreams"
     ],
     
     "cheaders"   :  [ "omp.h" ],
@@ -134,82 +152,76 @@ localconf = {
                       "boost/ref.hpp",
                       "boost/regex.hpp",
                       "boost/lexical_cast.hpp",
+                      
+                      "boost/iostreams/filter/gzip.hpp", 
+                      "boost/iostreams/filter/bzip2.hpp", 
+                      "boost/iostreams/stream.hpp", 
+                      "boost/iostreams/device/null.hpp", 
+                      "boost/iostreams/filtering_streambuf.hpp", 
+                      "boost/iostreams/filtering_stream.hpp", 
+                      "boost/iostreams/filter/counter.hpp", 
+                      "boost/iostreams/concepts.hpp", 
+                      "boost/iostreams/operations.hpp", 
+                      "boost/iostreams/copy.hpp"
+                      
                    ]
 }
       
 
 if not("javac" in COMMAND_LINE_TARGETS) :
-    localconf["librariesWithHeader"].extend([
-        {"lib" : "boost_program_options", "lang" : "CXX", "header" : ["boost/program_options/parsers.hpp", "boost/program_options/variables_map.hpp", "boost/program_options/options_description.hpp"] },
-        {"lib" : "boost_filesystem", "lang" : "CXX", "header" : "boost/filesystem.hpp" }
-    ])
-    localconf["libraries"].extend(["boost_exception"])
-    localconf["cppheaders"].extend( ["cstdlib"] )
-
-#if conf.env["atlaslink"] == "multi" :
-#    localconf["libraries"].extend( ["ptcblas", "ptf77blas", "gfortran"] )
-#elif conf.env["atlaslink"] == "single" :
-#    localconf["libraries"].extend( ["cblas", "f77blas", "gfortran"] )
-
-#conf.env.Append(LINKFLAGS = "-static")
+    localconf["libraries"].extend(["boost_program_options", "boost_filesystem"])
+    localconf["cppheaders"].extend( ["cstdlib", "boost/program_options/parsers.hpp", "boost/program_options/variables_map.hpp", "boost/filesystem.hpp", "boost/program_options/options_description.hpp"] )
 
 
-#if conf.env["staticlink"] :
-#localconf["libraries"].append("atlas")
-#else :
-#   if conf.env["atlaslink"] == "multi" :
-#        localconf["libraries"].append("tatlas")
-#    elif conf.env["atlaslink"] == "single" :
-#        localconf["libraries"].append("satlas")
 
-if conf.env["withdebug"] :
-    conf.env.Append(CXXFLAGS = "-g")
+localconf["cppheaders"].extend(["boost/numeric/bindings/blas.hpp", "boost/numeric/bindings/ublas/vector.hpp", "boost/numeric/bindings/ublas/matrix.hpp", "boost/numeric/bindings/lapack/driver/geev.hpp", "boost/numeric/bindings/lapack/driver/ggev.hpp","boost/numeric/bindings/lapack/driver/gesv.hpp", "boost/numeric/bindings/lapack/driver/gesvd.hpp", "boost/numeric/bindings/lapack/computational/hseqr.hpp"])
+if conf.env["staticlink"] :
+    localconf["libraries"].append("atlas")
 else :
-    conf.env.Append(CXXFLAGS = "-D NDEBUG -D BOOST_UBLAS_NDEBUG")
-    
+    if conf.env["atlaslink"] == "multi" :
+        localconf["libraries"].extend( ["tatlas", "ptcblas", "ptf77blas", "gfortran"] )
+    elif conf.env["atlaslink"] == "single" :
+        localconf["libraries"].extend( ["satlas", "cblas", "f77blas", "gfortran"] )
+
+
+
 if conf.env["withsources"] :
     conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_SOURCES -D MACHINELEARNING_SOURCES_TWITTER")
-    localconf["librariesWithHeader"].extend([
-        {"lib" : "xm2", "lang" : "C", "header" : ["libxml/parser.h", "libxml/tree.h", "libxml/xpath.h", "libxml/xpathInternals.h"]},
-        {"lib" : "json", "lang" : "CXX", "header" : "json/json.h"}
-    ])
-    localconf["cppheaders"].extend( ["locale", "boost/asio.hpp", "boost/xpressive/xpressive.hpp", "boost/date_time/time_facet.hpp", "boost/date_time/gregorian/gregorian.hpp", "boost/date_time/local_time/local_time.hpp"] )
+    localconf["libraries"].extend(["xml2", "json"])
+    localconf["cheaders"].extend(["libxml/parser.h", "libxml/tree.h", "libxml/xpath.h", "libxml/xpathInternals.h"]);
+    localconf["cppheaders"].extend(["locale", "json/json.h", "boost/asio.hpp", "boost/xpressive/xpressive.hpp", "boost/date_time/time_facet.hpp", "boost/date_time/gregorian/gregorian.hpp", "boost/date_time/local_time/local_time.hpp"] )
 
 if conf.env["withrandomdevice"] :
     conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_RANDOMDEVICE")
-    localconf["librariesWithHeader"].append({"lib" : "boost_random", "lang" : "CXX", "header" : "boost/nondet_random.hpp"})
+    localconf["libraries"].append("boost_random")
+    localconf["cppheaders"].append("boost/nondet_random.hpp")
     
 if conf.env["withmpi"] :
     conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_MPI")
-    localconf["librariesWithHeader"].append({"lib" : "boost_mpi", "lang" : "CXX", "header" : "boost/mpi.hpp"})
-    localconf["libraries"].append( "boost_serialization" )
+    localconf["libraries"].extend([ "boost_mpi", "boost_serialization" ])
+    localconf["cppheaders"].append("boost/mpi.hpp")
     conf.env.Replace(CXX = "mpic++")
     
 if conf.env["withmultilanguage"] :
     conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_MULTILANGUAGE")
-    localconf["librariesWithHeader"].append({"lib" : "intl", "lang" : "C", "header" : "libintl.h"})
+    localconf["libraries"].append("intl")
+    localconf["cheaders"].append("libintl.h")
     
 if conf.env["withfiles"] :
     conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_FILES -D MACHINELEARNING_FILES_HDF")
-    localconf["librariesWithHeader"].append({"lib" : "hdf5_cpp", "lang" : "CXX", "header" : "H5Cpp.h"})
-    localconf["libraries"].append( ["hdf5"] )
+    localconf["cppheaders"].append("H5Cpp.h")
+    localconf["libraries"].extend(["hdf5", "hdf5_cpp"])
     
 if conf.env["withsymbolicmath"] :
     conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_SYMBOLICMATH")
-    localconf["librariesWithHeader"].append({"lib" : "ginac", "lang" : "CXX", "header" : ["boost/multi_array.hpp", "boost/variant.hpp", "ginac/ginac.h"]})
+    localconf["cppheaders"].extend(["boost/multi_array.hpp", "boost/variant.hpp", "ginac/ginac.h"])
+    localconf["libraries"].append("ginac")
 
 if conf.env["withlogger"] :
     conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_LOGGER")
     localconf["libraries"].append("boost_thread")
     
-if conf.env["withoptimize"] :
-    conf.env.Append(CXXFLAGS = "-O2 -fomit-frame-pointer -finline-functions")
-    if conf.env["math"] == "sse3" :
-        conf.env.Append(CXXFLAGS = "-mfpmath=sse -msse3")
-    elif conf.env["math"] == "sse" :
-        conf.env.Append(CXXFLAGS = "-mfpmath=sse -msse")
-    else :
-        conf.env.Append(CXXFLAGS = "-mfpmath=387")
+
 
 
 
@@ -224,6 +236,5 @@ help.checkConfiguratin( conf, localconf )
 #    libraries = [conf.env["LIBPREFIX"]+i+conf.env["LIBSUFFIX"] for i in libraries]
 #    libraries.extend( ["z", "bz2"] )
 #libraries.append(conf.env["LIBPREFIX"]+"lapack"+conf.env["LIBSUFFIX"])
-
 
 
