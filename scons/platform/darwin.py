@@ -51,9 +51,13 @@ elif "LIBRARY_PATH" in os.environ :
     print("Appending custom library path (LIBRARY_PATH)")
 
 
+conf.CheckStaticLib('boost_filesystem', language='C++') 
+Exit()
+
+
 # main configuration
 conf.env.Append(CXXFLAGS = "-fopenmp -pipe -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS")    
-conf.env.Append(LINKFLAGS = "-pthread -fopenmp")
+conf.env.Append(LINKFLAGS = "-pthread -fopenmp --as-needed")
 
 localconf = {
     "libraries" : [  "boost_system",
@@ -147,9 +151,11 @@ if not("javac" in COMMAND_LINE_TARGETS) :
 #elif conf.env["atlaslink"] == "single" :
 #    localconf["libraries"].extend( ["cblas", "f77blas", "gfortran"] )
 
+#conf.env.Append(LINKFLAGS = "-static")
+
+
 #if conf.env["staticlink"] :
-localconf["libraries"].append("atlas")
-conf.env.Append(LINKFLAGS = "--static")
+#localconf["libraries"].append("atlas")
 #else :
 #   if conf.env["atlaslink"] == "multi" :
 #        localconf["libraries"].append("tatlas")

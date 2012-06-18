@@ -22,7 +22,6 @@
 import os
 import sys
 import platform
-import json
 sys.path.append("scons")
 import help
 import colorama
