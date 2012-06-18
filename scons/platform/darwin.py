@@ -59,14 +59,6 @@ elif "LIBRARY_PATH" in os.environ :
 conf.env.Append(CXXFLAGS = "-fopenmp -pipe -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS")    
 conf.env.Append(LINKFLAGS = "-pthread -fopenmp --as-needed")
 
-
-if conf.env["staticlink"] :
-    conf.env["LIBLINKPREFIX"] = "-Bstatic -l";
-    conf.env["LIBLINKSUFFIX"] = " -Wl";
-    conf.env.Append(LINKFLAGS = "-Bdynamic -lz -Wl -Bdynamic -lbz2 -Wl")
-    conf.env["LINKCOM"]       = "$LINK $LINKFLAGS $__RPATH $_LIBDIRFLAGS $_LIBFLAGS $_FRAMEWORKPATH $_FRAMEWORKS $FRAMEWORKSFLAGS -o $TARGET $SOURCES"
-    
-    
 if conf.env["withdebug"] :
     conf.env.Append(CXXFLAGS = "-g")
 else :
@@ -180,13 +172,10 @@ if not("javac" in COMMAND_LINE_TARGETS) :
 
 
 localconf["cppheaders"].extend(["boost/numeric/bindings/blas.hpp", "boost/numeric/bindings/ublas/vector.hpp", "boost/numeric/bindings/ublas/matrix.hpp", "boost/numeric/bindings/lapack/driver/geev.hpp", "boost/numeric/bindings/lapack/driver/ggev.hpp","boost/numeric/bindings/lapack/driver/gesv.hpp", "boost/numeric/bindings/lapack/driver/gesvd.hpp", "boost/numeric/bindings/lapack/computational/hseqr.hpp"])
-if conf.env["staticlink"] :
-    localconf["libraries"].append("atlas")
-else :
-    if conf.env["atlaslink"] == "multi" :
-        localconf["libraries"].extend( ["tatlas", "ptcblas", "ptf77blas", "gfortran"] )
-    elif conf.env["atlaslink"] == "single" :
-        localconf["libraries"].extend( ["satlas", "cblas", "f77blas", "gfortran"] )
+if conf.env["atlaslink"] == "multi" :
+    localconf["libraries"].extend( ["tatlas", "ptcblas", "ptf77blas", "gfortran"] )
+elif conf.env["atlaslink"] == "single" :
+    localconf["libraries"].extend( ["satlas", "cblas", "f77blas", "gfortran"] )
 
 
 if conf.env["withsources"] :

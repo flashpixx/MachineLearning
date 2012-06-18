@@ -42,7 +42,6 @@ def createVariables(vars) :
     vars.Add(EnumVariable("math", "optimization of math structure", "sse3", allowed_values=("sse3", "sse", "387")))
 
     vars.Add(EnumVariable("atlaslink", "value of the atlas threadding (multi = tatlas, single = satlas)", "multi", allowed_values=("multi", "single")))
-    vars.Add(BoolVariable("staticlink", "libraries will linked static", True))
     vars.Add(BoolVariable("showconfig", "shows the environment configuration", False))
 
     vars.Add(EnumVariable("cputype", "value of the cpu type [see: http://gcc.gnu.org/onlinedocs/gcc/i386-and-x86_002d64-Options.html]", "native", allowed_values=("native", "generic", "i386", "i486", "i586", "i686", "pentium-mmx", "pentiumpro", "pentium2", "pentium3", "pentium-m", "pentium4", "prescott", "nocona", "core2", "corei7", "corei7-avx", "core-avx-i", "atom", "k6", "k6-2", "athlon", "athlon-4", "k8", "k8-sse3", "amdfam10", "winchip-c6", "winchip2", "c3", "c3-2", "geode" )))
@@ -157,7 +156,6 @@ if not env.GetOption('clean') :
         print "CPU Type : \t\t"+env.Dump("cputype")
         print "Math : \t\t"+env.Dump("math")
         print "Skip builderror : \t\t"+env.Dump("skipbuilderror")
-        print "static link : \t\t"+env.Dump("staticlink")
         print "with debug : \t\t"+env.Dump("withdebug")
         print "with files : \t\t"+env.Dump("withfiles")
         print "with logger : \t\t"+env.Dump("withlogger")
