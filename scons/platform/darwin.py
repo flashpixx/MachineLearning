@@ -55,7 +55,7 @@ elif "LIBRARY_PATH" in os.environ :
 
 
 # main configuration
-conf.env.Append(CXXFLAGS = "-fopenmp -pipe -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS")    
+conf.env.Append(CXXFLAGS = "-M -fopenmp -pipe -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS")    
 conf.env.Append(LINKFLAGS = "-pthread -fopenmp --as-needed")
 
 
@@ -231,3 +231,4 @@ if conf.env["withlogger"] :
     
 
 help.checkConfiguratin( conf, localconf )
+print conf.env.Dump()
