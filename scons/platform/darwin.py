@@ -231,4 +231,3 @@ if conf.env["withlogger"] :
     
 
 help.checkConfiguratin( conf, localconf )
-print conf.env.Dump()
