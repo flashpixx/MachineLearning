@@ -20,6 +20,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import itertools
 Import("*")
 
 
@@ -55,16 +56,10 @@ elif "LIBRARY_PATH" in os.environ :
 
 
 # main configuration
-conf.env.Append(CXXFLAGS = "-M -fopenmp -pipe -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS")    
+conf.env.Append(CXXFLAGS = "-fopenmp -pipe -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS")    
 conf.env.Append(LINKFLAGS = "-pthread -fopenmp --as-needed")
 
 
-if conf.env["staticlink"] :
-    conf.env["LIBLINKPREFIX"] = "-Bstatic -l";
-    conf.env["LIBLINKSUFFIX"] = " -Wl";
-    #conf.env.Append(LINKFLAGS = "-Bdynamic -lz -Wl -Bdynamic -lbz2 -Wl")
-    
-    
 if conf.env["withdebug"] :
     conf.env.Append(CXXFLAGS = "-g")
 else :
@@ -228,6 +223,7 @@ if conf.env["withsymbolicmath"] :
 if conf.env["withlogger"] :
     conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_LOGGER")
     localconf["libraries"].append("boost_thread")
+    
     
 
 help.checkConfiguratin( conf, localconf )
