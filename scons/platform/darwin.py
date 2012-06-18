@@ -60,6 +60,13 @@ conf.env.Append(CXXFLAGS = "-fopenmp -pipe -D BOOST_FILESYSTEM_NO_DEPRECATED -D 
 conf.env.Append(LINKFLAGS = "-pthread -fopenmp --as-needed")
 
 
+if conf.env["staticlink"] :
+    conf.env["LIBLINKPREFIX"] = "-Bstatic -l";
+    conf.env["LIBLINKSUFFIX"] = " -Wl";
+    conf.env.Append(LINKFLAGS = "-Bdynamic -lz -Wl -Bdynamic -lbz2 -Wl")
+    conf.env["LINKCOM"]       = "$LINK $LINKFLAGS $__RPATH $_LIBDIRFLAGS $_LIBFLAGS $_FRAMEWORKPATH $_FRAMEWORKS $FRAMEWORKSFLAGS -o $TARGET $SOURCES"
+    
+    
 if conf.env["withdebug"] :
     conf.env.Append(CXXFLAGS = "-g")
 else :
