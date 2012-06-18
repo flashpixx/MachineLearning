@@ -64,6 +64,7 @@ if conf.env["staticlink"] :
     conf.env["LIBLINKSUFFIX"] = " -Wl";
     #conf.env.Append(LINKFLAGS = "-Bdynamic -lz -Wl -Bdynamic -lbz2 -Wl")
     
+    
 if conf.env["withdebug"] :
     conf.env.Append(CXXFLAGS = "-g")
 else :
@@ -79,6 +80,8 @@ if conf.env["withoptimize"] :
         conf.env.Append(CXXFLAGS = "-mfpmath=387")
 
 
+
+# library defintion
 localconf = {
     "libraries" : [  "boost_exception",
                      "boost_system",
@@ -184,57 +187,47 @@ else :
         localconf["libraries"].extend( ["satlas", "cblas", "f77blas", "gfortran"] )
 
 
-
 if conf.env["withsources"] :
     conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_SOURCES -D MACHINELEARNING_SOURCES_TWITTER")
     localconf["libraries"].extend(["xml2", "json"])
     localconf["cheaders"].extend(["libxml/parser.h", "libxml/tree.h", "libxml/xpath.h", "libxml/xpathInternals.h"]);
     localconf["cppheaders"].extend(["locale", "json/json.h", "boost/asio.hpp", "boost/xpressive/xpressive.hpp", "boost/date_time/time_facet.hpp", "boost/date_time/gregorian/gregorian.hpp", "boost/date_time/local_time/local_time.hpp"] )
 
+
 if conf.env["withrandomdevice"] :
     conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_RANDOMDEVICE")
     localconf["libraries"].append("boost_random")
     localconf["cppheaders"].append("boost/nondet_random.hpp")
+
     
 if conf.env["withmpi"] :
     conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_MPI")
     localconf["libraries"].extend([ "boost_mpi", "boost_serialization" ])
     localconf["cppheaders"].append("boost/mpi.hpp")
     conf.env.Replace(CXX = "mpic++")
+
     
 if conf.env["withmultilanguage"] :
     conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_MULTILANGUAGE")
     localconf["libraries"].append("intl")
     localconf["cheaders"].append("libintl.h")
+
     
 if conf.env["withfiles"] :
     conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_FILES -D MACHINELEARNING_FILES_HDF")
     localconf["cppheaders"].append("H5Cpp.h")
     localconf["libraries"].extend(["hdf5", "hdf5_cpp"])
     
+
 if conf.env["withsymbolicmath"] :
     conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_SYMBOLICMATH")
     localconf["cppheaders"].extend(["boost/multi_array.hpp", "boost/variant.hpp", "ginac/ginac.h"])
     localconf["libraries"].append("ginac")
+
 
 if conf.env["withlogger"] :
     conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_LOGGER")
     localconf["libraries"].append("boost_thread")
     
 
-
-
-
-
-
 help.checkConfiguratin( conf, localconf )
-
-
-# check library data (Lapack is linked always static)
-#if conf.env["staticlink"] :
-#    conf.env.Append(LINKFLAGS = "-static")
-#    libraries = [conf.env["LIBPREFIX"]+i+conf.env["LIBSUFFIX"] for i in libraries]
-#    libraries.extend( ["z", "bz2"] )
-#libraries.append(conf.env["LIBPREFIX"]+"lapack"+conf.env["LIBSUFFIX"])
-
-
