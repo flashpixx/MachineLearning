@@ -80,32 +80,22 @@ def checkConfiguratin( conf, data ) :
         if not conf.CheckCXXHeader(i) :
             sys.exit(1)
     
-    for i in data["libraries"] :
-        if not conf.CheckLib(i) :
-            sys.exit(1)
+    
+    # on static libs we must the check a little bit different
+    if conf.env["staticlink"] :
+        for i in data["dynamiclibrariesonly"] :
+            if not conf.CheckLib(i) :
+                sys.exit(1)
+    
+        for i in data["libraries"] :
+            lc     = conf.env["LIBPREFIX"] + i + conf.env["LIBSUFFIX"]   
+            lcPath = str(conf.env.FindFile(lc, conf.env["LIBPATH"]))
+            conf.env.Append(LINKFLAGS = lcPath)
 
-"""    
-    for i in data["librariesWithHeader"] :
+            print "Checking for static C library " + lc + " found in " + os.path.dirname(lcPath) + "..."
 
-        # the "lang" is not set, because in CXX the library is not found
-        if not conf.CheckLib(i["lib"], None) :
-            sys.exit(1)
-            
-        if i["lang"] == "CXX" :
-            if type([]) == type(i["header"]) :
-                for n in i["header"] :
-                    if not conf.CheckCXXHeader(n) :
-                        sys.exit(1)
-            elif type("") == type(i["header"]) :
-                if not conf.CheckCXXHeader(i["header"]) :
-                        sys.exit(1)
-                    
-        elif i["lang"] == "C" :
-            if type([]) == type(i["header"]) :
-                for n in i["header"] :
-                    if not conf.CheckCHeader(n) :
-                        sys.exit(1)
-            elif type("") == type(i["header"]) :
-                if not conf.CheckCHeader(i["header"]) :
-                        sys.exit(1)
-"""
+    
+    else :
+        for i in data["dynamiclibrariesonly"]+data["libraries"] :
+            if not conf.CheckLib(i) :
+                sys.exit(1)

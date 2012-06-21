@@ -83,9 +83,13 @@ localconf = {
                      "boost_iostreams"
     ],
     
+    "dynamiclibrariesonly" : [ ], 
+    
     "cheaders"   :  [ "omp.h" ],
     
-    "cppheaders" :  [  "map",
+    "cppheaders" :  [ "machinelearning.h", 
+    
+                      "map",
                       "algorithm",
                       "limits",
                       "iostream",
@@ -100,7 +104,7 @@ localconf = {
                       "iterator",
                       "typeinfo",
                       "cxxabi.h",
-                
+                      
                       "boost/numeric/ublas/matrix.hpp",
                       "boost/numeric/ublas/vector.hpp", 
                       "boost/numeric/ublas/matrix_sparse.hpp",
@@ -159,7 +163,16 @@ localconf = {
                       "boost/iostreams/filter/counter.hpp", 
                       "boost/iostreams/concepts.hpp", 
                       "boost/iostreams/operations.hpp", 
-                      "boost/iostreams/copy.hpp"
+                      "boost/iostreams/copy.hpp",
+                      
+                      "boost/numeric/bindings/blas.hpp",
+                      "boost/numeric/bindings/ublas/vector.hpp",
+                      "boost/numeric/bindings/ublas/matrix.hpp",
+                      "boost/numeric/bindings/lapack/driver/geev.hpp",
+                      "boost/numeric/bindings/lapack/driver/ggev.hpp",
+                      "boost/numeric/bindings/lapack/driver/gesv.hpp", 
+                      "boost/numeric/bindings/lapack/driver/gesvd.hpp", 
+                      "boost/numeric/bindings/lapack/computational/hseqr.hpp"
                       
                    ]
 }
@@ -170,12 +183,13 @@ if not("javac" in COMMAND_LINE_TARGETS) :
     localconf["cppheaders"].extend( ["cstdlib", "boost/program_options/parsers.hpp", "boost/program_options/variables_map.hpp", "boost/filesystem.hpp", "boost/program_options/options_description.hpp"] )
 
 
-
-localconf["cppheaders"].extend(["boost/numeric/bindings/blas.hpp", "boost/numeric/bindings/ublas/vector.hpp", "boost/numeric/bindings/ublas/matrix.hpp", "boost/numeric/bindings/lapack/driver/geev.hpp", "boost/numeric/bindings/lapack/driver/ggev.hpp","boost/numeric/bindings/lapack/driver/gesv.hpp", "boost/numeric/bindings/lapack/driver/gesvd.hpp", "boost/numeric/bindings/lapack/computational/hseqr.hpp"])
-if conf.env["atlaslink"] == "multi" :
-    localconf["libraries"].extend( ["tatlas", "ptcblas", "ptf77blas", "gfortran"] )
-elif conf.env["atlaslink"] == "single" :
-    localconf["libraries"].extend( ["satlas", "cblas", "f77blas", "gfortran"] )
+if conf.env["staticlink"] :
+    localconf["libraries"].append("atlas")
+    localconf["dynamiclibrariesonly"].extend(["z", "bz2"])
+elif not(conf.env["staticlink"]) and conf.env["atlaslink"] == "multi" :
+    localconf["libraries"].append("tatlas")
+elif not(conf.env["staticlink"]) and conf.env["atlaslink"] == "single" :
+    localconf["libraries"].append("satlas")
 
 
 if conf.env["withsources"] :
