@@ -91,9 +91,13 @@ def checkConfiguratin( conf, data ) :
             lc     = conf.env["LIBPREFIX"] + i + conf.env["LIBSUFFIX"]   
             lcPath = str(conf.env.FindFile(lc, conf.env["LIBPATH"]))
             conf.env.Append(LINKFLAGS = lcPath)
-
-            print "Checking for static C library " + lc + " found in " + os.path.dirname(lcPath) + "..."
-
+            
+            lcMsg = ""
+            if lcPath == "" :
+                lcMsg = "Checking for static C library " + lc + "... no"
+            else :
+                lcMsg = "Checking for static C library " + lc + "... yes (found in " + os.path.dirname(lcPath) + ")"
+            print lcMsg
     
     else :
         for i in data["dynamiclibrariesonly"]+data["libraries"] :
