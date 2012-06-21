@@ -4,7 +4,7 @@
  # LGPL License                                                             #
  #                                                                          #
  # This file is part of the Machine Learning Framework.                     #
- # Copyright (c) 2010, Philipp Kraus, <philipp.kraus@flashpixx.de>          #
+ # Copyright (c) 2010-2012, Philipp Kraus, <philipp.kraus@flashpixx.de>     #
  # This program is free software: you can redistribute it and/or modify     #
  # it under the terms of the GNU Lesser General Public License as           #
  # published by the Free Software Foundation, either version 3 of the       #
@@ -893,6 +893,7 @@
  * @todo create a PHP modul ( http://devzone.zend.com/article/4486 / http://devzone.zend.com/node/view/id/1021 )
  * @todo implementating graph algorithms (use boost graph): http://en.wikipedia.org/wiki/A*_search_algorithm / http://en.wikipedia.org/wiki/Floyd%E2%80%93Warshall_algorithm
  * @todo add celluar algorithms: http://en.wikipedia.org/wiki/Cellular_automaton
+ * @todo add http://en.wikipedia.org/wiki/RANSAC
  * @todo thinking about additional datatypes http://en.wikipedia.org/wiki/GNU_Multiple_Precision_Arithmetic_Library
  **/
 namespace machinelearning {}
