@@ -202,10 +202,10 @@ if conf.env["withrandomdevice"] :
 
     
 if conf.env["withmpi"] :
+    conf.env.Replace(CXX = "mpic++")
     conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_MPI")
     localconf["libraries"].extend([ "boost_mpi", "boost_serialization" ])
     localconf["cppheaders"].append("boost/mpi.hpp")
-    conf.env.Replace(CXX = "mpic++")
 
     
 if conf.env["withmultilanguage"] :
