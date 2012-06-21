@@ -87,7 +87,7 @@ def showlicence() :
     print "# LGPL License                                                             #"
     print "#                                                                          #"
     print "# This file is part of the Machine Learning Framework.                     #"
-    print "# Copyright (c) 2010, Philipp Kraus, <philipp.kraus@flashpixx.de>          #"
+    print "# Copyright (c) 2010-2012, Philipp Kraus, <philipp.kraus@flashpixx.de>     #"
     print "# This program is free software: you can redistribute it and/or modify     #"
     print "# it under the terms of the GNU Lesser General Public License as           #"
     print "# published by the Free Software Foundation, either version 3 of the       #"

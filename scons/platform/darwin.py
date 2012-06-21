@@ -45,10 +45,10 @@ if "DYLD_LIBRARY_PATH" in os.environ :
     print("Appending custom OSX dynamic library path (DYLD_LIBRARY_PATH)")
 elif "LD_LIBRARY_PATH" in os.environ :
     conf.env.Append(LIBPATH = os.environ["LD_LIBRARY_PATH"].split(os.pathsep)) 
-    print("Appending custom library path (LD_LIBRARY_PATH)")
+    print("Appending custom posix library path (LD_LIBRARY_PATH)")
 elif "LIBRARY_PATH" in os.environ :
     conf.env.Append(LIBPATH = os.environ["LIBRARY_PATH"].split(os.pathsep)) 
-    print("Appending custom library path (LIBRARY_PATH)")
+    print("Appending custom posix library path (LIBRARY_PATH)")
 
 
 
