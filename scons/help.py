@@ -88,16 +88,17 @@ def checkConfiguratin( conf, data ) :
                 sys.exit(1)
     
         for i in data["libraries"] :
-            lc     = conf.env["LIBPREFIX"] + i + conf.env["LIBSUFFIX"]   
-            lcPath = str(conf.env.FindFile(lc, conf.env["LIBPATH"]))
-            conf.env.Append(LINKFLAGS = lcPath)
-            
+            lcLib  = conf.env["LIBPREFIX"] + i + conf.env["LIBSUFFIX"]   
+            lxPath = conf.env.FindFile(lcLib, conf.env["LIBPATH"])
+            #print type(lxPath)
+           
             lcMsg = ""
-            if lcPath == "" :
-                lcMsg = "Checking for static C library " + lc + "... no"
+            if lxPath == None :
+                print "Checking for static C library " + lcLib + "... no"
+                sys.exit(1)
             else :
-                lcMsg = "Checking for static C library " + lc + "... yes (found in " + os.path.dirname(lcPath) + ")"
-            print lcMsg
+                conf.env.Append(LINKFLAGS = str(lxPath))
+                print "Checking for static C library " + lcLib + "... yes (found in " + os.path.dirname(str(lxPath)) + ")"
     
     else :
         for i in data["dynamiclibrariesonly"]+data["libraries"] :
