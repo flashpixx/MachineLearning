@@ -156,8 +156,6 @@ if not env.GetOption('clean') :
             print "\n\n\n"
             print "==== configuration =================================================================="
 
-            print "PATH :\t\t\t"+env.Dump("PATH")
-            print ""
             print "C++ compiler :\t\t"+env.Dump("CXX")
             print "C++ flags :\t\t"+env.Dump("CXXFLAGS")
             print "C++ path :\t\t"+env.Dump("CPPPATH")
