@@ -128,6 +128,16 @@ cleantarget(env)
 
 if not env.GetOption('clean') :
     # adding platform scripts, create configuration and finish the configuration (only we build something)
+        
+    if "PATH" in os.environ :
+        laPath     = env["ENV"]
+        
+        laPathList = laPath["PATH"].split(os.pathsep)
+        laPathList.extend(os.environ["PATH"].split(os.pathsep))
+        laPath["PATH"] = os.pathsep.join(laPathList)
+        
+        env["ENV"] = laPath
+        print("Appending custom path (PATH)")
 
 
     if not("documentation" in COMMAND_LINE_TARGETS) and not("librarybuild" in COMMAND_LINE_TARGETS) and not("updatelanguage" in COMMAND_LINE_TARGETS) and not("createlanguage" in COMMAND_LINE_TARGETS) :
@@ -146,8 +156,13 @@ if not env.GetOption('clean') :
             print "\n\n\n"
             print "==== configuration =================================================================="
 
-            print "CXX :\t\t\t"+env.Dump("CXX")
-            print "CXXFLAGS :\t\t"+env.Dump("CXXFLAGS")
+            print "PATH :\t\t\t"+env.Dump("PATH")
+            print ""
+            print "C++ compiler :\t\t"+env.Dump("CXX")
+            print "C++ flags :\t\t"+env.Dump("CXXFLAGS")
+            print "C++ path :\t\t"+env.Dump("CPPPATH")
+            print "Linker flags :\t\t"+env.Dump("LINKFLAGS")
+            print "Library path :\t\t"+env.Dump("LIBPATH")
             print ""
             print "Atlas CPU Throttle : \t"+env.Dump("atlascputhrottle")
             print "AtlasLink : \t\t"+env.Dump("atlaslink")
