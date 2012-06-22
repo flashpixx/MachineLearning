@@ -893,10 +893,10 @@
  * @todo adding http://en.wikipedia.org/wiki/OPTICS_algorithm
  * @todo adding http://en.wikipedia.org/wiki/Local_outlier_factor
  * @todo thinking about CILK support http://supertech.csail.mit.edu/cilk/
- * @todo adding simulated annealing (see GSL)
+ * @todo adding simulated annealing (see GSL http://www.gnu.org/software/gsl/)
  * @todo adding some generic support for http://headmyshoulder.github.com/odeint-v2/
  * @todo adding voronoi tessellation (with CGAL http://http://www.cgal.org/ )
- * @todo create a PHP modul ( http://devzone.zend.com/article/4486 / http://devzone.zend.com/node/view/id/1021 )
+ * @todo create a PHP modul ( use Swig )
  * @todo implementating graph algorithms (use boost graph): http://en.wikipedia.org/wiki/A*_search_algorithm / http://en.wikipedia.org/wiki/Floyd%E2%80%93Warshall_algorithm
  * @todo add celluar algorithms: http://en.wikipedia.org/wiki/Cellular_automaton
  * @todo add http://en.wikipedia.org/wiki/RANSAC
