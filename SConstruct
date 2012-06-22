@@ -130,7 +130,7 @@ if not env.GetOption('clean') :
     # adding platform scripts, create configuration and finish the configuration (only we build something)
 
 
-    if not("documentation" in COMMAND_LINE_TARGETS) or not("librarybuild" in COMMAND_LINE_TARGETS):
+    if not("documentation" in COMMAND_LINE_TARGETS) and not("librarybuild" in COMMAND_LINE_TARGETS) and not("updatelanguage" in COMMAND_LINE_TARGETS) and not("createlanguage" in COMMAND_LINE_TARGETS) :
         env.Append(CPPPATH = [os.path.abspath(os.curdir)])
         conf = Configure(env)
 
