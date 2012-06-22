@@ -886,6 +886,12 @@
  * @todo adding GSL support http://www.gnu.org/software/gsl/
  * @todo adding PAPI support http://icl.cs.utk.edu/papi/
  * @todo thinking about a SSE support in the framework http://en.wikipedia.org/wiki/SSE3
+ * @todo adding GTML with http://en.wikipedia.org/wiki/Expectation–maximization_algorithm
+ * @todo adding http://en.wikipedia.org/wiki/Apriori_algorithm
+ * @todo adding http://en.wikipedia.org/wiki/Hierarchical_clustering
+ * @todo adding http://en.wikipedia.org/wiki/DBSCAN
+ * @todo adding http://en.wikipedia.org/wiki/OPTICS_algorithm
+ * @todo adding http://en.wikipedia.org/wiki/Local_outlier_factor
  * @todo thinking about CILK support http://supertech.csail.mit.edu/cilk/
  * @todo adding simulated annealing (see GSL)
  * @todo adding some generic support for http://headmyshoulder.github.com/odeint-v2/
