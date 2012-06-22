@@ -145,13 +145,9 @@ if not env.GetOption('clean') :
         if env["showconfig"] :
             print "\n\n\n"
             print "==== configuration =================================================================="
-        
-            #json.dumps(data, sort_keys=True, indent=4)
-            #data = {k: env[k] for k in ("CXX", "CXXFLAGS", "ENV", "atlascputhrottle", "atlaslink", "atlaspointerwidth", "cputype", "math", "skipbuilderror") }
 
             print "CXX :\t\t\t"+env.Dump("CXX")
             print "CXXFLAGS :\t\t"+env.Dump("CXXFLAGS")
-            #print "ENV : \t\t"+env.Dump("ENV")
             print ""
             print "Atlas CPU Throttle : \t"+env.Dump("atlascputhrottle")
             print "AtlasLink : \t\t"+env.Dump("atlaslink")
