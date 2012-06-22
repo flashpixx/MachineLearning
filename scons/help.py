@@ -89,11 +89,15 @@ def checkConfiguratin( conf, data ) :
     
     # on static libs we must the check a little bit different
     if conf.env["staticlink"] :
-        for i in data["dynamiclibrariesonly"] :
-            if not conf.CheckLib(i) :
+        for i in data["cdylibrariesonly"] :
+            if not conf.CheckLib(i, language="C") :
                 sys.exit(1)
-    
-        for i in data["libraries"] :
+        for i in data["cppdylibrariesonly"] :
+            if not conf.CheckLib(i, language="C++") :
+                sys.exit(1)
+
+                
+        for i in data["cpplibraries"]+data["clibraries"] :
             lcLib  = conf.env["LIBPREFIX"] + i + conf.env["LIBSUFFIX"]   
             lxPath = conf.env.FindFile(lcLib, conf.env["LIBPATH"])
            
@@ -103,7 +107,7 @@ def checkConfiguratin( conf, data ) :
                 sys.exit(1)
             else :
                 conf.env.Append(LINKFLAGS = str(lxPath))
-                print "Checking for static C library " + lcLib + "... yes (found in " + os.path.dirname(str(lxPath)) + ")"
+                print "Checking for static C/C++ library " + lcLib + "... yes (found in " + os.path.dirname(str(lxPath)) + ")"
     
     else :
     
