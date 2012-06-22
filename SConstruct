@@ -142,36 +142,37 @@ if not env.GetOption('clean') :
 
 
 
-    if env["showconfig"] :
-        print "\n\n\n"
-        print "==== configuration =================================================================="
-    
-        #json.dumps(data, sort_keys=True, indent=4)
-        #data = {k: env[k] for k in ("CXX", "CXXFLAGS", "ENV", "atlascputhrottle", "atlaslink", "atlaspointerwidth", "cputype", "math", "skipbuilderror") }
-        """
-        print "CXX :\t\t"+env.Dump("CXX")
-        print "CXXFLAGS :\t\t"+env.Dump("CXXFLAGS")
-        print "ENV : \t\t"+env.Dump("ENV")
-        print ""
-        print "Atlas CPU Throttle : \t\t"+env.Dump("atlascputhrottle")
-        print "AtlasLink : \t\t"+env.Dump("atlaslink")
-        print "Atlas pointer width : \t\t"+env.Dump("atlaspointerwidth")
-        print "CPU Type : \t\t"+env.Dump("cputype")
-        print "Math : \t\t"+env.Dump("math")
-        print "Skip builderror : \t\t"+env.Dump("skipbuilderror")
-        print "with debug : \t\t"+env.Dump("withdebug")
-        print "with files : \t\t"+env.Dump("withfiles")
-        print "with logger : \t\t"+env.Dump("withlogger")
-        print "with MPI : \t\t"+env.Dump("withmpi")
-        print "with multilanguage : \t\t"+env.Dump("withmultilanguage")
-        print "with optimize : \t\t"+env.Dump("withoptimize")
-        print "with random device : \t\t"+env.Dump("withrandomdevice")
-        print "with sources : \t\t"+env.Dump("withsources")
-        print "with symbolic math : \t\t"+env.Dump("withsymbolicmath")
-        """
+        if env["showconfig"] :
+            print "\n\n\n"
+            print "==== configuration =================================================================="
         
-        print "====================================================================================="
-        print "\n\n\n"
+            #json.dumps(data, sort_keys=True, indent=4)
+            #data = {k: env[k] for k in ("CXX", "CXXFLAGS", "ENV", "atlascputhrottle", "atlaslink", "atlaspointerwidth", "cputype", "math", "skipbuilderror") }
+
+            print "CXX :\t\t\t"+env.Dump("CXX")
+            print "CXXFLAGS :\t\t"+env.Dump("CXXFLAGS")
+            #print "ENV : \t\t"+env.Dump("ENV")
+            print ""
+            print "Atlas CPU Throttle : \t"+env.Dump("atlascputhrottle")
+            print "AtlasLink : \t\t"+env.Dump("atlaslink")
+            print "Atlas pointer width : \t"+env.Dump("atlaspointerwidth")
+            print "CPU Type : \t\t"+env.Dump("cputype")
+            print "Math : \t\t\t"+env.Dump("math")
+            print "with debug : \t\t"+env.Dump("withdebug")
+            print "with files : \t\t"+env.Dump("withfiles")
+            print "with logger : \t\t"+env.Dump("withlogger")
+            print "with MPI : \t\t"+env.Dump("withmpi")
+            print "with multilanguage : \t"+env.Dump("withmultilanguage")
+            print "with optimize : \t"+env.Dump("withoptimize")
+            print "with random device : \t"+env.Dump("withrandomdevice")
+            print "with sources : \t\t"+env.Dump("withsources")
+            print "with symbolic math : \t"+env.Dump("withsymbolicmath")
+            
+            if "cygwin" in platform.system().lower() :
+                print "Windows Version : \t"+env.Dump("winver")
+            
+            print "====================================================================================="
+            print "\n\n\n"
 
         
 
