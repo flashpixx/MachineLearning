@@ -127,16 +127,18 @@ cleantarget(env)
 
 
 if not env.GetOption('clean') :
-    # adding platform scripts, create configuration and finish the configuration
+    # adding platform scripts, create configuration and finish the configuration (only we build something)
 
-    env.Append(CPPPATH = [os.path.abspath(os.curdir)])
-    conf = Configure(env)
 
-    platformconfig = env["PLATFORM"].lower()
-    if not(os.path.isfile(os.path.join("scons", "platform", platformconfig+".py"))) :
-        raise ImportError("platform configuration script ["+platformconfig+"] not found")
-    env.SConscript( os.path.join("scons", "platform", platformconfig+".py"), exports="conf help" )
-    env = conf.Finish()
+    if not("documentation" in COMMAND_LINE_TARGETS) or not("librarybuild" in COMMAND_LINE_TARGETS):
+        env.Append(CPPPATH = [os.path.abspath(os.curdir)])
+        conf = Configure(env)
+
+        platformconfig = env["PLATFORM"].lower()
+        if not(os.path.isfile(os.path.join("scons", "platform", platformconfig+".py"))) :
+            raise ImportError("platform configuration script ["+platformconfig+"] not found")
+        env.SConscript( os.path.join("scons", "platform", platformconfig+".py"), exports="conf help" )
+        env = conf.Finish()
 
 
 
