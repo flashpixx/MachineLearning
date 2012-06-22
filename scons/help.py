@@ -101,5 +101,8 @@ def checkConfiguratin( conf, data ) :
     
     else :
         for i in data["dynamiclibrariesonly"]+data["libraries"] :
+            if i == "boost_mpi" :
+                conf.env.Append(LIBS = i)
+                continue
             if not conf.CheckLib(i) :
                 sys.exit(1)
