@@ -63,9 +63,15 @@ def unique(seq) :
 def checkConfiguratin( conf, data ) :
 
     # uniquify all lists
-    data["cheaders"]   = unique(data["cheaders"])
-    data["cppheaders"] = unique(data["cppheaders"])
-    data["libraries"]  = unique(data["libraries"])
+    data["cheaders"]            = unique(data["cheaders"])
+    data["cppheaders"]          = unique(data["cppheaders"])
+
+    data["cpplibraries"]        = unique(data["cpplibraries"])
+    data["cppdylibrariesonly"]  = unique(data["cppdylibrariesonly"])
+    data["cdylibrariesonly"]    = unique(data["cdylibrariesonly"])
+    data["clibraries"]          = unique(data["clibraries"])
+    
+
 
     # check C++ environment
     if not conf.CheckCXX() :
@@ -100,9 +106,14 @@ def checkConfiguratin( conf, data ) :
                 print "Checking for static C library " + lcLib + "... yes (found in " + os.path.dirname(str(lxPath)) + ")"
     
     else :
-        for i in data["dynamiclibrariesonly"]+data["libraries"] :
+    
+        for i in data["cdylibrariesonly"]+data["clibraries"] :
+            if not conf.CheckLib(i, language="C") :
+                sys.exit(1)
+    
+        for i in data["cppdylibrariesonly"]+data["cpplibraries"] :
             if i == "boost_mpi" :
                 conf.env.Append(LIBS = i)
                 continue
-            if not conf.CheckLib(i) :
+            if not conf.CheckLib(i, language="C++") :
                 sys.exit(1)

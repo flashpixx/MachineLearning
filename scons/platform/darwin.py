@@ -76,13 +76,17 @@ if conf.env["withoptimize"] :
 
 # library defintion
 localconf = {
-    "libraries" : [  "boost_exception",
-                     "boost_system",
-                     "boost_regex",
-                     "boost_iostreams"
+    "cpplibraries" : [  "boost_exception",
+                        "boost_system",
+                        "boost_regex",
+                        "boost_iostreams"
     ],
     
-    "dynamiclibrariesonly" : [ ], 
+    "cppdylibrariesonly" : [ ], 
+    
+    "cdylibrariesonly"   : [ ], 
+    
+    "clibraries"         : [ ],
     
     "cheaders"   :  [ "omp.h" ],
     
@@ -178,60 +182,62 @@ localconf = {
       
 
 if not("javac" in COMMAND_LINE_TARGETS) :
-    localconf["libraries"].extend(["boost_program_options", "boost_filesystem"])
+    localconf["cpplibraries"].extend(["boost_program_options", "boost_filesystem"])
     localconf["cppheaders"].extend( ["cstdlib", "boost/program_options/parsers.hpp", "boost/program_options/variables_map.hpp", "boost/filesystem.hpp", "boost/program_options/options_description.hpp"] )
 
 
 if conf.env["staticlink"] :
-    localconf["libraries"].append("atlas")
-    localconf["dynamiclibrariesonly"].extend(["z", "bz2"])
+    localconf["clibraries"].append("atlas")
+    localconf["cdylibrariesonly"].extend(["z", "bz2"])
 elif not(conf.env["staticlink"]) and conf.env["atlaslink"] == "multi" :
-    localconf["libraries"].append("tatlas")
+    localconf["clibraries"].append("tatlas")
 elif not(conf.env["staticlink"]) and conf.env["atlaslink"] == "single" :
-    localconf["libraries"].append("satlas")
+    localconf["clibraries"].append("satlas")
 
 
 if conf.env["withsources"] :
     conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_SOURCES -D MACHINELEARNING_SOURCES_TWITTER")
-    localconf["libraries"].extend(["xml2", "json"])
+    localconf["clibraries"].append("xml2")
+    localconf["cpplibraries"].append("json")
     localconf["cheaders"].extend(["libxml/parser.h", "libxml/tree.h", "libxml/xpath.h", "libxml/xpathInternals.h"]);
     localconf["cppheaders"].extend(["locale", "json/json.h", "boost/asio.hpp", "boost/xpressive/xpressive.hpp", "boost/date_time/time_facet.hpp", "boost/date_time/gregorian/gregorian.hpp", "boost/date_time/local_time/local_time.hpp"] )
 
 
 if conf.env["withrandomdevice"] :
     conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_RANDOMDEVICE")
-    localconf["libraries"].append("boost_random")
+    localconf["cpplibraries"].append("boost_random")
     localconf["cppheaders"].append("boost/nondet_random.hpp")
 
     
 if conf.env["withmpi"] :
     conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_MPI")
-    localconf["libraries"].extend([ "boost_mpi", "boost_serialization" ])
+    localconf["cpplibraries"].extend([ "boost_mpi", "boost_serialization" ])
     localconf["cppheaders"].append("boost/mpi.hpp")
     conf.env.Replace(CXX = "mpic++")
 
     
 if conf.env["withmultilanguage"] :
     conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_MULTILANGUAGE")
-    localconf["libraries"].append("intl")
+    localconf["clibraries"].append("intl")
     localconf["cheaders"].append("libintl.h")
 
     
 if conf.env["withfiles"] :
     conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_FILES -D MACHINELEARNING_FILES_HDF")
     localconf["cppheaders"].append("H5Cpp.h")
-    localconf["libraries"].extend(["hdf5", "hdf5_cpp"])
+    localconf["clibraries"].append("hdf5")
+    localconf["cpplibraries"].append("hdf5_cpp")
     
 
 if conf.env["withsymbolicmath"] :
     conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_SYMBOLICMATH")
     localconf["cppheaders"].extend(["boost/multi_array.hpp", "boost/variant.hpp", "ginac/ginac.h"])
-    localconf["libraries"].append("ginac")
+    localconf["cpplibraries"].append("ginac")
 
 
 if conf.env["withlogger"] :
     conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_LOGGER")
-    localconf["libraries"].append("boost_thread")
+    localconf["cpplibraries"].append("boost_thread")
     
 
 help.checkConfiguratin( conf, localconf )
