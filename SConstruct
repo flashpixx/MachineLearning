@@ -178,7 +178,7 @@ if not env.GetOption('clean') :
     # main cpp must compiled in
     defaultcpp = []
     if env["withlogger"] or env["withrandomdevice"] :
-        defaultcpp.append( "machinelearning.cpp" )
+        defaultcpp.append( os.path.join(os.path.abspath(os.curdir), "machinelearning.cpp") )
 
 
     # setup all different sub build script
