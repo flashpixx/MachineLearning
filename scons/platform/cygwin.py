@@ -18,123 +18,239 @@
 ############################################################################
 
 # -*- coding: utf-8 -*-
+
 import os
+import sys
 Import("*")
 
-flags = {}
+
+# OSX system information
+if "CXX" in os.environ:
+    conf.env.Replace(CXX = os.environ["CXX"])
+    print("Using compiler " + os.environ["CXX"])
+
+if "CPPPATH" in os.environ :
+    conf.env.Append(CPPPATH = os.environ["CPPPATH"].split(os.pathsep))
+    print("Appending custom C++ path (CPPPATH)")
+
+if "CXXFLAGS" in os.environ:
+    conf.env.Append(CXXFLAGS = os.environ["CXXFLAGS"].split(" "))
+    print("Appending custom build flags (CXXFLAGS)")
+ 
+if "LDFLAGS" in os.environ:
+    conf.env.Append(LINKFLAGS = os.environ["LDFLAGS"].split(" "))
+    print("Appending custom link flags (LDFLAG)")
+
+if "LD_LIBRARY_PATH" in os.environ :
+    conf.env.Append(LIBPATH = os.environ["LD_LIBRARY_PATH"].split(os.pathsep)) 
+    print("Appending custom posix library path (LD_LIBRARY_PATH)")
+elif "LIBRARY_PATH" in os.environ :
+    conf.env.Append(LIBPATH = os.environ["LIBRARY_PATH"].split(os.pathsep)) 
+    print("Appending custom posix library path (LIBRARY_PATH)")
 
 
-flags["CPPPATH"] = []
-if os.environ.has_key("CPPPATH") :
-    flags["CPPPATH"].extend( os.environ["CPPPATH"].split(os.pathsep) )
-elif os.environ.has_key("CPATH") :
-    flags["CPPPATH"].extend( os.environ["CPATH"].split(os.pathsep) )
-    
-flags["LIBPATH"] = []
-if os.environ.has_key("PATH") :
-    flags["LIBPATH"].extend(os.environ["PATH"].split(os.pathsep))
-elif os.environ.has_key("LIBRARY_PATH") :
-    flags["LIBPATH"].extend(os.environ["LIBRARY_PATH"].split(os.pathsep))
-elif os.environ.has_key("LD_LIBRARY_PATH") :
-    flags["LIBPATH"].extend(os.environ["LD_LIBRARY_PATH"].split(os.pathsep))
-
-flags["CXXFLAGS"] = []
-if os.environ.has_key("CXXFLAGS") :
-    flags["CXXFLAGS"].extend(os.environ["CXXFLAGS"].split(" "))
-
-flags["LINKFLAGS"] = []
-if os.environ.has_key("LDFLAGS") :
-    flags["LINKFLAGS"].extend(os.environ["LDFLAGS"].split(" "))
+if conf.env["withmpi"] :
+    print "Cygwin builds can not use MPI builds"
+    sys.exit(1)
 
 
 
-flags["CXXFLAGS"].extend(["-fopenmp", "-pipe", "-Wall", "-D BOOST_FILESYSTEM_NO_DEPRECATED", "-D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"])
-flags["LINKFLAGS"].extend(["-fopenmp", "-mconsole", "-enable-stdcall-fixup", "-mthread"])
-flags["LIBS"]         = ["boost_system", "boost_iostreams", "boost_regex"]
 
 
-# linker command -mdll can be used
-if not("javac" in COMMAND_LINE_TARGETS) :
-    flags["LIBS"].extend(["boost_program_options", "boost_exception", "boost_filesystem"])
-    
-#Windows Version options see http://msdn.microsoft.com/en-us/library/aa383745%28v=vs.85%29.aspx
-if env["winver"] == "win7" :
-    flags["CXXFLAGS"].append("-D _WIN32_WINNT=0x0601")
-elif env["winver"] == "srv2008" :
-    flags["CXXFLAGS"].append("-D _WIN32_WINNT=0x0600")
-elif env["winver"] == "vista" :
-    flags["CXXFLAGS"].append("-D _WIN32_WINNT=0x0600")
-elif env["winver"] == "srv2003sp1" :
-    flags["CXXFLAGS"].append("-D _WIN32_WINNT=0x0502")
-elif env["winver"] == "xpsp2" :
-    flags["CXXFLAGS"].append("-D _WIN32_WINNT=0x0502")
-elif env["winver"] == "srv2003" :
-    flags["CXXFLAGS"].append("-D _WIN32_WINNT=0x0501")
-elif env["winver"] == "xp" :
-    flags["CXXFLAGS"].append("-D _WIN32_WINNT=0x0501")
-elif env["winver"] == "w2000" :
-    flags["CXXFLAGS"].append("-D _WIN32_WINNT=0x0500")
-    
-# Atlas build creates a static library under Cygwin, so we link directly without the "atlaslink" option
-# Library sequence must be preserved !!
-if env["atlaslink"] == "multi" :
-    flags["LIBS"].extend( ["lapack", "ptcblas", "ptf77blas", "gfortran"] )
-elif env["atlaslink"] == "single" :
-    flags["LIBS"].extend( ["lapack", "cblas", "f77blas", "gfortran"] )
+# main configuration
+conf.env.Append(CXXFLAGS = "-fopenmp -pipe -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS")    
+conf.env.Append(LINKFLAGS = "-fopenmp --as-needed -mconsole -enable-stdcall-fixup -mthread")
 
-if env["staticlink"] :
-    flags["LIBS"].append("atlas")
+if conf.env["withdebug"] :
+    conf.env.Append(CXXFLAGS = "-g")
 else :
-    if env["atlaslink"] == "multi" :
-        flags["LIBS"].append("tatlas")
-    elif env["atlaslink"] == "single" :
-        flags["LIBS"].append("satlas")
-
+    conf.env.Append(CXXFLAGS = "-D NDEBUG -D BOOST_UBLAS_NDEBUG")
     
-if env["withdebug"] :
-    flags["CXXFLAGS"].append("-g")
-else :
-    flags["CXXFLAGS"].extend(["-D NDEBUG", "-D BOOST_UBLAS_NDEBUG"])
-
-if env["withrandomdevice"] :
-    flags["CXXFLAGS"].append("-D MACHINELEARNING_RANDOMDEVICE")
-    flags["LIBS"].append("boost_random");
-
-if env["withsources"] :
-    flags["CXXFLAGS"].extend(["-D MACHINELEARNING_SOURCES", "-D MACHINELEARNING_SOURCES_TWITTER", "-D __USE_W32_SOCKETS"])
-    flags["LIBS"].extend( ["xml2-2", "ws2_32", "json"] )
-
-if env["withfiles"] :
-    flags["CXXFLAGS"].extend(["-D MACHINELEARNING_FILES", "-D MACHINELEARNING_FILES_HDF"])
-    flags["LIBS"].extend( ["hdf5_cpp", "hdf5"] )
-
-if env["withsymbolicmath"] :
-    flags["CXXFLAGS"].append("-D MACHINELEARNING_SYMBOLICMATH")
-    flags["LIBS"].append("ginac")
-
-if env["withoptimize"] :
-    flags["CXXFLAGS"].extend(["-O2", "-fomit-frame-pointer", "-finline-functions", "-mtune="+env["cputype"]])
-    if env["math"] == "sse3" :
-        flags["CXXFLAGS"].extend(["-mfpmath=sse", "-msse3"])
-    elif env["math"] == "sse" :
-        flags["CXXFLAGS"].extend(["-mfpmath=sse", "-msse"])
+if conf.env["withoptimize"] :
+    conf.env.Append(CXXFLAGS = "-O2 -fomit-frame-pointer -finline-functions")
+    if conf.env["math"] == "sse3" :
+        conf.env.Append(CXXFLAGS = "-mfpmath=sse -msse3")
+    elif conf.env["math"] == "sse" :
+        conf.env.Append(CXXFLAGS = "-mfpmath=sse -msse")
     else :
-        flags["CXXFLAGS"].extend(["-mfpmath=387"])
+        conf.env.Append(CXXFLAGS = "-mfpmath=387")
+        
+        
+#Windows Version options see http://msdn.microsoft.com/en-us/library/aa383745%28v=vs.85%29.aspx
+if conf.env["winver"] == "win7" :
+    conf.env.Append(CXXFLAGS = "-D _WIN32_WINNT=0x0601")
+elif conf.env["winver"] == "srv2008" :
+    conf.env.Append(CXXFLAGS = "-D _WIN32_WINNT=0x0600")
+elif conf.env["winver"] == "vista" :
+    conf.env.Append(CXXFLAGS = "-D _WIN32_WINNT=0x0600")
+elif conf.env["winver"] == "srv2003sp1" :
+    conf.env.Append(CXXFLAGS = "-D _WIN32_WINNT=0x0502")
+elif conf.env["winver"] == "xpsp2" :
+    conf.env.Append(CXXFLAGS = "-D _WIN32_WINNT=0x0502")
+elif conf.env["winver"] == "srv2003" :
+    conf.env.Append(CXXFLAGS = "-D _WIN32_WINNT=0x0501")
+elif conf.env["winver"] == "xp" :
+    conf.env.Append(CXXFLAGS = "-D _WIN32_WINNT=0x0501")
+elif conf.env["winver"] == "w2000" :
+    conf.env.Append(CXXFLAGS = "-D _WIN32_WINNT=0x0500")
 
-if env["withlogger"] :
-    flags["CXXFLAGS"].append("-D MACHINELEARNING_LOGGER")
-    flags["LIBS"].append("boost_thread")
 
 
-# if the static option is set, replace all libraries with the static version
-if env["staticlink"] :
-    dylink = ["z", "bz2"]
-    for i in flags["LIBS"] :
-        found = env.FindFile(env["LIBPREFIX"]+i+env["LIBSUFFIX"], flags["LIBPATH"])
-        if found <> None :
-            flags["LINKFLAGS"].append(found)
-        else :
-            dylink.append(i);
-    flags["LIBS"] = dylink
+# library defintion
+localconf = {
+    "cpplibraries" : [  "boost_exception",
+                        "boost_system",
+                        "boost_regex",
+                        "boost_iostreams"
+    ],
+    
+    "cppdylibrariesonly" : [ ], 
+    
+    "cdylibrariesonly"   : [ ], 
+    
+    "clibraries"         : [ ],
+    
+    "cheaders"   :  [ "omp.h" ],
+    
+    "cppheaders" :  [ "machinelearning.h", 
+    
+                      "map",
+                      "algorithm",
+                      "limits",
+                      "iostream",
+                      "numeric",
+                      "string",
+                      "sstream",
+                      "ostream",
+                      "fstream",
+                      "stdexcept",
+                      "vector",
+                      "ctime",
+                      "iterator",
+                      "typeinfo",
+                      "cxxabi.h",
+                      
+                      "boost/numeric/ublas/matrix.hpp",
+                      "boost/numeric/ublas/vector.hpp", 
+                      "boost/numeric/ublas/matrix_sparse.hpp",
+                      "boost/numeric/ublas/vector_proxy.hpp",
+                      "boost/numeric/ublas/matrix_proxy.hpp",
+                      "boost/numeric/ublas/storage.hpp",
+                      "boost/numeric/ublas/io.hpp",
+                      "boost/numeric/ublas/symmetric.hpp", 
+                
+                      "boost/numeric/bindings/blas.hpp",
+                      "boost/numeric/bindings/ublas/vector.hpp",
+                      "boost/numeric/bindings/ublas/matrix.hpp",
+                      "boost/numeric/bindings/lapack/driver/geev.hpp",
+                      "boost/numeric/bindings/lapack/driver/ggev.hpp",
+                      "boost/numeric/bindings/lapack/driver/gesv.hpp",
+                      "boost/numeric/bindings/lapack/driver/gesvd.hpp",
+                      "boost/numeric/bindings/lapack/computational/hseqr.hpp",
+                
+                      "boost/algorithm/string.hpp", 
+                      "boost/algorithm/string/erase.hpp",
+                
+                      "boost/accumulators/accumulators.hpp",
+                      "boost/accumulators/statistics/stats.hpp",
+                      "boost/accumulators/statistics/min.hpp",
+                      "boost/accumulators/statistics/max.hpp",
+                      "boost/accumulators/statistics/mean.hpp",
+                      "boost/accumulators/statistics/variance.hpp",
+                      "boost/math/distributions/beta.hpp",
+                      "boost/math/distributions/students_t.hpp",
+                      "boost/math/distributions/weibull.hpp",
+                      "boost/math/distributions/rayleigh.hpp",
+                      "boost/math/distributions/pareto.hpp",
+                      "boost/math/distributions/chi_squared.hpp",
+                      "boost/math/distributions/triangular.hpp",
+                
+                      "boost/iterator/counting_iterator.hpp",
+                      "boost/iterator/permutation_iterator.hpp",
+                
+                      "boost/lambda/lambda.hpp",
+                
+                      "boost/foreach.hpp",
+                      "boost/random.hpp",
+                      "boost/shared_ptr.hpp",
+                      "boost/static_assert.hpp",
+                      "boost/bind.hpp",
+                      "boost/ref.hpp",
+                      "boost/regex.hpp",
+                      "boost/lexical_cast.hpp",
+                      
+                      "boost/iostreams/filter/gzip.hpp", 
+                      "boost/iostreams/filter/bzip2.hpp", 
+                      "boost/iostreams/stream.hpp", 
+                      "boost/iostreams/device/null.hpp", 
+                      "boost/iostreams/filtering_streambuf.hpp", 
+                      "boost/iostreams/filtering_stream.hpp", 
+                      "boost/iostreams/filter/counter.hpp", 
+                      "boost/iostreams/concepts.hpp", 
+                      "boost/iostreams/operations.hpp", 
+                      "boost/iostreams/copy.hpp",
+                      
+                      "boost/numeric/bindings/blas.hpp",
+                      "boost/numeric/bindings/ublas/vector.hpp",
+                      "boost/numeric/bindings/ublas/matrix.hpp",
+                      "boost/numeric/bindings/lapack/driver/geev.hpp",
+                      "boost/numeric/bindings/lapack/driver/ggev.hpp",
+                      "boost/numeric/bindings/lapack/driver/gesv.hpp", 
+                      "boost/numeric/bindings/lapack/driver/gesvd.hpp", 
+                      "boost/numeric/bindings/lapack/computational/hseqr.hpp"
+                      
+                   ]
+}
+      
 
-env.MergeFlags(flags)
+if not("javac" in COMMAND_LINE_TARGETS) :
+    localconf["cpplibraries"].extend(["boost_program_options", "boost_filesystem"])
+    localconf["cppheaders"].extend( ["cstdlib", "boost/program_options/parsers.hpp", "boost/program_options/variables_map.hpp", "boost/filesystem.hpp", "boost/program_options/options_description.hpp"] )
+
+
+if conf.env["staticlink"] :
+    localconf["clibraries"].append("atlas")
+    localconf["cdylibrariesonly"].extend(["z", "bz2"])
+elif not(conf.env["staticlink"]) and conf.env["atlaslink"] == "multi" :
+    localconf["clibraries"].append("tatlas")
+elif not(conf.env["staticlink"]) and conf.env["atlaslink"] == "single" :
+    localconf["clibraries"].append("satlas")
+
+
+if conf.env["withsources"] :
+    conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_SOURCES -D MACHINELEARNING_SOURCES_TWITTER")
+    localconf["clibraries"].append("xml2")
+    localconf["cpplibraries"].append("json")
+    localconf["cheaders"].extend(["libxml/parser.h", "libxml/tree.h", "libxml/xpath.h", "libxml/xpathInternals.h"]);
+    localconf["cppheaders"].extend(["locale", "json/json.h", "boost/asio.hpp", "boost/xpressive/xpressive.hpp", "boost/date_time/time_facet.hpp", "boost/date_time/gregorian/gregorian.hpp", "boost/date_time/local_time/local_time.hpp"] )
+
+
+if conf.env["withrandomdevice"] :
+    conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_RANDOMDEVICE")
+    localconf["cpplibraries"].append("boost_random")
+    localconf["cppheaders"].append("boost/nondet_random.hpp")
+
+    
+if conf.env["withmultilanguage"] :
+    conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_MULTILANGUAGE")
+
+    
+if conf.env["withfiles"] :
+    conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_FILES -D MACHINELEARNING_FILES_HDF")
+    localconf["cppheaders"].append("H5Cpp.h")
+    localconf["clibraries"].append("hdf5")
+    localconf["cpplibraries"].append("hdf5_cpp")
+    
+
+if conf.env["withsymbolicmath"] :
+    conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_SYMBOLICMATH")
+    localconf["cppheaders"].extend(["boost/multi_array.hpp", "boost/variant.hpp", "ginac/ginac.h"])
+    localconf["cpplibraries"].append("ginac")
+
+
+if conf.env["withlogger"] :
+    conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_LOGGER")
+    localconf["cpplibraries"].append("boost_thread")
+    
+
+help.checkConfiguratin( conf, localconf )
