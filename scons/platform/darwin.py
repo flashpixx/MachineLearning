@@ -233,6 +233,5 @@ if conf.env["withlogger"] :
     conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_LOGGER")
     localconf["libraries"].append("boost_thread")
     
-    
 
 help.checkConfiguratin( conf, localconf )

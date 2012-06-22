@@ -90,7 +90,6 @@ def checkConfiguratin( conf, data ) :
         for i in data["libraries"] :
             lcLib  = conf.env["LIBPREFIX"] + i + conf.env["LIBSUFFIX"]   
             lxPath = conf.env.FindFile(lcLib, conf.env["LIBPATH"])
-            #print type(lxPath)
            
             lcMsg = ""
             if lxPath == None :
