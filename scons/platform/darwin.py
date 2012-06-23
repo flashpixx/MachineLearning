@@ -82,6 +82,8 @@ localconf = {
                         "boost_iostreams"
     ],
     
+    "staticlinkonly"     : [ ],
+    
     "cppdylibrariesonly" : [ ], 
     
     "cdylibrariesonly"   : [ ], 

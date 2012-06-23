@@ -143,7 +143,7 @@ if not env.GetOption('clean') :
     if not("documentation" in COMMAND_LINE_TARGETS) and not("librarybuild" in COMMAND_LINE_TARGETS) and not("updatelanguage" in COMMAND_LINE_TARGETS) and not("createlanguage" in COMMAND_LINE_TARGETS) :
         env.Append(CPPPATH = [os.path.abspath(os.curdir)])
         conf = Configure(env)
-
+    
         platformconfig = env["PLATFORM"].lower()
         if not(os.path.isfile(os.path.join("scons", "platform", platformconfig+".py"))) :
             raise ImportError("platform configuration script ["+platformconfig+"] not found")
