@@ -117,9 +117,7 @@ localconf = {
     
     "cheaders"   :  [ "omp.h" ],
     
-    "cppheaders" :  [  
-    
-                      "map",
+    "cppheaders" :  [ "map",
                       "algorithm",
                       "limits",
                       "iostream",
@@ -241,6 +239,7 @@ if conf.env["withfiles"] :
     localconf["cppheaders"].append("H5Cpp.h")
     localconf["clibraries"].append("hdf5")
     localconf["cpplibraries"].append("hdf5_cpp")
+    #localconf["staticlinkonly"].extend(["hdf5", "hdf5_cpp"])
     
 
 if conf.env["withsymbolicmath"] :
