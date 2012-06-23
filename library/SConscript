@@ -426,8 +426,6 @@ def build_jsoncpp(target, source, env) :
         oFile.write(makefile)
         oFile.close()
     
-
-    
     runsyscmd("cd "+jsonpath+"; scons platform=linux-gcc", env)
     
     # manual copy of the data
