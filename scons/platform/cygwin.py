@@ -41,7 +41,10 @@ if "LDFLAGS" in os.environ:
     conf.env.Append(LINKFLAGS = os.environ["LDFLAGS"].split(" "))
     print("Appending custom link flags (LDFLAG)")
 
-if "LD_LIBRARY_PATH" in os.environ :
+elif "PATH" in os.environ :
+    conf.env.Append(LIBPATH = os.environ["PATH"].split(os.pathsep)) 
+    print("Appending custom Windows library path (PATH)")
+elif "LD_LIBRARY_PATH" in os.environ :
     conf.env.Append(LIBPATH = os.environ["LD_LIBRARY_PATH"].split(os.pathsep)) 
     print("Appending custom posix library path (LD_LIBRARY_PATH)")
 elif "LIBRARY_PATH" in os.environ :
@@ -104,6 +107,8 @@ localconf = {
                         "boost_iostreams"
     ],
     
+    "staticlinkonly" : [ ], 
+    
     "cppdylibrariesonly" : [ ], 
     
     "cdylibrariesonly"   : [ ], 
@@ -112,7 +117,7 @@ localconf = {
     
     "cheaders"   :  [ "omp.h" ],
     
-    "cppheaders" :  [ "machinelearning.h", 
+    "cppheaders" :  [  
     
                       "map",
                       "algorithm",
@@ -208,13 +213,9 @@ if not("javac" in COMMAND_LINE_TARGETS) :
     localconf["cppheaders"].extend( ["cstdlib", "boost/program_options/parsers.hpp", "boost/program_options/variables_map.hpp", "boost/filesystem.hpp", "boost/program_options/options_description.hpp"] )
 
 
+localconf["staticlinkonly"].append("atlas")
 if conf.env["staticlink"] :
-    localconf["clibraries"].append("atlas")
     localconf["cdylibrariesonly"].extend(["z", "bz2"])
-elif not(conf.env["staticlink"]) and conf.env["atlaslink"] == "multi" :
-    localconf["clibraries"].append("tatlas")
-elif not(conf.env["staticlink"]) and conf.env["atlaslink"] == "single" :
-    localconf["clibraries"].append("satlas")
 
 
 if conf.env["withsources"] :

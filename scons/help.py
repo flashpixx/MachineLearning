@@ -88,6 +88,21 @@ def checkConfiguratin( conf, data ) :
     
     
     # on static libs we must the check a little bit different
+    for i in data["staticlinkonly"] :
+        lcLib  = conf.env["LIBPREFIX"] + i + conf.env["LIBSUFFIX"]   
+        lxPath = conf.env.FindFile(lcLib, conf.env["LIBPATH"])
+           
+        lcMsg = ""
+        if lxPath == None :
+            print "Checking for static C library " + lcLib + "... no"
+            sys.exit(1)
+        else :
+            conf.env.Append(LINKFLAGS = str(lxPath))
+            print "Checking for static C/C++ library " + lcLib + "... yes (found in " + os.path.dirname(str(lxPath)) + ")"
+    
+    
+    
+    
     if conf.env["staticlink"] :
         for i in data["cdylibrariesonly"] :
             if not conf.CheckLib(i, language="C") :
