@@ -130,14 +130,12 @@ if not env.GetOption('clean') :
     # adding platform scripts, create configuration and finish the configuration (only we build something)
         
     if "PATH" in os.environ :
-        laPath     = env["ENV"]
-        
-        laPathList = laPath["PATH"].split(os.pathsep)
+        laPathList = env["ENV"]["PATH"].split(os.pathsep)
         laPathList.extend(os.environ["PATH"].split(os.pathsep))
-        laPath["PATH"] = os.pathsep.join(laPathList)
-        
-        env["ENV"] = laPath
+        env["ENV"]["PATH"] = laPathList
+
         print("Appending custom path (PATH)")
+
 
 
     if not("documentation" in COMMAND_LINE_TARGETS) and not("librarybuild" in COMMAND_LINE_TARGETS) and not("updatelanguage" in COMMAND_LINE_TARGETS) and not("createlanguage" in COMMAND_LINE_TARGETS) :
