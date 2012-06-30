@@ -132,7 +132,14 @@ def checkConfiguratin( conf, data ) :
     
         for i in data["cppdylibrariesonly"]+data["cpplibraries"] :
             if i == "boost_mpi" :
+                lxPath = conf.env.FindFile(conf.env["LIBPREFIX"]+i+conf.env["SHLIBSUFFIX"], conf.env["LIBPATH"])
+                if lxPath == None :
+                    print "Checking for C++ library "+i+"... no"
+                    sys.exit(1)
+
+                print "Checking for C++ library "+i+"... yes"
                 conf.env.Append(LIBS = i)
                 continue
+                
             if not conf.CheckLib(i, language="C++") :
                 sys.exit(1)
