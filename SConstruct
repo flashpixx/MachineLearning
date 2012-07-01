@@ -41,6 +41,8 @@ def createVariables(vars) :
     vars.Add(BoolVariable("withoptimize", "compile with CPU optimization code", True))
     vars.Add(EnumVariable("math", "optimization of math structure", "sse3", allowed_values=("sse3", "sse", "387")))
 
+    vars.Add(BoolVariable("usecolorgcc", "use color gcc call (add 'color-' prefix to the compiler)", True))
+
     vars.Add(EnumVariable("atlaslink", "value of the atlas threadding (multi = tatlas, single = satlas)", "multi", allowed_values=("multi", "single")))
     vars.Add(BoolVariable("staticlink", "libraries will linked static", False))
     vars.Add(BoolVariable("showconfig", "shows the environment configuration", False))
@@ -136,6 +138,10 @@ if not env.GetOption('clean') :
 
         print("Appending custom path (PATH)")
 
+    if "TERM" in os.environ :
+        env["ENV"]["TERM"] = os.environ["TERM"]
+        print("Using term environment (TERM)")
+
 
 
     if not("documentation" in COMMAND_LINE_TARGETS) and not("librarybuild" in COMMAND_LINE_TARGETS) and not("updatelanguage" in COMMAND_LINE_TARGETS) and not("createlanguage" in COMMAND_LINE_TARGETS) :
@@ -146,6 +152,11 @@ if not env.GetOption('clean') :
         if not(os.path.isfile(os.path.join("scons", "platform", platformconfig+".py"))) :
             raise ImportError("platform configuration script ["+platformconfig+"] not found")
         env.SConscript( os.path.join("scons", "platform", platformconfig+".py"), exports="conf help" )
+        
+        # set the colorgcc prefix after checkig, because otherwise it can creates errors on checklibrary
+        if conf.env["usecolorgcc"] :
+            conf.env.Replace(CXX = "color-"+conf.env["CXX"])
+        
         env = conf.Finish()
 
 
