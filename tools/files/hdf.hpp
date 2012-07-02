@@ -85,8 +85,8 @@ namespace machinelearning { namespace tools { namespace files {
             template<typename T> void writeBlasVector( const std::string&, const ublas::vector<T>&, const H5::PredType& ) const;
             template<typename T> void writeValue( const std::string&, const T&, const H5::PredType& ) const;
             
-            void writeString( const std::string&, const std::string&, const bool& = true ) const;
-            void writeStringVector( const std::string&, const std::vector<std::string>&, const bool& = true ) const;
+            void writeString( const std::string&, const std::string& ) const;
+            void writeStringVector( const std::string&, const std::vector<std::string>& ) const;
         
         
         private :
@@ -368,9 +368,8 @@ namespace machinelearning { namespace tools { namespace files {
     /** writes a simple string to hdf
      * @param p_path path to dataset
      * @param p_value string value
-     * @param p_utf8 write the string value with UTF-8 encoding
      **/
-    inline void hdf::writeString( const std::string& p_path, const std::string& p_value, const bool& p_utf8 ) const
+    inline void hdf::writeString( const std::string& p_path, const std::string& p_value ) const
     {
         if (p_value.empty())
             throw exception::runtime(_("can not write empty data"), *this);
@@ -379,13 +378,9 @@ namespace machinelearning { namespace tools { namespace files {
         H5::DataSet l_dataset;
         H5::StrType l_str;
         std::vector<H5::Group> l_groups;
-        
-        createStringSpace(p_path, ublas::vector<std::size_t>(1,1), p_value.size(), l_dataspace, l_dataset, l_str, l_groups);
 
-        if (p_utf8)
-            l_str.setCset( H5T_CSET_UTF8 );
-        
-        // write string
+        // create string space and write the data
+        createStringSpace(p_path, ublas::vector<std::size_t>(1,1), p_value.size(), l_dataspace, l_dataset, l_str, l_groups);
         l_dataset.write( p_value.c_str(), l_str, l_dataspace  );
         
         closeSpace(l_groups, l_dataset, l_dataspace);
@@ -395,9 +390,8 @@ namespace machinelearning { namespace tools { namespace files {
     /** writes a string vector to hdf
      * @param p_path path to dataset
      * @param p_value string vector
-     * @param p_utf8 write the string value with UTF-8 encoding
      **/
-    inline void hdf::writeStringVector( const std::string& p_path, const std::vector<std::string>& p_value, const bool& p_utf8 ) const
+    inline void hdf::writeStringVector( const std::string& p_path, const std::vector<std::string>& p_value ) const
     {
         if (p_value.size() == 0)
             throw exception::runtime(_("can not write empty data"), *this);
@@ -411,25 +405,29 @@ namespace machinelearning { namespace tools { namespace files {
         std::size_t l_maxstrlen = 0;
         for(std::size_t i=0; i < p_value.size(); ++i)
             l_maxstrlen  = std::max( l_maxstrlen, p_value[i].size() );
-        
+
         if (l_maxstrlen == 0)
             throw exception::runtime(_("can not write empty data"), *this);
-        
-        // create char array for the string data, each vector element ist seperated with \0
-        char l_data[(l_maxstrlen+1)*p_value.size()];
+
+		// at second, we create the block size for the full vector
+		const std::size_t l_blocksize = (l_maxstrlen+1)*p_value.size();
+
+
+        // create char array for the string data, each vector element ist seperated with \0, so we fill the block with 0
+        char* l_data = new char[l_blocksize];
+		memset(l_data, 0, l_blocksize );
+
         std::size_t l_start = 0;
         for(std::size_t i=0; i < p_value.size(); ++i) {
-            memcpy( &l_data[l_start], p_value[i].c_str(), (p_value[i].size()+1) * sizeof(char) );
+            memcpy( l_data+l_start, p_value[i].c_str(), p_value[i].size() * sizeof(char) );
             l_start += (l_maxstrlen+1) * sizeof(char);
         }
        
         // create string vector data and write it
         createStringSpace(p_path, ublas::vector<std::size_t>(1, p_value.size()), l_maxstrlen, l_dataspace, l_dataset, l_str, l_groups);
-        
-        if (p_utf8)
-            l_str.setCset( H5T_CSET_UTF8 );
-        
         l_dataset.write( l_data, l_str, l_dataspace  );
+
+		delete[] l_data;
         closeSpace(l_groups, l_dataset, l_dataspace);
     }
     
