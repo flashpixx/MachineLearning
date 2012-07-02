@@ -417,10 +417,10 @@ namespace machinelearning { namespace tools { namespace files {
         char* l_data = new char[l_blocksize];
 		memset(l_data, 0, l_blocksize );
 
-        std::size_t l_start = 0;
+        std::size_t l_offset = 0;
         for(std::size_t i=0; i < p_value.size(); ++i) {
-            memcpy( l_data+l_start, p_value[i].c_str(), p_value[i].size() * sizeof(char) );
-            l_start += (l_maxstrlen+1) * sizeof(char);
+            memcpy( l_data+l_offset, p_value[i].c_str(), p_value[i].size() * sizeof(char) );
+            l_offset += (l_maxstrlen+1) * sizeof(char);
         }
        
         // create string vector data and write it
