@@ -142,6 +142,10 @@ if not env.GetOption('clean') :
         env["ENV"]["TERM"] = os.environ["TERM"]
         print("Using term environment (TERM)")
 
+    if "HOME" in os.environ :
+        env["ENV"]["HOME"] = os.environ["HOME"]
+        print("Using home environment (HOME)")
+
 
 
     # changing falgs if needed
