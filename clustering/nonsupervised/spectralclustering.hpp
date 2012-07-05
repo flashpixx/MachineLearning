@@ -183,7 +183,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
     
     /** cluster the graph with the <strong>normalized</strong> graph laplacian
-     * @param p_matrix adjacency / distance matrix
+     * @param p_adjacency adjacency / distance matrix
      * @param p_iterations number of iterations
      **/
     template<typename T> inline void spectralclustering<T>::train( const ublas::matrix<T>& p_adjacency, const std::size_t& p_iterations )

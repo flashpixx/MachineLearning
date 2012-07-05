@@ -226,7 +226,7 @@ namespace machinelearning { namespace tools { namespace sources {
         
             std::vector<twitter::timelinetweet> getPublicTimeline( void );
         
-            std::vector<std::string> getDailyTrends( const std::vector<std::string>& = std::vector<std::string> );
+            std::vector<std::string> getDailyTrends( const std::vector<std::string>& = std::vector<std::string>() );
         
             ~twitter( void );
         
@@ -635,8 +635,35 @@ namespace machinelearning { namespace tools { namespace sources {
     }
     
     
-    inline std::vector<std::string> twitter::getDailyTrends( const std::vector<std::string>& = std::vector<std::string> )
+    /** read the daily twitter trends
+     * @param p_exclude hashtags that ware exclude
+     * @return trends in a vector
+     **/
+    inline std::vector<std::string> twitter::getDailyTrends( const std::vector<std::string>& p_exclude )
     {
+        boost::system::error_code l_error = boost::asio::error::host_not_found;
+        
+        m_socketapi.connect(m_resolveapi, l_error);
+        if (l_error)
+            throw exception::runtime(_("can not connect to twitter search server"), *this);
+        
+        // create GET query (with default values)
+        std::ostringstream l_query;
+        l_query << "/1/trends/daily.json";
+        
+        const std::string l_json = sendRequest( m_socketapi, l_query.str(), "api.twitter.com" );
+        m_socketapi.close();
+        
+        // do Json parsing
+        Json::Value l_resultroot;
+        Json::Reader l_jsonreader;
+        if (!l_jsonreader.parse( l_json, l_resultroot ))
+            throw exception::runtime(_("JSON data can not be parsed"), *this);
+        
+        if (Json::objectValue != l_resultroot.type())
+            throw exception::runtime(_("no result data is found"), *this);
+        
+        
         std::vector<std::string> l_hashtags;
         return l_hashtags;
     }

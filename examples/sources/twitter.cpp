@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
     po::options_description l_description("allowed options");
     l_description.add_options()
         ("help", "produce help message")
-        ("search", po::value< std::vector<std::string> >()->multitoken(), "search keyword / keyword list ['tm' returns the actuall timeline tweets and other options are ignored]")
+        ("search", po::value< std::vector<std::string> >()->multitoken(), "search keyword / keyword list ['tm' returns the actuall timeline tweets, 'trend' returns the daily trends and other options are ignored]")
         ("lang", po::value<std::string>(), "language code (iso 639-1 or -3)")
         ("geo", po::value< std::vector<std::string> >()->multitoken(), "geographic position (format: latitude longitude radius radiuslength [km = kilometer, mi = miles])")
         ("max", po::value<std::size_t>(&l_max)->default_value(0), "maximum number of tweets [default: 0 = maximum]")
@@ -132,14 +132,19 @@ int main(int argc, char* argv[])
         for(std::size_t j=0; j < l_data.size(); ++j)
             std::cout << l_data[j] << std::endl;
     } else
-        for(std::size_t i=0; i < l_search.size(); ++i) {
-            std::vector<tools::sources::twitter::searchtweet> l_data = l_twitter.search( l_search[i], l_params, l_max );
-
+        if (l_searchfirst == "trend") {
+            std::vector<std::string> l_data = l_twitter.getDailyTrends();
             for(std::size_t j=0; j < l_data.size(); ++j)
                 std::cout << l_data[j] << std::endl;
+        } else
+            for(std::size_t i=0; i < l_search.size(); ++i) {
+                std::vector<tools::sources::twitter::searchtweet> l_data = l_twitter.search( l_search[i], l_params, l_max );
 
-            std::cout << "===================================================================================" << std::endl;
-        }
+                for(std::size_t j=0; j < l_data.size(); ++j)
+                    std::cout << l_data[j] << std::endl;
+
+                std::cout << "===================================================================================" << std::endl;
+            }
 
     return EXIT_SUCCESS;
 }

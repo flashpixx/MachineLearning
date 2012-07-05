@@ -28,7 +28,7 @@
  * @section licenseSection license
  * The framework is supported under the @subpage license
  * 
- * @section requirements requirements
+ * @section Requirements
  * <ul>
  * <li>Automatically Tuned Linear Algebra Software ( http://math-atlas.sourceforge.net/ ) [version newer than 3.9.40]</li>
  * <li>Boost ( http://www.boost.org/ ) with following components
@@ -70,7 +70,7 @@
  * </ul>
  * For manual installation of the library you can follow the short @subpage installationnotes / A default library installation can be created with the command <dfn>scons librarybuild</dfn>
  * with the optional ATLAS building parameters. After compiling the directory <dfn>library/build</dfn> must be moved to a directory in that all libraries should be stored, because
- * a clean-target removes the <dfn>install</dfn> directory. The default installation need the make-tools (make), gcc / g++ (C and C++ compiler) and gfortran (Fortran compiler).
+ * a clean-target removes the <dfn>library/build</dfn> directory. The default installation need the make-tools (make), gcc / g++ (C and C++ compiler) and gfortran (Fortran compiler).
  * The framework was tested under: Mac OS X Leopard (10.5), Mac OS X Snow Leopard (10.6), Mac OS X Lion (10.7), Ubuntu Lucid Lynx (10.04), Gentoo Linux (stable / unstable) and Microsoft
  * Windows 7 (with Cygwin). The main header file <dfn>machinelearning.h</dfn> must be added to the <dfn>CPPPATH</dfn> variable with the prefix directory <dfn>machinelearning</dfn>, if the examples
  * external libraries (Java / Python ...) should be build.
@@ -147,6 +147,7 @@
  * <li><dfn>withdebug</dfn> compile with debug symbols</li>
  * <li><dfn>withoptimize</dfn> optimization like O2</li>
  * <li><dfn>cputype</dfn> cpu type, see GCC documentation http://gcc.gnu.org/onlinedocs/gcc/i386-and-x86_002d64-Options.html [default: native]</li>
+ * <li><dfn>showconfig</dfn> creates a printable output of the build configuration</li>
  * </ul><ul>
  * <li><dfn>atlaspointerwidth</dfn> parameter for setting the ATLAS pointer width during running the library build target (default empty for system default)</li>
  * <li><dfn>atlascputhrottle</dfn> enable / disable detection of ATLAS CPU throtteling during runngin the library build target (default disable)</li>

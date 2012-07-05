@@ -89,9 +89,7 @@ localconf = {
     
     "cheaders"   :  [ "omp.h" ],
     
-    "cppheaders" :  [ "machinelearning.h", 
-    
-                      "map",
+    "cppheaders" :  [ "map",
                       "algorithm",
                       "limits",
                       "iostream",
