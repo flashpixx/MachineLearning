@@ -26,7 +26,7 @@
  * @author Philipp Kraus <philipp.kraus@flashpixx.de> 
  *
  * @section licenseSection license
- * The framework is supported under the @subpage license
+ * The framework is supported under the @subpage licensePage
  * 
  * @section Requirements
  * <ul>
@@ -396,7 +396,7 @@
  *
  *
  *
- * @page license GNU Lesser General Public License
+ * @page licensePage GNU Lesser General Public License
  * @verbinclude license.txt
  *
  *
