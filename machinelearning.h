@@ -25,10 +25,10 @@
  * @mainpage Base Information
  * @author Philipp Kraus <philipp.kraus@flashpixx.de> 
  *
- * @section licenseSection license
- * The framework is supported under the @subpage licensePage
+ * @section licenseSection License
+ * The framework is supported under the <a href="http://www.gnu.org/licenses/lgpl-3.0.en.html">GNU Lesser General Public License</a>
  * 
- * @section Requirements
+ * @section requirements Requirements
  * <ul>
  * <li>Automatically Tuned Linear Algebra Software ( http://math-atlas.sourceforge.net/ ) [version newer than 3.9.40]</li>
  * <li>Boost ( http://www.boost.org/ ) with following components
@@ -75,7 +75,7 @@
  * Windows 7 (with Cygwin). The main header file <dfn>machinelearning.h</dfn> must be added to the <dfn>CPPPATH</dfn> variable with the prefix directory <dfn>machinelearning</dfn>, if the examples
  * external libraries (Java / Python ...) should be build.
  *
- * @section def definition / style guide
+ * @section def Definition / Style Guide
  * <ul>
  * <li>the framework is only header-based so you don't need compile any files (except logger or random device support is needed, than the <dfn>machinelearnig.cpp</dfn> must compiled and linked)</li>
  * <li>data points should be matrix data and the matrix is row-orientated, so for K data points with every point dimension P, we have a K x P matrix (prototype matrices are equal)</li>
@@ -106,7 +106,7 @@
  * <li>template parameter should be asserted for the correct type</li>
  * </ul>
  *
- * @section compileroptions compiler option
+ * @section compileroptions Compileroption
  * toolbox compilerflags
  * <ul>
  * <li><dfn>MACHINELEARNING_RANDOMDEVICE</dfn> for using the Boost Device Random support (requires Boost Random Device Support), otherwise a Mersenne Twister is used</li>
@@ -129,7 +129,7 @@
  * <li><dfn>BOOST_FILESYSTEM_NO_DEPRECATED</dfn> disabled deprecated code</li>
  * </ul>
  *
- * @subsection scons scons build environment
+ * @subsection scons Scons Build Environment
  * The framework supports Scons for compiling. The script reads the environment (Linux, OS X & Microsoft) and uses the
  * plattform specified options for compiling the sources. For compiling the test cpp files in the test directory the following option can
  * be set (Hierarchical Data Format is needed) [see options and default values with <dfn>scons -Q -h</dfn>]
@@ -162,7 +162,7 @@
  * are stored. For each target a own <dfn>SConscript</dfn> script exists under the directory, which should be build. For each platform a own script is stored under <dfn>scons/platform</dfn> that is used for setting the
  * platform default compile option like linked libraries, pathes, ...
  *
- * @subsection targets build targets
+ * @subsection targets Buildtargets
  * The scons script supports different targets for building the examples. The call can be supplemented with the parameters above. Each subdirectory within the example directory
  * show a build target, but some targets will be build first if different parameters are set
  * <ul>
@@ -191,7 +191,7 @@
  * <li><dfn>javautil</dfn> build the java examples of the util subpackage</li>
  * </ul>
  *
- * @section ex examples
+ * @section ex Examples
  * <ul>
  * <li>@subpage lang</li>
  * <li>@subpage classifier</li>
@@ -396,14 +396,9 @@
  *
  *
  *
- * @page licensePage GNU Lesser General Public License
- * @verbinclude license.txt
- *
- *
- *
  * @page classifier Example Classifier
  * The classifier algorithms are tempalte classes.
- * @section lazy lazy learner
+ * @section lazy Lazy Learner
  * @include examples/classifier/lazy.cpp
  *
  *
@@ -416,19 +411,19 @@
  * @section kmeans k-Means
  * @include examples/clustering/kmeans.cpp
  *
- * @section ng neural gas
+ * @section ng Neural Gas
  * @include examples/clustering/neuralgas.cpp
  *
- * @section png patch neural gas
+ * @section png Patch Neural Gas
  * @include examples/clustering/patch_neuralgas.cpp
  *
- * @section rng relational neural gas
+ * @section rng Relational Neural Gas
  * @include examples/clustering/relational_neuralgas.cpp
  *
- * @section rlvq relevance learning vector quantization (RLVQ)
+ * @section rlvq Relevance Learning Vector Quantization (RLVQ)
  * @include examples/clustering/rlvq.cpp
  *
- * @section spcl spectral clustering
+ * @section spcl Spectral Clustering
  * @include examples/clustering/spectral.cpp
  *
  *
@@ -438,16 +433,16 @@
  * for dimension reduction. Supervised uses two template parameter first one for datatype, second one for labeling. The nonsupervised is used only one parameter
  * (for datatype). The examples show the different option
  *
- * @section pca principle component analysis (PCA)
+ * @section pca Principle Component Analysis (PCA)
  * @include examples/reducing/pca.cpp
  *
- * @section lda linear discriminant analysis (LDA)
+ * @section lda Linear Discriminant Analysis (LDA)
  * @include examples/reducing/lda.cpp
  *
- * @section mds multidimensional scaling (MDS)
+ * @section mds Multidimensional Scaling (MDS)
  * @include examples/reducing/mds.cpp
  *
- * @section lle local linear embedding (LLE)
+ * @section lle Local Linear Embedding (LLE)
  * @code
  * @endcode
  *
@@ -459,7 +454,7 @@
  * symmetric/asymmetric dissimilarity matrix of string- or filedata with the <i>normalized compression distance</i>, that based on an approximation of the the Kolmogorov complexity. The
  * example show how to use these classes.
  *
- * @section ncd normalize compression distance (NCD)
+ * @section ncd Normalize Compression Distance (NCD)
  * @include examples/distance/ncd.cpp
  *
  *
@@ -468,20 +463,20 @@
  * The toolbox implements some structures for geting datasets. The compile option <dfn>MACHINELEARNING_SOURCES</dfn> must be set for compiling the namespace
  * machinelearning::tools::sources .
  *
- * @section nntp newsgroups
+ * @section nntp Newsgroups
  * The class allows to browse newsgroups in a naitve way for extraction the message content. The class throws different exception if there
  * are connection or stream errors during sending or receiving data (see exceptions within the class).
  * @include examples/sources/newsgroup.cpp
  *
- * @section wiki wikipedia
+ * @section wiki Wikipedia
  * The wikipedia class can be used for read the article data of wikipedia articles in different languages
  * @include examples/sources/wikipedia.cpp
  *
- * @section twitter twitter
+ * @section twitter Twitter
  * The twitter class can be used for reading tweet data with different search tags
  * @include examples/sources/twitter.cpp
  *
- * @section cloud cloud
+ * @section cloud Cloud
  * The cloud class creates a multimodal n-dimensional data set with normal distribution. The n-dimensional cube is sampled in equidistant
  * steps and on the cross-points a normal distribution is created.
  * @include examples/sources/cloud.cpp
@@ -492,7 +487,7 @@
  * Within the toolbox is a logger class which implements a thread-safe and optional MPI logger. The logger create a singletone object that create
  * a file access for writing messages. The MPI component sends all messages with non-blocking communication to the CPU 0. See in the logger class
  * for log states, which must be used for writing the messages.
- * @section normal normal use
+ * @section normal Normal Use
  * @code
     // sets the log level for writing messages 
     tools::logger::getInstance()->setLevel( tools::logger::info );
@@ -504,7 +499,7 @@
     std::cout << tools::logger::getInstance()->getFilename() << std::endl;
  * @endcode
  *
- * @section mpi mpi use
+ * @section mpi MPI Use
  * <strong>The MPI library must be compiled with thread-support and must be initialized manually</strong>
  * @code
     MPI::Init_thread( argc, argv, MPI_THREAD_SERIALIZED )
@@ -536,7 +531,7 @@
  * @page files Example File Support
  * The toolbox supports different file formats. The compile option <dfn>MACHINELEARNING_FILES</dfn> must be set for
  * using the support and all components are within the namespace machinelearning::tools::files
- * @section csv comma separated values (csv)
+ * @section csv Comma Separated Values (CSV)
  * @code
      tools::sources::csv csv;
      
@@ -568,7 +563,7 @@
      csv.write<double>(""<filename>", matrix);
  * @endcode
  *
- * @section hdf hierarchical data format (hdf)
+ * @section hdf Hierarchical Data Format (HDF)
  * HDF files need on reading and writing own data formats that description can found on http://www.hdfgroup.org/HDF5/doc/cpplus_RM/classH5_1_1PredType.html 
  * @code
      // only read access

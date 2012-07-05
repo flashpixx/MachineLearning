@@ -271,7 +271,7 @@ BUILTIN_STL_SUPPORT    = YES
 # If you use Microsoft's C++/CLI language, you should set this option to YES to 
 # enable parsing support.
 
-CPP_CLI_SUPPORT        = NO
+CPP_CLI_SUPPORT        = YES
 
 # Set the SIP_SUPPORT tag to YES if your project consists of sip sources only. 
 # Doxygen will parse them like normal C++ but will assume all classes use public 
