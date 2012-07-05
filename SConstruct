@@ -144,6 +144,12 @@ if not env.GetOption('clean') :
 
 
 
+    # changing falgs if needed
+    if "sources" in COMMAND_LINE_TARGETS : 
+        env["withsources"] = True;
+
+
+
     if not("documentation" in COMMAND_LINE_TARGETS) and not("librarybuild" in COMMAND_LINE_TARGETS) and not("updatelanguage" in COMMAND_LINE_TARGETS) and not("createlanguage" in COMMAND_LINE_TARGETS) :
         env.Append(CPPPATH = [os.path.abspath(os.curdir)])
         conf = Configure(env)
