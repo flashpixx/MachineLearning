@@ -424,9 +424,14 @@ namespace machinelearning { namespace tools { namespace files {
         }
        
         // create string vector data and write it
-        createStringSpace(p_path, ublas::vector<std::size_t>(1, p_value.size()), l_maxstrlen, l_dataspace, l_dataset, l_str, l_groups);
-        l_dataset.write( l_data, l_str, l_dataspace  );
-
+        try {
+            createStringSpace(p_path, ublas::vector<std::size_t>(1, p_value.size()), l_maxstrlen, l_dataspace, l_dataset, l_str, l_groups);
+            l_dataset.write( l_data, l_str, l_dataspace  );
+        } catch (...) {
+            delete[] l_data;
+            throw;
+        }
+            
 		delete[] l_data;
         closeSpace(l_groups, l_dataset, l_dataspace);
     }

@@ -226,6 +226,8 @@ namespace machinelearning { namespace tools { namespace sources {
         
             std::vector<twitter::timelinetweet> getPublicTimeline( void );
         
+            std::vector<std::string> getDailyTrends( const std::vector<std::string>& = std::vector<std::string> );
+        
             ~twitter( void );
         
         
@@ -630,6 +632,13 @@ namespace machinelearning { namespace tools { namespace sources {
             }
         }
         return l_result;
+    }
+    
+    
+    inline std::vector<std::string> twitter::getDailyTrends( const std::vector<std::string>& = std::vector<std::string> )
+    {
+        std::vector<std::string> l_hashtags;
+        return l_hashtags;
     }
     
     
