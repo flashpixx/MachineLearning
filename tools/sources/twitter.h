@@ -638,6 +638,7 @@ namespace machinelearning { namespace tools { namespace sources {
     /** read the daily twitter trends
      * @param p_exclude hashtags that ware exclude
      * @return trends in a vector
+     * @see https://dev.twitter.com/docs/api/1/get/trends/daily
      **/
     inline std::vector<std::string> twitter::getDailyTrends( const std::vector<std::string>& p_exclude )
     {
@@ -651,6 +652,12 @@ namespace machinelearning { namespace tools { namespace sources {
         std::ostringstream l_query;
         l_query << "/1/trends/daily.json";
         
+        // adding exclude data
+        if (p_exclude.size() > 0) {
+            
+        }
+        
+        
         const std::string l_json = sendRequest( m_socketapi, l_query.str(), "api.twitter.com" );
         m_socketapi.close();
         
@@ -663,9 +670,25 @@ namespace machinelearning { namespace tools { namespace sources {
         if (Json::objectValue != l_resultroot.type())
             throw exception::runtime(_("no result data is found"), *this);
         
+        // get content
+        std::vector<std::string> l_searchtags;
         
-        std::vector<std::string> l_hashtags;
-        return l_hashtags;
+        if (Json::objectValue == l_resultroot["trends"].type()) {
+            Json::Value l_trends = l_resultroot["trends"];
+            std::vector<std::string> l_hours  = l_trends.getMemberNames();
+            
+            for(std::size_t i=0; i < l_hours.size(); ++i)
+                
+                if (Json::arrayValue == l_trends[l_hours[i]].type())
+                    for(std::size_t n=0; n < l_trends[l_hours[i]].size(); ++n) {
+                        std::string l_tag = l_trends[l_hours[i]][n]["name"].asString();
+            
+                        if (std::find( l_searchtags.begin(), l_searchtags.end(), l_tag ) == l_searchtags.end())
+                            l_searchtags.push_back(l_tag);
+                    }
+        }
+        
+        return l_searchtags;
     }
     
     
