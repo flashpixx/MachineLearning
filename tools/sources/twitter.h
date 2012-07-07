@@ -226,7 +226,7 @@ namespace machinelearning { namespace tools { namespace sources {
         
             std::vector<twitter::timelinetweet> getPublicTimeline( void );
         
-            std::vector<std::string> getDailyTrends( const std::vector<std::string>& = std::vector<std::string>() );
+            std::vector<std::string> getDailyTrends( void );
         
             ~twitter( void );
         
@@ -636,11 +636,10 @@ namespace machinelearning { namespace tools { namespace sources {
     
     
     /** read the daily twitter trends
-     * @param p_exclude hashtags that ware exclude
      * @return trends in a vector
      * @see https://dev.twitter.com/docs/api/1/get/trends/daily
      **/
-    inline std::vector<std::string> twitter::getDailyTrends( const std::vector<std::string>& p_exclude )
+    inline std::vector<std::string> twitter::getDailyTrends( void )
     {
         boost::system::error_code l_error = boost::asio::error::host_not_found;
         
@@ -651,11 +650,6 @@ namespace machinelearning { namespace tools { namespace sources {
         // create GET query (with default values)
         std::ostringstream l_query;
         l_query << "/1/trends/daily.json";
-        
-        // adding exclude data
-        if (p_exclude.size() > 0) {
-            
-        }
         
         
         const std::string l_json = sendRequest( m_socketapi, l_query.str(), "api.twitter.com" );
