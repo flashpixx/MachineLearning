@@ -33,6 +33,7 @@
 namespace machinelearning { 
     
     /** namespace for all exceptions of the framework
+     * @todo adding more exceptions for a better error handling
      * $LastChangedDate$
      **/
     namespace exception {
