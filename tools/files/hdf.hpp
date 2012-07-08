@@ -684,7 +684,7 @@ namespace machinelearning { namespace tools { namespace files {
         if (p_path.empty())
             return false;
         
-        return p_path[0] == "/";
+        return p_path[0] == '/';
     }
     
     
