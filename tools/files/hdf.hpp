@@ -33,6 +33,10 @@
 #include <boost/algorithm/string.hpp> 
 #include <H5Cpp.h>
 
+extern "C" {
+#include <hdf5_hl.h>
+}
+
 
 #include <iostream>
 #include <boost/numeric/ublas/io.hpp>
@@ -185,49 +189,13 @@ namespace machinelearning { namespace tools { namespace files {
     
     /** returns the bool if path exists
      * @note we use the C function, because this is not portet to C++
+     * @see http://www.hdfgroup.org/HDF5/doc/HL/RM_H5LT.html#H5LTpath_valid
      * @param p_path path
      * @return boolean
      **/
     inline bool hdf::pathexists( const std::string& p_path ) const
     {
-        // split string and remove first element if empty
-        std::vector<std::string> l_path;
-        boost::split( l_path, p_path, boost::is_any_of("/") );
-        
-        // clear empty elements
-        for(std::vector<std::string>::iterator it = l_path.begin(); it != l_path.end(); ++it)
-            if ((*it).empty())
-                l_path.erase( it );
-        
-        // path must have more than zero elements
-        if (l_path.size() == 0)
-            throw exception::runtime(_("empty path is forbidden"), *this);
-
-        
-        // check root path
-        if (!H5Lexists( m_file.getId(), l_path[0].c_str(), H5P_DEFAULT ))
-            return false;
-        
-        
-        // check subdirectories
-        std::vector<hid_t> l_group;
-        bool l_exist = true;
-        l_group.push_back( H5Dopen( m_file.getId(), l_path[0].c_str(), 0 ) );
-        
-        for(std::size_t i=1; i < l_path.size(); ++i) {
-            if (!H5Lexists( *(l_group.end()), l_path[i].c_str(), H5P_DEFAULT )) {
-                l_exist = false;
-                break;
-            }
-
-            l_group.push_back( H5Dopen( *(l_group.end()), l_path[i].c_str(), 0 ) );
-        }
-        
-        // close subdirectories
-        for(std::vector<hid_t>::reverse_iterator it = l_group.rbegin(); it != l_group.rend(); ++it)
-            H5Dclose( *it );
-        
-        return l_exist;
+        return H5LTpath_valid(m_file.getId(), p_path.c_str(), true);
     }
     
     

@@ -237,9 +237,8 @@ if conf.env["withmultilanguage"] :
 if conf.env["withfiles"] :
     conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_FILES -D MACHINELEARNING_FILES_HDF")
     localconf["cppheaders"].append("H5Cpp.h")
-    localconf["clibraries"].append("hdf5")
+    localconf["clibraries"].extend(["hdf5", "hdf5_hl"])
     localconf["cpplibraries"].append("hdf5_cpp")
-    #localconf["staticlinkonly"].extend(["hdf5", "hdf5_cpp"])
     
 
 if conf.env["withsymbolicmath"] :
