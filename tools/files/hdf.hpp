@@ -98,6 +98,7 @@ namespace machinelearning { namespace tools { namespace files {
             /** file handler **/
             H5::H5File m_file;
             
+            bool isAbsolutePath( const std::string& p_path ) const;
             std::string createPath( const std::string&, std::vector<H5::Group>& ) const;
             void createDataSpace( const std::string&, const H5::PredType&, const ublas::vector<std::size_t>&, H5::DataSpace&, H5::DataSet&, std::vector<H5::Group>& ) const;
             void createStringSpace( const std::string&, const ublas::vector<std::size_t>&, const std::size_t&, H5::DataSpace&, H5::DataSet&, H5::StrType&, std::vector<H5::Group>& ) const;
@@ -183,6 +184,9 @@ namespace machinelearning { namespace tools { namespace files {
      **/
     inline void hdf::remove( const std::string& p_path ) const
     {
+        if (!isAbsolutePath(p_path))
+            throw exception::runtime(_("path is not an absolute path"), *this);
+        
         m_file.unlink( p_path );
     }
     
@@ -195,6 +199,9 @@ namespace machinelearning { namespace tools { namespace files {
      **/
     inline bool hdf::pathexists( const std::string& p_path ) const
     {
+        if (!isAbsolutePath(p_path))
+            throw exception::runtime(_("path is not an absolute path"), *this);
+        
         return H5LTpath_valid(m_file.getId(), p_path.c_str(), true);
     }
     
@@ -206,6 +213,9 @@ namespace machinelearning { namespace tools { namespace files {
      **/ 
     template<typename T> inline ublas::matrix<T> hdf::readBlasMatrix( const std::string& p_path, const H5::PredType& p_datatype ) const
     {
+        if (!isAbsolutePath(p_path))
+            throw exception::runtime(_("path is not an absolute path"), *this);
+        
         H5::DataSet   l_dataset   = m_file.openDataSet( p_path.c_str() );
         H5::DataSpace l_dataspace = l_dataset.getSpace();
         
@@ -241,6 +251,9 @@ namespace machinelearning { namespace tools { namespace files {
      **/ 
     template<typename T> inline ublas::vector<T> hdf::readBlasVector( const std::string& p_path, const H5::PredType& p_datatype ) const
     {
+        if (!isAbsolutePath(p_path))
+            throw exception::runtime(_("path is not an absolute path"), *this);
+        
         H5::DataSet   l_dataset   = m_file.openDataSet( p_path.c_str() );
         H5::DataSpace l_dataspace = l_dataset.getSpace();
         
@@ -274,6 +287,9 @@ namespace machinelearning { namespace tools { namespace files {
      **/ 
     template<typename T> inline T hdf::readValue( const std::string& p_path, const H5::PredType& p_datatype ) const
     {
+        if (!isAbsolutePath(p_path))
+            throw exception::runtime(_("path is not an absolute path"), *this);
+        
         H5::DataSet   l_dataset   = m_file.openDataSet( p_path.c_str() );
         H5::DataSpace l_dataspace = l_dataset.getSpace();
         
@@ -306,6 +322,9 @@ namespace machinelearning { namespace tools { namespace files {
      **/
     inline std::vector<std::string> hdf::readStringVector( const std::string& p_path ) const
     {
+        if (!isAbsolutePath(p_path))
+            throw exception::runtime(_("path is not an absolute path"), *this);
+        
         H5::DataSet   l_dataset   = m_file.openDataSet( p_path.c_str() );
         H5::DataSpace l_dataspace = l_dataset.getSpace();
         
@@ -349,6 +368,9 @@ namespace machinelearning { namespace tools { namespace files {
      **/
     inline std::string hdf::readString( const std::string& p_path ) const
     {
+        if (!isAbsolutePath(p_path))
+            throw exception::runtime(_("path is not an absolute path"), *this);
+        
         H5::DataSet   l_dataset   = m_file.openDataSet( p_path.c_str() );
         H5::DataSpace l_dataspace = l_dataset.getSpace();
         
@@ -379,6 +401,9 @@ namespace machinelearning { namespace tools { namespace files {
         if (p_value.empty())
             throw exception::runtime(_("can not write empty data"), *this);
         
+        if (!isAbsolutePath(p_path))
+            throw exception::runtime(_("path is not an absolute path"), *this);
+        
         H5::DataSpace l_dataspace;
         H5::DataSet l_dataset;
         H5::StrType l_str;
@@ -400,6 +425,9 @@ namespace machinelearning { namespace tools { namespace files {
     {
         if (p_value.size() == 0)
             throw exception::runtime(_("can not write empty data"), *this);
+        
+        if (!isAbsolutePath(p_path))
+            throw exception::runtime(_("path is not an absolute path"), *this);
             
         H5::DataSpace l_dataspace;
         H5::DataSet l_dataset;
@@ -453,6 +481,9 @@ namespace machinelearning { namespace tools { namespace files {
         if ((p_dataset.size1() == 0) || (p_dataset.size2() == 0))
             throw exception::runtime(_("can not write empty data"), *this);
         
+        if (!isAbsolutePath(p_path))
+            throw exception::runtime(_("path is not an absolute path"), *this);
+        
         H5::DataSet l_dataset;
         H5::DataSpace l_dataspace;
         std::vector<H5::Group> l_groups;
@@ -478,6 +509,9 @@ namespace machinelearning { namespace tools { namespace files {
         if (p_dataset.size() == 0)
             throw exception::runtime(_("can not write empty data"), *this);
         
+        if (!isAbsolutePath(p_path))
+            throw exception::runtime(_("path is not an absolute path"), *this);
+        
         H5::DataSet l_dataset;
         H5::DataSpace l_dataspace;
         std::vector<H5::Group> l_groups;
@@ -495,6 +529,9 @@ namespace machinelearning { namespace tools { namespace files {
      **/
     template<typename T> inline void hdf::writeValue( const std::string& p_path, const T& p_dataset, const H5::PredType& p_datatype ) const
     {        
+        if (!isAbsolutePath(p_path))
+            throw exception::runtime(_("path is not an absolute path"), *this);
+        
         H5::DataSet l_dataset;
         H5::DataSpace l_dataspace;
         std::vector<H5::Group> l_groups;
@@ -635,6 +672,19 @@ namespace machinelearning { namespace tools { namespace files {
         }
         
         throw exception::runtime(_("can not create path structure"), *this);
+    }
+    
+    
+    /** checks if a path is an absolute path
+     * @param p_path string with path
+     * @return boolean is absolute
+     **/
+    inline bool hdf::isAbsolutePath( const std::string& p_path ) const
+    {
+        if (p_path.empty())
+            return false;
+        
+        return p_path[0] == "/";
     }
     
     
