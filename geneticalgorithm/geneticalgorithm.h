@@ -33,6 +33,7 @@ namespace machinelearning {
     
     /** namespace for genetic algorithms
      * @todo adding different individuals, crossover and fitness function for example use
+     * @todo adding LUA ( http://en.wikipedia.org/wiki/Lua_(programming_language) ) support for 
      **/
     namespace geneticalgorithm {}
     

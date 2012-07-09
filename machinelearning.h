@@ -878,6 +878,7 @@
 
 /** main namespace of the framework
  * $LastChangedDate$
+ * @todo adding LUA ( http://en.wikipedia.org/wiki/Lua_(programming_language) ) support for dynamic programming ( http://en.wikipedia.org/wiki/Dynamic_programming )
  * @todo adding SFDP support (placment for lage graph data) http://www2.research.att.com/~yifanhu/SOFTWARE/SFDP/index.html / http://www2.research.att.com/~yifanhu/PUB/graph_draw_small.pdf
  * @todo adding GSL support http://www.gnu.org/software/gsl/
  * @todo adding PAPI support http://icl.cs.utk.edu/papi/
