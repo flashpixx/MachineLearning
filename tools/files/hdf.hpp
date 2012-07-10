@@ -74,7 +74,7 @@ namespace machinelearning { namespace tools { namespace files {
             std::string getFilename( void ) const;
             std::size_t getFilesize( void ) const;
             void remove( const std::string& ) const;
-            bool pathexists( const std::string& ) const;
+            bool pathexists( const std::string&, const bool& = true ) const;
             
             
             template<typename T> ublas::matrix<T> readBlasMatrix( const std::string&, const H5::PredType& ) const;
@@ -195,14 +195,15 @@ namespace machinelearning { namespace tools { namespace files {
      * @note we use the C function, because this is not portet to C++
      * @see http://www.hdfgroup.org/HDF5/doc/HL/RM_H5LT.html#H5LTpath_valid
      * @param p_path path
+     * @param p_checkend checks if the last component exists (default true)
      * @return boolean
      **/
-    inline bool hdf::pathexists( const std::string& p_path ) const
+    inline bool hdf::pathexists( const std::string& p_path, const bool& p_checkend ) const
     {
         if (!isAbsolutePath(p_path))
             throw exception::runtime(_("path is not an absolute path"), *this);
         
-        return H5LTpath_valid(m_file.getId(), p_path.c_str(), true);
+        return H5LTpath_valid(m_file.getId(), p_path.c_str(), p_checkend);
     }
     
     
