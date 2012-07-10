@@ -281,6 +281,7 @@ namespace machinelearning { namespace tools {
     #ifdef MACHINELEARNING_MPI
     
     /** creates the local listener on CPU 0
+      * @note this method must be called on each instance
       * @param p_mpi MPI object
      **/
     inline void logger::startListener( const mpi::communicator& p_mpi )
@@ -300,6 +301,7 @@ namespace machinelearning { namespace tools {
     
     
     /** shutdown the listener thread and synchronize the CPUs
+     * @note this method must be called on each instance
      * @param p_mpi MPI object
      **/
     inline void logger::shutdownListener( const mpi::communicator& p_mpi ) {
