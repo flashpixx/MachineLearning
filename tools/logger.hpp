@@ -86,6 +86,7 @@ namespace machinelearning { namespace tools {
                 info  = 3
             };
                 
+            static void createInstance( void );
             static logger* getInstance( void );
             void setLevel( const logstate& );
             logstate getLevel( void ) const;
@@ -185,9 +186,19 @@ namespace machinelearning { namespace tools {
     inline logger* logger::getInstance()
     {
         if (!m_instance)
-            m_instance = new logger();
+            throw exception::runtime(_("no logger instance exists, run createInstance first"), *this);
 
         return m_instance;
+    }
+    
+    
+    /** creates a logger instance, run on main first **/
+    inline void logger::createInstance( void )
+    {
+        if (m_instance)
+            throw exception::runtime(_("loger instance exists"), *this);
+            
+        m_instance = new logger();
     }
     
     
