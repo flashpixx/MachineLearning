@@ -31,7 +31,7 @@
 
 #include "../dimensionreduce.hpp"
 #include "../../neighborhood/neighborhood.h"
-#include "../../exception/exception.h"
+#include "../../errorhandling/exception.h"
 #include "../../tools/tools.h"
 
 #include <iostream>

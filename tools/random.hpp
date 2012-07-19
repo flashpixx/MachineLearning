@@ -49,7 +49,7 @@
 #include <boost/math/distributions/triangular.hpp>
 
 
-#include "../exception/exception.h"
+#include "../errorhandling/exception.h"
 #include "function.hpp"
 #include "language/language.h"
 

@@ -32,7 +32,7 @@
 #include <boost/numeric/ublas/matrix_proxy.hpp>
 #include <boost/numeric/ublas/matrix_sparse.hpp>
 
-#include "../exception/exception.h"
+#include "../errorhandling/exception.h"
 #include "vector.hpp"
 #include "function.hpp"
 #include "language/language.h"

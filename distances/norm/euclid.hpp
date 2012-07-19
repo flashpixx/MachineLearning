@@ -33,7 +33,7 @@
 #include <boost/numeric/bindings/ublas/matrix.hpp>
 
 #include "../distance.hpp"
-#include "../../exception/exception.h"
+#include "../../errorhandling/exception.h"
 #include "../../tools/tools.h"
 
 

@@ -49,7 +49,7 @@
 #include <boost/iostreams/filtering_streambuf.hpp>
 #include <boost/iostreams/filter/counter.hpp>
 
-#include "../exception/exception.h"
+#include "../errorhandling/exception.h"
 
 
 

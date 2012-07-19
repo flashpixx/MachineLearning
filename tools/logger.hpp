@@ -46,7 +46,7 @@
 
 #endif
 
-#include "../exception/exception.h"
+#include "../errorhandling/exception.h"
 #include "language/language.h"
 
 
@@ -87,6 +87,7 @@ namespace machinelearning { namespace tools {
                 info  = 3
             };
                 
+            static bool exists( void );
             static void createInstance( void );
             static void releaseInstance( void );
             static logger* getInstance( void );
@@ -188,6 +189,15 @@ namespace machinelearning { namespace tools {
     inline logger* logger::getInstance()
     {
         assert(m_instance);
+        return m_instance;
+    }
+    
+    
+    /** checks if a logger instance exists
+     * @return bool
+     **/
+    inline bool logger::exists( void )
+    {
         return m_instance;
     }
     

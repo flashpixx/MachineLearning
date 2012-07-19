@@ -31,7 +31,7 @@
 
 #include "individual.hpp"
 #include "../../tools/tools.h"
-#include "../../exception/exception.h"
+#include "../../errorhandling/exception.h"
 
 
 namespace machinelearning { namespace geneticalgorithm { namespace individual {

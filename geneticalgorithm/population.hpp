@@ -31,7 +31,7 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "../exception/exception.h"
+#include "../errorhandling/exception.h"
 #include "../tools/tools.h"
 
 #include "individual/individual.h"

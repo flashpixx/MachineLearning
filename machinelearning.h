@@ -816,7 +816,7 @@
  * @file distances/norm/euclid.hpp class for euclidian distances
  * @file distances/ncd.hpp implementation of the normalize compression distance
  *
- * @file exception/exception.h header file for exceptions with implemention
+ * @file errorhandling/exception.h header file for exceptions with implemention
  *
  * @file functionoptimization/functionoptimization.h main header for function optimization
  * @file functionoptimization/gradientdescent.hpp gradient descent implementation
@@ -905,7 +905,7 @@
 namespace machinelearning {}
 
 
-#include "exception/exception.h"
+#include "errorhandling/exception.h"
 #include "dimensionreduce/dimensionreduce.h"
 #include "classifier/classifier.h"
 #include "clustering/clustering.h"

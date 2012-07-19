@@ -37,7 +37,7 @@ extern "C" {
 #include <libxml/xpathInternals.h>
 }
 
-#include "../../exception/exception.h"
+#include "../../errorhandling/exception.h"
 #include "../language/language.h"
 
 

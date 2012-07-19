@@ -33,7 +33,7 @@
 #include <boost/mpi.hpp>
 #endif
 
-#include "../exception/exception.h"
+#include "../errorhandling/exception.h"
 #include "../tools/tools.h"
 
 

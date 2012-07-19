@@ -32,7 +32,7 @@
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/bindings/blas.hpp>
 
-#include "../exception/exception.h"
+#include "../errorhandling/exception.h"
 #include "../tools/tools.h"
 
 

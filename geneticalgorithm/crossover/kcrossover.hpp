@@ -30,7 +30,7 @@
 
 #include "crossover.hpp"
 #include "../individual/individual.hpp"
-#include "../../exception/exception.h"
+#include "../../errorhandling/exception.h"
 #include "../../tools/tools.h"
 
 

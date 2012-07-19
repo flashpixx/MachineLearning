@@ -35,7 +35,7 @@
 #endif
 
 #include "../dimensionreduce.hpp"
-#include "../../exception/exception.h"
+#include "../../errorhandling/exception.h"
 #include "../../tools/tools.h"
 
 

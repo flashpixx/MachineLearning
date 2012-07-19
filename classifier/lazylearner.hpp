@@ -31,7 +31,7 @@
 #include <boost/numeric/ublas/vector.hpp>
 
 #include "classifier.hpp"
-#include "../exception/exception.h"
+#include "../errorhandling/exception.h"
 #include "../tools/tools.h"
 #include "../neighborhood/neighborhood.h"
 

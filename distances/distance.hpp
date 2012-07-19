@@ -29,7 +29,7 @@
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 
-#include "../exception/exception.h"
+#include "../errorhandling/exception.h"
 #include "../tools/tools.h"
 
 
