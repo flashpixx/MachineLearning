@@ -109,6 +109,7 @@
  * @section compileroptions Compileroption
  * toolbox compilerflags
  * <ul>
+ * <li><dfn>MACHINELEARNING_NDEBUG</dfn> remove any debug information (eg framework individual asserts)</li> 
  * <li><dfn>MACHINELEARNING_RANDOMDEVICE</dfn> for using the Boost Device Random support (requires Boost Random Device Support), otherwise a Mersenne Twister is used</li>
  * <li><dfn>MACHINELEARNING_MULTILANGUAGE</dfn> option for compiling the framework with multilanguage support (uses gettext)</li>
  * <li><dfn>MACHINELEARNING_LOGGER</dfn> option for using a own logger</li>
@@ -137,6 +138,7 @@
  * <li><dfn>atlaslink</dfn> adds the option which ATLAS library is linked (multi = multithreadding [tatlas], single = singlethreadding [satlas])</li>
  * <li><dfn>staticlink</dfn> links all libraries static (default option yes), overrides <dfn>atlaslink</dfn> flag</li>
  * <li><dfn>math</dfn> compiler math option (sse3, sse, 387 for floating-point arithmetics) (used if optimazation is enabled)</li>
+ * <li><dfn>withframeworkdebug</dfn> enables the <dfn>MACHINELEARNING_NDEBUG</dfn> flag</li>
  * <li><dfn>withrandomdevice</dfn> adds the compilerflag for random device support</li>
  * <li><dfn>withmpi</dfn> adds the compilerflag for cluster / MPI support (on the target <dfn>librarybuild</dfn> MPI support is compiled into the Boost)</li>
  * <li><dfn>withmultilanguage</dfn> adds the multilanguage support with gettext</li>
@@ -484,11 +486,14 @@
  *
  *
  * @page logger Examples Logger
- * Within the toolbox is a logger class which implements a thread-safe and optional MPI logger. The logger create a singletone object that create
+ * Within the toolbox is a logger class which implements a thread-safe and optional MPI logger. The logger create a singleton object that create
  * a file access for writing messages. The MPI component sends all messages with non-blocking communication to the CPU 0. See in the logger class
  * for log states, which must be used for writing the messages.
  * @section normal Normal Use
  * @code
+    // create the logger singleton instance
+    tools::logger::createInstance();
+ 
     // sets the log level for writing messages 
     tools::logger::getInstance()->setLevel( tools::logger::info );
  
@@ -497,6 +502,9 @@
  
     // shows the filename in which the messages are write down
     std::cout << tools::logger::getInstance()->getFilename() << std::endl;
+ 
+    // release the logger instance
+    tools::logger::releaseInstance();
  * @endcode
  *
  * @section mpi MPI Use
@@ -504,6 +512,9 @@
  * @code
     MPI::Init_thread( argc, argv, MPI_THREAD_SERIALIZED )
     boost::mpi::communicator l_mpi;
+ 
+    // create the logger singleton instance
+    tools::logger::createInstance();
  
     // create the listener 
     tools::logger::getInstance()->startListener( l_mpi );
@@ -524,6 +535,9 @@
     // shows the filename of each CPU (only CPU 0 collectes all messages with MPI support)
     std::cout << tools::logger::getInstance()->getFilename() << std::endl;
     MPI::Finalize();
+ 
+    // release the logger instance
+    tools::logger::releaseInstance();
  * @endcode
  *
  *
@@ -817,6 +831,7 @@
  * @file distances/ncd.hpp implementation of the normalize compression distance
  *
  * @file errorhandling/exception.h header file for exceptions with implemention
+ * @file errorhandling/assert.h header file for framework asserts
  *
  * @file functionoptimization/functionoptimization.h main header for function optimization
  * @file functionoptimization/gradientdescent.hpp gradient descent implementation

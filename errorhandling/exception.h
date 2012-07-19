@@ -28,6 +28,7 @@
 #include <stdexcept>
 
 #include "../tools/typeinfo.h"
+#include "../tools/logger.hpp"
 
 
 namespace machinelearning { 

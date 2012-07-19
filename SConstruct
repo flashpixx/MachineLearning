@@ -38,7 +38,7 @@ def createVariables(vars) :
     vars.Add(BoolVariable("withsymbolicmath", "compile for using symbolic math expression (needed by gradient descent)", False))
 
     vars.Add(BoolVariable("withdebug", "compile with debug information", False))
-    vars.Add(BoolVariable("withframeworkassert", "compile with frameworks asserts", True))
+    vars.Add(BoolVariable("withframeworkdebug", "compile with frameworks debug option", True))
     vars.Add(BoolVariable("withoptimize", "compile with CPU optimization code", True))
     vars.Add(EnumVariable("math", "optimization of math structure", "sse3", allowed_values=("sse3", "sse", "387")))
 
