@@ -895,7 +895,8 @@
  * @todo adding simulated annealing (see GSL http://www.gnu.org/software/gsl/)
  * @todo adding some generic support for http://headmyshoulder.github.com/odeint-v2/
  * @todo adding voronoi tessellation (with CGAL http://http://www.cgal.org/ ) and other CGAL algorithms
- * @todo create a PHP modul ( use Swig )
+ * @todo create a PHP & Python modul ( use Swig )
+ * @todo add unit tests with Google ( http://code.google.com/p/googletest/ )
  * @todo implementating graph algorithms (use boost graph): http://en.wikipedia.org/wiki/A*_search_algorithm / http://en.wikipedia.org/wiki/Floyd%E2%80%93Warshall_algorithm
  * @todo add celluar algorithms: http://en.wikipedia.org/wiki/Cellular_automaton
  * @todo add http://en.wikipedia.org/wiki/RANSAC
