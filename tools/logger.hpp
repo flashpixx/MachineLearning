@@ -81,10 +81,11 @@ namespace machinelearning { namespace tools {
         public :
         
             enum logstate {
-                none  = 0,
-                error = 1,
-                warn  = 2,
-                info  = 3
+                none   = 0,
+                assert = 1,
+                error  = 2,
+                warn   = 3,
+                info   = 4
             };
                 
             static bool exists( void );
@@ -250,7 +251,7 @@ namespace machinelearning { namespace tools {
      * @param p_val value
      **/
     template<typename T> inline void logger::write( const logstate& p_state, const T& p_val ) {
-        if ( (m_logstate == none) || (p_state == none) || (p_state > m_logstate) )
+        if ( (p_state != assert) && ( (m_logstate == none) || (p_state == none) || (p_state > m_logstate) ) )
             return;
   
         std::ostringstream l_stream;
@@ -270,6 +271,7 @@ namespace machinelearning { namespace tools {
         switch (p_state) {
             case info   : p_stream << "[info]       " << p_val;   break;
             case warn   : p_stream << "[warn]       " << p_val;   break;
+            case assert : p_stream << "[assert]     " << p_val;   break;
             case error  : p_stream << "[error]      " << p_val;   break;
         }
     }

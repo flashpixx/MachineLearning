@@ -63,6 +63,10 @@ if conf.env["withdebug"] :
 else :
     conf.env.Append(CXXFLAGS = "-D NDEBUG -D BOOST_UBLAS_NDEBUG")
     
+if not(conf.env["withframeworkassert"]) :
+    conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_NDEBUG")
+    
+    
 if conf.env["withoptimize"] :
     conf.env.Append(CXXFLAGS = "-O2 -fomit-frame-pointer -finline-functions -mtune="+conf.env["cputype"])
     if conf.env["math"] == "sse3" :
