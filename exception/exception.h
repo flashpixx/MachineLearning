@@ -53,16 +53,16 @@ namespace machinelearning {
                 {}
             
             
-                /** creates the exception with a message and a class name
+                /** creates the exception with a message and a classname
                  * @param p_msg error message
-                 * @param p_ptr pointer to an class object
+                 * @param p_ptr pointer to a class object
                  **/
                 template <typename T> explicit classmethod( const std::string& p_msg, const T* p_ptr ) :
                     std::logic_error( p_msg + ( !tools::typeinfo::getClassName(p_ptr).empty() ? " ["+tools::typeinfo::getClassName(p_ptr)+"]" : "") )
                 {}  
             
             
-                /** creates the exception with a message and a class name
+                /** creates the exception with a message and a classname
                  * @param p_msg error message
                  * @param p_obj reference to an class object
                  **/
@@ -99,7 +99,7 @@ namespace machinelearning {
             
                 /** creates the exception with a message and a class name
                  * @param p_msg error message
-                 * @param p_obj reference to an class object
+                 * @param p_obj reference to a classobject
                  **/
                 template <typename T> explicit runtime( const std::string& p_msg, const T& p_obj ) :
                     std::runtime_error( p_msg + ( !tools::typeinfo::getClassName(p_obj).empty() ? " ["+tools::typeinfo::getClassName(p_obj)+"]" : "") )

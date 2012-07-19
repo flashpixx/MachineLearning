@@ -76,13 +76,13 @@ if conf.env["withoptimize"] :
 
 # library defintion
 localconf = {
-    "cpplibraries" : [  "boost_exception",
+    "cpplibraries" : [  "stdc++",
                         "boost_system",
                         "boost_regex",
                         "boost_iostreams"
     ],
     
-    "staticlinkonly"     : [ ],
+    "staticlinkonly"     : [ "boost_exception" ],
     
     "cppdylibrariesonly" : [ ], 
     

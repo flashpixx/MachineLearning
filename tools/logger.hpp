@@ -28,6 +28,7 @@
 #define MACHINELEARNING_LOGGER_PATHSUFFIX "machinelearning_%%%%%"
 #define MACHINELEARNING_LOGGER_FILENAME   "log.txt"
 
+#include <cassert>
 #include <string>
 #include <iostream>
 #include <sstream>
@@ -186,9 +187,7 @@ namespace machinelearning { namespace tools {
      **/
     inline logger* logger::getInstance()
     {
-        if (!m_instance)
-            throw exception::runtime(_("no logger instance exists, run createInstance first"), *this);
-
+        assert(m_instance);
         return m_instance;
     }
     
@@ -196,9 +195,7 @@ namespace machinelearning { namespace tools {
     /** creates a logger instance, run on main first **/
     inline void logger::createInstance( void )
     {
-        if (m_instance)
-            throw exception::runtime(_("loger instance exists"), *this);
-            
+        assert(!m_instance);
         m_instance = new logger();
     }
     
@@ -206,9 +203,7 @@ namespace machinelearning { namespace tools {
     /** release logger instance, run before return in main **/
     inline void logger::releaseInstance( void )
     {
-        if (!m_instance)
-            throw exception::runtime(_("loger does not exist, run createInstance first"), *this);
-        
+        assert(m_instance);
         delete m_instance;
     }
     
@@ -266,8 +261,6 @@ namespace machinelearning { namespace tools {
             case info   : p_stream << "[info]       " << p_val;   break;
             case warn   : p_stream << "[warn]       " << p_val;   break;
             case error  : p_stream << "[error]      " << p_val;   break;
-                
-            default     : throw exception::runtime(_("log state is unkown"), *this);
         }
     }
     
