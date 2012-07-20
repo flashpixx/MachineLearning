@@ -86,7 +86,12 @@ namespace machinelearning {
                  **/
                 explicit runtime( const std::string& p_msg ) :
                     std::runtime_error( p_msg )
-                {}  
+                {
+                    #ifdef MACHINELEARNING_LOGGER
+                    //if (tools::logger::exists())
+                    //    tools::logger::getInstance()->write( tools::logger::exception, "runtime exception is thrown with message: " + p_msg);
+                    #endif
+                }  
             
             
                 /** creates the exception with a message and a class name

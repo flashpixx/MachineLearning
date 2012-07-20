@@ -398,6 +398,16 @@
  *
  *
  *
+ * @page frameworkassert Framework Asserts
+ * The framework supports an own assert method. The asserts can be defined via preprocessor call and support the framework logger, so each assert is logged. With the option
+ * <dfn>MACHINELEARNING_NDEBUG</dfn> the assert values can be disabled. An assert statement can be used with
+ * @code
+    MACHINELEARNING_ASSERT( expression, message )
+ * @endcode
+ * If the <dfn>expression</dfn> is set to false the assert is called with <dfn>message</dfn>. Filename and line number are added automatically.
+ *
+ *
+ *
  * @page classifier Example Classifier
  * The classifier algorithms are tempalte classes.
  * @section lazy Lazy Learner
@@ -675,10 +685,10 @@
          emptycell = maxcount == 0;
          for i=1:numel(emptycell)
             if emptycell(i)
-                datacell(i)	  = [];
+                datacell(i)   = [];
                 labelcolor(i) = [];
-                label(i)	  = [];
-                maxcount(i)	  = [];
+                label(i)      = [];
+                maxcount(i)   = [];
             end
          end
          

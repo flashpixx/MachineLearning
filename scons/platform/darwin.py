@@ -63,7 +63,7 @@ if conf.env["withdebug"] :
 else :
     conf.env.Append(CXXFLAGS = "-D NDEBUG -D BOOST_UBLAS_NDEBUG")
     
-if not(conf.env["withframeworkassert"]) :
+if not(conf.env["withframeworkdebug"]) :
     conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_NDEBUG")
     
     

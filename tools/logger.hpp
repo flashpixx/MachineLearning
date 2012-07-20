@@ -81,11 +81,14 @@ namespace machinelearning { namespace tools {
         public :
         
             enum logstate {
-                none   = 0,
-                assert = 1,
-                error  = 2,
-                warn   = 3,
-                info   = 4
+                none        = 0,
+                #ifndef MACHINELEARNING_NDEBUG
+                assert      = 1,
+                #endif
+                exception   = 2,
+                error       = 3,
+                warn        = 4,
+                info        = 5
             };
                 
             static bool exists( void );
@@ -251,7 +254,12 @@ namespace machinelearning { namespace tools {
      * @param p_val value
      **/
     template<typename T> inline void logger::write( const logstate& p_state, const T& p_val ) {
-        if ( (p_state != assert) && ( (m_logstate == none) || (p_state == none) || (p_state > m_logstate) ) )
+        if ( !(
+            #ifndef MACHINELEARNING_NDEBUG
+            (p_state == assert) || 
+            #endif
+            (p_state == exception)) && ( (m_logstate == none) || (p_state == none) || (p_state > m_logstate) )
+        )
             return;
   
         std::ostringstream l_stream;
@@ -269,10 +277,13 @@ namespace machinelearning { namespace tools {
     template<typename T> inline void logger::logformat( const logstate& p_state, const T& p_val, std::ostringstream& p_stream ) const
     {
         switch (p_state) {
-            case info   : p_stream << "[info]       " << p_val;   break;
-            case warn   : p_stream << "[warn]       " << p_val;   break;
-            case assert : p_stream << "[assert]     " << p_val;   break;
-            case error  : p_stream << "[error]      " << p_val;   break;
+            case info       : p_stream << "[info]       " << p_val;   break;
+            case warn       : p_stream << "[warn]       " << p_val;   break;
+            #ifndef MACHINELEARNING_NDEBUG
+            case assert     : p_stream << "[assert]     " << p_val;   break;
+            #endif
+            case error      : p_stream << "[error]      " << p_val;   break;
+            case exception  : p_stream << "[exception]  " << p_val;   break;
         }
     }
     
