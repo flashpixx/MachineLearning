@@ -104,6 +104,7 @@
  * <li>all parameters should be a call-by-reference parameter</li>
  * <li>matrix structures should be row-oriantated, so loops over the elements are first over the rows and columns on the second / inner loop</li>
  * <li>template parameter should be asserted for the correct type</li>
+ * <li>header inclusion (forward declaration) and implementation are split into two files (if needed), header file (.h/.hpp) and the implementation file with name <dfn>name.implementation.hpp/.h/.cpp</dfn></li>
  * </ul>
  *
  * @section compileroptions Compileroption
@@ -840,7 +841,8 @@
  * @file distances/norm/euclid.hpp class for euclidian distances
  * @file distances/ncd.hpp implementation of the normalize compression distance
  *
- * @file errorhandling/exception.hpp header file for exceptions with implemention
+ * @file errorhandling/exception.hpp header file for exceptions with implemention (forward declaration)
+ * @file errorhandling/exception.implementation.hpp file with the exception implementation
  * @file errorhandling/assert.h header file for framework asserts
  *
  * @file functionoptimization/functionoptimization.h main header for function optimization
@@ -867,7 +869,8 @@
  *
  * @file tools/tools.h main header for tools algorithms
  * @file tools/function.hpp different functions eg. numerical limit checking
- * @file tools/logger.hpp logger implementation
+ * @file tools/logger.hpp logger implementation (forward declaration)
+ * @file tools/logger.implementation.hpp logger implementation
  * @file tools/lapack.hpp wrapper class for LAPack calls
  * @file tools/matrix.hpp implementation of matrix operations
  * @file tools/vector.hpp implementation of vector operations
@@ -903,6 +906,7 @@
 
 /** main namespace of the framework
  * $LastChangedDate$
+ * @todo split class declaration and implementation in different files for solving guard dependcy problems
  * @todo adding LUA ( http://en.wikipedia.org/wiki/Lua_(programming_language) ) support for dynamic programming ( http://en.wikipedia.org/wiki/Dynamic_programming )
  * @todo adding Twiddle Algorithm ( http://www.youtube.com/watch?v=2uQ2BSzDvXs )
  * @todo adding SFDP support (placment for lage graph data) http://www2.research.att.com/~yifanhu/SOFTWARE/SFDP/index.html / http://www2.research.att.com/~yifanhu/PUB/graph_draw_small.pdf

@@ -27,9 +27,6 @@
 #include <string>
 #include <stdexcept>
 
-#include "../tools/typeinfo.h"
-#include "../tools/logger.hpp"
-
 
 namespace machinelearning { 
     
@@ -39,6 +36,7 @@ namespace machinelearning {
      **/
     namespace exception {
     
+        
         /** exception class for throwing on not implementated method 
          * $LastChangedDate$
          **/
@@ -46,30 +44,9 @@ namespace machinelearning {
         { 
             public : 
             
-                /** creates the exception with a message
-                 * @param p_msg error message
-                 **/
-                explicit classmethod( const std::string& p_msg) :
-                    std::logic_error( p_msg )
-                {}
-            
-            
-                /** creates the exception with a message and a classname
-                 * @param p_msg error message
-                 * @param p_ptr pointer to a class object
-                 **/
-                template <typename T> explicit classmethod( const std::string& p_msg, const T* p_ptr ) :
-                    std::logic_error( p_msg + ( !tools::typeinfo::getClassName(p_ptr).empty() ? " ["+tools::typeinfo::getClassName(p_ptr)+"]" : "") )
-                {}  
-            
-            
-                /** creates the exception with a message and a classname
-                 * @param p_msg error message
-                 * @param p_obj reference to an class object
-                 **/
-                template <typename T> explicit classmethod( const std::string& p_msg, const T& p_obj ) :
-                    std::logic_error( p_msg + ( !tools::typeinfo::getClassName(p_obj).empty() ? " ["+tools::typeinfo::getClassName(p_obj)+"]" : "") )
-                {}  
+                explicit classmethod( const std::string& );            
+                template <typename T> explicit classmethod( const std::string&, const T* );
+                template <typename T> explicit classmethod( const std::string&, const T& );
         };
         
         
@@ -80,39 +57,17 @@ namespace machinelearning {
         class runtime : public std::runtime_error
         { 
             public : 
-                
-                /** creates the exception with a message
-                 * @param p_msg error message
-                 **/
-                explicit runtime( const std::string& p_msg ) :
-                    std::runtime_error( p_msg )
-                {
-                    #ifdef MACHINELEARNING_LOGGER
-                    if (tools::logger::exists())
-                        tools::logger::getInstance()->write( tools::logger::exception, "runtime exception is thrown with message: " + p_msg);
-                    #endif
-                }  
-            
-            
-                /** creates the exception with a message and a class name
-                 * @param p_msg error message
-                 * @param p_ptr pointer to an class object
-                 **/
-                template <typename T> explicit runtime( const std::string& p_msg, const T* p_ptr ) :
-                    std::runtime_error( p_msg + ( !tools::typeinfo::getClassName(p_ptr).empty() ? " ["+tools::typeinfo::getClassName(p_ptr)+"]" : "") )
-                {}  
-            
-            
-                /** creates the exception with a message and a class name
-                 * @param p_msg error message
-                 * @param p_obj reference to a classobject
-                 **/
-                template <typename T> explicit runtime( const std::string& p_msg, const T& p_obj ) :
-                    std::runtime_error( p_msg + ( !tools::typeinfo::getClassName(p_obj).empty() ? " ["+tools::typeinfo::getClassName(p_obj)+"]" : "") )
-                {}  
+
+                explicit runtime( const std::string& );            
+                template <typename T> explicit runtime( const std::string&, const T* );
+                template <typename T> explicit runtime( const std::string&, const T& );
         };
-             
+ 
         
     }
 }
+
+
+#include "exception.implementation.hpp"
+
 #endif
