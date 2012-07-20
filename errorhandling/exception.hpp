@@ -88,9 +88,8 @@ namespace machinelearning {
                     std::runtime_error( p_msg )
                 {
                     #ifdef MACHINELEARNING_LOGGER
-                    std::cout << p_msg << std::endl;
-                    //if (tools::logger::exists())
-                    //    tools::logger::getInstance()->write( tools::logger::exception, "runtime exception is thrown with message: " + p_msg);
+                    if (tools::logger::exists())
+                        tools::logger::getInstance()->write( tools::logger::exception, "runtime exception is thrown with message: " + p_msg);
                     #endif
                 }  
             
