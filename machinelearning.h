@@ -196,6 +196,7 @@
  *
  * @section ex Examples
  * <ul>
+ * <li>@subpage frameworkassert</li>
  * <li>@subpage lang</li>
  * <li>@subpage classifier</li>
  * <li>@subpage clustering</li>
