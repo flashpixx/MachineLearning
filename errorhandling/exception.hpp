@@ -21,8 +21,8 @@
  @endcond
  **/
 
-#ifndef __MACHINELEARNING_EXCEPTION_H
-#define __MACHINELEARNING_EXCEPTION_H
+#ifndef __MACHINELEARNING_EXCEPTION_HPP
+#define __MACHINELEARNING_EXCEPTION_HPP
 
 #include <string>
 #include <stdexcept>
@@ -88,6 +88,7 @@ namespace machinelearning {
                     std::runtime_error( p_msg )
                 {
                     #ifdef MACHINELEARNING_LOGGER
+                    std::cout << p_msg << std::endl;
                     //if (tools::logger::exists())
                     //    tools::logger::getInstance()->write( tools::logger::exception, "runtime exception is thrown with message: " + p_msg);
                     #endif

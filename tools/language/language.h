@@ -27,7 +27,7 @@
 #include <vector>
 #include <boost/algorithm/string.hpp> 
 
-#include "../../errorhandling/exception.h"
+#include "../../errorhandling/exception.hpp"
 #include "bindings.h"
 
 

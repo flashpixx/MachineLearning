@@ -35,7 +35,7 @@
 #include <boost/algorithm/string.hpp> 
 #include <boost/lexical_cast.hpp>
 
-#include "../../errorhandling/exception.h"
+#include "../../errorhandling/exception.hpp"
 
 
 namespace machinelearning { namespace tools { namespace files {

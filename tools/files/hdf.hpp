@@ -41,7 +41,7 @@ extern "C" {
 #include <iostream>
 #include <boost/numeric/ublas/io.hpp>
 
-#include "../../errorhandling/exception.h"
+#include "../../errorhandling/exception.hpp"
 
 
 

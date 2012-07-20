@@ -29,7 +29,7 @@
 #include <boost/numeric/ublas/matrix.hpp>
 
 
-#include "../../errorhandling/exception.h"
+#include "../../errorhandling/exception.hpp"
 #include "../language/language.h"
 #include "../matrix.hpp"
 #include "../random.hpp"

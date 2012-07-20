@@ -37,7 +37,7 @@
 #include <boost/numeric/bindings/lapack/computational/hseqr.hpp>
 
 
-#include "../errorhandling/exception.h"
+#include "../errorhandling/exception.hpp"
 #include "language/language.h"
 
 

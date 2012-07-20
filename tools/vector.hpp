@@ -45,7 +45,7 @@
 #include <boost/accumulators/statistics/mean.hpp>
 #include <boost/accumulators/statistics/variance.hpp>
 
-#include "../errorhandling/exception.h"
+#include "../errorhandling/exception.hpp"
 #include "language/language.h"
 
 

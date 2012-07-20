@@ -840,7 +840,7 @@
  * @file distances/norm/euclid.hpp class for euclidian distances
  * @file distances/ncd.hpp implementation of the normalize compression distance
  *
- * @file errorhandling/exception.h header file for exceptions with implemention
+ * @file errorhandling/exception.hpp header file for exceptions with implemention
  * @file errorhandling/assert.h header file for framework asserts
  *
  * @file functionoptimization/functionoptimization.h main header for function optimization
@@ -932,7 +932,7 @@ namespace machinelearning {}
 
 
 #include "errorhandling/assert.h"
-#include "errorhandling/exception.h"
+#include "errorhandling/exception.hpp"
 #include "dimensionreduce/dimensionreduce.h"
 #include "classifier/classifier.h"
 #include "clustering/clustering.h"

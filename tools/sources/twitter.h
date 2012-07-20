@@ -41,7 +41,7 @@
 #include <boost/date_time/gregorian/gregorian.hpp> 
 #include <boost/date_time/local_time/local_time.hpp>
 
-#include "../../errorhandling/exception.h"
+#include "../../errorhandling/exception.hpp"
 #include "../language/language.h"
 #include "../function.hpp"
 

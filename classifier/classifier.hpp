@@ -28,7 +28,7 @@
 #include <boost/static_assert.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 
-#include "../errorhandling/exception.h"
+#include "../errorhandling/exception.hpp"
 #include "../distances/distances.h"
 
 

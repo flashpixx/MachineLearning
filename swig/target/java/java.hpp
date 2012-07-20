@@ -28,7 +28,7 @@ extern "C" {
 #include <jni.h>
 }
     
-#include "machinelearning/machinelearning.h"
+#include "machinelearning.h"
 
 
 namespace machinelearning { namespace swig {

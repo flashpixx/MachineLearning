@@ -46,7 +46,7 @@
 
 #endif
 
-#include "../errorhandling/exception.h"
+#include "../errorhandling/exception.hpp"
 #include "language/language.h"
 
 

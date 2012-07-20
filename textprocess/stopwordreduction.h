@@ -32,7 +32,7 @@
 #include <boost/regex.hpp> 
 #include <boost/xpressive/xpressive.hpp>
 
-#include "../errorhandling/exception.h"
+#include "../errorhandling/exception.hpp"
 
 
 
