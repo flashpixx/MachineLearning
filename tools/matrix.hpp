@@ -68,6 +68,7 @@ namespace machinelearning { namespace tools {
             template<typename T> static ublas::vector<T> max( const ublas::matrix<T>&, const rowtype& = row );
             template<typename T> static ublas::vector<T> min( const ublas::matrix<T>&, const rowtype& = row );
             template<typename T> static ublas::vector<T> mean( const ublas::matrix<T>&, const rowtype& = row );
+            template<typename T> static ublas::vector<T> variance( const ublas::matrix<T>&, const rowtype& = row );
             template<typename T> static ublas::vector<T> sum( const ublas::matrix<T>&, const rowtype& = row );
             template<typename T> static ublas::mapped_matrix<T> diag( const ublas::vector<T>& );
             template<typename T> static ublas::vector<T> diag( const ublas::matrix<T>& );
@@ -200,23 +201,50 @@ namespace machinelearning { namespace tools {
      **/
     template<typename T> inline ublas::vector<T> matrix::mean( const ublas::matrix<T>& p_matrix, const rowtype& p_which )
     {
-        ublas::vector<T> l_min( (p_which==row) ? p_matrix.size1() : p_matrix.size2() );
+        ublas::vector<T> l_mean( (p_which==row) ? p_matrix.size1() : p_matrix.size2() );
         
         switch (p_which) {                
             case row :
-                #pragma omp parallel for shared(l_min)
+                #pragma omp parallel for shared(l_mean)
                 for(std::size_t i=0; i < p_matrix.size1(); ++i)
-                    l_min(i) = tools::vector::mean( static_cast< ublas::vector<T> >(ublas::row(p_matrix, i)) );
+                    l_mean(i) = tools::vector::mean( static_cast< ublas::vector<T> >(ublas::row(p_matrix, i)) );
                 break;
                 
             case column :
-                #pragma omp parallel for shared(l_min)
+                #pragma omp parallel for shared(l_mean)
                 for(std::size_t i=0; i < p_matrix.size2(); ++i)
-                    l_min(i) = tools::vector::mean( static_cast< ublas::vector<T> >(ublas::column(p_matrix, i)) );
+                    l_mean(i) = tools::vector::mean( static_cast< ublas::vector<T> >(ublas::column(p_matrix, i)) );
                 break;
         }
         
-        return l_min;
+        return l_mean;
+    }
+    
+    
+    /** calulates from a blas matrix the variance values on the rows or columns
+     * @param p_matrix blas matrix
+     * @param p_which row / column option (default row)
+     * @return vector with mean elements
+     **/
+    template<typename T> inline ublas::vector<T> matrix::variance( const ublas::matrix<T>& p_matrix, const rowtype& p_which )
+    {
+        ublas::vector<T> l_var( (p_which==row) ? p_matrix.size1() : p_matrix.size2() );
+        
+        switch (p_which) {                
+            case row :
+                #pragma omp parallel for shared(l_var)
+                for(std::size_t i=0; i < p_matrix.size1(); ++i)
+                    l_var(i) = tools::vector::variance( static_cast< ublas::vector<T> >(ublas::row(p_matrix, i)) );
+                break;
+                
+            case column :
+                #pragma omp parallel for shared(l_var)
+                for(std::size_t i=0; i < p_matrix.size2(); ++i)
+                    l_var(i) = tools::vector::variance( static_cast< ublas::vector<T> >(ublas::column(p_matrix, i)) );
+                break;
+        }
+        
+        return l_var;
     }
     
     

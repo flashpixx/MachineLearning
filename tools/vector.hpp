@@ -88,6 +88,7 @@ namespace machinelearning { namespace tools {
             template<typename T> static T min( const ublas::vector<T>& );
             template<typename T> static T max( const ublas::vector<T>& );
             template<typename T> static T mean( const ublas::vector<T>& );
+            template<typename T> static T variance( const ublas::vector<T>& );
             template<typename T> static std::vector<T> unique( const std::vector<T>& p_vec );
             template<typename T> static ublas::vector<std::size_t> rank( ublas::vector<T>& );
             template<typename T> static ublas::vector<std::size_t> rankIndexVector( ublas::vector<T>& );
@@ -205,6 +206,18 @@ namespace machinelearning { namespace tools {
         bac::accumulator_set<T, bac::stats< bac::tag::mean > > l_acc;
         std::for_each( p_vec.begin(), p_vec.end(), boost::bind<void>( boost::ref(l_acc), _1 ));
         return bac::mean(l_acc);
+    }
+    
+    
+    /** returns the variance of the vector elements
+     * @param p_vec input vector
+     * @return mean of the vector
+     **/   
+    template<typename T> inline T vector::variance( const ublas::vector<T>& p_vec )
+    {
+        bac::accumulator_set<T, bac::stats< bac::tag::variance > > l_acc;
+        std::for_each( p_vec.begin(), p_vec.end(), boost::bind<void>( boost::ref(l_acc), _1 ));
+        return bac::variance(l_acc);
     }
     
     
