@@ -42,8 +42,6 @@ def createVariables(vars) :
     vars.Add(BoolVariable("withoptimize", "compile with CPU optimization code", True))
     vars.Add(EnumVariable("math", "optimization of math structure", "sse3", allowed_values=("sse3", "sse", "387")))
 
-    vars.Add(BoolVariable("usecolorgcc", "use color gcc call (add 'color-' prefix to the compiler)", True))
-
     vars.Add(EnumVariable("atlaslink", "value of the atlas threadding (multi = tatlas, single = satlas)", "multi", allowed_values=("multi", "single")))
     vars.Add(BoolVariable("staticlink", "libraries will linked static", False))
     vars.Add(BoolVariable("showconfig", "shows the environment configuration", False))
@@ -165,7 +163,8 @@ if not env.GetOption('clean') :
         env.SConscript( os.path.join("scons", "platform", platformconfig+".py"), exports="conf help" )
         
         # set the colorgcc prefix after checkig, because otherwise it can creates errors on checklibrary
-        if conf.env["usecolorgcc"] :
+        lxPath = conf.env.FindFile("color-"+conf.env["CXX"], conf.env["ENV"]["PATH"])
+        if lxPath <> None :
             conf.env.Replace(CXX = "color-"+conf.env["CXX"])
         
         env = conf.Finish()
