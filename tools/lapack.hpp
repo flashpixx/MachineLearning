@@ -218,6 +218,7 @@ namespace machinelearning { namespace tools {
   
      
     /** generates the eigenvalue / -vector with the perronforbenius theorem
+     * @see http://en.wikipedia.org/wiki/Perron–Frobenius_theorem
      * @param p_matrix input matrix
      * @param p_iteration number of iterations
      * @return eigenvector
@@ -229,6 +230,7 @@ namespace machinelearning { namespace tools {
     
     
     /** generates the eigenvalue / -vector with the perronforbenius theorem
+     * @see http://en.wikipedia.org/wiki/Perron–Frobenius_theorem
      * @param p_matrix input matrix
      * @param p_iteration number of iterations
      * @param p_init initialization vector
