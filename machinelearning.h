@@ -912,6 +912,7 @@
  * @todo adding Twiddle Algorithm ( http://www.youtube.com/watch?v=2uQ2BSzDvXs )
  * @todo adding SFDP support (placment for lage graph data) http://www2.research.att.com/~yifanhu/SOFTWARE/SFDP/index.html / http://www2.research.att.com/~yifanhu/PUB/graph_draw_small.pdf
  * @todo adding GSL support http://www.gnu.org/software/gsl/
+ * @todo adding http://en.wikipedia.org/wiki/Ford–Fulkerson_algorithm / http://en.wikipedia.org/wiki/Edmonds–Karp_algorithm / http://en.wikipedia.org/wiki/Dinic%27s_algorithm
  * @todo adding PAPI support http://icl.cs.utk.edu/papi/
  * @todo adding stemming support ( http://en.wikipedia.org/wiki/Stemming )
  * @todo thinking about a SSE support in the framework http://en.wikipedia.org/wiki/SSE3
