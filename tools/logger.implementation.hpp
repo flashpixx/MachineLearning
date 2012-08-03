@@ -158,7 +158,7 @@ namespace machinelearning { namespace tools {
 
 
     /** returns the status of logging
-     * @return boolean status
+     * @return logger state
      **/
     inline logger::logstate logger::getLevel( void ) const
     {
