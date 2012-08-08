@@ -39,6 +39,7 @@ namespace machinelearning {
          * @todo adding support for mySQL / MS SQL / Postgres SQL / Oracle via eg http://www.sqlapi.com/
          * @todo adding twitter streaming support https://dev.twitter.com/docs/streaming-api/methods
          * @todo adding support for reading HTML data with WGet / Curl
+         * @todo adding support for http://en.wikipedia.org/wiki/CouchDB
          * @todo adding support for web-sockets http://www.whatwg.org/specs/web-socket-protocol/
          * @todo adding support for differnt source of http://datacatalogs.org/ 
          * @todo adding support for http://www.data.gov/
