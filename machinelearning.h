@@ -914,6 +914,7 @@
  * @todo adding GSL support http://www.gnu.org/software/gsl/
  * @todo adding http://en.wikipedia.org/wiki/Ford–Fulkerson_algorithm / http://en.wikipedia.org/wiki/Edmonds–Karp_algorithm / http://en.wikipedia.org/wiki/Dinic%27s_algorithm
  * @todo adding PAPI support http://icl.cs.utk.edu/papi/
+ * @todo thinking about http://en.wikipedia.org/wiki/Conceptual_graph
  * @todo adding stemming support ( http://en.wikipedia.org/wiki/Stemming )
  * @todo thinking about a SSE support in the framework http://en.wikipedia.org/wiki/SSE3
  * @todo adding GTML with http://en.wikipedia.org/wiki/Expectation–maximization_algorithm
