@@ -48,7 +48,7 @@ def downloadfile(url, file)  :
     if os.path.isfile(file) :
         return
                 
-    target = open( file, "w" )
+    target = open( file, "wb" )
     f = urllib2.urlopen(url)
     target.write(f.read())
     target.close()
@@ -60,7 +60,7 @@ def clearbuilddir(target, source, env) :
     for i in os.listdir(workingpath) :
         if os.path.isfile(os.path.join(workingpath, i)) :
             continue
-        if i <> "build" :
+        if (i <> "build") and (i <> ".svn" ) :
             clearlist.append(i)
     
     for i in clearlist :
