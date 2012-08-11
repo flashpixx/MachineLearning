@@ -126,6 +126,18 @@ env.VariantDir("build", ".", duplicate=0)
 Help(vars.GenerateHelpText(env))
 cleantarget(env)
 
+# check the toolkit option
+if env["PLATFORM"].lower() == "posix" :
+    env["TOOLKIT"] = "posix"
+elif env["PLATFORM"].lower() == "darwin" :
+    env["TOOLKIT"] = "darwin"
+elif env["PLATFORM"].lower() == "cygwin" :
+    env["PLATFORM"] = "cygwin"
+else :
+    raise RuntimeError("toolkit is not known")
+
+
+
 
 if not env.GetOption('clean') :
     # adding platform scripts, create configuration and finish the configuration (only we build something)
