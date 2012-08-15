@@ -914,7 +914,9 @@
  * @todo adding GSL support http://www.gnu.org/software/gsl/
  * @todo adding http://en.wikipedia.org/wiki/Ford–Fulkerson_algorithm / http://en.wikipedia.org/wiki/Edmonds–Karp_algorithm / http://en.wikipedia.org/wiki/Dinic%27s_algorithm
  * @todo adding PAPI support http://icl.cs.utk.edu/papi/
+ * @todo adding Cuda support http://thrust.github.com/
  * @todo thinking about http://en.wikipedia.org/wiki/Conceptual_graph
+ * @todo adding minimum spanning tree clustering http://zachjorgensen.com/ictai06.pdf
  * @todo adding stemming support ( http://en.wikipedia.org/wiki/Stemming )
  * @todo thinking about a SSE support in the framework http://en.wikipedia.org/wiki/SSE3
  * @todo adding GTML with http://en.wikipedia.org/wiki/Expectation–maximization_algorithm
@@ -926,7 +928,7 @@
  * @todo thinking about CILK support http://supertech.csail.mit.edu/cilk/
  * @todo adding simulated annealing (see GSL http://www.gnu.org/software/gsl/)
  * @todo adding some generic support for http://headmyshoulder.github.com/odeint-v2/
- * @todo adding voronoi tessellation (with CGAL http://http://www.cgal.org/ ) and other CGAL algorithms
+ * @todo adding voronoi tessellation (with CGAL http://http://www.cgal.org/ ) and other CGAL algorithms / http://en.wikipedia.org/wiki/Fortune%27s_algorithm
  * @todo adding support for SuperLU ( http://crd-legacy.lbl.gov/~xiaoye/SuperLU/ )
  * @todo create a PHP & Python modul ( use Swig )
  * @todo add unit tests with Google ( http://code.google.com/p/googletest/ )
