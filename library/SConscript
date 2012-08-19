@@ -468,7 +468,7 @@ def build_xml(target, source, env) :
 
 #=== configuration ===================================================================================================================
 def showconfig(target, source, env) :
-    #detect builded packages and shows PATH, CPPPATH, LIBRARY_PATH for installation
+    #detect built packages and shows PATH, CPPPATH, LIBRARY_PATH for installation
     includes = glob.glob(os.path.join(workingpath, "build", "**", "**", "include"))
     
     #replace "install/build" to "<installation dir>"
