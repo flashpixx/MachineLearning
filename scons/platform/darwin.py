@@ -23,6 +23,18 @@ import os
 Import("*")
 
 
+
+# setup the environment
+def tarparse( line ) :
+    return line.split()[-1]
+    
+conf.env["EXTRACT_PARSE"]   = tarparse
+conf.env["EXTRACT_LIST"]    = "tar tvfz $SOURCE"
+conf.env["EXTRACT_CMD"]     = "tar oxfvz $SOURCE"
+conf.env["EXTRACT_CMDBZ"]   = "tar oxfvj $SOURCE"
+conf.env["extractsuffix"]   = " -C "
+
+
 # OSX system information
 if "CXX" in os.environ:
     conf.env.Replace(CXX = os.environ["CXX"])
@@ -51,30 +63,16 @@ elif "LIBRARY_PATH" in os.environ :
     print("Appending custom posix library path (LIBRARY_PATH)")
 
 
-
-
-
 # main configuration
-conf.env.Append(CXXFLAGS = "-fopenmp -pipe -D BOOST_FILESYSTEM_NO_DEPRECATED -D BOOST_NUMERIC_BINDINGS_BLAS_CBLAS")    
-conf.env.Append(LINKFLAGS = "-pthread -fopenmp --as-needed")
+conf.env.AppendUnique(LINKFLAGS   = ["fopenmp", "-pthread", "--as-needed"])
+conf.env.AppendUnique(CXXFLAGS    = ["fopenmp", "-pthread", "-pipe", "BOOST_FILESYSTEM_NO_DEPRECATED", "BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"])
 
-if conf.env["withdebug"] :
-    conf.env.Append(CXXFLAGS = "-g")
-else :
-    conf.env.Append(CXXFLAGS = "-D NDEBUG -D BOOST_UBLAS_NDEBUG")
-    
-if not(conf.env["withframeworkdebug"]) :
-    conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_NDEBUG")
-    
+if conf.env["buildtype"] == "release" :
+    conf.env.AppendUnique(CPPDEFINES     = ["NDEBUG", "BOOST_UBLAS_NDEBUG", "MACHINELEARNING_NDEBUG"])
     
 if conf.env["withoptimize"] :
-    conf.env.Append(CXXFLAGS = "-O2 -fomit-frame-pointer -finline-functions -mtune="+conf.env["cputype"])
-    if conf.env["math"] == "sse3" :
-        conf.env.Append(CXXFLAGS = "-mfpmath=sse -msse3")
-    elif conf.env["math"] == "sse" :
-        conf.env.Append(CXXFLAGS = "-mfpmath=sse -msse")
-    else :
-        conf.env.Append(CXXFLAGS = "-mfpmath=387")
+    conf.env.AppendUnique(CXXFLAGS    = ["-O2", "-fomit-frame-pointer", "-finline-functions"])
+
 
 
 
@@ -244,4 +242,4 @@ if conf.env["withlogger"] :
     localconf["cpplibraries"].append("boost_thread")
     
 
-help.checkConfiguratin( conf, localconf )
+#help.checkConfiguratin( conf, localconf )

@@ -22,4 +22,9 @@
 import os
 Import("*")
 
-env.Alias("documentation", env.Command("doxygen", "", "doxygen "+os.path.join("documentation", "documentation.doxyfile")))
+env.Clean(
+    env.Alias( "documentation", 
+        env.Command("documentation", "documentation.doxyfile", "doxygen $SOURCE") 
+    ),
+    os.path.join("#", "documentation", "html")
+)
