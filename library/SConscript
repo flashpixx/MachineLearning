@@ -207,7 +207,7 @@ def Boost_BuildInstall(env, source, gzipbuild, bzipbuild)  :
     boostpath   = os.path.join(workingpath, boostpath.replace(".", "_").replace("-", "_"))
 
     # set the toolset and compile the bjam and build boost
-    boostoptions = "--with-exception --with-filesystem --with-math --with-random --with-regex --with-date_time --with-thread --with-system --with-program_options --with-serialization --with-iostreams --disable-filesystem2 link=shared runtime-link=shared threading=multi variant=release toolset=%T% install --prefix="+os.path.abspath(os.path.join(workingpath, "build", "boost", version))
+    boostoptions = "--with-exception --with-filesystem --with-math --with-random --with-regex --with-date_time --with-thread --with-system --with-program_options --with-serialization --with-iostreams --disable-filesystem2 link=shared runtime-link=shared threading=multi variant=release toolset=%T% install --layout=system --prefix="+os.path.abspath(os.path.join(workingpath, "build", "boost", version))
     if env["withmpi"] :
         boostoptions = "--with-mpi " + boostoptions
     
