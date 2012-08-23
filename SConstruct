@@ -58,7 +58,6 @@ def createVariables(vars) :
     
     vars.Add(BoolVariable("uselocallibrary", "use the library in the local directory only", False))
     vars.Add(ListVariable("skiplibrary", "skipping library builds / downloads", "", ["atlas", "boost", "hdf", "ginac", "json", "xml"]))
-    vars.Add(BoolVariable("uselocallibrary", "use the library in the local directory only", False))
     
     
     

@@ -207,26 +207,19 @@ def Boost_BuildInstall(env, source, gzipbuild, bzipbuild)  :
     boostpath   = os.path.join(workingpath, boostpath.replace(".", "_").replace("-", "_"))
 
     # set the toolset and compile the bjam and build boost
-    boostoptions = "--with-exception --with-filesystem --with-math --with-random --with-regex --with-date_time --with-thread --with-system --with-program_options --with-serialization --with-iostreams --disable-filesystem2 link=shared runtime-link=shared threading=multi variant=release toolset=%T% install --layout=system --prefix="+os.path.abspath(os.path.join(workingpath, "build", "boost", version))
+    boostoptions = "--with-exception --with-filesystem --with-math --with-random --with-regex --with-date_time --with-thread --with-system --with-program_options --with-serialization --with-iostreams --disable-filesystem2 link=shared runtime-link=shared threading=multi variant=release install --layout=system --prefix="+os.path.abspath(os.path.join(workingpath, "build", "boost", version))
     if env["withmpi"] :
         boostoptions = "--with-mpi " + boostoptions
     
     cmd = None
-    if env["TOOLKIT"] == "darwin" :
+    if env["TOOLKIT"] in ["darwin", "posix"] :
         cmd = "cd " + boostpath + ";"
         if env["withmpi"] :
             cmd = cmd + " echo \"using mpi ;\" >> " + os.path.join(boostpath, "tools", "build", "v2", "user-config.jam") + ";"
-        cmd = cmd + " ./bootstrap.sh; ./b2 " + boostoptions.replace("%T%", "darwin")
-        print cmd
-    elif env["TOOLKIT"] == "posix" :
-        cmd = "cd " + boostpath + ";"
-        if env["withmpi"] :
-            cmd = cmd + " echo \"using mpi ;\" >> " + os.path.join(boostpath, "tools", "build", "v2", "user-config.jam") + ";"
-        cmd = " ./bootstrap.sh; ./b2 " + boostoptions.replace("%T%", "gcc")
-    
+        cmd = cmd + " ./bootstrap.sh; ./b2 " + boostoptions
+       
     elif env["TOOLKIT"] == "cygwin" :
-        pass
-    
+         cmd = "cd " + boostpath + "; ./bootstrap.sh; ./b2 " + boostoptions
     
     else :
         raise RuntimeError("toolkit not known")
