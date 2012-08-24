@@ -34,6 +34,13 @@ namespace machinelearning {
     /** initialization of the random device **/
     #ifdef MACHINELEARNING_RANDOMDEVICE
     boost::random_device tools::random::m_random;
+    #else
+    #ifdef MACHINELEARNING_MPI
+    mpi::communicator l_mpi;
+    boost::mt19937 tools::random::m_random( time(NULL)* (l_mpi.rank()+1) );
+    #else
+    boost::mt19937 tools::random::m_random( time(NULL) );
+    #endif
     #endif
     
     /** initialization of the logger instance **/

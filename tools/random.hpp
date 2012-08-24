@@ -36,10 +36,6 @@
 #include <boost/nondet_random.hpp>
 #endif
 
-#ifdef MACHINELEARNING_MPI
-#include <boost/mpi.hpp>
-#endif
-
 #include <boost/math/distributions/beta.hpp>
 #include <boost/math/distributions/students_t.hpp>
 #include <boost/math/distributions/weibull.hpp>
@@ -56,20 +52,12 @@
 
 namespace machinelearning { namespace tools {
     
-    #ifndef SWIG
-    #ifdef MACHINELEARNING_MPI
-    namespace mpi   = boost::mpi;
-    #endif
-    #endif
-
     
     /** class for using some thread-safe & MPI-safe random structures. Pseudo generator (Mersenne Twister) and
      * system-random-generator can be used. The class holds different distribution that
      * can be used. The system-random-generator must be set with the compileflag 
-     * $LastChangedDate$
-     * @todo optimizing generators, because on each call the generator is created again
-     * @todo think about pseudo generator random seed (because on cloning the object in different thread the seed is euqal in each thread, so it generates the same numbers)
      * @todo reactivate binomial distribution with correct type casting
+     * $LastChangedDate$
      **/
     class random
     {
@@ -95,10 +83,6 @@ namespace machinelearning { namespace tools {
                 //binomial    = 14
             };
             
-            
-            #ifndef MACHINELEARNING_RANDOMDEVICE
-            random( void );
-            #endif
             template<typename T> T get( const distribution&, const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon() );
             
         
@@ -109,7 +93,7 @@ namespace machinelearning { namespace tools {
             static boost::random_device m_random;
             #else
             /** mersenne twister object **/
-            boost::mt19937 m_random;
+            static boost::mt19937 m_random;
             #endif
             
             template<typename T> T getUniform( const T&, const T& );
@@ -130,25 +114,6 @@ namespace machinelearning { namespace tools {
         
     };
     
-    
-    
-    /** constructor with creating a own number generator
-     * for multithrading. Read thread-id and create xor
-     * with time (and add MPI support, for creating different start values)
-     **/
-    #ifndef MACHINELEARNING_RANDOMDEVICE
-    inline random::random( void )
-        #ifndef MACHINELEARNING_MPI
-        : m_random(  boost::mt19937( (omp_get_thread_num()+1) * time(NULL))  )
-        #endif
-    {
-        #ifdef MACHINELEARNING_MPI
-        mpi::communicator l_mpi;
-        m_random = boost::mt19937( (omp_get_thread_num()+1) * time(NULL) * (l_mpi.rank()+1) );
-        #endif
-    }
-    #endif
-        
     
     
     /** returns a number from a pseudo random generator. Default values are set with the numerical limits for checking
