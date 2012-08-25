@@ -40,24 +40,15 @@ def createVariables(vars) :
     vars.Add(BoolVariable("withfiles", "installation with file reading support for CSV & HDF", True))
     vars.Add(BoolVariable("withlogger", "use the interal logger of the framework", False))
     vars.Add(BoolVariable("withsymbolicmath", "compile for using symbolic math expression (needed by gradient descent)", False))
-
-    #vars.Add(BoolVariable("withdebug", "compile with debug information", False))
-    #vars.Add(BoolVariable("withframeworkdebug", "compile with frameworks debug option", True)) #-- move to debug
-    vars.Add(BoolVariable("withoptimize", "compile with CPU optimization code", True))
-    vars.Add(EnumVariable("math", "optimization of math structure", "sse3", allowed_values=("sse3", "sse", "387"))) # ------
     
     vars.Add(EnumVariable("buildtype", "value of the buildtype", "release", allowed_values=("debug", "release")))
-
-    vars.Add(EnumVariable("atlaslink", "value of the atlas threadding (multi = tatlas, single = satlas)", "multi", allowed_values=("multi", "single"))) #----??
-    vars.Add(BoolVariable("staticlink", "libraries will linked static", False)) #-----??
-    #vars.Add(BoolVariable("showconfig", "shows the environment configuration", False)) #------
-
-    vars.Add(EnumVariable("cputype", "value of the cpu type [see: http://gcc.gnu.org/onlinedocs/gcc/i386-and-x86_002d64-Options.html]", "native", allowed_values=("native", "generic", "i386", "i486", "i586", "i686", "pentium-mmx", "pentiumpro", "pentium2", "pentium3", "pentium-m", "pentium4", "prescott", "nocona", "core2", "corei7", "corei7-avx", "core-avx-i", "atom", "k6", "k6-2", "athlon", "athlon-4", "k8", "k8-sse3", "amdfam10", "winchip-c6", "winchip2", "c3", "c3-2", "geode" ))) #------
-    
-    vars.Add(EnumVariable("atlaspointerwidth", "pointer width for compiling ATLAS (empty = system default, 32 = 32 Bit, 64 = 64 Bit)", "", allowed_values=("", "32", "64")))
-    
     vars.Add(BoolVariable("uselocallibrary", "use the library in the local directory only", False))
     vars.Add(ListVariable("skiplibrary", "skipping library builds / downloads", "", ["atlas", "boost", "hdf", "ginac", "json", "xml"]))
+    vars.Add(BoolVariable("zipsupport", "build Bzip2 and ZLib support for Boost", (platform.system().lower()=="cygwin")))
+    vars.Add(EnumVariable("atlaslink", "type of the ATLAS link file", "multi", allowed_values=("single", "multi")))
+    vars.Add(EnumVariable("atlaspointerwidth", "pointer width for compiling ATLAS (empty = system default, 32 = 32 Bit, 64 = 64 Bit)", "", allowed_values=("", "32", "64")))
+    
+
     
     
     
@@ -110,11 +101,11 @@ def checkExecutables(conf, commands) :
 def setupToolkitEnv(env) :
     # check the toolkit option
     env["TOOLKIT_ARCH"] = (platform.architecture()[0]).replace("bit", "")
-    if env["PLATFORM"].lower() == "posix" :
+    if platform.system().lower() == "posix" :
         env["TOOLKIT"]      = "posix"
-    elif env["PLATFORM"].lower() == "darwin" :
+    elif platform.system().lower() == "darwin" :
         env["TOOLKIT"]      = "darwin"
-    elif env["PLATFORM"].lower() == "cygwin" :
+    elif platform.system().lower() == "cygwin" :
         env["PLATFORM"]     = "cygwin"
     else :
         raise RuntimeError("toolkit not known")
@@ -221,10 +212,6 @@ def showlicence() :
 #=== create environment and compiling ==================================================================================================
 showlicence()
 
-
-
-
-
 # create configuration option
 vars = Variables()
 createVariables(vars)
@@ -235,17 +222,17 @@ Help(vars.GenerateHelpText(env))
 setupToolkitEnv(env)
 conf = Configure(env)
 
+
+# changing flags if needed
+if "sources" in COMMAND_LINE_TARGETS : 
+    conf.env["withsources"] = True;
+
 # read platform configuration (only if not clean target is used)
 platformconfig = env["TOOLKIT"]
 if not(os.path.isfile(os.path.join("scons", "platform", platformconfig+".py"))) :
     raise ImportError("toolkit configuration script ["+platformconfig+"] not found")
 
 env.SConscript( os.path.join("scons", "platform", platformconfig+".py"), exports="conf checkCPPEnv checkExecutables" )
-
-# changing falgs if needed
-if "sources" in COMMAND_LINE_TARGETS : 
-    conf.env["withsources"] = True;
-
 env = conf.Finish()
 
 

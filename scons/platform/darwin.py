@@ -23,8 +23,117 @@ import os
 Import("*")
 
 
+# === default configuration ================================================
+localconf = {
+    "cpplibraries"          : [  "stdc++",
+                                 "boost_system",
+                                 "boost_regex",
+                                 "boost_iostreams"
+    ],
+    
+    "staticlinkonly"        : [  "boost_exception"
+    ],
+    
+    "cppdylibrariesonly"    : [ ], 
+    
+    "cdylibrariesonly"      : [ ], 
+    
+    "clibraries"            : [ ],
+    
+    "cheaders"              :  [ "omp.h"
+    ],
+    
+    "cppheaders"            :  [ "map",
+                                 "algorithm",
+                                 "limits",
+                                 "iostream",
+                                 "numeric",
+                                 "string",
+                                 "sstream",
+                                 "ostream",
+                                 "fstream",
+                                 "stdexcept",
+                                 "vector",
+                                 "ctime",
+                                 "iterator",
+                                 "typeinfo",
+                                 "cxxabi.h",
 
-# setup the environment
+                                 os.path.join("boost", "numeric", "ublas", "matrix.hpp"),
+                                 os.path.join("boost", "numeric", "ublas", "vector.hpp"), 
+                                 os.path.join("boost", "numeric", "ublas", "matrix_sparse.hpp"),
+                                 os.path.join("boost", "numeric", "ublas", "vector_proxy.hpp"),
+                                 os.path.join("boost", "numeric", "ublas", "matrix_proxy.hpp"),
+                                 os.path.join("boost", "numeric", "ublas", "storage.hpp"),
+                                 os.path.join("boost", "numeric", "ublas", "io.hpp"),
+                                 os.path.join("boost", "numeric", "ublas", "symmetric.hpp"), 
+                            
+                                 os.path.join("boost", "numeric", "bindings", "blas.hpp"),
+                                 os.path.join("boost", "numeric", "bindings", "ublas", "vector.hpp"),
+                                 os.path.join("boost", "numeric", "bindings", "ublas", "matrix.hpp"),
+                                 os.path.join("boost", "numeric", "bindings", "lapack", "driver", "geev.hpp"),
+                                 os.path.join("boost", "numeric", "bindings", "lapack", "driver", "ggev.hpp"),
+                                 os.path.join("boost", "numeric", "bindings", "lapack", "driver", "gesv.hpp"),
+                                 os.path.join("boost", "numeric", "bindings", "lapack", "driver", "gesvd.hpp"),
+                                 os.path.join("boost", "numeric", "bindings", "lapack", "computational", "hseqr.hpp"),
+                            
+                                 os.path.join("boost", "algorithm", "string.hpp"), 
+                                 os.path.join("boost", "algorithm", "string", "erase.hpp"),
+                            
+                                 os.path.join("boost", "accumulators", "accumulators.hpp"),
+                                 os.path.join("boost", "accumulators", "statistics", "stats.hpp"),
+                                 os.path.join("boost", "accumulators", "statistics", "min.hpp"),
+                                 os.path.join("boost", "accumulators", "statistics", "max.hpp"),
+                                 os.path.join("boost", "accumulators", "statistics", "mean.hpp"),
+                                 os.path.join("boost", "accumulators", "statistics", "variance.hpp"),
+                                 os.path.join("boost", "math", "distributions", "beta.hpp"),
+                                 os.path.join("boost", "math", "distributions", "students_t.hpp"),
+                                 os.path.join("boost", "math", "distributions", "weibull.hpp"),
+                                 os.path.join("boost", "math", "distributions", "rayleigh.hpp"),
+                                 os.path.join("boost", "math", "distributions", "pareto.hpp"),
+                                 os.path.join("boost", "math", "distributions", "chi_squared.hpp"),
+                                 os.path.join("boost", "math", "distributions", "triangular.hpp"),
+                            
+                                 os.path.join("boost", "iterator", "counting_iterator.hpp"),
+                                 os.path.join("boost", "iterator", "permutation_iterator.hpp"),
+                            
+                                 os.path.join("boost", "lambda", "lambda.hpp"),
+                            
+                                 os.path.join("boost", "foreach.hpp"),
+                                 os.path.join("boost", "random.hpp"),
+                                 os.path.join("boost", "shared_ptr.hpp"),
+                                 os.path.join("boost", "static_assert.hpp"),
+                                 os.path.join("boost", "bind.hpp"),
+                                 os.path.join("boost", "ref.hpp"),
+                                 os.path.join("boost", "regex.hpp"),
+                                 os.path.join("boost", "lexical_cast.hpp"),
+                                  
+                                 os.path.join("boost", "iostreams", "filter", "gzip.hpp"), 
+                                 os.path.join("boost", "iostreams", "filter", "bzip2.hpp"), 
+                                 os.path.join("boost", "iostreams", "stream.hpp"), 
+                                 os.path.join("boost", "iostreams", "device", "null.hpp"), 
+                                 os.path.join("boost", "iostreams", "filtering_streambuf.hpp"), 
+                                 os.path.join("boost", "iostreams", "filtering_stream.hpp"), 
+                                 os.path.join("boost", "iostreams", "filter", "counter.hpp"), 
+                                 os.path.join("boost", "iostreams", "concepts.hpp"), 
+                                 os.path.join("boost", "iostreams", "operations.hpp"), 
+                                 os.path.join("boost", "iostreams", "copy.hpp"),
+                                  
+                                 os.path.join("boost", "numeric", "bindings", "blas.hpp"),
+                                 os.path.join("boost", "numeric", "bindings", "ublas", "vector.hpp"),
+                                 os.path.join("boost", "numeric", "bindings", "ublas", "matrix.hpp"),
+                                 os.path.join("boost", "numeric", "bindings", "lapack", "driver", "geev.hpp"),
+                                 os.path.join("boost", "numeric", "bindings", "lapack", "driver", "ggev.hpp"),
+                                 os.path.join("boost", "numeric", "bindings", "lapack", "driver", "gesv.hpp"), 
+                                 os.path.join("boost", "numeric", "bindings", "lapack", "driver", "gesvd.hpp"), 
+                                 os.path.join("boost", "numeric", "bindings", "lapack", "computational", "hseqr.hpp")
+    ]
+}
+# ==========================================================================
+
+
+
+# === OSX environment configuration ========================================
 def tarparse( line ) :
     return line.split()[-1]
     
@@ -43,7 +152,7 @@ if "CXX" in os.environ:
 if "CPPPATH" in os.environ :
     conf.env.Append(CPPPATH = os.environ["CPPPATH"].split(os.pathsep))
     print("Appending custom C++ path (CPPPATH)")
-
+    
 if "CXXFLAGS" in os.environ:
     conf.env.Append(CXXFLAGS = os.environ["CXXFLAGS"].split(" "))
     print("Appending custom build flags (CXXFLAGS)")
@@ -65,181 +174,118 @@ elif "LIBRARY_PATH" in os.environ :
 
 # main configuration
 conf.env.AppendUnique(LINKFLAGS   = ["fopenmp", "-pthread", "--as-needed"])
-conf.env.AppendUnique(CXXFLAGS    = ["fopenmp", "-pthread", "-pipe", "BOOST_FILESYSTEM_NO_DEPRECATED", "BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"])
+conf.env.AppendUnique(CXXFLAGS    = ["fopenmp", "-pthread", "-pipe"])
+conf.env.AppendUnique(CPPDEFINES  = ["BOOST_FILESYSTEM_NO_DEPRECATED", "BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"])
 
 if conf.env["buildtype"] == "release" :
-    conf.env.AppendUnique(CPPDEFINES     = ["NDEBUG", "BOOST_UBLAS_NDEBUG", "MACHINELEARNING_NDEBUG"])
-    
-if conf.env["withoptimize"] :
+    conf.env.AppendUnique(CPPDEFINES  = ["NDEBUG", "BOOST_UBLAS_NDEBUG", "MACHINELEARNING_NDEBUG"])
     conf.env.AppendUnique(CXXFLAGS    = ["-O2", "-fomit-frame-pointer", "-finline-functions"])
-
-
-
-
-# library defintion
-localconf = {
-    "cpplibraries" : [  "stdc++",
-                        "boost_system",
-                        "boost_regex",
-                        "boost_iostreams"
-    ],
     
-    "staticlinkonly"     : [ "boost_exception" ],
-    
-    "cppdylibrariesonly" : [ ], 
-    
-    "cdylibrariesonly"   : [ ], 
-    
-    "clibraries"         : [ ],
-    
-    "cheaders"   :  [ "omp.h" ],
-    
-    "cppheaders" :  [ "map",
-                      "algorithm",
-                      "limits",
-                      "iostream",
-                      "numeric",
-                      "string",
-                      "sstream",
-                      "ostream",
-                      "fstream",
-                      "stdexcept",
-                      "vector",
-                      "ctime",
-                      "iterator",
-                      "typeinfo",
-                      "cxxabi.h",
-                      
-                      "boost/numeric/ublas/matrix.hpp",
-                      "boost/numeric/ublas/vector.hpp", 
-                      "boost/numeric/ublas/matrix_sparse.hpp",
-                      "boost/numeric/ublas/vector_proxy.hpp",
-                      "boost/numeric/ublas/matrix_proxy.hpp",
-                      "boost/numeric/ublas/storage.hpp",
-                      "boost/numeric/ublas/io.hpp",
-                      "boost/numeric/ublas/symmetric.hpp", 
-                
-                      "boost/numeric/bindings/blas.hpp",
-                      "boost/numeric/bindings/ublas/vector.hpp",
-                      "boost/numeric/bindings/ublas/matrix.hpp",
-                      "boost/numeric/bindings/lapack/driver/geev.hpp",
-                      "boost/numeric/bindings/lapack/driver/ggev.hpp",
-                      "boost/numeric/bindings/lapack/driver/gesv.hpp",
-                      "boost/numeric/bindings/lapack/driver/gesvd.hpp",
-                      "boost/numeric/bindings/lapack/computational/hseqr.hpp",
-                
-                      "boost/algorithm/string.hpp", 
-                      "boost/algorithm/string/erase.hpp",
-                
-                      "boost/accumulators/accumulators.hpp",
-                      "boost/accumulators/statistics/stats.hpp",
-                      "boost/accumulators/statistics/min.hpp",
-                      "boost/accumulators/statistics/max.hpp",
-                      "boost/accumulators/statistics/mean.hpp",
-                      "boost/accumulators/statistics/variance.hpp",
-                      "boost/math/distributions/beta.hpp",
-                      "boost/math/distributions/students_t.hpp",
-                      "boost/math/distributions/weibull.hpp",
-                      "boost/math/distributions/rayleigh.hpp",
-                      "boost/math/distributions/pareto.hpp",
-                      "boost/math/distributions/chi_squared.hpp",
-                      "boost/math/distributions/triangular.hpp",
-                
-                      "boost/iterator/counting_iterator.hpp",
-                      "boost/iterator/permutation_iterator.hpp",
-                
-                      "boost/lambda/lambda.hpp",
-                
-                      "boost/foreach.hpp",
-                      "boost/random.hpp",
-                      "boost/shared_ptr.hpp",
-                      "boost/static_assert.hpp",
-                      "boost/bind.hpp",
-                      "boost/ref.hpp",
-                      "boost/regex.hpp",
-                      "boost/lexical_cast.hpp",
-                      
-                      "boost/iostreams/filter/gzip.hpp", 
-                      "boost/iostreams/filter/bzip2.hpp", 
-                      "boost/iostreams/stream.hpp", 
-                      "boost/iostreams/device/null.hpp", 
-                      "boost/iostreams/filtering_streambuf.hpp", 
-                      "boost/iostreams/filtering_stream.hpp", 
-                      "boost/iostreams/filter/counter.hpp", 
-                      "boost/iostreams/concepts.hpp", 
-                      "boost/iostreams/operations.hpp", 
-                      "boost/iostreams/copy.hpp",
-                      
-                      "boost/numeric/bindings/blas.hpp",
-                      "boost/numeric/bindings/ublas/vector.hpp",
-                      "boost/numeric/bindings/ublas/matrix.hpp",
-                      "boost/numeric/bindings/lapack/driver/geev.hpp",
-                      "boost/numeric/bindings/lapack/driver/ggev.hpp",
-                      "boost/numeric/bindings/lapack/driver/gesv.hpp", 
-                      "boost/numeric/bindings/lapack/driver/gesvd.hpp", 
-                      "boost/numeric/bindings/lapack/computational/hseqr.hpp"
-                      
-                   ]
-}
-      
-
-if not("javac" in COMMAND_LINE_TARGETS) :
-    localconf["cpplibraries"].extend(["boost_program_options", "boost_filesystem"])
-    localconf["cppheaders"].extend( ["cstdlib", "boost/program_options/parsers.hpp", "boost/program_options/variables_map.hpp", "boost/filesystem.hpp", "boost/program_options/options_description.hpp"] )
-
-
-if conf.env["staticlink"] :
-    localconf["clibraries"].append("atlas")
-    localconf["cdylibrariesonly"].extend(["z", "bz2"])
-elif not(conf.env["staticlink"]) and conf.env["atlaslink"] == "multi" :
+if conf.env["atlaslink"] == "multi" :
     localconf["clibraries"].append("tatlas")
-elif not(conf.env["staticlink"]) and conf.env["atlaslink"] == "single" :
+elif conf.env["atlaslink"] == "single" :
     localconf["clibraries"].append("satlas")
+    
+if not("javac" in COMMAND_LINE_TARGETS) :
+    localconf["cpplibraries"].extend([
+                            "boost_program_options", "boost_filesystem"
+    ])
+    localconf["cppheaders"].extend([
+                            "cstdlib",
+                            os.path.join("boost", "program_options", "parsers.hpp"),
+                            os.path.join("boost", "program_options", "variables_map.hpp"),
+                            os.path.join("boost", "filesystem.hpp"),
+                            os.path.join("boost", "program_options", "options_description.hpp")
+    ])
+# ==========================================================================
 
 
-if conf.env["withsources"] :
-    conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_SOURCES -D MACHINELEARNING_SOURCES_TWITTER")
-    localconf["clibraries"].append("xml2")
-    localconf["cpplibraries"].append("json")
-    localconf["cheaders"].extend(["libxml/parser.h", "libxml/tree.h", "libxml/xpath.h", "libxml/xpathInternals.h"]);
-    localconf["cppheaders"].extend(["locale", "json/json.h", "boost/asio.hpp", "boost/xpressive/xpressive.hpp", "boost/date_time/time_facet.hpp", "boost/date_time/gregorian/gregorian.hpp", "boost/date_time/local_time/local_time.hpp"] )
 
-
+# === build configuration ==================================================
 if conf.env["withrandomdevice"] :
-    conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_RANDOMDEVICE")
-    localconf["cpplibraries"].append("boost_random")
-    localconf["cppheaders"].append("boost/nondet_random.hpp")
-
+    conf.env.AppendUnique(CPPDEFINES  = ["MACHINELEARNING_RANDOMDEVICE"])
+    localconf["cpplibraries"].append(
+                            "boost_random"
+    )
+    localconf["cppheaders"].append(
+                            os.path.join("boost", "nondet_random.hpp")
+    )
+    
     
 if conf.env["withmpi"] :
-    conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_MPI")
-    localconf["cpplibraries"].extend([ "boost_mpi", "boost_serialization" ])
-    localconf["cppheaders"].append("boost/mpi.hpp")
     conf.env.Replace(CXX = "mpic++")
-
+    conf.env.AppendUnique(CPPDEFINES  = ["MACHINELEARNING_MPI"])
+    localconf["cpplibraries"].extend([
+                            "boost_mpi",
+                            "boost_serialization"
+    ])
+    localconf["cppheaders"].append(
+                            os.path.join("boost", "mpi.hpp")
+    )
     
+
 if conf.env["withmultilanguage"] :
-    conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_MULTILANGUAGE")
-    localconf["clibraries"].append("intl")
-    localconf["cheaders"].append("libintl.h")
+    conf.env.AppendUnique(CPPDEFINES  = ["MACHINELEARNING_MULTILANGUAGE"])
+    localconf["clibraries"].append(
+                            "intl"
+    )
+    localconf["cheaders"].append(
+                            "libintl.h"
+    )
 
     
 if conf.env["withfiles"] :
-    conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_FILES -D MACHINELEARNING_FILES_HDF")
-    localconf["cppheaders"].append("H5Cpp.h")
-    localconf["clibraries"].extend(["hdf5", "hdf5_hl"])
-    localconf["cpplibraries"].append("hdf5_cpp")
+    conf.env.AppendUnique(CPPDEFINES  = ["MACHINELEARNING_FILES", "MACHINELEARNING_FILES_HDF"])
+    localconf["cppheaders"].append(
+                            "H5Cpp.h"
+    )
+    localconf["clibraries"].extend([
+                            "hdf5",
+                            "hdf5_hl"
+    ])
+    localconf["cpplibraries"].append(
+                            "hdf5_cpp"
+    )
     
 
 if conf.env["withsymbolicmath"] :
-    conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_SYMBOLICMATH")
-    localconf["cppheaders"].extend(["boost/multi_array.hpp", "boost/variant.hpp", "ginac/ginac.h"])
-    localconf["cpplibraries"].append("ginac")
+    conf.env.AppendUnique(CPPDEFINES  = ["MACHINELEARNING_SYMBOLICMATH"])
+    localconf["cppheaders"].extend([
+                            os.path.join("boost", "multi_array.hpp"),
+                            os.path.join("boost", "variant.hpp"),
+                            os.path.join("ginac", "ginac.h")
+    ])
+    localconf["cpplibraries"].append(
+                            "ginac"
+    )
 
 
 if conf.env["withlogger"] :
-    conf.env.Append(CXXFLAGS = "-D MACHINELEARNING_LOGGER")
-    localconf["cpplibraries"].append("boost_thread")
-    
+    conf.env.AppendUnique(CPPDEFINES  = ["MACHINELEARNING_LOGGER"])
+    localconf["cpplibraries"].append(
+                            "boost_thread"
+    )    
+
+
+if conf.env["withsources"] :
+    conf.env.AppendUnique(CPPDEFINES  = ["MACHINELEARNING_SOURCES", "MACHINELEARNING_SOURCES_TWITTER"])
+    localconf["clibraries"].append("xml2")
+    localconf["cpplibraries"].append("json")
+    localconf["cheaders"].extend([
+                            os.path.join("libxml", "parser.h"),
+                            os.path.join("libxml", "tree.h"),
+                            os.path.join("libxml", "xpath.h"),
+                            os.path.join("libxml", "xpathInternals.h")
+    ])
+    localconf["cppheaders"].extend([
+                            "locale",
+                            os.path.join("json", "json.h"),
+                            os.path.join("boost", "asio.hpp"),
+                            os.path.join("boost", "xpressive", "xpressive.hpp"),
+                            os.path.join("boost", "date_time", "time_facet.hpp"),
+                            os.path.join("boost", "date_time", "gregorian", "gregorian.hpp"),
+                            os.path.join("boost", "date_time", "local_time", "local_time.hpp")
+    ])
+# ==========================================================================
 
 #help.checkConfiguratin( conf, localconf )
