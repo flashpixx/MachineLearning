@@ -197,6 +197,11 @@ if not("javac" in COMMAND_LINE_TARGETS) :
                             os.path.join("boost", "filesystem.hpp"),
                             os.path.join("boost", "program_options", "options_description.hpp")
     ])
+    
+if "librarybuild" in COMMAND_LINE_TARGETS :
+    checkExecutables(conf, [ "g++", "gcc", "gfortran", "tar", "make" ])
+elif "documentation" in COMMAND_LINE_TARGETS :
+    checkExecutables(conf, "doxygen")
 # ==========================================================================
 
 

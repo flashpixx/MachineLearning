@@ -307,7 +307,7 @@ def Atlas_BuildInstall(env, atlasdir, lapacktargz) :
         cmd += " -b 64"
     cmd += " --with-netlib-lapack-tarfile=../" + str(lapacktargz).replace("['", "").replace("']", "") + " --prefix=" + os.path.join(workingpath, "build_"+env["buildtype"], "atlas", version) + "; make; make install"
     
-    return env.Command("buildatlas-"+version, [atlasdir, lapacktargz], cmd)
+    return env.Command("buildatlas-"+version, [atlasdir, lapacktargz, builddir], cmd)
 
 
 def HDF5_BuildInstall(env, hdfdir) :
