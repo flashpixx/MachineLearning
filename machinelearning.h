@@ -908,6 +908,7 @@
 /** main namespace of the framework
  * $LastChangedDate$
  * @todo split class declaration and implementation in different files for solving guard dependcy problems
+ * @todo define testcases http://www.boost.org/doc/libs/1_51_0/libs/test/doc/html/index.html
  * @todo adding LUA ( http://en.wikipedia.org/wiki/Lua_(programming_language) ) support for dynamic programming ( http://en.wikipedia.org/wiki/Dynamic_programming )
  * @todo adding Twiddle Algorithm ( http://www.youtube.com/watch?v=2uQ2BSzDvXs )
  * @todo adding SFDP support (placment for lage graph data) http://www2.research.att.com/~yifanhu/SOFTWARE/SFDP/index.html / http://www2.research.att.com/~yifanhu/PUB/graph_draw_small.pdf
