@@ -916,11 +916,13 @@
  * @todo adding http://en.wikipedia.org/wiki/Ford–Fulkerson_algorithm / http://en.wikipedia.org/wiki/Edmonds–Karp_algorithm / http://en.wikipedia.org/wiki/Dinic%27s_algorithm
  * @todo adding PAPI support http://icl.cs.utk.edu/papi/
  * @todo adding Cuda support http://thrust.github.com/
+ * @todo adding LSH for distance calculation ( http://en.wikipedia.org/wiki/Locality-sensitive_hashing )
  * @todo adding optimization algorithmus http://en.wikipedia.org/wiki/Levenberg–Marquardt_algorithm
  * @todo thinking about http://en.wikipedia.org/wiki/Conceptual_graph
  * @todo adding minimum spanning tree clustering http://zachjorgensen.com/ictai06.pdf
  * @todo adding stemming support ( http://en.wikipedia.org/wiki/Stemming )
  * @todo thinking about a SSE support in the framework http://en.wikipedia.org/wiki/SSE3
+ * @todo adding SVM components ( http://www.csie.ntu.edu.tw/~cjlin/libsvm/ )
  * @todo adding GTML with http://en.wikipedia.org/wiki/Expectation–maximization_algorithm
  * @todo adding http://en.wikipedia.org/wiki/Apriori_algorithm
  * @todo adding http://en.wikipedia.org/wiki/Hierarchical_clustering
