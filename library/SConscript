@@ -360,6 +360,9 @@ lstdownload = []
 # build target list
 if ("librarybuild" in COMMAND_LINE_TARGETS) or ("librarydownload" in COMMAND_LINE_TARGETS) :
 
+    if " " in workingpath :
+        raise RuntimeError("there are spaces within the path, use a path without spaces")
+
     # download Atlas & LaPack, extract & install
     if not("atlas" in skiplist) :
         lapacktargz = env.ParseAndDownload( LaPack_DownloadURL )
