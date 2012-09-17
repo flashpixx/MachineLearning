@@ -185,7 +185,7 @@ namespace machinelearning { namespace tools { namespace files {
     inline void hdf::remove( const std::string& p_path ) const
     {
         if (!isAbsolutePath(p_path))
-            throw exception::runtime(_("path is not an absolute path"), *this);
+            throw std::runtime_error("path is not an absolute path");
         
         m_file.unlink( p_path );
     }
@@ -201,7 +201,7 @@ namespace machinelearning { namespace tools { namespace files {
     inline bool hdf::pathexists( const std::string& p_path, const bool& p_checkend ) const
     {
         if (!isAbsolutePath(p_path))
-            throw exception::runtime(_("path is not an absolute path"), *this);
+            throw std::runtime_error("path is not an absolute path");
         
         return H5LTpath_valid(m_file.getId(), p_path.c_str(), p_checkend);
     }
@@ -215,16 +215,16 @@ namespace machinelearning { namespace tools { namespace files {
     template<typename T> inline ublas::matrix<T> hdf::readBlasMatrix( const std::string& p_path, const H5::PredType& p_datatype ) const
     {
         if (!isAbsolutePath(p_path))
-            throw exception::runtime(_("path is not an absolute path"), *this);
+            throw std::runtime_error("path is not an absolute path");
         
         H5::DataSet   l_dataset   = m_file.openDataSet( p_path.c_str() );
         H5::DataSpace l_dataspace = l_dataset.getSpace();
         
         // check datasetdimension
         if (l_dataspace.getSimpleExtentNdims() != 2)
-            throw exception::runtime(_("dataset must be two-dimensional"), *this);
+            throw std::runtime_error("dataset must be two-dimensional");
         if (!l_dataspace.isSimple())
-            throw exception::runtime(_("dataset must be a simple datatype"), *this);
+            throw std::runtime_error("dataset must be a simple datatype");
         
         // read matrix size and create matrix
         // (first element is column size, second row size)
@@ -232,7 +232,7 @@ namespace machinelearning { namespace tools { namespace files {
         l_dataspace.getSimpleExtentDims( l_size );
         
         if ((l_size[1]==0) || (l_size[0]==0))
-            throw exception::runtime(_("dimension need not be zero"), *this);
+            throw std::runtime_error("dimension need not be zero");
         
         // read data (read column oriantated, because data order is changed)
         ublas::matrix<T, ublas::column_major> l_mat(l_size[1],l_size[0]);
@@ -253,23 +253,23 @@ namespace machinelearning { namespace tools { namespace files {
     template<typename T> inline ublas::vector<T> hdf::readBlasVector( const std::string& p_path, const H5::PredType& p_datatype ) const
     {
         if (!isAbsolutePath(p_path))
-            throw exception::runtime(_("path is not an absolute path"), *this);
+            throw std::runtime_error("path is not an absolute path");
         
         H5::DataSet   l_dataset   = m_file.openDataSet( p_path.c_str() );
         H5::DataSpace l_dataspace = l_dataset.getSpace();
         
         // check datasetdimension
         if (l_dataspace.getSimpleExtentNdims() != 1)
-            throw exception::runtime(_("dataset must be one-dimensional"), *this);
+            throw std::runtime_error("dataset must be one-dimensional");
         if (!l_dataspace.isSimple())
-            throw exception::runtime(_("dataset must be a simple datatype"), *this);
+            throw std::runtime_error("dataset must be a simple datatype");
         
         // read vector size and create vector
         hsize_t l_size[1];
         l_dataspace.getSimpleExtentDims( l_size );
         
         if (l_size[0]==0)
-            throw exception::runtime(_("dimension need not be zero"), *this);
+            throw std::runtime_error("dimension need not be zero");
         
         // create temp structur for reading data
         ublas::vector<T> l_vec(l_size[0]);
@@ -289,22 +289,22 @@ namespace machinelearning { namespace tools { namespace files {
     template<typename T> inline T hdf::readValue( const std::string& p_path, const H5::PredType& p_datatype ) const
     {
         if (!isAbsolutePath(p_path))
-            throw exception::runtime(_("path is not an absolute path"), *this);
+            throw std::runtime_error("path is not an absolute path");
         
         H5::DataSet   l_dataset   = m_file.openDataSet( p_path.c_str() );
         H5::DataSpace l_dataspace = l_dataset.getSpace();
         
         // check datasetdimension
         if (l_dataspace.getSimpleExtentNdims() != 1)
-            throw exception::runtime(_("dataset must be one-dimensional"), *this);
+            throw std::runtime_error("dataset must be one-dimensional");
         if (!l_dataspace.isSimple())
-            throw exception::runtime(_("dataset must be a simple datatype"), *this);
+            throw std::runtime_error("dataset must be a simple datatype");
         
         // read dataset size
         hsize_t l_size[1];
         l_dataspace.getSimpleExtentDims( l_size );
         if (l_size[0] != 1)
-            throw exception::runtime(_("element is not a single value"), *this);
+            throw std::runtime_error("element is not a single value");
         
         // create temp structur for reading data
         T l_value;
@@ -324,19 +324,19 @@ namespace machinelearning { namespace tools { namespace files {
     inline std::vector<std::string> hdf::readStringVector( const std::string& p_path ) const
     {
         if (!isAbsolutePath(p_path))
-            throw exception::runtime(_("path is not an absolute path"), *this);
+            throw std::runtime_error("path is not an absolute path");
         
         H5::DataSet   l_dataset   = m_file.openDataSet( p_path.c_str() );
         H5::DataSpace l_dataspace = l_dataset.getSpace();
         
         // check datasetdimension
         if (l_dataspace.getSimpleExtentNdims() != 1)
-            throw exception::runtime(_("dataset must be one-dimensional"), *this);
+            throw std::runtime_error("dataset must be one-dimensional");
         if (!l_dataspace.isSimple())
-            throw exception::runtime(_("dataset must be a simple datatype"), *this);
-          
+            throw std::runtime_error("dataset must be a simple datatype");
+        
         // the storage size is the whole string array data
-        char l_data[l_dataset.getStorageSize()];
+        char* l_data = new char[l_dataset.getStorageSize()];
         
         // create a string type of dataset for getting string length of each vector element
         H5::StrType l_str(l_dataset);
@@ -344,20 +344,24 @@ namespace machinelearning { namespace tools { namespace files {
         
         // check correct size for avoid wrong memcopy
         if (l_dataset.getStorageSize() % l_str.getSize() != 0)
-            throw exception::runtime(_("block size can not seperated by the string length"), *this);
+        {
+            delete[] l_data;
+            throw std::runtime_error("block size can not seperated by the string length");
+        }
         
         // each element has max l_str.getSize() chars (with \0), so the array will be cut on
         // each l_str.getSize()-th element ( l_dataset.getStorageSize() = l_str.getSize * number of elements)
         std::vector<std::string> l_vec;
+        char* l_cut = new char[l_str.getSize()];
         for(std::size_t i=0; i < l_dataset.getStorageSize(); i += l_str.getSize()) {
-            char l_cut[l_str.getSize()];
             memcpy( l_cut, &l_data[i], l_str.getSize() * sizeof(char) );
-            
-            l_vec.push_back( l_cut );
+            l_vec.push_back( std::string(l_cut) );
         }
-
+        delete[] l_cut;
+        
         l_dataspace.close();
         l_dataset.close();
+        delete[] l_data;
         
         return l_vec;
     }
@@ -370,25 +374,28 @@ namespace machinelearning { namespace tools { namespace files {
     inline std::string hdf::readString( const std::string& p_path ) const
     {
         if (!isAbsolutePath(p_path))
-            throw exception::runtime(_("path is not an absolute path"), *this);
+            throw std::runtime_error("path is not an absolute path");
         
         H5::DataSet   l_dataset   = m_file.openDataSet( p_path.c_str() );
         H5::DataSpace l_dataspace = l_dataset.getSpace();
         
         // check datasetdimension
         if (l_dataspace.getSimpleExtentNdims() != 1)
-            throw exception::runtime(_("dataset must be one-dimensional"), *this);
+            throw std::runtime_error("dataset must be one-dimensional");
         if (!l_dataspace.isSimple())
-            throw exception::runtime(_("dataset must be a simple datatype"), *this);       
+            throw std::runtime_error("dataset must be a simple datatype");       
         
         // read size of chars and create dataspace
-        char l_chars[l_dataset.getStorageSize()];
-        l_dataset.read(l_chars, H5::StrType(l_dataset) );
+        char* l_chars = new char[l_dataset.getStorageSize()];
         
+        l_dataset.read(l_chars, H5::StrType(l_dataset) );
+        const std::string l_ret(l_chars);
+        
+        delete[] l_chars;
         l_dataspace.close();
         l_dataset.close();
         
-        return std::string(l_chars);
+        return l_ret;
     }
     
     
@@ -400,16 +407,16 @@ namespace machinelearning { namespace tools { namespace files {
     inline void hdf::writeString( const std::string& p_path, const std::string& p_value ) const
     {
         if (p_value.empty())
-            throw exception::runtime(_("can not write empty data"), *this);
+            throw std::runtime_error("can not write empty data");
         
         if (!isAbsolutePath(p_path))
-            throw exception::runtime(_("path is not an absolute path"), *this);
+            throw std::runtime_error("path is not an absolute path");
         
         H5::DataSpace l_dataspace;
         H5::DataSet l_dataset;
         H5::StrType l_str;
         std::vector<H5::Group> l_groups;
-
+        
         // create string space and write the data
         createStringSpace(p_path, ublas::vector<std::size_t>(1,1), p_value.size(), l_dataspace, l_dataset, l_str, l_groups);
         l_dataset.write( p_value.c_str(), l_str, l_dataspace  );
@@ -417,7 +424,7 @@ namespace machinelearning { namespace tools { namespace files {
         closeSpace(l_groups, l_dataset, l_dataspace);
     }
     
-
+    
     /** writes a string vector to hdf
      * @param p_path path to dataset
      * @param p_value string vector
@@ -425,11 +432,11 @@ namespace machinelearning { namespace tools { namespace files {
     inline void hdf::writeStringVector( const std::string& p_path, const std::vector<std::string>& p_value ) const
     {
         if (p_value.size() == 0)
-            throw exception::runtime(_("can not write empty data"), *this);
+            throw std::runtime_error("can not write empty data");
         
         if (!isAbsolutePath(p_path))
-            throw exception::runtime(_("path is not an absolute path"), *this);
-            
+            throw std::runtime_error("path is not an absolute path");
+        
         H5::DataSpace l_dataspace;
         H5::DataSet l_dataset;
         H5::StrType l_str;
@@ -439,24 +446,24 @@ namespace machinelearning { namespace tools { namespace files {
         std::size_t l_maxstrlen = 0;
         for(std::size_t i=0; i < p_value.size(); ++i)
             l_maxstrlen  = std::max( l_maxstrlen, p_value[i].size() );
-
+        
         if (l_maxstrlen == 0)
-            throw exception::runtime(_("can not write empty data"), *this);
-
+            throw std::runtime_error("can not write empty data");
+        
 		// at second, we create the block size for the full vector
 		const std::size_t l_blocksize = (l_maxstrlen+1)*p_value.size();
-
-
+        
+        
         // create char array for the string data, each vector element ist seperated with \0, so we fill the block with 0
         char* l_data = new char[l_blocksize];
 		memset(l_data, 0, l_blocksize );
-
+        
         std::size_t l_offset = 0;
         for(std::size_t i=0; i < p_value.size(); ++i) {
             memcpy( l_data+l_offset, p_value[i].c_str(), p_value[i].size() * sizeof(char) );
             l_offset += (l_maxstrlen+1) * sizeof(char);
         }
-       
+        
         // create string vector data and write it
         try {
             createStringSpace(p_path, ublas::vector<std::size_t>(1, p_value.size()), l_maxstrlen, l_dataspace, l_dataset, l_str, l_groups);
@@ -465,7 +472,7 @@ namespace machinelearning { namespace tools { namespace files {
             delete[] l_data;
             throw;
         }
-            
+        
 		delete[] l_data;
         closeSpace(l_groups, l_dataset, l_dataspace);
     }
@@ -480,10 +487,10 @@ namespace machinelearning { namespace tools { namespace files {
     template<typename T> inline void hdf::writeBlasMatrix( const std::string& p_path, const ublas::matrix<T>& p_dataset, const H5::PredType& p_datatype ) const
     {        
         if ((p_dataset.size1() == 0) || (p_dataset.size2() == 0))
-            throw exception::runtime(_("can not write empty data"), *this);
+            throw std::runtime_error("can not write empty data");
         
         if (!isAbsolutePath(p_path))
-            throw exception::runtime(_("path is not an absolute path"), *this);
+            throw std::runtime_error("path is not an absolute path");
         
         H5::DataSet l_dataset;
         H5::DataSpace l_dataspace;
@@ -508,10 +515,10 @@ namespace machinelearning { namespace tools { namespace files {
     template<typename T> inline void hdf::writeBlasVector( const std::string& p_path, const ublas::vector<T>& p_dataset, const H5::PredType& p_datatype ) const
     {     
         if (p_dataset.size() == 0)
-            throw exception::runtime(_("can not write empty data"), *this);
+            throw std::runtime_error("can not write empty data");
         
         if (!isAbsolutePath(p_path))
-            throw exception::runtime(_("path is not an absolute path"), *this);
+            throw std::runtime_error("path is not an absolute path");
         
         H5::DataSet l_dataset;
         H5::DataSpace l_dataspace;
@@ -531,7 +538,7 @@ namespace machinelearning { namespace tools { namespace files {
     template<typename T> inline void hdf::writeValue( const std::string& p_path, const T& p_dataset, const H5::PredType& p_datatype ) const
     {        
         if (!isAbsolutePath(p_path))
-            throw exception::runtime(_("path is not an absolute path"), *this);
+            throw std::runtime_error("path is not an absolute path");
         
         H5::DataSet l_dataset;
         H5::DataSpace l_dataspace;
@@ -572,18 +579,19 @@ namespace machinelearning { namespace tools { namespace files {
     inline void hdf::createDataSpace( const std::string& p_path, const H5::PredType& p_datatype, const ublas::vector<std::size_t>& p_dim, H5::DataSpace& p_dataspace, H5::DataSet& p_dataset, std::vector<H5::Group>& p_groups ) const
     {
         if (p_dim.size() == 0)
-            throw exception::runtime(_("it is at least one dimension requires"), *this);
+            throw std::runtime_error("it is at least one dimension requires");
         
-        hsize_t l_size[p_dim.size()];
+        hsize_t* l_size = new hsize_t[p_dim.size()];
         for(std::size_t i=0; i < p_dim.size(); ++i)
             l_size[i] = p_dim(i);
         
         p_dataspace              = H5::DataSpace( p_dim.size(), l_size );
         p_groups                 = std::vector<H5::Group>();
         const std::string l_path = createPath( p_path, p_groups );
+        delete[] l_size;
         
         if (l_path.empty())
-            throw exception::runtime(_("empty path is forbidden"), *this);
+            throw std::runtime_error("empty path is forbidden");
         
         if (p_groups.size() == 0)
             p_dataset = m_file.createDataSet( l_path.c_str(), p_datatype, p_dataspace );
@@ -604,18 +612,19 @@ namespace machinelearning { namespace tools { namespace files {
     inline void hdf::createStringSpace( const std::string& p_path, const ublas::vector<std::size_t>& p_dim, const std::size_t& p_strlen, H5::DataSpace& p_dataspace, H5::DataSet& p_dataset, H5::StrType& p_str, std::vector<H5::Group>& p_groups ) const
     {
         if (p_dim.size() == 0)
-            throw exception::runtime(_("it is at least one dimension requires"), *this);
+            throw std::runtime_error("it is at least one dimension requires");
         
-        hsize_t l_size[p_dim.size()];
+        hsize_t* l_size = new hsize_t[p_dim.size()];
         for(std::size_t i=0; i < p_dim.size(); ++i)
             l_size[i] = p_dim(i);
         
         p_dataspace              = H5::DataSpace( p_dim.size(), l_size );
         p_groups                 = std::vector<H5::Group>();
         const std::string l_path = createPath( p_path, p_groups );
+        delete[] l_size;
         
         if (l_path.empty())
-            throw exception::runtime(_("empty path is forbidden"), *this);
+            throw std::runtime_error("empty path is forbidden");
         
         p_str     = H5::StrType(0, p_strlen+1);
         if (p_groups.size() == 0)
@@ -644,7 +653,7 @@ namespace machinelearning { namespace tools { namespace files {
         
         // path must have more than zero elements
         if (l_path.size() == 0)
-            throw exception::runtime(_("empty path is forbidden"), *this);
+            throw std::runtime_error("empty path is forbidden");
         
         // if only one element then create dataset directly
         if (l_path.size() == 1)
@@ -672,7 +681,7 @@ namespace machinelearning { namespace tools { namespace files {
             return *l_path.end();
         }
         
-        throw exception::runtime(_("can not create path structure"), *this);
+        throw std::runtime_error("can not create path structure");
     }
     
     
@@ -687,6 +696,7 @@ namespace machinelearning { namespace tools { namespace files {
         
         return p_path[0] == '/';
     }
+    
     
     
 }}}
