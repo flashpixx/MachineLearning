@@ -345,7 +345,7 @@ def FinishMessage(target, source, env) :
     if alias == "librarydownload" :
         print "\n==> library sources have been downloaded, run for building the target [librarybuild]\n"
     if alias == "librarybuild" :
-        print "\n==> libraries have been built and stored under ["+os.path.join("library", env["buildtype"])+"]\n"
+        print "\n==> libraries have been built and stored under ["+os.path.join("library", "build_"+env["buildtype"])+"]\n"
     
     
 
