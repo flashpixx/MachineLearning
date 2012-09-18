@@ -59,6 +59,7 @@ namespace machinelearning { namespace tools {
      * @todo add matrix exponential via Pade approximation (shown in Matlab with expmdemo)
      * @todo portage this class to the Intel Math Kernel Library http://software.intel.com/en-us/articles/intel-mkl/
      * @todo adding support for PETSc http://www.mcs.anl.gov/petsc/
+     * @todo adding support for http://en.wikipedia.org/wiki/List_of_numerical_libraries
      **/
     class lapack
     {
