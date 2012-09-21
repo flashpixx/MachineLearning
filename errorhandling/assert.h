@@ -53,7 +53,7 @@
                     machinelearning::tools::logger::getInstance()->write( machinelearning::tools::logger::assert, l_msg.str() ); \
                 } \
                 std::cerr << "Machinlearning Assertion failed: " << p_message << ", " << __FILE__ << ", line " << __LINE__ << std::endl; \
-                exit(-1); \
+                exit(EXIT_FAILURE); \
             }
 
     #else
@@ -61,7 +61,7 @@
         #define MACHINELEARNING_ASSERT( p_expression, p_message ) \
             { \
                 std::cerr << "Machinlearning Assertion failed: " << p_message << ", " << __FILE__ << ", line " << __LINE__ << std::endl; \
-                exit(-1); \
+                exit(EXIT_FAILURE); \
             }
 
     #endif
