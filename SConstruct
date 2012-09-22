@@ -65,11 +65,11 @@ def checkCPPEnv(conf, localconf) :
         sys.exit(1)
         
     # check data (header & libraries)
-    for i in localconf["cheader"] :
+    for i in localconf["cheaders"] :
         if not conf.CheckCHeader(i) :
             sys.exit(1)
             
-    for i in localconf["cppheader"] :
+    for i in localconf["cppheaders"] :
         if not conf.CheckCXXHeader(i) :
             sys.exit(1)
 

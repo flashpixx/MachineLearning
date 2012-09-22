@@ -25,6 +25,6 @@ Import("*")
 buildlist = []
 
 if env["withfiles"] :
-    buildlist.append( env.Program( target=os.path.join("#build", "ncd"), source=defaultcpp + ["ncd.cpp"] ) )
+    buildlist.append( env.Program( target=os.path.join("#build", "distance", "ncd"), source=defaultcpp + ["ncd.cpp"] ) )
     
 env.Alias( "distance", buildlist )

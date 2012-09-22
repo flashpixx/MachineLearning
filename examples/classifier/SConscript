@@ -25,6 +25,6 @@ Import("*")
 buildlist = []
 
 if env["withfiles"] :
-    buildlist.append( env.Program( target=os.path.join("#build", "lazy"), source=defaultcpp + ["lazy.cpp"] ) )
+    buildlist.append( env.Program( target=os.path.join("#build", "classifier", "lazy"), source=defaultcpp + ["lazy.cpp"] ) )
     
 env.Alias( "classifier", buildlist )
