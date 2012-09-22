@@ -22,7 +22,7 @@
 import os
 Import("*")
 
-
+"""
 # POInit http://www.scons.org/doc/2.2.0/HTML/scons-user/a8580.html
 
 sources = []
@@ -58,3 +58,4 @@ for i in po :
 
 env.Alias("updatelanguage", updatetargets)
 env.Alias("createlanguage", createtargets)
+"""

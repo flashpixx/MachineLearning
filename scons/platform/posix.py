@@ -47,7 +47,13 @@ elif "LIBRARY_PATH" in os.environ :
     conf.env.Append(LIBPATH = os.environ["LIBRARY_PATH"].split(os.pathsep)) 
     print("Appending custom posix library path (LIBRARY_PATH)")
 
+if "TERM" in os.environ :
+    conf.env["ENV"]["TERM"] = os.environ["TERM"]
+    print("Using term environment variable (TERM)")
 
+if "HOME" in os.environ :
+    conf.env["ENV"]["HOME"] = os.environ["HOME"]
+    print("Using home environment variable (HOME)")
 
 
 

@@ -43,7 +43,7 @@ def createVariables(vars) :
     
     vars.Add(EnumVariable("buildtype", "value of the buildtype", "release", allowed_values=("debug", "release")))
     vars.Add(BoolVariable("uselocallibrary", "use the library in the local directory only", False))
-    vars.Add(ListVariable("skiplibrary", "skipping library builds / downloads", "", ["atlas", "boost", "hdf", "ginac", "json", "xml"]))
+    vars.Add(ListVariable("skiplibrary", "skipping library builds / downloads", ["xml"], ["atlas", "boost", "hdf", "ginac", "json", "xml"]))
     vars.Add(BoolVariable("zipsupport", "build Bzip2 and ZLib support for Boost", (platform.system().lower()=="cygwin")))
     vars.Add(EnumVariable("atlaslink", "type of the ATLAS link file", "multi", allowed_values=("single", "multi")))
     vars.Add(EnumVariable("atlaspointerwidth", "pointer width for compiling ATLAS (empty = system default, 32 = 32 Bit, 64 = 64 Bit)", "", allowed_values=("", "32", "64")))
@@ -85,9 +85,6 @@ def checkCPPEnv(conf, localconf) :
     lxPath = conf.env.FindFile("color-"+conf.env["CXX"], conf.env["ENV"]["PATH"])
     if lxPath <> None :
         conf.env.Replace(CXX = "color-"+conf.env["CXX"])
-    lxPath = conf.env.FindFile("color-"+conf.env["CC"], conf.env["ENV"]["PATH"])
-    if lxPath <> None :
-        conf.env.Replace(CC = "color-"+conf.env["CC"])
 
     
 def checkExecutables(conf, commands) :
@@ -116,14 +113,6 @@ def setupToolkitEnv(env) :
         laPathList.extend(os.environ["PATH"].split(os.pathsep))
         env["ENV"]["PATH"] = laPathList
         print("Appending custom path (PATH)")
-
-    if "TERM" in os.environ :
-        env["ENV"]["TERM"] = os.environ["TERM"]
-        print("Using term environment variable (TERM)")
-
-    if "HOME" in os.environ :
-        env["ENV"]["HOME"] = os.environ["HOME"]
-        print("Using home environment variable (HOME)")
 
 
 
@@ -240,13 +229,13 @@ env = conf.Finish()
 defaultcpp = [os.path.join(os.path.abspath(os.curdir), "machinelearning.cpp")]
 
 # setup all different sub build script
-env.SConscript( os.path.join("tools", "language", "SConscript"), exports="env defaultcpp help" )
-env.SConscript( os.path.join("documentation", "SConscript"), exports="env defaultcpp help" )
-env.SConscript( os.path.join("library", "SConscript"), exports="env defaultcpp help" )
+env.SConscript( os.path.join("tools", "language", "SConscript"), exports="env defaultcpp" )
+env.SConscript( os.path.join("documentation", "SConscript"), exports="env defaultcpp" )
+env.SConscript( os.path.join("library", "SConscript"), exports="env defaultcpp" )
 
-env.SConscript( os.path.join("swig", "target", "java", "SConscript"), exports="env defaultcpp help" )
-#env.SConscript( os.path.join("swig", "target", "python", "SConscript"), exports="env defaultcpp help" )
-#env.SConscript( os.path.join("swig", "target", "php", "SConscript"), exports="env defaultcpp help" )
+#env.SConscript( os.path.join("swig", "target", "java", "SConscript"), exports="env defaultcpp" )
+#env.SConscript( os.path.join("swig", "target", "python", "SConscript"), exports="env defaultcpp" )
+#env.SConscript( os.path.join("swig", "target", "php", "SConscript"), exports="env defaultcpp" )
 
 for i in ["geneticalgorithm", "classifier", "clustering", "distance", "other", "reducing", "sources"] :
-    env.SConscript( os.path.join("examples", i, "SConscript"), exports="env defaultcpp help" )
+    env.SConscript( os.path.join("examples", i, "SConscript"), exports="env defaultcpp" )

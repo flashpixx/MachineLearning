@@ -19,6 +19,11 @@
 
 # -*- coding: utf-8 -*-
 
+
+# environmental script for Mac OS X. The libraries must be stored within
+# the global system paths or must be set within the environment variables. The env
+# variables are read here and are added to the environment object
+
 import os
 Import("*")
 
@@ -170,6 +175,14 @@ elif "LD_LIBRARY_PATH" in os.environ :
 elif "LIBRARY_PATH" in os.environ :
     conf.env.Append(LIBPATH = os.environ["LIBRARY_PATH"].split(os.pathsep)) 
     print("Appending custom posix library path (LIBRARY_PATH)")
+    
+if "TERM" in os.environ :
+    conf.env["ENV"]["TERM"] = os.environ["TERM"]
+    print("Using term environment variable (TERM)")
+
+if "HOME" in os.environ :
+    conf.env["ENV"]["HOME"] = os.environ["HOME"]
+    print("Using home environment variable (HOME)")
 
 
 # main configuration
@@ -180,6 +193,9 @@ conf.env.AppendUnique(CPPDEFINES  = ["BOOST_FILESYSTEM_NO_DEPRECATED", "BOOST_NU
 if conf.env["buildtype"] == "release" :
     conf.env.AppendUnique(CPPDEFINES  = ["NDEBUG", "BOOST_UBLAS_NDEBUG", "MACHINELEARNING_NDEBUG"])
     conf.env.AppendUnique(CXXFLAGS    = ["-O2", "-fomit-frame-pointer", "-finline-functions"])
+elif conf.env["buildtype"] == "debug" :
+    conf.env.AppendUnique(LINKFLAGS   = ["-g"])
+    conf.env.AppendUnique(CXXFLAGS    = ["-g"])
     
 if conf.env["atlaslink"] == "multi" :
     localconf["clibraries"].append("tatlas")
@@ -293,4 +309,4 @@ if conf.env["withsources"] :
     ])
 # ==========================================================================
 
-#help.checkConfiguratin( conf, localconf )
+checkCPPEnv(conf, localconf)
