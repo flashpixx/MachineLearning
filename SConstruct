@@ -56,7 +56,7 @@ def createVariables(vars) :
 def checkCPPEnv(conf, localconf) :
     if conf.env.GetOption("clean") :
         return
-    for i in ["documentation", "librarybuild", "librarydownload", "createlanguage", "updatelanguage"] :
+    for i in ["documentation", "librarybuild", "librarydownload", "language"] :
         if i in COMMAND_LINE_TARGETS :
             return
             
@@ -114,6 +114,18 @@ def setupToolkitEnv(env) :
         env["ENV"]["PATH"] = laPathList
         print("Appending custom path (PATH)")
 
+
+def GlobRekursiv(startdir, extensions=[], excludedir=[]) :
+    lst = []
+    if not extensions :
+        return lst
+    for root, dirs, filenames in os.walk(startdir) :
+        if not [i.startswith(".") for i in dirs]  or  any([i in root for i in excludedir]) :
+            continue
+        for filename in filenames :
+            if any([filename.endswith(i) for i in extensions]) :
+                lst.append( os.path.abspath(os.path.join(root, filename)) )
+    return lst
 
 
 #===  builder ============================================================================================================
@@ -205,7 +217,7 @@ showlicence()
 vars = Variables()
 createVariables(vars)
 
-env = Environment( variables=vars, BUILDERS = { "Download" : DownloadBuilder, "Extract" : ExtractBuilder } )
+env = Environment( variables=vars, tools = ["default", "gettext"], BUILDERS = { "Download" : DownloadBuilder, "Extract" : ExtractBuilder } )
 env.VariantDir("build", ".", duplicate=0)
 Help(vars.GenerateHelpText(env))
 setupToolkitEnv(env)
@@ -229,7 +241,7 @@ env = conf.Finish()
 defaultcpp = [os.path.join(os.path.abspath(os.curdir), "machinelearning.cpp")]
 
 # setup all different sub build script
-env.SConscript( os.path.join("tools", "language", "SConscript"), exports="env defaultcpp" )
+env.SConscript( os.path.join("tools", "language", "SConscript"), exports="env defaultcpp GlobRekursiv" )
 env.SConscript( os.path.join("documentation", "SConscript"), exports="env defaultcpp" )
 env.SConscript( os.path.join("library", "SConscript"), exports="env defaultcpp" )
 
