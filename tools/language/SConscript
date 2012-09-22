@@ -22,40 +22,19 @@
 import os
 Import("*")
 
-"""
-# POInit http://www.scons.org/doc/2.2.0/HTML/scons-user/a8580.html
 
-sources = []
-for i in env["CPPSUFFIXES"] :
-    lst = help.getRekusivFiles(os.path.join("..", ".."), i, ["examples", "scons", "install", "build"], True, False)
-    for i in lst :
-        sources.append( os.path.sep.join(i.split(os.path.sep)[2:]) )
+env.AppendUnique(MSGMERGEFLAGS   = ["--no-wrap", "--update"])
+env.AppendUnique(XGETTEXTFLAGS   = ["--keyword=_", "--language=c++", "--no-wrap"])
 
+po = env.Translate(["de"], GlobRekursiv(os.path.join("..", ".."), env["CPPSUFFIXES"], ["swig", "examples", "documentation"]), POAUTOINIT = True) 
+mo = env.MOFiles(po)
 
-# get all strings out of the sources
-updatetargets  = []
-createtargets  = []
-updatetargets.append( env.Command("xgettext", "", "xgettext --output="+os.path.join("tools", "language", "language.po")+" --keyword=_ --language=c++ " + " ".join(sources)) )
-createtargets.extend( updatetargets )
-
-
-# get all language files in the subdirs and add the new texts
-po = help.getRekusivFiles(os.path.join("..", "..", "tools", "language"), ".po") 
-for i in po :
-    updatetargets.append( env.Command("msmerge", "", "msgmerge --no-wrap --update " + os.path.sep.join(i.split(os.path.sep)[2:]) + " "+os.path.join("tools", "language", "language.po") ) )
-    createtargets.append( env.Command("msmerge", "", "msgmerge --no-wrap --update " + os.path.sep.join(i.split(os.path.sep)[2:]) + " "+os.path.join("tools", "language", "language.po") ) )
-
-createtargets.append( env.Command("deletelang", "", [Delete(os.path.join("tools", "language", "language.po"))] ) )
-updatetargets.append( env.Command("deletelang", "", [Delete(os.path.join("tools", "language", "language.po"))] ) )
-
-# compiling all files
-for i in po :
-    updatefile = os.path.join(os.path.dirname(i), "machinelearning.mo")
-    updatefile = os.path.sep.join(updatefile.split(os.path.sep)[2:]) 
-    
-    updatetargets.append( env.Command("msgfmt", "", "msgfmt -v -o " + updatefile +" "+ os.path.sep.join(i.split(os.path.sep)[2:]) ) )
-    
-
-env.Alias("updatelanguage", updatetargets)
-env.Alias("createlanguage", createtargets)
-"""
+env.Clean(
+    env.Alias("language", [
+        env.InstallAs( os.path.join("#build", "language", "de_DE.UTF-8", "LC_MESSAGES", "machinelearning.mo"), "de.mo")
+    ]),
+    [
+        "messages.pot",
+        Glob("*.po~")
+    ]
+)
