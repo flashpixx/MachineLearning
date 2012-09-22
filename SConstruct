@@ -26,8 +26,6 @@ import platform
 import subprocess
 import SCons.Action
 import SCons.Node
-sys.path.append("scons")
-import help
 
 
 
@@ -94,6 +92,7 @@ def checkExecutables(conf, commands) :
     for i in cmd :
         if env.FindFile(i, conf.env["ENV"]["PATH"]) == None :
             raise RuntimeError("build tool ["+i+"] not found")
+
 
 def setupToolkitEnv(env) :
     # check the toolkit option

@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
     #endif
 
     #ifdef MACHINELEARNING_MULTILANGUAGE
-    tools::language::bindings::bind("machinelearning", "language");
+    tools::language::bindings::bind();
     #endif
 
     // default values

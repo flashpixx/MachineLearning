@@ -59,7 +59,7 @@ void output( tools::sources::wikipedia& p_wiki ) {
 int main(int argc, char* argv[])
 {
     #ifdef MACHINELEARNING_MULTILANGUAGE
-    tools::language::bindings::bind("machinelearning", "language");
+    tools::language::bindings::bind();
     #endif
     
     std::string l_lang;

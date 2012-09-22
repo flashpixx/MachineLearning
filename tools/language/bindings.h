@@ -48,7 +48,7 @@ namespace machinelearning { namespace tools { namespace language {
         public :
         
             static std::string getLanguage( void );
-            static void bind( const std::string&, const std::string&, const std::string& = "" );
+            static void bind( const std::string& = "machinelearning", const std::string& = "language", const std::string& = "" );
         
         
     };
@@ -64,8 +64,8 @@ namespace machinelearning { namespace tools { namespace language {
     
     
     /** bind the textdomain for different language
-     * @param p_name name of language file
-     * @param p_path path to language file (eg: ./language files locate under p_path / p_lang / p_name.mo)
+     * @param p_name name of language file (default: machinelearning)
+     * @param p_path path to language file (default: language directory, relative to the executable / eg: language files locate under p_path / p_lang / p_name.mo)
      * @param p_lang language (empty for system value)
      **/
     inline void bindings::bind( const std::string& p_name, const std::string& p_path, const std::string& p_lang )
