@@ -199,6 +199,7 @@ namespace machinelearning { namespace tools {
      * @param p_matrix left side matrix
      * @param p_vec right side vector
      * @param p_solve solved equation
+     * @bug gesv does not work, create compiler error 
     **/
     template<typename T> inline void lapack::solve( const ublas::matrix<T>& p_matrix, const ublas::vector<T>& p_vec, ublas::vector<T>& p_solve )
     {
