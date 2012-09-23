@@ -468,7 +468,7 @@ env = Environment(
         SwigJavaOutDir  = swigjava_outdiraction,
         SwigJavaCppDir  = swigjava_cppdiraction,
         
-        variables=vars, tools = ["default", "gettext"],
+        variables=vars,
         
         BUILDERS = { 
             "LibraryCopy" : LibraryCopyBuilder,
@@ -477,6 +477,7 @@ env = Environment(
             "Extract"     : ExtractBuilder
         }
 )
+env.Tool("gettext")
 env.VariantDir("build", ".", duplicate=0)
 Help(vars.GenerateHelpText(env))
 setupToolkitEnv(env)

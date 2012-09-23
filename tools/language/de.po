@@ -7,14 +7,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Machinelearning Framework 2010-2012\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-22 23:56+0200\n"
-"PO-Revision-Date: 2012-09-22 23:58+0100\n"
+"POT-Creation-Date: 2012-09-24 01:38+0200\n"
+"PO-Revision-Date: 2012-09-24 01:40+0100\n"
 "Last-Translator: Philipp Kraus <philipp.kraus@flashpixx.de>\n"
 "Language-Team: Philipp Kraus <philipp.kraus@flashpixx.de>\n"
+"Language: de_DE\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: de_DE\n"
 "Plural-Forms: nplurals=2; plural=n == 1 ? 0 : 1;\n"
 "X-Generator: Poedit 1.5.3\n"
 "X-Poedit-SourceCharset: UTF-8\n"
@@ -98,7 +98,7 @@ msgstr "Lambda muss größer Null sein"
 #: ../../clustering/nonsupervised/relational_neuralgas.hpp:556
 #: ../../dimensionreduce/nonsupervised/mds.hpp:193
 #: ../../dimensionreduce/nonsupervised/mds.hpp:515 ../lapack.hpp:92
-#: ../lapack.hpp:134 ../lapack.hpp:243 ../lapack.hpp:264 ../lapack.hpp:282
+#: ../lapack.hpp:134 ../lapack.hpp:244 ../lapack.hpp:265 ../lapack.hpp:283
 #: ../matrix.hpp:291
 msgid "matrix must be square"
 msgstr "Matrix muss quadratisch sein"
@@ -220,8 +220,11 @@ msgid "only one variable for the data must be added"
 msgstr "nur eine Variable darf für die Daten hinzugefügt werden"
 
 #: ../../functionoptimization/gradientdescent.hpp:296
-msgid "static variable is not in the symbol table or is an optimazation variable"
-msgstr "statische Variable ist nicht in der Symboltabelle oder ist keine Variablen, die optimiert wird"
+msgid ""
+"static variable is not in the symbol table or is an optimazation variable"
+msgstr ""
+"statische Variable ist nicht in der Symboltabelle oder ist keine Variablen, "
+"die optimiert wird"
 
 #: ../../functionoptimization/gradientdescent.hpp:314
 msgid "stepsize must be greater than zero"
@@ -307,9 +310,13 @@ msgstr "keine Worte in der Map"
 msgid "both matrices have not the same size"
 msgstr "beide Matrizen haben nicht die gleiche Größe"
 
-#: ../lapack.hpp:245
-msgid "number of rows / columns of the matrix must have the same dimension like the initialisation vector"
-msgstr "Anzahl der Zeilen / Spalten der Matrix müssen die selbe Dimension haben, wie der Initialisierungsvektor"
+#: ../lapack.hpp:246
+msgid ""
+"number of rows / columns of the matrix must have the same dimension like the "
+"initialisation vector"
+msgstr ""
+"Anzahl der Zeilen / Spalten der Matrix müssen die selbe Dimension haben, wie "
+"der Initialisierungsvektor"
 
 #: ../random.hpp:150
 msgid "distribution is not kwon"
