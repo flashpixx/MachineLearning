@@ -53,12 +53,8 @@ def createVariables(vars) :
     
 #=== build environment check ===========================================================================================================
 def checkCPPEnv(conf, localconf) :
-    if conf.env.GetOption("clean") :
+    if conf.env.GetOption("clean")  or  any([i in COMMAND_LINE_TARGETS for i in ["documentation", "librarybuild", "librarydownload", "language"]]) :
         return
-    for i in ["documentation", "librarybuild", "librarydownload", "language"] :
-        if i in COMMAND_LINE_TARGETS :
-            return
-            
 
     if not conf.CheckCXX() :
         sys.exit(1)
