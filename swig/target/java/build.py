@@ -23,9 +23,21 @@ import os
 Import("*")
 
 
-buildlist = []
+cpp  = []
 
+# glob all Swig files and call the builder
 for i in GlobRekursiv( os.path.join("..", ".."), [".i"], ["target"]) :
-    buildlist.extend(  env.SwigJava( os.path.join("#build", env["buildtype"], "jar"), i )  ) 
+
+    # split all result files into Java and C++ sources
+    for n in env.SwigJava( os.path.join("#build", env["buildtype"], "jar", "source"), i ) :
+        if os.path.splitext(str(n))[1] <> env["JAVASUFFIX"] :
+            cpp.append(n)
+        
+# call Java & C++ builder
+dll  = env.SharedLibrary( os.path.join("#build", env["buildtype"], "jar", "build", "native", "machinelearning"), defaultcpp + cpp )
+java = env.Java(  os.path.join("#build", env["buildtype"], "jar", "build"), os.path.join("#build", env["buildtype"], "jar", "source", "java")  )
+
+# copy libraries
+Depends(dll, env.LibraryCopy( os.path.join("#build", env["buildtype"], "jar", "build", "native"), [] ))
     
-env.Alias( "java", buildlist )
+env.Alias( "java", env.Jar(os.path.join("#build", env["buildtype"], "machinelearning.jar"), [dll, os.path.join("#build", env["buildtype"], "jar", "build")]) )

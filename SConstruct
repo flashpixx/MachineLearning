@@ -266,8 +266,8 @@ ExtractBuilder = Builder( action = SCons.Action.Action("$EXTRACT_CMD$extractsuff
 # --- Java Swig Builder -----------------------------------------------------
 def swigjava_emitter(target, source, env) :
     # create build dir path
-    jbuilddir = os.path.join(str(target[0]), "javasource")
-    nbuilddir = os.path.join(str(target[0]), "nativesource")
+    jbuilddir = os.path.join(str(target[0]), "java")
+    nbuilddir = os.path.join(str(target[0]), "native")
 
     regex = {
           # remove expression of the interface file (store a list with expressions)
@@ -405,7 +405,7 @@ def swigjava_packageaction(dirname) :
     return ".".join( str(dirname).split(os.path.sep)[1:] )
     
 def swigjava_outdiraction(sourcedir, targets) :
-    path = os.path.join( os.path.commonprefix([str(i) for i in targets]), "javasource", os.path.sep.join(str(sourcedir).split(os.path.sep)[1:]) )
+    path = os.path.join( os.path.commonprefix([str(i) for i in targets]), "java", os.path.sep.join(str(sourcedir).split(os.path.sep)[1:]) )
 
     try :
         os.makedirs(path)
@@ -414,7 +414,7 @@ def swigjava_outdiraction(sourcedir, targets) :
     return path
     
 def swigjava_cppdiraction(source, targets) :
-    path = os.path.join( os.path.commonprefix([str(i) for i in targets]), "nativesource" )
+    path = os.path.join( os.path.commonprefix([str(i) for i in targets]), "native" )
     try :
         os.makedirs(path)
     except :

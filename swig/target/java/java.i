@@ -143,7 +143,7 @@
 // ---------------------------------------------------------------------------------------------------------------------------------------------
 // structure that is included in each cpp file
 %{
-#include "machinelearning/swig/target/java/java.hpp"
+#include "swig/target/java/java.hpp"
 namespace swig  = machinelearning::swig;
 namespace ublas = boost::numeric::ublas;
 %}
