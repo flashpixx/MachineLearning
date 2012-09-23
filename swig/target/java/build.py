@@ -28,6 +28,4 @@ buildlist = []
 for i in GlobRekursiv( os.path.join("..", ".."), [".i"], ["target"]) :
     buildlist.extend(  env.SwigJava( os.path.join("#build", env["buildtype"], "jar"), i )  ) 
     
-print buildlist
-    
 env.Alias( "java", buildlist )

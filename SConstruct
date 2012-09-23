@@ -266,8 +266,8 @@ ExtractBuilder = Builder( action = SCons.Action.Action("$EXTRACT_CMD$extractsuff
 # --- Java Swig Builder -----------------------------------------------------
 def swigjava_emitter(target, source, env) :
     # create build dir path
-    jbuilddir = os.path.join("build", env["buildtype"], "jar", "javasource")
-    nbuilddir = os.path.join("build", env["buildtype"], "jar", "nativesource")
+    jbuilddir = os.path.join(str(target[0]), "javasource")
+    nbuilddir = os.path.join(str(target[0]), "nativesource")
 
     regex = {
           # remove expression of the interface file (store a list with expressions)
@@ -398,28 +398,30 @@ def swigjava_emitter(target, source, env) :
             else :
                 for l in data["template"][n] :
                     target.append( os.path.normpath(os.path.join(jbuilddir, os.sep.join(data["cppnamespace"][n]), l+".java")) )
+                    
     return target, source
     
 def swigjava_packageaction(dirname) :
     return ".".join( str(dirname).split(os.path.sep)[1:] )
     
-def swigjava_outdiraction(dirname, buildtype) :
-    path = os.path.join( "build", buildtype, "jar", "javasource", os.path.sep.join(str(dirname).split(os.path.sep)[1:]) )
+def swigjava_outdiraction(sourcedir, targets) :
+    path = os.path.join( os.path.commonprefix([str(i) for i in targets]), "javasource", os.path.sep.join(str(sourcedir).split(os.path.sep)[1:]) )
+
     try :
         os.makedirs(path)
     except :
         pass
     return path
     
-def swigjava_cppdiraction(filename, buildtype) :
-    path = os.path.join( "build", buildtype, "jar", "nativesource" )
+def swigjava_cppdiraction(source, targets) :
+    path = os.path.join( os.path.commonprefix([str(i) for i in targets]), "nativesource" )
     try :
         os.makedirs(path)
     except :
         pass
-    return os.path.join(path, str(filename)+".cpp")
+    return os.path.join(path, str(source)+".cpp")
     
-SwigJavaBuilder = Builder( action = SCons.Action.Action("swig -Wall -O -templatereduce -c++ -java -package ${SwigJavaPackage(SOURCE.dir)} -outdir ${SwigJavaOutDir(SOURCE.dir, buildtype)} -o ${SwigJavaCppDir(SOURCE.filebase, buildtype)} $SOURCE"), emitter=swigjava_emitter, single_source = True, src_suffix=".i", target_factory=Dir, source_factory=File )
+SwigJavaBuilder = Builder( action = SCons.Action.Action("swig -Wall -O -templatereduce -c++ -java -package ${SwigJavaPackage(SOURCE.dir)} -outdir ${SwigJavaOutDir(SOURCE.dir, TARGETS)} -o ${SwigJavaCppDir(SOURCE.filebase, TARGETS)} $SOURCE"), emitter=swigjava_emitter, single_source = True, src_suffix=".i", target_factory=Entry, source_factory=File )
 # ---------------------------------------------------------------------------
 
 
