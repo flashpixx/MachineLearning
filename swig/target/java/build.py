@@ -40,4 +40,10 @@ java = env.Java(  os.path.join("#build", env["buildtype"], "jar", "build"), os.p
 # copy libraries
 Depends(dll, env.LibraryCopy( os.path.join("#build", env["buildtype"], "jar", "build", "native"), [] ))
     
-env.Alias( "java", env.Jar(os.path.join("#build", env["buildtype"], "machinelearning.jar"), [dll, os.path.join("#build", env["buildtype"], "jar", "build")]) )
+# set Jar flags (we need a own command for the -C option)   
+env["JARCOM"] = "$JAR $_JARFLAGS $TARGET $_JARMANIFEST $_JARCHDIR $_JARSOURCES -C " + os.path.join("build", env["buildtype"], "jar", "build") + " ."
+jar = env.Jar(os.path.join("#build", env["buildtype"], "machinelearning.jar"), [])
+Depends(jar, [dll, java])
+
+# set Alias with Jar build
+env.Alias( "java", jar )

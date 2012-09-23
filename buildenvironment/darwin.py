@@ -185,7 +185,7 @@ if "HOME" in os.environ :
     print("Using home environment variable (HOME)")
 
 # set additional dynamic link libraries which should be copied into the build dir    
-conf.env["NOTCOPYLIBRARY"] = ["stdc++"]
+conf.env["NOTCOPYLIBRARY"] = ["stdc++", "intl"]
 
 # main configuration
 conf.env.AppendUnique(LINKFLAGS   = ["-fopenmp", "-pthread", "--as-needed"])
