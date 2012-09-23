@@ -184,9 +184,7 @@ ExtractBuilder = Builder( action = SCons.Action.Action("$EXTRACT_CMD$extractsuff
 
 
 
-def swigjava_print(s, target, source, env) : 
-    print "=> swig ["+str(source[0])+"] ..."
-    
+   
 def swigjava_emitter(target, source, env) :
     # create build dir path
     jbuilddir = os.path.join("build", "jar", "javasource")
@@ -323,7 +321,17 @@ def swigjava_emitter(target, source, env) :
                     target.append( os.path.normpath(os.path.join(jbuilddir, os.sep.join(data["cppnamespace"][n]), l+".java")) )
     return target, source
     
-SwigJavaBuilder = Builder( action = SCons.Action.Action("swig -Wall -O -templatereduce -c++ -java -package ??? -outdir ??? -o ${SOURCE.filebase}.cpp $SOURCE"), emitter=swigjava_emitter, single_source = True, src_suffix=".i", target_factory=Dir, source_factory=File, PRINT_CMD_LINE_FUNC=swigjava_print )
+def swigjava_packageaction(dirname) :
+    return ".".join( str(dirname).split(os.path.sep)[1:] )
+    
+def swigjava_outdiraction(dirname) :
+    return os.path.join( "build", "jar", "javasource", os.path.sep.join(str(dirname).split(os.path.sep)[1:]) )
+    
+def swigjava_cppdiraction(filename) :
+    return os.path.join( "build", "jar", "nativesource", str(filename)+".cpp" )
+    
+SwigJavaBuilder = Builder( action = SCons.Action.Action("swig -Wall -O -templatereduce -c++ -java -package ${SwigJavaPackage(SOURCE.dir)} -outdir ${SwigJavaOutDir(SOURCE.dir)} -o ${SwigJavaCppDir(SOURCE.filebase)} $SOURCE"), emitter=swigjava_emitter, single_source = False, src_suffix=".i", target_factory=Dir, source_factory=File )
+
 
 #=== licence ===========================================================================================================================
 def showlicence() :
@@ -356,7 +364,19 @@ showlicence()
 vars = Variables()
 createVariables(vars)
 
-env = Environment( variables=vars, tools = ["default", "gettext"], BUILDERS = { "SwigJava" : SwigJavaBuilder, "Download" : DownloadBuilder, "Extract" : ExtractBuilder } )
+env = Environment( 
+        SwigJavaPackage = swigjava_packageaction, 
+        SwigJavaOutDir  = swigjava_outdiraction,
+        SwigJavaCppDir  = swigjava_cppdiraction,
+        
+        variables=vars, tools = ["default", "gettext"],
+        
+        BUILDERS = { 
+            "SwigJava" : SwigJavaBuilder, 
+            "Download" : DownloadBuilder, 
+            "Extract" : ExtractBuilder
+        }
+)
 env.VariantDir("build", ".", duplicate=0)
 Help(vars.GenerateHelpText(env))
 setupToolkitEnv(env)
