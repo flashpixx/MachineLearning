@@ -31,5 +31,8 @@ if env["withfiles"] :
         buildlist.append( env.Program( target=os.path.join("#build", "other", "mds_nntp"), source=defaultcpp+["mds_nntp.cpp"] ) )
         buildlist.append( env.Program( target=os.path.join("#build", "other", "mds_wikipedia"), source=defaultcpp+["mds_wikipedia.cpp"] ) )
         buildlist.append( env.Program( target=os.path.join("#build", "other", "mds_twitter"), source=defaultcpp+["mds_twitter.cpp"] ) )
+        
+if env["uselocallibrary"] or env["copylibrary"] :
+    Depends(buildlist, env.LibraryCopy( os.path.join("#build", env["buildtype"], "other"), [] ))
 
 env.Alias( "other", buildlist )

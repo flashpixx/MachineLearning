@@ -22,6 +22,7 @@
 import os
 import re
 import sys
+import shutil
 import urllib2
 import platform
 import subprocess
@@ -44,6 +45,8 @@ def createVariables(vars) :
     vars.Add(EnumVariable("buildtype", "value of the buildtype", "release", allowed_values=("debug", "release")))
     vars.Add(BoolVariable("uselocallibrary", "use the library in the local directory only", False))
     vars.Add(ListVariable("skiplibrary", "skipping library builds / downloads", "", ["atlas", "boost", "hdf", "ginac", "json", "xml"]))
+    vars.Add(BoolVariable("copylibrary", "copy the dynamic link libraries into the build dir", False))
+    
     vars.Add(BoolVariable("zipsupport", "build Bzip2 and ZLib support for Boost", (platform.system().lower()=="cygwin")))
     vars.Add(EnumVariable("atlaslink", "type of the ATLAS link file", "multi", allowed_values=("single", "multi")))
     vars.Add(EnumVariable("atlaspointerwidth", "pointer width for compiling ATLAS (empty = system default, 32 = 32 Bit, 64 = 64 Bit)", "", allowed_values=("", "32", "64")))
@@ -146,6 +149,60 @@ def GlobRekursiv(startdir, extensions=[], excludedir=[]) :
 
 #===  builder ============================================================================================================
 
+# --- Library Copy Builder --------------------------------------------------
+def librarycopy_print(s, target, source, env): 
+    for j,i in zip(target,source) :
+        print "copy dynamic library ["+str(i)+"] to ["+str(j)+"]..."
+
+def librarycopy_emitter(target, source, env) :
+    listsources = []
+    listtargets = []
+    lst         = []
+
+    lst.extend( env["LIBS"] )
+    if source :
+        if SCons.Util.is_List(source) :
+            lst.extend( source )
+        else : 
+            lst.append( source ) 
+        
+    if "COPYLIBRARY" in env :
+        if SCons.Util.is_List(env["COPYLIBRARY"]) :
+            lst.extend( env["COPYLIBRARY"] )
+        else :
+            lst.append( env["COPYLIBRARY"] )
+    lst = set(lst)
+    
+    
+    removelib = []
+    if "NOTCOPYLIBRARY" in env :
+        if SCons.Util.is_List(env["NOTCOPYLIBRARY"]) :
+            removelib.extend(env["NOTCOPYLIBRARY"])
+        else :
+            removelib.append(env["NOTCOPYLIBRARY"])
+    removelib = set(removelib)
+        
+        
+    for i in lst :
+        if i in removelib :
+            continue
+    
+        name = env["LIBPREFIX"]+str(i)+env["SHLIBSUFFIX"]
+        lib  = env.FindFile(name, env["LIBPATH"])
+        if lib <> None :
+            listsources.append(lib)
+            listtargets.append( os.path.join(str(target[0]), name) )
+    return listtargets, listsources
+    
+def librarycopy_action(target, source, env) :
+    for i,j in zip(source, target) :
+        shutil.copy2( str(i), str(j) )
+    
+LibraryCopyBuilder = Builder( action = SCons.Action.Action("${LIBRARYCOPY}"), emitter = librarycopy_emitter, single_source = False, target_factory=SCons.Node.FS.default_fs.Entry, source_factory=File, PRINT_CMD_LINE_FUNC=librarycopy_print )
+# ---------------------------------------------------------------------------
+
+
+
 # --- URL Download builder --------------------------------------------------
 def url_print(s, target, source, env) : 
     print "downloading ["+str(source[0])+"] to ["+str(target[0])+"] ..."
@@ -209,8 +266,8 @@ ExtractBuilder = Builder( action = SCons.Action.Action("$EXTRACT_CMD$extractsuff
 # --- Java Swig Builder -----------------------------------------------------
 def swigjava_emitter(target, source, env) :
     # create build dir path
-    jbuilddir = os.path.join("build", "jar", "javasource")
-    nbuilddir = os.path.join("build", "jar", "nativesource")
+    jbuilddir = os.path.join("build", env["buildtype"], "jar", "javasource")
+    nbuilddir = os.path.join("build", env["buildtype"], "jar", "nativesource")
 
     regex = {
           # remove expression of the interface file (store a list with expressions)
@@ -347,10 +404,20 @@ def swigjava_packageaction(dirname) :
     return ".".join( str(dirname).split(os.path.sep)[1:] )
     
 def swigjava_outdiraction(dirname) :
-    return os.path.join( "build", "jar", "javasource", os.path.sep.join(str(dirname).split(os.path.sep)[1:]) )
+    path = os.path.join( "build", "jar", "javasource", os.path.sep.join(str(dirname).split(os.path.sep)[1:]) )
+    try :
+        os.makedirs(path)
+    except :
+        pass
+    return path
     
 def swigjava_cppdiraction(filename) :
-    return os.path.join( "build", "jar", "nativesource", str(filename)+".cpp" )
+    path = os.path.join( "build", "jar", "nativesource" )
+    try :
+        os.makedirs(path)
+    except :
+        pass
+    return os.path.join(path, str(filename)+".cpp")
     
 SwigJavaBuilder = Builder( action = SCons.Action.Action("swig -Wall -O -templatereduce -c++ -java -package ${SwigJavaPackage(SOURCE.dir)} -outdir ${SwigJavaOutDir(SOURCE.dir)} -o ${SwigJavaCppDir(SOURCE.filebase)} $SOURCE"), emitter=swigjava_emitter, single_source = False, src_suffix=".i", target_factory=Dir, source_factory=File )
 # ---------------------------------------------------------------------------
@@ -393,6 +460,7 @@ vars = Variables()
 createVariables(vars)
 
 env = Environment( 
+        LIBRARYCOPY     = librarycopy_action,
         SwigJavaPackage = swigjava_packageaction, 
         SwigJavaOutDir  = swigjava_outdiraction,
         SwigJavaCppDir  = swigjava_cppdiraction,
@@ -400,9 +468,10 @@ env = Environment(
         variables=vars, tools = ["default", "gettext"],
         
         BUILDERS = { 
-            "SwigJava" : SwigJavaBuilder, 
-            "Download" : DownloadBuilder, 
-            "Extract" : ExtractBuilder
+            "LibraryCopy" : LibraryCopyBuilder,
+            "SwigJava"    : SwigJavaBuilder, 
+            "Download"    : DownloadBuilder, 
+            "Extract"     : ExtractBuilder
         }
 )
 env.VariantDir("build", ".", duplicate=0)
@@ -433,8 +502,6 @@ env.SConscript( os.path.join("documentation", "build.py"), exports="env defaultc
 env.SConscript( os.path.join("library", "build.py"), exports="env defaultcpp" )
 
 env.SConscript( os.path.join("swig", "target", "java", "build.py"), exports="env defaultcpp GlobRekursiv" )
-#env.SConscript( os.path.join("swig", "target", "python", "SConscript"), exports="env defaultcpp" )
-#env.SConscript( os.path.join("swig", "target", "php", "SConscript"), exports="env defaultcpp" )
 
 for i in ["geneticalgorithm", "classifier", "clustering", "distance", "other", "reducing", "sources"] :
     env.SConscript( os.path.join("examples", i, "build.py"), exports="env defaultcpp" )

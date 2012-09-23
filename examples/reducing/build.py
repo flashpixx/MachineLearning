@@ -29,4 +29,7 @@ if env["withfiles"] :
     buildlist.append( env.Program( target=os.path.join("#build", "reducing", "mds"), source=defaultcpp+["mds.cpp"] ) )
     buildlist.append( env.Program( target=os.path.join("#build", "reducing", "pca"), source=defaultcpp+["pca.cpp"] ) )
     
+if env["uselocallibrary"] or env["copylibrary"] :
+    Depends(buildlist, env.LibraryCopy( os.path.join("#build", env["buildtype"], "reducing"), [] ))
+    
 env.Alias( "reducing", buildlist )

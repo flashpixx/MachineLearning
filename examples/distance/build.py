@@ -27,4 +27,7 @@ buildlist = []
 if env["withfiles"] :
     buildlist.append( env.Program( target=os.path.join("#build", "distance", "ncd"), source=defaultcpp + ["ncd.cpp"] ) )
     
+if env["uselocallibrary"] or env["copylibrary"] :
+    Depends(buildlist, env.LibraryCopy( os.path.join("#build", env["buildtype"], "distance"), [] ))
+    
 env.Alias( "distance", buildlist )

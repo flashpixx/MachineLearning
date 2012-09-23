@@ -32,4 +32,7 @@ if env["withfiles"] :
     buildlist.append( env.Program( target=os.path.join("#build", "clustering", "relational_neuralgas"), source=defaultcpp+["relational_neuralgas.cpp"] ) )
     buildlist.append( env.Program( target=os.path.join("#build", "clustering", "spectral"), source=defaultcpp+["spectral.cpp"] ) )
     
+if env["uselocallibrary"] or env["copylibrary"] :
+    Depends(buildlist, env.LibraryCopy( os.path.join("#build", env["buildtype"], "clustering"), [] ))
+    
 env.Alias( "clustering", buildlist )

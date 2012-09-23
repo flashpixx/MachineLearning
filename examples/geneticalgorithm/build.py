@@ -25,6 +25,9 @@ Import("*")
 buildlist = []
 
 if env["withfiles"] :
-    buildlist.append( env.Program( target=os.path.join("#build", "geneticalgorithm", "knapsack"), source=defaultcpp + ["knapsack.cpp"] ) )
+    buildlist.append( env.Program( target=os.path.join("#build", env["buildtype"], "geneticalgorithm", "knapsack"), source=defaultcpp + ["knapsack.cpp"] ) )
+    
+if env["uselocallibrary"] or env["copylibrary"] :
+    Depends(buildlist, env.LibraryCopy( os.path.join("#build", env["buildtype"], "geneticalgorithm"), [] ))
     
 env.Alias( "ga", buildlist )

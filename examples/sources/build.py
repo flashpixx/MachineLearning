@@ -32,4 +32,7 @@ if env["withsources"] :
     if env["withfiles"] :
         buildlist.append( env.Program( target=os.path.join("#build", "sources", "cloud"), source=defaultcpp+["cloud.cpp"] ) )
     
+if env["uselocallibrary"] or env["copylibrary"] :
+    Depends(buildlist, env.LibraryCopy( os.path.join("#build", env["buildtype"], "sources"), [] ))
+    
 env.Alias( "sources", buildlist )
