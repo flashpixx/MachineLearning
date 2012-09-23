@@ -96,6 +96,8 @@ def setupToolkitEnv(env) :
     env["TOOLKIT_ARCH"] = (platform.architecture()[0]).replace("bit", "")
     if platform.system().lower() == "posix" :
         env["TOOLKIT"]      = "posix"
+    elif platform.system().lower() == "linux" :
+        env["TOOLKIT"]      = "posix"
     elif platform.system().lower() == "darwin" :
         env["TOOLKIT"]      = "darwin"
     elif platform.system().lower() == "cygwin" :
