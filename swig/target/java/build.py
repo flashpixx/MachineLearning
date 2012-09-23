@@ -262,5 +262,9 @@ def unique(seq) :
     
 #env.Alias( "javac", buildlist )
 
-x = env.SwigJava( os.path.join("#build", "xxx"), GlobRekursiv( os.path.join("..", ".."), [".i"], ["target"]) ), 
-env.Alias( "java", x )
+buildlist = []
+
+for i in GlobRekursiv( os.path.join("..", ".."), [".i"], ["target"]) :
+    buildlist.append(  env.SwigJava( os.path.join("#build", env["buildtype"], "jar"), i )  ) 
+    
+env.Alias( "java", buildlist )

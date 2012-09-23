@@ -419,7 +419,7 @@ def swigjava_cppdiraction(filename) :
         pass
     return os.path.join(path, str(filename)+".cpp")
     
-SwigJavaBuilder = Builder( action = SCons.Action.Action("swig -Wall -O -templatereduce -c++ -java -package ${SwigJavaPackage(SOURCE.dir)} -outdir ${SwigJavaOutDir(SOURCE.dir)} -o ${SwigJavaCppDir(SOURCE.filebase)} $SOURCE"), emitter=swigjava_emitter, single_source = False, src_suffix=".i", target_factory=Dir, source_factory=File )
+SwigJavaBuilder = Builder( action = SCons.Action.Action("swig -Wall -O -templatereduce -c++ -java -package ${SwigJavaPackage(SOURCE.dir)} -outdir ${SwigJavaOutDir(SOURCE.dir)} -o ${SwigJavaCppDir(SOURCE.filebase)} $SOURCE"), emitter=swigjava_emitter, single_source = True, src_suffix=".i", target_factory=Dir, source_factory=File )
 # ---------------------------------------------------------------------------
 
 
