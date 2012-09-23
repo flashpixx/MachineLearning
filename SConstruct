@@ -360,7 +360,7 @@ if "sources" in COMMAND_LINE_TARGETS :
 
 # read platform configuration (only if not clean target is used)
 platformconfig = env["TOOLKIT"]
-if not(os.path.isfile(os.path.join("scons", "platform", platformconfig+".py"))) :
+if not(os.path.isfile(os.path.join("buildenvironment", platformconfig+".py"))) :
     raise ImportError("toolkit configuration script ["+platformconfig+"] not found")
 
 env.SConscript( os.path.join("buildenvironment", platformconfig+".py"), exports="conf checkCPPEnv checkExecutables" )
