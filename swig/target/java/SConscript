@@ -19,7 +19,7 @@
  
 # -*- coding: utf-8 -*-
 
-#import os
+import os
 #import sys
 #import glob
 #import re
@@ -253,7 +253,7 @@ def unique(seq) :
 #env.Replace( JAVASOURCEPATH = os.path.join(Dir("#").abspath, "jar", "javasource") )
 
 
-buildlist = []
+#buildlist = []
 
 #swiglist = env.SwigJava( "swigbuild", help.getRekusivFiles( os.path.join("..", "..", "machinelearning"), ".i") )
 
@@ -261,3 +261,6 @@ buildlist = []
 #buildlist.append( env.Java(os.path.join(Dir("#").abspath, "jar", "library"), os.path.join(Dir("#").abspath, "jar", "javasource")) )
     
 #env.Alias( "javac", buildlist )
+
+x = env.SwigJava( os.path.join("#build", "xxx"), GlobRekursiv( os.path.join("..", ".."), [".i"], ["target"]) ), 
+env.Alias( "java", x )

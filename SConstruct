@@ -20,6 +20,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import re
 import sys
 import urllib2
 import platform
@@ -128,7 +129,7 @@ def GlobRekursiv(startdir, extensions=[], excludedir=[]) :
 
 
 #===  builder ============================================================================================================
-def url_print(s, target, source, env): 
+def url_print(s, target, source, env) : 
     print "downloading ["+str(source[0])+"] to ["+str(target[0])+"] ..."
 
 def url_downloadfile(target, source, env) :
@@ -154,7 +155,7 @@ DownloadBuilder = Builder( action = url_downloadfile, single_source = True, targ
 
 
 
-def extract_print(s, target, source, env): 
+def extract_print(s, target, source, env) : 
     print "extracting ["+str(source[0])+"] ..."
     
 def extract_emitter(target, source, env) :
@@ -184,6 +185,137 @@ def extract_emitter(target, source, env) :
 ExtractBuilder = Builder( action = SCons.Action.Action("$EXTRACT_CMD$extractsuffix"), emitter=extract_emitter, single_source = True, src_suffix=".tar.gz", target_factory=Entry, source_factory=File, PRINT_CMD_LINE_FUNC=extract_print )
 
 
+
+def swigjava_print(s, target, source, env) : 
+    print "=> swig ["+str(source[0])+"] ..."
+    
+def swigjava_emitter(target, source, env) :
+    listtargets = []
+
+    regex = {
+          # remove expression of the interface file (store a list with expressions)
+          "remove"              : [ re.compile( r"#ifdef SWIGPYTHON(.*)#endif", re.DOTALL ) ],
+          
+          # regex for extracting data of the interface file
+          "template"            : re.compile( r"%template(.*);" ),
+          "include"             : re.compile( r"%include \"(.*\.h.?.?)\"" ),
+          "rename"              : re.compile( r"%rename\((.*)\)(.*)" ),
+          "module"              : re.compile( r"%module \"(.*)\"" ),
+          
+          # regex for C++ comments
+          "cppcomment"          : re.compile( r"//.*?\n|/\*.*?\*/", re.DOTALL ),
+          
+          # regex for the C++ class name
+          "cppclass"            : re.compile( r"class (.*)" ),
+          "cppbaseclass"        : re.compile( r":(.*)" ),
+          "cppnamespace"        : re.compile( r"namespace(.*){" ),
+          "cppstaticfunction"   : re.compile( r"static (.*) (.*)\(" ), 
+          
+          # regex helpers
+          "cppremove"           : re.compile( r"(\(|\)|<(.*)>)" )
+    }
+
+    for input in source :
+        # read source file
+        oFile = open( str(input), "r" )
+        ifacetext = oFile.read()
+        oFile.close()
+        
+        #path of the source file and remove reduce the interface file for parsing
+        ifacepath = os.sep.join( str(input).split(os.sep)[0:-1] )
+        for n in regex["remove"] :
+            ifacetext = re.sub(n, "", ifacetext)
+        
+        #getting all needed informations if the interface file
+        data = {
+                 # stores the fill source filepath
+                 "source"            : str(input),
+                 # stores the source file name
+                 "sourcename"        : (str(input).split(os.sep)[-1]).replace(".i", ""),
+                 # stores the template parameter with a dict like { templatename : [cpp classname, namespace of the cpp class] or [ static function name, cpp class name]              
+                 "template"          : re.findall(regex["template"], ifacetext),
+                 # stores a rename structure { cpp classname : target name }
+                 "rename"            : re.findall(regex["rename"], ifacetext),
+                 # stores the module name
+                 "module"            : re.findall(regex["module"], ifacetext),
+                 # stores all %include files
+                 "include"           : re.findall(regex["include"], ifacetext),
+                 # stores a dict of cpp namespaces
+                 "cppnamespace"      : {},
+                 # stores a list of cpp classnames
+                 "cppclass"          : [],
+                 # stores a list of static function names
+                 "cppstaticfunction" : []
+        }
+        
+        # getting C++ class name (read the %include file name)
+        # [bug: if a class with the same name exists in different namespaces, the dict stores only the last namespace entry]
+        # [bug: namespace and target directory that is extracted by the builder can be different]
+        for n in data["include"] :
+        
+            # read cpp data
+            oFile   = open( os.path.normpath(os.path.join(ifacepath, n)), "r" )
+            cpptext = re.sub(regex["cppcomment"], "", oFile.read()) 
+            oFile.close()
+            
+            # get class names and static function
+            classnames = re.findall(regex["cppclass"], cpptext)
+            classnames = [ re.sub(regex["cppbaseclass"], "", k).strip() for k in classnames ]
+            data["cppstaticfunction"].extend( [ k[1] for k in re.findall(regex["cppstaticfunction"], cpptext) ] ) 
+
+            # determine class and namespace connection (which class exists in which namespace)
+            namespaces = re.findall(regex["cppnamespace"], cpptext)
+            nslist     = [ n.replace("{", "").split("namespace") for n in namespaces ]
+            nslist     = [ [ k.strip() for k in i ] for i in nslist ]
+            
+            for k in classnames :
+                for l,j in enumerate(namespaces) :
+                    if re.search( re.compile( r"namespace" + j + "{(.*)class " + k, re.DOTALL ), cpptext ) :
+                        data["cppnamespace"][k] = nslist[l]
+            
+            # add classnames ti the dict
+            data["cppclass"].extend( classnames  )
+
+
+
+        # create the remap dict { cpp class name : swig rename}
+        help = {}
+        for targetname,sourcename in data["rename"] :
+            help[sourcename.replace(";","").strip()] = targetname.strip()
+        data["rename"]            = help
+        
+        # remove template parameters <> or brackets
+        data["template"]          = [ re.sub(regex["cppremove"], "", i) for i in data["template"] ]
+        help = {}
+        for n in data["template"] :
+            k = n.split()
+            help[k[0]] = k[1].split("::")[-2:]
+        data["template"]          = help
+        
+        # create a unique list of the static functions
+        noDupes = []
+        [noDupes.append(i) for i in data["cppstaticfunction"] if not noDupes.count(i)]
+        data["cppstaticfunction"] = noDupes
+
+
+
+        # determine classname of each template parameter and
+        # change the template parameter in this way, that we get a dict with { cpp class name : [target names] }
+        help = {}
+        for k,v in data["template"].items() :
+            newval = list(set(data["cppclass"]) & set(v))[0]
+            if help.has_key(newval) :
+                help[newval].append(k)
+            else :
+                help[newval] = [k]
+        data["template"] = help
+        
+        print data
+
+        
+    return listtargets, source
+    
+SwigJavaBuilder = Builder( action = SCons.Action.Action("swig -Wall -O -templatereduce -c++ -java -package ??? -outdir ??? -o ${SOURCE.filebase}.cpp $SOURCE"), emitter=swigjava_emitter, single_source = True, src_suffix=".i", target_factory=Dir, source_factory=File, PRINT_CMD_LINE_FUNC=swigjava_print )
 
 #=== licence ===========================================================================================================================
 def showlicence() :
@@ -216,7 +348,7 @@ showlicence()
 vars = Variables()
 createVariables(vars)
 
-env = Environment( variables=vars, tools = ["default", "gettext"], BUILDERS = { "Download" : DownloadBuilder, "Extract" : ExtractBuilder } )
+env = Environment( variables=vars, tools = ["default", "gettext"], BUILDERS = { "SwigJava" : SwigJavaBuilder, "Download" : DownloadBuilder, "Extract" : ExtractBuilder } )
 env.VariantDir("build", ".", duplicate=0)
 Help(vars.GenerateHelpText(env))
 setupToolkitEnv(env)
@@ -244,7 +376,7 @@ env.SConscript( os.path.join("tools", "language", "SConscript"), exports="env de
 env.SConscript( os.path.join("documentation", "SConscript"), exports="env defaultcpp" )
 env.SConscript( os.path.join("library", "SConscript"), exports="env defaultcpp" )
 
-#env.SConscript( os.path.join("swig", "target", "java", "SConscript"), exports="env defaultcpp" )
+env.SConscript( os.path.join("swig", "target", "java", "SConscript"), exports="env defaultcpp GlobRekursiv" )
 #env.SConscript( os.path.join("swig", "target", "python", "SConscript"), exports="env defaultcpp" )
 #env.SConscript( os.path.join("swig", "target", "php", "SConscript"), exports="env defaultcpp" )
 
