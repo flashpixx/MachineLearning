@@ -309,6 +309,7 @@ def swigjava_emitter(target, source, env) :
         data["template"] = help
         
         print data
+        print "\n"
 
         
     return listtargets, source
@@ -374,7 +375,7 @@ env.SConscript( os.path.join("tools", "language", "build.py"), exports="env defa
 env.SConscript( os.path.join("documentation", "build.py"), exports="env defaultcpp" )
 env.SConscript( os.path.join("library", "build.py"), exports="env defaultcpp" )
 
-#env.SConscript( os.path.join("swig", "target", "java", "build.py"), exports="env defaultcpp GlobRekursiv" )
+env.SConscript( os.path.join("swig", "target", "java", "build.py"), exports="env defaultcpp GlobRekursiv" )
 #env.SConscript( os.path.join("swig", "target", "python", "SConscript"), exports="env defaultcpp" )
 #env.SConscript( os.path.join("swig", "target", "php", "SConscript"), exports="env defaultcpp" )
 
