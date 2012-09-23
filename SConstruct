@@ -188,7 +188,9 @@ def swigjava_print(s, target, source, env) :
     print "=> swig ["+str(source[0])+"] ..."
     
 def swigjava_emitter(target, source, env) :
-    listtargets = []
+    # create build dir path
+    jbuilddir = os.path.join("build", "jar", "javasource")
+    nbuilddir = os.path.join("build", "jar", "nativesource")
 
     regex = {
           # remove expression of the interface file (store a list with expressions)
@@ -213,6 +215,7 @@ def swigjava_emitter(target, source, env) :
           "cppremove"           : re.compile( r"(\(|\)|<(.*)>)" )
     }
 
+    target = []
     for input in source :
         # read source file
         oFile = open( str(input), "r" )
@@ -295,8 +298,6 @@ def swigjava_emitter(target, source, env) :
         [noDupes.append(i) for i in data["cppstaticfunction"] if not noDupes.count(i)]
         data["cppstaticfunction"] = noDupes
 
-
-
         # determine classname of each template parameter and
         # change the template parameter in this way, that we get a dict with { cpp class name : [target names] }
         help = {}
@@ -308,11 +309,19 @@ def swigjava_emitter(target, source, env) :
                 help[newval] = [k]
         data["template"] = help
         
-        print data
-        print "\n"
-
+        # adding target filenames with path (first the cpp name, second the java names)
+        target.append( os.path.normpath(os.path.join(nbuilddir, data["sourcename"]+".cpp" )) )
         
-    return listtargets, source
+        # we read the cpp classname, get the template parameter which matchs the cpp class name in the value
+        # if the rename option is not empty and matches the cpp class name, we use this result for the java class name
+        # because the template parameter points to a static function, otherwise we use the template name
+        for n in data["cppclass"] :
+            if data["rename"].has_key(n) :
+                target.append( os.path.normpath(os.path.join(jbuilddir, os.sep.join(data["cppnamespace"][n]), data["rename"][n]+".java")) )
+            else :
+                for l in data["template"][n] :
+                    target.append( os.path.normpath(os.path.join(jbuilddir, os.sep.join(data["cppnamespace"][n]), l+".java")) )
+    return target, source
     
 SwigJavaBuilder = Builder( action = SCons.Action.Action("swig -Wall -O -templatereduce -c++ -java -package ??? -outdir ??? -o ${SOURCE.filebase}.cpp $SOURCE"), emitter=swigjava_emitter, single_source = True, src_suffix=".i", target_factory=Dir, source_factory=File, PRINT_CMD_LINE_FUNC=swigjava_print )
 
