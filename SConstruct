@@ -30,6 +30,7 @@ import SCons.Node
 
 
 
+
 #=== CLI parameters ====================================================================================================================
 def createVariables(vars) :
     vars.Add(BoolVariable("withrandomdevice", "installation with random device support", False))
@@ -50,8 +51,11 @@ def createVariables(vars) :
 
     
     
-    
 #=== build environment check ===========================================================================================================
+
+# function for checking C/C++ configuration data, function is called from the environment scripts
+# @param conf configuration object
+# @localconf configuration directionary
 def checkCPPEnv(conf, localconf) :
     if conf.env.GetOption("clean")  or  any([i in COMMAND_LINE_TARGETS for i in ["documentation", "librarybuild", "librarydownload", "language"]]) :
         return
@@ -82,6 +86,10 @@ def checkCPPEnv(conf, localconf) :
         conf.env.Replace(CXX = "color-"+conf.env["CXX"])
 
     
+    
+# checks the environment path for executables
+# @param conf configuration object
+# @param commands list or string with executable
 def checkExecutables(conf, commands) :
     cmd = commands
     if type(cmd) <> type([]) :
@@ -91,6 +99,9 @@ def checkExecutables(conf, commands) :
             raise RuntimeError("build tool ["+i+"] not found")
 
 
+
+# function for checking the environment structur and setup toolkit values
+# @param env environment object
 def setupToolkitEnv(env) :
     # check the toolkit option
     env["TOOLKIT_ARCH"] = (platform.architecture()[0]).replace("bit", "")
@@ -113,6 +124,11 @@ def setupToolkitEnv(env) :
         print("Appending custom path (PATH)")
 
 
+
+# glob recursiv file / directories
+# @param startdir root directory
+# @param extension extension list of the files
+# @param excludedir directory parts for excluding
 def GlobRekursiv(startdir, extensions=[], excludedir=[]) :
     lst = []
     if not extensions :
@@ -126,7 +142,11 @@ def GlobRekursiv(startdir, extensions=[], excludedir=[]) :
     return lst
 
 
+
+
 #===  builder ============================================================================================================
+
+# --- URL Download builder --------------------------------------------------
 def url_print(s, target, source, env) : 
     print "downloading ["+str(source[0])+"] to ["+str(target[0])+"] ..."
 
@@ -150,9 +170,11 @@ def ParseAndDownload(env, parsefunction=None):
 
 AddMethod(Environment, ParseAndDownload)
 DownloadBuilder = Builder( action = url_downloadfile, single_source = True, target_factory=File, source_factory=Value, PRINT_CMD_LINE_FUNC=url_print )
+# ---------------------------------------------------------------------------
 
 
 
+# --- GZip Extract Builder --------------------------------------------------
 def extract_print(s, target, source, env) : 
     print "extracting ["+str(source[0])+"] ..."
     
@@ -181,10 +203,10 @@ def extract_emitter(target, source, env) :
     return listtargets, source
        
 ExtractBuilder = Builder( action = SCons.Action.Action("$EXTRACT_CMD$extractsuffix"), emitter=extract_emitter, single_source = True, src_suffix=".tar.gz", target_factory=Entry, source_factory=File, PRINT_CMD_LINE_FUNC=extract_print )
+# ---------------------------------------------------------------------------
 
 
-
-   
+# --- Java Swig Builder -----------------------------------------------------
 def swigjava_emitter(target, source, env) :
     # create build dir path
     jbuilddir = os.path.join("build", "jar", "javasource")
@@ -331,9 +353,14 @@ def swigjava_cppdiraction(filename) :
     return os.path.join( "build", "jar", "nativesource", str(filename)+".cpp" )
     
 SwigJavaBuilder = Builder( action = SCons.Action.Action("swig -Wall -O -templatereduce -c++ -java -package ${SwigJavaPackage(SOURCE.dir)} -outdir ${SwigJavaOutDir(SOURCE.dir)} -o ${SwigJavaCppDir(SOURCE.filebase)} $SOURCE"), emitter=swigjava_emitter, single_source = False, src_suffix=".i", target_factory=Dir, source_factory=File )
+# ---------------------------------------------------------------------------
+
+
 
 
 #=== licence ===========================================================================================================================
+
+# licence text
 def showlicence() :
     print "############################################################################"
     print "# LGPL License                                                             #"
@@ -354,6 +381,7 @@ def showlicence() :
     print "# along with this program. If not, see <http://www.gnu.org/licenses/>.     #"
     print "############################################################################"
     print "\n\n"
+
 
 
 
