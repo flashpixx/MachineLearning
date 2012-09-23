@@ -42,7 +42,7 @@ def createVariables(vars) :
     
     vars.Add(EnumVariable("buildtype", "value of the buildtype", "release", allowed_values=("debug", "release")))
     vars.Add(BoolVariable("uselocallibrary", "use the library in the local directory only", False))
-    vars.Add(ListVariable("skiplibrary", "skipping library builds / downloads", ["xml"], ["atlas", "boost", "hdf", "ginac", "json", "xml"]))
+    vars.Add(ListVariable("skiplibrary", "skipping library builds / downloads", "", ["atlas", "boost", "hdf", "ginac", "json", "xml"]))
     vars.Add(BoolVariable("zipsupport", "build Bzip2 and ZLib support for Boost", (platform.system().lower()=="cygwin")))
     vars.Add(EnumVariable("atlaslink", "type of the ATLAS link file", "multi", allowed_values=("single", "multi")))
     vars.Add(EnumVariable("atlaspointerwidth", "pointer width for compiling ATLAS (empty = system default, 32 = 32 Bit, 64 = 64 Bit)", "", allowed_values=("", "32", "64")))
@@ -362,7 +362,7 @@ platformconfig = env["TOOLKIT"]
 if not(os.path.isfile(os.path.join("scons", "platform", platformconfig+".py"))) :
     raise ImportError("toolkit configuration script ["+platformconfig+"] not found")
 
-env.SConscript( os.path.join("scons", "platform", platformconfig+".py"), exports="conf checkCPPEnv checkExecutables" )
+env.SConscript( os.path.join("buildenvironment", platformconfig+".py"), exports="conf checkCPPEnv checkExecutables" )
 env = conf.Finish()
 
 
@@ -374,7 +374,7 @@ env.SConscript( os.path.join("tools", "language", "build.py"), exports="env defa
 env.SConscript( os.path.join("documentation", "build.py"), exports="env defaultcpp" )
 env.SConscript( os.path.join("library", "build.py"), exports="env defaultcpp" )
 
-env.SConscript( os.path.join("swig", "target", "java", "build.py"), exports="env defaultcpp GlobRekursiv" )
+#env.SConscript( os.path.join("swig", "target", "java", "build.py"), exports="env defaultcpp GlobRekursiv" )
 #env.SConscript( os.path.join("swig", "target", "python", "SConscript"), exports="env defaultcpp" )
 #env.SConscript( os.path.join("swig", "target", "php", "SConscript"), exports="env defaultcpp" )
 
