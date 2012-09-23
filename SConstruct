@@ -372,13 +372,13 @@ env = conf.Finish()
 defaultcpp = [os.path.join(os.path.abspath(os.curdir), "machinelearning.cpp")]
 
 # setup all different sub build script
-env.SConscript( os.path.join("tools", "language", "SConscript"), exports="env defaultcpp GlobRekursiv" )
-env.SConscript( os.path.join("documentation", "SConscript"), exports="env defaultcpp" )
-env.SConscript( os.path.join("library", "SConscript"), exports="env defaultcpp" )
+env.SConscript( os.path.join("tools", "language", "build.py"), exports="env defaultcpp GlobRekursiv" )
+env.SConscript( os.path.join("documentation", "build.py"), exports="env defaultcpp" )
+env.SConscript( os.path.join("library", "build.py"), exports="env defaultcpp" )
 
-env.SConscript( os.path.join("swig", "target", "java", "SConscript"), exports="env defaultcpp GlobRekursiv" )
+env.SConscript( os.path.join("swig", "target", "java", "build.py"), exports="env defaultcpp GlobRekursiv" )
 #env.SConscript( os.path.join("swig", "target", "python", "SConscript"), exports="env defaultcpp" )
 #env.SConscript( os.path.join("swig", "target", "php", "SConscript"), exports="env defaultcpp" )
 
 for i in ["geneticalgorithm", "classifier", "clustering", "distance", "other", "reducing", "sources"] :
-    env.SConscript( os.path.join("examples", i, "SConscript"), exports="env defaultcpp" )
+    env.SConscript( os.path.join("examples", i, "build.py"), exports="env defaultcpp" )
