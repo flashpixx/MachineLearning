@@ -61,6 +61,7 @@ def createVariables(vars) :
 # @localconf configuration directionary
 def checkCPPEnv(conf, localconf) :
     if conf.env.GetOption("clean")  or  any([i in COMMAND_LINE_TARGETS for i in ["documentation", "librarybuild", "librarydownload", "language"]]) :
+        conf.env["LIBS"] = []
         return
 
     if not conf.CheckCXX() :
