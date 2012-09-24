@@ -60,7 +60,7 @@ def createVariables(vars) :
 # @param conf configuration object
 # @localconf configuration directionary
 def checkCPPEnv(conf, localconf) :
-    if conf.env.GetOption("clean")  or  any([i in COMMAND_LINE_TARGETS for i in ["documentation", "librarybuild", "librarydownload", "language"]]) :
+    if conf.env.GetOption("clean")  or  any([i in COMMAND_LINE_TARGETS for i in ["documentation", "librarybuild", "librarydownload", "language", "javareduce", "javaclustering", "javautil"]]) :
         conf.env["LIBS"] = []
         return
 
@@ -516,6 +516,8 @@ env.SConscript( os.path.join("documentation", "build.py"), exports="env defaultc
 env.SConscript( os.path.join("library", "build.py"), exports="env defaultcpp" )
 
 env.SConscript( os.path.join("swig", "target", "java", "build.py"), exports="env defaultcpp GlobRekursiv" )
+for i in ["clustering", "util", "reducing"] :
+    env.SConscript( os.path.join("examples", "java", i, "build.py"), exports="env defaultcpp" )
 
 for i in ["geneticalgorithm", "classifier", "clustering", "distance", "other", "reducing", "sources"] :
     env.SConscript( os.path.join("examples", i, "build.py"), exports="env defaultcpp" )
