@@ -22,6 +22,7 @@
  **/
 
 
+import machinelearning.tools.*;
 import java.util.Random;
 
 
@@ -47,46 +48,44 @@ public class eigen {
         }
         
      
-        // create eigeninformation
-        machinelearning.util.Eigen<Double> l_eigen = machinelearning.util.Math.eigen(l_data);
+        // create eigenvectors / -values
+        Double[] l_vals   = new Double[6];
+        Double[][] l_vecs = new Double[6][6];
         
-        if (l_eigen != null) {
+        Lapack.eigen(l_data, l_vals, l_vecs);
             
-            System.out.println("\neigenvalues:");
-            
-            Double[] l_vals = l_eigen.getValues();
-            for(int i=0; i < l_vals.length; i++)
-                System.out.print(l_vals[i] + "\t");
-            System.out.println("");
-            l_vals = null;
-            
-            
-            
-            System.out.println("\neigenvectors:\n");
-            
-            Double[][] l_vecs = l_eigen.getVectors();
-            for(int j=0; j < l_vecs.length; j++) {
-                System.out.print( (j+1) + " eigenvector:\t");
-                for(int i=0; i < l_vecs[j].length; i++)
-                    System.out.print(l_vecs[j][i] + "\t");
-                System.out.println("\n");
-            }
-            l_vecs = null;
-            
-            
-            // get the largest eigenvector with perron-frobenius
-            Double[] l_perron = machinelearning.util.Math.perronfrobenius( l_data, l_data.length );
-            
-            System.out.println("\nlargest eigenvector with perron-frobenius-theorem:\n");
-            for(int i=0; i < l_perron.length; i++)
-                System.out.print(l_perron[i] + "\t");
-            System.out.println("");
-            l_perron = null;
+        
+        
+        System.out.println("\neigenvalues:");
+        for(int i=0; i < l_vals.length; i++)
+            System.out.print(l_vals[i] + "\t");
+        System.out.println("");
+        l_vals = null;
+        
+        
+        
+        System.out.println("\neigenvectors:\n");
+        for(int j=0; j < l_vecs.length; j++) {
+            System.out.print( (j+1) + " eigenvector:\t");
+            for(int i=0; i < l_vecs[j].length; i++)
+                System.out.print(l_vecs[j][i] + "\t");
+            System.out.println("\n");
         }
+        l_vecs = null;
+            
+            
+        // get the largest eigenvector with perron-frobenius
+        Double[] l_perron = Lapack.perronFrobenius( l_data, l_data.length );
+            
+        System.out.println("\nlargest eigenvector with perron-frobenius-theorem:\n");
+        for(int i=0; i < l_perron.length; i++)
+            System.out.print(l_perron[i] + "\t");
+        System.out.println("");
         
-        l_eigen        = null;
-        l_data         = null;
-        l_rand         = null;
+        
+        l_perron = null;
+        l_data   = null;
+        l_rand   = null;
     }
     
 }

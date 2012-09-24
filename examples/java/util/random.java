@@ -46,55 +46,55 @@ public class random {
         
         
         // create random object
-        machinelearning.util.Random l_random = new machinelearning.util.Random();
+        machinelearning.tools.Random l_random = new machinelearning.tools.Random();
         
         for(int i=0; i < l_num; i++) {
 
             if (p_args[0].toLowerCase().equals("uniform"))
-                System.out.println( l_random.getDouble(machinelearning.util.Random.Distribution.UNIFORM) );
+                System.out.println( l_random.get(machinelearning.tools.Random.distribution.uniform) );
             
             if (p_args[0].toLowerCase().equals("bernoulli"))
-                System.out.println( l_random.getDouble(machinelearning.util.Random.Distribution.BERNOULLI) );
+                System.out.println( l_random.get(machinelearning.tools.Random.distribution.bernoulli) );
         
             if (p_args[0].toLowerCase().equals("cauchy"))
-                System.out.println( l_random.getDouble(machinelearning.util.Random.Distribution.CAUCHY) );
+                System.out.println( l_random.get(machinelearning.tools.Random.distribution.cauchy) );
             
             if (p_args[0].toLowerCase().equals("gamma"))
-                System.out.println( l_random.getDouble(machinelearning.util.Random.Distribution.GAMMA) );
+                System.out.println( l_random.get(machinelearning.tools.Random.distribution.gamma) );
             
             if (p_args[0].toLowerCase().equals("poisson"))
-                System.out.println( l_random.getDouble(machinelearning.util.Random.Distribution.POISSON) );
+                System.out.println( l_random.get(machinelearning.tools.Random.distribution.poisson) );
             
             if (p_args[0].toLowerCase().equals("exponential"))
-                System.out.println( l_random.getDouble(machinelearning.util.Random.Distribution.EXPONENTIAL) );
+                System.out.println( l_random.get(machinelearning.tools.Random.distribution.exponential) );
             
             if (p_args[0].toLowerCase().equals("normal"))
-                System.out.println( l_random.getDouble(machinelearning.util.Random.Distribution.NORMAL) );
+                System.out.println( l_random.get(machinelearning.tools.Random.distribution.normal) );
             
             if (p_args[0].toLowerCase().equals("student"))
-                System.out.println( l_random.getDouble(machinelearning.util.Random.Distribution.STUDENT) );
+                System.out.println( l_random.get(machinelearning.tools.Random.distribution.student) );
             
             if (p_args[0].toLowerCase().equals("weibull"))
-                System.out.println( l_random.getDouble(machinelearning.util.Random.Distribution.WEIBULL) );
+                System.out.println( l_random.get(machinelearning.tools.Random.distribution.weibull) );
             
             if (p_args[0].toLowerCase().equals("rayleigh"))
-                System.out.println( l_random.getDouble(machinelearning.util.Random.Distribution.RAYLEIGH) );
+                System.out.println( l_random.get(machinelearning.tools.Random.distribution.rayleigh) );
             
             if (p_args[0].toLowerCase().equals("chisquared"))
-                System.out.println( l_random.getDouble(machinelearning.util.Random.Distribution.CHISQUARED) );
+                System.out.println( l_random.get(machinelearning.tools.Random.distribution.chisquared) );
             
             if (p_args[0].toLowerCase().equals("pareto"))
-                System.out.println( l_random.getDouble(machinelearning.util.Random.Distribution.PARETO) );
+                System.out.println( l_random.get(machinelearning.tools.Random.distribution.pareto) );
             
             if (p_args[0].toLowerCase().equals("triangular"))
-                System.out.println( l_random.getDouble(machinelearning.util.Random.Distribution.TRIANGULAR) );
+                System.out.println( l_random.get(machinelearning.tools.Random.distribution.triangular) );
             
             if (p_args[0].toLowerCase().equals("beta"))
-                System.out.println( l_random.getDouble(machinelearning.util.Random.Distribution.BETA) );
+                System.out.println( l_random.get(machinelearning.tools.Random.distribution.beta) );
         }
 
         
-        l_random.dispose();
+        l_random.delete();
         l_random = null;
 	}
 	

@@ -22,6 +22,7 @@
  **/
 
 
+import machinelearning.tools.*;
 import java.util.Random;
 
 
@@ -48,46 +49,42 @@ public class svd {
         
 
         // create SVD
-        machinelearning.util.SVD<Double> l_svd = machinelearning.util.Math.svd(l_data);
+        Double[] l_vals    = null;
+        Double[][] l_vecs1 = null;
+        Double[][] l_vecs2 = null;
+        Lapack.svd(l_data, l_vals, l_vecs1, l_vecs2);
         
-        if (l_svd != null) {
-            
-            System.out.println("\nsvd values:");
-            
-            Double[] l_vals = l_svd.getValues();
-            for(int i=0; i < l_vals.length; i++)
-                System.out.print(l_vals[i] + "\t");
-            System.out.println("");
-            l_vals = null;
-            
-            
-            
-            System.out.println("\nsvd vectors 1:\n");
-            
-            Double[][] l_vecs1 = l_svd.getVectors1();
-            for(int j=0; j < l_vecs1.length; j++) {
-                System.out.print( (j+1) + " svd vector:\t");
-                for(int i=0; i < l_vecs1[j].length; i++)
-                    System.out.print(l_vecs1[j][i] + "\t");
-                System.out.println("\n");
-            }
-            l_vecs1 = null;
-            
-            
-            
-            System.out.println("\nsvd vectors 2:\n");
-            
-            Double[][] l_vecs2 = l_svd.getVectors2();
-            for(int j=0; j < l_vecs2.length; j++) {
-                System.out.print( (j+1) + " svd vector:\t");
-                for(int i=0; i < l_vecs2[j].length; i++)
-                    System.out.print(l_vecs2[j][i] + "\t");
-                System.out.println("\n");
-            }
-            l_vecs2 = null;
+
+        
+        System.out.println("\nsvd values:");
+        for(int i=0; i < l_vals.length; i++)
+            System.out.print(l_vals[i] + "\t");
+        System.out.println("");
+        l_vals = null;
+        
+        
+        
+        System.out.println("\nsvd vectors 1:\n");
+        for(int j=0; j < l_vecs1.length; j++) {
+            System.out.print( (j+1) + " svd vector:\t");
+            for(int i=0; i < l_vecs1[j].length; i++)
+                System.out.print(l_vecs1[j][i] + "\t");
+            System.out.println("\n");
         }
+        l_vecs1 = null;
         
-        l_svd          = null;
+        
+        
+        System.out.println("\nsvd vectors 2:\n");
+        for(int j=0; j < l_vecs2.length; j++) {
+            System.out.print( (j+1) + " svd vector:\t");
+            for(int i=0; i < l_vecs2[j].length; i++)
+                System.out.print(l_vecs2[j][i] + "\t");
+            System.out.println("\n");
+        }
+        l_vecs2 = null;
+
+        
         l_data         = null;
         l_rand         = null;
     }
