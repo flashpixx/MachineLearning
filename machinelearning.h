@@ -68,12 +68,14 @@
  * <li><i>optional Swig</i> ( http://www.swig.org/ )</li>
  * <li><i>optional Doxygen</i> ( http://www.doxygen.org/ ) with Graphviz support ( http://www.graphviz.org )</li>
  * </ul>
- * For manual installation of the library you can follow the short @subpage installationnotes / A default library installation can be created with the command <dfn>scons librarybuild</dfn>
- * with the optional ATLAS building parameters. After compiling the directory <dfn>library/build</dfn> must be moved to a directory in that all libraries should be stored, because
- * a clean-target removes the <dfn>library/build</dfn> directory. The default installation need the make-tools (make), gcc / g++ (C and C++ compiler) and gfortran (Fortran compiler).
+ * A default library installation can be created with the commands
+ * @code
+    scons librarydownload
+    scons librarybuild
+ * @endcode
+ * After compiling the directory <dfn>library/build_*</dfn> is created with the libraries. The * can be <dfn>debug</dfn> or <dfn>release</dfn> for different build options.
  * The framework was tested under: Mac OS X Leopard (10.5), Mac OS X Snow Leopard (10.6), Mac OS X Lion (10.7), Ubuntu Lucid Lynx (10.04), Gentoo Linux (stable / unstable) and Microsoft
- * Windows 7 (with Cygwin). The main header file <dfn>machinelearning.h</dfn> must be added to the <dfn>CPPPATH</dfn> variable with the prefix directory <dfn>machinelearning</dfn>, if the examples
- * external libraries (Java / Python ...) should be build.
+ * Windows 7 (with Cygwin). On projects the main header <dfn>machinelearning.h</dfn> and the cpp file <dfn>machinelearning.cpp</dfn> are needed.
  *
  * @section def Definition / Style Guide
  * <ul>
@@ -85,6 +87,8 @@
  * <li>all include defines for header files are set in this way <dfn>__MACHINELEARNING_DIRECTORY_FILE_H/HPP</dfn>
  * <li>all structures are in the namespace <dfn>machinelearning</dfn></li>
  * <li>all messages should get the structure <dfn>_("<message>")</dfn>, because the underline prefix is the support for different languages</li>
+ * <li>all subbuild scripts are stored within the directory that stores the main build files, the build file is named <dfn>build.py</dfn></li>
+ * <li>platform environmanetal build scripts are stores under <dfn>buildenvironment</dfn></li>
  * </ul>
  *
  * The source code uses some style guides options:
@@ -133,13 +137,8 @@
  *
  * @subsection scons Scons Build Environment
  * The framework supports Scons for compiling. The script reads the environment (Linux, OS X & Microsoft) and uses the
- * plattform specified options for compiling the sources. For compiling the test cpp files in the test directory the following option can
- * be set (Hierarchical Data Format is needed) [see options and default values with <dfn>scons -Q -h</dfn>]
+ * plattform specified options for compiling the sources [see options and default values with <dfn>scons -Q -h</dfn>].
  * <ul>
- * <li><dfn>atlaslink</dfn> adds the option which ATLAS library is linked (multi = multithreadding [tatlas], single = singlethreadding [satlas])</li>
- * <li><dfn>staticlink</dfn> links all libraries static (default option yes), overrides <dfn>atlaslink</dfn> flag</li>
- * <li><dfn>math</dfn> compiler math option (sse3, sse, 387 for floating-point arithmetics) (used if optimazation is enabled)</li>
- * <li><dfn>withframeworkdebug</dfn> enables the <dfn>MACHINELEARNING_NDEBUG</dfn> flag</li>
  * <li><dfn>withrandomdevice</dfn> adds the compilerflag for random device support</li>
  * <li><dfn>withmpi</dfn> adds the compilerflag for cluster / MPI support (on the target <dfn>librarybuild</dfn> MPI support is compiled into the Boost)</li>
  * <li><dfn>withmultilanguage</dfn> adds the multilanguage support with gettext</li>
@@ -147,37 +146,25 @@
  * <li><dfn>withsources</dfn> support for the namespace machinelearning::tools::sources</li>
  * <li><dfn>withfiles</dfn> support for the namespace machinelearning::tools::files</li>
  * <li><dfn>withsymbolicmath</dfn> support for symbolic math (eg: machinelearning::functionaloptimization::gradientdescent )</li>
- * <li><dfn>withdebug</dfn> compile with debug symbols</li>
- * <li><dfn>withoptimize</dfn> optimization like O2</li>
- * <li><dfn>cputype</dfn> cpu type, see GCC documentation http://gcc.gnu.org/onlinedocs/gcc/i386-and-x86_002d64-Options.html [default: native]</li>
- * <li><dfn>showconfig</dfn> creates a printable output of the build configuration</li>
  * </ul><ul>
+ * <li><dfn>buildtype</dfn> build type [allowed valus: debug | release, default value is set to release]</li>
+ * <li><dfn>uselocallibrary</dfn> uses only the libraries which are stores within the library directory</li>
+ * <li><dfn>skiplibrary</dfn> disables / skips the automatic build of a library [allowd values: all, none, atlas, boost, hdf, ginac, json, xml]</li> 
+ * <li><dfn>copylibrary</dfn> copy the dynamic libraries into the build directory</li>
  * <li><dfn>atlaspointerwidth</dfn> parameter for setting the ATLAS pointer width during running the library build target (default empty for system default)</li>
- * <li><dfn>atlascputhrottle</dfn> enable / disable detection of ATLAS CPU throtteling during runngin the library build target (default disable)</li>
- * <li><dfn>skipbuild</dfn> disables / skips the automatic build of a library [allowd values: all, none, atlas, boost, hdf, ginac, json , xml (only available on Cygwin)]</li> 
- * <li><dfn>skipbuilderror</dfn> if an error occures during the building process, a commandline input for aborting or continuing is needed, with this option the input can be suppressed (default disable)</li>
+ * <li><dfn>atlaslink</dfn> link option for the atlas library [allowed values: multi | single] </li>
  * </ul>
- * On Cygwin the option
- * <ul>
- * <li><dfn>winver</dfn> is set for the Windows version [default: win7, other allowed values: srv2008, vista, srv2003sp1, xpsp2, srv2003, xp, w2000)</li>
- * </ul>
- * The <dfn>SConstruct</dfn> script, which is the entry point to the compiler calls, is stored in the framework main directory. Under the <dfn>scons</dfn> directory all other script (helper, platform)
- * are stored. For each target a own <dfn>SConscript</dfn> script exists under the directory, which should be build. For each platform a own script is stored under <dfn>scons/platform</dfn> that is used for setting the
- * platform default compile option like linked libraries, pathes, ...
+ * The <dfn>SConstruct</dfn> script, which is the entry point to the compiler calls, is stored in the framework main directory. Under the <dfn>buildenvironment</dfn> directory all platform / environment specialized 
+ * scripts are stored. All build scripts are named <dfn>build.py</dfn> and stored within the subdirectories.
  *
  * @subsection targets Buildtargets
  * The scons script supports different targets for building the examples. The call can be supplemented with the parameters above. Each subdirectory within the example directory
  * show a build target, but some targets will be build first if different parameters are set
  * <ul>
  * <li><dfn>documentation</dfn> create the documentation with Doxygen (Doxygen must be installed and be reached within the path)</li>
- * <li><dfn>librarybuild</dfn> download the librarys and compile each library with the default option. Compiled libraries are installed under the subdirectory <dfn>library/build</dfn>.
- * Requirements for the automatic build installation process: <ul>
- * <li>tar, make, gfortran, gcc & g++ must be installed and within the search path</li>
- * <li>all files are downloaded under <dfn>library/</dfn>, each file can be replaced with another version, so the script downloads the packages only, if the file does not exists</li>
- * <li>the framework must be stored in a directory without any spaces, spaces create errors on the build process</li>
- * </ul>
- * <li><dfn>createlanguage</dfn> creates the language files / adds new messages to the existing files (xgettext must be called, so it should be within the path)</li>
- * <li><dfn>updatelanguage</dfn> compiles all language files (msgfmt must be called, so it should be within the path)</li>
+ * <li><dfn>librarydownload</dfn> downloads each library</li>
+ * <li><dfn>librarybuild</dfn> compiles each library with the default option. Compiled libraries are installed under the subdirectory <dfn>library/build_*</dfn>.</li>
+ * <li><dfn>language</dfn> creates the language files / adds new messages to the existing files (xgettext must be called, so it should be within the path)</li>
  * <li><dfn>clean / -c</dfn> target that cleans framework files</li>
  * </ul><ul>
  * <li><dfn>sources</dfn> sources are eg. Wikipedia, NNTP, but the parameter <dfn>withsources</dfn> must be set for compiling and for the cloud example the files parameter must be set additionally</li>
@@ -189,7 +176,7 @@
  * <dfn>withmpi</dfn> </li>
  * <li><dfn>ga</dfn> target for building genetic algorithms</li>
  * </ul><ul>
- * <li><dfn>javac</dfn> create the the C/C++ stub files of each Java class, create the shared library and add all to the Jar file</li>
+ * <li><dfn>java</dfn> create the the C/C++ stub files of each Java class, create the shared library and add all to the Jar file</li>
  * <li><dfn>javareduce</dfn> build the java examples of the reducing algorithms (java library jar file must build first and stored under the build directory)</li>
  * <li><dfn>javautil</dfn> build the java examples of the util subpackage</li>
  * </ul>
@@ -208,195 +195,6 @@
  * <li>@subpage other</li>
  * <li>@subpage java</li>
  * </ul>
- *
- *
- *
- * @page installationnotes Installation Notes
- * For building all libraries with a set of default options the target <dfn>librarybuild</dfn> with the parameters <dfn>atlaspointerwidth</dfn>, <dfn>atlascputhrottle</dfn>, <dfn>skipbuild</dfn>
- * and <dfn>skipbuilderror</dfn> can be used.<br/>
- * All configure scripts have a <dfn>--prefix=</dfn> option for setting a target installation directory. It is recommand to use this option for seperating the manually installation
- * in contrast to the system libraries. This steps discribe the manually compilation of each library, but you can use the devel packages of your distribution (and precompiled libraries).
- * This tutorial is a short excerpt for the install process only, so it is recommand, that you know the system details for installing. 
- *
- * @section nix Linux / Mac OS X
- * In both OS (Linux & Mac OS X) the libraries can be build with the following steps within the extracted source directory:
- * @code
-    ./configure
-    make
-    make install
- * @endcode
- * For the single packages are some notes:
- *
- * @subsection nixzip BZip2 and ZLib support 
- * Within the most systems <a href="http://www.bzip.org/">BZip2 sources</a> and <a href="http://zlib.net/">ZLib sources</a> are installed. Sources can be installed from the package
- * tree or manually from the source packages.
- *
- * @subsection nixboost Boost
- * First bJam must be build in the command line (terminal), so in the extracted source path the command
- * @code bootstrap.sh @endcode
- * must be run. After that Boost can be build with (The MPI support can be enabled with <dfn>withmpi</dfn>, but it requires MPI sources and libraries. The configuration for MPI use can be found on
- * <dfn>www.boost.org/doc/libs/-release number-/doc/html/mpi.html</dfn>)
- * @code bjam --with-exception --with-filesystem --with-math --with-random --with-regex --with-date_time --with-thread --with-system --with-program_options --with-serialization --with-iostreams --disable-filesystem2 threading=multi runtime-link=shared link=shared variant=release toolset=gcc|darwin install @endcode
- * In newer Boost version (since 1.50) the <dfn>bjam</dfn> command is replaced with <dfn>b2</dfn>. The <dfn>toolset</dfn> option must be:
- * <ul>
- * <li><dfn>gcc</dfn> for unix systems (Cygwin too)</li>
- * <li><dfn>darwin</dfn> for Mac OS X</li>
- * </ul>
- * The numerical bindings for LAPack are needed, so the SVN direcotry http://svn.boost.org/svn/boost/sandbox/numeric_bindings must be checked out.
- *
- * @subsection nixhdf HDF
- * The HDF libraray must be build with C++ support:
- * @code configure --enable-cxx @endcode
- *
- * @subsection nixatlas Atlas with full LAPack
- * The framework need a full LAPack support, so a GFortran compiler is needed. The fortran compiler can be downloaded on http://gcc.gnu.org/wiki/GFortranBinaries or use the compiler within the distribution.
- * The configure call should be
- * @code configure --dylibs --with-netlib-lapack-tarfile=-path to lapack.tgz- @endcode
- * In some cases the pointer bitwidth (<dfn>-b</dfn>) must be set. The flag <dfn>--nof77</dfn> should not be set, because some LAPack routines are not built (a full LAPack support is required).
- * The configure call must be run into a temporary directory, so in the first step the temporary directory must be created. It is recommend that you take a look into the Atlas errata for more
- * information about installing Atlas under Windows (see http://math-atlas.sourceforge.net/errata.html ). 
- * @subsubsection nixsoname Linux library with soname
- * If you want build the Java packages with the Atlas and LAPack library, you must compile the library and after compiling you should change the line in <dfn>working directory/lib/Makefile</dfn>
- * @code
-    (LD) $(LDFLAGS) -shared -soname $(LIBINSTdir)/$(outso) -o $(outso) \
- * @endcode
- * to
- * @code
-    (LD) $(LDFLAGS) -shared -soname $(outso) -o $(outso) \
- * @endcode
- * for setting the internal soname of the library. After changing you should run on the working directory
- * @code
-    make shared
- * @endcode
- * Now the library can installed with the default option.
- * 
- *
- * @subsection nixpath path under Linux
- * Under Linux some environmantal variables must be set, if the libraries are installed into a non-default directory. The variable <dfn>CPPPATH</dfn> must be set to the include
- * directories and <dfn>LD_LIBRARY_PATH</dfn> and <dfn>LIBRARY_PATH</dfn> must be pointed to the library path. The variables can be set within the <dfn>/etc/profile</dfn> or <dfn>~/.profile</dfn> with
- * @code
-    export CPPPATH=first_path:second_path
-    export LIBRARY_PATH=first_path:second_path
-    export LD_LIBRARY_PATH=$LIBRARY_PATH
- * @endcode
- *
- * @subsection macpath path under Mac OS X
- * The path data should be set in the same way as in Linux, but OS X needs a own configuration file to use the variables in all OSX programs. Create a blank file in the hidden directory <dfn>~/.MacOSX</dfn>
- * with the name <dfn>environment.plist</dfn> and set the variable <dfn>CPPPATH</dfn> to the include directories and  <dfn>LIBRARY_PATH</dfn> to the library subdirectories. If you run a program a variable
- * <dfn>DYLD_LIBRARY_PATH</dfn> is also needed, but it can't set with the environmental file (because of security reasons) so it is recommand that the following line is added to the <dfn>/etc/profile</dfn>:
- * @code
-    export DYLD_LIBRARY_PATH=$LIBRARY_PATH
- * @endcode
- *
- *
- * <hr>
- * @section windows Microsoft Windows
- * The building process with Windows is very difficult, because not all libraries support native Windows building scripts. It is recommand to use <a href="http://www.cygwin.com/">Cygwin</a> for building.  
- * Install Cygwin with the tools (but in some cases dependend libraries are needed, Cygwin creates errors if the libraries not exist):
- * <ul>
- * <li><dfn>devel/make</dfn></li>
- * <li><dfn>devel/gcc4-core</dfn></li>
- * <li><dfn>devel/gcc4-g++</dfn></li>
- * <li><dfn>devel/gcc4-gfortran</dfn></li>
- * <li><dfn>python/python</dfn></li>
- * </ul>
- * Here all libraries are installed under <dfn>C:\\opt\\library</dfn> with the version number of the library is set to a subdirectory, other the tools under <dfn>C:\\opt</dfn>. On Windows the 
- * <a href="http://www.bzip.org/">BZip2</a> and <a href="http://www.zlib.net/">ZLib</a> must be installed for using in the Boost.Iostreams. BZip2 sources must be extracted and run the commands
- * @code
-    make
-    make install PREFIX=/cygdrive/c/opt/library/bzip2/<version>
- * @endcode
- * The ZLib library is installed with
- * @code
-    configure --prefix=/cygdrive/c/opt/library/zlib/<version>
-    make
-    make install
- * @endcode
- * For Boost.Iostreams in the Cygwin install directory in the file <dfn>etc/profile</dfn> or <dfn>~/.bashrc</dfn> the following variables must be set:
- * @code
-    export BZIP2_BINARY=bz2
-    export BZIP2_INCLUDE=/cygdrive/c/opt/library/bzip2/<version>/include
-    export BZIP2_LIBPATH=/cygdrive/c/opt/library/bzip2/<version>/lib
- 
-    export ZLIB_BINARY=z
-    export ZLIB_INCLUDE=/cygdrive/c/opt/library/zlib/<version>/include
-    export ZLIB_LIBPATH=/cygdrive/c/opt/library/zlib/<version>/lib
- * @endcode
- * It is also recommend, that the linker flag is set with, because all examples are console applications
- * @code
-    export LDFLAGS="-mconsole"
- * @endcode
- *
- * The libraries can be installed with the same steps as in Linux.
- * The path to the libraries directories must be set / added to the system or user path variable <dfn>PATH</dfn> (the Cygwin <dfn>bin</dfn> directory must be added, because all libraries are linked to the
- * <dfn>cygwin.dll</dfn>, which is stored in the <dfn>bin</dfn> directory), eg:
- * @code
-    C:\opt\cygwin\bin;C:\opt\library\atlas\<version>\lib;C:\opt\library\hdf\<version>\lib;C:\opt\library\xml2\<version>\bin;C:\opt\library\boost\<version>\bin;C:\opt\library\boost\<version>\lib
- * @endcode
- * Scons can be installed under Cygwin with the command within the extracted source:
- * @code
-    python setup.py install --prefix=/cygdrive/c/opt/scons
- * @endcode
- * The variable <dfn>CPPPATH</dfn> of the include directories is set in the file within the Cygwin install directory <dfn>etc/profile</dfn> (and to the path variable is added the scons directory)
- * @code
-    PATH=$PATH:/cygdrive/c/opt/scons/bin
-    export CPPPATH=/cygdrive/c/opt/library/atlas/<version>/include:/cygdrive/c/opt/library/boost/<version>/include:/cygdrive/c/opt/library/boost/sandbox/numeric_bindings:/cygdrive/c/opt/library/hdf/<version>/include:/cygdrive/c/opt/library/xml2/<version>/include/libxml2
- * @endcode
- * 
- * @subsection winversion Windows Version
- * The Windows version must be set with the scons parameter <dfn>winver</dfn>. The values are:
- * <ul>
- * <li><dfn>win7</dfn> Windows 7 [default]</li>
- * <li><dfn>srv2008</dfn> Windows Server 2008</li>
- * <li><dfn>vista</dfn> Windows Vista</li>
- * <li><dfn>srv2003sp1</dfn> Windows Server 2003 with SP1</li>
- * <li><dfn>xpsp2</dfn> Windows XP with SP2</li>
- * <li><dfn>srv2003</dfn> Windows Server 2003</li>
- * <li><dfn>xp</dfn> Windows XP</li>
- * <li><dfn>w2000</dfn> Windows 2000</li>
- * </ul>
- * The description and hexdecimal values can be found on http://msdn.microsoft.com/en-us/library/aa383745%28v=vs.85%29.aspx
- *
- * @subsection winjavac using Java builds under Cygwin
- * For using the Java builds all libraries must be installed and the JDK must be installed also and within the path directory. The include directory must be expanded with the subdirectory
- * <dfn>include</dfn> and <dfn>include/win32</dfn>. The GCC compiler under Cygwin does not have a buildin type <dfn>__int64</dfn>, so within the file <dfn>include/win32/jni_md.h</dfn> 
- * the line 
- * @code
-    typedef long long jlong;
- * @endcode
- * must be changed to
- * @code
-    #ifdef __GNUC__
-    typedef long long jlong;
-    #else
-    typedef __int64 jlong;
-    #endif
- * @endcode
- * Now the Java parts can be compiled with the Cygwin G++
- *
- * @subsection winscons Error with Scons
- * In some cases if Scons is running, the python would be create a memory error like:
- * @code
-    6976514 [main] python 3456 C:\opt\cygwin\bin\python.exe: *** fatal error - unable to remap \\?\C:\opt\cygwin\lib\python2.6\lib-dynload\time.dll to same address as parent: 0x260000 != 0x2C0000
-    Stack trace:
-    Frame     Function  Args
-    00228748  6102796B  (00228748, 00000000, 00000000, 00000000)
-    00228A38  6102796B  (6117EC60, 00008000, 00000000, 61180977)
-    00229A68  61004F1B  (611A7FAC, 61243BA4, 00260000, 002C0000)
-    End of stack trace
- * @endcode
- * Following steps are solving the problem
- * <ol>
- * <li>close all Cygwin windows and Cygwin programs</li>
- * <li>open the <dfn>dash.exe</dfn> within the <dfn>bin</dfn> directory of the Cygwin installation</li>
- * <li>run the command @code /bin/rebaseall -v @endcode</li>
- * </ol>
- * If you get an error that the temporary directory is not writable, run first in a Cygwin shell the command
- * @code
-    cd -to your Windows Home directory eg /cygdrive/c/Users/username-
-    cd AppData/Local
-    chmod 777 Temp
- * @endcode
  *
  *
  *
@@ -791,32 +589,6 @@
  *
  * @file machinelearning.h main header for including in a project
  * @file machinelearning.cpp main implementation file of the project, that must be compiled and added to the compile targets
- *
- * @file examples/distance/ncd.cpp testprogram for the normalized compression distance
- * @file examples/clustering/neuralgas.cpp testprogram for the neural gas algorithm
- * @file examples/clustering/patch_neuralgas.cpp testprogram for the patch neural gas algorithm
- * @file examples/clustering/relational_neuralgas.cpp testprogram for the relational neural gas algorithm
- * @file examples/clustering/kmeans.cpp testprogram for the k-means algorithm
- * @file examples/clustering/spectral.cpp testprogram for spectral clustering
- * @file examples/clustering/rlvq.cpp testprogram for the rlvq algorithm
- * @file examples/classifier/lazy.cpp testprogram for the lazy-learner algorithm
- * @file examples/reducing/pca.cpp testprogram for the pca
- * @file examples/reducing/lda.cpp testprogram for lda
- * @file examples/reducing/mds.cpp testprogram for mds
- * @file examples/geneticalgorithm/knapsack.cpp testprogram for genetic algorithm (knapsack problem)
- * @file examples/sources/newsgroup.cpp testprogram for NNTP using
- * @file examples/sources/wikipedia.cpp testprogram for using Wikipedia
- * @file examples/sources/twitter.cpp testprogram for using Twitter tweets
- * @file examples/sources/cloud.cpp testprogram for create n-dimensional normal distribution
- * @file examples/other/mds_nntp.cpp program for reading newsgroup articles, stopword reduction, distance calculating and MDS plotting
- * @file examples/other/mds_wikipedia.cpp program for reading Wikipedia articles, stopword reduction, distance calculating and MDS plotting
- * @file examples/other/mds_file.cpp program for reading (text) files, stopword reduction, distance calculating and MDS plotting
- * @file examples/other/mds_twitter.cpp program for reading Twitter data and calculating plot with MDS
- * @file examples/java/reducing/pca.java example java program for using PCA
- * @file examples/java/reducing/mds.java example java program for using MDS
- * @file examples/java/util/eigen.java example for eigenvalue algorithms
- * @file examples/java/util/svd.java example for SVD algorithms
- * @file examples/java/util/random.java example for distribution algorithms
  *
  * @file classifier/classifier.h main header for all classifier structurs
  * @file classifier/classifier.hpp header for the abstract class implementation of the classifiers

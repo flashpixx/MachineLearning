@@ -409,7 +409,8 @@ def swigjava_outdiraction(sourcedir, targets) :
     path = os.path.join( os.path.commonprefix([str(i) for i in targets]), "java", os.path.sep.join(str(sourcedir).split(os.path.sep)[1:]) )
 
     try :
-        os.makedirs(path)
+        if "java" in COMMAND_LINE_TARGETS :
+            os.makedirs(path)
     except :
         pass
     return path
@@ -417,7 +418,8 @@ def swigjava_outdiraction(sourcedir, targets) :
 def swigjava_cppdiraction(source, targets) :
     path = os.path.join( os.path.commonprefix([str(i) for i in targets]), "native" )
     try :
-        os.makedirs(path)
+        if "java" in COMMAND_LINE_TARGETS :
+            os.makedirs(path)
     except :
         pass
     return os.path.join(path, str(source)+".cpp")
@@ -497,8 +499,16 @@ env.SConscript( os.path.join("buildenvironment", platformconfig+".py"), exports=
 env = conf.Finish()
 
 
-# main cpp must compiled in
+
+# setup default builds and default clean
 defaultcpp = [os.path.join(os.path.abspath(os.curdir), "machinelearning.cpp")]
+env.Clean(defaultcpp, [
+    "build",
+    "config.log",
+    ".sconf_temp",
+    ".sconsign.dblite"
+])
+
 
 # setup all different sub build script
 env.SConscript( os.path.join("tools", "language", "build.py"), exports="env defaultcpp GlobRekursiv" )
