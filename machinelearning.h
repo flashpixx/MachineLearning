@@ -179,7 +179,7 @@
  * <li><dfn>java</dfn> create the the C/C++ stub files of each Java class, create the shared library and add all to the Jar file</li>
  * <li><dfn>javaclustering</dfn> build the java examples of the clustering subpackage</li>
  * <li><dfn>javareduce</dfn> build the java examples of the reducing algorithms (java library jar file must build first and stored under the build directory)</li>
- * <li><dfn>javautil</dfn> build the java examples of the util subpackage</li>
+ * <li><dfn>javatools</dfn> build the java examples of the util subpackage</li>
  * </ul>
  *
  * @section ex Examples

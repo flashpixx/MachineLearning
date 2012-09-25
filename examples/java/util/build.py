@@ -23,6 +23,6 @@ import os
 Import("*")
 
 
-env.Alias( "javautil", 
-    env.Java(  os.path.join("#build", env["buildtype"], "java", "util"), Dir("."), JAVACLASSPATH = [os.path.join("build", env["buildtype"], "machinelearning.jar")] )
+env.Alias( "javatools", 
+    env.Java(  os.path.join("#build", env["buildtype"], "java", "tools"), Dir("."), JAVACLASSPATH = [os.path.join("build", env["buildtype"], "machinelearning.jar")] )
 )

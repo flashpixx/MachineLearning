@@ -31,6 +31,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------
 // type converting from C++ types to Java types (both directions)
+
 %typemap(jni)       ublas::matrix<double>,                          ublas::matrix<double>&                          "jobjectArray"
 %typemap(jtype)     ublas::matrix<double>,                          ublas::matrix<double>&                          "Double[][]"
 %typemap(jstype)    ublas::matrix<double>,                          ublas::matrix<double>&                          "Double[][]"
@@ -75,6 +76,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------
 // input type, so that the value type will be passed through to the JNI (connection JNI to Java proxy class)
+
 %typemap(javain)    ublas::matrix<double>,                          ublas::matrix<double>&                          "$javainput"
 %typemap(javain)    ublas::vector<double>,                          ublas::vector<double>&                          "$javainput"
 %typemap(javain)    ublas::symmetric_matrix<double, ublas::upper>,  ublas::symmetric_matrix<double, ublas::upper>&  "$javainput"
@@ -89,52 +91,75 @@
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------
 // main typemaps for "return types" with code converting
+
 %typemap(out, optimal=1, noblock=1) ublas::matrix<double>, ublas::matrix<double>&,
                                     ublas::vector<double>, ublas::vector<double>&,
                                     std::vector<double>, std::vector<double>&,
-                                    ublas::indirect_array<>, ublas::indirect_array<>& {
+                                    ublas::indirect_array<>, ublas::indirect_array<>&
+{
     $result = swig::java::getArray(jenv, $1);
 }
 
-%typemap(out, optimal=1, noblock=1) std::vector< ublas::matrix<double> >, std::vector< ublas::matrix<double> >& {
+%typemap(out, optimal=1, noblock=1) std::vector< ublas::matrix<double> >, std::vector< ublas::matrix<double> >&
+{
     $result = swig::java::getArrayList(jenv, $1);
 }
 
-%typemap(out, optimal=1, noblock=1) ublas::symmetric_matrix<double, ublas::upper>, ublas::symmetric_matrix<double, ublas::upper>& {
+%typemap(out, optimal=1, noblock=1) ublas::symmetric_matrix<double, ublas::upper>, ublas::symmetric_matrix<double, ublas::upper>&
+{
     $result = swig::java::getArray(jenv, static_cast< ublas::matrix<double> >($1));
 }
 
-%typemap(out, optimal=1, noblock=1) std::size_t, std::size_t& {
+%typemap(out, optimal=1, noblock=1) std::size_t, std::size_t&
+{
     $result = $1;
 }
 
 
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------
-// main typemaps for "parameter types" with code converting
-%typemap(in, optimal=1, noblock=1) ublas::matrix<double>& (ublas::matrix<double> l_param) {
+// main typemaps for "parameter types" with code converting (different uses for const (in) and non-const (argout) references, empty rules create a do-nothing-call)
+// the return parameter must be copy into a local variable (l_param) because Swig uses pointers to reference the parameter
+
+%typemap(in, optimal=1, noblock=1) const ublas::matrix<double>& (ublas::matrix<double> l_param)
+{
     l_param = swig::java::getDoubleMatrixFrom2DArray(jenv, $input);
     $1      = &l_param;
 }
 
-// the return parameter must be copy into a local variable (l_param)
-// because Swig uses pointers to reference the parameter
-%typemap(in, optimal=1, noblock=1) std::string, std::string& (std::string l_param) {
+%typemap(argout, optimal=1, noblock=1) const ublas::matrix<double>&, const ublas::vector<double>& {}
+
+%typemap(in, optimal=1, noblock=1) ublas::matrix<double>&, ublas::vector<double>& {}
+
+%typemap(argout, optimal=1, noblock=1) ublas::matrix<double>&, ublas::vector<double>&
+{
+    $input = swig::java::getArray(jenv, *$1);
+} 
+
+
+%typemap(in, optimal=1, noblock=1) std::string, std::string& (std::string l_param)
+{
     l_param = swig::java::getString(jenv, $input);
     $1      = &l_param;
 }
 
-%typemap(in, optimal=1, noblock=1) std::vector<std::string>, std::vector<std::string>& (std::vector<std::string> l_param) {
+
+%typemap(in, optimal=1, noblock=1) std::vector<std::string>, std::vector<std::string>& (std::vector<std::string> l_param)
+{
     l_param = swig::java::getStringVectorFromArray(jenv, $input);
     $1      = &l_param;
 }
 
-%typemap(in, optimal=1, noblock=1) std::vector<std::size_t>, std::vector<std::size_t>& (std::vector<std::size_t> l_param) {
+
+%typemap(in, optimal=1, noblock=1) std::vector<std::size_t>, std::vector<std::size_t>& (std::vector<std::size_t> l_param)
+{
     l_param = swig::java::getSizetVectorFromArray(jenv, $input);
     $1      = &l_param;
 }
 
-%typemap(in, optimal=1, noblock=1) std::size_t, std::size_t& {
+
+%typemap(in, optimal=1, noblock=1) std::size_t, std::size_t&
+{
     $1 = ($1_ltype)& $input;
 }
 
