@@ -516,7 +516,7 @@ env.SConscript( os.path.join("documentation", "build.py"), exports="env defaultc
 env.SConscript( os.path.join("library", "build.py"), exports="env defaultcpp" )
 
 env.SConscript( os.path.join("swig", "target", "java", "build.py"), exports="env defaultcpp GlobRekursiv" )
-for i in ["clustering", "util", "reducing"] :
+for i in ["clustering", "tools", "reducing"] :
     env.SConscript( os.path.join("examples", "java", i, "build.py"), exports="env defaultcpp" )
 
 for i in ["geneticalgorithm", "classifier", "clustering", "distance", "other", "reducing", "sources"] :
