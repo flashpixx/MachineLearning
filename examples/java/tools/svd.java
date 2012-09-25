@@ -49,9 +49,9 @@ public class svd {
         
 
         // create SVD
-        Double[] l_vals    = null;
-        Double[][] l_vecs1 = null;
-        Double[][] l_vecs2 = null;
+        Double[] l_vals    = new Double[0];
+        Double[][] l_vecs1 = new Double[0][0];
+        Double[][] l_vecs2 = new Double[0][0];
         Lapack.svd(l_data, l_vals, l_vecs1, l_vecs2);
         
 

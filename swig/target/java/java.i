@@ -129,9 +129,20 @@
 
 %typemap(argout, optimal=1, noblock=1) const ublas::matrix<double>&, const ublas::vector<double>& {}
 
-%typemap(in, optimal=1, noblock=1) ublas::matrix<double>&, ublas::vector<double>& {}
+%typemap(in, optimal=1, noblock=1) ublas::matrix<double>& (ublas::matrix<double> l_return) {
+    $1 = &l_return;
+}
 
-%typemap(argout, optimal=1, noblock=1) ublas::matrix<double>&, ublas::vector<double>&
+%typemap(in, optimal=1, noblock=1) ublas::vector<double>& (ublas::vector<double> l_return) {
+    $1 = &l_return;
+}
+
+%typemap(argout, optimal=1, noblock=1) ublas::matrix<double>&
+{
+    $input = swig::java::getArray(jenv, *$1);
+} 
+
+%typemap(argout, optimal=1, noblock=1) ublas::vector<double>&
 {
     $input = swig::java::getArray(jenv, *$1);
 } 

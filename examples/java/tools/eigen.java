@@ -49,8 +49,8 @@ public class eigen {
         
      
         // create eigenvectors / -values
-        Double[] l_vals   = new Double[6];
-        Double[][] l_vecs = new Double[6][6];
+        Double[] l_vals   = new Double[0];
+        Double[][] l_vecs = new Double[0][0];
         
         Lapack.eigen(l_data, l_vals, l_vecs);
             
@@ -72,7 +72,7 @@ public class eigen {
             System.out.println("\n");
         }
         l_vecs = null;
-            
+        
             
         // get the largest eigenvector with perron-frobenius
         Double[] l_perron = Lapack.perronFrobenius( l_data, l_data.length );

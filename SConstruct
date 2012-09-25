@@ -60,7 +60,7 @@ def createVariables(vars) :
 # @param conf configuration object
 # @localconf configuration directionary
 def checkCPPEnv(conf, localconf) :
-    if conf.env.GetOption("clean")  or  any([i in COMMAND_LINE_TARGETS for i in ["documentation", "librarybuild", "librarydownload", "language", "javareduce", "javaclustering", "javautil"]]) :
+    if conf.env.GetOption("clean")  or  any([i in COMMAND_LINE_TARGETS for i in ["documentation", "librarybuild", "librarydownload", "language", "javareduce", "javaclustering", "javatools"]]) :
         conf.env["LIBS"] = []
         return
 
