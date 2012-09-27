@@ -183,6 +183,15 @@ if "TERM" in os.environ :
 if "HOME" in os.environ :
     conf.env["ENV"]["HOME"] = os.environ["HOME"]
     print("Using home environment variable (HOME)")
+    
+# setup DistCC
+if "DISTCC_HOSTS" in os.environ :
+    if "DISTCC_VERBOSE" in os.environ :
+        conf.env.Replace(DISTCC_VERBOSE = os.environ["DISTCC_VERBOSE"])
+        
+    conf.env.AppendUnique(DISTCC_HOSTS = os.environ["DISTCC_HOSTS"].split(os.pathsep))
+    conf.env.Replace(CXX = "distcc " + conf.env["CXX"])
+    print("Using DistCC")
 
 # set additional dynamic link libraries which should be copied into the build dir    
 conf.env["NOTCOPYLIBRARY"] = ["stdc++", "intl"]

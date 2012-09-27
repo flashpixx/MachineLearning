@@ -30,15 +30,20 @@
 
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------
-// type converting from C++ types to Java types (both directions)
+// type converting from C++ types to Java types (both directions [different handles on const and non-const parameters])
 
-%typemap(jni)       ublas::matrix<double>,                          ublas::matrix<double>&                          "jobjectArray"
+%typemap(jni)       ublas::matrix<double>,                          ublas::matrix<double>&                          "jobjectArray*"
+%typemap(jni)       const ublas::matrix<double>,                    const ublas::matrix<double>&                    "jobjectArray"
 %typemap(jtype)     ublas::matrix<double>,                          ublas::matrix<double>&                          "Double[][]"
 %typemap(jstype)    ublas::matrix<double>,                          ublas::matrix<double>&                          "Double[][]"
 
-%typemap(jni)       ublas::vector<double>,                          ublas::vector<double>&                          "jobjectArray"
+%typemap(jni)       ublas::vector<double>,                          ublas::vector<double>&                          "jobjectArray*"
+%typemap(jni)       const ublas::vector<double>,                    const ublas::vector<double>&                    "jobjectArray"
 %typemap(jtype)     ublas::vector<double>,                          ublas::vector<double>&                          "Double[]"
 %typemap(jstype)    ublas::vector<double>,                          ublas::vector<double>&                          "Double[]"
+
+
+
 
 %typemap(jni)       ublas::symmetric_matrix<double, ublas::upper>,  ublas::symmetric_matrix<double, ublas::upper>&  "jobjectArray"
 %typemap(jtype)     ublas::symmetric_matrix<double, ublas::upper>,  ublas::symmetric_matrix<double, ublas::upper>&  "Double[][]"
@@ -85,7 +90,7 @@
 %typemap(javain)    std::vector<std::string>,                       std::vector<std::string>&                       "$javainput"
 %typemap(javain)    std::vector<std::size_t>,                       std::vector<std::size_t>&                       "$javainput"
 
-%typemap(javaout) SWIGTYPE                                                                                          { return $jnicall; }
+//%typemap(javaout) SWIGTYPE                                                                                          { return $jnicall; }
 
 
 
