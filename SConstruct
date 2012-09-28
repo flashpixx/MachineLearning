@@ -44,6 +44,7 @@ def createVariables(vars) :
     
     vars.Add(EnumVariable("buildtype", "value of the buildtype", "release", allowed_values=("debug", "release")))
     vars.Add(BoolVariable("uselocallibrary", "use the library in the local directory only", False))
+    vars.Add(BoolVariable("usedistcc", "use distributed compiling with DistCC", False))
     vars.Add(ListVariable("skiplibrary", "skipping library builds / downloads", "", ["atlas", "boost", "hdf", "ginac", "json", "xml"]))
     vars.Add(BoolVariable("copylibrary", "copy the dynamic link libraries into the build dir", False))
     
@@ -83,11 +84,21 @@ def checkCPPEnv(conf, localconf) :
     for i in localconf["cpplibraries"] :
         if not conf.CheckLib(i, language="C++") :
             sys.exit(1)
-            
-    # set the colorgcc prefix after checkig, because otherwise it can creates errors on checklibrary
-    lxPath = conf.env.FindFile("color-"+conf.env["CXX"], conf.env["ENV"]["PATH"])
-    if lxPath <> None :
-        conf.env.Replace(CXX = "color-"+conf.env["CXX"])
+        
+    # setup DistCC or on local color-compiler
+    if "DISTCC_HOSTS" in os.environ  or  conf.env["usedistcc"]:
+        if "DISTCC_VERBOSE" in os.environ :
+            conf.env.Replace(DISTCC_VERBOSE = os.environ["DISTCC_VERBOSE"])
+        if "DISTCC_HOSTS" in os.environ :
+            conf.env.AppendUnique(DISTCC_HOSTS = os.environ["DISTCC_HOSTS"].split(os.pathsep))
+        conf.env.Replace(CXX = "distcc --randomize " + conf.env["CXX"])
+        print("use distributed compiling (DistCC)")
+    
+    else :
+        lxPath = conf.env.FindFile("color-"+conf.env["CXX"], conf.env["ENV"]["PATH"])
+        if lxPath <> None :
+            conf.env.Replace(CXX = "color-"+conf.env["CXX"])
+            print("use colored compiling")
 
     
     
