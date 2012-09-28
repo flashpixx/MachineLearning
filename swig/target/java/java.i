@@ -37,11 +37,12 @@
 %typemap(jtype)     ublas::matrix<double>,                          ublas::matrix<double>&                          "Double[][]"
 %typemap(jstype)    ublas::matrix<double>,                          ublas::matrix<double>&                          "Double[][]"
 
-%typemap(jni)       ublas::vector<double>,                          ublas::vector<double>&                          "jobjectArray*"
+
+%typemap(jni)       ublas::vector<double> INPUT,                          ublas::vector<double>& INPUT                          "jobjectArray*"
+%typemap(jni)       ublas::vector<double> OUTPUT,                          ublas::vector<double>& OUTPUT                         "jobjectArray"
 %typemap(jni)       const ublas::vector<double>,                    const ublas::vector<double>&                    "jobjectArray"
 %typemap(jtype)     ublas::vector<double>,                          ublas::vector<double>&                          "Double[]"
 %typemap(jstype)    ublas::vector<double>,                          ublas::vector<double>&                          "Double[]"
-
 
 
 

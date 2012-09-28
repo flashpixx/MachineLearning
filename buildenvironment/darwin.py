@@ -191,7 +191,7 @@ if "DISTCC_HOSTS" in os.environ :
         
     conf.env.AppendUnique(DISTCC_HOSTS = os.environ["DISTCC_HOSTS"].split(os.pathsep))
     conf.env.Replace(CXX = "distcc " + conf.env["CXX"])
-    print("Using DistCC")
+    print("Distributed compilinger (DistCC)")
 
 # set additional dynamic link libraries which should be copied into the build dir    
 conf.env["NOTCOPYLIBRARY"] = ["stdc++", "intl"]
