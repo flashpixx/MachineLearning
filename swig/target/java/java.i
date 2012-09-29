@@ -64,7 +64,7 @@
 // ---------------------------------------------------------------------------------------------------------------------------------------------
 // defines for short typemapping
 
-%define UNMODIFIED( JNITYPE, JVTYPE, CPPTYPE )
+%define CONSTTYPES( JNITYPE, JVTYPE, CPPTYPE )
 
 %typemap(jni)       CPPTYPE, const CPPTYPE, const CPPTYPE&      "JNITYPE"
 %typemap(jtype)     CPPTYPE, const CPPTYPE, const CPPTYPE&      "JVTYPE"
@@ -74,33 +74,34 @@
 %enddef
 
 
-%define MODIFIED(CPPTYPE, JVTYPE, JNITYPE)
+%define NONCONSTTYPES( JNITYPE, JVTYPE, CPPTYPE )
 
 %typemap(jni)       CPPTYPE&       "JNITYPE*"
 %typemap(jtype)     CPPTYPE&       "JVTYPE"
 %typemap(jstype)    CPPTYPE&       "JVTYPE"
-%typemap(javain)    CPPTYPE&,      "$javainput"
+%typemap(javain)    CPPTYPE&       "$javainput"
 
 %enddef
-
-//MODIFIED(ublas::vector<double>, Double[], jobjectArray)
-//MODIFIED(ublas::matrix<double>, Double[][], jobjectArray)
  
  
  
 // ---------------------------------------------------------------------------------------------------------------------------------------------
 // type converting from C++ types to Java types
 
-UNMODIFIED( jobjectArray,   Double[],                           ublas::vector<double> )
-UNMODIFIED( jobjectArray,   Double[],                           std::vector<double> )
-UNMODIFIED( jobjectArray,   Double[][],                         ublas::matrix<double> )
-UNMODIFIED( jobjectArray,   Double[][],                         swig::java::symmetric_matrix )
-UNMODIFIED( jobjectArray,   java.util.ArrayList<Double[][]>,    std::vector< ublas::matrix<double> > )
-UNMODIFIED( jobjectArray,   String[],                           std::vector<std::string> )
-UNMODIFIED( jobjectArray,   long[],                             std::vector<std::size_t> )
-UNMODIFIED( jobjectArray,   Long[],                             ublas::indirect_array<> )
-UNMODIFIED( jlong,          long,                               std::size_t )
-UNMODIFIED( jstring,        String,                             std::string )
+CONSTTYPES( jobjectArray,   Double[],                           ublas::vector<double> )
+CONSTTYPES( jobjectArray,   Double[],                           std::vector<double> )
+CONSTTYPES( jobjectArray,   Double[][],                         ublas::matrix<double> )
+CONSTTYPES( jobjectArray,   Double[][],                         swig::java::symmetric_matrix )
+CONSTTYPES( jobjectArray,   java.util.ArrayList<Double[][]>,    std::vector< ublas::matrix<double> > )
+CONSTTYPES( jobjectArray,   String[],                           std::vector<std::string> )
+CONSTTYPES( jobjectArray,   long[],                             std::vector<std::size_t> )
+CONSTTYPES( jobjectArray,   Long[],                             ublas::indirect_array<> )
+CONSTTYPES( jlong,          long,                               std::size_t )
+CONSTTYPES( jstring,        String,                             std::string )
+
+NONCONSTTYPES( jobjectArray,     Double[],                      ublas::vector<double> )
+NONCONSTTYPES( jobjectArray,     Double[][],                    ublas::matrix<double> )
+
 
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------
