@@ -132,19 +132,21 @@ NONCONSTTYPES( jobjectArray,     Double[][],                    ublas::matrix<do
 // main typemaps for "parameter types" with code converting (different uses for const (in) and non-const (argout) references, empty rules create a do-nothing-call)
 // the return parameter must be copy into a local variable (l_param) because Swig uses pointers to reference the parameter
 
-%typemap(in, optimal=1, noblock=1) ublas::matrix<double>& (ublas::matrix<double> l_param)
+%typemap(in, optimal=1, noblock=1) ublas::vector<double>&, ublas::matrix<double>& {}
+
+%typemap(in, optimal=1, noblock=1) const ublas::matrix<double>&, ublas::matrix<double> (ublas::matrix<double> l_param)
 {
     l_param = swig::java::getDoubleMatrixFrom2DArray(jenv, $input);
     $1      = &l_param;
 }
 
-%typemap(in, optimal=1, noblock=1) ublas::vector<double>& (ublas::vector<double> l_return) {
+%typemap(in, optimal=1, noblock=1) const ublas::vector<double>&, ublas::vector<double> (ublas::vector<double> l_return) {
     $1 = &l_return;
 }
 
-%typemap(argout, optimal=1, noblock=1) ublas::matrix<double>&, ublas::vector<double>&
+%typemap(out, optimal=1, noblock=1) const ublas::matrix<double>&, ublas::matrix<double>, const ublas::vector<double>&, ublas::vector<double>
 {
-    $input = swig::java::getArray(jenv, *$1);
+    $result = swig::java::getArray(jenv, $1);
 } 
 
 
