@@ -53,6 +53,8 @@ namespace machinelearning { namespace swig {
                 row     = 0,
                 column  = 1
             };
+        
+            typedef ublas::symmetric_matrix<double, ublas::upper> symmetric_matrix;
             
             
             static ublas::matrix<double> getDoubleMatrixFrom2DArray( JNIEnv*, const jobjectArray& );

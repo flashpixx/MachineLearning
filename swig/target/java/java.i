@@ -27,72 +27,80 @@
  * $LastChangedDate$
  **/
 
+/**
+ Point 1. I group typemaps in defines, for instance:
+ // CPPTYPE - c++ type
+ // JVTYPE - java type
+ // JNITYPE - jni type as follows
+ %define UBLA(CPPTYPE, JVTYPE, JNITYPE)
+ %typemap(jni) const CPPTYPE, CPPTYPE, const CPPTYPE&, CPPTYPE& "JNITYPE" // don't know on whar purpose
+ //pointers may be used here
+ %typemap(jtype) const CPPTYPE, CPPTYPE, const CPPTYPE&, CPPTYPE& "JVTYPE"
+ %typemap(jstype) const CPPTYPE, CPPTYPE, const CPPTYPE&, CPPTYPE& "JVTYPE"
+ 
+ // from here you should separate object, pointer and reference
+ // (you do not use pointers so without them) so try like this
+ %typemap(in)    const CPPTYPE, CPPTYPE "$1 = (CPPTYPE*)$input;"
+ %typemap(in)    const CPPTYPE&, CPPTYPE& "*$1 = (CPPTYPE*)$input;" // ! mind the first*, previous line doesn't have it
+ 
+ %typemap(out)  const CPPTYPE, CPPTYPE "$result = (JNITYPE)$1"
+ %typemap(out) const CPPTYPE&, CPPTYPE& "$result = (JNITYPE)*$1" // ! mind the*, previous line doesn't have it
+ // here the separation stops cause on java side we do not care of object or ref it was for c++
+ // you will need separation only if you write directorin/directorout typemaps,
+ // so do it like for out and in
+ 
+ %typemap(javain) const CPPTYPE, CPPTYPE, const CPPTYPE&, CPPTYPE& "$javainput"
+ %typemap(javaout) const CPPTYPE, CPPTYPE, const CPPTYPE&, CPPTYPE&
+ {
+ return $jnicall;
+ }
+ %enddef
+ 
+ so after it you may write something like:
+ UBLA(ublas::vector<double>, Double[], jobjectArray)
+ **/
 
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------
-// type converting from C++ types to Java types (both directions [different handles on const and non-const parameters])
+// defines for short typemapping
 
-%typemap(jni)       ublas::matrix<double>,                          ublas::matrix<double>&                          "jobjectArray*"
-%typemap(jni)       const ublas::matrix<double>,                    const ublas::matrix<double>&                    "jobjectArray"
-%typemap(jtype)     ublas::matrix<double>,                          ublas::matrix<double>&                          "Double[][]"
-%typemap(jstype)    ublas::matrix<double>,                          ublas::matrix<double>&                          "Double[][]"
+%define UNMODIFIED( JNITYPE, JVTYPE, CPPTYPE )
 
+%typemap(jni)       CPPTYPE, const CPPTYPE, const CPPTYPE&      "JNITYPE"
+%typemap(jtype)     CPPTYPE, const CPPTYPE, const CPPTYPE&      "JVTYPE"
+%typemap(jstype)    CPPTYPE, const CPPTYPE, const CPPTYPE&      "JVTYPE"
+%typemap(javain)    CPPTYPE, const CPPTYPE, const CPPTYPE&      "$javainput"
 
-%typemap(jni)       ublas::vector<double> INPUT,                          ublas::vector<double>& INPUT                          "jobjectArray*"
-%typemap(jni)       ublas::vector<double> OUTPUT,                          ublas::vector<double>& OUTPUT                         "jobjectArray"
-%typemap(jni)       const ublas::vector<double>,                    const ublas::vector<double>&                    "jobjectArray"
-%typemap(jtype)     ublas::vector<double>,                          ublas::vector<double>&                          "Double[]"
-%typemap(jstype)    ublas::vector<double>,                          ublas::vector<double>&                          "Double[]"
+%enddef
 
 
+%define MODIFIED(CPPTYPE, JVTYPE, JNITYPE)
 
-%typemap(jni)       ublas::symmetric_matrix<double, ublas::upper>,  ublas::symmetric_matrix<double, ublas::upper>&  "jobjectArray"
-%typemap(jtype)     ublas::symmetric_matrix<double, ublas::upper>,  ublas::symmetric_matrix<double, ublas::upper>&  "Double[][]"
-%typemap(jstype)    ublas::symmetric_matrix<double, ublas::upper>,  ublas::symmetric_matrix<double, ublas::upper>&  "Double[][]"
+%typemap(jni)       CPPTYPE&       "JNITYPE*"
+%typemap(jtype)     CPPTYPE&       "JVTYPE"
+%typemap(jstype)    CPPTYPE&       "JVTYPE"
+%typemap(javain)    CPPTYPE&,      "$javainput"
 
-%typemap(jni)       std::vector<double>,                            std::vector<double>&                            "jobjectArray"
-%typemap(jtype)     std::vector<double>,                            std::vector<double>&                            "Double[]"
-%typemap(jstype)    std::vector<double>,                            std::vector<double>&                            "Double[]"
+%enddef
 
-%typemap(jni)       std::vector< ublas::matrix<double> >,           std::vector< ublas::matrix<double> >&           "jobject"
-%typemap(jtype)     std::vector< ublas::matrix<double> >,           std::vector< ublas::matrix<double> >&           "java.util.ArrayList<Double[][]>"
-%typemap(jstype)    std::vector< ublas::matrix<double> >,           std::vector< ublas::matrix<double> >&           "java.util.ArrayList<Double[][]>"
-
-%typemap(jni)       std::vector<std::string>,                       std::vector<std::string>&                       "jobjectArray"
-%typemap(jtype)     std::vector<std::string>,                       std::vector<std::string>&                       "String[]"
-%typemap(jstype)    std::vector<std::string>,                       std::vector<std::string>&                       "String[]"
-
-%typemap(jni)       std::vector<std::size_t>,                       std::vector<std::size_t>&                       "jobjectArray"
-%typemap(jtype)     std::vector<std::size_t>,                       std::vector<std::size_t>&                       "long[]"
-%typemap(jstype)    std::vector<std::size_t>,                       std::vector<std::size_t>&                       "long[]"
-
-%typemap(jni)       std::size_t,                                    std::size_t&                                    "jlong"
-%typemap(jtype)     std::size_t,                                    std::size_t&                                    "long"
-%typemap(jstype)    std::size_t,                                    std::size_t&                                    "long"
-
-%typemap(jni)       ublas::indirect_array<>,                        ublas::indirect_array<>&                        "jobjectArray"
-%typemap(jtype)     ublas::indirect_array<>,                        ublas::indirect_array<>&                        "Long[]"
-%typemap(jstype)    ublas::indirect_array<>,                        ublas::indirect_array<>&                        "Long[]"
-
-%typemap(jni)       std::string,                                    std::string&                                    "jstring"
-%typemap(jtype)     std::string,                                    std::string&                                    "String"
-%typemap(jstype)    std::string,                                    std::string&                                    "String"
-
-
-
+//MODIFIED(ublas::vector<double>, Double[], jobjectArray)
+//MODIFIED(ublas::matrix<double>, Double[][], jobjectArray)
+ 
+ 
+ 
 // ---------------------------------------------------------------------------------------------------------------------------------------------
-// input type, so that the value type will be passed through to the JNI (connection JNI to Java proxy class)
+// type converting from C++ types to Java types
 
-%typemap(javain)    ublas::matrix<double>,                          ublas::matrix<double>&                          "$javainput"
-%typemap(javain)    ublas::vector<double>,                          ublas::vector<double>&                          "$javainput"
-%typemap(javain)    ublas::symmetric_matrix<double, ublas::upper>,  ublas::symmetric_matrix<double, ublas::upper>&  "$javainput"
-%typemap(javain)    std::size_t,                                    std::size_t&                                    "$javainput"
-%typemap(javain)    std::string,                                    std::string&                                    "$javainput"
-%typemap(javain)    std::vector<std::string>,                       std::vector<std::string>&                       "$javainput"
-%typemap(javain)    std::vector<std::size_t>,                       std::vector<std::size_t>&                       "$javainput"
-
-//%typemap(javaout) SWIGTYPE                                                                                          { return $jnicall; }
-
+UNMODIFIED( jobjectArray,   Double[],                           ublas::vector<double> )
+UNMODIFIED( jobjectArray,   Double[],                           std::vector<double> )
+UNMODIFIED( jobjectArray,   Double[][],                         ublas::matrix<double> )
+UNMODIFIED( jobjectArray,   Double[][],                         swig::java::symmetric_matrix )
+UNMODIFIED( jobjectArray,   java.util.ArrayList<Double[][]>,    std::vector< ublas::matrix<double> > )
+UNMODIFIED( jobjectArray,   String[],                           std::vector<std::string> )
+UNMODIFIED( jobjectArray,   long[],                             std::vector<std::size_t> )
+UNMODIFIED( jobjectArray,   Long[],                             ublas::indirect_array<> )
+UNMODIFIED( jlong,          long,                               std::size_t )
+UNMODIFIED( jstring,        String,                             std::string )
 
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------
@@ -101,17 +109,13 @@
 %typemap(out, optimal=1, noblock=1) ublas::matrix<double>, ublas::matrix<double>&,
                                     ublas::vector<double>, ublas::vector<double>&,
                                     std::vector<double>, std::vector<double>&,
+                                    std::vector< ublas::matrix<double> >, std::vector< ublas::matrix<double> >&,
                                     ublas::indirect_array<>, ublas::indirect_array<>&
 {
     $result = swig::java::getArray(jenv, $1);
 }
 
-%typemap(out, optimal=1, noblock=1) std::vector< ublas::matrix<double> >, std::vector< ublas::matrix<double> >&
-{
-    $result = swig::java::getArrayList(jenv, $1);
-}
-
-%typemap(out, optimal=1, noblock=1) ublas::symmetric_matrix<double, ublas::upper>, ublas::symmetric_matrix<double, ublas::upper>&
+%typemap(out, optimal=1, noblock=1) swig::java::symmetric_matrix, swig::java::symmetric_matrix&
 {
     $result = swig::java::getArray(jenv, static_cast< ublas::matrix<double> >($1));
 }
@@ -127,28 +131,17 @@
 // main typemaps for "parameter types" with code converting (different uses for const (in) and non-const (argout) references, empty rules create a do-nothing-call)
 // the return parameter must be copy into a local variable (l_param) because Swig uses pointers to reference the parameter
 
-%typemap(in, optimal=1, noblock=1) const ublas::matrix<double>& (ublas::matrix<double> l_param)
+%typemap(in, optimal=1, noblock=1) ublas::matrix<double>& (ublas::matrix<double> l_param)
 {
     l_param = swig::java::getDoubleMatrixFrom2DArray(jenv, $input);
     $1      = &l_param;
-}
-
-%typemap(argout, optimal=1, noblock=1) const ublas::matrix<double>&, const ublas::vector<double>& {}
-
-%typemap(in, optimal=1, noblock=1) ublas::matrix<double>& (ublas::matrix<double> l_return) {
-    $1 = &l_return;
 }
 
 %typemap(in, optimal=1, noblock=1) ublas::vector<double>& (ublas::vector<double> l_return) {
     $1 = &l_return;
 }
 
-%typemap(argout, optimal=1, noblock=1) ublas::matrix<double>&
-{
-    $input = swig::java::getArray(jenv, *$1);
-} 
-
-%typemap(argout, optimal=1, noblock=1) ublas::vector<double>&
+%typemap(argout, optimal=1, noblock=1) ublas::matrix<double>&, ublas::vector<double>&
 {
     $input = swig::java::getArray(jenv, *$1);
 } 
