@@ -116,17 +116,18 @@ NONCONSTTYPES( jobjectArray,     Double[][],                    ublas::matrix<do
     $result = swig::java::getArray(jenv, $1);
 }
 
-%typemap(out, optimal=1, noblock=1) swig::java::symmetric_matrix, swig::java::symmetric_matrix&
+%typemap(out, optimal=1, noblock=1) swig::java::symmetric_matrix, const swig::java::symmetric_matrix&
 {
     $result = swig::java::getArray(jenv, static_cast< ublas::matrix<double> >($1));
 }
 
-%typemap(argout, optimal=1, noblock=1) ublas::vector<double>&, ublas::matrix<double>&
-{
-    $input = &swig::java::getArray(jenv, $1);
-}
+//%typemap(argout, optimal=1, noblock=1) ublas::vector<double>&, ublas::matrix<double>&
+//{
+    //prob
+//    $input = swig::java::getArray(jenv, $1);
+//}
 
-%typemap(out, optimal=1, noblock=1) std::size_t, std::size_t&
+%typemap(out, optimal=1, noblock=1) std::size_t, const std::size_t&
 {
     $result = $1;
 }
