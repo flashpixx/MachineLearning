@@ -27,40 +27,6 @@
  * $LastChangedDate$
  **/
 
-/**
- Point 1. I group typemaps in defines, for instance:
- // CPPTYPE - c++ type
- // JVTYPE - java type
- // JNITYPE - jni type as follows
- %define UBLA(CPPTYPE, JVTYPE, JNITYPE)
- %typemap(jni) const CPPTYPE, CPPTYPE, const CPPTYPE&, CPPTYPE& "JNITYPE" // don't know on whar purpose
- //pointers may be used here
- %typemap(jtype) const CPPTYPE, CPPTYPE, const CPPTYPE&, CPPTYPE& "JVTYPE"
- %typemap(jstype) const CPPTYPE, CPPTYPE, const CPPTYPE&, CPPTYPE& "JVTYPE"
- 
- // from here you should separate object, pointer and reference
- // (you do not use pointers so without them) so try like this
- %typemap(in)    const CPPTYPE, CPPTYPE "$1 = (CPPTYPE*)$input;"
- %typemap(in)    const CPPTYPE&, CPPTYPE& "*$1 = (CPPTYPE*)$input;" // ! mind the first*, previous line doesn't have it
- 
- %typemap(out)  const CPPTYPE, CPPTYPE "$result = (JNITYPE)$1"
- %typemap(out) const CPPTYPE&, CPPTYPE& "$result = (JNITYPE)*$1" // ! mind the*, previous line doesn't have it
- // here the separation stops cause on java side we do not care of object or ref it was for c++
- // you will need separation only if you write directorin/directorout typemaps,
- // so do it like for out and in
- 
- %typemap(javain) const CPPTYPE, CPPTYPE, const CPPTYPE&, CPPTYPE& "$javainput"
- %typemap(javaout) const CPPTYPE, CPPTYPE, const CPPTYPE&, CPPTYPE&
- {
- return $jnicall;
- }
- %enddef
- 
- so after it you may write something like:
- UBLA(ublas::vector<double>, Double[], jobjectArray)
- **/
-
-
 // ---------------------------------------------------------------------------------------------------------------------------------------------
 // defines for short typemapping
 
