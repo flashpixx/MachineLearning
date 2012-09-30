@@ -105,13 +105,13 @@ NONCONSTTYPES( jobjectArray,     Double[][],                    ublas::matrix<do
 
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------
-// main typemaps for "return types / reference types" with code converting
+// main typemaps for "return / output types" (output = return type and call-by-reference)
 
-%typemap(out, optimal=1, noblock=1) ublas::matrix<double>, ublas::matrix<double>&,
-                                    ublas::vector<double>, ublas::vector<double>&,
-                                    std::vector<double>, std::vector<double>&,
-                                    std::vector< ublas::matrix<double> >, std::vector< ublas::matrix<double> >&,
-                                    ublas::indirect_array<>, ublas::indirect_array<>&
+%typemap(out, optimal=1, noblock=1) ublas::matrix<double>,                ublas::matrix<double>&,
+                                    ublas::vector<double>,                ublas::vector<double>&,
+                                    ublas::indirect_array<>,              ublas::indirect_array<>&
+                                    std::vector<double>,                  std::vector<double>&,
+                                    std::vector< ublas::matrix<double> >, std::vector< ublas::matrix<double> >&
 {
     $result = swig::java::getArray(jenv, $1);
 }
@@ -134,53 +134,44 @@ NONCONSTTYPES( jobjectArray,     Double[][],                    ublas::matrix<do
 
 
 
+
 // ---------------------------------------------------------------------------------------------------------------------------------------------
-// main typemaps for "parameter types" with code converting (different uses for const (in) and non-const (argout) references, empty rules create a do-nothing-call)
-// the return parameter must be copy into a local variable (l_param) because Swig uses pointers to reference the parameter
+// typemaps for input paramter, that are used for type convert and declaration of additional variables. The typemaps are called before the method
+// is called
 
 %typemap(in, optimal=1, noblock=1) ublas::vector<double>& (ublas::vector<double> l_return)
 {
     $1 = &l_return;
 }
 
-%typemap(in, optimal=1, noblock=1) ublas::matrix<double>&
+%typemap(in, optimal=1, noblock=1) ublas::matrix<double>& (ublas::matrix<double> l_return)
 {
+    $1 = &l_return;
 }
 
 %typemap(in, optimal=1, noblock=1) const ublas::matrix<double>&, ublas::matrix<double> (ublas::matrix<double> l_param)
 {
     l_param = swig::java::getDoubleMatrixFrom2DArray(jenv, $input);
-    $1      = &l_param;
+    $1 = &l_param;
 }
-
-%typemap(in, optimal=1, noblock=1) const ublas::vector<double>&, ublas::vector<double> (ublas::vector<double> l_return) {
-    $1 = &l_return;
-}
-
-%typemap(out, optimal=1, noblock=1) const ublas::matrix<double>&, ublas::matrix<double>, const ublas::vector<double>&, ublas::vector<double>
-{
-    $result = swig::java::getArray(jenv, $1);
-} 
-
 
 %typemap(in, optimal=1, noblock=1) std::string, std::string& (std::string l_param)
 {
     l_param = swig::java::getString(jenv, $input);
-    $1      = &l_param;
+    $1 = &l_param;
 }
-
 
 %typemap(in, optimal=1, noblock=1) std::vector<std::string>, std::vector<std::string>& (std::vector<std::string> l_param)
 {
     l_param = swig::java::getStringVectorFromArray(jenv, $input);
-    $1      = &l_param;
+    $1 = &l_param;
 }
 
 
 %typemap(in, optimal=1, noblock=1) std::vector<std::size_t>, std::vector<std::size_t>& (std::vector<std::size_t> l_param)
 {
     l_param = swig::java::getSizetVectorFromArray(jenv, $input);
-    $1      = &l_param;
+    $1 = &l_param;
 }
 
 
