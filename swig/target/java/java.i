@@ -42,7 +42,7 @@
 
 %define NONCONSTTYPES( JNITYPE, JVTYPE, CPPTYPE )
 
-%typemap(jni)       CPPTYPE&       "JNITYPE*"
+%typemap(jni)       CPPTYPE&       "JNITYPE&"
 %typemap(jtype)     CPPTYPE&       "JVTYPE"
 %typemap(jstype)    CPPTYPE&       "JVTYPE"
 %typemap(javain)    CPPTYPE&       "$javainput"
@@ -101,16 +101,9 @@ NONCONSTTYPES( jobjectArray,     Double[][],                         ublas::matr
 {
 }
 
-%typemap(argout, optimal=1, noblock=1) ublas::vector<double>& (jobjectArray l_jnireturn)
+%typemap(argout, optimal=1, noblock=1) ublas::vector<double>&, ublas::matrix<double>&
 {
-    l_jnireturn = swig::java::getArray(jenv, *$1);
-    $input = &l_jnireturn;
-}
-
-%typemap(argout, optimal=1, noblock=1) ublas::matrix<double>& (jobjectArray l_jnireturn)
-{
-    l_jnireturn = swig::java::getArray(jenv, *$1);
-    $input = &l_jnireturn;
+    $input = swig::java::getArray(jenv, *$1);
 }
 
 %typemap(out, optimal=1, noblock=1) std::size_t, const std::size_t&
