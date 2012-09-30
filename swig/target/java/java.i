@@ -57,7 +57,6 @@
 CONSTTYPES( jobjectArray,        Double[],                           ublas::vector<double> )
 CONSTTYPES( jobjectArray,        Double[],                           std::vector<double> )
 CONSTTYPES( jobjectArray,        Double[][],                         ublas::matrix<double> )
-CONSTTYPES( jobjectArray,        Double[][],                         swig::java::symmetric_matrix )
 CONSTTYPES( jobject,             java.util.ArrayList<Double[][]>,    std::vector< ublas::matrix<double> > )
 CONSTTYPES( jobjectArray,        String[],                           std::vector<std::string> )
 CONSTTYPES( jobjectArray,        long[],                             std::vector<std::size_t> )
@@ -68,8 +67,14 @@ CONSTTYPES( jstring,             String,                             std::string
 NONCONSTTYPES( jobjectArray,     Double[],                           ublas::vector<double> )
 NONCONSTTYPES( jobjectArray,     Double[][],                         ublas::matrix<double> )
 
-// add the global rule, so no swigtype is created
+// add the global rule, so no swigtype is created and JNI return types are passed to the Java method return
 %typemap(javaout) SWIGTYPE { return $jnicall; }
+
+// the ublas::symmetric_matrix template does not work with the define, so run it manually
+%typemap(jni)       ublas::symmetric_matrix<double, ublas::upper>, const ublas::symmetric_matrix<double, ublas::upper>&      "jobjectArray"
+%typemap(jtype)     ublas::symmetric_matrix<double, ublas::upper>, const ublas::symmetric_matrix<double, ublas::upper>&      "Double[][]"
+%typemap(jstype)    ublas::symmetric_matrix<double, ublas::upper>, const ublas::symmetric_matrix<double, ublas::upper>&      "Double[][]"
+%typemap(javain)    ublas::symmetric_matrix<double, ublas::upper>, const ublas::symmetric_matrix<double, ublas::upper>&      "$javainput"
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------
 // main typemaps for "return / output types" (output = return type and call-by-reference)
@@ -87,7 +92,7 @@ NONCONSTTYPES( jobjectArray,     Double[][],                         ublas::matr
     $result = swig::java::getArrayList(jenv, $1);
 }
 
-%typemap(out, optimal=1, noblock=1) swig::java::symmetric_matrix, const swig::java::symmetric_matrix&
+%typemap(out, optimal=1, noblock=1) ublas::symmetric_matrix<double, ublas::upper>, const ublas::symmetric_matrix<double, ublas::upper>&
 {
     $result = swig::java::getArray(jenv, static_cast< ublas::matrix<double> >($1));
 }
@@ -112,7 +117,6 @@ NONCONSTTYPES( jobjectArray,     Double[][],                         ublas::matr
 {
     $result = $1;
 }
-
 
 
 
