@@ -48,6 +48,6 @@ Depends(jar, [dll, java])
 # set Alias with Jar build
 # env.SwigJava( os.path.join("#build", env["buildtype"], "jar", "source"), "../../machinelearning/tools/lapack.i" )
 env.Clean(
-    env.Alias( "java", env.SwigJava( os.path.join("#build", env["buildtype"], "jar", "source"), "../../machinelearning/tools/lapack.i" ) ),
+    env.Alias( "java", jar ),
     os.path.join("#build", env["buildtype"], "jar")
 )

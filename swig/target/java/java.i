@@ -58,7 +58,7 @@ CONSTTYPES( jobjectArray,   Double[],                           ublas::vector<do
 CONSTTYPES( jobjectArray,   Double[],                           std::vector<double> )
 CONSTTYPES( jobjectArray,   Double[][],                         ublas::matrix<double> )
 CONSTTYPES( jobjectArray,   Double[][],                         swig::java::symmetric_matrix )
-CONSTTYPES( jobjectArray,   java.util.ArrayList<Double[][]>,    std::vector< ublas::matrix<double> > )
+CONSTTYPES( jobject,        java.util.ArrayList<Double[][]>,    std::vector< ublas::matrix<double> > )
 CONSTTYPES( jobjectArray,   String[],                           std::vector<std::string> )
 CONSTTYPES( jobjectArray,   long[],                             std::vector<std::size_t> )
 CONSTTYPES( jobjectArray,   Long[],                             ublas::indirect_array<> )
@@ -76,10 +76,14 @@ NONCONSTTYPES( jobjectArray,     Double[][],                    ublas::matrix<do
 %typemap(out, optimal=1, noblock=1) ublas::matrix<double>,                const ublas::matrix<double>&,
                                     ublas::vector<double>,                const ublas::vector<double>&,
                                     ublas::indirect_array<>,              const ublas::indirect_array<>&
-                                    std::vector<double>,                  const std::vector<double>&,
-                                    std::vector< ublas::matrix<double> >, const std::vector< ublas::matrix<double> >&
+                                    std::vector<double>,                  const std::vector<double>&
 {
     $result = swig::java::getArray(jenv, $1);
+}
+
+%typemap(out, optimal=1, noblock=1) std::vector< ublas::matrix<double> >, const std::vector< ublas::matrix<double> >&
+{
+    $result = swig::java::getArrayList(jenv, $1);
 }
 
 %typemap(out, optimal=1, noblock=1) swig::java::symmetric_matrix, const swig::java::symmetric_matrix&
@@ -118,33 +122,33 @@ NONCONSTTYPES( jobjectArray,     Double[][],                    ublas::matrix<do
     $1 = &l_return;
 }
 
-%typemap(in, optimal=1, noblock=1) const ublas::matrix<double>&, ublas::matrix<double> (ublas::matrix<double> l_param)
+%typemap(in, optimal=1, noblock=1) ublas::matrix<double>, const ublas::matrix<double>& (ublas::matrix<double> l_param)
 {
     l_param = swig::java::getDoubleMatrixFrom2DArray(jenv, $input);
     $1 = &l_param;
 }
 
-%typemap(in, optimal=1, noblock=1) std::string, std::string& (std::string l_param)
+%typemap(in, optimal=1, noblock=1) std::string, const std::string& (std::string l_param)
 {
     l_param = swig::java::getString(jenv, $input);
     $1 = &l_param;
 }
 
-%typemap(in, optimal=1, noblock=1) std::vector<std::string>, std::vector<std::string>& (std::vector<std::string> l_param)
+%typemap(in, optimal=1, noblock=1) std::vector<std::string>, const std::vector<std::string>& (std::vector<std::string> l_param)
 {
     l_param = swig::java::getStringVectorFromArray(jenv, $input);
     $1 = &l_param;
 }
 
 
-%typemap(in, optimal=1, noblock=1) std::vector<std::size_t>, std::vector<std::size_t>& (std::vector<std::size_t> l_param)
+%typemap(in, optimal=1, noblock=1) std::vector<std::size_t>, const std::vector<std::size_t>& (std::vector<std::size_t> l_param)
 {
     l_param = swig::java::getSizetVectorFromArray(jenv, $input);
     $1 = &l_param;
 }
 
 
-%typemap(in, optimal=1, noblock=1) std::size_t, std::size_t&
+%typemap(in, optimal=1, noblock=1) std::size_t, const std::size_t&
 {
     $1 = ($1_ltype)& $input;
 }
