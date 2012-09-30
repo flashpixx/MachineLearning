@@ -52,11 +52,14 @@
  
  
 // ---------------------------------------------------------------------------------------------------------------------------------------------
-// type converting from C++ types to Java types
+// type converting from C++ types to Java types (for templates with more than one argument, we need the %arg definition, otherwise the comma is expanded)
+
+#define %arg(X...) X
 
 CONSTTYPES( jobjectArray,        Double[],                           ublas::vector<double> )
 CONSTTYPES( jobjectArray,        Double[],                           std::vector<double> )
 CONSTTYPES( jobjectArray,        Double[][],                         ublas::matrix<double> )
+CONSTTYPES( jobjectArray,        Double[][],                         %arg(ublas::symmetric_matrix<double, ublas::upper>) )
 CONSTTYPES( jobject,             java.util.ArrayList<Double[][]>,    std::vector< ublas::matrix<double> > )
 CONSTTYPES( jobjectArray,        String[],                           std::vector<std::string> )
 CONSTTYPES( jobjectArray,        long[],                             std::vector<std::size_t> )
@@ -70,11 +73,7 @@ NONCONSTTYPES( jobjectArray,     Double[][],                         ublas::matr
 // add the global rule, so no swigtype is created and JNI return types are passed to the Java method return
 %typemap(javaout) SWIGTYPE { return $jnicall; }
 
-// the ublas::symmetric_matrix template does not work with the define, so run it manually
-%typemap(jni)       ublas::symmetric_matrix<double, ublas::upper>, const ublas::symmetric_matrix<double, ublas::upper>&      "jobjectArray"
-%typemap(jtype)     ublas::symmetric_matrix<double, ublas::upper>, const ublas::symmetric_matrix<double, ublas::upper>&      "Double[][]"
-%typemap(jstype)    ublas::symmetric_matrix<double, ublas::upper>, const ublas::symmetric_matrix<double, ublas::upper>&      "Double[][]"
-%typemap(javain)    ublas::symmetric_matrix<double, ublas::upper>, const ublas::symmetric_matrix<double, ublas::upper>&      "$javainput"
+
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------
 // main typemaps for "return / output types" (output = return type and call-by-reference)
