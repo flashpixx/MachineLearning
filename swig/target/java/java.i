@@ -73,11 +73,11 @@ NONCONSTTYPES( jobjectArray,     Double[][],                    ublas::matrix<do
 // ---------------------------------------------------------------------------------------------------------------------------------------------
 // main typemaps for "return / output types" (output = return type and call-by-reference)
 
-%typemap(out, optimal=1, noblock=1) ublas::matrix<double>,                ublas::matrix<double>&,
-                                    ublas::vector<double>,                ublas::vector<double>&,
-                                    ublas::indirect_array<>,              ublas::indirect_array<>&
-                                    std::vector<double>,                  std::vector<double>&,
-                                    std::vector< ublas::matrix<double> >, std::vector< ublas::matrix<double> >&
+%typemap(out, optimal=1, noblock=1) ublas::matrix<double>,                const ublas::matrix<double>&,
+                                    ublas::vector<double>,                const ublas::vector<double>&,
+                                    ublas::indirect_array<>,              const ublas::indirect_array<>&
+                                    std::vector<double>,                  const std::vector<double>&,
+                                    std::vector< ublas::matrix<double> >, const std::vector< ublas::matrix<double> >&
 {
     $result = swig::java::getArray(jenv, $1);
 }
@@ -87,11 +87,14 @@ NONCONSTTYPES( jobjectArray,     Double[][],                    ublas::matrix<do
     $result = swig::java::getArray(jenv, static_cast< ublas::matrix<double> >($1));
 }
 
-//%typemap(argout, optimal=1, noblock=1) ublas::vector<double>&, ublas::matrix<double>&
-//{
-    //prob
-//    $input = swig::java::getArray(jenv, $1);
-//}
+%typemap(argout, optimal=1, noblock=1) const ublas::vector<double>&, const ublas::matrix<double>&,ublas::vector<double>, ublas::matrix<double>
+{
+}
+
+%typemap(argout, optimal=1, noblock=1) ublas::vector<double>&, ublas::matrix<double>&
+{
+    $input = swig::java::getArray(jenv, $1);
+}
 
 %typemap(out, optimal=1, noblock=1) std::size_t, const std::size_t&
 {
