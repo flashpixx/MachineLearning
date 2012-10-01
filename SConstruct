@@ -398,6 +398,7 @@ def swigjava_emitter(target, source, env) :
                 help[newval] = [k]
         data["template"] = help
         
+        
         # adding target filenames with path (first the cpp name, second the java names)
         target.append( os.path.normpath(os.path.join(nbuilddir, data["sourcename"]+".cpp" )) )
         
@@ -410,6 +411,9 @@ def swigjava_emitter(target, source, env) :
             else :
                 for l in data["template"][n] :
                     target.append( os.path.normpath(os.path.join(jbuilddir, os.sep.join(data["cppnamespace"][n]), l+".java")) )
+                    
+            #adding generated file, that should be deleted later to the targets (with the extension .del)
+            target.append( os.path.join(jbuilddir, os.sep.join(data["cppnamespace"][n]), str(data["module"]).replace("'","").replace("]","").replace("[","")+".java.del") )
                     
     return target, source
     
@@ -435,7 +439,14 @@ def swigjava_cppdiraction(source, targets) :
         pass
     return os.path.join(path, str(source)+".cpp")
     
-SwigJavaBuilder = Builder( action = SCons.Action.Action("swig -Wall -O -templatereduce -c++ -java -package ${SwigJavaPackage(SOURCE.dir)} -outdir ${SwigJavaOutDir(SOURCE.dir, TARGETS)} -o ${SwigJavaCppDir(SOURCE.filebase, TARGETS)} $SOURCE"), emitter=swigjava_emitter, single_source = True, src_suffix=".i", target_factory=Entry, source_factory=File )
+def swigjava_remove(targets) :
+    for i in filter(lambda i: str(i).endswith(".del"), targets) :
+        try :
+            os.remove(str(i).replace(".del",""))
+        except :
+            pass
+    
+SwigJavaBuilder = Builder( action = SCons.Action.Action(["swig -Wall -O -templatereduce -c++ -java -package ${SwigJavaPackage(SOURCE.dir)} -outdir ${SwigJavaOutDir(SOURCE.dir, TARGETS)} -o ${SwigJavaCppDir(SOURCE.filebase, TARGETS)} $SOURCE", "${SwigJavaRemove(TARGETS)}"]), emitter=swigjava_emitter, single_source = True, src_suffix=".i", target_factory=Entry, source_factory=File )
 # ---------------------------------------------------------------------------
 
 
@@ -480,6 +491,7 @@ env = Environment(
         SwigJavaPackage = swigjava_packageaction, 
         SwigJavaOutDir  = swigjava_outdiraction,
         SwigJavaCppDir  = swigjava_cppdiraction,
+        SwigJavaRemove  = swigjava_remove,
         
         variables=vars,
         
