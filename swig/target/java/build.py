@@ -78,7 +78,7 @@ dll    = env.SharedLibrary( os.path.join("#build", env["buildtype"], "jar", "bui
 java   = env.Java(  os.path.join("#build", env["buildtype"], "jar", "build"), os.path.join("#build", env["buildtype"], "jar", "source", "java")  )
 libcp  = env.LibraryCopy( os.path.join("#build", env["buildtype"], "jar", "build", "native"), [] )
 rellib = env.Command("rellib_dll", dll, libchange )
-Depends(dll, libcp)
+Depends(rellib, libcp)
     
 # set Jar flags (we need a own command for the -C option)   
 env["JARCOM"] = "$JAR $_JARFLAGS $TARGET $_JARMANIFEST $_JARCHDIR $_JARSOURCES -C " + os.path.join("build", env["buildtype"], "jar", "build") + " ."
