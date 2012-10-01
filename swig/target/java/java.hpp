@@ -61,10 +61,11 @@ namespace machinelearning { namespace swig {
             static jobjectArray getArray( JNIEnv*, const ublas::matrix<double>&, const rowtype& = row );
             static jobjectArray getArray( JNIEnv*, const ublas::vector<double>& );
             static jobjectArray getArray( JNIEnv*, const std::vector<double>& );
-            
             static jobjectArray getArray( JNIEnv*, const ublas::indirect_array<>& );
             
             static jobject getArrayList( JNIEnv*, const std::vector< ublas::matrix<double> >&, const rowtype& = row );
+            static void setArrayList( JNIEnv*, const jobject&, const ublas::vector<double>& );
+            static void setArrayList( JNIEnv*, const jobject&, const ublas::matrix<double>&, const rowtype& = row );
         
             static std::string getString( JNIEnv*, const jstring );
             static std::vector<std::string> getStringVectorFromArray( JNIEnv*, const jobjectArray& );
@@ -124,6 +125,8 @@ namespace machinelearning { namespace swig {
             return 0;
         }
         
+        
+        
         jmethodID l_id = p_env->GetMethodID(l_class, p_methodname, p_signatur);
         if (!l_id) {
             SWIG_JavaThrowException(p_env, SWIG_JavaRuntimeException, "can not find method with signature" );
@@ -133,7 +136,7 @@ namespace machinelearning { namespace swig {
         return l_id;
     }
     
-    
+
     /** create resources to the constructor call
      * @param p_env JNI environment
      * @param p_name name of the class
@@ -189,6 +192,86 @@ namespace machinelearning { namespace swig {
         }
         
         return l_data;
+    }
+    
+    
+    /** sets the data into an array (vector) of mutable double objects
+     * @param p_env JNI environment
+     * @param p_array input array
+     * @param p_data vector data
+     **/
+    inline void java::setArrayList( JNIEnv* p_env, const jobject& p_array, const ublas::vector<double>& p_data )
+    {
+        if (p_data.size() == 0)
+            return;
+        if (!p_array)
+        {
+            SWIG_JavaThrowException(p_env, SWIG_JavaNullPointerException, "" );
+            return;
+        }
+        
+        // get add method
+        jmethodID l_add = getMethodID(p_env, p_array, "add", "(Ljava/lang/Object;)Z"); 
+        
+        // get Double object
+        jclass l_doubleelementclass   = NULL;
+        jmethodID l_doubleelementctor = NULL;
+        getCtor(p_env, "java/lang/Double", "(D)V", l_doubleelementclass, l_doubleelementctor);
+        
+        for(std::size_t i=0; i < p_data.size(); ++i)
+            p_env->CallObjectMethod(  p_array, l_add, p_env->NewObject(l_doubleelementclass, l_doubleelementctor, tools::function::isNumericalZero(p_data(i)) ? static_cast<double>(0) : p_data(i) )  );
+    }
+    
+    
+    /** sets the data into an array (matrix) of mutable double objects
+     * @param p_env JNI environment
+     * @param p_array input array
+     * @param p_data matrix data
+     * @param p_rowtype row type
+     **/
+    inline void java::setArrayList( JNIEnv* p_env, const jobject& p_array, const ublas::matrix<double>& p_data, const rowtype& p_rowtype )
+    {
+        if ( (p_data.size1() == 0) || (p_data.size2() == 0) )
+            return;
+        if (!p_array)
+        {
+            SWIG_JavaThrowException(p_env, SWIG_JavaNullPointerException, "" );
+            return;
+        }
+        
+        // get add method
+        jmethodID l_add = getMethodID(p_env, p_array, "add", "(Ljava/lang/Object;)Z"); 
+        
+        // get Double object
+        jclass l_doubleelementclass   = NULL;
+        jmethodID l_doubleelementctor = NULL;
+        getCtor(p_env, "java/lang/Double", "(D)V", l_doubleelementclass, l_doubleelementctor);
+        
+        switch (p_rowtype) {
+            
+            case row: {
+                for(std::size_t i=0; i < p_data.size1(); ++i)
+                {
+                    jobjectArray l_row = p_env->NewObjectArray( static_cast<jint>(p_data.size2()), l_doubleelementclass, NULL );
+                    for(std::size_t j=0; j < p_data.size2(); ++j)
+                        p_env->SetObjectArrayElement(l_row, j, p_env->NewObject(l_doubleelementclass, l_doubleelementctor, tools::function::isNumericalZero(p_data(i,j)) ? static_cast<double>(0) : p_data(i,j) ) );
+                    p_env->CallObjectMethod( p_array, l_add, (jobject)l_row );
+                }
+                break;
+            }
+                
+            case column: {
+                for(std::size_t i=0; i < p_data.size2(); ++i)
+                {
+                    jobjectArray l_row = p_env->NewObjectArray( static_cast<jint>(p_data.size1()), l_doubleelementclass, NULL );
+                    for(std::size_t j=0; j < p_data.size1(); ++j)
+                        p_env->SetObjectArrayElement(l_row, j, p_env->NewObject(l_doubleelementclass, l_doubleelementctor, tools::function::isNumericalZero(p_data(i,j)) ? static_cast<double>(0) : p_data(i,j) ) );
+                    p_env->CallObjectMethod( p_array, l_add, (jobject)l_row );
+                }
+                break;
+            }
+                
+        }
     }
    
     

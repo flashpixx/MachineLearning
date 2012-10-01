@@ -42,7 +42,7 @@
 
 %define NONCONSTTYPES( JNITYPE, JVTYPE, CPPTYPE )
 
-%typemap(jni)       CPPTYPE&       "JNITYPE&"
+%typemap(jni)       CPPTYPE&       "JNITYPE"
 %typemap(jtype)     CPPTYPE&       "JVTYPE"
 %typemap(jstype)    CPPTYPE&       "JVTYPE"
 %typemap(javain)    CPPTYPE&       "$javainput"
@@ -67,8 +67,8 @@ CONSTTYPES( jobjectArray,        Long[],                             ublas::indi
 CONSTTYPES( jlong,               long,                               std::size_t )
 CONSTTYPES( jstring,             String,                             std::string )
 
-NONCONSTTYPES( jobjectArray,     Double[],                           ublas::vector<double> )
-NONCONSTTYPES( jobjectArray,     Double[][],                         ublas::matrix<double> )
+NONCONSTTYPES( jobject,          java.util.ArrayList<Double>,        ublas::vector<double> )
+NONCONSTTYPES( jobject,          java.util.ArrayList<Double[]>,      ublas::matrix<double> )
 
 // add the global rule, so no swigtype is created and JNI return types are passed to the Java method return
 %typemap(javaout) SWIGTYPE { return $jnicall; }
@@ -102,7 +102,7 @@ NONCONSTTYPES( jobjectArray,     Double[][],                         ublas::matr
 
 %typemap(argout, optimal=1, noblock=1) ublas::vector<double>&, ublas::matrix<double>&
 {
-    $input = swig::java::getArray(jenv, *$1);
+    swig::java::setArrayList(jenv, $input, *$1);
 }
 
 %typemap(out, optimal=1, noblock=1) std::size_t, const std::size_t&

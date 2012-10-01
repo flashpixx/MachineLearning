@@ -23,7 +23,7 @@
 
 
 import machinelearning.tools.*;
-import java.util.Random;
+import java.util.*;
 
 
 /** java testprogram for using svd algorithms **/
@@ -36,7 +36,7 @@ public class svd {
     public static void main(String[] p_args)
     {
         // generates random datapoints
-        Random l_rand = new Random();
+        java.util.Random l_rand = new java.util.Random();
         
         Double[][] l_data = new Double[4][8];
         for(int i=0; i < l_data.length; i++) {
@@ -49,40 +49,41 @@ public class svd {
         
 
         // create SVD
-        Double[] l_vals    = new Double[0];
-        Double[][] l_vecs1 = new Double[0][0];
-        Double[][] l_vecs2 = new Double[0][0];
-        Lapack.svd(l_data, l_vals, l_vecs1, l_vecs2);
+        ArrayList<Double> l_svdvals   = new ArrayList<Double>();
+        ArrayList<Double[]> l_svdvecs1 = new ArrayList<Double[]>();
+        ArrayList<Double[]> l_svdvecs2 = new ArrayList<Double[]>();
+        
+        Lapack.svd(l_data, l_svdvals, l_svdvecs1, l_svdvecs2);
         
 
         
         System.out.println("\nsvd values:");
-        for(int i=0; i < l_vals.length; i++)
-            System.out.print(l_vals[i] + "\t");
+        for(int i=0; i < l_svdvals.size(); i++)
+            System.out.print(l_svdvals.get(i) + "\t");
         System.out.println("");
-        l_vals = null;
+        l_svdvals = null;
         
         
         
         System.out.println("\nsvd vectors 1:\n");
-        for(int j=0; j < l_vecs1.length; j++) {
+        for(int j=0; j < l_svdvecs1.size(); j++) {
             System.out.print( (j+1) + " svd vector:\t");
-            for(int i=0; i < l_vecs1[j].length; i++)
-                System.out.print(l_vecs1[j][i] + "\t");
+            for(int i=0; i < l_svdvecs1.get(j).length; i++)
+                System.out.print(l_svdvecs1.get(j)[i] + "\t");
             System.out.println("\n");
         }
-        l_vecs1 = null;
+        l_svdvecs1 = null;
         
         
         
         System.out.println("\nsvd vectors 2:\n");
-        for(int j=0; j < l_vecs2.length; j++) {
+        for(int j=0; j < l_svdvecs2.size(); j++) {
             System.out.print( (j+1) + " svd vector:\t");
-            for(int i=0; i < l_vecs2[j].length; i++)
-                System.out.print(l_vecs2[j][i] + "\t");
+            for(int i=0; i < l_svdvecs2.get(j).length; i++)
+                System.out.print(l_svdvecs2.get(j)[i] + "\t");
             System.out.println("\n");
         }
-        l_vecs2 = null;
+        l_svdvecs2 = null;
 
         
         l_data         = null;
