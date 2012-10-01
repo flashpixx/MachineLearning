@@ -26,6 +26,27 @@ import subprocess
 Import("*")
 
 
+
+# library change for Mac OS X
+def libchange_osx(source) :
+    cmd = subprocess.Popen( "otool -L "+source, shell=True, stdout=subprocess.PIPE)
+    output = cmd.stdout.readlines()
+    cmd.communicate()
+    if cmd.returncode <> 0 :
+        raise SCons.Errors.UserError("error reading output")
+
+    # get linked libs and change the path
+    os.system("install_name_tool -id " + os.path.basename(source) + " " + source )
+    for n in [i.strip().split(" ")[0] for i in output[2:]] :
+        fname  = os.path.splitext(os.path.basename(n))
+        fname  = re.sub(r"\.[0-9]+", "", fname[0])+fname[1]
+
+        if os.path.isfile( os.path.join( os.path.dirname(source), fname) ) :
+            os.system("install_name_tool -change " + n + " @loader_path" + os.path.sep + fname + " " + source)
+            libchange_osx( os.path.join( os.path.dirname(source), fname) )
+
+
+
 # function that is run on the build JNI library for setup relative links
 def libchange(target, source, env) :
     if platform.system().lower() == "posix" :
@@ -33,22 +54,7 @@ def libchange(target, source, env) :
     elif platform.system().lower() == "linux" :
         pass
     elif platform.system().lower() == "darwin" :
-    
-        cmd = subprocess.Popen( "otool -L "+str(source[0]), shell=True, stdout=subprocess.PIPE)
-        output = cmd.stdout.readlines()
-        cmd.communicate()
-        if cmd.returncode <> 0 :
-            raise SCons.Errors.UserError("error reading output")
-    
-        # get linked libs and change the path
-        source = str(source[0])
-        for n in [i.strip().split(" ")[0] for i in output[2:]] :
-            fname = os.path.splitext(os.path.basename(n))
-            fname = re.sub(r"\.[0-9]+", "", fname[0])+fname[1]
-
-            if os.path.isfile( os.path.join( os.path.dirname(source), fname) ) :
-                os.system("install_name_tool -change " + n + " @loader_path" + os.path.sep + fname + " " + source)
-          
+        libchange_osx(str(source[0]))
     else :
         raise RuntimeError("platform not known")
 

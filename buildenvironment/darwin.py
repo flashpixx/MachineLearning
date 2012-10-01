@@ -204,7 +204,7 @@ if conf.env["atlaslink"] == "multi" :
 elif conf.env["atlaslink"] == "single" :
     localconf["clibraries"].append("satlas")
     
-if not("javac" in COMMAND_LINE_TARGETS) :
+if not("java" in COMMAND_LINE_TARGETS) :
     localconf["cpplibraries"].extend([
                             "boost_program_options", "boost_filesystem"
     ])
