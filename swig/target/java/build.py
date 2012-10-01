@@ -46,8 +46,10 @@ def libchange_osx(source) :
             libchange_osx( os.path.join( os.path.dirname(source), fname) )
 
 
+# linux change: os.system( "objdump -p " + pathfile + " | grep -i soname | awk '{system(\"mv " + pathfile + " "+nativepath+os.path.sep+"\"$2)}'" )
 
-# function that is run on the build JNI library for setup relative links
+
+# builder command function that is run on the build JNI library for setup relative links
 def libchange(target, source, env) :
     if platform.system().lower() == "posix" :
         pass
