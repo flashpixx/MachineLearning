@@ -465,7 +465,6 @@ SwigJavaBuilder = Builder( action = SCons.Action.Action(["swig -Wall -O -templat
 
 
 
-
 #=== licence ===========================================================================================================================
 
 # licence text
@@ -510,10 +509,10 @@ env = Environment(
         variables=vars,
         
         BUILDERS = { 
-            "LibraryCopy" : LibraryCopyBuilder,
-            "SwigJava"    : SwigJavaBuilder, 
-            "Download"    : DownloadBuilder, 
-            "Extract"     : ExtractBuilder
+            "LibraryCopy"   : LibraryCopyBuilder,
+            "SwigJava"      : SwigJavaBuilder, 
+            "Download"      : DownloadBuilder, 
+            "Extract"       : ExtractBuilder
         }
 )
 env.Tool("gettext")

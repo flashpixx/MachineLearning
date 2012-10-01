@@ -20,7 +20,39 @@
 # -*- coding: utf-8 -*-
 
 import os
+import re
+import platform
+import subprocess
 Import("*")
+
+
+# function that is run on the build JNI library for setup relative links
+def libchange(target, source, env) :
+    if platform.system().lower() == "posix" :
+        pass
+    elif platform.system().lower() == "linux" :
+        pass
+    elif platform.system().lower() == "darwin" :
+    
+        cmd = subprocess.Popen( "otool -L "+str(source[0]), shell=True, stdout=subprocess.PIPE)
+        output = cmd.stdout.readlines()
+        cmd.communicate()
+        if cmd.returncode <> 0 :
+            raise SCons.Errors.UserError("error reading output")
+    
+        # get linked libs and change the path
+        source = str(source[0])
+        for n in [i.strip().split(" ")[0] for i in output[2:]] :
+            fname = os.path.splitext(os.path.basename(n))
+            fname = re.sub(r"\.[0-9]+", "", fname[0])+fname[1]
+
+            if os.path.isfile( os.path.join( os.path.dirname(source), fname) ) :
+                os.system("install_name_tool -change " + n + " @loader_path" + os.path.sep + fname + " " + source)
+          
+    else :
+        raise RuntimeError("platform not known")
+
+
 
 
 cpp  = []
@@ -34,16 +66,16 @@ for i in GlobRekursiv( os.path.join("..", ".."), [".i"], ["target"]) :
             cpp.append(n)
         
 # call Java & C++ builder
-dll  = env.SharedLibrary( os.path.join("#build", env["buildtype"], "jar", "build", "native", "machinelearning"), defaultcpp + cpp )
-java = env.Java(  os.path.join("#build", env["buildtype"], "jar", "build"), os.path.join("#build", env["buildtype"], "jar", "source", "java")  )
-
-# copy libraries
-Depends(dll, env.LibraryCopy( os.path.join("#build", env["buildtype"], "jar", "build", "native"), [] ))
+dll    = env.SharedLibrary( os.path.join("#build", env["buildtype"], "jar", "build", "native", "machinelearning"), defaultcpp + cpp )
+java   = env.Java(  os.path.join("#build", env["buildtype"], "jar", "build"), os.path.join("#build", env["buildtype"], "jar", "source", "java")  )
+libcp  = env.LibraryCopy( os.path.join("#build", env["buildtype"], "jar", "build", "native"), [] )
+rellib = env.Command("rellib_dll", dll, libchange )
+Depends(dll, libcp)
     
 # set Jar flags (we need a own command for the -C option)   
 env["JARCOM"] = "$JAR $_JARFLAGS $TARGET $_JARMANIFEST $_JARCHDIR $_JARSOURCES -C " + os.path.join("build", env["buildtype"], "jar", "build") + " ."
 jar = env.Jar(os.path.join("#build", env["buildtype"], "machinelearning.jar"), [])
-Depends(jar, [dll, java])
+Depends(jar, [rellib, java])
 
 # set Alias with Jar build
 env.Clean(
