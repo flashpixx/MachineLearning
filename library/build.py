@@ -319,7 +319,12 @@ def HDF5_BuildInstall(env, hdfdir) :
 def LibXML2_BuildInstall(env, libxmldir) :
     version = str(libxmldir).replace("']", "").replace("['", "").replace("libxml2-", "")
     
-    return env.Command("buildlibxml2-"+version, libxmldir, "cd $SOURCE; ./configure --prefix="+os.path.abspath(os.path.join(workingpath, "build_"+env["buildtype"], "xml", version))+ "; make; make install")
+    cmd = "cd $SOURCE; ./configure --without-python --without-threads --prefix="+os.path.abspath(os.path.join(workingpath, "build_"+env["buildtype"], "xml", version))
+    if env["buildtype"] == "release" :
+        cmd = cmd + " --without-debug"
+    cmd = cmd + "; make; make install"
+    
+    return env.Command("buildlibxml2-"+version, libxmldir, cmd)
     
         
 def GiNaC_BuildInstall(env, ginacdir, clnbuild) :
