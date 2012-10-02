@@ -25,6 +25,7 @@
 # variables are read here and are added to the environment object
 
 import os
+import re
 Import("*")
 
 
@@ -154,10 +155,6 @@ if "CXX" in os.environ:
     conf.env.Replace(CXX = os.environ["CXX"])
     print("Using compiler " + os.environ["CXX"])
 
-if "CPPPATH" in os.environ :
-    conf.env.Append(CPPPATH = os.environ["CPPPATH"].split(os.pathsep))
-    print("Appending custom C++ path (CPPPATH)")
-    
 if "CXXFLAGS" in os.environ:
     conf.env.Append(CXXFLAGS = os.environ["CXXFLAGS"].split(" "))
     print("Appending custom build flags (CXXFLAGS)")
@@ -166,16 +163,6 @@ if "LDFLAGS" in os.environ:
     conf.env.Append(LINKFLAGS = os.environ["LDFLAGS"].split(" "))
     print("Appending custom link flags (LDFLAG)")
 
-if "DYLD_LIBRARY_PATH" in os.environ :
-    conf.env.Append(LIBPATH = os.environ["DYLD_LIBRARY_PATH"].split(os.pathsep)) 
-    print("Appending custom OSX dynamic library path (DYLD_LIBRARY_PATH)")
-elif "LD_LIBRARY_PATH" in os.environ :
-    conf.env.Append(LIBPATH = os.environ["LD_LIBRARY_PATH"].split(os.pathsep)) 
-    print("Appending custom posix library path (LD_LIBRARY_PATH)")
-elif "LIBRARY_PATH" in os.environ :
-    conf.env.Append(LIBPATH = os.environ["LIBRARY_PATH"].split(os.pathsep)) 
-    print("Appending custom posix library path (LIBRARY_PATH)")
-    
 if "TERM" in os.environ :
     conf.env["ENV"]["TERM"] = os.environ["TERM"]
     print("Using term environment variable (TERM)")
@@ -183,6 +170,51 @@ if "TERM" in os.environ :
 if "HOME" in os.environ :
     conf.env["ENV"]["HOME"] = os.environ["HOME"]
     print("Using home environment variable (HOME)")
+    
+if conf.env["uselocallibrary"] :
+    libdir      = []
+    includedir  = []
+    
+    path   = os.path.abspath(os.path.join(os.path.abspath(os.curdir), "..", "library", "build_"+conf.env["buildtype"]))
+    reg    = re.compile("\d(.*)")
+    
+    for i in ["atlas", "boost", "cln", "ginac", "hdf", "jsoncpp", "xml"] :
+        dir = os.path.join(path, i)
+        if not(os.path.isdir(dir)) :
+            continue
+            
+        version = filter(lambda x: reg.match(x) <> None, os.listdir( dir ))
+        if version :
+            libdir.append( os.path.join(dir, version[0], "lib" ) )
+            includedir.append( os.path.join(dir, version[0], "include" ) )
+            
+            if i == "boost" :
+                includedir.append( os.path.join(dir, "sandbox", "numeric_bindings" ) )
+        
+    conf.env.Replace(LIBPATH = libdir)
+    conf.env.Replace(CPPPATH = includedir)
+    print("Using local C++ path")
+    print("Using local dynamic library path")
+    
+else :
+    if "CPPPATH" in os.environ :
+        conf.env.AppendUnique(CPPPATH = os.environ["CPPPATH"].split(os.pathsep))
+        print("Appending custom C++ path (CPPPATH)")
+
+    if "DYLD_LIBRARY_PATH" in os.environ :
+        conf.env.AppendUnique(LIBPATH = os.environ["DYLD_LIBRARY_PATH"].split(os.pathsep)) 
+        print("Appending custom OSX dynamic library path (DYLD_LIBRARY_PATH)")
+    elif "LD_LIBRARY_PATH" in os.environ :
+        conf.env.AppendUnique(LIBPATH = os.environ["LD_LIBRARY_PATH"].split(os.pathsep)) 
+        print("Appending custom posix library path (LD_LIBRARY_PATH)")
+    elif "LIBRARY_PATH" in os.environ :
+        conf.env.AppendUnique(LIBPATH = os.environ["LIBRARY_PATH"].split(os.pathsep)) 
+        print("Appending custom posix library path (LIBRARY_PATH)")
+    
+# append main framework directory
+conf.env.AppendUnique(CPPPATH = [Dir("#")])
+    
+    
     
 # set additional dynamic link libraries which should be copied into the build dir    
 conf.env["NOTCOPYLIBRARY"] = ["stdc++", "intl"]
