@@ -137,7 +137,8 @@
  *
  * @subsection scons Scons Build Environment
  * The framework supports Scons for compiling. The script reads the environment (Linux, OS X & Microsoft) and uses the
- * plattform specified options for compiling the sources [see options and default values with <dfn>scons -Q -h</dfn>].
+ * plattform specified options for compiling the sources [see options and default values with <dfn>scons -Q -h</dfn>]. On
+ * default the script tries to detect the distcc environment and try to use it
  * <ul>
  * <li><dfn>withrandomdevice</dfn> adds the compilerflag for random device support</li>
  * <li><dfn>withmpi</dfn> adds the compilerflag for cluster / MPI support (on the target <dfn>librarybuild</dfn> MPI support is compiled into the Boost)</li>
@@ -149,6 +150,7 @@
  * </ul><ul>
  * <li><dfn>buildtype</dfn> build type [allowed valus: debug | release, default value is set to release]</li>
  * <li><dfn>uselocallibrary</dfn> uses only the libraries which are stores within the library directory</li>
+ * <li><dfn>usedistcc</dfn> the build process forces distcc on building</li>
  * <li><dfn>skiplibrary</dfn> disables / skips the automatic build of a library [allowd values: all, none, atlas, boost, hdf, ginac, json, xml]</li> 
  * <li><dfn>copylibrary</dfn> copy the dynamic libraries into the build directory</li>
  * <li><dfn>atlaspointerwidth</dfn> parameter for setting the ATLAS pointer width during running the library build target (default empty for system default)</li>
