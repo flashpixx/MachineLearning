@@ -34,6 +34,9 @@ import SCons.Node
 
 #=== CLI parameters ====================================================================================================================
 def createVariables(vars) :
+    
+    
+
     vars.Add(BoolVariable("withrandomdevice", "installation with random device support", False))
     vars.Add(BoolVariable("withmpi", "installation with MPI support", False))
     vars.Add(BoolVariable("withmultilanguage", "installation with multilanguage support", False))
@@ -48,8 +51,12 @@ def createVariables(vars) :
     vars.Add(ListVariable("skiplibrary", "skipping library builds / downloads", "", ["atlas", "boost", "hdf", "ginac", "json", "xml"]))
     vars.Add(BoolVariable("copylibrary", "copy the dynamic link libraries into the build dir", False))
     
-    vars.Add(BoolVariable("zipsupport", "build Bzip2 and ZLib support for Boost", (platform.system().lower()=="cygwin")))
-    vars.Add(EnumVariable("atlaslink", "type of the ATLAS link file", "multi", allowed_values=("single", "multi")))
+    if platform.system().lower().split("_")[0] == "cygwin" :
+        vars.Add(BoolVariable("zipsupport", "build Bzip2 and ZLib support for Boost", True))
+        vars.Add(EnumVariable("atlaslink", "type of the ATLAS link file", "single", allowed_values=("single", "multi")))
+    else :
+        vars.Add(BoolVariable("zipsupport", "build Bzip2 and ZLib support for Boost", False))
+        vars.Add(EnumVariable("atlaslink", "type of the ATLAS link file", "multi", allowed_values=("single", "multi")))
     vars.Add(EnumVariable("atlaspointerwidth", "pointer width for compiling ATLAS (empty = system default, 32 = 32 Bit, 64 = 64 Bit)", "", allowed_values=("", "32", "64")))
     
 
@@ -126,8 +133,8 @@ def setupToolkitEnv(env) :
         env["TOOLKIT"]      = "posix"
     elif platform.system().lower() == "darwin" :
         env["TOOLKIT"]      = "darwin"
-    elif platform.system().lower() == "cygwin" :
-        env["PLATFORM"]     = "cygwin"
+    elif platform.system().lower().split("_")[0] == "cygwin" :
+        env["TOOLKIT"]      = "cygwin"
     else :
         raise RuntimeError("toolkit not known")
 
