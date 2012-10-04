@@ -188,6 +188,11 @@ if conf.env["uselocallibrary"] :
             libdir.append( os.path.join(dir, version[0], "lib" ) )
             includedir.append( os.path.join(dir, version[0], "include" ) )
             
+            if i == "xml" :
+                includedir.append( os.path.join(dir, version[0], "include", "libxml2" ) )
+            else :
+                includedir.append( os.path.join(dir, version[0], "include" ) )
+            
             if i == "boost" :
                 includedir.append( os.path.join(dir, "sandbox", "numeric_bindings" ) )
         
