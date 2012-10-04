@@ -254,7 +254,7 @@ if not("java" in COMMAND_LINE_TARGETS) :
     ])
     
 if "librarybuild" in COMMAND_LINE_TARGETS :
-    checkExecutables(conf, [ "g++", "gcc", "gfortran", "tar", "make" ])
+    checkExecutables(conf, [ "g++", "gcc", "gfortran", "tar", "make", "svn" ])
 elif "documentation" in COMMAND_LINE_TARGETS :
     checkExecutables(conf, "doxygen")
 # ==========================================================================
