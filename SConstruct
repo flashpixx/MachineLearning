@@ -192,7 +192,6 @@ def librarycopy_emitter(target, source, env) :
             lst.append( env["COPYLIBRARY"] )
     lst = set(lst)
     
-    
     removelib = []
     if "NOTCOPYLIBRARY" in env :
         if SCons.Util.is_List(env["NOTCOPYLIBRARY"]) :
@@ -205,12 +204,18 @@ def librarycopy_emitter(target, source, env) :
     for i in lst :
         if i in removelib :
             continue
-    
-        name = env["LIBPREFIX"]+str(i)+env["SHLIBSUFFIX"]
-        lib  = env.FindFile(name, env["LIBPATH"])
-        if lib <> None :
-            listsources.append(lib)
-            listtargets.append( os.path.join(str(target[0]), name) )
+            
+        libnames = [ env["LIBPREFIX"]+str(i)+env["SHLIBSUFFIX"] ]
+        if env["TOOLKIT"] == "cygwin" :
+            libnames.extend([ str(i)+env["SHLIBSUFFIX"], "cyg"+str(i)+env["SHLIBSUFFIX"] ])
+        
+        for i in  libnames :
+            lib  = env.FindFile(i, env["LIBPATH"])
+            if lib <> None :
+                listsources.append(lib)
+                listtargets.append( os.path.join(str(target[0]), i) )
+                break
+            
     return listtargets, listsources
     
 def librarycopy_action(target, source, env) :

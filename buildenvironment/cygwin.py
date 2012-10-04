@@ -192,7 +192,12 @@ if conf.env["uselocallibrary"] :
         version = filter(lambda x: reg.match(x) <> None, os.listdir( dir ))
         if version :
             libdir.append( os.path.join(dir, version[0], "lib" ) )
-            includedir.append( os.path.join(dir, version[0], "include" ) )
+            libdir.append( os.path.join(dir, version[0], "bin" ) )
+            
+            if i == "xml" :
+                includedir.append( os.path.join(dir, version[0], "include", "libxml2" ) )
+            else :
+                includedir.append( os.path.join(dir, version[0], "include" ) )
             
             if i == "boost" :
                 includedir.append( os.path.join(dir, "sandbox", "numeric_bindings" ) )
@@ -214,16 +219,17 @@ else :
         conf.env.AppendUnique(LIBPATH = os.environ["LIBRARY_PATH"].split(os.pathsep)) 
         print("Appending custom posix library path (LIBRARY_PATH)")
     
-# append main framework directory
+# append main framework directory and Cygwin directory
 conf.env.AppendUnique(CPPPATH = [Dir("#")])
+conf.env.AppendUnique(LIBPATH = ["/bin"])
 
     
 # set additional dynamic link libraries which should be copied into the build dir    
-conf.env["NOTCOPYLIBRARY"] = ["stdc++"]
+conf.env["COPYLIBRARY"] = ["win1", "gcc_s-1", "gomp-1", "stdc++-6"]
 
 # main configuration
-conf.env.AppendUnique(LINKFLAGS   = ["-fopenmp", "-pthread", "--as-needed"])
-conf.env.AppendUnique(CXXFLAGS    = ["-fopenmp", "-pthread", "-pipe"])
+conf.env.AppendUnique(LINKFLAGS   = ["-fopenmp", "--as-needed"])
+conf.env.AppendUnique(CXXFLAGS    = ["-fopenmp", "-pipe"])
 conf.env.AppendUnique(CPPDEFINES  = ["BOOST_FILESYSTEM_NO_DEPRECATED", "BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"])
 
 if conf.env["buildtype"] == "release" :
@@ -251,7 +257,7 @@ if not("java" in COMMAND_LINE_TARGETS) :
     ])
     
 if "librarybuild" in COMMAND_LINE_TARGETS :
-    checkExecutables(conf, [ "g++.exe", "gcc.exe", "gfortran.exe", "tar.exe", "make.exe" ])
+    checkExecutables(conf, [ "g++.exe", "gcc.exe", "gfortran.exe", "tar.exe", "make.exe", "svn.exe" ])
 elif "documentation" in COMMAND_LINE_TARGETS :
     checkExecutables(conf, "doxygen.exe")
 # ==========================================================================
