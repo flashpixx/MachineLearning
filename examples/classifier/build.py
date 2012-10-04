@@ -25,7 +25,7 @@ Import("*")
 buildlist = []
 
 if env["withfiles"] :
-    buildlist.append( env.Program( target=os.path.join("#build", "classifier", "lazy"), source=defaultcpp + ["lazy.cpp"] ) )
+    buildlist.append( env.Program( target=os.path.join("#build", env["buildtype"], "classifier", "lazy"), source=defaultcpp + ["lazy.cpp"] ) )
     
 if env["uselocallibrary"] or env["copylibrary"] :
     Depends(buildlist, env.LibraryCopy( os.path.join("#build", env["buildtype"], "classifier"), [] ))

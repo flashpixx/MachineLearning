@@ -25,12 +25,12 @@ Import("*")
 buildlist = []
 
 if env["withfiles"] :
-    buildlist.append( env.Program( target=os.path.join("#build", "clustering", "rlvq"), source=defaultcpp+["rlvq.cpp"] ) )
-    buildlist.append( env.Program( target=os.path.join("#build", "clustering", "kmeans"), source=defaultcpp+["kmeans.cpp"] ) )
-    buildlist.append( env.Program( target=os.path.join("#build", "clustering", "neuralgas"), source=defaultcpp+["neuralgas.cpp"] ) )
-    buildlist.append( env.Program( target=os.path.join("#build", "clustering", "patch_neuralgas"), source=defaultcpp+["patch_neuralgas.cpp"] ) )
-    buildlist.append( env.Program( target=os.path.join("#build", "clustering", "relational_neuralgas"), source=defaultcpp+["relational_neuralgas.cpp"] ) )
-    buildlist.append( env.Program( target=os.path.join("#build", "clustering", "spectral"), source=defaultcpp+["spectral.cpp"] ) )
+    buildlist.append( env.Program( target=os.path.join("#build", env["buildtype"], "clustering", "rlvq"), source=defaultcpp+["rlvq.cpp"] ) )
+    buildlist.append( env.Program( target=os.path.join("#build", env["buildtype"], "clustering", "kmeans"), source=defaultcpp+["kmeans.cpp"] ) )
+    buildlist.append( env.Program( target=os.path.join("#build", env["buildtype"], "clustering", "neuralgas"), source=defaultcpp+["neuralgas.cpp"] ) )
+    buildlist.append( env.Program( target=os.path.join("#build", env["buildtype"], "clustering", "patch_neuralgas"), source=defaultcpp+["patch_neuralgas.cpp"] ) )
+    buildlist.append( env.Program( target=os.path.join("#build", env["buildtype"], "clustering", "relational_neuralgas"), source=defaultcpp+["relational_neuralgas.cpp"] ) )
+    buildlist.append( env.Program( target=os.path.join("#build", env["buildtype"], "clustering", "spectral"), source=defaultcpp+["spectral.cpp"] ) )
     
 if env["uselocallibrary"] or env["copylibrary"] :
     Depends(buildlist, env.LibraryCopy( os.path.join("#build", env["buildtype"], "clustering"), [] ))

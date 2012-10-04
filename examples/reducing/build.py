@@ -25,9 +25,9 @@ Import("*")
 buildlist = []
 
 if env["withfiles"] :
-    buildlist.append( env.Program( target=os.path.join("#build", "reducing", "lda"), source=defaultcpp+["lda.cpp"] ) )
-    buildlist.append( env.Program( target=os.path.join("#build", "reducing", "mds"), source=defaultcpp+["mds.cpp"] ) )
-    buildlist.append( env.Program( target=os.path.join("#build", "reducing", "pca"), source=defaultcpp+["pca.cpp"] ) )
+    buildlist.append( env.Program( target=os.path.join("#build", env["buildtype"], "reducing", "lda"), source=defaultcpp+["lda.cpp"] ) )
+    buildlist.append( env.Program( target=os.path.join("#build", env["buildtype"], "reducing", "mds"), source=defaultcpp+["mds.cpp"] ) )
+    buildlist.append( env.Program( target=os.path.join("#build", env["buildtype"], "reducing", "pca"), source=defaultcpp+["pca.cpp"] ) )
     
 if env["uselocallibrary"] or env["copylibrary"] :
     Depends(buildlist, env.LibraryCopy( os.path.join("#build", env["buildtype"], "reducing"), [] ))
