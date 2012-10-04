@@ -25,6 +25,7 @@
 # variables are read here and are added to the environment object
 
 import os
+import re
 Import("*")
 
 
