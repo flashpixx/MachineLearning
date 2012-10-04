@@ -25,12 +25,12 @@ Import("*")
 buildlist = []
 
 if env["withsources"] :
-    buildlist.append( env.Program( target=os.path.join("#build", "sources", "twitter"), source=defaultcpp+["twitter.cpp"] ) )
-    buildlist.append( env.Program( target=os.path.join("#build", "sources", "newsgroup"), source=defaultcpp+["newsgroup.cpp"] ) )
-    buildlist.append( env.Program( target=os.path.join("#build", "sources", "wikipedia"), source=defaultcpp+["wikipedia.cpp"] ) )
+    buildlist.append( env.Program( target=os.path.join("#build", env["buildtype"], "sources", "twitter"), source=defaultcpp+["twitter.cpp"] ) )
+    buildlist.append( env.Program( target=os.path.join("#build", env["buildtype"], "sources", "newsgroup"), source=defaultcpp+["newsgroup.cpp"] ) )
+    buildlist.append( env.Program( target=os.path.join("#build", env["buildtype"], "sources", "wikipedia"), source=defaultcpp+["wikipedia.cpp"] ) )
 
     if env["withfiles"] :
-        buildlist.append( env.Program( target=os.path.join("#build", "sources", "cloud"), source=defaultcpp+["cloud.cpp"] ) )
+        buildlist.append( env.Program( target=os.path.join("#build", env["buildtype"], "sources", "cloud"), source=defaultcpp+["cloud.cpp"] ) )
     
 if env["uselocallibrary"] or env["copylibrary"] :
     Depends(buildlist, env.LibraryCopy( os.path.join("#build", env["buildtype"], "sources"), [] ))
