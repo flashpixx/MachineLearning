@@ -25,6 +25,7 @@
 # variables are read here and are added to the environment object
 
 import os
+import re
 Import("*")
 
 
@@ -215,7 +216,6 @@ else :
     
 # append main framework directory
 conf.env.AppendUnique(CPPPATH = [Dir("#")])
-
 
     
 # set additional dynamic link libraries which should be copied into the build dir    
