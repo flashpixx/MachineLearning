@@ -19,6 +19,10 @@
  
 # -*- coding: utf-8 -*-
 
+# build script for the reducing example
+# $LastChangedDate$
+
+
 import os
 Import("*")
 

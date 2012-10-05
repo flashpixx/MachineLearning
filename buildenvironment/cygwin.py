@@ -23,6 +23,7 @@
 # environmental script for Cygwin system. The libraries must be stored within
 # the global system paths or must be set within the environment variables. The env
 # variables are read here and are added to the environment object
+# $LastChangedDate$
 
 import os
 import re

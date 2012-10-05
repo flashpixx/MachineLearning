@@ -19,6 +19,10 @@
  
 # -*- coding: utf-8 -*-
 
+
+# build script for the Java tools
+# $LastChangedDate$
+
 import os
 Import("*")
 

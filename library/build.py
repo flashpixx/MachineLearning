@@ -19,6 +19,10 @@
  
 # -*- coding: utf-8 -*-
 
+
+# build script for all libraries
+# $LastChangedDate$
+
 import os
 import re
 import urllib2

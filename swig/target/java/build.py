@@ -19,6 +19,10 @@
  
 # -*- coding: utf-8 -*-
 
+
+# build script for the Java port of the framework
+# $LastChangedDate$
+
 import os
 import re
 import platform
