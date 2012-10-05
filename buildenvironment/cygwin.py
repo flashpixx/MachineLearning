@@ -169,10 +169,6 @@ if "CXXFLAGS" in os.environ:
 if "LDFLAGS" in os.environ:
     conf.env.Append(LINKFLAGS = os.environ["LDFLAGS"].split(" "))
     print("Appending custom link flags (LDFLAG)")
-    
-if "TERM" in os.environ :
-    conf.env["ENV"]["TERM"] = os.environ["TERM"]
-    print("Using term environment variable (TERM)")
 
 if "HOME" in os.environ :
     conf.env["ENV"]["HOME"] = os.environ["HOME"]

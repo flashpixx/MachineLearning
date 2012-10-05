@@ -176,6 +176,13 @@ def GlobRekursiv(startdir, extensions=[], excludedir=[]) :
 def librarycopy_print(s, target, source, env): 
     for j,i in zip(target,source) :
         print "copy dynamic library ["+str(i)+"] to ["+str(j)+"]..."
+        
+def librarycopy_findfile(name, pathlist=[]):
+    for l in pathlist :
+        for root, dirs, files in os.walk(l) :
+            if name in files :
+                return os.path.join(root, name)
+    return None
 
 def librarycopy_emitter(target, source, env) :
     listsources = []
@@ -204,7 +211,6 @@ def librarycopy_emitter(target, source, env) :
             removelib.append(env["NOTCOPYLIBRARY"])
     removelib = set(removelib)
         
-        
     for i in lst :
         if i in removelib :
             continue
@@ -212,14 +218,13 @@ def librarycopy_emitter(target, source, env) :
         libnames = [ env["LIBPREFIX"]+str(i)+env["SHLIBSUFFIX"] ]
         if env["TOOLKIT"] == "cygwin" :
             libnames.extend([ str(i)+env["SHLIBSUFFIX"], "cyg"+str(i)+env["SHLIBSUFFIX"] ])
-        
-        for i in  libnames :
-            lib  = env.FindFile(i, env["LIBPATH"])
+            
+        for n in libnames :
+            lib  = librarycopy_findfile(n, env["LIBPATH"])
             if lib <> None :
                 listsources.append(lib)
-                listtargets.append( os.path.join(str(target[0]), i) )
+                listtargets.append( os.path.join(str(target[0]), n) )
                 break
-            
     return listtargets, listsources
     
 def librarycopy_action(target, source, env) :
@@ -531,10 +536,14 @@ env = Environment(
             "Extract"       : ExtractBuilder
         }
 )
-env.Tool("gettext")
+setupToolkitEnv(env)
 env.VariantDir("build", ".", duplicate=0)
 Help(vars.GenerateHelpText(env))
-setupToolkitEnv(env)
+
+# detect gettext
+gettextexists = env.has_key("XGETTEXT") or env.Detect("xgettext") <> None
+if gettextexists :
+    env.Tool("gettext") 
 conf = Configure(env)
 
 
@@ -550,8 +559,6 @@ if not(os.path.isfile(os.path.join("buildenvironment", platformconfig+".py"))) :
 env.SConscript( os.path.join("buildenvironment", platformconfig+".py"), exports="conf checkCPPEnv checkExecutables" )
 env = conf.Finish()
 
-
-
 # setup default builds and default clean
 defaultcpp = [os.path.join(os.path.abspath(os.curdir), "machinelearning.cpp")]
 env.Clean(defaultcpp, [
@@ -563,7 +570,8 @@ env.Clean(defaultcpp, [
 
 
 # setup all different sub build script
-env.SConscript( os.path.join("tools", "language", "build.py"), exports="env defaultcpp GlobRekursiv" )
+if gettextexists :
+    env.SConscript( os.path.join("tools", "language", "build.py"), exports="env defaultcpp GlobRekursiv" )
 env.SConscript( os.path.join("documentation", "build.py"), exports="env defaultcpp" )
 env.SConscript( os.path.join("library", "build.py"), exports="env defaultcpp" )
 
