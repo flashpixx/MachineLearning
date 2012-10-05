@@ -39,9 +39,6 @@ import SCons.Node
 
 #=== CLI parameters ====================================================================================================================
 def createVariables(vars) :
-    
-    
-
     vars.Add(BoolVariable("withrandomdevice", "installation with random device support", False))
     vars.Add(BoolVariable("withmpi", "installation with MPI support", False))
     vars.Add(BoolVariable("withmultilanguage", "installation with multilanguage support", False))
