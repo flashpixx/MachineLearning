@@ -137,8 +137,10 @@ def setupToolkitEnv(env) :
         env["TOOLKIT"]      = "darwin"
     elif platform.system().lower().split("_")[0] == "cygwin" :
         env["TOOLKIT"]      = "cygwin"
+    elif platform.system().lower() == "windows"  and  "msystem" in os.environ  and  os.environ["msystem"] :
+        env["TOOLKIT"]      = "msys"
     else :
-        raise RuntimeError("toolkit not known")
+        raise RuntimeError("toolkit ["+platform.system()+"] not known")
 
     # adding OS environment data
     if "PATH" in os.environ :
