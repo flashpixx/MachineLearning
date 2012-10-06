@@ -129,9 +129,7 @@ def checkExecutables(conf, commands) :
 def setupToolkitEnv(env) :
     # check the toolkit option
     env["TOOLKIT_ARCH"] = (platform.architecture()[0]).replace("bit", "")
-    if platform.system().lower() == "posix" :
-        env["TOOLKIT"]      = "posix"
-    elif platform.system().lower() == "linux" :
+    if platform.system().lower() == "posix" or platform.system().lower() == "linux" :
         env["TOOLKIT"]      = "posix"
     elif platform.system().lower() == "darwin" :
         env["TOOLKIT"]      = "darwin"
@@ -540,10 +538,11 @@ setupToolkitEnv(env)
 env.VariantDir("build", ".", duplicate=0)
 Help(vars.GenerateHelpText(env))
 
-# detect gettext
+# detect gettext, show configuration and setup configuration
 gettextexists = env.has_key("XGETTEXT") or env.Detect("xgettext") <> None
 if gettextexists :
     env.Tool("gettext") 
+print "Build environment is set to ["+env["TOOLKIT"]+"] and architecture ["+env["TOOLKIT_ARCH"]+"]"
 conf = Configure(env)
 
 
