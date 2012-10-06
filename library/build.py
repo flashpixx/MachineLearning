@@ -217,7 +217,7 @@ def Boost_BuildInstall(env, source, gzipbuild, bzipbuild)  :
         boostoptions = "--with-mpi " + boostoptions
     
     cmd = None
-    if env["TOOLKIT"] in ["darwin", "posix", "cygwin"] :
+    if env["TOOLKIT"] in ["darwin", "posix", "cygwin", "msys"] :
         cmd = "cd " + boostpath + ";"
         if env["withmpi"] :
             cmd = cmd + " echo \"using mpi ;\" >> " + os.path.join(boostpath, "tools", "build", "v2", "user-config.jam") + ";"
@@ -278,7 +278,7 @@ def JsonCPP_BuildInstall(env, targz, extract) :
     envjson.Append(CPPPATH = os.path.join(sourcepath, "include"))
     
     libbuild = []
-    if env["TOOLKIT"] in ["posix", "cygwin", "darwin"] :
+    if env["TOOLKIT"] in ["posix", "cygwin", "darwin", "msys"] :
         libbuild.append( envjson.Library(target="json", source=libsrc) )
         libbuild.append( envjson.SharedLibrary(target="json", source=libsrc) )
         
