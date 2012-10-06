@@ -542,7 +542,7 @@ Help(vars.GenerateHelpText(env))
 gettextexists = env.has_key("XGETTEXT") or env.Detect("xgettext") <> None
 if gettextexists :
     env.Tool("gettext") 
-print "Build environment is set to ["+env["TOOLKIT"]+"] and architecture ["+env["TOOLKIT_ARCH"]+"]"
+print "Build environment is ["+env["TOOLKIT"]+"] and architecture ["+env["TOOLKIT_ARCH"]+"]"
 conf = Configure(env)
 
 
