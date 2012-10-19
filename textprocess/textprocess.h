@@ -28,9 +28,7 @@
 
 namespace machinelearning { 
     
-    /** namespace for all textprocessing algorithm
-     * $LastChangedDate$
-     **/
+    /** namespace for all textprocessing algorithm **/
     namespace textprocess {}
     
 }

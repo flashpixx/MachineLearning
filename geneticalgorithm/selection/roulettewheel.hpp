@@ -41,9 +41,7 @@ namespace machinelearning { namespace geneticalgorithm { namespace selection {
     namespace ublas = boost::numeric::ublas;
     
     
-    /** class of the roulette-wheel-selection
-     * $LastChangedDate$
-     **/
+    /** class of the roulette-wheel-selection **/
     template<typename T, typename L> class roulettewheel : public selection<T,L>
     {
         BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );

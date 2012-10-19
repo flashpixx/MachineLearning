@@ -21,9 +21,7 @@
  @endcond
  **/
 
-/** interface file for the Lapack calls
- * $LastChangedDate$
- **/
+/** interface file for the Lapack calls **/
 
 
 #ifdef SWIGJAVA

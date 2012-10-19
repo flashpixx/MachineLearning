@@ -45,9 +45,7 @@ namespace machinelearning { namespace tools {
     namespace bio           = boost::iostreams; 
     
     
-    /** class for functions
-     * $LastChangedDate$
-     **/
+    /** class for functions **/
     class function
     {
         

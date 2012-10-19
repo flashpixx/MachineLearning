@@ -27,9 +27,7 @@
 namespace machinelearning { 
     namespace tools { 
         
-        /** namespace with classes for iostreams (eg URL encoding / decoding)
-         * $LastChangedDate$
-        **/
+        /** namespace with classes for iostreams (eg URL encoding / decoding) **/
         namespace iostreams {}
         
     }

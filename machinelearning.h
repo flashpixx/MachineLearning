@@ -104,7 +104,6 @@
  * <li>classes, that implementates algorithms with numerical structures, should be written as template class</li>
  * <li>methods, properties, classes and namespaces should be documentated with Doxygen</li>
  * <li>each subdirectory of the framework, should have a header file with the same directoryname for including the whole directory. This header file must be appended to the main header file of the framework</li>
- * <li>the svn keyword LastChangeDate should be set for all files</li>
  * <li>all parameters should be a call-by-reference parameter</li>
  * <li>matrix structures should be row-oriantated, so loops over the elements are first over the rows and columns on the second / inner loop</li>
  * <li>template parameter should be asserted for the correct type</li>
@@ -681,7 +680,6 @@
 
 
 /** main namespace of the framework
- * $LastChangedDate$
  * @todo split class declaration and implementation in different files for solving guard dependcy problems
  * @todo define testcases http://www.boost.org/doc/libs/1_51_0/libs/test/doc/html/index.html
  * @todo adding LUA ( http://en.wikipedia.org/wiki/Lua_(programming_language) ) support for dynamic programming ( http://en.wikipedia.org/wiki/Dynamic_programming )

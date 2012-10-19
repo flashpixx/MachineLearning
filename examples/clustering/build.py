@@ -20,8 +20,6 @@
 # -*- coding: utf-8 -*-
 
 # build script for the clustering example
-# $LastChangedDate$
-
 
 import os
 Import("*")

@@ -20,7 +20,6 @@
 # -*- coding: utf-8 -*-
 
 # build script for the other example
-# $LastChangedDate$
 
 import os
 Import("*")

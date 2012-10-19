@@ -21,7 +21,6 @@
 
 
 # build script for the Java tools
-# $LastChangedDate$
 
 import os
 Import("*")

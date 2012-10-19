@@ -52,7 +52,6 @@ namespace machinelearning { namespace tools { namespace files {
     
     
     /** class for reading and writing the HDF data
-     * $LastChangedDate$
      * @see http://www.hdfgroup.org
      * @note hdf uses their own datatypes http://www.hdfgroup.org/HDF5/doc/cpplus_RM/classH5_1_1PredType.html 
      * @todo add ndim cube support

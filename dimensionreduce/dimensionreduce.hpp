@@ -39,9 +39,7 @@
 
 namespace machinelearning { 
     
-    /** namespace for all algorithms to reduce data dimension
-     * $LastChangedDate$
-     **/    
+    /** namespace for all algorithms to reduce data dimension **/    
     namespace dimensionreduce {
  
         #ifndef SWIG

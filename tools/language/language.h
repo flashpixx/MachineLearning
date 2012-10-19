@@ -34,9 +34,7 @@
 namespace machinelearning { namespace tools { 
     
     
-    /** namespace with language structurs
-     * $LastChangedDate$
-     **/
+    /** namespace with language structurs **/
     namespace language {
     
         /** enum with language codes on ISO 639-1 and ISO 639-3 **/

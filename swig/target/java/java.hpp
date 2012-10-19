@@ -39,7 +39,6 @@ namespace machinelearning { namespace swig {
     /** class for generate fragment code, that is used to convert
      * numericial structurs of Java to C++ UBlas (both ways), it is called by
      * the SWIG fragment calls
-     * $LastChangedDate$
      * @todo catching exception and pipe them to Java (use Swig calls)
      * @todo add copy process with OpenMP
      **/

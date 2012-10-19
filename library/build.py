@@ -21,7 +21,6 @@
 
 
 # build script for all libraries
-# $LastChangedDate$
 
 import os
 import re

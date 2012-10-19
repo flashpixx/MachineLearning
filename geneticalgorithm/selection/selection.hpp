@@ -39,9 +39,7 @@ namespace machinelearning { namespace geneticalgorithm { namespace selection {
     namespace ublas = boost::numeric::ublas;
     
     
-    /** abstract class of the selection function
-     * $LastChangedDate$
-     **/
+    /** abstract class of the selection function **/
     template<typename T, typename L> class selection
     {
         BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );

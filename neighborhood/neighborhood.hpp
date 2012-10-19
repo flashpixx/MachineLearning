@@ -37,7 +37,6 @@ namespace machinelearning {
     
     
     /** neighborhood namespace for all structures to calculate neighbors
-     * $LastChangedDate$
      **/
     namespace neighborhood {
     
@@ -47,7 +46,6 @@ namespace machinelearning {
         
         
         /** abstract class for neighborhood classes
-         * $LastChangedDate$
          * @todo recreate base class for neighborhood
          **/      
         template<typename T> class neighborhood

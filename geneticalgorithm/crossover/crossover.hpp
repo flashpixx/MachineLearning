@@ -32,9 +32,7 @@
 
 namespace machinelearning { namespace geneticalgorithm { namespace crossover {
     
-    /** abstract class of the crossover function
-     * $LastChangedDate$
-     **/
+    /** abstract class of the crossover function **/
     template<typename T> class crossover
     {
         

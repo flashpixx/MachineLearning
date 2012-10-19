@@ -21,7 +21,6 @@
 
 
 # build script for the genetic algorithm example
-# $LastChangedDate$
 
 import os
 Import("*")

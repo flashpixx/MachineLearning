@@ -27,9 +27,7 @@
 
 namespace machinelearning { 
     
-    /** namespace with structurs for fitting functions
-     * $LastChangedDate$
-     **/
+    /** namespace with structurs for fitting functions **/
     namespace functionaloptimization {}
 }
 

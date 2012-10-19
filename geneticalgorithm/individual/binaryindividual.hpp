@@ -36,9 +36,7 @@
 
 namespace machinelearning { namespace geneticalgorithm { namespace individual {
     
-    /** class of a binary indivdual (template type must be an unsigned integral type)
-     * $LastChangedDate$
-     **/
+    /** class of a binary indivdual (template type must be an unsigned integral type) **/
     template<typename T> class binaryindividual : public individual<T>
     {
         BOOST_STATIC_ASSERT( boost::is_integral<T>::value && boost::is_unsigned<T>::value );

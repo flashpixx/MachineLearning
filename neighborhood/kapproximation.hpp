@@ -42,7 +42,6 @@ namespace machinelearning { namespace neighborhood {
     
     
     /** class for k-approximation
-     * $LastChangedDate$
      * @todo switch code to using distance classes / objects
      **/
     template<typename T> class kapproximation

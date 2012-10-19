@@ -39,9 +39,7 @@ extern "C" {
 namespace machinelearning { namespace tools { namespace language {
     
     
-    /** class for create langugage bindings
-     * $LastChangedDate$
-     **/
+    /** class for create langugage bindings **/
     class bindings
     {
         

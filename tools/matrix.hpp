@@ -44,9 +44,7 @@ namespace machinelearning { namespace tools {
     namespace ublas     = boost::numeric::ublas;
     
     
-    /** class for matrix operations
-     * $LastChangedDate$
-     **/
+    /** class for matrix operations **/
     class matrix
     {
     

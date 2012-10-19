@@ -28,9 +28,7 @@
 
 namespace machinelearning { 
     
-    /** namespace for all tools, which are used within the toolbox 
-     * $LastChangedDate$
-     **/
+    /** namespace for all tools, which are used within the toolbox **/
     namespace tools {}
 
 }

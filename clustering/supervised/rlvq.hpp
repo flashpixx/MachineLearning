@@ -48,7 +48,6 @@ namespace machinelearning { namespace clustering { namespace supervised {
      * RLVQ is not the best solution for overlapping cluster,
      * the class is created like a template class for free types
      * of the label structure
-     * $LastChangedDate$
     **/
     template<typename T, typename L> class rlvq : public clustering<T, L> 
     {

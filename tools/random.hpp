@@ -57,7 +57,6 @@ namespace machinelearning { namespace tools {
      * system-random-generator can be used. The class holds different distribution that
      * can be used. The system-random-generator must be set with the compileflag 
      * @todo reactivate binomial distribution with correct type casting
-     * $LastChangedDate$
      **/
     class random
     {

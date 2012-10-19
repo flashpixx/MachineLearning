@@ -35,9 +35,7 @@
 
 namespace machinelearning { 
     
-    /** distance namespace for structures which calculates distances
-     * $LastChangedDate$
-     **/
+    /** distance namespace for structures which calculates distances **/
     namespace distances {
         
         namespace ublas = boost::numeric::ublas;

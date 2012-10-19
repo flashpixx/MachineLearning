@@ -33,9 +33,7 @@
 
 namespace machinelearning { namespace geneticalgorithm { namespace fitness {
     
-    /** abstract class of the fitness function
-     * $LastChangedDate$
-     **/
+    /** abstract class of the fitness function **/
     template<typename T, typename L> class fitness
     {
         BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );

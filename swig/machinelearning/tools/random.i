@@ -21,9 +21,7 @@
  @endcond
  **/
 
-/** interface file for the Random calls
- * $LastChangedDate$
- **/
+/** interface file for the Random calls **/
 
 
 #ifdef SWIGJAVA

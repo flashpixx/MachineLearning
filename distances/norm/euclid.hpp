@@ -44,7 +44,6 @@ namespace machinelearning { namespace distances {
 
     
     /** class for calculating euclid distance beween datapoints
-     * $LastChangedDate$
      * @todo portage this class to the Intel Math Kernel Library http://software.intel.com/en-us/articles/intel-mkl/
      **/
     template<typename T> class euclid : public distance<T>

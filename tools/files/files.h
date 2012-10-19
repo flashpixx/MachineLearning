@@ -29,9 +29,7 @@
 namespace machinelearning { 
     namespace tools { 
         
-        /** namespace for file support
-         * $LastChangedDate$
-         **/
+        /** namespace for file support **/
         namespace files {}
     
     }

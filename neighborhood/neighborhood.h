@@ -21,6 +21,7 @@
  @endcond
  **/
 
+/** header file to connect all neighborhood algorithms for one include **/
 
 #ifndef __MACHINELEARNING_NEIGHBORHOOD_H
 #define __MACHINELEARNING_NEIGHBORHOOD_H

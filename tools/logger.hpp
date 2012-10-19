@@ -43,7 +43,6 @@ namespace machinelearning { namespace tools {
     
 
     /** logger class for writing log information 
-     * $LastChangedDate$
      * @note there are two defines for setting the logger directory (MACHINELEARNING_LOGGER_PATHSUFFIX) and logger file (MACHINELEARNING_LOGGER_FILENAME). Within the path suffix the % characters will be
      * substitute to a random hexadecimal value and the directory is created under the temporary path. The value of the filename is append to this directory for writing the log items
      * @note for MPI using every process must call startListener and shutdownListener for synchronize the CPUs and the tag for logtargets is set with a preprocessor flag (MACHINELEARNING_LOGGER_MPI_TAG).

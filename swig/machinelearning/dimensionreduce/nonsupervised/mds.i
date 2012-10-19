@@ -21,9 +21,7 @@
  @endcond
  **/
 
-/** interface file for PCA
- * $LastChangedDate$
- **/
+/** interface file for MDS **/
 
 
 #ifdef SWIGJAVA

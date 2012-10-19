@@ -21,9 +21,7 @@
  @endcond
  **/
 
-/** interface file for spectral clustering
- * $LastChangedDate$
- **/
+/** interface file for spectral clustering **/
 
 
 #ifdef SWIGJAVA

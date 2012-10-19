@@ -54,7 +54,6 @@ namespace machinelearning { namespace tools { namespace sources {
      * @see https://dev.twitter.com/docs
      * @todo create thread-safe structure
      * @todo adding support for reading timelines (see https://dev.twitter.com/docs/api#timelines )
-     * $LastChangedDate$
      **/
     class twitter 
     {

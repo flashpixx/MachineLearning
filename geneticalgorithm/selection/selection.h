@@ -27,9 +27,7 @@
 
 namespace machinelearning { namespace geneticalgorithm { 
     
-    /** namespace of the genetic algorithms for selection structures
-     * $LastChangedDate$
-     **/
+    /** namespace of the genetic algorithms for selection structures **/
     namespace selection {}
     
 }}

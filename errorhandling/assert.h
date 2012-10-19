@@ -23,7 +23,6 @@
 
 /** preprocessor command for framework asserts, which can be added to the logger
  * if the logger exists
- * $LastChangedDate$
  **/
 
 #ifndef __MACHINELEARNING_ASSERT_H

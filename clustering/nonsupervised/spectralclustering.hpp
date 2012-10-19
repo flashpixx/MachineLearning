@@ -48,7 +48,6 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     /** class for normalized spectral clustering. This class calculates only the graph laplacian
      * and creates the general eigenvector decomposition. A neuralgas algorithm with euclidian
      * distancesis used for clustering the data
-     * $LastChangedDate$
      * @todo set all routines to sparse matrix if arpack can be used with boost
      * @todo create eigengap heurstic
      **/

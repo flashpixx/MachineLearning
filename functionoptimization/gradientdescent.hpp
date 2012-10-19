@@ -54,7 +54,6 @@ namespace machinelearning { namespace functionaloptimization {
     /** class for using a (stochastic) gradient descent.
      * For symbolic numerical algorithms @see http://www.ginac.de .
      * GiNaC is not thread-safe, so for the thread we create only std::string vars
-     * $LastChangedDate$
      * @bug uncomplete, so doesn't work
      * @todo adding detection of numerical instability eg x*exp(x) the optimization of the
      * multiplication x is uncomplicated that the exp(x) (in the exponent). One solution to

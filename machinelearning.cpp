@@ -23,7 +23,6 @@
 
 /** implementation for initialization of static member 
  * or different code structures that must run only once
- * $LastChangedDate$
  **/
 
 

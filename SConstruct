@@ -22,7 +22,6 @@
 
 # main build script, that sets the script parameters, detects the build toolkit,
 # sets the builders / emitters and collect all sub build scripts
-# $LastChangedDate$
 
 import os
 import re

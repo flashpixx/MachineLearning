@@ -21,7 +21,6 @@
 
 
 # build script for the Java port of the framework
-# $LastChangedDate$
 
 import os
 import re

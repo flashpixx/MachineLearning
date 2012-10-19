@@ -26,7 +26,7 @@ import machinelearning.dimensionreduce.nonsupervised.*;
 import java.util.Random;
 
 
-/** java testprogram for using PCA **/
+/** java testprogram for using MDS **/
 public class mds {
     
     

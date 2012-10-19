@@ -73,9 +73,7 @@ namespace machinelearning { namespace tools {
     namespace lam   = boost::lambda;
     
     
-    /** class for vector operations
-     * $LastChangedDate$
-     **/
+    /** class for vector operations **/
     class vector 
     {
         

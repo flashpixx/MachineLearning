@@ -21,7 +21,6 @@
 
 
 # build script for the Java clustering
-# $LastChangedDate$
 
 import os
 Import("*")

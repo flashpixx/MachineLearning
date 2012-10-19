@@ -27,9 +27,7 @@
 
 namespace machinelearning { namespace geneticalgorithm { 
     
-    /** namespace of the genetic algorithms for fitness structures
-     * $LastChangedDate$
-     **/
+    /** namespace of the genetic algorithms for fitness structures **/
     namespace fitness {}
     
 }}

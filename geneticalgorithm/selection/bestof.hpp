@@ -41,9 +41,7 @@ namespace machinelearning { namespace geneticalgorithm { namespace selection {
     namespace ublas = boost::numeric::ublas;
     
     
-    /** class of the bestof-selection. uses the n best elements of the population
-     * $LastChangedDate$
-     **/
+    /** class of the bestof-selection. uses the n best elements of the population **/
     template<typename T, typename L> class bestof : public selection<T,L>
     {
         BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );

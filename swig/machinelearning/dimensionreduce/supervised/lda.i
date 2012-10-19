@@ -21,9 +21,7 @@
  @endcond
  **/
 
-/** interface file for LDA
- * $LastChangedDate$
- **/
+/** interface file for LDA **/
 
 
 #ifdef SWIGJAVA

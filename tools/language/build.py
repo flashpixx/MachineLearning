@@ -21,7 +21,6 @@
 
 
 # build script for the multilanguage of the framework
-# $LastChangedDate$
 
 import os
 Import("*")

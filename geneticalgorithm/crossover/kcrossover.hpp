@@ -36,9 +36,7 @@
 
 namespace machinelearning { namespace geneticalgorithm { namespace crossover {
 
-    /** k-crossover algorithm
-     * $LastChangedDate$
-     **/
+    /** k-crossover algorithm **/
     template<typename T> class kcrossover : public crossover<T>
     {
         public :

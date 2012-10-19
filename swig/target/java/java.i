@@ -24,7 +24,6 @@
 
 /** Java interface file for converting Java types and data into C++ 
  * datatypes and UBlas structurs
- * $LastChangedDate$
  **/
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------

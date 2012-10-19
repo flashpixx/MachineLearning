@@ -40,7 +40,6 @@ namespace machinelearning { namespace textprocess {
     
     /** class for term frequency. The class analyses texts and create a map with word counts,
      * that can be used for stop-word-reduction
-     * $LastChangedDate$
      **/
     class termfrequency
     {

@@ -39,9 +39,7 @@ namespace machinelearning { namespace dimensionreduce { namespace nonsupervised 
     #endif
     
     
-    /** create the principal component analysis (PCA)
-     * $LastChangedDate$
-     **/
+    /** create the principal component analysis (PCA) **/
     template<typename T> class pca : public reduce<T>
     {
         #ifndef SWIG

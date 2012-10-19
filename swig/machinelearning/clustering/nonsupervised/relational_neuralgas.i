@@ -21,9 +21,7 @@
  @endcond
  **/
 
-/** interface file for relational neuralgas
- * $LastChangedDate$
- **/
+/** interface file for relational neuralgas **/
 
 
 #ifdef SWIGJAVA

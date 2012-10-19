@@ -31,9 +31,7 @@
 
 namespace machinelearning { namespace geneticalgorithm { namespace individual {
     
-    /** abstract class of an indivdual of the population
-     * $LastChangedDate$
-     **/
+    /** abstract class of an indivdual of the population **/
     template<typename T> class individual
     {
 

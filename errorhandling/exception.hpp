@@ -32,14 +32,11 @@ namespace machinelearning {
     
     /** namespace for all exceptions of the framework
      * @todo adding more exceptions for a better error handling
-     * $LastChangedDate$
      **/
     namespace exception {
     
         
-        /** exception class for throwing on not implementated method 
-         * $LastChangedDate$
-         **/
+        /** exception class for throwing on not implementated method **/
         class classmethod : public std::logic_error
         { 
             public : 
@@ -51,9 +48,7 @@ namespace machinelearning {
         
         
         
-        /** exception class for throwing on runtime errors
-         * $LastChangedDate$
-         **/
+        /** exception class for throwing on runtime errors **/
         class runtime : public std::runtime_error
         { 
             public : 

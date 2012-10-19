@@ -21,9 +21,7 @@
  @endcond
  **/
 
-/** interface file for the NCD
- * $LastChangedDate$
- **/
+/** interface file for the NCD **/
 
 
 #ifdef SWIGJAVA

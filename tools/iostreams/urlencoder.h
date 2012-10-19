@@ -35,7 +35,6 @@ namespace machinelearning { namespace tools { namespace iostreams {
     /** filter class for creating a stream with "percent encoding"
      * @see http://en.wikipedia.org/wiki/Percent-encoding
      * @todo test with different encodings of the input stream and |values| > 255
-     * $LastChangedDate$
      **/
     class urlencoder : public boost::iostreams::output_filter
     {
