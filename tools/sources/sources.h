@@ -34,6 +34,7 @@ namespace machinelearning {
          * @todo adding support for Apache Cassandra http://en.wikipedia.org/wiki/Apache_Cassandra
          * @todo adding support for Hadoop http://hadoop.apache.org/
          * @todo adding support for MangoDB http://www.mongodb.org/
+         * @todo adding support for MonetDB http://www.monetdb.org/
          * @todo adding support for graph databases http://en.wikipedia.org/wiki/Graph_database 
          * @todo adding support for mySQL / MS SQL / Postgres SQL / Oracle via eg http://www.sqlapi.com/
          * @todo adding twitter streaming support https://dev.twitter.com/docs/streaming-api/methods
