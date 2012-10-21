@@ -253,7 +253,8 @@ if not("java" in COMMAND_LINE_TARGETS) :
     ])
     
 if "librarybuild" in COMMAND_LINE_TARGETS :
-    checkExecutables(conf, [ "g++.exe", "gcc.exe", "gfortran.exe", "tar.exe", "make.exe", "svn.exe" ])
+    pass
+    #checkExecutables(conf, [ "g++.exe", "gcc.exe", "gfortran.exe", "tar.exe", "make.exe", "svn.exe" ])
 elif "documentation" in COMMAND_LINE_TARGETS :
     checkExecutables(conf, "doxygen.exe")
 # ==========================================================================
@@ -289,9 +290,10 @@ if conf.env["withfiles"] :
                             "hdf5",
                             "hdf5_hl"
     ])
-    localconf["cpplibraries"].append(
-                            "hdf5_cpp"
-    )
+    localconf["cpplibraries"].extend([
+                            "hdf5_cpp",
+                            "hdf5_hl_cpp"
+    ])
     
 
 if conf.env["withsymbolicmath"] :

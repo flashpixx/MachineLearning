@@ -17,6 +17,7 @@
 *.png
 *.pyc
 *.so
+*.o
 *.stackdump
 *.tar*
 *.xcodeproj

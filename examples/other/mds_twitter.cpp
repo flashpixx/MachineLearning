@@ -33,9 +33,6 @@
 #include <boost/mpi.hpp>
 #endif
 
-#if defined(_WIN32) || defined(__CYGWIN__)
-#include <windows.h>
-#endif
 
 
 namespace po        = boost::program_options;
