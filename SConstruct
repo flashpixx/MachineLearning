@@ -118,7 +118,7 @@ def checkExecutables(conf, commands) :
     if type(cmd) <> type([]) :
         cmd = [cmd]
     for i in cmd :
-        if env.FindFile(i, conf.env["ENV"]["PATH"]) == None :
+        if findfile(i, conf.env["ENV"]["PATH"]) == None :
             raise RuntimeError("build tool ["+i+"] not found")
 
 
@@ -164,6 +164,17 @@ def GlobRekursiv(startdir, extensions=[], excludedir=[]) :
                 lst.append( os.path.abspath(os.path.join(root, filename)) )
     return lst
 
+# find file implementation, because on some systems
+# there is a problem with the env-FindFile
+# @param name filename
+# @param pathlist a list of directories
+# @return None or the first found item with full path
+def findfile(name, pathlist=[]):
+    for l in pathlist :
+        for root, dirs, files in os.walk(l) :
+            if name in files :
+                return os.path.join(root, name)
+    return None
 
 
 
@@ -174,13 +185,6 @@ def librarycopy_print(s, target, source, env):
     for j,i in zip(target,source) :
         print "copy dynamic library ["+str(i)+"] to ["+str(j)+"]..."
         
-def librarycopy_findfile(name, pathlist=[]):
-    for l in pathlist :
-        for root, dirs, files in os.walk(l) :
-            if name in files :
-                return os.path.join(root, name)
-    return None
-
 def librarycopy_emitter(target, source, env) :
     listsources = []
     listtargets = []
@@ -217,7 +221,7 @@ def librarycopy_emitter(target, source, env) :
             libnames.extend([ str(i)+env["SHLIBSUFFIX"], "cyg"+str(i)+env["SHLIBSUFFIX"] ])
             
         for n in libnames :
-            lib  = librarycopy_findfile(n, env["LIBPATH"])
+            lib  = findfile(n, env["LIBPATH"])
             if lib <> None :
                 listsources.append(lib)
                 listtargets.append( os.path.join(str(target[0]), n) )
