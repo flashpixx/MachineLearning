@@ -31,7 +31,7 @@ workingpath = os.path.abspath(os.curdir)
 
 
 #=== download packages ===============================================================================================================
-def Boost_DownloadURL()  :
+def Boost_DownloadURL(env)  :
     # read download path of the Boost (latest version)
     f = urllib2.urlopen("http://www.boost.org/users/download/")
     html = f.read()
@@ -65,7 +65,7 @@ def Boost_DownloadURL()  :
     
     
     
-def JsonCPP_DownloadURL() :
+def JsonCPP_DownloadURL(env) :
     # read download path of the JsonCPP library (latest version)
     f = urllib2.urlopen("http://sourceforge.net/projects/jsoncpp/")
     html = f.read()
@@ -79,7 +79,7 @@ def JsonCPP_DownloadURL() :
     
    
      
-def LibXML2_DownloadURL() :
+def LibXML2_DownloadURL(env) :
     # read latest release version of LibXML (latest version under ftp://xmlsoft.org/libxml2/LATEST_LIBXML2 )
     f = urllib2.urlopen("http://xmlsoft.org/news.html")
     html = f.read()
@@ -96,7 +96,7 @@ def LibXML2_DownloadURL() :
 
 
 
-def HDF5_DownloadURL() :
+def HDF5_DownloadURL(env) :
     # read download path of the HDF library (latest version)
     f = urllib2.urlopen("http://www.hdfgroup.org/ftp/HDF5/current/src/")
     html = f.read()
@@ -112,7 +112,7 @@ def HDF5_DownloadURL() :
 
 
 
-def LaPack_DownloadURL() :
+def LaPack_DownloadURL(env) :
     # read download path of the LAPack (latest version)
     f = urllib2.urlopen("http://www.netlib.org/lapack/")
     html = f.read()
@@ -128,20 +128,35 @@ def LaPack_DownloadURL() :
     return downloadurl, filename
 
 
-def Atlas_DownloadURL() :
-    # read download path of the LAPack (latest version)
-    f = urllib2.urlopen("http://sourceforge.net/projects/math-atlas/")
-    html = f.read()
-    f.close()
+def Atlas_DownloadURL(env) :
+    if env["atlasversion"] == "stable" :     
+        # read download path of the Atlas (latest stableversion)
+        f = urllib2.urlopen("http://sourceforge.net/projects/math-atlas/")
+        html = f.read()
+        f.close()
     
-    found = re.search("<small title=\"(.*)\">(.*)</small>", html)
-    if found == None :
-        raise RuntimeError("Atlas Download URL not found")
+        found = re.search("<small title=\"(.*)\">(.*)</small>", html)
+        if found == None :
+            raise RuntimeError("Atlas Download URL not found")
+        return "http://sourceforge.net/projects/math-atlas/files/latest/download?source=files", found.group(2)
 
-    return "http://sourceforge.net/projects/math-atlas/files/latest/download?source=files", found.group(2)
+    elif env["atlasversion"] == "devel" : 
+        # read download path of the Atlas (latest developer version)
+        f = urllib2.urlopen("https://sourceforge.net/projects/math-atlas/files/Developer%20%28unstable%29/")
+        html = f.read()
+        f.close()
+
+        found = re.search("<a href=\"/projects/math-atlas/files/Developer%20%28unstable%29/(.+)/\"", html)
+        if found == None :
+            raise RuntimeError("Atlas Version Download URL not found")
+        version  = found.group(0).replace("\"", "").replace("<a href=", "").strip("/").split("/")[-1]     
+        filename = "atlas" + version + ".tar.bz2"
+        return "https://downloads.sourceforge.net/project/math-atlas/Developer%20%28unstable%29/"+version+"/"+filename, filename
+        
+    raise RuntimeError("Atlas Download unknown")
     
     
-def CLN_DownloadURL() :
+def CLN_DownloadURL(env) :
     # read download path of the CLN (latest version)
     f = urllib2.urlopen("http://www.ginac.de/CLN/")
     html = f.read()
@@ -156,7 +171,7 @@ def CLN_DownloadURL() :
     return "http://www.ginac.de/CLN/"+filename, filename
     
     
-def Ginac_DownloadURL() :
+def Ginac_DownloadURL(env) :
     # read download path of the CLN (latest version)
     f = urllib2.urlopen("http://www.ginac.de/Download.html")
     html = f.read()
@@ -171,7 +186,7 @@ def Ginac_DownloadURL() :
     return "http://www.ginac.de/"+filename, filename
     
     
-def GZip_DownloadURL() :
+def GZip_DownloadURL(env) :
     # read download path of the ZLib (latest version)
     f = urllib2.urlopen("http://www.zlib.net/")
     html = f.read()
@@ -186,7 +201,7 @@ def GZip_DownloadURL() :
     return "http://zlib.net/"+filename, filename
 
     
-def BZip2_DownloadURL() :
+def BZip2_DownloadURL(env) :
     # read download path of the BZip2 (latest version)
     f = urllib2.urlopen("http://www.bzip.org/downloads.html")
     html = f.read()
@@ -322,7 +337,7 @@ def HDF5_BuildInstall(env, hdfdir) :
 def LibXML2_BuildInstall(env, libxmldir) :
     version = str(libxmldir).replace("']", "").replace("['", "").replace("libxml2-", "")
     
-    cmd = "cd $SOURCE; ./configure --without-python --without-threads --prefix="+os.path.abspath(os.path.join(workingpath, "build_"+env["buildtype"], "xml", version))
+    cmd = "cd $SOURCE; " + os.path.join(".", "configure") + " --without-python --without-threads --prefix="+os.path.abspath(os.path.join(workingpath, "build_"+env["buildtype"], "xml", version))
     if env["buildtype"] == "release" :
         cmd = cmd + " --without-debug"
     cmd = cmd + "; make; make install"
@@ -336,13 +351,18 @@ def GiNaC_BuildInstall(env, ginacdir, clnbuild) :
     clninclude = os.path.join(workingpath, "build_"+env["buildtype"], "cln", clnversion, "include")
     clnlib     = os.path.join(workingpath, "build_"+env["buildtype"], "cln", clnversion, "lib")
     
-    return env.Command("buildginac-"+version, [ginacdir, clnbuild], "cd $SOURCE; export CLN_CFLAGS=-I" + clninclude + "; export CLN_LIBS=\"-L" + clnlib + " -lcln\"; ./configure --prefix="+os.path.abspath(os.path.join(workingpath, "build_"+env["buildtype"], "ginac", version))+ "; make; make install")
+    return env.Command("buildginac-"+version, [ginacdir, clnbuild], "cd $SOURCE; export CLN_CFLAGS=-I" + clninclude + "; export CLN_LIBS=\"-L" + clnlib + " -lcln\"; " + os.path.join(".", "configure") + " --prefix="+os.path.abspath(os.path.join(workingpath, "build_"+env["buildtype"], "ginac", version))+ "; make; make install")
         
         
 def CLN_BuildInstall(env, clndir) :
     version = str(clndir).replace("']", "").replace("['", "").replace("cln-", "")
     
-    return env.Command("buildcln-"+version, clndir, "cd $SOURCE; ./configure --prefix="+os.path.abspath(os.path.join(workingpath, "build_"+env["buildtype"], "cln", version))+ "; make; make install")
+    path = os.path.abspath(os.path.join(workingpath, "build_"+env["buildtype"], "cln", version))
+    if env["TOOLKIT"] == "msys" :
+        path = "/"+path.replace("\\", "/")
+        path = path.replace(":", "")
+    
+    return env.Command("buildcln-"+version, clndir, "cd $SOURCE; ./configure --prefix="+path+ "; make; make install")
     
 
 #=== target structure ================================================================================================================
