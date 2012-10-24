@@ -17,8 +17,11 @@
 *.png
 *.pyc
 *.so
+*.a
+*.lib
 *.stackdump
 *.xcodeproj
 *.zip
 .sconf_temp
-build/**/*
+build
+
