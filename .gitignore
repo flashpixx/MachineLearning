@@ -23,5 +23,8 @@
 *.zip
 .sconf_temp
 build/**/*
-html/**/*
-build_*
+documentation/html/**/*
+library/build_*
+library/ginac-*/**/*
+library/cln-*/**/*
+library/ATLAS/**/*

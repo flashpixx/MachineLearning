@@ -317,12 +317,12 @@ def Atlas_BuildInstall(env, atlasdir, lapacktargz) :
     builddir = env.Command( str(atlasdir).replace("['", "").replace("']", "")+"-buildtmp", atlasdir, Mkdir("$TARGET"))
     version  = str(atlasdir).replace("atlas", "").replace("['", "").replace("']", "")
     
-    cmd = "cd " + os.path.join(os.curdir, str(builddir).replace("['", "").replace("']", "")) + "; " + os.path.join("..", "configure") + " --dylibs"
+    cmd = "cd " + os.path.join("library", str(builddir).replace("['", "").replace("']", "")) + "; " + os.path.join("..", "ATLAS", "configure") + " --dylibs"
     if env["atlaspointerwidth"] == "32" :
         cmd += " -b 32"
     elif env["atlaspointerwidth"] == "64" :
         cmd += " -b 64"
-    cmd += " --with-netlib-lapack-tarfile=" + os.path.join("..", str(lapacktargz).replace("['", "").replace("']", "")) + " --prefix=" + os.path.join(os.curdir, "build_"+env["buildtype"], "atlas", version) + "; make; make install"
+    cmd += " --with-netlib-lapack-tarfile=" + os.path.join("..", str(lapacktargz).replace("['", "").replace("']", "")) + " --prefix=" + os.path.join("..", "build_"+env["buildtype"], "atlas", version) + "; make; make install"
     
     return env.Command("buildatlas-"+version, [atlasdir, lapacktargz, builddir], cmd)
 
@@ -330,7 +330,7 @@ def Atlas_BuildInstall(env, atlasdir, lapacktargz) :
 def HDF5_BuildInstall(env, hdfdir) :
     version = str(hdfdir).replace("']", "").replace("['", "").replace("hdf5-", "")
     
-    return env.Command("buildhdf5-"+version, hdfdir, "cd $SOURCE; ./configure --enable-cxx --prefix=" + os.path.join(os.curdir, "build_"+env["buildtype"], "hdf", version) + "; make; make install")
+    return env.Command("buildhdf5-"+version, hdfdir, "cd $SOURCE; ./configure --enable-cxx --prefix=" + os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "hdf", version)) + "; make; make install")
 
 
 def LibXML2_BuildInstall(env, libxmldir) :
@@ -347,16 +347,16 @@ def LibXML2_BuildInstall(env, libxmldir) :
 def GiNaC_BuildInstall(env, ginacdir, clnbuild) :
     version    = str(ginacdir).replace("']", "").replace("['", "").replace("ginac-", "")
     clnversion = str(clnbuild).replace("']", "").replace("['", "").replace("buildcln-", "")
-    clninclude = os.path.join(os.curdir, "build_"+env["buildtype"], "cln", clnversion, "include")
-    clnlib     = os.path.join(os.curdir, "build_"+env["buildtype"], "cln", clnversion, "lib")
+    clninclude = os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "cln", clnversion, "include"))
+    clnlib     = os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "cln", clnversion, "lib"))
     
-    return env.Command("buildginac-"+version, [ginacdir, clnbuild], "cd $SOURCE; export CLN_CFLAGS=-I" + clninclude + "; export CLN_LIBS=\"-L" + clnlib + " -lcln\"; " + os.path.join(".", "configure") + " --prefix="+os.path.join(os.curdir, "build_"+env["buildtype"], "ginac", version)+ "; make; make install")
+    return env.Command("buildginac-"+version, [ginacdir, clnbuild], "cd $SOURCE; export CLN_CFLAGS=-I" + clninclude + "; export CLN_LIBS=\"-L" + clnlib + " -lcln\"; " + os.path.join(".", "configure") + " --prefix="+os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "ginac", version))+ "; make; make install")
         
         
 def CLN_BuildInstall(env, clndir) :
     version = str(clndir).replace("']", "").replace("['", "").replace("cln-", "")
     
-    path = os.path.join(os.curdir, "build_"+env["buildtype"], "cln", version)
+    path = os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "cln", version))
     if env["TOOLKIT"] == "msys" :
         path = "/"+path.replace("\\", "/")
         path = path.replace(":", "")
@@ -454,10 +454,13 @@ env.Alias("librarydownload", lstdownload, FinishMessage, PRINT_CMD_LINE_FUNC=Fin
 env.Clean(
     env.Alias("librarybuild", lstbuild, FinishMessage, PRINT_CMD_LINE_FUNC=FinishMessage_print), 
     [
+        Glob(os.path.join("#", "library", "*"+env["SHLIBSUFFIX"])),
+        Glob(os.path.join("#", "library", "*"+env["LIBSUFFIX"])),
         Glob(os.path.join("#", "library", "boost*")),
         Glob(os.path.join("#", "library", "bzip2*")),
         Glob(os.path.join("#", "library", "zlib*")),
         Glob(os.path.join("#", "library", "jsoncpp-src-*")),
+        Glob(os.path.join("#", "library", "lapack*")),
         Glob(os.path.join("#", "library", "hdf*")),
         Glob(os.path.join("#", "library", "cln*")),
         Glob(os.path.join("#", "library", "ginac*")),
