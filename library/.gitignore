@@ -1,0 +1,8 @@
+*.tar.*
+build_*/**/*
+ginac-*/**/*
+cln-*/**/*
+ATLAS/**/*
+jsoncpp-src-*/**/*
+libxml2-*/**/*
+

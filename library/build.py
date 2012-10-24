@@ -336,7 +336,7 @@ def HDF5_BuildInstall(env, hdfdir) :
 def LibXML2_BuildInstall(env, libxmldir) :
     version = str(libxmldir).replace("']", "").replace("['", "").replace("libxml2-", "")
     
-    cmd = "cd $SOURCE; " + os.path.join(".", "configure") + " --without-python --without-threads --prefix="+os.path.join(os.curdir, "build_"+env["buildtype"], "xml", version)
+    cmd = "cd $SOURCE; " + os.path.join(".", "configure") + " --without-python --without-threads --prefix="+os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "xml", version))
     if env["buildtype"] == "release" :
         cmd = cmd + " --without-debug"
     cmd = cmd + "; make; make install"

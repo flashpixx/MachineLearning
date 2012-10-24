@@ -18,13 +18,7 @@
 *.pyc
 *.so
 *.stackdump
-*.tar*
 *.xcodeproj
 *.zip
 .sconf_temp
 build/**/*
-documentation/html/**/*
-library/build_*
-library/ginac-*/**/*
-library/cln-*/**/*
-library/ATLAS/**/*
