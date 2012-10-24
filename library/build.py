@@ -27,7 +27,6 @@ import re
 import urllib2
 Import("*")
 
-workingpath = os.path.abspath(os.curdir)
 
 
 #=== download packages ===============================================================================================================
@@ -222,10 +221,10 @@ def Boost_BuildInstall(env, source, gzipbuild, bzipbuild)  :
     # extract path and version of the source name
     boostpath   = str(source).replace("['", "").replace("']", "")
     version     = boostpath.replace("boost-", "")
-    boostpath   = os.path.join(workingpath, boostpath.replace(".", "_").replace("-", "_"))
+    boostpath   = os.path.join(os.curdir, boostpath.replace(".", "_").replace("-", "_"))
 
     # set the toolset and compile the bjam and build boost
-    boostoptions = "--with-exception --with-filesystem --with-math --with-random --with-regex --with-date_time --with-thread --with-system --with-program_options --with-serialization --with-iostreams --disable-filesystem2 link=shared runtime-link=shared threading=multi variant=%V% install --layout=system --prefix="+os.path.abspath(os.path.join(workingpath, "build_"+env["buildtype"], "boost", version))
+    boostoptions = "--with-exception --with-filesystem --with-math --with-random --with-regex --with-date_time --with-thread --with-system --with-program_options --with-serialization --with-iostreams --disable-filesystem2 link=shared runtime-link=shared threading=multi variant=%V% install --layout=system --prefix="+os.path.join(os.curdir, "build_"+env["buildtype"], "boost", version)
     boostoptions = boostoptions.replace("%V%", env["buildtype"])
     if env["withmpi"] :
         boostoptions = "--with-mpi " + boostoptions
@@ -249,10 +248,10 @@ def Boost_BuildInstall(env, source, gzipbuild, bzipbuild)  :
         gzipversion = str(gzipbuild).replace("['", "").replace("']", "").replace("buildgzip-", "")
         bzipversion = str(bzipbuild).replace("['", "").replace("']", "").replace("buildbzip2-", "")
         zipcmd   = "export BZIP2_BINARY=bz2; export ZLIB_BINARY=z; "
-        zipcmd  += "export ZLIB_INCLUDE="+os.path.join(workingpath, "build_"+env["buildtype"], "zlib", gzipversion, "include")+"; "
-        zipcmd  += "export ZLIB_LIBPATH="+os.path.join(workingpath, "build_"+env["buildtype"], "zlib", gzipversion, "lib")+"; "
-        zipcmd  += "export BZIP2_INCLUDE="+os.path.join(workingpath, "build_"+env["buildtype"], "bzip2", bzipversion, "include")+"; "
-        zipcmd  += "export BZIP2_LIBPATH="+os.path.join(workingpath, "build_"+env["buildtype"], "bzip2", bzipversion, "lib")+"; "
+        zipcmd  += "export ZLIB_INCLUDE="+os.path.join(os.curdir, "build_"+env["buildtype"], "zlib", gzipversion, "include")+"; "
+        zipcmd  += "export ZLIB_LIBPATH="+os.path.join(os.curdir, "build_"+env["buildtype"], "zlib", gzipversion, "lib")+"; "
+        zipcmd  += "export BZIP2_INCLUDE="+os.path.join(os.curdir, "build_"+env["buildtype"], "bzip2", bzipversion, "include")+"; "
+        zipcmd  += "export BZIP2_LIBPATH="+os.path.join(os.curdir, "build_"+env["buildtype"], "bzip2", bzipversion, "lib")+"; "
         cmd      = zipcmd + cmd
         
     return env.Command("buildboost-"+version, dependency, cmd)
@@ -260,12 +259,12 @@ def Boost_BuildInstall(env, source, gzipbuild, bzipbuild)  :
       
 def Gzip_BuildInstall(env, extract) :
     version = str(extract).replace("['", "").replace("']", "").replace("zlib-", "")
-    return env.Command("buildgzip-"+version, extract, "cd $SOURCE; ./configure --prefix="+os.path.abspath(os.path.join(workingpath, "build_"+env["buildtype"], "zlib", version))+"; make; make install")
+    return env.Command("buildgzip-"+version, extract, "cd $SOURCE; ./configure --prefix="+os.path.join(os.curdir, "build_"+env["buildtype"], "zlib", version)+"; make; make install")
    
    
 def BZip2_BuildInstall(env, extract) :
     version = str(extract).replace("['", "").replace("']", "").replace("bzip2-", "")
-    return env.Command("buildbzip2-"+version, extract, "cd $SOURCE; make install PREFIX="+os.path.abspath(os.path.join(workingpath, "build_"+env["buildtype"], "bzip2", version)))
+    return env.Command("buildbzip2-"+version, extract, "cd $SOURCE; make install PREFIX="+os.path.join(os.curdir, "build_"+env["buildtype"], "bzip2", version))
       
         
 def JsonCPP_BuildInstall(env, targz, extract) :
@@ -300,8 +299,8 @@ def JsonCPP_BuildInstall(env, targz, extract) :
         raise RuntimeError("no library jsoncpp build target found in toolkit ["+env["TOOLKIT"]+"]")
         
     # install header and libraries
-    libinstall      = env.Install( os.path.join(workingpath, "build_"+env["buildtype"], "jsoncpp", version, "lib"), libbuild )
-    headerdir       = env.Command( os.path.join(workingpath, "build_"+env["buildtype"], "jsoncpp", version, "include", "json"), "", Mkdir("$TARGET"))
+    libinstall      = env.Install( os.path.join(os.curdir, "build_"+env["buildtype"], "jsoncpp", version, "lib"), libbuild )
+    headerdir       = env.Command( os.path.join(os.curdir, "build_"+env["buildtype"], "jsoncpp", version, "include", "json"), "", Mkdir("$TARGET"))
     headerinstall   = []
     for i in libheader :
         headerinstall.append( env.Command( os.path.join(str(headerdir).replace("']", "").replace("['", ""), os.path.basename(str(i))), i, Copy("$TARGET", "$SOURCE")) )
@@ -318,12 +317,12 @@ def Atlas_BuildInstall(env, atlasdir, lapacktargz) :
     builddir = env.Command( str(atlasdir).replace("['", "").replace("']", "")+"-buildtmp", atlasdir, Mkdir("$TARGET"))
     version  = str(atlasdir).replace("atlas", "").replace("['", "").replace("']", "")
     
-    cmd = "cd " + os.path.join(workingpath, str(builddir).replace("['", "").replace("']", "")) + "; " + os.path.join("..", "configure") + " --dylibs"
+    cmd = "cd " + os.path.join(os.curdir, str(builddir).replace("['", "").replace("']", "")) + "; " + os.path.join("..", "configure") + " --dylibs"
     if env["atlaspointerwidth"] == "32" :
         cmd += " -b 32"
     elif env["atlaspointerwidth"] == "64" :
         cmd += " -b 64"
-    cmd += " --with-netlib-lapack-tarfile=" + os.path.join("..", str(lapacktargz).replace("['", "").replace("']", "")) + " --prefix=" + os.path.join(workingpath, "build_"+env["buildtype"], "atlas", version) + "; make; make install"
+    cmd += " --with-netlib-lapack-tarfile=" + os.path.join("..", str(lapacktargz).replace("['", "").replace("']", "")) + " --prefix=" + os.path.join(os.curdir, "build_"+env["buildtype"], "atlas", version) + "; make; make install"
     
     return env.Command("buildatlas-"+version, [atlasdir, lapacktargz, builddir], cmd)
 
@@ -331,13 +330,13 @@ def Atlas_BuildInstall(env, atlasdir, lapacktargz) :
 def HDF5_BuildInstall(env, hdfdir) :
     version = str(hdfdir).replace("']", "").replace("['", "").replace("hdf5-", "")
     
-    return env.Command("buildhdf5-"+version, hdfdir, "cd $SOURCE; ./configure --enable-cxx --prefix=" + os.path.join(workingpath, "build_"+env["buildtype"], "hdf", version) + "; make; make install")
+    return env.Command("buildhdf5-"+version, hdfdir, "cd $SOURCE; ./configure --enable-cxx --prefix=" + os.path.join(os.curdir, "build_"+env["buildtype"], "hdf", version) + "; make; make install")
 
 
 def LibXML2_BuildInstall(env, libxmldir) :
     version = str(libxmldir).replace("']", "").replace("['", "").replace("libxml2-", "")
     
-    cmd = "cd $SOURCE; " + os.path.join(".", "configure") + " --without-python --without-threads --prefix="+os.path.abspath(os.path.join(workingpath, "build_"+env["buildtype"], "xml", version))
+    cmd = "cd $SOURCE; " + os.path.join(".", "configure") + " --without-python --without-threads --prefix="+os.path.join(os.curdir, "build_"+env["buildtype"], "xml", version)
     if env["buildtype"] == "release" :
         cmd = cmd + " --without-debug"
     cmd = cmd + "; make; make install"
@@ -348,16 +347,16 @@ def LibXML2_BuildInstall(env, libxmldir) :
 def GiNaC_BuildInstall(env, ginacdir, clnbuild) :
     version    = str(ginacdir).replace("']", "").replace("['", "").replace("ginac-", "")
     clnversion = str(clnbuild).replace("']", "").replace("['", "").replace("buildcln-", "")
-    clninclude = os.path.join(workingpath, "build_"+env["buildtype"], "cln", clnversion, "include")
-    clnlib     = os.path.join(workingpath, "build_"+env["buildtype"], "cln", clnversion, "lib")
+    clninclude = os.path.join(os.curdir, "build_"+env["buildtype"], "cln", clnversion, "include")
+    clnlib     = os.path.join(os.curdir, "build_"+env["buildtype"], "cln", clnversion, "lib")
     
-    return env.Command("buildginac-"+version, [ginacdir, clnbuild], "cd $SOURCE; export CLN_CFLAGS=-I" + clninclude + "; export CLN_LIBS=\"-L" + clnlib + " -lcln\"; " + os.path.join(".", "configure") + " --prefix="+os.path.abspath(os.path.join(workingpath, "build_"+env["buildtype"], "ginac", version))+ "; make; make install")
+    return env.Command("buildginac-"+version, [ginacdir, clnbuild], "cd $SOURCE; export CLN_CFLAGS=-I" + clninclude + "; export CLN_LIBS=\"-L" + clnlib + " -lcln\"; " + os.path.join(".", "configure") + " --prefix="+os.path.join(os.curdir, "build_"+env["buildtype"], "ginac", version)+ "; make; make install")
         
         
 def CLN_BuildInstall(env, clndir) :
     version = str(clndir).replace("']", "").replace("['", "").replace("cln-", "")
     
-    path = os.path.abspath(os.path.join(workingpath, "build_"+env["buildtype"], "cln", version))
+    path = os.path.join(os.curdir, "build_"+env["buildtype"], "cln", version)
     if env["TOOLKIT"] == "msys" :
         path = "/"+path.replace("\\", "/")
         path = path.replace(":", "")
@@ -388,7 +387,7 @@ lstdownload = []
 # build target list
 if ("librarybuild" in COMMAND_LINE_TARGETS) or ("librarydownload" in COMMAND_LINE_TARGETS) :
 
-    if " " in workingpath :
+    if " " in os.curdir :
         raise RuntimeError("there are spaces within the path, use a path without spaces")
 
     # download Atlas & LaPack, extract & install
@@ -416,7 +415,7 @@ if ("librarybuild" in COMMAND_LINE_TARGETS) or ("librarydownload" in COMMAND_LIN
         boostdir   = env.Command(str(boosttargz).replace("[", "").replace("]", "").replace("'", "").replace(".tar.gz", ""), boosttargz, env["EXTRACT_CMD"]+env["extractsuffix"]+"library")
         boostbuild = Boost_BuildInstall(env, boostdir, gzipbuild, bzipbuild)
         
-        lstbuild.append( env.Command("boostnumericbindings", boostbuild, "svn checkout http://svn.boost.org/svn/boost/sandbox/numeric_bindings/ "+os.path.join(workingpath, "build_"+env["buildtype"], "boost", "sandbox", "numeric_bindings")) )
+        lstbuild.append( env.Command("boostnumericbindings", boostbuild, "svn checkout http://svn.boost.org/svn/boost/sandbox/numeric_bindings/ "+os.path.join(os.curdir, "build_"+env["buildtype"], "boost", "sandbox", "numeric_bindings")) )
         lstdownload.append(boosttargz)
         
         
