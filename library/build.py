@@ -221,10 +221,10 @@ def Boost_BuildInstall(env, source, gzipbuild, bzipbuild)  :
     # extract path and version of the source name
     boostpath   = str(source).replace("['", "").replace("']", "")
     version     = boostpath.replace("boost-", "")
-    boostpath   = os.path.join(os.curdir, boostpath.replace(".", "_").replace("-", "_"))
+    boostpath   = os.path.join("library", boostpath.replace(".", "_").replace("-", "_"))
 
     # set the toolset and compile the bjam and build boost
-    boostoptions = "--with-exception --with-filesystem --with-math --with-random --with-regex --with-date_time --with-thread --with-system --with-program_options --with-serialization --with-iostreams --disable-filesystem2 link=shared runtime-link=shared threading=multi variant=%V% install --layout=system --prefix="+os.path.join(os.curdir, "build_"+env["buildtype"], "boost", version)
+    boostoptions = "--with-exception --with-filesystem --with-math --with-random --with-regex --with-date_time --with-thread --with-system --with-program_options --with-serialization --with-iostreams --disable-filesystem2 link=shared runtime-link=shared threading=multi variant=%V% install --layout=system --prefix="+os.path.join("..", "build_"+env["buildtype"], "boost", version)
     boostoptions = boostoptions.replace("%V%", env["buildtype"])
     if env["withmpi"] :
         boostoptions = "--with-mpi " + boostoptions
@@ -259,12 +259,12 @@ def Boost_BuildInstall(env, source, gzipbuild, bzipbuild)  :
       
 def Gzip_BuildInstall(env, extract) :
     version = str(extract).replace("['", "").replace("']", "").replace("zlib-", "")
-    return env.Command("buildgzip-"+version, extract, "cd $SOURCE; ./configure --prefix="+os.path.join(os.curdir, "build_"+env["buildtype"], "zlib", version)+"; make; make install")
+    return env.Command("buildgzip-"+version, extract, "cd $SOURCE; ./configure --prefix="+os.path.join("..", "build_"+env["buildtype"], "zlib", version)+"; make; make install")
    
    
 def BZip2_BuildInstall(env, extract) :
     version = str(extract).replace("['", "").replace("']", "").replace("bzip2-", "")
-    return env.Command("buildbzip2-"+version, extract, "cd $SOURCE; make install PREFIX="+os.path.join(os.curdir, "build_"+env["buildtype"], "bzip2", version))
+    return env.Command("buildbzip2-"+version, extract, "cd $SOURCE; make install PREFIX="+os.path.join("..", "build_"+env["buildtype"], "bzip2", version))
       
         
 def JsonCPP_BuildInstall(env, targz, extract) :
@@ -415,7 +415,7 @@ if ("librarybuild" in COMMAND_LINE_TARGETS) or ("librarydownload" in COMMAND_LIN
         boostdir   = env.Command(str(boosttargz).replace("[", "").replace("]", "").replace("'", "").replace(".tar.gz", ""), boosttargz, env["EXTRACT_CMD"]+env["extractsuffix"]+"library")
         boostbuild = Boost_BuildInstall(env, boostdir, gzipbuild, bzipbuild)
         
-        lstbuild.append( env.Command("boostnumericbindings", boostbuild, "svn checkout http://svn.boost.org/svn/boost/sandbox/numeric_bindings/ "+os.path.join(os.curdir, "build_"+env["buildtype"], "boost", "sandbox", "numeric_bindings")) )
+        lstbuild.append( env.Command("boostnumericbindings", boostbuild, "svn checkout http://svn.boost.org/svn/boost/sandbox/numeric_bindings/ "+os.path.join("library", "build_"+env["buildtype"], "boost", "sandbox", "numeric_bindings")) )
         lstdownload.append(boosttargz)
         
         
