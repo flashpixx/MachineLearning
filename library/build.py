@@ -303,12 +303,12 @@ def Atlas_BuildInstall(env, atlasdir, lapacktargz) :
     builddir = env.Command( str(atlasdir).replace("['", "").replace("']", "")+"-buildtmp", atlasdir, Mkdir("$TARGET"))
     version  = str(atlasdir).replace("atlas", "").replace("['", "").replace("']", "")
     
-    cmd = "cd " + os.path.join(workingpath, str(builddir).replace("['", "").replace("']", "")) + "; ../ATLAS/configure --dylibs"
+    cmd = "cd " + os.path.join(workingpath, str(builddir).replace("['", "").replace("']", "")) + "; " + os.path.join("..", "configure") + " --dylibs"
     if env["atlaspointerwidth"] == "32" :
         cmd += " -b 32"
     elif env["atlaspointerwidth"] == "64" :
         cmd += " -b 64"
-    cmd += " --with-netlib-lapack-tarfile=../" + str(lapacktargz).replace("['", "").replace("']", "") + " --prefix=" + os.path.join(workingpath, "build_"+env["buildtype"], "atlas", version) + "; make; make install"
+    cmd += " --with-netlib-lapack-tarfile=" + os.path.join("..", str(lapacktargz).replace("['", "").replace("']", "")) + " --prefix=" + os.path.join(workingpath, "build_"+env["buildtype"], "atlas", version) + "; make; make install"
     
     return env.Command("buildatlas-"+version, [atlasdir, lapacktargz, builddir], cmd)
 
