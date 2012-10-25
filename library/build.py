@@ -259,12 +259,24 @@ def Boost_BuildInstall(env, source, gzipbuild, bzipbuild)  :
       
 def Gzip_BuildInstall(env, extract) :
     version = str(extract).replace("['", "").replace("']", "").replace("zlib-", "")
-    return env.Command("buildgzip-"+version, extract, "cd $SOURCE; ./configure --prefix="+os.path.join("..", "build_"+env["buildtype"], "zlib", version)+"; make; make install")
+    prefix  = os.path.join("..", "build_"+env["buildtype"], "zlib", version)
+    
+    cmd = "cd $SOURCE; ./configure --prefix=" + prefix + "; make; make install"
+    if env["TOOLKIT"] == "msys" :
+        cmd = cmd.replace(";", " && ")
+    
+    return env.Command("buildgzip-"+version, extract, cmd)
    
    
 def BZip2_BuildInstall(env, extract) :
     version = str(extract).replace("['", "").replace("']", "").replace("bzip2-", "")
-    return env.Command("buildbzip2-"+version, extract, "cd $SOURCE; make install PREFIX="+os.path.join("..", "build_"+env["buildtype"], "bzip2", version))
+    prefix  = os.path.join("..", "build_"+env["buildtype"], "bzip2", version)
+    
+    cmd = "cd $SOURCE; make install PREFIX=" + prefix
+    if env["TOOLKIT"] == "msys" :
+        cmd = cmd.replace(";", " && ")
+    
+    return env.Command("buildbzip2-"+version, extract, cmd)
       
         
 def JsonCPP_BuildInstall(env, targz, extract) :
@@ -324,44 +336,62 @@ def Atlas_BuildInstall(env, atlasdir, lapacktargz) :
         cmd += " -b 64"
     cmd += " --with-netlib-lapack-tarfile=" + os.path.join("..", str(lapacktargz).replace("['", "").replace("']", "")) + " --prefix=" + os.path.join("..", "build_"+env["buildtype"], "atlas", version) + "; make; make install"
     
+    if env["TOOLKIT"] == "msys" :
+        cmd = cmd.replace(";", " && ")
+    
     return env.Command("buildatlas-"+version, [atlasdir, lapacktargz, builddir], cmd)
 
 
 def HDF5_BuildInstall(env, hdfdir) :
     version = str(hdfdir).replace("']", "").replace("['", "").replace("hdf5-", "")
+    prefix  = os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "hdf", version))
     
-    return env.Command("buildhdf5-"+version, hdfdir, "cd $SOURCE; ./configure --enable-cxx --prefix=" + os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "hdf", version)) + "; make; make install")
+    cmd = "cd $SOURCE; ./configure --enable-cxx --prefix=" + prefix + "; make; make install"
+    if env["TOOLKIT"] == "msys" :
+        cmd = cmd.replace(";", " && ")
+    
+    return env.Command("buildhdf5-"+version, hdfdir, cmd)
 
 
 def LibXML2_BuildInstall(env, libxmldir) :
-    version = str(libxmldir).replace("']", "").replace("['", "").replace("libxml2-", "")
+    version   = str(libxmldir).replace("']", "").replace("['", "").replace("libxml2-", "")
+    prefix    = os.path.abspath(os.path.join("..", "build_"+env["buildtype"], "xml", version))
     
-    cmd = "cd $SOURCE; " + os.path.join(".", "configure") + " --without-python --without-threads --prefix="+os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "xml", version))
+    cmd = "cd $SOURCE; " + "./configure --without-python --without-threads"
     if env["buildtype"] == "release" :
         cmd = cmd + " --without-debug"
-    cmd = cmd + "; make; make install"
+    cmd = cmd + " --prefix=" + prefix + "; make; make install"
+    
+    if env["TOOLKIT"] == "msys" :
+        cmd = cmd.replace(";", " && ")
     
     return env.Command("buildlibxml2-"+version, libxmldir, cmd)
     
         
 def GiNaC_BuildInstall(env, ginacdir, clnbuild) :
     version    = str(ginacdir).replace("']", "").replace("['", "").replace("ginac-", "")
+    prefix     = os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "ginac", version))
+    
     clnversion = str(clnbuild).replace("']", "").replace("['", "").replace("buildcln-", "")
     clninclude = os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "cln", clnversion, "include"))
     clnlib     = os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "cln", clnversion, "lib"))
     
-    return env.Command("buildginac-"+version, [ginacdir, clnbuild], "cd $SOURCE; export CLN_CFLAGS=-I" + clninclude + "; export CLN_LIBS=\"-L" + clnlib + " -lcln\"; " + os.path.join(".", "configure") + " --prefix="+os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "ginac", version))+ "; make; make install")
+    cmd = "cd $SOURCE; export CLN_CFLAGS=-I" + clninclude + "; export CLN_LIBS=\"-L" + clnlib + " -lcln\"; " + "./configure" + " --prefix=" + prefix + "; make; make install"
+    if env["TOOLKIT"] == "msys" :
+        cmd = cmd.replace(";", " && ")
+    
+    return env.Command("buildginac-"+version, [ginacdir, clnbuild], cmd)
         
         
 def CLN_BuildInstall(env, clndir) :
     version = str(clndir).replace("']", "").replace("['", "").replace("cln-", "")
+    prefix  = os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "cln", version))
     
-    path = os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "cln", version))
+    cmd = "cd $SOURCE; ./configure --prefix=" + prefix + "; make; make install"
     if env["TOOLKIT"] == "msys" :
-        path = "/"+path.replace("\\", "/")
-        path = path.replace(":", "")
+        cmd = cmd.replace(";", " && ")
     
-    return env.Command("buildcln-"+version, clndir, "cd $SOURCE; ./configure --prefix="+path+ "; make; make install")
+    return env.Command("buildcln-"+version, clndir, cmd)
     
 
 #=== target structure ================================================================================================================
