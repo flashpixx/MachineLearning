@@ -59,7 +59,7 @@ def createVariables(vars) :
         vars.Add(BoolVariable("zipsupport", "build Bzip2 and ZLib support for Boost", False))
         vars.Add(EnumVariable("atlaslink", "type of the ATLAS link file", "multi", allowed_values=("single", "multi")))
     vars.Add(EnumVariable("atlaspointerwidth", "pointer width for compiling ATLAS (empty = system default, 32 = 32 Bit, 64 = 64 Bit)", "", allowed_values=("", "32", "64")))
-    
+    vars.Add(EnumVariable("atlasversion", "version of the ATLAS library (developer or stable version)", "devel", allowed_values=("stable", "devel")))
 
     
     
@@ -134,7 +134,7 @@ def setupToolkitEnv(env) :
         env["TOOLKIT"]      = "darwin"
     elif platform.system().lower().split("_")[0] == "cygwin" :
         env["TOOLKIT"]      = "cygwin"
-    elif platform.system().lower() == "windows"  and  "msystem" in os.environ  and  os.environ["msystem"] :
+    elif "msystem" in os.environ  and  os.environ["msystem"].lower() == "mingw32":
         env["TOOLKIT"]      = "msys"
     else :
         raise RuntimeError("toolkit ["+platform.system()+"] not known")
@@ -253,7 +253,7 @@ def ParseAndDownload(env, parsefunction=None):
     if not(callable(parsefunction)) :
         raise SCons.Errors.UserError("parameter is a ['%s'] not a function " % parsefunction.__class__)
 
-    [url, filename] = parsefunction()
+    [url, filename] = parsefunction(env)
     if (type(url) <> type("")) or (type(filename) <> type("")) or not(url) or not(filename):
         raise SCons.Errors.UserError("return parameter of the function must be string and need not be empty")
     

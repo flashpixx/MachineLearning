@@ -1,0 +1,10 @@
+*.tar.*
+build_*
+ginac-*
+cln-*
+ATLAS
+jsoncpp-src-*
+libxml2-*
+boost*
+zlib*
+bzip2*

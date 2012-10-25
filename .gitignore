@@ -9,7 +9,6 @@
 *.git*
 *.gzip
 *.hdf*
-*.jar
 *.jpg
 *.layout
 *.log
@@ -19,10 +18,7 @@
 *.so
 *.o
 *.stackdump
-*.tar*
 *.xcodeproj
 *.zip
 .sconf_temp
-build/**/*
-html/**/*
-build_*
+build
