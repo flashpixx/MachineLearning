@@ -164,6 +164,7 @@ def GlobRekursiv(startdir, extensions=[], excludedir=[]) :
                 lst.append( os.path.abspath(os.path.join(root, filename)) )
     return lst
 
+
 # find file implementation, because on some systems
 # there is a problem with the env-FindFile
 # @param name filename

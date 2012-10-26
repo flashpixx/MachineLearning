@@ -196,7 +196,7 @@ if conf.env["uselocallibrary"] :
                 includedir.append( os.path.join(dir, version[0], "include" ) )
             
             if i == "boost" :
-                includedir.append( os.path.join(dir, "sandbox", "numeric_bindings" ) )
+                includedir.append( os.path.join(dir, "numeric_bindings" ) )
         
     conf.env.Replace(LIBPATH = libdir)
     conf.env.Replace(CPPPATH = includedir)

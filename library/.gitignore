@@ -1,11 +1,13 @@
 *.tgz
 *.tar.*
 build_*
-ginac-*
-cln-*
+ginac*
+cln*
+hdf5*
+atlas*
 ATLAS
 jsoncpp-src-*
-libxml2-*
+libxml2*
 boost*
 zlib*
 bzip2*

@@ -17,6 +17,8 @@
 *.pyc
 *.so
 *.o
+*.a
+*.lib
 *.stackdump
 *.xcodeproj
 *.zip

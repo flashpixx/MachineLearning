@@ -194,7 +194,7 @@ if conf.env["uselocallibrary"] :
                 includedir.append( os.path.join(dir, version[0], "include" ) )
             
             if i == "boost" :
-                includedir.append( os.path.join(dir, "sandbox", "numeric_bindings" ) )
+                includedir.append( os.path.join(dir, "numeric_bindings" ) )
         
     conf.env.Replace(LIBPATH = libdir)
     conf.env.Replace(CPPPATH = includedir)
@@ -272,7 +272,7 @@ if conf.env["withrandomdevice"] :
     )
     
     
-if conf.env["withmpi"] :
+if conf.env["withmpi"] and not("librarybuild" in COMMAND_LINE_TARGETS) :
     conf.env.Replace(CXX = "mpic++")
     conf.env.AppendUnique(CPPDEFINES  = ["MACHINELEARNING_MPI"])
     localconf["cpplibraries"].extend([
