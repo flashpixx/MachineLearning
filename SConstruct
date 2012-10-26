@@ -52,7 +52,7 @@ def createVariables(vars) :
     vars.Add(ListVariable("skiplibrary", "skipping library builds / downloads", "", ["atlas", "boost", "hdf", "ginac", "json", "xml"]))
     vars.Add(BoolVariable("copylibrary", "copy the dynamic link libraries into the build dir", False))
     
-    if platform.system().lower().split("_")[0] == "cygwin" :
+    if (platform.system().lower().split("_")[0] == "cygwin")  or  ("msystem" in os.environ  and  os.environ["msystem"].lower() == "mingw32") :
         vars.Add(BoolVariable("zipsupport", "build Bzip2 and ZLib support for Boost", True))
         vars.Add(EnumVariable("atlaslink", "type of the ATLAS link file", "single", allowed_values=("single", "multi")))
     else :
