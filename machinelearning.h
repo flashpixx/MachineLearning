@@ -39,8 +39,8 @@
  *         <li>Math support</li>
  *         <li>Program Options</li>
  *         <li>Regular Expression support</li>
- *         <li>Filesystem support</li>
  *         <li>System support</li>
+ *         <li><i>optional Filesystem support</i> (only used by the examples)</li>
  *         <li><i>optional Thread support</i> (only used by the framework logger)</li>
  *         <li><i>optional Serialization</i> (only used by MPI use)</li>
  *         <li><i>optional Program options</i> (only used by the examples)</li>
@@ -82,7 +82,7 @@
  * <li>Ubuntu Lucid Lynx (10.04)</li>
  * <li>Gentoo Linux (stable / unstable)</li>
  * <li>Windows 7 with <a href="http://www.cygwin.com/">Cygwin</a> [in some cases you need to rebase all libraries in Cygwin (eg fork errors): Close all Cygwin windows, start the
- * <dfn>dash.exe</dfn> from Cygwins bin directory and run the command <dfn>/bin/rebase</dfn>]</li>
+ * <dfn>dash.exe</dfn> from Cygwins bin directory and run the command <dfn>/bin/rebaseall -v</dfn>]</li>
  * </ul>
  * On projects the main header <dfn>machinelearning.h</dfn> and the cpp file <dfn>machinelearning.cpp</dfn> are needed.
  *
