@@ -66,7 +66,7 @@
  * <li><i>optional Java Runtime Environment (JRE) / Java Developer Kit (JDK)</i> ( http://www.java.com/ / http://www.oracle.com/technetwork/java/javase/downloads/index.html ) </li>
  * <li><i>optional Scons</i> ( http://www.scons.org/ )</li>
  * <li><i>optional Swig</i> ( http://www.swig.org/ )</li>
- * <li><i>optional Doxygen</i> ( http://www.doxygen.org/ ) with Graphviz support ( http://www.graphviz.org )</li>
+ * <li><i>optional Doxygen</i> ( http://www.doxygen.org/ )</li>
  * </ul>
  * A default library installation can be created with the commands
  * @code
