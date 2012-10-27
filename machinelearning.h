@@ -74,8 +74,18 @@
     scons librarybuild
  * @endcode
  * After compiling the directory <dfn>library/build_*</dfn> is created with the libraries. The * can be <dfn>debug</dfn> or <dfn>release</dfn> for different build options.
- * The framework was tested under: Mac OS X Leopard (10.5), Mac OS X Snow Leopard (10.6), Mac OS X Lion (10.7), Ubuntu Lucid Lynx (10.04), Gentoo Linux (stable / unstable) and Microsoft
- * Windows 7 (with Cygwin). On projects the main header <dfn>machinelearning.h</dfn> and the cpp file <dfn>machinelearning.cpp</dfn> are needed.
+ * The framework has been tested under
+ * <ul>
+ * <li>Mac OS X Leopard (10.5)</li>
+ * <li>Mac OS X Snow Leopard (10.6)</li>
+ * <li>Mac OS X Lion (10.7)</li>
+ * <li>Ubuntu Lucid Lynx (10.04)</li>
+ * <li>Gentoo Linux (stable / unstable)</li>
+ * <li>Windows 7 with <a href="http://www.cygwin.com/">Cygwin</a> [in some cases you need to rebase all libraries in Cygwin (eg fork errors): Close all Cygwin windows, start the
+ * <dfn>dash.exe</dfn> from Cygwins bin directory and run the command <dfn>/bin/rebase</dfn>]</li>
+ * </ul>
+ * On projects the main header <dfn>machinelearning.h</dfn> and the cpp file <dfn>machinelearning.cpp</dfn> are needed.
+ *
  *
  * @section def Definition / Style Guide
  * <ul>
@@ -110,6 +120,7 @@
  * <li>header inclusion (forward declaration) and implementation are split into two files (if needed), header file (.h/.hpp) and the implementation file with name <dfn>name.implementation.hpp/.h/.cpp</dfn></li>
  * </ul>
  *
+ *
  * @section compileroptions Compileroption
  * toolbox compilerflags
  * <ul>
@@ -134,6 +145,7 @@
  * <li><dfn>BOOST_FILESYSTEM_NO_DEPRECATED</dfn> disabled deprecated code</li>
  * </ul>
  *
+ *
  * @subsection scons Scons Build Environment
  * The framework supports Scons for compiling. The script reads the environment (Linux, OS X & Microsoft) and uses the
  * plattform specified options for compiling the sources [see options and default values with <dfn>scons -Q -h</dfn>]. On
@@ -154,9 +166,11 @@
  * <li><dfn>copylibrary</dfn> copy the dynamic libraries into the build directory</li>
  * <li><dfn>atlaspointerwidth</dfn> parameter for setting the ATLAS pointer width during running the library build target (default empty for system default)</li>
  * <li><dfn>atlaslink</dfn> link option for the atlas library [allowed values: multi | single] </li>
+ * <li><dfn>atlasversion</dfn> type of the atlas version. The default option uses the latest developer version, otherwise the latest stable version is used [allowed values: devel | stable]</li>
  * </ul>
  * The <dfn>SConstruct</dfn> script, which is the entry point to the compiler calls, is stored in the framework main directory. Under the <dfn>buildenvironment</dfn> directory all platform / environment specialized 
  * scripts are stored. All build scripts are named <dfn>build.py</dfn> and stored within the subdirectories.
+ *
  *
  * @subsection targets Buildtargets
  * The scons script supports different targets for building the examples. The call can be supplemented with the parameters above. Each subdirectory within the example directory
@@ -182,6 +196,7 @@
  * <li><dfn>javareduce</dfn> build the java examples of the reducing algorithms (java library jar file must build first and stored under the build directory)</li>
  * <li><dfn>javatools</dfn> build the java examples of the util subpackage</li>
  * </ul>
+ *
  *
  * @section ex Examples
  * <ul>
