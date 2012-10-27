@@ -224,7 +224,7 @@ def Boost_BuildInstall(env, source, gzipbuild, bzipbuild)  :
     boostpath   = os.path.join("library", boostpath.replace(".", "_").replace("-", "_"))
 
     # set the toolset and compile the bjam and build boost
-    boostoptions = "--with-exception --with-filesystem --with-math --with-random --with-regex --with-date_time --with-thread --with-system --with-program_options --with-serialization --with-iostreams --disable-filesystem2 link=shared runtime-link=shared threading=multi variant="+env["buildtype"]+" install --layout=system --prefix="+os.path.join("..", "build_"+env["buildtype"], "boost", version)
+    boostoptions = "--with-exception --with-filesystem --with-math --with-random --with-regex --with-date_time --with-thread --with-system --with-program_options --with-serialization --with-iostreams --layout=system link=shared runtime-link=shared threading=multi variant="+env["buildtype"]+" install --prefix="+os.path.join("..", "build_"+env["buildtype"], "boost", version)
     if env["withmpi"] :
         boostoptions = "--with-mpi " + boostoptions
     
@@ -241,7 +241,8 @@ def Boost_BuildInstall(env, source, gzipbuild, bzipbuild)  :
         
         gzipversion = str(gzipbuild).replace("['", "").replace("']", "").replace("buildgzip-", "")
         bzipversion = str(bzipbuild).replace("['", "").replace("']", "").replace("buildbzip2-", "")
-        zipcmd   = "export BZIP2_BINARY=bz2 && export ZLIB_BINARY=z && "
+        zipcmd   = "export BZIP2_BINARY=bz2 && "
+        zipcmd  += "export ZLIB_BINARY=z    && "
         zipcmd  += "export ZLIB_INCLUDE="  + os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "zlib", gzipversion, "include"))  + " && "
         zipcmd  += "export ZLIB_LIBPATH="  + os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "zlib", gzipversion, "lib"))      + " && "
         zipcmd  += "export BZIP2_INCLUDE=" + os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "bzip2", bzipversion, "include")) + " && "
