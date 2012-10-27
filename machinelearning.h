@@ -164,7 +164,9 @@
  * <li><dfn>usedistcc</dfn> the build process forces distcc on building</li>
  * <li><dfn>skiplibrary</dfn> disables / skips the automatic build of a library [allowd values: all, none, atlas, boost, hdf, ginac, json, xml]</li> 
  * <li><dfn>copylibrary</dfn> copy the dynamic libraries into the build directory</li>
- * </ul><ul>
+ * </ul>
+ * Optionflag, that are used during building the library package:
+ * <ul>
  * <li><dfn>zipsupport</dfn> enable / disable locale zip support on the Boost. BZip2 and GZip library can be downloaded</li>
  * <li><dfn>atlaspointerwidth</dfn> parameter for setting the ATLAS pointer width during running the library build target (default empty for system default)</li>
  * <li><dfn>atlaslink</dfn> link option for the atlas library [allowed values: multi | single] </li>
