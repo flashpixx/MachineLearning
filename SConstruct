@@ -125,9 +125,26 @@ def checkExecutables(conf, commands) :
 
 
 # function for checking the environment structur and setup toolkit values
-# @param env environment object
-def setupToolkitEnv(env) :
-    # check the toolkit option
+# @param vars script variables
+# @return environment object
+def setupToolkitEnv(vars) :
+    # MSYS / MinGW must be handle manually
+    if "msystem" in os.environ  and  os.environ["msystem"].lower() == "mingw32":
+        env = Environment( tools = ["mingw"], variables=vars,
+            BUILDERS = { "LibraryCopy" : LibraryCopyBuilder, "SwigJava" : SwigJavaBuilder, "Download" : DownloadBuilder, "Extract" : ExtractBuilder },
+            LIBRARYCOPY = librarycopy_action, SwigJavaPackage = swigjava_packageaction, SwigJavaOutDir  = swigjava_outdiraction, SwigJavaCppDir  = swigjava_cppdiraction, SwigJavaRemove  = swigjava_remove,
+        )
+    else :
+        env = Environment( variables=vars,
+            BUILDERS = { "LibraryCopy" : LibraryCopyBuilder, "SwigJava" : SwigJavaBuilder, "Download" : DownloadBuilder, "Extract" : ExtractBuilder },
+            LIBRARYCOPY = librarycopy_action, SwigJavaPackage = swigjava_packageaction, SwigJavaOutDir  = swigjava_outdiraction, SwigJavaCppDir  = swigjava_cppdiraction, SwigJavaRemove  = swigjava_remove,
+        )
+        
+    # additional tools
+    if env.Detect("xgettext") :
+        env.Tool("gettext") 
+
+    # setup toolkit values (that are called by eg librarybuild) 
     env["TOOLKIT_ARCH"] = (platform.architecture()[0]).replace("bit", "")
     if platform.system().lower() == "posix" or platform.system().lower() == "linux" :
         env["TOOLKIT"]      = "posix"
@@ -146,7 +163,8 @@ def setupToolkitEnv(env) :
         laPathList.extend(os.environ["PATH"].split(os.pathsep))
         env["ENV"]["PATH"] = laPathList
         print("Appending custom path (PATH)")
-
+        
+    return env
 
 
 # glob recursiv file / directories
@@ -522,31 +540,11 @@ showlicence()
 # create configuration option
 vars = Variables()
 createVariables(vars)
-
-env = Environment( 
-        LIBRARYCOPY     = librarycopy_action,
-        SwigJavaPackage = swigjava_packageaction, 
-        SwigJavaOutDir  = swigjava_outdiraction,
-        SwigJavaCppDir  = swigjava_cppdiraction,
-        SwigJavaRemove  = swigjava_remove,
-        
-        variables=vars,
-        
-        BUILDERS = { 
-            "LibraryCopy"   : LibraryCopyBuilder,
-            "SwigJava"      : SwigJavaBuilder, 
-            "Download"      : DownloadBuilder, 
-            "Extract"       : ExtractBuilder
-        }
-)
-setupToolkitEnv(env)
+env = setupToolkitEnv(vars)
 env.VariantDir("build", ".", duplicate=0)
 Help(vars.GenerateHelpText(env))
 
 # detect gettext, show configuration and setup configuration
-gettextexists = env.has_key("XGETTEXT") or env.Detect("xgettext") <> None
-if gettextexists :
-    env.Tool("gettext") 
 print "Build environment is ["+env["TOOLKIT"]+"] and architecture ["+env["TOOLKIT_ARCH"]+"]"
 conf = Configure(env)
 
@@ -573,15 +571,18 @@ env.Clean(defaultcpp, [
 ])
 
 
-# setup all different sub build script
-if gettextexists :
+# setup all different sub build script (first tool depend)
+if env.Detect("xgettext") :
     env.SConscript( os.path.join("tools", "language", "build.py"), exports="env defaultcpp GlobRekursiv" )
+if env.Detect(['swig']) and env.Detect(['javac']) and env.Detect(['jar']) :
+    env.SConscript( os.path.join("swig", "target", "java", "build.py"), exports="env defaultcpp GlobRekursiv" )
+if env.Detect(['javac']) :
+    for i in ["clustering", "tools", "reducing"] :
+        env.SConscript( os.path.join("examples", "java", i, "build.py"), exports="env defaultcpp" )
+
+
 env.SConscript( os.path.join("documentation", "build.py"), exports="env defaultcpp" )
 env.SConscript( os.path.join("library", "build.py"), exports="env defaultcpp" )
-
-env.SConscript( os.path.join("swig", "target", "java", "build.py"), exports="env defaultcpp GlobRekursiv" )
-for i in ["clustering", "tools", "reducing"] :
-    env.SConscript( os.path.join("examples", "java", i, "build.py"), exports="env defaultcpp" )
 
 for i in ["geneticalgorithm", "classifier", "clustering", "distance", "other", "reducing", "sources"] :
     env.SConscript( os.path.join("examples", i, "build.py"), exports="env defaultcpp" )
