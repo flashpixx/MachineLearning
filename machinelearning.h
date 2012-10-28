@@ -35,11 +35,11 @@
  *     <ul>
  *         <li>IOStreams with ZLib and BZip2 support</li>
  *         <li>Exception support</li>
- *         <li>Date-Time support</li>
  *         <li>Math support</li>
- *         <li>Program Options</li>
  *         <li>Regular Expression support</li>
  *         <li>System support</li>
+ *         <li><i>optional Date-Time support</i> (used by Twitter support)</li>
+ *         <li><i>optional Program Options</i> (only used by the examples)</li>
  *         <li><i>optional Filesystem support</i> (only used by the examples)</li>
  *         <li><i>optional Thread support</i> (only used by the framework logger)</li>
  *         <li><i>optional Serialization</i> (only used by MPI use)</li>
