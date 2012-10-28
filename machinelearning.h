@@ -165,12 +165,19 @@
  * <li><dfn>skiplibrary</dfn> disables / skips the automatic build of a library [allowd values: all, none, atlas, boost, hdf, ginac, json, xml]</li> 
  * <li><dfn>copylibrary</dfn> copy the dynamic libraries into the build directory</li>
  * </ul>
- * Optionflag, that are used during building the library package:
+ * Option flag, that are used during building the library package:
  * <ul>
  * <li><dfn>zipsupport</dfn> enable / disable locale zip support on the Boost. BZip2 and GZip library can be downloaded</li>
  * <li><dfn>atlaspointerwidth</dfn> parameter for setting the ATLAS pointer width during running the library build target (default empty for system default)</li>
  * <li><dfn>atlaslink</dfn> link option for the atlas library [allowed values: multi | single] </li>
  * <li><dfn>atlasversion</dfn> type of the atlas version. The default option uses the latest developer version, otherwise the latest stable version is used [allowed values: devel | stable]</li>
+ * <li><dfn>boostbuild</dfn> the Boost build options sets the required Boost libraries on the build process:
+ * <ul>
+ *      <li><dfn>required</dfn> builds only the required library (no additional support like logger, Wikipedia)</li>
+ *      <li><dfn>requiredoptional</dfn> builds the libraries except the librarie, that are needed by the examples</li>
+ *      <li><dfn>full</dfn> builds all libraries</li>
+ * </ul>
+ * The MPI option (<dfn>withmpi</dfn>) is independed of this options.
  * </ul>
  * The <dfn>SConstruct</dfn> script, which is the entry point to the compiler calls, is stored in the framework main directory. Under the <dfn>buildenvironment</dfn> directory all platform / environment specialized 
  * scripts are stored. All build scripts are named <dfn>build.py</dfn> and stored within the subdirectories.

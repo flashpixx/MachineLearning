@@ -224,14 +224,42 @@ def Boost_BuildInstall(env, source, gzipbuild, bzipbuild)  :
     boostpath   = os.path.join("library", boostpath.replace(".", "_").replace("-", "_"))
 
     # set the toolset and compile the bjam and build boost
-    boostoptions = "--with-exception --with-filesystem --with-math --with-random --with-regex --with-date_time --with-thread --with-system --with-program_options --with-serialization --with-iostreams --layout=system link=shared runtime-link=shared threading=multi variant="+env["buildtype"]+" install --prefix="+os.path.join("..", "build_"+env["buildtype"], "boost", version)
+    boostoptions = [
+        "--with-exception",
+        "--with-math",
+        "--with-system",
+        "--with-iostreams",
+        "--layout=system",
+        "link=shared",
+        "runtime-link=shared",
+        "threading=multi",
+        "variant="+env["buildtype"],
+        "install",
+        "--prefix="+os.path.join("..", "build_"+env["buildtype"], "boost", version)
+    ]
+    
+    if env["boostbuild"] == "requiredoptional"  or  env["boostbuild"] == "full" :
+        boostoptions.extend([
+            "--with-regex",
+            "--with-random",
+            "--with-thread",
+            "--with-date_time"
+        ])
+    if env["boostbuild"] == "full" :
+        boostoptions.extend([
+            "--with-program_options",
+            "--with-filesystem"
+        ])
     if env["withmpi"] :
-        boostoptions = "--with-mpi " + boostoptions
+        boostoptions.extend([
+            "--with-mpi",
+            "--with-serialization"
+        ])
     
     cmd = "cd " + boostpath + " && "
     if env["withmpi"] :
         cmd = cmd + " echo \"using mpi ;\" >> " + os.path.join("tools", "build", "v2", "user-config.jam") + " && "
-    cmd = cmd + " ./bootstrap.sh && ./b2 " + boostoptions
+    cmd = cmd + " ./bootstrap.sh && ./b2 " + " ".join(boostoptions)
     
     # build Boost with Bzip2 and ZLib support and set the dependency
     dependency = [source]
