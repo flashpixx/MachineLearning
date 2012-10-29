@@ -213,7 +213,7 @@ conf.env.AppendUnique(CPPPATH = [Dir("#")])
 conf.env["NOTCOPYLIBRARY"] = ["stdc++"]
 
 # main configuration
-conf.env.AppendUnique(LINKFLAGS   = ["-fopenmp", "-pthread", "--as-needed"])
+conf.env.AppendUnique(LINKFLAGS   = ["-fopenmp", "-pthread"])
 conf.env.AppendUnique(CXXFLAGS    = ["-fopenmp", "-pthread", "-pipe"])
 conf.env.AppendUnique(CPPDEFINES  = ["BOOST_FILESYSTEM_NO_DEPRECATED", "BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"])
 
