@@ -80,6 +80,7 @@
  * <li>Mac OS X Snow Leopard (10.6)</li>
  * <li>Mac OS X Lion (10.7)</li>
  * <li>Ubuntu Lucid Lynx (10.04)</li>
+ * <li>Linux Mint Maya (13)</li>
  * <li>Gentoo Linux (stable / unstable)</li>
  * <li>Windows 7 with <a href="http://www.cygwin.com/">Cygwin</a> [in some cases you need to rebase all libraries in Cygwin (eg fork errors): Close all Cygwin windows, start the
  * <dfn>dash.exe</dfn> from Cygwins bin directory and run the command <dfn>/bin/rebaseall -v</dfn>]</li>
@@ -180,7 +181,8 @@
  * The MPI option (<dfn>withmpi</dfn>) is independed of this options.
  * </ul>
  * The <dfn>SConstruct</dfn> script, which is the entry point to the compiler calls, is stored in the framework main directory. Under the <dfn>buildenvironment</dfn> directory all platform / environment specialized 
- * scripts are stored. All build scripts are named <dfn>build.py</dfn> and stored within the subdirectories.
+ * scripts are stored. All build scripts are named <dfn>build.py</dfn> and stored within the subdirectories. The script tries to find a color compiler (a compiler with the prefix <dfn>color</dfn> or <dfn>color-</dfn>
+ * is searched and if found used)
  *
  *
  * @subsection targets Buildtargets

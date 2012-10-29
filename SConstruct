@@ -104,10 +104,12 @@ def checkCPPEnv(conf, localconf) :
         print("use distributed compiling (DistCC)")
     
     else :
-        lxPath = conf.env.FindFile("color-"+conf.env["CXX"], conf.env["ENV"]["PATH"])
-        if lxPath <> None :
-            conf.env.Replace(CXX = "color-"+conf.env["CXX"])
-            print("use colored compiling")
+        for i in [ "color-"+conf.env["CXX"], "color"+conf.env["CXX"] ] :
+            lxPath = findfile(i, conf.env["ENV"]["PATH"])
+            if lxPath <> None :
+                conf.env.Replace(CXX = "color-"+conf.env["CXX"])
+                print("use colored compiling")
+                break
 
     
     

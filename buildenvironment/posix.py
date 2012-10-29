@@ -123,16 +123,7 @@ localconf = {
                                  os.path.join("boost", "iostreams", "filter", "counter.hpp"), 
                                  os.path.join("boost", "iostreams", "concepts.hpp"), 
                                  os.path.join("boost", "iostreams", "operations.hpp"), 
-                                 os.path.join("boost", "iostreams", "copy.hpp"),
-                                  
-                                 os.path.join("boost", "numeric", "bindings", "blas.hpp"),
-                                 os.path.join("boost", "numeric", "bindings", "ublas", "vector.hpp"),
-                                 os.path.join("boost", "numeric", "bindings", "ublas", "matrix.hpp"),
-                                 os.path.join("boost", "numeric", "bindings", "lapack", "driver", "geev.hpp"),
-                                 os.path.join("boost", "numeric", "bindings", "lapack", "driver", "ggev.hpp"),
-                                 os.path.join("boost", "numeric", "bindings", "lapack", "driver", "gesv.hpp"), 
-                                 os.path.join("boost", "numeric", "bindings", "lapack", "driver", "gesvd.hpp"), 
-                                 os.path.join("boost", "numeric", "bindings", "lapack", "computational", "hseqr.hpp")
+                                 os.path.join("boost", "iostreams", "copy.hpp")
     ]
 }
 # ==========================================================================
