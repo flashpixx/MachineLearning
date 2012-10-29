@@ -157,10 +157,6 @@ def setupToolkitEnv(vars) :
     else :
         raise RuntimeError("toolkit ["+platform.system()+"] not known")
 
-    # additional tools
-    if env.Detect("xgettext") :
-        env.Tool("gettext") 
-        
     # adding OS environment data
     if "PATH" in os.environ :
         laPathList = env["ENV"]["PATH"].split(os.pathsep)
@@ -577,10 +573,11 @@ env.Clean(defaultcpp, [
 
 # setup all different sub build script (first tool depend)
 if env.Detect("xgettext") :
+    env.Tool("gettext") 
     env.SConscript( os.path.join("tools", "language", "build.py"), exports="env defaultcpp GlobRekursiv" )
-if env.Detect(['swig']) and env.Detect(['javac']) and env.Detect(['jar']) :
+if env.Detect("swig") and env.Detect("javac") and env.Detect("jar") :
     env.SConscript( os.path.join("swig", "target", "java", "build.py"), exports="env defaultcpp GlobRekursiv" )
-if env.Detect(['javac']) :
+if env.Detect("javac") :
     for i in ["clustering", "tools", "reducing"] :
         env.SConscript( os.path.join("examples", "java", i, "build.py"), exports="env defaultcpp" )
 

@@ -239,7 +239,7 @@ if not("java" in COMMAND_LINE_TARGETS) :
                             "cstdlib",
                             os.path.join("boost", "program_options", "parsers.hpp"),
                             os.path.join("boost", "program_options", "variables_map.hpp"),
-                            #os.path.join("boost", "filesystem.hpp"), creates some problems
+                            os.path.join("boost", "filesystem.hpp"),
                             os.path.join("boost", "program_options", "options_description.hpp")
     ])
 
