@@ -26,6 +26,7 @@ import os
 Import("*")
 
 
+env.Tool("gettext") 
 env.AppendUnique(MSGMERGEFLAGS   = ["--no-wrap", "--update"])
 env.AppendUnique(XGETTEXTFLAGS   = ["--keyword=_", "--language=c++", "--no-wrap"])
 

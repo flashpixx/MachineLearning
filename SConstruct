@@ -573,13 +573,12 @@ env.Clean(defaultcpp, [
 ])
 
 
-# setup all different sub build script (first tool depend)
-if env.Detect("xgettext") and env.Detect("msgfmt") :
-    env.Tool("gettext") 
+# setup all different sub build script
+if "language" in COMMAND_LINE_TARGETS :
     env.SConscript( os.path.join("tools", "language", "build.py"), exports="env defaultcpp GlobRekursiv" )
-if env.Detect("swig") and env.Detect("javac") and env.Detect("jar") :
+if "java" in COMMAND_LINE_TARGETS :
     env.SConscript( os.path.join("swig", "target", "java", "build.py"), exports="env defaultcpp GlobRekursiv" )
-if env.Detect("javac") :
+if any([i in COMMAND_LINE_TARGETS for i in ["javatools", "javaclustering", "javareduce"]]) :
     for i in ["clustering", "tools", "reducing"] :
         env.SConscript( os.path.join("examples", "java", i, "build.py"), exports="env defaultcpp" )
 
