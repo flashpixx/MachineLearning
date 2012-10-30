@@ -176,9 +176,11 @@ def GlobRekursiv(startdir, extensions=[], excludedir=[]) :
     if not extensions :
         return lst
     for root, dirs, filenames in os.walk(startdir) :
-        if not [i.startswith(".") for i in dirs]  or  any([i in root for i in excludedir]) :
+        if any([i in root for i in excludedir]) :
             continue
         for filename in filenames :
+            if filename.startswith(".") :
+                continue
             if any([filename.endswith(i) for i in extensions]) :
                 lst.append( os.path.abspath(os.path.join(root, filename)) )
     return lst
@@ -572,7 +574,7 @@ env.Clean(defaultcpp, [
 
 
 # setup all different sub build script (first tool depend)
-if env.Detect("xgettext") :
+if env.Detect("xgettext") and env.Detect("msgfmt") :
     env.Tool("gettext") 
     env.SConscript( os.path.join("tools", "language", "build.py"), exports="env defaultcpp GlobRekursiv" )
 if env.Detect("swig") and env.Detect("javac") and env.Detect("jar") :
