@@ -135,6 +135,14 @@ def setupToolkitEnv(vars) :
         BUILDERS = { "LibraryCopy" : LibraryCopyBuilder, "SwigJava" : SwigJavaBuilder, "Download" : DownloadBuilder, "Extract" : ExtractBuilder },
         LIBRARYCOPY = librarycopy_action, SwigJavaPackage = swigjava_packageaction, SwigJavaOutDir  = swigjava_outdiraction, SwigJavaCppDir  = swigjava_cppdiraction, SwigJavaRemove  = swigjava_remove,
     )
+    
+    # adding OS environment data
+    if "PATH" in os.environ :
+        laPathList = env["ENV"]["PATH"].split(os.pathsep)
+        laPathList.extend(os.environ["PATH"].split(os.pathsep))
+        env["ENV"]["PATH"] = laPathList
+        print("Appending custom path (PATH)")
+
         
     # setup toolkit values (that are called by eg librarybuild) 
     env["TOOLKIT_ARCH"] = (platform.architecture()[0]).replace("bit", "")
@@ -154,16 +162,22 @@ def setupToolkitEnv(vars) :
         env["TOOLKIT"]      = "msys"
         env.Tool("mingw")
         
+        # set unix shell 
+        if not( "msyscon" in os.environ ) :
+            raise RuntimeError("MSYS environment shell not found")
+        shell = findfile( os.environ["msyscon"], env["ENV"]["PATH"] )
+        if shell == None :
+            raise RuntimeError("MSYS shell not found")
+        
+        env["SHELL"] = shell
+        from SCons.Platform.win32 import exec_spawn
+        env["SPAWN"] = (lambda sh, esc, cmd, args, env_param : exec_spawn([sh, '-c', ' '.join(args)], env_param))
+        os.path.sep = "/"
+    
     else :
         raise RuntimeError("toolkit ["+platform.system()+"] not known")
 
-    # adding OS environment data
-    if "PATH" in os.environ :
-        laPathList = env["ENV"]["PATH"].split(os.pathsep)
-        laPathList.extend(os.environ["PATH"].split(os.pathsep))
-        env["ENV"]["PATH"] = laPathList
-        print("Appending custom path (PATH)")
-        
+    print "Build environment is ["+env["TOOLKIT"]+"] and architecture ["+env["TOOLKIT_ARCH"]+"]"
     return env
 
 
@@ -545,9 +559,6 @@ createVariables(vars)
 env = setupToolkitEnv(vars)
 env.VariantDir("build", ".", duplicate=0)
 Help(vars.GenerateHelpText(env))
-
-# detect gettext, show configuration and setup configuration
-print "Build environment is ["+env["TOOLKIT"]+"] and architecture ["+env["TOOLKIT_ARCH"]+"]"
 conf = Configure(env)
 
 
