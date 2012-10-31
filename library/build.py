@@ -359,6 +359,9 @@ def HDF5_BuildInstall(env, hdfdir) :
     version = str(hdfdir).replace("']", "").replace("['", "").replace("hdf5-", "")
     prefix  = os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "hdf", version))
     
+    if env["TOOLKIT"] == "msys" :
+        prefix = "/" + prefix.replace("\\", "/").replace(":", "")
+    
     cmd = "cd $SOURCE && ./configure --enable-cxx --prefix=" + prefix + " && make && make install"
     return env.Command("buildhdf5-"+version, hdfdir, cmd)
 
@@ -366,6 +369,9 @@ def HDF5_BuildInstall(env, hdfdir) :
 def LibXML2_BuildInstall(env, libxmldir) :
     version   = str(libxmldir).replace("']", "").replace("['", "").replace("libxml2-", "")
     prefix    = os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "xml", version))
+    
+    if env["TOOLKIT"] == "msys" :
+        prefix = "/" + prefix.replace("\\", "/").replace(":", "")
     
     cmd = "cd $SOURCE && ./configure --without-python --without-threads"
     if env["buildtype"] == "release" :
@@ -382,6 +388,11 @@ def GiNaC_BuildInstall(env, ginacdir, clnbuild) :
     clninclude = os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "cln", clnversion, "include"))
     clnlib     = os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "cln", clnversion, "lib"))
     
+    if env["TOOLKIT"] == "msys" :
+        prefix     = "/" + prefix.replace("\\", "/").replace(":", "")
+        clninclude = "/" + clninclude.replace("\\", "/").replace(":", "")
+        clnlib     = "/" + clnlib.replace("\\", "/").replace(":", "")
+    
     cmd = "cd $SOURCE && export CLN_CFLAGS=-I" + clninclude + " && export CLN_LIBS=\"-L" + clnlib + " -lcln\" && ./configure --prefix=" + prefix + " && make && make install"
     return env.Command("buildginac-"+version, [ginacdir, clnbuild], cmd)
         
@@ -389,6 +400,9 @@ def GiNaC_BuildInstall(env, ginacdir, clnbuild) :
 def CLN_BuildInstall(env, clndir) :
     version = str(clndir).replace("']", "").replace("['", "").replace("cln-", "")
     prefix  = os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "cln", version))
+    
+    if env["TOOLKIT"] == "msys" :
+        prefix = "/" + prefix.replace("\\", "/").replace(":", "")
     
     cmd = "cd $SOURCE && ./configure --prefix=" + prefix + " && make && make install"
     return env.Command("buildcln-"+version, clndir, cmd)

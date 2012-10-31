@@ -66,6 +66,61 @@ def createVariables(vars) :
     
 #=== build environment check ===========================================================================================================
 
+# function for checking the environment structur and setup toolkit values
+# @param vars script variables
+# @return environment object
+def setupToolkitEnv(vars) :
+    # we disable all tools and set it manually on the platform
+    env = Environment( tools = [], variables=vars,
+        BUILDERS = { "LibraryCopy" : LibraryCopyBuilder, "SwigJava" : SwigJavaBuilder, "Download" : DownloadBuilder, "Extract" : ExtractBuilder },
+        LIBRARYCOPY = librarycopy_action, SwigJavaPackage = swigjava_packageaction, SwigJavaOutDir  = swigjava_outdiraction, SwigJavaCppDir  = swigjava_cppdiraction, SwigJavaRemove  = swigjava_remove,
+    )
+    
+    # adding OS environment data
+    if "PATH" in os.environ :
+        laPathList = env["ENV"]["PATH"].split(os.pathsep)
+        laPathList.extend(os.environ["PATH"].split(os.pathsep))
+        env["ENV"]["PATH"] = laPathList
+        print("Appending custom path (PATH)")
+
+        
+    # setup toolkit values (that are called by eg librarybuild) 
+    env["TOOLKIT_ARCH"] = (platform.architecture()[0]).replace("bit", "")
+    if platform.system().lower() == "posix" or platform.system().lower() == "linux" :
+        env["TOOLKIT"]      = "posix"
+        env.Tool("default")
+        
+    elif platform.system().lower() == "darwin" :
+        env["TOOLKIT"]      = "darwin"
+        env.Tool("default")
+        
+    elif platform.system().lower().split("_")[0] == "cygwin" :
+        env["TOOLKIT"]      = "cygwin"
+        env.Tool("default")
+        
+    elif "msystem" in os.environ  and  os.environ["msystem"].lower() == "mingw32":
+        env["TOOLKIT"]      = "msys"
+        env.Tool("mingw")
+        
+        # set unix shell 
+        if not( "msyscon" in os.environ ) :
+            raise RuntimeError("MSYS environment shell not found")
+        shell = findfile( os.environ["msyscon"], env["ENV"]["PATH"] )
+        if shell == None :
+            raise RuntimeError("MSYS shell not found")
+        
+        env["SHELL"] = shell
+        from SCons.Platform.win32 import exec_spawn
+        from SCons.Platform.posix import escape
+        env["SPAWN"] = (lambda sh, esc, cmd, args, env_param : exec_spawn([sh, "-c", escape(" ".join(args))], env_param))
+    
+    else :
+        raise RuntimeError("toolkit ["+platform.system()+"] not known")
+
+    print "Build environment is ["+env["TOOLKIT"]+"] and architecture ["+env["TOOLKIT_ARCH"]+"]"
+    return env
+    
+
 # function for checking C/C++ configuration data, function is called from the environment scripts
 # @param conf configuration object
 # @localconf configuration directionary
@@ -123,61 +178,6 @@ def checkExecutables(conf, commands) :
     for i in cmd :
         if findfile(i, conf.env["ENV"]["PATH"]) == None :
             raise RuntimeError("build tool ["+i+"] not found")
-
-
-
-# function for checking the environment structur and setup toolkit values
-# @param vars script variables
-# @return environment object
-def setupToolkitEnv(vars) :
-    # we disable all tools and set it manually on the platform
-    env = Environment( tools = [], variables=vars,
-        BUILDERS = { "LibraryCopy" : LibraryCopyBuilder, "SwigJava" : SwigJavaBuilder, "Download" : DownloadBuilder, "Extract" : ExtractBuilder },
-        LIBRARYCOPY = librarycopy_action, SwigJavaPackage = swigjava_packageaction, SwigJavaOutDir  = swigjava_outdiraction, SwigJavaCppDir  = swigjava_cppdiraction, SwigJavaRemove  = swigjava_remove,
-    )
-    
-    # adding OS environment data
-    if "PATH" in os.environ :
-        laPathList = env["ENV"]["PATH"].split(os.pathsep)
-        laPathList.extend(os.environ["PATH"].split(os.pathsep))
-        env["ENV"]["PATH"] = laPathList
-        print("Appending custom path (PATH)")
-
-        
-    # setup toolkit values (that are called by eg librarybuild) 
-    env["TOOLKIT_ARCH"] = (platform.architecture()[0]).replace("bit", "")
-    if platform.system().lower() == "posix" or platform.system().lower() == "linux" :
-        env["TOOLKIT"]      = "posix"
-        env.Tool("default")
-        
-    elif platform.system().lower() == "darwin" :
-        env["TOOLKIT"]      = "darwin"
-        env.Tool("default")
-        
-    elif platform.system().lower().split("_")[0] == "cygwin" :
-        env["TOOLKIT"]      = "cygwin"
-        env.Tool("default")
-        
-    elif "msystem" in os.environ  and  os.environ["msystem"].lower() == "mingw32":
-        env["TOOLKIT"]      = "msys"
-        env.Tool("mingw")
-        
-        # set unix shell 
-        if not( "msyscon" in os.environ ) :
-            raise RuntimeError("MSYS environment shell not found")
-        shell = findfile( os.environ["msyscon"], env["ENV"]["PATH"] )
-        if shell == None :
-            raise RuntimeError("MSYS shell not found")
-        
-        env["SHELL"] = shell
-        from SCons.Platform.win32 import exec_spawn
-        env["SPAWN"] = (lambda sh, esc, cmd, args, env_param : exec_spawn([sh, '-c', ' '.join(args)], env_param))
-    
-    else :
-        raise RuntimeError("toolkit ["+platform.system()+"] not known")
-
-    print "Build environment is ["+env["TOOLKIT"]+"] and architecture ["+env["TOOLKIT_ARCH"]+"]"
-    return env
 
 
 # glob recursiv file / directories
