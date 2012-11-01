@@ -264,7 +264,12 @@ def Boost_BuildInstall(env, source, gzipbuild, bzipbuild)  :
     cmd = "cd " + boostpath + " && "
     if env["withmpi"] :
         cmd = cmd + " echo \"using mpi ;\" >> " + os.path.join("tools", "build", "v2", "user-config.jam") + " && "
-    cmd = cmd + " ./bootstrap.sh && ./b2 " + " ".join(boostoptions)
+    cmd = cmd + " ./bootstrap.sh"
+    
+    if env["TOOLKIT"] == "msys" :
+        cmd = cmd + " --with-toolset=mingw"
+    
+    cmd = " && ./b2 " + " ".join(boostoptions)
     
     # build Boost with Bzip2 and ZLib support and set the dependency
     dependency = [source]
