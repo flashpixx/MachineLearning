@@ -300,8 +300,10 @@ def BZip2_BuildInstall(env, extract) :
     
     if env["TOOLKIT"] == "msys" :
         prefix = prefix.replace("\\", "/")
+        cmd = "cd $SOURCE && grep -v chmod Makefile | grep -v ln > Makefile.msys && make -fMakefile.msys install PREFIX=" + prefix
+    else :
+        cmd = "cd $SOURCE && make install PREFIX=" + prefix
     
-    cmd = "cd $SOURCE && make install PREFIX=" + prefix
     return env.Command("buildbzip2-"+version, extract, cmd)
       
         
