@@ -283,14 +283,23 @@ def Boost_BuildInstall(env, source, gzipbuild, bzipbuild)  :
 def Gzip_BuildInstall(env, extract) :
     version = str(extract).replace("['", "").replace("']", "").replace("zlib-", "")
     prefix  = os.path.join("..", "build_"+env["buildtype"], "zlib", version)
-    
-    cmd = "cd $SOURCE && ./configure --prefix=" + prefix + " && make && make install"
+
+    cmd = "cd $SOURCE && ";
+    if env["TOOLKIT"] == "msys" :
+        lib = os.path.join(prefix, "lib").replace("\\", "/")
+        inc = os.path.join(prefix, "include").replace("\\", "/")
+        cmd = cmd + "make -fwin32/Makefile.gcc && make install -fwin32/Makefile.gcc INCLUDE_PATH="+inc+" BINARY_PATH="+lib+" LIBRARY_PATH="+lib
+    else :
+        cmd = cmd + "./configure --prefix=" + prefix + " && make && make install"
     return env.Command("buildgzip-"+version, extract, cmd)
    
    
 def BZip2_BuildInstall(env, extract) :
     version = str(extract).replace("['", "").replace("']", "").replace("bzip2-", "")
     prefix  = os.path.join("..", "build_"+env["buildtype"], "bzip2", version)
+    
+    if env["TOOLKIT"] == "msys" :
+        prefix = prefix.replace("\\", "/")
     
     cmd = "cd $SOURCE && make install PREFIX=" + prefix
     return env.Command("buildbzip2-"+version, extract, cmd)
