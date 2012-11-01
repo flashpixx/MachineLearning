@@ -109,10 +109,10 @@ def setupToolkitEnv(vars) :
         if shell == None :
             raise RuntimeError("MSYS shell not found")
         
-        env["SHELL"] = shell
         from SCons.Platform.win32 import exec_spawn
         from SCons.Platform.posix import escape
-        env["SPAWN"] = (lambda sh, esc, cmd, args, env_param : exec_spawn([sh, "-c", escape(" ".join(args))], env_param))
+        env["SHELL"] = shell
+        env["SPAWN"] = (lambda sh, esc, cmd, args, envparam : exec_spawn([sh, "-c", escape(" ".join(args))], envparam))
     
     else :
         raise RuntimeError("toolkit ["+platform.system()+"] not known")

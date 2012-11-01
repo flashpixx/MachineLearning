@@ -317,7 +317,7 @@ def JsonCPP_BuildInstall(env, targz, extract) :
             libheader.append( i ) 
 
     envjson = env.Clone()
-    envjson.Append(CPPPATH = os.path.join(sourcepath, "include"))
+    envjson.Replace(CPPPATH = os.path.join(sourcepath, "include"))
     
     libbuild = []
     if env["TOOLKIT"] in ["posix", "cygwin", "darwin", "msys"] :
