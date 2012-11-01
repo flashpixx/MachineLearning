@@ -82,8 +82,9 @@
  * <li>Ubuntu Lucid Lynx (10.04)</li>
  * <li>Linux Mint Maya (13)</li>
  * <li>Gentoo Linux (stable / unstable)</li>
- * <li>Windows 7 with <a href="http://www.cygwin.com/">Cygwin</a> [in some cases you need to rebase all libraries in Cygwin (eg fork errors): Close all Cygwin windows, start the
- * <dfn>dash.exe</dfn> from Cygwins bin directory and run the command <dfn>/bin/rebaseall -v</dfn>]</li>
+ * <li>Windows 7 with <a href="http://www.cygwin.com/">Cygwin</a> with the buildin Python installation [in some cases you need to rebase all libraries in Cygwin (eg fork errors):
+ * Close all Cygwin windows, start the <dfn>dash.exe</dfn> from Cygwins bin directory and run the command <dfn>/bin/rebaseall -v</dfn>]</li>
+ * <li>Windows 7 with <a href="http://www.mingw.org">MinGW / MSYS</a> with a native <a href="http://www.python.org">Python installation</a></li>
  * </ul>
  * On projects the main header <dfn>machinelearning.h</dfn> and the cpp file <dfn>machinelearning.cpp</dfn> are needed.
  *
