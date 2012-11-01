@@ -65,16 +65,31 @@ def Boost_DownloadURL(env)  :
     
     
 def JsonCPP_DownloadURL(env) :
-    # read download path of the JsonCPP library (latest version)
-    f = urllib2.urlopen("http://sourceforge.net/projects/jsoncpp/")
-    html = f.read()
-    f.close()
+    if env["jsoncppversion"] == "stable" :
+        # read download path of the JsonCPP library (latest stable version)
+        f = urllib2.urlopen("http://sourceforge.net/projects/jsoncpp/")
+        html = f.read()
+        f.close()
+        
+        found = re.search("<a href=\"/projects/jsoncpp/files/latest/download\" title=\"Download /jsoncpp/(.*)/jsoncpp-src-(.*)\.tar\.gz", html)
+        if found == None :
+            raise RuntimeError("JsonCPP Download URL not found")
+        return "http://sourceforge.net/projects/jsoncpp/files/latest/download", "jsoncpp-src-" + found.group(1) + ".tar.gz"
+        
+    elif env["jsoncppversion"] == "devel" :
+        # read download path of the JsonCPP library (latest developer version)
+        f = urllib2.urlopen("http://sourceforge.net/projects/jsoncpp/files/jsoncpp/")
+        html = f.read()
+        f.close()
+        
+        found = re.search("<a href=\"/projects/jsoncpp/files/jsoncpp/(.+)/\"", html)
+        if found == None :
+            raise RuntimeError("Json-Cpp Version Download URL not found")
+        version  = found.group(0).replace("\"", "").replace("<a href=", "").strip("/").split("/")[-1]     
+        filename = "jsoncpp-src-" + version + ".tar.gz"
+        return "http://sourceforge.net/projects/jsoncpp/files/jsoncpp/"+version+"/"+filename, filename
     
-    found = re.search("<a href=\"/projects/jsoncpp/files/latest/download\" title=\"Download /jsoncpp/(.*)/jsoncpp-src-(.*)\.tar\.gz", html)
-    if found == None :
-        raise RuntimeError("JsonCPP Download URL not found")
-
-    return "http://sourceforge.net/projects/jsoncpp/files/latest/download", "jsoncpp-src-" + found.group(1) + ".tar.gz"
+    raise RuntimeError("Json-Cpp Download unknown")
     
    
      
