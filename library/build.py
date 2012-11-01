@@ -269,7 +269,7 @@ def Boost_BuildInstall(env, source, gzipbuild, bzipbuild)  :
     if env["TOOLKIT"] == "msys" :
         cmd = cmd + " --with-toolset=mingw"
     
-    cmd = " && ./b2 " + " ".join(boostoptions)
+    cmd = cmd + " && ./b2 " + " ".join(boostoptions)
     
     # build Boost with Bzip2 and ZLib support and set the dependency
     dependency = [source]
