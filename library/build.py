@@ -222,6 +222,11 @@ def Boost_BuildInstall(env, source, gzipbuild, bzipbuild)  :
     boostpath   = str(source).replace("['", "").replace("']", "")
     version     = boostpath.replace("boost-", "")
     boostpath   = os.path.join("library", boostpath.replace(".", "_").replace("-", "_"))
+    prefix      = os.path.join("..", "build_"+env["buildtype"], "boost", version)
+    
+    if env["TOOLKIT"] == "msys" :
+        prefix    = "/" + prefix.replace("\\", "/")
+        boostpath = boostpath.replace("\\", "/")
 
     # set the toolset and compile the bjam and build boost
     boostoptions = [
@@ -235,7 +240,7 @@ def Boost_BuildInstall(env, source, gzipbuild, bzipbuild)  :
         "threading=multi",
         "variant="+env["buildtype"],
         "install",
-        "--prefix="+os.path.join("..", "build_"+env["buildtype"], "boost", version)
+        "--prefix="+prefix
     ]
     
     if env["boostbuild"] == "requiredoptional"  or  env["boostbuild"] == "full" :
@@ -264,17 +269,27 @@ def Boost_BuildInstall(env, source, gzipbuild, bzipbuild)  :
     # build Boost with Bzip2 and ZLib support and set the dependency
     dependency = [source]
     if (gzipbuild <> None) and (bzipbuild <> None) :
+        zipcmd   = "export BZIP2_BINARY=bz2 && export ZLIB_BINARY=z && "
         dependency.append(gzipbuild)
         dependency.append(bzipbuild)
-        
         gzipversion = str(gzipbuild).replace("['", "").replace("']", "").replace("buildgzip-", "")
         bzipversion = str(bzipbuild).replace("['", "").replace("']", "").replace("buildbzip2-", "")
-        zipcmd   = "export BZIP2_BINARY=bz2 && "
-        zipcmd  += "export ZLIB_BINARY=z    && "
-        zipcmd  += "export ZLIB_INCLUDE="  + os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "zlib", gzipversion, "include"))  + " && "
-        zipcmd  += "export ZLIB_LIBPATH="  + os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "zlib", gzipversion, "lib"))      + " && "
-        zipcmd  += "export BZIP2_INCLUDE=" + os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "bzip2", bzipversion, "include")) + " && "
-        zipcmd  += "export BZIP2_LIBPATH=" + os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "bzip2", bzipversion, "lib"))     + " && "
+        
+        inc = os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "zlib", gzipversion, "include"))
+        lib = os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "zlib", gzipversion, "lib"))
+        if env["TOOLKIT"] == "msys" :
+            inc = "/" + inc.replace("\\", "/").replace(":", "")
+            lib = "/" + lib.replace("\\", "/").replace(":", "")
+        zipcmd  += "export ZLIB_INCLUDE="  + inc + " && "
+        zipcmd  += "export ZLIB_LIBPATH="  + lib + " && "
+        
+        inc = os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "bzip2", bzipversion, "include"))
+        lib = os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "bzip2", bzipversion, "lib"))
+        if env["TOOLKIT"] == "msys" :
+            inc = "/" + inc.replace("\\", "/").replace(":", "")
+            lib = "/" + lib.replace("\\", "/").replace(":", "")
+        zipcmd  += "export BZIP2_INCLUDE=" + inc + " && "
+        zipcmd  += "export BZIP2_LIBPATH=" + lib + " && "
         cmd      = zipcmd + cmd
         
     return env.Command("buildboost-"+version, dependency, cmd)
