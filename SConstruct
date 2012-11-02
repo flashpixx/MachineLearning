@@ -61,6 +61,7 @@ def createVariables(vars) :
     vars.Add(EnumVariable("atlaspointerwidth", "pointer width for compiling ATLAS (empty = system default, 32 = 32 Bit, 64 = 64 Bit)", "", allowed_values=("", "32", "64")))
     vars.Add(EnumVariable("atlasversion", "version of the ATLAS library (developer or stable version)", "devel", allowed_values=("stable", "devel")))
     vars.Add(EnumVariable("boostbuild", "Boost build option: required builds all libraries, requiredoptional build the required libraries with optional libraries, full build all libraries", "requiredoptional", allowed_values=("required", "requiredoptional", "full")))
+    vars.Add(EnumVariable("jsoncppversion", "version of the Json-Cpp library (developer or stable version)", "devel", allowed_values=("stable", "devel")))
 
     
     
