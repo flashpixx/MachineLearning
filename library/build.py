@@ -221,12 +221,8 @@ def Boost_BuildInstall(env, source, gzipbuild, bzipbuild)  :
     # extract path and version of the source name
     boostpath   = str(source).replace("['", "").replace("']", "")
     version     = boostpath.replace("boost-", "")
-    boostpath   = os.path.join("library", boostpath.replace(".", "_").replace("-", "_"))
-    prefix      = os.path.join("..", "build_"+env["buildtype"], "boost", version)
-    
-    if env["TOOLKIT"] == "msys" :
-        prefix    = "/" + prefix.replace("\\", "/")
-        boostpath = boostpath.replace("\\", "/")
+    boostpath   = setpath(env, os.path.join("library", boostpath.replace(".", "_").replace("-", "_")))
+    prefix      = setpath(env, os.path.join("..", "build_"+env["buildtype"], "boost", version))
 
     # set the toolset and compile the bjam and build boost
     boostoptions = [
@@ -269,7 +265,7 @@ def Boost_BuildInstall(env, source, gzipbuild, bzipbuild)  :
     if env["TOOLKIT"] == "msys" :
         cmd = cmd + " --with-toolset=mingw"
     
-    cmd = cmd + " && ./b2 " + " ".join(boostoptions)
+    #cmd = cmd + " && ./b2 " + " ".join(boostoptions)
     
     # build Boost with Bzip2 and ZLib support and set the dependency
     dependency = [source]
@@ -280,21 +276,10 @@ def Boost_BuildInstall(env, source, gzipbuild, bzipbuild)  :
         gzipversion = str(gzipbuild).replace("['", "").replace("']", "").replace("buildgzip-", "")
         bzipversion = str(bzipbuild).replace("['", "").replace("']", "").replace("buildbzip2-", "")
         
-        inc = os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "zlib", gzipversion, "include"))
-        lib = os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "zlib", gzipversion, "lib"))
-        if env["TOOLKIT"] == "msys" :
-            inc = "/" + inc.replace("\\", "/").replace(":", "")
-            lib = "/" + lib.replace("\\", "/").replace(":", "")
-        zipcmd  += "export ZLIB_INCLUDE="  + inc + " && "
-        zipcmd  += "export ZLIB_LIBPATH="  + lib + " && "
-        
-        inc = os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "bzip2", bzipversion, "include"))
-        lib = os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "bzip2", bzipversion, "lib"))
-        if env["TOOLKIT"] == "msys" :
-            inc = "/" + inc.replace("\\", "/").replace(":", "")
-            lib = "/" + lib.replace("\\", "/").replace(":", "")
-        zipcmd  += "export BZIP2_INCLUDE=" + inc + " && "
-        zipcmd  += "export BZIP2_LIBPATH=" + lib + " && "
+        zipcmd  += "export ZLIB_INCLUDE="  + setpath(env, os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "zlib", gzipversion, "include"))) + " && "
+        zipcmd  += "export ZLIB_LIBPATH="  + setpath(env, os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "zlib", gzipversion, "lib"))) + " && "
+        zipcmd  += "export BZIP2_INCLUDE=" + setpath(env, os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "bzip2", bzipversion, "include"))) + " && "
+        zipcmd  += "export BZIP2_LIBPATH=" + setpath(env, os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "bzip2", bzipversion, "lib"))) + " && "
         cmd      = zipcmd + cmd
         
     return env.Command("buildboost-"+version, dependency, cmd)
@@ -306,8 +291,8 @@ def Gzip_BuildInstall(env, extract) :
 
     cmd = "cd $SOURCE && ";
     if env["TOOLKIT"] == "msys" :
-        lib = os.path.join(prefix, "lib").replace("\\", "/")
-        inc = os.path.join(prefix, "include").replace("\\", "/")
+        lib = setpath(env, os.path.join(prefix, "lib"))
+        inc = setpath(env, os.path.join(prefix, "include"))
         cmd = cmd + "make -fwin32/Makefile.gcc && make install -fwin32/Makefile.gcc INCLUDE_PATH="+inc+" BINARY_PATH="+lib+" LIBRARY_PATH="+lib
     else :
         cmd = cmd + "./configure --prefix=" + prefix + " && make && make install"
@@ -316,11 +301,10 @@ def Gzip_BuildInstall(env, extract) :
    
 def BZip2_BuildInstall(env, extract) :
     version = str(extract).replace("['", "").replace("']", "").replace("bzip2-", "")
-    prefix  = os.path.join("..", "build_"+env["buildtype"], "bzip2", version)
+    prefix  = setpath(env, os.path.join("..", "build_"+env["buildtype"], "bzip2", version))
     
     if env["TOOLKIT"] == "msys" :
-        prefix = prefix.replace("\\", "/")
-        cmd = "cd $SOURCE && grep -v chmod Makefile | grep -v ln > Makefile.msys && make -fMakefile.msys install PREFIX=" + prefix
+        cmd = "cd $SOURCE && grep -v chmod Makefile | grep -v ln > Makefile.msys && make -fMakefile.msys install PREFIX=" + setpath(env, prefix)
     else :
         cmd = "cd $SOURCE && make install PREFIX=" + prefix
     
@@ -388,10 +372,7 @@ def Atlas_BuildInstall(env, atlasdir, lapacktargz) :
 
 def HDF5_BuildInstall(env, hdfdir) :
     version = str(hdfdir).replace("']", "").replace("['", "").replace("hdf5-", "")
-    prefix  = os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "hdf", version))
-    
-    if env["TOOLKIT"] == "msys" :
-        prefix = "/" + prefix.replace("\\", "/").replace(":", "")
+    prefix  = setpath(env, os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "hdf", version)))
     
     cmd = "cd $SOURCE && ./configure --enable-cxx --prefix=" + prefix + " && make && make install"
     return env.Command("buildhdf5-"+version, hdfdir, cmd)
@@ -399,10 +380,7 @@ def HDF5_BuildInstall(env, hdfdir) :
 
 def LibXML2_BuildInstall(env, libxmldir) :
     version   = str(libxmldir).replace("']", "").replace("['", "").replace("libxml2-", "")
-    prefix    = os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "xml", version))
-    
-    if env["TOOLKIT"] == "msys" :
-        prefix = "/" + prefix.replace("\\", "/").replace(":", "")
+    prefix    = setpath(env, os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "xml", version)))
     
     cmd = "cd $SOURCE && ./configure --without-python --without-threads"
     if env["buildtype"] == "release" :
@@ -413,16 +391,11 @@ def LibXML2_BuildInstall(env, libxmldir) :
         
 def GiNaC_BuildInstall(env, ginacdir, clnbuild) :
     version    = str(ginacdir).replace("']", "").replace("['", "").replace("ginac-", "")
-    prefix     = os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "ginac", version))
+    prefix     = setpath(env, os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "ginac", version)))
     
     clnversion = str(clnbuild).replace("']", "").replace("['", "").replace("buildcln-", "")
-    clninclude = os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "cln", clnversion, "include"))
-    clnlib     = os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "cln", clnversion, "lib"))
-    
-    if env["TOOLKIT"] == "msys" :
-        prefix     = "/" + prefix.replace("\\", "/").replace(":", "")
-        clninclude = "/" + clninclude.replace("\\", "/").replace(":", "")
-        clnlib     = "/" + clnlib.replace("\\", "/").replace(":", "")
+    clninclude = setpath(env, os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "cln", clnversion, "include")))
+    clnlib     = setpath(env, os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "cln", clnversion, "lib")))
     
     cmd = "cd $SOURCE && export CLN_CFLAGS=-I" + clninclude + " && export CLN_LIBS=\"-L" + clnlib + " -lcln\" && ./configure --prefix=" + prefix + " && make && make install"
     return env.Command("buildginac-"+version, [ginacdir, clnbuild], cmd)
@@ -430,14 +403,21 @@ def GiNaC_BuildInstall(env, ginacdir, clnbuild) :
         
 def CLN_BuildInstall(env, clndir) :
     version = str(clndir).replace("']", "").replace("['", "").replace("cln-", "")
-    prefix  = os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "cln", version))
-    
-    if env["TOOLKIT"] == "msys" :
-        prefix = "/" + prefix.replace("\\", "/").replace(":", "")
+    prefix  = setpath(env, os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "cln", version)))
     
     cmd = "cd $SOURCE && ./configure --prefix=" + prefix + " && make && make install"
     return env.Command("buildcln-"+version, clndir, cmd)
     
+    
+def setpath(env, path) :
+    if env["TOOLKIT"] == "msys" :
+        if path[1] == ":" :
+            return "/" + path.replace("\\", "/").replace(":", "")
+        else :
+            return path.replace("\\", "/")
+
+    return path
+
 
 #=== target structure ================================================================================================================
 def FinishMessage_print(s, target, source, env):
@@ -490,7 +470,7 @@ if ("librarybuild" in COMMAND_LINE_TARGETS) or ("librarydownload" in COMMAND_LIN
         boostdir   = env.Command(str(boosttargz).replace("[", "").replace("]", "").replace("'", "").replace(".tar.gz", ""), boosttargz, env["EXTRACT_CMD"]+env["extractsuffix"]+"library")
         boostbuild = Boost_BuildInstall(env, boostdir, gzipbuild, bzipbuild)
         
-        lstbuild.append( env.Command("boostnumericbindings", boostbuild, "svn checkout http://svn.boost.org/svn/boost/sandbox/numeric_bindings/ "+os.path.join("library", "build_"+env["buildtype"], "boost", "numeric_bindings")) )
+        lstbuild.append( env.Command("boostnumericbindings", boostbuild, "svn checkout http://svn.boost.org/svn/boost/sandbox/numeric_bindings/ "+setpath(env, os.path.join("library", "build_"+env["buildtype"], "boost", "numeric_bindings"))) )
         lstdownload.append(boosttargz)
         
         
