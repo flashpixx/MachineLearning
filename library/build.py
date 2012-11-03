@@ -339,28 +339,25 @@ def JsonCPP_BuildInstall(env, targz, extract) :
     libheader   = []
     for i in extract :
         name = str(i)
-        cpp  = regcpp.match( name ) 
 
+        cpp  = regcpp.match( name ) 
         if cpp <> None :
             libsrc.append( i )
+
         header = regheader.match( name )
         if header <> None :
             libheader.append( i ) 
 
     envjson = env.Clone()
-    envjson.Replace(CPPPATH = os.path.join(sourcepath, "include"))
+    envjson.Replace(CPPPATH = os.path.abspath(os.path.join(os.curdir, sourcepath, "include")))
     
     libbuild = []
-    if env["TOOLKIT"] in ["posix", "cygwin", "darwin", "msys"] :
-        libbuild.append( envjson.Library(target="json", source=libsrc) )
-        libbuild.append( envjson.SharedLibrary(target="json", source=libsrc) )
-        
-    else :
-        raise RuntimeError("no library jsoncpp build target found in toolkit ["+env["TOOLKIT"]+"]")
+    libbuild.append( envjson.Library(target="json", source=libsrc) )
+    libbuild.append( envjson.SharedLibrary(target="json", source=libsrc) )
         
     # install header and libraries
-    libinstall      = env.Install( os.path.join(os.curdir, "build_"+env["buildtype"], "jsoncpp", version, "lib"), libbuild )
-    headerdir       = env.Command( os.path.join(os.curdir, "build_"+env["buildtype"], "jsoncpp", version, "include", "json"), "", Mkdir("$TARGET"))
+    libinstall      = env.Install( setpath(env, os.path.join(os.curdir, "build_"+env["buildtype"], "jsoncpp", version, "lib")), libbuild )
+    headerdir       = env.Command( setpath(env, os.path.join(os.curdir, "build_"+env["buildtype"], "jsoncpp", version, "include", "json")), "", Mkdir("$TARGET"))
     headerinstall   = []
     for i in libheader :
         headerinstall.append( env.Command( os.path.join(str(headerdir).replace("']", "").replace("['", ""), os.path.basename(str(i))), i, Copy("$TARGET", "$SOURCE")) )
