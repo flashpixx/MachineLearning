@@ -349,8 +349,11 @@ def JsonCPP_BuildInstall(env, targz, extract) :
             libheader.append( i ) 
 
     envjson = env.Clone()
-    envjson.Replace(CPPPATH = os.path.abspath(os.path.join(os.curdir, sourcepath, "include")))
-    
+    envjson.Replace(CPPPATH = os.path.join(sourcepath, "include"))
+    if env["TOOLKIT"] == "msys" :
+        envjson["SPAWN"] = env["MSYSSPAWN"]
+        envjson["SHELL"] = env["MSYSSHELL"]
+        
     libbuild = []
     libbuild.append( envjson.Library(target="json", source=libsrc) )
     libbuild.append( envjson.SharedLibrary(target="json", source=libsrc) )

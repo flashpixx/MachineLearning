@@ -103,17 +103,20 @@ def setupToolkitEnv(vars) :
         env["TOOLKIT"]      = "msys"
         env.Tool("mingw")
         
-        # set unix shell 
-        if not( "msyscon" in os.environ ) :
-            raise RuntimeError("MSYS environment shell not found")
-        shell = findfile( os.environ["msyscon"], env["ENV"]["PATH"] )
-        if shell == None :
-            raise RuntimeError("MSYS shell not found")
+        # set unix environment only on librarybuild, otherwise we get problems on compiler calls
+        if "librarybuild" in COMMAND_LINE_TARGETS :        
+            if not( "msyscon" in os.environ ) :
+                raise RuntimeError("MSYS environment shell not found")
+            shell = findfile( os.environ["msyscon"], env["ENV"]["PATH"] )
+            if shell == None :
+                raise RuntimeError("MSYS shell not found")
         
-        from SCons.Platform.win32 import exec_spawn
-        from SCons.Platform.posix import escape
-        env["SHELL"] = shell
-        env["SPAWN"] = (lambda sh, esc, cmd, args, envparam : exec_spawn([sh, "-c", escape(" ".join(args))], envparam))
+            from SCons.Platform.win32 import exec_spawn
+            from SCons.Platform.posix import escape
+            env["MSYSSPAWN"] = env["SPAWN"]
+            env["MSYSSHELL"] = env["SHELL"]
+            env["SHELL"]     = shell
+            env["SPAWN"]     = (lambda sh, esc, cmd, args, envparam : exec_spawn([sh, "-c", escape(" ".join(args))], envparam))
     
     else :
         raise RuntimeError("toolkit ["+platform.system()+"] not known")
