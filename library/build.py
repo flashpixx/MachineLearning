@@ -234,9 +234,9 @@ def BZip2_DownloadURL(env) :
 #=== building libraries ==============================================================================================================
 def Boost_BuildInstall(env, source, gzipbuild, bzipbuild)  :
     # extract path and version of the source name
-    boostpath   = str(source).replace("['", "").replace("']", "")
-    version     = boostpath.replace("boost-", "")
-    boostpath   = setpath(env, os.path.join("library", boostpath.replace(".", "_").replace("-", "_")))
+    boostdir    = str(source).replace("['", "").replace("']", "").replace(".", "_").replace("-", "_")
+    version     = boostdir.replace("boost-", "")
+    boostpath   = setpath(env, os.path.join("library", boostdir))
     prefix      = setpath(env, os.path.join("..", "build_"+env["buildtype"], "boost", version))
 
     # set the toolset and compile the bjam and build boost
@@ -274,13 +274,14 @@ def Boost_BuildInstall(env, source, gzipbuild, bzipbuild)  :
     
     cmd = "cd " + boostpath + " && "
     if env["withmpi"] :
-        cmd = cmd + " echo \"using mpi ;\" >> " + os.path.join("tools", "build", "v2", "user-config.jam") + " && "
+        cmd = cmd + " echo \"using mpi ;\" >> " + setpath(env, os.path.join("tools", "build", "v2", "user-config.jam")) + " && "
     cmd = cmd + " ./bootstrap.sh"
     
     if env["TOOLKIT"] == "msys" :
-        cmd = cmd + " --with-toolset=mingw"
+        cmd = cmd + " --with-toolset=mingw && rm project-config.jam"
+        boostoptions.append("toolset=gcc")
     
-    #cmd = cmd + " && ./b2 " + " ".join(boostoptions)
+    cmd = cmd + " && ./b2 " + " ".join(boostoptions)
     
     # build Boost with Bzip2 and ZLib support and set the dependency
     dependency = [source]
