@@ -56,6 +56,7 @@ namespace machinelearning { namespace tools {
      * @todo add Johnson Lindenstrauss Lemma for orthognal high dimensional matrices http://en.wikipedia.org/wiki/Johnson%E2%80%93Lindenstrauss_lemma
      * @todo try to change the matrix copy in eigen / svd to a better option (eg bindings::trans or traits )
      * @todo add matrix exponential via Pade approximation (shown in Matlab with expmdemo)
+     * @todo add support for http://en.wikipedia.org/wiki/Matrix_Template_Library
      * @todo portage this class to the Intel Math Kernel Library http://software.intel.com/en-us/articles/intel-mkl/
      * @todo adding support for PETSc http://www.mcs.anl.gov/petsc/
      * @todo adding support for http://en.wikipedia.org/wiki/List_of_numerical_libraries
