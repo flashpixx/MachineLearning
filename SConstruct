@@ -38,6 +38,19 @@ import SCons.Node
 
 #=== CLI parameters ====================================================================================================================
 def createVariables(vars) :
+    [platform, arch] = detectPlatform()
+    
+    skiplist = ["boost", "hdf", "ginac", "json", "xml"]
+    if platform <> "msys" :
+        skiplist = ["atlas"] + skiplist
+    
+    atlaslink  = "multi"
+    zipsupport = False
+    if (platform == "cygwin")  or  (platform == "msys") :
+        atlaslink  = "single"
+        zipsupport = True
+    
+
     vars.Add(BoolVariable("withrandomdevice", "installation with random device support", False))
     vars.Add(BoolVariable("withmpi", "installation with MPI support", False))
     vars.Add(BoolVariable("withmultilanguage", "installation with multilanguage support", False))
@@ -47,20 +60,16 @@ def createVariables(vars) :
     vars.Add(BoolVariable("withsymbolicmath", "compile for using symbolic math expression (needed by gradient descent)", False))
     
     vars.Add(EnumVariable("buildtype", "value of the buildtype", "release", allowed_values=("debug", "release")))
+    vars.Add(EnumVariable("atlaslink", "type of the ATLAS link file", atlaslink, allowed_values=("single", "multi")))
     vars.Add(BoolVariable("uselocallibrary", "use the library in the local directory only", False))
     vars.Add(BoolVariable("usedistcc", "use distributed compiling with DistCC", False))
-    vars.Add(ListVariable("skiplibrary", "skipping library builds / downloads", "", ["atlas", "boost", "hdf", "ginac", "json", "xml"]))
     vars.Add(BoolVariable("copylibrary", "copy the dynamic link libraries into the build dir", False))
     
-    if (platform.system().lower().split("_")[0] == "cygwin")  or  ("msystem" in os.environ  and  os.environ["msystem"].lower() == "mingw32") :
-        vars.Add(BoolVariable("zipsupport", "build Bzip2 and ZLib support for Boost", True))
-        vars.Add(EnumVariable("atlaslink", "type of the ATLAS link file", "single", allowed_values=("single", "multi")))
-    else :
-        vars.Add(BoolVariable("zipsupport", "build Bzip2 and ZLib support for Boost", False))
-        vars.Add(EnumVariable("atlaslink", "type of the ATLAS link file", "multi", allowed_values=("single", "multi")))
+    vars.Add(ListVariable("skiplibrary", "skipping library builds / downloads", "", skiplist))
+    vars.Add(BoolVariable("zipsupport", "build Bzip2 and ZLib support for Boost", zipsupport))
+    vars.Add(EnumVariable("boostbuild", "Boost build option: required builds all libraries, requiredoptional build the required libraries with optional libraries, full build all libraries", "requiredoptional", allowed_values=("required", "requiredoptional", "full")))
     vars.Add(EnumVariable("atlaspointerwidth", "pointer width for compiling ATLAS (empty = system default, 32 = 32 Bit, 64 = 64 Bit)", "", allowed_values=("", "32", "64")))
     vars.Add(EnumVariable("atlasversion", "version of the ATLAS library (developer or stable version)", "devel", allowed_values=("stable", "devel")))
-    vars.Add(EnumVariable("boostbuild", "Boost build option: required builds all libraries, requiredoptional build the required libraries with optional libraries, full build all libraries", "requiredoptional", allowed_values=("required", "requiredoptional", "full")))
     vars.Add(EnumVariable("jsoncppversion", "version of the Json-Cpp library (developer or stable version)", "devel", allowed_values=("stable", "devel")))
 
     
@@ -84,23 +93,11 @@ def setupToolkitEnv(vars) :
         env["ENV"]["PATH"] = laPathList
         print("Appending custom path (PATH)")
 
-        
     # setup toolkit values (that are called by eg librarybuild) 
-    env["TOOLKIT_ARCH"] = (platform.architecture()[0]).replace("bit", "")
-    if platform.system().lower() == "posix" or platform.system().lower() == "linux" :
-        env["TOOLKIT"]      = "posix"
+    [env["TOOLKIT"], env["TOOLKIT_ARCH"]] = detectPlatform()
+    if env["TOOLKIT"] in ["posix", "darwin", "cygwin"] :
         env.Tool("default")
-        
-    elif platform.system().lower() == "darwin" :
-        env["TOOLKIT"]      = "darwin"
-        env.Tool("default")
-        
-    elif platform.system().lower().split("_")[0] == "cygwin" :
-        env["TOOLKIT"]      = "cygwin"
-        env.Tool("default")
-        
-    elif "msystem" in os.environ  and  os.environ["msystem"].lower() == "mingw32":
-        env["TOOLKIT"]      = "msys"
+    elif env["TOOLKIT"] == "msys":
         env.Tool("mingw")
         
         # set unix environment only on librarybuild, otherwise we get problems on compiler calls
@@ -118,12 +115,27 @@ def setupToolkitEnv(vars) :
             env["SHELL"]     = shell
             env["SPAWN"]     = (lambda sh, esc, cmd, args, envparam : exec_spawn([sh, "-c", escape(" ".join(args))], envparam))
     
-    else :
-        raise RuntimeError("toolkit ["+platform.system()+"] not known")
-
     print "Build environment is ["+env["TOOLKIT"]+"] and architecture ["+env["TOOLKIT_ARCH"]+"]"
     return env
     
+    
+# platform detection
+# @return returns name and architectur of the platform
+def detectPlatform() :
+    arch = (platform.architecture()[0]).replace("bit", "")
+
+    if platform.system().lower() == "posix" or platform.system().lower() == "linux" :
+        return "posix", arch 
+    elif platform.system().lower() == "darwin" :
+        return "darwin", arch
+    elif platform.system().lower().split("_")[0] == "cygwin" :
+        return "cygwin", arch
+    elif "msystem" in os.environ  and  os.environ["msystem"].lower() == "mingw32":
+        return "msys", arch
+   
+    raise RuntimeError("toolkit ["+platform.system()+"] not known")
+    
+
 
 # function for checking C/C++ configuration data, function is called from the environment scripts
 # @param conf configuration object
