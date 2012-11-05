@@ -156,29 +156,30 @@
  * <li><dfn>withrandomdevice</dfn> adds the compilerflag for random device support</li>
  * <li><dfn>withmpi</dfn> adds the compilerflag for cluster / MPI support (on the target <dfn>librarybuild</dfn> MPI support is compiled into the Boost)</li>
  * <li><dfn>withmultilanguage</dfn> adds the multilanguage support with gettext</li>
- * <li><dfn>withlogger</dfn> compiles a own logger class within the framework</li>
  * <li><dfn>withsources</dfn> support for the namespace machinelearning::tools::sources</li>
  * <li><dfn>withfiles</dfn> support for the namespace machinelearning::tools::files</li>
+ * <li><dfn>withlogger</dfn> compiles a own logger class within the framework</li>
  * <li><dfn>withsymbolicmath</dfn> support for symbolic math (eg: machinelearning::functionaloptimization::gradientdescent )</li>
  * </ul><ul>
  * <li><dfn>buildtype</dfn> build type [allowed valus: debug | release, default value is set to release]</li>
+ * <li><dfn>atlaslink</dfn> link option for the atlas library [allowed values: multi | single] </li>
  * <li><dfn>uselocallibrary</dfn> uses only the libraries which are stores within the library directory</li>
  * <li><dfn>usedistcc</dfn> the build process forces distcc on building</li>
- * <li><dfn>skiplibrary</dfn> disables / skips the automatic build of a library [allowd values: all, none, atlas, boost, hdf, ginac, json, xml]</li> 
  * <li><dfn>copylibrary</dfn> copy the dynamic libraries into the build directory</li>
  * </ul>
  * Option flag, that are used during building the library package:
  * <ul>
+ * <li><dfn>skiplibrary</dfn> disables / skips the automatic build of a library [allowd values: all, none, atlas, boost, hdf, ginac, json, xml]</li> 
  * <li><dfn>zipsupport</dfn> enable / disable locale zip support on the Boost. BZip2 and GZip library can be downloaded</li>
- * <li><dfn>atlaspointerwidth</dfn> parameter for setting the ATLAS pointer width during running the library build target (default empty for system default)</li>
- * <li><dfn>atlaslink</dfn> link option for the atlas library [allowed values: multi | single] </li>
- * <li><dfn>atlasversion</dfn> type of the atlas version. The default option uses the latest developer version, otherwise the latest stable version is used [allowed values: devel | stable]</li>
  * <li><dfn>boostbuild</dfn> the Boost build options sets the required Boost libraries on the build process:
  * <ul>
  *      <li><dfn>required</dfn> builds only the required library (no additional support like logger, Wikipedia)</li>
  *      <li><dfn>requiredoptional</dfn> builds the libraries except the librarie, that are needed by the examples</li>
  *      <li><dfn>full</dfn> builds all libraries</li>
  * </ul>
+ * <li><dfn>atlaspointerwidth</dfn> parameter for setting the ATLAS pointer width during running the library build target (default empty for system default)</li>
+ * <li><dfn>atlasversion</dfn> type of the atlas version. The default option uses the latest developer version, otherwise the latest stable version is used [allowed values: devel | stable]</li>
+ * <li><dfn>jsoncppversion</dfn> type of the Json-Cpp version. The default option uses the latest developer version, otherwise the latest stable version is used [allowed values: devel | stable]</li>
  * The MPI option (<dfn>withmpi</dfn>) is independed of this options.
  * </ul>
  * The <dfn>SConstruct</dfn> script, which is the entry point to the compiler calls, is stored in the framework main directory. Under the <dfn>buildenvironment</dfn> directory all platform / environment specialized 
