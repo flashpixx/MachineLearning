@@ -67,6 +67,7 @@
  * <li><i>optional Scons</i> ( http://www.scons.org/ )</li>
  * <li><i>optional Swig</i> ( http://www.swig.org/ )</li>
  * <li><i>optional Doxygen</i> ( http://www.doxygen.org/ )</li>
+ * <li><i>optional CMake</i> ( http://www.cmake.org/ ) needed by MSYS / MinGW use</li>
  * </ul>
  * A default library installation can be created with the commands
  * @code
