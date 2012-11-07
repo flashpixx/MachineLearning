@@ -471,13 +471,13 @@ if ("librarybuild" in COMMAND_LINE_TARGETS) or ("librarydownload" in COMMAND_LIN
     # download Atlas / LaPack, extract & install
     if not("lapack" in skiplist) :
         lapacktargz = env.ParseAndDownload( LaPack_DownloadURL )
+        lstdownload.append(lapacktargz)
         if env["TOOLKIT"] == "msys" :
             lstbuild.append( Lapack_BuildInstall(env, env.Command(str(lapacktargz).replace("[", "").replace("]", "").replace("'", "").replace(".tgz", ""), lapacktargz, env["EXTRACT_CMD"]+env["extractsuffix"]+"library")) )
         else :
             atlastarbz  = env.ParseAndDownload( Atlas_DownloadURL )
-            atlasdir    = env.Command(str(atlastarbz).replace("[", "").replace("]", "").replace("'", "").replace(".tar.bz2", ""), atlastarbz, env["EXTRACT_CMDBZ"]+env["extractsuffix"]+"library")
-            lstdownload.append(lapacktargz)
             lstdownload.append(atlastarbz)
+            atlasdir    = env.Command(str(atlastarbz).replace("[", "").replace("]", "").replace("'", "").replace(".tar.bz2", ""), atlastarbz, env["EXTRACT_CMDBZ"]+env["extractsuffix"]+"library")
             lstbuild.append( LapackAtlas_BuildInstall(env, atlasdir, lapacktargz) )
 
     # download Boost, extract & install
