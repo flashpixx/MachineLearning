@@ -173,10 +173,8 @@ namespace ublas = boost::numeric::ublas;
 %pragma(java) jniclasscode=%{
     
     /** static call of the external library, each class that uses the native
-     * interface calls must be derivated from this abstract base class, so
-     * we create a own glue code of library binding
-     * @bug does not work if system path(es) not set. Depended libraries eg boost_system
-     * are not loaded from the machinelearning-library.
+     * interface calls must implementated this static call, so we create this glue
+     * code of library binding and the Swig compiler copy the code into the class
      * @todo the memory management can be worked with addShutDownHook(), so on this
      * event objects can be destroyed ( http://download.oracle.com/javase/1.4.2/docs/api/java/lang/Runtime.html#addShutdownHook%28java.lang.Thread%29 )
      **/    
