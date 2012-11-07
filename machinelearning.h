@@ -30,7 +30,7 @@
  * 
  * @section requirements Requirements
  * <ul>
- * <li>Automatically Tuned Linear Algebra Software ( http://math-atlas.sourceforge.net/ ) [version newer than 3.9.40]</li>
+ * <li>Automatically Tuned Linear Algebra Software ( http://math-atlas.sourceforge.net/ ) [Version newer than 3.9.40]</li>
  * <li>Boost ( http://www.boost.org/ ) with following components
  *     <ul>
  *         <li>IOStreams with ZLib and BZip2 support</li>
@@ -51,7 +51,7 @@
  * <li>Boost Bindings ( SVN http://svn.boost.org/svn/boost/sandbox/numeric_bindings/ )</li>
  * <li>Linear Algebra PACKage ( http://www.netlib.org/lapack/ ) [Version newer than 3.3]</li>
  * <li>OpenMP ( http://www.openmp.org )</li>
- * <li><i>optional Hierarchical Data Format (HDF)</i> ( http://www.hdfgroup.org/ ) [version newer or equal 5.1.8.4]</li>
+ * <li><i>optional Hierarchical Data Format (HDF)</i> ( http://www.hdfgroup.org/ ) [Version newer or equal 5.1.8.4]</li>
  * <li><i>optional Message-Passing-Interface-Support</i>
  *      <ul>
  *          <li>Open MPI ( http://www.open-mpi.org/ )</li>
@@ -59,7 +59,7 @@
  *          <li>Microsoft High Performance Computing Pack SDK ( http://www.microsoft.com/download/en/search.aspx?q=HPC%20Pack%20SDK )</li>
  *      </ul>
  * </li>
- * <li><i>optional GiNaC</i> ( http://www.ginac.de/ ) with CLN ( http://www.ginac.de/CLN/ ) [version newer or equal 1.6]</li>
+ * <li><i>optional GiNaC</i> ( http://www.ginac.de/ ) with CLN ( http://www.ginac.de/CLN/ ) [Version newer or equal 1.6]</li>
  * <li><i>optional GetText</i> ( http://www.gnu.org/software/gettext/ ) (used by multilanguage support)</li>
  * <li><i>optional LibXML2</i> ( http://xmlsoft.org/ ) (used by wikipedia support)</li>
  * <li><i>optional LibJSONCPP</i> ( http://sourceforge.net/projects/jsoncpp/ ) (used by twitter support)</li>
