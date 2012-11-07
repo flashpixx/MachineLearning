@@ -40,10 +40,6 @@ import SCons.Node
 def createVariables(vars) :
     [platform, arch] = detectPlatform()
     
-    skiplist = ["boost", "hdf", "ginac", "json", "xml"]
-    if platform <> "msys" :
-        skiplist = ["atlas"] + skiplist
-    
     atlaslink  = "multi"
     zipsupport = False
     if (platform == "cygwin")  or  (platform == "msys") :
@@ -65,7 +61,7 @@ def createVariables(vars) :
     vars.Add(BoolVariable("usedistcc", "use distributed compiling with DistCC", False))
     vars.Add(BoolVariable("copylibrary", "copy the dynamic link libraries into the build dir", False))
     
-    vars.Add(ListVariable("skiplibrary", "skipping library builds / downloads", "", skiplist))
+    vars.Add(ListVariable("skiplibrary", "skipping library builds / downloads", "", ["lapack", "boost", "hdf", "ginac", "json", "xml"]))
     vars.Add(BoolVariable("zipsupport", "build Bzip2 and ZLib support for Boost", zipsupport))
     vars.Add(EnumVariable("boostbuild", "Boost build option: required builds all libraries, requiredoptional build the required libraries with optional libraries, full build all libraries", "requiredoptional", allowed_values=("required", "requiredoptional", "full")))
     vars.Add(EnumVariable("atlaspointerwidth", "pointer width for compiling ATLAS (empty = system default, 32 = 32 Bit, 64 = 64 Bit)", "", allowed_values=("", "32", "64")))

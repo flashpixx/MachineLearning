@@ -50,86 +50,87 @@ localconf = {
     
     "cdylibrariesonly"      : [ ], 
     
-    "clibraries"            : [ ],
-    
-    "cheaders"              :  [ "omp.h"
+    "clibraries"            : [ "lapack"
     ],
     
-    "cppheaders"            :  [ "map",
-                                 "algorithm",
-                                 "limits",
-                                 "iostream",
-                                 "numeric",
-                                 "string",
-                                 "sstream",
-                                 "ostream",
-                                 "fstream",
-                                 "stdexcept",
-                                 "vector",
-                                 "ctime",
-                                 "iterator",
-                                 "typeinfo",
-                                 "cxxabi.h",
+    "cheaders"              : [ "omp.h"
+    ],
+    
+    "cppheaders"            : [ "map",
+                                "algorithm",
+                                "limits",
+                                "iostream",
+                                "numeric",
+                                "string",
+                                "sstream",
+                                "ostream",
+                                "fstream",
+                                "stdexcept",
+                                "vector",
+                                "ctime",
+                                "iterator",
+                                "typeinfo",
+                                "cxxabi.h",
 
-                                 os.path.join("boost", "numeric", "ublas", "matrix.hpp"),
-                                 os.path.join("boost", "numeric", "ublas", "vector.hpp"), 
-                                 os.path.join("boost", "numeric", "ublas", "matrix_sparse.hpp"),
-                                 os.path.join("boost", "numeric", "ublas", "vector_proxy.hpp"),
-                                 os.path.join("boost", "numeric", "ublas", "matrix_proxy.hpp"),
-                                 os.path.join("boost", "numeric", "ublas", "storage.hpp"),
-                                 os.path.join("boost", "numeric", "ublas", "io.hpp"),
-                                 os.path.join("boost", "numeric", "ublas", "symmetric.hpp"), 
+                                os.path.join("boost", "numeric", "ublas", "matrix.hpp"),
+                                os.path.join("boost", "numeric", "ublas", "vector.hpp"), 
+                                os.path.join("boost", "numeric", "ublas", "matrix_sparse.hpp"),
+                                os.path.join("boost", "numeric", "ublas", "vector_proxy.hpp"),
+                                os.path.join("boost", "numeric", "ublas", "matrix_proxy.hpp"),
+                                os.path.join("boost", "numeric", "ublas", "storage.hpp"),
+                                os.path.join("boost", "numeric", "ublas", "io.hpp"),
+                                os.path.join("boost", "numeric", "ublas", "symmetric.hpp"), 
                             
-                                 os.path.join("boost", "numeric", "bindings", "blas.hpp"),
-                                 os.path.join("boost", "numeric", "bindings", "ublas", "vector.hpp"),
-                                 os.path.join("boost", "numeric", "bindings", "ublas", "matrix.hpp"),
-                                 os.path.join("boost", "numeric", "bindings", "lapack", "driver", "geev.hpp"),
-                                 os.path.join("boost", "numeric", "bindings", "lapack", "driver", "ggev.hpp"),
-                                 os.path.join("boost", "numeric", "bindings", "lapack", "driver", "gesv.hpp"),
-                                 os.path.join("boost", "numeric", "bindings", "lapack", "driver", "gesvd.hpp"),
-                                 os.path.join("boost", "numeric", "bindings", "lapack", "computational", "hseqr.hpp"),
+                                os.path.join("boost", "numeric", "bindings", "blas.hpp"),
+                                os.path.join("boost", "numeric", "bindings", "ublas", "vector.hpp"),
+                                os.path.join("boost", "numeric", "bindings", "ublas", "matrix.hpp"),
+                                os.path.join("boost", "numeric", "bindings", "lapack", "driver", "geev.hpp"),
+                                os.path.join("boost", "numeric", "bindings", "lapack", "driver", "ggev.hpp"),
+                                os.path.join("boost", "numeric", "bindings", "lapack", "driver", "gesv.hpp"),
+                                os.path.join("boost", "numeric", "bindings", "lapack", "driver", "gesvd.hpp"),
+                                os.path.join("boost", "numeric", "bindings", "lapack", "computational", "hseqr.hpp"),
                             
-                                 os.path.join("boost", "algorithm", "string.hpp"), 
-                                 os.path.join("boost", "algorithm", "string", "erase.hpp"),
+                                os.path.join("boost", "algorithm", "string.hpp"), 
+                                os.path.join("boost", "algorithm", "string", "erase.hpp"),
                             
-                                 os.path.join("boost", "accumulators", "accumulators.hpp"),
-                                 os.path.join("boost", "accumulators", "statistics", "stats.hpp"),
-                                 os.path.join("boost", "accumulators", "statistics", "min.hpp"),
-                                 os.path.join("boost", "accumulators", "statistics", "max.hpp"),
-                                 os.path.join("boost", "accumulators", "statistics", "mean.hpp"),
-                                 os.path.join("boost", "accumulators", "statistics", "variance.hpp"),
-                                 os.path.join("boost", "math", "distributions", "beta.hpp"),
-                                 os.path.join("boost", "math", "distributions", "students_t.hpp"),
-                                 os.path.join("boost", "math", "distributions", "weibull.hpp"),
-                                 os.path.join("boost", "math", "distributions", "rayleigh.hpp"),
-                                 os.path.join("boost", "math", "distributions", "pareto.hpp"),
-                                 os.path.join("boost", "math", "distributions", "chi_squared.hpp"),
-                                 os.path.join("boost", "math", "distributions", "triangular.hpp"),
+                                os.path.join("boost", "accumulators", "accumulators.hpp"),
+                                os.path.join("boost", "accumulators", "statistics", "stats.hpp"),
+                                os.path.join("boost", "accumulators", "statistics", "min.hpp"),
+                                os.path.join("boost", "accumulators", "statistics", "max.hpp"),
+                                os.path.join("boost", "accumulators", "statistics", "mean.hpp"),
+                                os.path.join("boost", "accumulators", "statistics", "variance.hpp"),
+                                os.path.join("boost", "math", "distributions", "beta.hpp"),
+                                os.path.join("boost", "math", "distributions", "students_t.hpp"),
+                                os.path.join("boost", "math", "distributions", "weibull.hpp"),
+                                os.path.join("boost", "math", "distributions", "rayleigh.hpp"),
+                                os.path.join("boost", "math", "distributions", "pareto.hpp"),
+                                os.path.join("boost", "math", "distributions", "chi_squared.hpp"),
+                                os.path.join("boost", "math", "distributions", "triangular.hpp"),
                             
-                                 os.path.join("boost", "iterator", "counting_iterator.hpp"),
-                                 os.path.join("boost", "iterator", "permutation_iterator.hpp"),
+                                os.path.join("boost", "iterator", "counting_iterator.hpp"),
+                                os.path.join("boost", "iterator", "permutation_iterator.hpp"),
                             
-                                 os.path.join("boost", "lambda", "lambda.hpp"),
+                                os.path.join("boost", "lambda", "lambda.hpp"),
                             
-                                 os.path.join("boost", "foreach.hpp"),
-                                 os.path.join("boost", "random.hpp"),
-                                 os.path.join("boost", "shared_ptr.hpp"),
-                                 os.path.join("boost", "static_assert.hpp"),
-                                 os.path.join("boost", "bind.hpp"),
-                                 os.path.join("boost", "ref.hpp"),
-                                 os.path.join("boost", "regex.hpp"),
-                                 os.path.join("boost", "lexical_cast.hpp"),
+                                os.path.join("boost", "foreach.hpp"),
+                                os.path.join("boost", "random.hpp"),
+                                os.path.join("boost", "shared_ptr.hpp"),
+                                os.path.join("boost", "static_assert.hpp"),
+                                os.path.join("boost", "bind.hpp"),
+                                os.path.join("boost", "ref.hpp"),
+                                os.path.join("boost", "regex.hpp"),
+                                os.path.join("boost", "lexical_cast.hpp"),
                                   
-                                 os.path.join("boost", "iostreams", "filter", "gzip.hpp"), 
-                                 os.path.join("boost", "iostreams", "filter", "bzip2.hpp"), 
-                                 os.path.join("boost", "iostreams", "stream.hpp"), 
-                                 os.path.join("boost", "iostreams", "device", "null.hpp"), 
-                                 os.path.join("boost", "iostreams", "filtering_streambuf.hpp"), 
-                                 os.path.join("boost", "iostreams", "filtering_stream.hpp"), 
-                                 os.path.join("boost", "iostreams", "filter", "counter.hpp"), 
-                                 os.path.join("boost", "iostreams", "concepts.hpp"), 
-                                 os.path.join("boost", "iostreams", "operations.hpp"), 
-                                 os.path.join("boost", "iostreams", "copy.hpp")
+                                os.path.join("boost", "iostreams", "filter", "gzip.hpp"), 
+                                os.path.join("boost", "iostreams", "filter", "bzip2.hpp"), 
+                                os.path.join("boost", "iostreams", "stream.hpp"), 
+                                os.path.join("boost", "iostreams", "device", "null.hpp"), 
+                                os.path.join("boost", "iostreams", "filtering_streambuf.hpp"), 
+                                os.path.join("boost", "iostreams", "filtering_stream.hpp"), 
+                                os.path.join("boost", "iostreams", "filter", "counter.hpp"), 
+                                os.path.join("boost", "iostreams", "concepts.hpp"), 
+                                os.path.join("boost", "iostreams", "operations.hpp"), 
+                                os.path.join("boost", "iostreams", "copy.hpp")
     ]
 }
 # ==========================================================================
@@ -171,7 +172,7 @@ if conf.env["uselocallibrary"] :
     path   = os.path.abspath(os.path.join(os.path.abspath(os.curdir), "..", "library", "build_"+conf.env["buildtype"]))
     reg    = re.compile("\d(.*)")
     
-    for i in ["atlas", "boost", "cln", "ginac", "hdf", "jsoncpp", "xml"] :
+    for i in ["lapack", "boost", "cln", "ginac", "hdf", "jsoncpp", "xml"] :
         dir = os.path.join(path, i)
         if not(os.path.isdir(dir)) :
             continue
@@ -214,10 +215,11 @@ conf.env.AppendUnique(LIBPATH = ["/bin"])
 # set additional dynamic link libraries which should be copied into the build dir    
 conf.env["COPYLIBRARY"] = ["win1", "gcc_s-1", "gomp-1", "stdc++-6"]
 
-# main configuration
+# main configuration (the C++ flag BOOST_NUMERIC_BINDINGS_BLAS_CBLAS need not be
+# set, because we build without ATLAS support)
 conf.env.AppendUnique(LINKFLAGS   = ["-fopenmp"])
 conf.env.AppendUnique(CXXFLAGS    = ["-fopenmp", "-pipe"])
-conf.env.AppendUnique(CPPDEFINES  = ["BOOST_FILESYSTEM_NO_DEPRECATED", "BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"])
+conf.env.AppendUnique(CPPDEFINES  = ["BOOST_FILESYSTEM_NO_DEPRECATED"])
 
 if conf.env["buildtype"] == "release" :
     conf.env.AppendUnique(CPPDEFINES  = ["NDEBUG", "BOOST_UBLAS_NDEBUG", "MACHINELEARNING_NDEBUG"])
@@ -225,11 +227,7 @@ if conf.env["buildtype"] == "release" :
 elif conf.env["buildtype"] == "debug" :
     conf.env.AppendUnique(LINKFLAGS   = ["-g"])
     conf.env.AppendUnique(CXXFLAGS    = ["-g"])
-    
-if conf.env["atlaslink"] == "multi" :
-    localconf["clibraries"].append("tatlas")
-elif conf.env["atlaslink"] == "single" :
-    localconf["clibraries"].append("satlas")
+
     
 if not("java" in COMMAND_LINE_TARGETS) :
     localconf["cpplibraries"].extend([
@@ -244,7 +242,7 @@ if not("java" in COMMAND_LINE_TARGETS) :
     ])
     
 if "librarybuild" in COMMAND_LINE_TARGETS :
-    checkExecutables(conf, [ "g++.exe", "gcc.exe", "gfortran.exe", "tar.exe", "make.exe", "svn.exe" ])
+    checkExecutables(conf, [ "g++.exe", "gcc.exe", "gfortran.exe", "tar.exe", "make.exe", "svn.exe", "cmake.exe" ])
 elif "documentation" in COMMAND_LINE_TARGETS :
     checkExecutables(conf, "doxygen.exe")
 # ==========================================================================

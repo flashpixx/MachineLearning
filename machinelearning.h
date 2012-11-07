@@ -169,7 +169,7 @@
  * </ul>
  * Option flag, that are used during building the library package:
  * <ul>
- * <li><dfn>skiplibrary</dfn> disables / skips the automatic build of a library [allowd values: all, none, atlas, boost, hdf, ginac, json, xml]</li> 
+ * <li><dfn>skiplibrary</dfn> disables / skips the automatic build of a library [allowd values: all, none, lapack, boost, hdf, ginac, json, xml]</li> 
  * <li><dfn>zipsupport</dfn> enable / disable locale zip support on the Boost. BZip2 and GZip library can be downloaded</li>
  * <li><dfn>boostbuild</dfn> the Boost build options sets the required Boost libraries on the build process:
  * <ul>
@@ -177,7 +177,7 @@
  *      <li><dfn>requiredoptional</dfn> builds the libraries except the librarie, that are needed by the examples</li>
  *      <li><dfn>full</dfn> builds all libraries</li>
  * </ul>
- * <li><dfn>atlaspointerwidth</dfn> parameter for setting the ATLAS pointer width during running the library build target (default empty for system default)</li>
+ * <li><dfn>atlasblaspointerwidth</dfn> parameter for setting the ATLAS / GotoBlas pointer width during running the library build target (default empty for system default)</li>
  * <li><dfn>atlasversion</dfn> type of the atlas version. The default option uses the latest developer version, otherwise the latest stable version is used [allowed values: devel | stable]</li>
  * <li><dfn>jsoncppversion</dfn> type of the Json-Cpp version. The default option uses the latest developer version, otherwise the latest stable version is used [allowed values: devel | stable]</li>
  * The MPI option (<dfn>withmpi</dfn>) is independed of this options.

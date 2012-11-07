@@ -371,8 +371,15 @@ def JsonCPP_BuildInstall(env, targz, extract) :
     
     return libinstall + headerinstall
 
+def Lapack_BuildInstall(env, lapackdir) :
+    # build Lapack only with MSYS
+    dir     = str(lapackdir).replace("']", "").replace("['", "")
+    version = dir.replace("lapack-", "")
+    
+    cmd = "cd " + setpath(env, os.path.join("library", dir)) + " && cmake . -G \"MSYS Makefiles\" -DLAPACKE:BOOL=\"1\" -DCMAKE_INSTALL_PREFIX:PATH=\"" + setpath(env, os.path.abspath(os.path.join("build_"+env["buildtype"], "lapack", version))) + "\" && make && make install"
+    return env.Command("buildlapack-"+version, lapackdir, cmd)
 
-def Atlas_BuildInstall(env, atlasdir, lapacktargz) :
+def LapackAtlas_BuildInstall(env, atlasdir, lapacktargz) :
     # Atlas need a temporary build directory
     builddir = env.Command( str(atlasdir).replace("['", "").replace("']", "")+"-buildtmp", atlasdir, Mkdir("$TARGET"))
     version  = str(atlasdir).replace("atlas", "").replace("['", "").replace("']", "")
@@ -461,14 +468,17 @@ if ("librarybuild" in COMMAND_LINE_TARGETS) or ("librarydownload" in COMMAND_LIN
     if " " in os.curdir :
         raise RuntimeError("there are spaces within the path, use a path without spaces")
 
-    # download Atlas & LaPack, extract & install
-    if not("atlas" in skiplist) :
+    # download Atlas / LaPack, extract & install
+    if not("lapack" in skiplist) :
         lapacktargz = env.ParseAndDownload( LaPack_DownloadURL )
-        atlastarbz  = env.ParseAndDownload( Atlas_DownloadURL )
-        atlasdir    = env.Command(str(atlastarbz).replace("[", "").replace("]", "").replace("'", "").replace(".tar.bz2", ""), atlastarbz, env["EXTRACT_CMDBZ"]+env["extractsuffix"]+"library")
-        lstdownload.append(lapacktargz)
-        lstdownload.append(atlastarbz)
-        lstbuild.append( Atlas_BuildInstall(env, atlasdir, lapacktargz) )
+        if env["TOOLKIT"] == "msys" :
+            lstbuild.append( Lapack_BuildInstall(env, env.Command(str(lapacktargz).replace("[", "").replace("]", "").replace("'", "").replace(".tgz", ""), lapacktargz, env["EXTRACT_CMD"]+env["extractsuffix"]+"library")) )
+        else :
+            atlastarbz  = env.ParseAndDownload( Atlas_DownloadURL )
+            atlasdir    = env.Command(str(atlastarbz).replace("[", "").replace("]", "").replace("'", "").replace(".tar.bz2", ""), atlastarbz, env["EXTRACT_CMDBZ"]+env["extractsuffix"]+"library")
+            lstdownload.append(lapacktargz)
+            lstdownload.append(atlastarbz)
+            lstbuild.append( LapackAtlas_BuildInstall(env, atlasdir, lapacktargz) )
 
     # download Boost, extract & install
     if not("boost" in skiplist) :
