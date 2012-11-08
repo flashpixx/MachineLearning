@@ -376,7 +376,7 @@ def Lapack_BuildInstall(env, lapackdir) :
     dir     = str(lapackdir).replace("']", "").replace("['", "")
     version = dir.replace("lapack-", "")
     
-    cmd = "cd " + setpath(env, os.path.join("library", dir)) + " && cmake . -G \"MSYS Makefiles\" -DLAPACKE:BOOL=\"1\" -DCMAKE_INSTALL_PREFIX:PATH=\"" + setpath(env, os.path.abspath(os.path.join("build_"+env["buildtype"], "lapack", version))) + "\" && make && make install"
+    cmd = "cd $SOURCE && cmake . -G \"MSYS Makefiles\" -DLAPACKE:BOOL=\"1\" -DCMAKE_INSTALL_PREFIX:PATH=\"" + setpath(env, os.path.abspath(os.path.join("build_"+env["buildtype"], "lapack", version))) + "\" && make && make install"
     return env.Command("buildlapack-"+version, lapackdir, cmd)
 
 def LapackAtlas_BuildInstall(env, atlasdir, lapacktargz) :
@@ -397,7 +397,10 @@ def HDF5_BuildInstall(env, hdfdir) :
     version = str(hdfdir).replace("']", "").replace("['", "").replace("hdf5-", "")
     prefix  = setpath(env, os.path.abspath(os.path.join(os.curdir, "build_"+env["buildtype"], "hdf", version)))
     
-    cmd = "cd $SOURCE && ./configure --enable-cxx --prefix=" + prefix + " && make && make install"
+    if env["TOOLKIT"] == "msys" :
+        cmd = "cd $SOURCE && cmake . -G \"MSYS Makefiles\" -DBUILD_SHARED_LIBS:BOOL=\"1\" -DHDF5_BUILD_HL_LIB:BOOL=\"1\" -DHDF5_BUILD_CPP_LIB:BOOL=\"1\" -DCMAKE_INSTALL_PREFIX:PATH=\"" + prefix + "\" && make && make install"
+    else :
+        cmd = "cd $SOURCE && ./configure --enable-cxx --prefix=" + prefix + " && make && make install"
     return env.Command("buildhdf5-"+version, hdfdir, cmd)
 
 
