@@ -173,6 +173,7 @@ if conf.env["uselocallibrary"] :
             continue
             
         version = filter(lambda x: reg.match(x) <> None, os.listdir( dir ))
+        version.sort(reverse=True)
         if version :
             libdir.append( os.path.join(dir, version[0], "lib" ) )
             libdir.append( os.path.join(dir, version[0], "bin" ) )
@@ -181,6 +182,9 @@ if conf.env["uselocallibrary"] :
                 includedir.append( os.path.join(dir, version[0], "include", "libxml2" ) )
             else :
                 includedir.append( os.path.join(dir, version[0], "include" ) )
+                
+            if i == "hdf" :
+                includedir.append( os.path.join(dir, version[0], "include", "cpp" ) )
             
             if i == "boost" :
                 includedir.append( os.path.join(dir, "numeric_bindings" ) )

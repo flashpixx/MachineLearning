@@ -177,6 +177,7 @@ if conf.env["uselocallibrary"] :
             continue
             
         version = filter(lambda x: reg.match(x) <> None, os.listdir( dir ))
+        version.sort(reverse=True)
         if version :
             libdir.append( os.path.join(dir, version[0], "lib" ) )
             libdir.append( os.path.join(dir, version[0], "bin" ) )
