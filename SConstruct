@@ -219,6 +219,8 @@ def GlobRekursiv(startdir, extensions=[], excludedir=[]) :
 # @return None or the first found item with full path
 def findfile(name, pathlist=[]):
     for l in pathlist :
+        if not os.path.exists(l) :
+            continue
         for root, dirs, files in os.walk(l) :
             if name in files :
                 return os.path.join(root, name)
@@ -267,6 +269,8 @@ def librarycopy_emitter(target, source, env) :
         libnames = [ env["LIBPREFIX"]+str(i)+env["SHLIBSUFFIX"] ]
         if env["TOOLKIT"] == "cygwin" :
             libnames.extend([ str(i)+env["SHLIBSUFFIX"], "cyg"+str(i)+env["SHLIBSUFFIX"] ])
+        elif env["TOOLKIT"] == "msys" :
+            libnames.append( str(i)+env["SHLIBSUFFIX"] )
             
         for n in libnames :
             lib  = findfile(n, env["LIBPATH"])

@@ -212,6 +212,9 @@ else :
 # append main framework directory directory
 conf.env.AppendUnique(CPPPATH = [Dir("#")])
 
+# set additional dynamic link libraries which should be copied into the build dir    
+conf.env["COPYLIBRARY"] = ["gcc_s_dw2-1", "gfortran-3", "quadmath-0", "gomp-1", "pthreadGC2", "stdc++-6"]
+
 # main configuration (the C++ flag BOOST_NUMERIC_BINDINGS_BLAS_CBLAS need not be
 # set, because we build without ATLAS support)
 conf.env.AppendUnique(LINKFLAGS   = ["-fopenmp"])
