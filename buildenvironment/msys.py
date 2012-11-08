@@ -44,8 +44,11 @@ localconf = {
                                  "boost_exception"
     ],
     
+    # gfortran must be linked after Lapack, otherwise a linker error is shown
     "clibraries"            : [ "lapack",
-                                "blas"
+                                "lapacke",
+                                "blas",
+                                "gfortran"
     ],
     
     "cheaders"              : [ "omp.h"

@@ -166,6 +166,7 @@
  * <li><dfn>atlaslink</dfn> link option for the atlas library [allowed values: multi | single] </li>
  * <li><dfn>uselocallibrary</dfn> uses only the libraries which are stores within the library directory</li>
  * <li><dfn>usedistcc</dfn> the build process forces distcc on building</li>
+ * <li><dfn>usecolorcompiler</dfn> enable / disable searching for color compiler</li>
  * <li><dfn>copylibrary</dfn> copy the dynamic libraries into the build directory</li>
  * </ul>
  * Option flag, that are used during building the library package:

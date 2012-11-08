@@ -40,11 +40,13 @@ import SCons.Node
 def createVariables(vars) :
     [platform, arch] = detectPlatform()
     
-    atlaslink  = "multi"
-    zipsupport = False
+    atlaslink     = "multi"
+    zipsupport    = False
+    colorcompiler = True
     if (platform == "cygwin")  or  (platform == "msys") :
-        atlaslink  = "single"
-        zipsupport = True
+        atlaslink     = "single"
+        zipsupport    = True
+        colorcompiler = False
     
 
     vars.Add(BoolVariable("withrandomdevice", "installation with random device support", False))
@@ -59,8 +61,8 @@ def createVariables(vars) :
     vars.Add(EnumVariable("atlaslink", "type of the ATLAS link file", atlaslink, allowed_values=("single", "multi")))
     vars.Add(BoolVariable("uselocallibrary", "use the library in the local directory only", False))
     vars.Add(BoolVariable("usedistcc", "use distributed compiling with DistCC", False))
+    vars.Add(BoolVariable("usecolorcompiler", "enable / disable searching for color compiler", colorcompiler))
     vars.Add(BoolVariable("copylibrary", "copy the dynamic link libraries into the build dir", False))
-    
     vars.Add(ListVariable("skiplibrary", "skipping library builds / downloads", "", ["lapack", "boost", "hdf", "ginac", "json", "xml"]))
     vars.Add(BoolVariable("zipsupport", "build Bzip2 and ZLib support for Boost", zipsupport))
     vars.Add(EnumVariable("boostbuild", "Boost build option: required builds all libraries, requiredoptional build the required libraries with optional libraries, full build all libraries", "requiredoptional", allowed_values=("required", "requiredoptional", "full")))
@@ -160,9 +162,9 @@ def checkCPPEnv(conf, localconf) :
     for i in localconf["cpplibraries"] :
         if not conf.CheckLib(i, language="C++") :
             sys.exit(1)
-        
+
     # setup DistCC or on local color-compiler
-    if "DISTCC_HOSTS" in os.environ  or  conf.env["usedistcc"]:
+    if "DISTCC_HOSTS" in os.environ  or  conf.env["usedistcc"] :
         if "DISTCC_VERBOSE" in os.environ :
             conf.env.Replace(DISTCC_VERBOSE = os.environ["DISTCC_VERBOSE"])
         if "DISTCC_HOSTS" in os.environ :
@@ -171,14 +173,13 @@ def checkCPPEnv(conf, localconf) :
         print("use distributed compiling (DistCC)")
     
     else :
-        for i in [ "color-"+conf.env["CXX"], "color"+conf.env["CXX"] ] :
-            lxPath = findfile(i, conf.env["ENV"]["PATH"])
-            if lxPath <> None :
-                conf.env.Replace(CXX = "color-"+conf.env["CXX"])
-                print("use colored compiling")
-                break
-
-    
+        if conf.env["usecolorcompiler"] :
+            for i in [ "color-"+conf.env["CXX"], "color"+conf.env["CXX"] ] :
+                lxPath = findfile(i, conf.env["ENV"]["PATH"])
+                if lxPath <> None :
+                    conf.env.Replace(CXX = "color-"+conf.env["CXX"])
+                    print("use colored compiling")
+                    break
     
 # checks the environment path for executables
 # @param conf configuration object
