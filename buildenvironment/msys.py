@@ -209,9 +209,12 @@ else :
         conf.env.AppendUnique(LIBPATH = os.environ["LIBRARY_PATH"].split(os.pathsep)) 
         print("Appending custom posix library path (LIBRARY_PATH)")
     
-# append main framework directory directory
+# append main framework directory directory (read mingw/bin directory from path)
 conf.env.AppendUnique(CPPPATH = [Dir("#")])
-
+for i in os.environ["PATH"].split(os.pathsep) :
+    if i.endswith("\\mingw\\bin") :
+        conf.env.AppendUnique(LIBPATH = [i])
+        break
 # set additional dynamic link libraries which should be copied into the build dir    
 conf.env["COPYLIBRARY"] = ["gcc_s_dw2-1", "gfortran-3", "quadmath-0", "gomp-1", "pthreadGC2", "stdc++-6"]
 
