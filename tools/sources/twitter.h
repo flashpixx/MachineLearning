@@ -437,7 +437,7 @@ namespace machinelearning { namespace tools { namespace sources {
     inline void twitter::extractSearchResult( const Json::Value& p_array, const std::size_t& p_number, std::vector<twitter::searchtweet>& p_result ) const
     {
         for(std::size_t i=0; (i < p_array.size()) && ((p_number == 0) || (p_result.size() < p_number)); ++i) {
-            Json::Value l_element = p_array[i];
+            Json::Value l_element = p_array[ static_cast<int>(i) ];
             
             if ( (Json::stringValue == l_element["from_user"].type()) &&
                  (Json::stringValue == l_element["iso_language_code"].type()) &&
@@ -457,7 +457,7 @@ namespace machinelearning { namespace tools { namespace sources {
                         l_geo = ublas::vector<double>(l_coordinates.size(), 0);
                         
                         for(std::size_t n=0; n < l_coordinates.size(); ++n)
-                            l_geo(n) = l_coordinates[n].asDouble();
+                            l_geo(n) = l_coordinates[ static_cast<int>(n) ].asDouble();
                     }
                 }
                 
@@ -534,7 +534,7 @@ namespace machinelearning { namespace tools { namespace sources {
         
         std::vector<twitter::timelinetweet> l_result;
         for(std::size_t i=0; i < l_resultroot.size(); ++i) {
-            Json::Value l_element = l_resultroot[i];
+            Json::Value l_element = l_resultroot[ static_cast<int>(i) ];
             
             if ( (Json::stringValue == l_element["created_at"].type()) &&
                 (Json::stringValue == l_element["text"].type()) &&
@@ -572,7 +572,7 @@ namespace machinelearning { namespace tools { namespace sources {
                         l_geo = ublas::vector<double>(l_coordinates.size(), 0);
                         
                         for(std::size_t n=0; n < l_coordinates.size(); ++n)
-                            l_geo(n) = l_coordinates[n].asDouble();
+                            l_geo(n) = l_coordinates[ static_cast<int>(n) ].asDouble();
                     }
                 }
                 
@@ -587,7 +587,7 @@ namespace machinelearning { namespace tools { namespace sources {
                         Json::Value l_hash = l_entities["hashtags"];
                         
                         for(std::size_t n=0; n < l_hash.size(); ++n) {
-                            Json::Value l_hashelement = l_hash[n];
+                            Json::Value l_hashelement = l_hash[ static_cast<int>(n) ];
                             if ( (Json::stringValue == l_hashelement["text"].type()) && (!l_hashelement["text"].asString().empty()) )
                                 l_hashtags.push_back( l_hashelement["text"].asString() );
                         }
@@ -598,7 +598,7 @@ namespace machinelearning { namespace tools { namespace sources {
                         Json::Value l_url = l_entities["urls"];
                      
                         for(std::size_t n=0; n < l_url.size(); ++n) {
-                            Json::Value l_urlelement = l_url[n];
+                            Json::Value l_urlelement = l_url[ static_cast<int>(n) ];
                             if ( (Json::stringValue == l_urlelement["text"].type()) && (!l_urlelement["text"].asString().empty()) )
                                 l_urltags.push_back( l_urlelement["text"].asString() );
                         }
@@ -674,7 +674,7 @@ namespace machinelearning { namespace tools { namespace sources {
                 
                 if (Json::arrayValue == l_trends[l_hours[i]].type())
                     for(std::size_t n=0; n < l_trends[l_hours[i]].size(); ++n) {
-                        std::string l_tag = l_trends[l_hours[i]][n]["name"].asString();
+                        std::string l_tag = l_trends[l_hours[i]][ static_cast<int>(n) ]["name"].asString();
             
                         if (std::find( l_searchtags.begin(), l_searchtags.end(), l_tag ) == l_searchtags.end())
                             l_searchtags.push_back(l_tag);
