@@ -29,11 +29,6 @@
 %include "../../target/java/java.i"
 #endif
 
-#ifdef SWIGPYTHON
-%module "ncd"
-%include "../../target/python/python.i"
-#endif
-
 
 %include "../../../distances/ncd.hpp"
 %template(NCD) machinelearning::distances::ncd<double>;

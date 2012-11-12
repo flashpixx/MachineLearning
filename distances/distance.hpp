@@ -38,7 +38,9 @@ namespace machinelearning {
     /** distance namespace for structures which calculates distances **/
     namespace distances {
         
+        #ifndef SWIG
         namespace ublas = boost::numeric::ublas;
+        #endif
         
         
         /** abstract class for distance classes. Calculates 
@@ -47,7 +49,9 @@ namespace machinelearning {
          **/      
         template<typename T> class distance
         {
+            #ifndef SWIG
             BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );            
+            #endif
             
             
             public :

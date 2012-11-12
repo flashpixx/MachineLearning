@@ -55,19 +55,20 @@
 
 #define %arg(X...) X
 
-CONSTTYPES( jobjectArray,        Double[],                           ublas::vector<double> )
-CONSTTYPES( jobjectArray,        Double[],                           std::vector<double> )
-CONSTTYPES( jobjectArray,        Double[][],                         ublas::matrix<double> )
-CONSTTYPES( jobjectArray,        Double[][],                         %arg(ublas::symmetric_matrix<double, ublas::upper>) )
-CONSTTYPES( jobject,             java.util.ArrayList<Double[][]>,    std::vector< ublas::matrix<double> > )
-CONSTTYPES( jobjectArray,        String[],                           std::vector<std::string> )
-CONSTTYPES( jobjectArray,        long[],                             std::vector<std::size_t> )
-CONSTTYPES( jobjectArray,        Long[],                             ublas::indirect_array<> )
-CONSTTYPES( jlong,               long,                               std::size_t )
-CONSTTYPES( jstring,             String,                             std::string )
+CONSTTYPES( jobjectArray,        Double[],                              ublas::vector<double> )
+CONSTTYPES( jobjectArray,        Double[],                              std::vector<double> )
+CONSTTYPES( jobjectArray,        Double[][],                            ublas::matrix<double> )
+CONSTTYPES( jobjectArray,        Double[][],                            %arg(ublas::symmetric_matrix<double, ublas::upper>) )
+CONSTTYPES( jobject,             java.util.ArrayList<Double[][]>,       std::vector< ublas::matrix<double> > )
+CONSTTYPES( jobjectArray,        String[],                              std::vector<std::string> )
+CONSTTYPES( jobjectArray,        long[],                                std::vector<std::size_t> )
+CONSTTYPES( jobjectArray,        Long[],                                ublas::indirect_array<> )
+CONSTTYPES( jlong,               long,                                  std::size_t )
+CONSTTYPES( jstring,             String,                                std::string )
+CONSTTYPES( jobject,             machinelearning.distances.Distance,    machinelearning::distances::distance<double> )
 
-NONCONSTTYPES( jobject,          java.util.ArrayList<Double>,        ublas::vector<double> )
-NONCONSTTYPES( jobject,          java.util.ArrayList<Double[]>,      ublas::matrix<double> )
+NONCONSTTYPES( jobject,          java.util.ArrayList<Double>,           ublas::vector<double> )
+NONCONSTTYPES( jobject,          java.util.ArrayList<Double[]>,         ublas::matrix<double> )
 
 // add the global rule, so no swigtype is created and JNI return types are passed to the Java method return
 %typemap(javaout) SWIGTYPE { return $jnicall; }
@@ -162,8 +163,9 @@ NONCONSTTYPES( jobject,          java.util.ArrayList<Double[]>,      ublas::matr
 // structure that is included in each cpp file
 %{
 #include "swig/target/java/java.hpp"
-namespace swig  = machinelearning::swig;
-namespace ublas = boost::numeric::ublas;
+namespace swig      = machinelearning::swig;
+namespace distances = machinelearning::distances;
+namespace ublas     = boost::numeric::ublas;
 %}
 
 

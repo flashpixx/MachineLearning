@@ -39,9 +39,11 @@
 
 namespace machinelearning { namespace distances {
     
+    #ifndef SWIG
     namespace ublas  = boost::numeric::ublas;
     namespace blas   = boost::numeric::bindings::blas;
-
+    #endif
+    
     
     /** class for calculating euclid distance beween datapoints
      * @todo portage this class to the Intel Math Kernel Library http://software.intel.com/en-us/articles/intel-mkl/

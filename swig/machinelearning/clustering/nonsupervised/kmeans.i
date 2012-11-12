@@ -21,14 +21,15 @@
  @endcond
  **/
 
-/** interface file for MDS **/
+/** interface file for k-means **/
 
 
 #ifdef SWIGJAVA
-%module "mdsmodule"
-%include "../../..//target/java/java.i"
+%module "kmeansmodule"
+%include "../../../target/java/java.i"
 #endif
 
 
-%include "../../../../dimensionreduce/nonsupervised/mds.hpp"
-%template(MDS) machinelearning::dimensionreduce::nonsupervised::mds<double>;
+%include "../../../../distances/distances.h"
+%include "../../../../clustering/nonsupervised/kmeans.hpp"
+%template(kMeans) machinelearning::clustering::nonsupervised::kmeans<double>;

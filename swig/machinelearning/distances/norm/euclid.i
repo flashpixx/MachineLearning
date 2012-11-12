@@ -21,14 +21,14 @@
  @endcond
  **/
 
-/** interface file for MDS **/
+/** interface file for the euclidian norm **/
 
 
 #ifdef SWIGJAVA
-%module "mdsmodule"
-%include "../../..//target/java/java.i"
+%module "euclidmodule"
+%include "../../../target/java/java.i"
 #endif
 
 
-%include "../../../../dimensionreduce/nonsupervised/mds.hpp"
-%template(MDS) machinelearning::dimensionreduce::nonsupervised::mds<double>;
+%include "../../../../distances/norm/euclid.hpp"
+%template(Euclid) machinelearning::distances::euclid<double>;

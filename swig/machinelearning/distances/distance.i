@@ -21,14 +21,14 @@
  @endcond
  **/
 
-/** interface file for MDS **/
+/** interface file for the distance class**/
 
 
 #ifdef SWIGJAVA
-%module "mdsmodule"
-%include "../../..//target/java/java.i"
+%module "distancemodule"
+%include "../../target/java/java.i"
 #endif
 
 
-%include "../../../../dimensionreduce/nonsupervised/mds.hpp"
-%template(MDS) machinelearning::dimensionreduce::nonsupervised::mds<double>;
+%include "../../../distances/distance.hpp"
+%template(Distance) machinelearning::distances::distance<double>;

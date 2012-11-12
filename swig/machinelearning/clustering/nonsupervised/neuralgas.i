@@ -21,14 +21,15 @@
  @endcond
  **/
 
-/** interface file for MDS **/
+/** interface file for neural gas **/
 
 
 #ifdef SWIGJAVA
-%module "mdsmodule"
-%include "../../..//target/java/java.i"
+%module "neuralgasmodule"
+%include "../../../target/java/java.i"
 #endif
 
 
-%include "../../../../dimensionreduce/nonsupervised/mds.hpp"
-%template(MDS) machinelearning::dimensionreduce::nonsupervised::mds<double>;
+%include "../../../../distances/distances.h"
+%include "../../../../clustering/nonsupervised/neuralgas.hpp"
+%template(NeuralGas) machinelearning::clustering::nonsupervised::neuralgas<double>;

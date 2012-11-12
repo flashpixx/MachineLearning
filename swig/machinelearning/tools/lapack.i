@@ -30,11 +30,6 @@
 %rename(Lapack) lapack;
 #endif
 
-#ifdef SWIGPYTHON
-%module "lapack"
-%include "../../target/python/python.i"
-#endif
-
 
 %include "../../../tools/lapack.hpp"
 %template(eigen) machinelearning::tools::lapack::eigen<double>;

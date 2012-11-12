@@ -21,14 +21,15 @@
  @endcond
  **/
 
-/** interface file for MDS **/
+/** interface file for rlvq **/
 
 
 #ifdef SWIGJAVA
-%module "mdsmodule"
-%include "../../..//target/java/java.i"
+%module "rlvqmodule"
+%include "../../../target/java/java.i"
 #endif
 
 
-%include "../../../../dimensionreduce/nonsupervised/mds.hpp"
-%template(MDS) machinelearning::dimensionreduce::nonsupervised::mds<double>;
+%include "../../../../clustering/supervised/rlvq.hpp"
+%template(RLVQString) machinelearning::clustering::supervised::rlvq<double, std::string>;
+%template(RLVQLong) machinelearning::clustering::supervised::rlvq<double, std::size_t>;

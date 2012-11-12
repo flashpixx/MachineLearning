@@ -29,11 +29,6 @@
 %include "../../../target/java/java.i"
 #endif
 
-#ifdef SWIGPYTHON
-%module "rng"
-%include "../../../target/python/python.i"
-#endif
-
 
 %include "../../../../clustering/nonsupervised/relational_neuralgas.hpp"
 %template(RelationalNeuralGas) machinelearning::clustering::nonsupervised::relational_neuralgas<double>;
