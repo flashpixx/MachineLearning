@@ -209,9 +209,8 @@ else :
     
 # append main framework directory and Cygwin directory
 conf.env.AppendUnique(CPPPATH = [Dir("#")])
-conf.env.AppendUnique(LIBPATH = ["/bin"])
+conf.env["COPYLIBRARYPATH"]   = ["/bin"]
 
-    
 # set additional dynamic link libraries which should be copied into the build dir    
 conf.env["COPYLIBRARY"] = ["win1", "gcc_s-1", "gomp-1", "stdc++-6"]
 

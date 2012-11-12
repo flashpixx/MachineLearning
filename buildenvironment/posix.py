@@ -202,8 +202,6 @@ else :
 # append main framework directory
 conf.env.AppendUnique(CPPPATH = [Dir("#")])
 
-
-    
 # set additional dynamic link libraries which should be copied into the build dir    
 conf.env["NOTCOPYLIBRARY"] = ["stdc++"]
 

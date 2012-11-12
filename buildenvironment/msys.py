@@ -211,9 +211,10 @@ else :
     
 # append main framework directory directory (read mingw/bin directory from path)
 conf.env.AppendUnique(CPPPATH = [Dir("#")])
+conf.env["COPYLIBRARYPATH"]   = []
 for i in os.environ["PATH"].split(os.pathsep) :
     if i.endswith("\\mingw\\bin") :
-        conf.env.AppendUnique(LIBPATH = [i])
+        conf.env["COPYLIBRARYPATH"].append(i)
         break
 # set additional dynamic link libraries which should be copied into the build dir    
 conf.env["COPYLIBRARY"] = ["gcc_s_dw2-1", "gfortran-3", "quadmath-0", "gomp-1", "pthreadGC2", "stdc++-6"]
@@ -231,6 +232,24 @@ elif conf.env["buildtype"] == "debug" :
     conf.env.AppendUnique(LINKFLAGS   = ["-g"])
     conf.env.AppendUnique(CXXFLAGS    = ["-g"])
 
+#Windows Version options see http://msdn.microsoft.com/en-us/library/aa383745%28v=vs.85%29.aspx
+if conf.env["winversion"] == "win7" :
+    conf.env.AppendUnique(CPPDEFINES = ["_WIN32_WINNT=0x0601"])
+elif conf.env["winversion"] == "srv2008" :
+    conf.env.AppendUnique(CPPDEFINES = ["_WIN32_WINNT=0x0600"])
+elif conf.env["winversion"] == "vista" :
+    conf.env.AppendUnique(CPPDEFINES = ["_WIN32_WINNT=0x0600"])
+elif conf.env["winversion"] == "srv2003sp1" :
+    conf.env.AppendUnique(CPPDEFINES = ["_WIN32_WINNT=0x0502"])
+elif conf.env["winversion"] == "xpsp2" :
+    conf.env.AppendUnique(CPPDEFINES = ["_WIN32_WINNT=0x0502"])
+elif conf.env["winversion"] == "srv2003" :
+    conf.env.AppendUnique(CPPDEFINES = ["_WIN32_WINNT=0x0501"])
+elif conf.env["winversion"] == "xp" :
+    conf.env.AppendUnique(CPPDEFINES = ["_WIN32_WINNT=0x0501"])
+elif conf.env["winversion"] == "w2000" :
+    conf.env.AppendUnique(CPPDEFINES = ["_WIN32_WINNT=0x0500"])
+    
     
 if not("java" in COMMAND_LINE_TARGETS) :
     localconf["cpplibraries"].extend([
@@ -307,7 +326,8 @@ if conf.env["withlogger"] :
 
 if conf.env["withsources"] :
     conf.env.AppendUnique(CPPDEFINES  = ["MACHINELEARNING_SOURCES", "MACHINELEARNING_SOURCES_TWITTER"])
-    localconf["clibraries"].append("xml2")
+    conf.env["COPYLIBRARY"].extend(["xml2-2", "libiconv-2"])
+    localconf["clibraries"].extend(["xml2", "ws2_32"])
     localconf["cpplibraries"].append("json")
     localconf["cheaders"].extend([
                             os.path.join("libxml", "parser.h"),

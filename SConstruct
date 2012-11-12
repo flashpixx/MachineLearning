@@ -58,11 +58,15 @@ def createVariables(vars) :
     vars.Add(BoolVariable("withsymbolicmath", "compile for using symbolic math expression (needed by gradient descent)", False))
     
     vars.Add(EnumVariable("buildtype", "value of the buildtype", "release", allowed_values=("debug", "release")))
-    vars.Add(EnumVariable("atlaslink", "type of the ATLAS link file", atlaslink, allowed_values=("single", "multi")))
     vars.Add(BoolVariable("uselocallibrary", "use the library in the local directory only", False))
     vars.Add(BoolVariable("usedistcc", "use distributed compiling with DistCC", False))
     vars.Add(BoolVariable("usecolorcompiler", "enable / disable searching for color compiler", colorcompiler))
     vars.Add(BoolVariable("copylibrary", "copy the dynamic link libraries into the build dir", False))
+    vars.Add(EnumVariable("atlaslink", "type of the ATLAS link file", atlaslink, allowed_values=("single", "multi")))
+    
+    if platform == "msys" :
+        vars.Add(EnumVariable("winversion", "value of the Windows version", "win7", allowed_values=("win7", "srv2008", "vista", "srv2003sp1", "xpsp2", "srv2003", "xp", "w2000")))
+    
     vars.Add(ListVariable("skiplibrary", "skipping library builds / downloads", "", ["lapack", "boost", "hdf", "ginac", "json", "xml"]))
     vars.Add(BoolVariable("zipsupport", "build Bzip2 and ZLib support for Boost", zipsupport))
     vars.Add(EnumVariable("boostbuild", "Boost build option: required builds all libraries, requiredoptional build the required libraries with optional libraries, full build all libraries", "requiredoptional", allowed_values=("required", "requiredoptional", "full")))
@@ -262,6 +266,12 @@ def librarycopy_emitter(target, source, env) :
             removelib.append(env["NOTCOPYLIBRARY"])
     removelib = set(removelib)
         
+    pathlist = []
+    pathlist.extend(env["LIBPATH"])
+    if ("COPYLIBRARYPATH" in env) and SCons.Util.is_List(env["COPYLIBRARYPATH"]) :
+        pathlist.extend(env["COPYLIBRARYPATH"])
+    pathlist = set(pathlist)
+        
     for i in lst :
         if i in removelib :
             continue
@@ -273,7 +283,7 @@ def librarycopy_emitter(target, source, env) :
             libnames.append( str(i)+env["SHLIBSUFFIX"] )
             
         for n in libnames :
-            lib  = findfile(n, env["LIBPATH"])
+            lib  = findfile(n, pathlist)
             if lib <> None :
                 listsources.append(lib)
                 listtargets.append( os.path.join(str(target[0]), n) )
