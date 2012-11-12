@@ -238,7 +238,7 @@ def Boost_BuildInstall(env, source, gzipbuild, bzipbuild)  :
     version     = boostdir.replace("boost_", "").replace("_", ".")
     boostpath   = setpath(env, os.path.join("library", boostdir))
     prefix      = setpath(env, os.path.join("..", "build_"+env["buildtype"], "boost", version))
-    print prefix
+
     # set the toolset and compile the bjam and build boost
     boostoptions = [
         "--with-exception",
