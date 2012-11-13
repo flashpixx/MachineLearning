@@ -60,12 +60,14 @@ CONSTTYPES( jobjectArray,        Double[],                              std::vec
 CONSTTYPES( jobjectArray,        Double[][],                            ublas::matrix<double> )
 CONSTTYPES( jobjectArray,        Double[][],                            %arg(ublas::symmetric_matrix<double, ublas::upper>) )
 CONSTTYPES( jobject,             java.util.ArrayList<Double[][]>,       std::vector< ublas::matrix<double> > )
+CONSTTYPES( jobject,             java.util.ArrayList<Double[]>,         std::vector< ublas::vector<double> > )
 CONSTTYPES( jobjectArray,        String[],                              std::vector<std::string> )
 CONSTTYPES( jobjectArray,        long[],                                std::vector<std::size_t> )
 CONSTTYPES( jobjectArray,        Long[],                                ublas::indirect_array<> )
 CONSTTYPES( jlong,               long,                                  std::size_t )
 CONSTTYPES( jstring,             String,                                std::string )
 CONSTTYPES( jobject,             machinelearning.distances.Distance,    machinelearning::distances::distance<double> )
+CONSTTYPES( jobject,             machinelearning.tools.MatrixRowtype,   machinelearning::tools::matrix::rowtype )
 
 NONCONSTTYPES( jobject,          java.util.ArrayList<Double>,           ublas::vector<double> )
 NONCONSTTYPES( jobject,          java.util.ArrayList<Double[]>,         ublas::matrix<double> )
@@ -87,6 +89,11 @@ NONCONSTTYPES( jobject,          java.util.ArrayList<Double[]>,         ublas::m
 }
 
 %typemap(out, optimal=1, noblock=1) std::vector< ublas::matrix<double> >, const std::vector< ublas::matrix<double> >&
+{
+    $result = swig::java::getArrayList(jenv, $1);
+}
+
+%typemap(out, optimal=1, noblock=1) std::vector< ublas::vector<double> >, const std::vector< ublas::vector<double> >&
 {
     $result = swig::java::getArrayList(jenv, $1);
 }
@@ -165,6 +172,7 @@ NONCONSTTYPES( jobject,          java.util.ArrayList<Double[]>,         ublas::m
 #include "swig/target/java/java.hpp"
 namespace swig      = machinelearning::swig;
 namespace distances = machinelearning::distances;
+namespace tools     = machinelearning::tools;
 namespace ublas     = boost::numeric::ublas;
 %}
 

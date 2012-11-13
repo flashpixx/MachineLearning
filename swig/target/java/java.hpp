@@ -63,6 +63,7 @@ namespace machinelearning { namespace swig {
             static jobjectArray getArray( JNIEnv*, const ublas::indirect_array<>& );
             
             static jobject getArrayList( JNIEnv*, const std::vector< ublas::matrix<double> >&, const rowtype& = row );
+            static jobject getArrayList( JNIEnv*, const std::vector< ublas::vector<double> >& );
             static void setArrayList( JNIEnv*, const jobject&, const ublas::vector<double>& );
             static void setArrayList( JNIEnv*, const jobject&, const ublas::matrix<double>&, const rowtype& = row );
         
@@ -392,6 +393,46 @@ namespace machinelearning { namespace swig {
             p_env->SetObjectArrayElement(l_vec, i, p_env->NewObject(l_elementclass, l_elementctor, p_data(i)) );
         
         return l_vec;
+    }
+    
+    
+    /** convert a std::vector of ublas::vector to a ArrayList of Double[]
+     * @param p_env JNI environment
+     * @param p_data vector with ublas vector
+     * @return array list object
+     **/    
+    inline jobject java::getArrayList( JNIEnv* p_env, const std::vector< ublas::vector<double> >& p_data )
+    {
+        if (p_data.size() == 0)
+            return (jobject)p_env->NewGlobalRef(NULL);
+        
+        // create ArrayList
+        jclass l_elementclass   = NULL;
+        jmethodID l_elementctor = NULL;
+        getCtor(p_env, "java/util/ArrayList", "(I)V", l_elementclass, l_elementctor);
+        
+        jobject l_list = p_env->NewObject( l_elementclass, l_elementctor, static_cast<jint>(p_data.size()) );
+        
+        // get add method of the ArrayList        
+        jmethodID l_add = getMethodID(p_env, l_list, "add", "(Ljava/lang/Object;)Z"); 
+        
+        
+        // get Double object
+        jclass l_doubleelementclass   = NULL;
+        jmethodID l_doubleelementctor = NULL;
+        getCtor(p_env, "java/lang/Double", "(D)V", l_doubleelementclass, l_doubleelementctor);
+        
+        for(std::size_t i=0; i < p_data.size(); ++i)
+        {
+            jobjectArray l_vec = p_env->NewObjectArray( static_cast<jint>(p_data[i].size()), l_doubleelementclass, NULL );
+            
+            for(std::size_t n=0; n < p_data[i].size(); ++n)
+                p_env->SetObjectArrayElement(l_vec, n, p_env->NewObject(l_doubleelementclass, l_doubleelementctor, tools::function::isNumericalZero(p_data[i](n)) ? static_cast<double>(0) : p_data[n](n) ) );
+            
+            p_env->CallObjectMethod( l_list, l_add, (jobject)l_vec );
+        }
+        
+        return l_list;
     }
     
     

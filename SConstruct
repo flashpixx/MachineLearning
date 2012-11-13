@@ -492,7 +492,7 @@ def swigjava_emitter(target, source, env) :
         for n in data["cppclass"] :
             if data["rename"].has_key(n) :
                 target.append( os.path.normpath(os.path.join(jbuilddir, os.sep.join(data["cppnamespace"][n]), data["rename"][n]+".java")) )
-            else :
+            elif data["template"].keys() : 
                 for l in data["template"][n] :
                     target.append( os.path.normpath(os.path.join(jbuilddir, os.sep.join(data["cppnamespace"][n]), l+".java")) )
                     
