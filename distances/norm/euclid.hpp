@@ -51,7 +51,7 @@ namespace machinelearning { namespace distances {
     template<typename T> class euclid : public distance<T>
     {
         
-
+        #ifndef SWIG
         public:
         
             void normalize( ublas::vector<T>& ) const;
@@ -73,7 +73,8 @@ namespace machinelearning { namespace distances {
             ublas::vector<T> getWeightedDistance( const ublas::matrix<T>&, const ublas::vector<T>&, const ublas::vector<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const;        
             ublas::vector<T> getWeightedDistance( const ublas::matrix<T>&, const ublas::matrix<T>&, const ublas::matrix<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const;
             ublas::vector<T> getWeightedDistance( const ublas::matrix<T>&, const ublas::vector<T>&, const ublas::matrix<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const;
-        
+      
+        #endif
     };
     
     

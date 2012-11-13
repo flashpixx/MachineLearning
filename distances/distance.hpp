@@ -51,7 +51,6 @@ namespace machinelearning {
         {
             #ifndef SWIG
             BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );            
-            #endif
             
             
             public :
@@ -110,7 +109,7 @@ namespace machinelearning {
                 /** distances between row / column vectors of matrix and  row / column of the weighted matrix **/
                 virtual ublas::vector<T> getWeightedDistance( const ublas::matrix<T>&, const ublas::vector<T>&, const ublas::matrix<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const = 0;
 
-            
+            #endif
         };
 
     }
