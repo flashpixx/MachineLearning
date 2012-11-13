@@ -67,7 +67,6 @@ CONSTTYPES( jobjectArray,        Long[],                                ublas::i
 CONSTTYPES( jlong,               long,                                  std::size_t )
 CONSTTYPES( jstring,             String,                                std::string )
 CONSTTYPES( jobject,             machinelearning.distances.Distance,    machinelearning::distances::distance<double> )
-CONSTTYPES( jobject,             machinelearning.tools.MatrixRowtype,   machinelearning::tools::matrix::rowtype )
 
 NONCONSTTYPES( jobject,          java.util.ArrayList<Double>,           ublas::vector<double> )
 NONCONSTTYPES( jobject,          java.util.ArrayList<Double[]>,         ublas::matrix<double> )

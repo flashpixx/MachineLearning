@@ -26,6 +26,7 @@
 
 import os
 import re
+import distutils.version as dv
 Import("*")
 
 
@@ -175,19 +176,19 @@ if conf.env["uselocallibrary"] :
         if not(os.path.isdir(dir)) :
             continue
             
-        version = filter(lambda x: reg.match(x) <> None, os.listdir( dir ))
+        version = [dv.LooseVersion(j) for j in filter(lambda x: reg.match(x) <> None, os.listdir( dir ))]
         version.sort(reverse=True)
         if version :
-            libdir.append( os.path.join(dir, version[0], "lib" ) )
-            libdir.append( os.path.join(dir, version[0], "bin" ) )
+            libdir.append( os.path.join(dir, str(version[0]), "lib" ) )
+            libdir.append( os.path.join(dir, str(version[0]), "bin" ) )
             
             if i == "xml" :
-                includedir.append( os.path.join(dir, version[0], "include", "libxml2" ) )
+                includedir.append( os.path.join(dir, str(version[0]), "include", "libxml2" ) )
             else :
-                includedir.append( os.path.join(dir, version[0], "include" ) )
+                includedir.append( os.path.join(dir, str(version[0]), "include" ) )
                 
             if i == "hdf" :
-                includedir.append( os.path.join(dir, version[0], "include", "cpp" ) )
+                includedir.append( os.path.join(dir, str(version[0]), "include", "cpp" ) )
             
             if i == "boost" :
                 includedir.append( os.path.join(dir, "numeric_bindings" ) )
