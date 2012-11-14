@@ -459,7 +459,7 @@ def swigjava_emitter(target, source, env) :
         data["rename"]            = help
         
         # remove template parameters <> or brackets
-        data["template"]          = [ re.sub(regex["cppremove"], "", i) for i in data["template"] ]
+        data["template"] = [ re.sub(regex["cppremove"], "", i) for i in data["template"] ]
         help = {}
         for n in data["template"] :
             k = n.split()
@@ -498,14 +498,22 @@ def swigjava_emitter(target, source, env) :
                     
             #adding generated file, that should be deleted later to the targets (with the extension .del)
             #target.append( os.path.join(jbuilddir, os.sep.join(data["cppnamespace"][n]), str(data["module"]).replace("'","").replace("]","").replace("[","")+".java.del") )
-                    
+
     return target, source
     
 def swigjava_packageaction(dirname) :
     return ".".join( str(dirname).split(os.path.sep)[1:] )
     
 def swigjava_outdiraction(sourcedir, targets) :
-    path = os.path.join( os.path.commonprefix([str(i) for i in targets]), "java", os.path.sep.join(str(sourcedir).split(os.path.sep)[1:]) )
+    prefix = os.path.join( os.path.commonprefix([str(i) for i in targets]), "java" )
+    for i in targets :
+        if "java" in str(i) :
+            path = os.path.join( prefix, os.path.dirname(str(i).replace(prefix, ""))[1:] )
+            break
+    print sourcedir
+    print path
+    print targets
+    print " "
 
     try :
         if "java" in COMMAND_LINE_TARGETS :
