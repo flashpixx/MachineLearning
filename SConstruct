@@ -401,6 +401,7 @@ def swigjava_emitter(target, source, env) :
         ifacepath = os.sep.join( str(input).split(os.sep)[0:-1] )
         for n in regex["remove"] :
             ifacetext = re.sub(n, "", ifacetext)
+        ifacetext = re.sub(regex["cppcomment"], "", ifacetext)
         
         #getting all needed informations if the interface file
         data = {
@@ -486,11 +487,12 @@ def swigjava_emitter(target, source, env) :
         # change the template parameter in this way, that we get a dict with { cpp class name : [target names] }
         help = {}
         for k,v in data["template"].items() :
-            newval = list(set(data["cppclass"]) & set(v))[0]
-            if help.has_key(newval) :
-                help[newval].append(k)
-            else :
-                help[newval] = [k]
+            newval = list(set(data["cppclass"]) & set(v))
+            if newval : 
+                if help.has_key(newval[0]) :
+                    help[newval[0]].append(k)
+                else :
+                    help[newval[0]] = [k]
         data["template"] = help
         
         
@@ -503,13 +505,10 @@ def swigjava_emitter(target, source, env) :
         for n in data["cppclass"] :
             if data["rename"].has_key(n) :
                 target.append( os.path.normpath(os.path.join(jbuilddir, os.sep.join(data["cppnamespace"][n]), data["rename"][n]+".java")) )
-            elif data["template"].keys() : 
+            else : 
                 for l in data["template"][n] :
                     target.append( os.path.normpath(os.path.join(jbuilddir, os.sep.join(data["cppnamespace"][n]), l+".java")) )
                     
-            #adding generated file, that should be deleted later to the targets (with the extension .del)
-            #target.append( os.path.join(jbuilddir, os.sep.join(data["cppnamespace"][n]), str(data["module"]).replace("'","").replace("]","").replace("[","")+".java.del") )
-
     return target, source
     
 def swigjava_packageaction(iface) :
