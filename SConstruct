@@ -512,19 +512,22 @@ def swigjava_emitter(target, source, env) :
 
     return target, source
     
-def swigjava_packageaction(dirname) :
-    return ".".join( str(dirname).split(os.path.sep)[1:] )
+def swigjava_packageaction(iface) :
+    dirname = os.path.dirname(str(iface)).split(os.path.sep)
+
+    if dirname[-1] == "norm" :
+        dirname = dirname[0:-1]
+    dirname = ["machinelearning"] + dirname
+    
+    return ".".join(dirname)
+
     
 def swigjava_outdiraction(sourcedir, targets) :
     prefix = os.path.join( os.path.commonprefix([str(i) for i in targets]), "java" )
     for i in targets :
-        if "java" in str(i) :
+        if str(i).endswith(env["JAVASUFFIX"]) :
             path = os.path.join( prefix, os.path.dirname(str(i).replace(prefix, ""))[1:] )
             break
-    print sourcedir
-    print path
-    print targets
-    print " "
 
     try :
         if "java" in COMMAND_LINE_TARGETS :
@@ -535,6 +538,7 @@ def swigjava_outdiraction(sourcedir, targets) :
     
 def swigjava_cppdiraction(source, targets) :
     path = os.path.join( os.path.commonprefix([str(i) for i in targets]), "native" )
+    
     try :
         if "java" in COMMAND_LINE_TARGETS :
             os.makedirs(path)
@@ -543,14 +547,13 @@ def swigjava_cppdiraction(source, targets) :
     return os.path.join(path, str(source)+".cpp")
     
 def swigjava_remove(sources, target) :
-    jbuilddir = os.path.sep.join(  str(target).split(os.path.sep)[0:-2]  )
-
-    remove = re.compile( r"#ifdef SWIGPYTHON(.*)#endif", re.DOTALL )
-    module = re.compile( r"%module \"(.*)\"" )
+    jbuilddir = os.path.join(  os.path.dirname(os.path.dirname(str(target))), "java" )
+    remove    = re.compile( r"#ifdef SWIGPYTHON(.*)#endif", re.DOTALL )
+    module    = re.compile( r"%module \"(.*)\"" )
 
     for input in sources :
-        delpath = os.path.join( jbuilddir, "java", os.path.sep.join(str(input).split(os.path.sep)[1:-1]) )
-    
+        delpath = os.path.join( jbuilddir, "machinelearning", os.path.dirname(str(input)) )
+
         # read source file
         oFile = open( str(input), "r" )
         ifacetext = oFile.read()
@@ -559,11 +562,11 @@ def swigjava_remove(sources, target) :
         ifacetext = re.sub(remove, "", ifacetext)
         for i in re.findall(module , ifacetext) :
             try :
-                os.remove(os.path.join(delpath, i+".java"))
+                os.remove(os.path.join(delpath, i+env["JAVASUFFIX"]))
             except :
                 pass
     
-SwigJavaBuilder = Builder( action = SCons.Action.Action(["swig -Wall -O -templatereduce -c++ -java -package ${SwigJavaPackage(SOURCE.dir)} -outdir ${SwigJavaOutDir(SOURCE.dir, TARGETS)} -o ${SwigJavaCppDir(SOURCE.filebase, TARGETS)} $SOURCE", "${SwigJavaRemove(SOURCES, TARGET)}"]), emitter=swigjava_emitter, single_source = True, src_suffix=".i", target_factory=Entry, source_factory=File )
+SwigJavaBuilder = Builder( action = SCons.Action.Action(["swig -Wall -O -templatereduce -c++ -java -package ${SwigJavaPackage(SOURCE)} -outdir ${SwigJavaOutDir(SOURCE.dir, TARGETS)} -o ${SwigJavaCppDir(SOURCE.filebase, TARGETS)} $SOURCE", "${SwigJavaRemove(SOURCES, TARGET)}"]), emitter=swigjava_emitter, single_source = True, src_suffix=".i", target_factory=Entry, source_factory=File )
 # ---------------------------------------------------------------------------
 
 
