@@ -69,7 +69,7 @@ def libchange(target, source, env) :
 cpp  = []
 
 # glob all Swig files and call the builder
-for i in GlobRekursiv( os.path.join("..", ".."), [".i"], ["target"]) :
+for i in GlobRekursiv( os.path.join("..", ".."), [".i"], ["swig", "examples", "documentation", "library", "buildenvironment"]) :
 
     # split all result files into Java and C++ sources
     for n in env.SwigJava( os.path.join("#build", env["buildtype"], "jar", "source"), i ) :
