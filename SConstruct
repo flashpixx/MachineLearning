@@ -367,7 +367,9 @@ def swigjava_emitter(target, source, env) :
 
     regex = {
           # remove expression of the interface file (store a list with expressions)
-          "remove"              : [ re.compile( r"#ifdef SWIGPYTHON(.*)#endif", re.DOTALL ) ],
+          "remove"              : [ re.compile( r"#ifdef SWIGPYTHON(.*)#endif", re.DOTALL ),
+                                    re.compile( r"#ifndef SWIG(.*?)#endif", re.DOTALL )
+                                  ],
           
           # regex for extracting data of the interface file
           "template"            : re.compile( r"%template(.*);" ),
@@ -381,7 +383,7 @@ def swigjava_emitter(target, source, env) :
           # regex for the C++ class name
           "cppclass"            : re.compile( r"class (.*)" ),
           "cppbaseclass"        : re.compile( r":(.*)" ),
-          "cppnamespace"        : re.compile( r"namespace(.*){" ),
+          "cppnamespace"        : re.compile( r"namespace(.*?)class", re.DOTALL ),
           "cppstaticfunction"   : re.compile( r"static (.*) (.*)\(" ), 
           
           # regex helpers
@@ -431,6 +433,8 @@ def swigjava_emitter(target, source, env) :
             oFile   = open( os.path.normpath(os.path.join(ifacepath, n)), "r" )
             cpptext = re.sub(regex["cppcomment"], "", oFile.read()) 
             oFile.close()
+            for rx in regex["remove"] :
+                cpptext = re.sub(rx, "", cpptext)
             
             # get class names and static function
             classnames = re.findall(regex["cppclass"], cpptext)
@@ -439,17 +443,24 @@ def swigjava_emitter(target, source, env) :
 
             # determine class and namespace connection (which class exists in which namespace)
             namespaces = re.findall(regex["cppnamespace"], cpptext)
+            
+            # remove all chars from the end till the latest {
+            namespaces = [ n.replace("\n", " ") for n in namespaces ]
+            namespaces = [ n[0:n.rfind("{")] for n in namespaces ]
+            
             nslist     = [ n.replace("{", "").split("namespace") for n in namespaces ]
             nslist     = [ [ k.strip() for k in i ] for i in nslist ]
             
             for k in classnames :
-                for l,j in enumerate(namespaces) :
-                    if re.search( re.compile( r"namespace" + j + "{(.*)class " + k, re.DOTALL ), cpptext ) :
-                        data["cppnamespace"][k] = nslist[l]
+                for ns in nslist :
+                    # create the regex for searching the class in the namespace
+                    nc = [ "namespace(.*)"+s+"(.*){" for s in ns ]
+                    nc = "(.*)".join(nc) + "(.*)class(.*)" + k
+                    if re.search( re.compile(nc, re.DOTALL ), cpptext ) :
+                        data["cppnamespace"][k] = ns
             
-            # add classnames ti the dict
+            # add classnames to the dict
             data["cppclass"].extend( classnames  )
-
 
 
         # create the remap dict { cpp class name : swig rename}
