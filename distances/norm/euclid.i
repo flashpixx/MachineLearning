@@ -26,9 +26,9 @@
 
 #ifdef SWIGJAVA
 %module "euclidmodule"
-%include "../../../target/java/java.i"
+%include "../../swig/java/java.i"
 #endif
 
 
-%include "../../../../distances/norm/euclid.hpp"
+%include "euclid.hpp"
 %template(Euclid) machinelearning::distances::euclid<double>;

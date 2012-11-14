@@ -26,9 +26,9 @@
 
 #ifdef SWIGJAVA
 %module "ncdmodule"
-%include "../../target/java/java.i"
+%include "../swig/java/java.i"
 #endif
 
 
-%include "../../../distances/ncd.hpp"
+%include "ncd.hpp"
 %template(NCD) machinelearning::distances::ncd<double>;

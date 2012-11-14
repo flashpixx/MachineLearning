@@ -426,7 +426,7 @@ def swigjava_emitter(target, source, env) :
         # [bug: if a class with the same name exists in different namespaces, the dict stores only the last namespace entry]
         # [bug: namespace and target directory that is extracted by the builder can be different]
         for n in data["include"] :
-        
+
             # read cpp data
             oFile   = open( os.path.normpath(os.path.join(ifacepath, n)), "r" )
             cpptext = re.sub(regex["cppcomment"], "", oFile.read()) 
@@ -622,7 +622,7 @@ env.Clean(defaultcpp, [
 if "language" in COMMAND_LINE_TARGETS :
     env.SConscript( os.path.join("tools", "language", "build.py"), exports="env defaultcpp GlobRekursiv" )
 if "java" in COMMAND_LINE_TARGETS :
-    env.SConscript( os.path.join("swig", "target", "java", "build.py"), exports="env defaultcpp GlobRekursiv" )
+    env.SConscript( os.path.join("swig", "java", "build.py"), exports="env defaultcpp GlobRekursiv" )
 if any([i in COMMAND_LINE_TARGETS for i in ["javatools", "javaclustering", "javareduce"]]) :
     for i in ["clustering", "tools", "reducing"] :
         env.SConscript( os.path.join("examples", "java", i, "build.py"), exports="env defaultcpp" )

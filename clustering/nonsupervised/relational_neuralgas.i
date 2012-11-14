@@ -26,9 +26,9 @@
 
 #ifdef SWIGJAVA
 %module "rngmodule"
-%include "../../../target/java/java.i"
+%include "../../swig/java/java.i"
 #endif
 
 
-%include "../../../../clustering/nonsupervised/relational_neuralgas.hpp"
+%include "relational_neuralgas.hpp"
 %template(RelationalNeuralGas) machinelearning::clustering::nonsupervised::relational_neuralgas<double>;

@@ -26,10 +26,10 @@
 
 #ifdef SWIGJAVA
 %module "rlvqmodule"
-%include "../../../target/java/java.i"
+%include "../../swig/java/java.i"
 #endif
 
 
-%include "../../../../clustering/supervised/rlvq.hpp"
+%include "rlvq.hpp"
 %template(RLVQString) machinelearning::clustering::supervised::rlvq<double, std::string>;
 %template(RLVQLong) machinelearning::clustering::supervised::rlvq<double, std::size_t>;

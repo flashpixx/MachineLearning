@@ -26,10 +26,10 @@
 
 #ifdef SWIGJAVA
 %module "randommodule"
-%include "../../target/java/java.i"
+%include "../swig/java/java.i"
 %rename(Random) random;
 #endif
 
 
-%include "../../../tools/random.hpp"
+%include "random.hpp"
 %template(get) machinelearning::tools::random::get<double>;

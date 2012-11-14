@@ -26,9 +26,9 @@
 
 #ifdef SWIGJAVA
 %module "distancemodule"
-%include "../../target/java/java.i"
+%include "../swig/java/java.i"
 #endif
 
 
-%include "../../../distances/distance.hpp"
+%include "distance.hpp"
 %template(Distance) machinelearning::distances::distance<double>;

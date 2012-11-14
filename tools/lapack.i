@@ -26,12 +26,12 @@
 
 #ifdef SWIGJAVA
 %module "lapackmodule"
-%include "../../target/java/java.i"
+%include "../swig/java/java.i"
 %rename(Lapack) lapack;
 #endif
 
 
-%include "../../../tools/lapack.hpp"
+%include "lapack.hpp"
 %template(eigen) machinelearning::tools::lapack::eigen<double>;
 %template(svd) machinelearning::tools::lapack::svd<double>;
 %template(perronFrobenius) machinelearning::tools::lapack::perronfrobenius<double>;

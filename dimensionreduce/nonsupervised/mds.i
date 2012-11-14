@@ -26,9 +26,9 @@
 
 #ifdef SWIGJAVA
 %module "mdsmodule"
-%include "../../..//target/java/java.i"
+%include "../../swig/java/java.i"
 #endif
 
 
-%include "../../../../dimensionreduce/nonsupervised/mds.hpp"
+%include "mds.hpp"
 %template(MDS) machinelearning::dimensionreduce::nonsupervised::mds<double>;

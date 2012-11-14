@@ -26,9 +26,9 @@
 
 #ifdef SWIGJAVA
 %module "pcamodule"
-%include "../../../target/java/java.i"
+%include "../../swig/java/java.i"
 #endif
 
 
-%include "../../../../dimensionreduce/nonsupervised/pca.hpp"
+%include "pca.hpp"
 %template(PCA) machinelearning::dimensionreduce::nonsupervised::pca<double>;

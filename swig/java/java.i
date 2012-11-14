@@ -168,7 +168,7 @@ NONCONSTTYPES( jobject,          java.util.ArrayList<Double[]>,         ublas::m
 // ---------------------------------------------------------------------------------------------------------------------------------------------
 // structure that is included in each cpp file
 %{
-#include "swig/target/java/java.hpp"
+#include "swig/java/java.hpp"
 namespace swig      = machinelearning::swig;
 namespace distances = machinelearning::distances;
 namespace tools     = machinelearning::tools;

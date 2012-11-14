@@ -26,10 +26,9 @@
 
 #ifdef SWIGJAVA
 %module "neuralgasmodule"
-%include "../../../target/java/java.i"
+%include "../../swig/java/java.i"
 #endif
 
 
-%include "../../../../distances/distances.h"
-%include "../../../../clustering/nonsupervised/neuralgas.hpp"
+%include "neuralgas.hpp"
 %template(NeuralGas) machinelearning::clustering::nonsupervised::neuralgas<double>;

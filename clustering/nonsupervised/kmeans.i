@@ -26,10 +26,9 @@
 
 #ifdef SWIGJAVA
 %module "kmeansmodule"
-%include "../../../target/java/java.i"
+%include "../../swig/java/java.i"
 #endif
 
 
-%include "../../../../distances/distances.h"
-%include "../../../../clustering/nonsupervised/kmeans.hpp"
+%include "kmeans.hpp"
 %template(kMeans) machinelearning::clustering::nonsupervised::kmeans<double>;

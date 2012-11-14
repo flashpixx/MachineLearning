@@ -26,10 +26,10 @@
 
 #ifdef SWIGJAVA
 %module "ldamodule"
-%include "../../../target/java/java.i"
+%include "../../swig/java/java.i"
 #endif
 
 
-%include "../../../../dimensionreduce/supervised/lda.hpp"
+%include "lda.hpp"
 %template(LDAString) machinelearning::dimensionreduce::supervised::lda<double, std::string>;
 %template(LDALong) machinelearning::dimensionreduce::supervised::lda<double, std::size_t>;
