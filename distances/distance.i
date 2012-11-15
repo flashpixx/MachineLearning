@@ -27,6 +27,11 @@
 #ifdef SWIGJAVA
 %module "distancemodule"
 %include "../swig/java/java.i"
+
+%typemap(javaclassmodifiers) machinelearning::distances::distance<double> "public abstract class"
+%typemap(javabody) machinelearning::distances::distance<double> %{ %}
+%nodefaultctor machinelearning::distances::distance<double>;
+%nodefaultdtor machinelearning::distances::distance<double>;
 #endif
 
 

@@ -48,11 +48,6 @@
 
 %enddef
 
-
-
- 
- 
- 
 // ---------------------------------------------------------------------------------------------------------------------------------------------
 // type converting from C++ types to Java types (for templates with more than one argument, we need the %arg definition, otherwise the comma is expanded)
 

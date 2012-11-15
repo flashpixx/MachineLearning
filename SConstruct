@@ -372,7 +372,8 @@ def swigjava_emitter(target, source, env) :
           # remove expression of the interface file (store a list with expressions)
           "remove"              : [ re.compile( r"#ifdef SWIGPYTHON(.*)#endif", re.DOTALL ),
                                     re.compile( r"#ifndef SWIG(.*?)#endif", re.DOTALL ),
-                                    re.compile( r"#ifdef MACHINELEARNING_MPI(.*?)#endif", re.DOTALL ) 
+                                    re.compile( r"#ifdef MACHINELEARNING_MPI(.*?)#endif", re.DOTALL ), 
+                                    re.compile( r"%pragma(.*?)%}", re.DOTALL ) 
                                   ],
           
           # regex for extracting data of the interface file
@@ -395,18 +396,15 @@ def swigjava_emitter(target, source, env) :
     }
     
     if not env["withsources"] :
-        data["regex"].append( re.compile( r"#ifndef MACHINELEARNING_SOURCES(.*?)#endif", re.DOTALL ) )
+        regex["remove"].append( re.compile( r"#ifndef MACHINELEARNING_SOURCES(.*?)#endif", re.DOTALL ) )
     if not env["withlogger"] :
-        data["regex"].append( re.compile( r"#ifndef MACHINELEARNING_LOGGER(.*?)#endif", re.DOTALL ) )
+        regex["remove"].append( re.compile( r"#ifndef MACHINELEARNING_LOGGER(.*?)#endif", re.DOTALL ) )
     if not env["withfiles"] :
-        data["regex"].append( re.compile( r"#ifndef MACHINELEARNING_FILES(.*?)#endif", re.DOTALL ) )
+        regex["remove"].append( re.compile( r"#ifndef MACHINELEARNING_FILES(.*?)#endif", re.DOTALL ) )
     if not env["withsymbolicmath"] :
-        data["regex"].append( re.compile( r"#ifndef MACHINELEARNING_SYMBOLICMATH(.*?)#endif", re.DOTALL ) )
+        regex["remove"].append( re.compile( r"#ifndef MACHINELEARNING_SYMBOLICMATH(.*?)#endif", re.DOTALL ) )
     if not env["withmultilanguage"] :
-        data["regex"].append( re.compile( r"#ifndef MACHINELEARNING_MULTILANGUAGE(.*?)#endif", re.DOTALL ) )
-        
-    
-    
+        regex["remove"].append( re.compile( r"#ifndef MACHINELEARNING_MULTILANGUAGE(.*?)#endif", re.DOTALL ) )
 
     target = []
     for input in source :
@@ -446,6 +444,7 @@ def swigjava_emitter(target, source, env) :
         # getting C++ class name (read the %include file name)
         # [bug: if a class with the same name exists in different namespaces, the dict stores only the last namespace entry]
         # [bug: namespace and target directory that is extracted by the builder can be different]
+        cpptext = ""
         for n in data["include"] :
 
             # read cpp data
