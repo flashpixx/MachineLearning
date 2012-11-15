@@ -396,10 +396,14 @@ def swigjava_emitter(target, source, env) :
     
     if not env["withsources"] :
         data["regex"].append( re.compile( r"#ifndef MACHINELEARNING_SOURCES(.*?)#endif", re.DOTALL ) )
+    if not env["withlogger"] :
+        data["regex"].append( re.compile( r"#ifndef MACHINELEARNING_LOGGER(.*?)#endif", re.DOTALL ) )
     if not env["withfiles"] :
         data["regex"].append( re.compile( r"#ifndef MACHINELEARNING_FILES(.*?)#endif", re.DOTALL ) )
     if not env["withsymbolicmath"] :
         data["regex"].append( re.compile( r"#ifndef MACHINELEARNING_SYMBOLICMATH(.*?)#endif", re.DOTALL ) )
+    if not env["withmultilanguage"] :
+        data["regex"].append( re.compile( r"#ifndef MACHINELEARNING_MULTILANGUAGE(.*?)#endif", re.DOTALL ) )
         
     
     
