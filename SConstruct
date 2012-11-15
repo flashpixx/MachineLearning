@@ -368,7 +368,8 @@ def swigjava_emitter(target, source, env) :
     regex = {
           # remove expression of the interface file (store a list with expressions)
           "remove"              : [ re.compile( r"#ifdef SWIGPYTHON(.*)#endif", re.DOTALL ),
-                                    re.compile( r"#ifndef SWIG(.*?)#endif", re.DOTALL )
+                                    re.compile( r"#ifndef SWIG(.*?)#endif", re.DOTALL ),
+                                    re.compile( r"#ifdef MACHINELEARNING_MPI(.*?)#endif", re.DOTALL ) 
                                   ],
           
           # regex for extracting data of the interface file
