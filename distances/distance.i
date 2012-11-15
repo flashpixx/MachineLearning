@@ -21,23 +21,22 @@
  @endcond
  **/
 
-/** interface file for the distance class,
- * build own class, for setting an abstract class
- **/
+/** interface file for the distance class **/
 
 
 #ifdef SWIGJAVA
 %module "distancemodule"
 %include "../swig/java/java.i"
 
-%typemap(javaclassmodifiers) Distance "public abstract class"
-%typemap(javabody) Distance ""
-%typemap(javafinalize) Distance ""
-%typemap(javadestruct) Distance ""
+%typemap(javaclassmodifiers) machinelearning::distances::distance<double> "public abstract class"
+%typemap(javabody) machinelearning::distances::distance<double> ""
+%typemap(javafinalize) machinelearning::distances::distance<double> ""
+%typemap(javadestruct) machinelearning::distances::distance<double> ""
 #endif
 
 
-%nodefaultctor Distance;
-%nodefaultdtor Distance;
+%nodefaultctor machinelearning::distances::distance<double>;
+%nodefaultdtor machinelearning::distances::distance<double>;
 
-struct Distance {};
+%include "distance.hpp"
+%template(Distance) machinelearning::distances::distance<double>;
