@@ -361,6 +361,9 @@ ExtractBuilder = Builder( action = SCons.Action.Action("$EXTRACT_CMD$extractsuff
 
 # --- Java Swig Builder -----------------------------------------------------
 def swigjava_emitter(target, source, env) :
+    if env["withmpi"] :
+        raise SCons.Errors.UserError("Java Swig Builder does not work with MPI")
+
     # create build dir path
     jbuilddir = os.path.join(str(target[0]), "java")
     nbuilddir = os.path.join(str(target[0]), "native")
@@ -390,6 +393,16 @@ def swigjava_emitter(target, source, env) :
           # regex helpers
           "cppremove"           : re.compile( r"(\(|\)|<(.*)>)" )
     }
+    
+    if not env["withsources"] :
+        data["regex"].append( re.compile( r"#ifndef MACHINELEARNING_SOURCES(.*?)#endif", re.DOTALL ) )
+    if not env["withfiles"] :
+        data["regex"].append( re.compile( r"#ifndef MACHINELEARNING_FILES(.*?)#endif", re.DOTALL ) )
+    if not env["withsymbolicmath"] :
+        data["regex"].append( re.compile( r"#ifndef MACHINELEARNING_SYMBOLICMATH(.*?)#endif", re.DOTALL ) )
+        
+    
+    
 
     target = []
     for input in source :
