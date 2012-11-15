@@ -77,20 +77,19 @@ for i in GlobRekursiv( os.path.join("..", ".."), [".i"], ["swig", "examples", "d
             cpp.append(n)
         
 # call Java & C++ builder
-#dll    = env.SharedLibrary( os.path.join("#build", env["buildtype"], "jar", "build", "native", "machinelearning"), defaultcpp + cpp )
-#java   = env.Java(  os.path.join("#build", env["buildtype"], "jar", "build"), os.path.join("#build", env["buildtype"], "jar", "source", "java")  )
-#libcp  = env.LibraryCopy( os.path.join("#build", env["buildtype"], "jar", "build", "native"), [] )
-#rellib = env.Command("rellib_dll", dll, libchange )
-#Depends(rellib, libcp)
+dll    = env.SharedLibrary( os.path.join("#build", env["buildtype"], "jar", "build", "native", "machinelearning"), defaultcpp + cpp )
+java   = env.Java(  os.path.join("#build", env["buildtype"], "jar", "build"), os.path.join("#build", env["buildtype"], "jar", "source", "java")  )
+libcp  = env.LibraryCopy( os.path.join("#build", env["buildtype"], "jar", "build", "native"), [] )
+rellib = env.Command("rellib_dll", dll, libchange )
+Depends(rellib, libcp)
     
 # set Jar flags (we need a own command for the -C option)   
-#env["JARCOM"] = "$JAR $_JARFLAGS $TARGET $_JARMANIFEST $_JARCHDIR $_JARSOURCES -C " + os.path.join("build", env["buildtype"], "jar", "build") + " ."
-#jar = env.Jar(os.path.join("#build", env["buildtype"], "machinelearning.jar"), [])
-#Depends(jar, [rellib, java])
+env["JARCOM"] = "$JAR $_JARFLAGS $TARGET $_JARMANIFEST $_JARCHDIR $_JARSOURCES -C " + os.path.join("build", env["buildtype"], "jar", "build") + " ."
+jar = env.Jar(os.path.join("#build", env["buildtype"], "machinelearning.jar"), [])
+Depends(jar, [rellib, java])
 
 # set Alias with Jar build
 env.Clean(
-    #env.Alias( "java", jar ),
-    env.Alias( "java", cpp ),
+    env.Alias( "java", jar ),
     os.path.join("#build", env["buildtype"], "jar")
 )
