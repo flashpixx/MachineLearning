@@ -539,18 +539,21 @@ def swigjava_packageaction(iface) :
 
     
 def swigjava_outdiraction(sourcedir, targets) :
+    path   = None
     prefix = os.path.join( os.path.commonprefix([str(i) for i in targets]), "java" )
     for i in targets :
         if str(i).endswith(env["JAVASUFFIX"]) :
             path = os.path.join( prefix, os.path.dirname(str(i).replace(prefix, ""))[1:] )
             break
-
-    try :
-        if "java" in COMMAND_LINE_TARGETS :
-            os.makedirs(path)
-    except :
-        pass
-    return path
+    
+    if path <> None :
+        try :
+            if "java" in COMMAND_LINE_TARGETS :
+                os.makedirs(path)
+        except :
+            pass
+        return "-outdir " + path
+    return ""
     
 def swigjava_cppdiraction(source, targets) :
     path = os.path.join( os.path.commonprefix([str(i) for i in targets]), "native" )
@@ -560,7 +563,7 @@ def swigjava_cppdiraction(source, targets) :
             os.makedirs(path)
     except :
         pass
-    return os.path.join(path, str(source)+".cpp")
+    return "-o " + os.path.join(path, str(source)+".cpp")
     
 def swigjava_remove(sources, target) :
     jbuilddir = os.path.join(  os.path.dirname(os.path.dirname(str(target))), "java" )
@@ -582,7 +585,7 @@ def swigjava_remove(sources, target) :
             except :
                 pass
     
-SwigJavaBuilder = Builder( action = SCons.Action.Action(["swig -Wall -O -templatereduce -c++ -java -package ${SwigJavaPackage(SOURCE)} -outdir ${SwigJavaOutDir(SOURCE.dir, TARGETS)} -o ${SwigJavaCppDir(SOURCE.filebase, TARGETS)} $SOURCE", "${SwigJavaRemove(SOURCES, TARGET)}"]), emitter=swigjava_emitter, single_source = True, src_suffix=".i", target_factory=Entry, source_factory=File )
+SwigJavaBuilder = Builder( action = SCons.Action.Action(["swig -Wall -O -templatereduce -c++ -java -package ${SwigJavaPackage(SOURCE)} ${SwigJavaOutDir(SOURCE.dir, TARGETS)} ${SwigJavaCppDir(SOURCE.filebase, TARGETS)} $SOURCE", "${SwigJavaRemove(SOURCES, TARGET)}"]), emitter=swigjava_emitter, single_source = True, src_suffix=".i", target_factory=Entry, source_factory=File )
 # ---------------------------------------------------------------------------
 
 
