@@ -144,7 +144,7 @@
  * <ul>
  * <li><dfn>NDEBUG</dfn> for disabling Boost and local debugging</li>
  * <li><dfn>BOOST_UBLAS_NDEBUG</dfn> for disabling Boost Ublas support</li>
- * <li><dfn>BOOST_NUMERIC_BINDINGS_BLAS_CBLAS</dfn> add CBLAS / LAPACK support for the Boost Bindings</li>
+ * <li><dfn>BOOST_NUMERIC_BINDINGS_BLAS_CBLAS</dfn> add CBLAS / LAPACK support for the Boost Bindings (need not be set under MSYS / MinGW)</li>
  * <li><dfn>BOOST_FILESYSTEM_NO_DEPRECATED</dfn> disabled deprecated code</li>
  * </ul>
  *
