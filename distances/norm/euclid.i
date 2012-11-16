@@ -27,14 +27,10 @@
 #ifdef SWIGJAVA
 %module "euclidmodule"
 %include "../../swig/java/java.i"
+
+%typemap(javabase) machinelearning::distances::euclid<double> "Distance";
 #endif
 
-
-/**
-%include "../distance.hpp"
-%template(Distance) machinelearning::distances::distance<double>;
-**/
- 
  
 %include "euclid.hpp"
 %template(Euclid) machinelearning::distances::euclid<double>;
