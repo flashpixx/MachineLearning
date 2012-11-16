@@ -391,6 +391,9 @@ def swigjava_emitter(target, source, env) :
           "cppnamespace"        : re.compile( r"namespace(.*?)class", re.DOTALL ),
           "cppstaticfunction"   : re.compile( r"static (.*) (.*)\(" ), 
           
+          # regex for abstract Java class
+          "abstractclass"       : re.compile( r"javaclassmodifiers(.*)public abstract class" ),
+        
           # regex helpers
           "cppremove"           : re.compile( r"(\(|\)|<(.*)>)" )
     }
@@ -514,7 +517,8 @@ def swigjava_emitter(target, source, env) :
         
         
         # adding target filenames with path (first the cpp name, second the java names)
-        target.append( os.path.normpath(os.path.join(nbuilddir, data["sourcename"]+".cpp" )) )
+        if not re.search(regex["abstractclass"], ifacetext) :
+            target.append( os.path.normpath(os.path.join(nbuilddir, data["sourcename"]+".cpp" )) )
         
         # we read the cpp classname, get the template parameter which matchs the cpp class name in the value
         # if the rename option is not empty and matches the cpp class name, we use this result for the java class name
@@ -555,7 +559,7 @@ def swigjava_outdiraction(sourcedir, targets) :
         return "-outdir " + path
     return ""
     
-def swigjava_cppdiraction(source, targets) :
+def swigjava_cppdiraction(source, interface, targets) :
     path = os.path.join( os.path.commonprefix([str(i) for i in targets]), "native" )
     
     try :
@@ -563,6 +567,14 @@ def swigjava_cppdiraction(source, targets) :
             os.makedirs(path)
     except :
         pass
+         
+    # read source file
+    oFile = open( str(interface), "r" )
+    ifacetext = oFile.read()
+    oFile.close()
+    
+    if re.search("javaclassmodifiers(.*)public abstract class", ifacetext) :
+        return ""
     return "-o " + os.path.join(path, str(source)+".cpp")
     
 def swigjava_remove(sources, target) :
@@ -585,7 +597,7 @@ def swigjava_remove(sources, target) :
             except :
                 pass
     
-SwigJavaBuilder = Builder( action = SCons.Action.Action(["swig -Wall -O -templatereduce -c++ -java ${SwigJavaPackage(SOURCE)} ${SwigJavaOutDir(SOURCE.dir, TARGETS)} ${SwigJavaCppDir(SOURCE.filebase, TARGETS)} $SOURCE", "${SwigJavaRemove(SOURCES, TARGET)}"]), emitter=swigjava_emitter, single_source = True, src_suffix=".i", target_factory=Entry, source_factory=File )
+SwigJavaBuilder = Builder( action = SCons.Action.Action(["swig -Wall -O -templatereduce -c++ -java ${SwigJavaPackage(SOURCE)} ${SwigJavaOutDir(SOURCE.dir, TARGETS)} ${SwigJavaCppDir(SOURCE.filebase, SOURCE, TARGETS)} $SOURCE", "${SwigJavaRemove(SOURCES, TARGET)}"]), emitter=swigjava_emitter, single_source = True, src_suffix=".i", target_factory=Entry, source_factory=File )
 # ---------------------------------------------------------------------------
 
 

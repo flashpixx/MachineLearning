@@ -26,17 +26,15 @@
 
 #ifdef SWIGJAVA
 %module "distancemodule"
-%include "../swig/java/java.i"
 
-%typemap(javaclassmodifiers) machinelearning::distances::distance<double> "public abstract class"
-%typemap(javabody) machinelearning::distances::distance<double> ""
-%typemap(javafinalize) machinelearning::distances::distance<double> ""
-%typemap(javadestruct) machinelearning::distances::distance<double> ""
+%typemap(javaclassmodifiers) Distance "public abstract class"
+%typemap(javabody) Distance ""
+%typemap(javafinalize) Distance ""
+%typemap(javadestruct) Distance ""
 #endif
 
 
-%nodefaultctor machinelearning::distances::distance<double>;
-%nodefaultdtor machinelearning::distances::distance<double>;
+%nodefaultctor Distance;
+%nodefaultdtor Distance;
 
-%include "distance.hpp"
-%template(Distance) machinelearning::distances::distance<double>;
+struct Distance { };
