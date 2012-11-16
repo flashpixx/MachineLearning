@@ -648,7 +648,9 @@ env.Clean(defaultcpp, [
     "build",
     "config.log",
     ".sconf_temp",
-    ".sconsign.dblite"
+    ".sconsign.dblite",
+    Glob("*.o"),
+    Glob("*.os")
 ])
 
 
