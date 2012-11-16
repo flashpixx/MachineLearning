@@ -21,7 +21,9 @@
  @endcond
  **/
 
-/** interface file for the distance class **/
+/** interface file for the distance class,
+ * the class must be abstract, so we disable all generator parts
+ **/
 
 
 #ifdef SWIGJAVA
