@@ -516,7 +516,8 @@ def swigjava_emitter(target, source, env) :
         data["template"] = help
         
         
-        # adding target filenames with path (first the cpp name, second the java names)
+        # adding target filenames with path (first the cpp name, second the java names),
+        # on abstract classes wie do not create any cpp file
         if not re.search(regex["abstractclass"], ifacetext) :
             target.append( os.path.normpath(os.path.join(nbuilddir, data["sourcename"]+".cpp" )) )
         
@@ -529,7 +530,6 @@ def swigjava_emitter(target, source, env) :
             else : 
                 for l in data["template"][n] :
                     target.append( os.path.normpath(os.path.join(jbuilddir, os.sep.join(data["cppnamespace"][n]), l+".java")) )
-                    
     return target, source
     
 def swigjava_packageaction(iface) :
@@ -543,41 +543,42 @@ def swigjava_packageaction(iface) :
 
     
 def swigjava_outdiraction(sourcedir, targets) :
-    path   = None
-    prefix = os.path.join( os.path.commonprefix([str(i) for i in targets]), "java" )
+    if not "java" in COMMAND_LINE_TARGETS :
+        return ""
+
     for i in targets :
         if str(i).endswith(env["JAVASUFFIX"]) :
-            path = os.path.join( prefix, os.path.dirname(str(i).replace(prefix, ""))[1:] )
-            break
-    
-    if path <> None :
-        try :
-            if "java" in COMMAND_LINE_TARGETS :
+            path = os.path.dirname(str(i))
+            try :
                 os.makedirs(path)
-        except :
-            pass
-        return "-outdir " + path
+            except :
+                pass
+            return "-outdir " + path
     return ""
     
-def swigjava_cppdiraction(source, interface, targets) :
-    path = os.path.join( os.path.commonprefix([str(i) for i in targets]), "native" )
+def swigjava_cppdiraction(source, interface, target) :
+    if not "java" in COMMAND_LINE_TARGETS :
+        return ""
     
-    try :
-        if "java" in COMMAND_LINE_TARGETS :
-            os.makedirs(path)
-    except :
-        pass
-         
     # read source file
     oFile = open( str(interface), "r" )
     ifacetext = oFile.read()
     oFile.close()
+    
+    path = os.path.dirname(str(target))
+    try :
+        os.makedirs(path)
+    except :
+        pass
     
     if re.search("javaclassmodifiers(.*)public abstract class", ifacetext) :
         return ""
     return "-o " + os.path.join(path, str(source)+".cpp")
     
 def swigjava_remove(sources, target) :
+    if not "java" in COMMAND_LINE_TARGETS :
+        return
+
     jbuilddir = os.path.join(  os.path.dirname(os.path.dirname(str(target))), "java" )
     remove    = re.compile( r"#ifdef SWIGPYTHON(.*)#endif", re.DOTALL )
     module    = re.compile( r"%module \"(.*)\"" )
@@ -589,7 +590,7 @@ def swigjava_remove(sources, target) :
         oFile = open( str(input), "r" )
         ifacetext = oFile.read()
         oFile.close()
-
+        
         ifacetext = re.sub(remove, "", ifacetext)
         for i in re.findall(module , ifacetext) :
             try :
@@ -597,7 +598,7 @@ def swigjava_remove(sources, target) :
             except :
                 pass
     
-SwigJavaBuilder = Builder( action = SCons.Action.Action(["swig -Wall -O -templatereduce -c++ -java ${SwigJavaPackage(SOURCE)} ${SwigJavaOutDir(SOURCE.dir, TARGETS)} ${SwigJavaCppDir(SOURCE.filebase, SOURCE, TARGETS)} $SOURCE", "${SwigJavaRemove(SOURCES, TARGET)}"]), emitter=swigjava_emitter, single_source = True, src_suffix=".i", target_factory=Entry, source_factory=File )
+SwigJavaBuilder = Builder( action = SCons.Action.Action(["swig -Wall -O -templatereduce -c++ -java ${SwigJavaPackage(SOURCE)} ${SwigJavaOutDir(SOURCE.dir, TARGETS)} ${SwigJavaCppDir(SOURCE.filebase, SOURCE, TARGET)} $SOURCE", "${SwigJavaRemove(SOURCES, TARGET)}"]), emitter=swigjava_emitter, single_source = True, src_suffix=".i", target_factory=Entry, source_factory=File )
 # ---------------------------------------------------------------------------
 
 

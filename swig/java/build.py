@@ -73,8 +73,8 @@ for i in GlobRekursiv( os.path.join("..", ".."), [".i"], ["swig", "examples", "d
 
     # split all result files into Java and C++ sources
     for n in env.SwigJava( os.path.join("#build", env["buildtype"], "jar", "source"), i ) :
-        if os.path.splitext(str(n))[1] <> env["JAVASUFFIX"] :
-            cpp.append(n)
+        #if os.path.splitext(str(n))[1] <> env["JAVASUFFIX"] :
+        cpp.append(n)
         
 # call Java & C++ builder
 #dll    = env.SharedLibrary( os.path.join("#build", env["buildtype"], "jar", "build", "native", "machinelearning"), defaultcpp + cpp )

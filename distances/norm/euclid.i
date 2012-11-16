@@ -30,8 +30,11 @@
 #endif
 
 
+/**
 %include "../distance.hpp"
 %template(Distance) machinelearning::distances::distance<double>;
-
+**/
+ 
+ 
 %include "euclid.hpp"
 %template(Euclid) machinelearning::distances::euclid<double>;
