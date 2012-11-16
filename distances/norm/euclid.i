@@ -21,7 +21,7 @@
  @endcond
  **/
 
-/** interface file for the euclidian norm **/
+/** interface file for the euclidian norm, set base classe manually **/
 
 
 #ifdef SWIGJAVA
