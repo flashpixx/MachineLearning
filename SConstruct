@@ -535,7 +535,7 @@ def swigjava_packageaction(iface) :
         dirname = dirname[0:-1]
     dirname = ["machinelearning"] + dirname
     
-    return "-package .".join(dirname)
+    return "-package " +  ".".join(dirname)
 
     
 def swigjava_outdiraction(sourcedir, targets) :
