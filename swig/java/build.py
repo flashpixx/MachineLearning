@@ -66,12 +66,12 @@ def libchange(target, source, env) :
 
 
 
-cpp  = []
+cpp    = []
 
 # glob all Swig files and call the builder
 for i in GlobRekursiv( os.path.join("..", ".."), [".i"], ["swig", "examples", "documentation", "library", "buildenvironment"]) :
-    cpp.extend( filter(lambda n: not str(n).endswith(env["JAVASUFFIX"]),  env.SwigJava( os.path.join("#build", env["buildtype"], "jar", "source"), i )  ) )
-        
+    cpp.extend( filter(lambda n: not str(n).endswith(env["JAVASUFFIX"]), env.SwigJava( os.path.join("#build", env["buildtype"], "jar", "source"), i ) ) )
+
 # call Java & C++ builder
 dll    = env.SharedLibrary( os.path.join("#build", env["buildtype"], "jar", "build", "native", "machinelearning"), defaultcpp + cpp )
 java   = env.Java(  os.path.join("#build", env["buildtype"], "jar", "build"), os.path.join("#build", env["buildtype"], "jar", "source", "java")  )
@@ -86,7 +86,6 @@ Depends(jar, [rellib, java])
 
 # set Alias with Jar build
 env.Clean(
-    env.Alias( "java", java ),
-    #env.Alias( "java", cpp ),
+    env.Alias( "java", jar ),
     os.path.join("#build", env["buildtype"], "jar")
 )

@@ -85,7 +85,7 @@ def setupToolkitEnv(vars) :
     # we disable all tools and set it manually on the platform
     env = Environment( tools = [], variables=vars,
         BUILDERS = { "LibraryCopy" : LibraryCopyBuilder, "SwigJava" : SwigJavaBuilder, "Download" : DownloadBuilder, "Extract" : ExtractBuilder },
-        LIBRARYCOPY = librarycopy_action, SwigJavaPackage = swigjava_packageaction, SwigJavaOutDir  = swigjava_outdiraction, SwigJavaCppDir  = swigjava_cppdiraction, SwigJavaRemove  = swigjava_remove,
+        LIBRARYCOPY = librarycopy_action, SwigJavaPackage = swigjava_packageaction, SwigJavaOutDir  = swigjava_outdiraction, SwigJavaCppDir  = swigjava_cppdiraction
     )
     
     # adding OS environment data
@@ -496,12 +496,10 @@ def swigjava_emitter(target, source, env) :
         for n in data["template"] :
             k = n.split()
             help[k[0]] = k[1].split("::")[-2:]
-        data["template"]          = help
+        data["template"] = help
         
         # create a unique list of the static functions
-        noDupes = []
-        [noDupes.append(i) for i in data["cppstaticfunction"] if not noDupes.count(i)]
-        data["cppstaticfunction"] = noDupes
+        data["cppstaticfunction"] = set(data["cppstaticfunction"])
 
         # determine classname of each template parameter and
         # change the template parameter in this way, that we get a dict with { cpp class name : [target names] }
@@ -520,16 +518,23 @@ def swigjava_emitter(target, source, env) :
         # on abstract classes wie do not create any cpp file
         if not re.search(regex["abstractclass"], ifacetext) :
             target.append( os.path.normpath(os.path.join(nbuilddir, data["sourcename"]+".cpp" )) )
-        
+            
         # we read the cpp classname, get the template parameter which matchs the cpp class name in the value
         # if the rename option is not empty and matches the cpp class name, we use this result for the java class name
         # because the template parameter points to a static function, otherwise we use the template name
         for n in data["cppclass"] :
+            
+            # add module java file
+            for i in data["module"] :
+                target.append(  os.path.normpath(os.path.join(jbuilddir, os.sep.join(data["cppnamespace"][n]), i + "JNI" + env["JAVASUFFIX"]))  )
+
+            # class file
             if data["rename"].has_key(n) :
-                target.append( os.path.normpath(os.path.join(jbuilddir, os.sep.join(data["cppnamespace"][n]), data["rename"][n]+".java")) )
+                target.append( os.path.normpath(os.path.join(jbuilddir, os.sep.join(data["cppnamespace"][n]), data["rename"][n] + env["JAVASUFFIX"])) )
             else : 
                 for l in data["template"][n] :
-                    target.append( os.path.normpath(os.path.join(jbuilddir, os.sep.join(data["cppnamespace"][n]), l+".java")) )
+                    target.append( os.path.normpath(os.path.join(jbuilddir, os.sep.join(data["cppnamespace"][n]), l + env["JAVASUFFIX"])) )
+    target = list(set(target))
     return target, source
     
 def swigjava_packageaction(iface) :
@@ -556,49 +561,32 @@ def swigjava_outdiraction(sourcedir, targets) :
             return "-outdir " + path
     return ""
     
-def swigjava_cppdiraction(source, interface, target) :
+def swigjava_cppdiraction(source, interface, targets) :
     if not "java" in COMMAND_LINE_TARGETS :
         return ""
-    
+        
     # read source file
     oFile = open( str(interface), "r" )
     ifacetext = oFile.read()
     oFile.close()
     
-    path = os.path.dirname(str(target))
+    path = None
+    for i in targets :
+        if str(i).endswith(".cpp") :
+            path = os.path.dirname(str(i))
+            break
+            
+    if not path :
+        return ""
     try :
         os.makedirs(path)
     except :
         pass
-    
     if re.search("javaclassmodifiers(.*)public abstract class", ifacetext) :
         return ""
     return "-o " + os.path.join(path, str(source)+".cpp")
     
-def swigjava_remove(sources, target) :
-    if not "java" in COMMAND_LINE_TARGETS :
-        return
-
-    jbuilddir = os.path.join(  os.path.dirname(os.path.dirname(str(target))), "java" )
-    remove    = re.compile( r"#ifdef SWIGPYTHON(.*)#endif", re.DOTALL )
-    module    = re.compile( r"%module \"(.*)\"" )
-
-    for input in sources :
-        delpath = os.path.join( jbuilddir, "machinelearning", os.path.dirname(str(input)) )
-
-        # read source file
-        oFile = open( str(input), "r" )
-        ifacetext = oFile.read()
-        oFile.close()
-        
-        ifacetext = re.sub(remove, "", ifacetext)
-        for i in re.findall(module , ifacetext) :
-            try :
-                os.remove(os.path.join(delpath, i+env["JAVASUFFIX"]))
-            except :
-                pass
-    
-SwigJavaBuilder = Builder( action = SCons.Action.Action(["swig -Wall -O -templatereduce -c++ -java ${SwigJavaPackage(SOURCE)} ${SwigJavaOutDir(SOURCE.dir, TARGETS)} ${SwigJavaCppDir(SOURCE.filebase, SOURCE, TARGET)} $SOURCE", "${SwigJavaRemove(SOURCES, TARGET)}"]), emitter=swigjava_emitter, single_source = True, src_suffix=".i", target_factory=Entry, source_factory=File )
+SwigJavaBuilder = Builder( action = SCons.Action.Action("swig -Wall -O -templatereduce -c++ -java ${SwigJavaPackage(SOURCE)} ${SwigJavaOutDir(SOURCE.dir, TARGETS)} ${SwigJavaCppDir(SOURCE.filebase, SOURCE, TARGETS)} $SOURCE"), emitter=swigjava_emitter, single_source = True, src_suffix=".i", target_factory=Entry, source_factory=File )
 # ---------------------------------------------------------------------------
 
 
