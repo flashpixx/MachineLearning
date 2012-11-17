@@ -575,16 +575,16 @@ def swigjava_cppdiraction(source, interface, targets) :
         if str(i).endswith(".cpp") :
             path = os.path.dirname(str(i))
             break
-            
+    
     if not path :
-        return ""
+        return "-o " + os.path.join( "build",  str(source) + ".tmp") 
     try :
         os.makedirs(path)
     except :
         pass
     if re.search("javaclassmodifiers(.*)public abstract class", ifacetext) :
         return ""
-    return "-o " + os.path.join(path, str(source)+".cpp")
+    return "-o " + os.path.join(path, str(source) + ".cpp")
     
 SwigJavaBuilder = Builder( action = SCons.Action.Action("swig -Wall -O -templatereduce -c++ -java ${SwigJavaPackage(SOURCE)} ${SwigJavaOutDir(SOURCE.dir, TARGETS)} ${SwigJavaCppDir(SOURCE.filebase, SOURCE, TARGETS)} $SOURCE"), emitter=swigjava_emitter, single_source = True, src_suffix=".i", target_factory=Entry, source_factory=File )
 # ---------------------------------------------------------------------------
