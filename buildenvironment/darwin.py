@@ -187,7 +187,6 @@ if conf.env["uselocallibrary"] :
     conf.env.Replace(CPPPATH = includedir)
     print("Using local C++ path")
     print("Using local dynamic library path")
-    exit(1)
 else :
     if "CPPPATH" in os.environ :
         conf.env.AppendUnique(CPPPATH = os.environ["CPPPATH"].split(os.pathsep))
