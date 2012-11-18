@@ -51,13 +51,10 @@ namespace machinelearning {
         #endif
         
         
-        /** namespace for all supervised cluster algorithms
-         * $LastChangedDate$
-         **/
+        /** namespace for all supervised cluster algorithms **/
         namespace supervised {
         
             /** abstract class for all supervised clustering classes
-             * $LastChangedDate$
              * @note every data / prototype matrix must be row orientated.
              * data matrix NxM with n number of datapoints and M data dimension
              * @note The template type of this class need not be a countable datatype like (eg. int, long)
@@ -108,13 +105,10 @@ namespace machinelearning {
         
         
         
-        /** namespace for all non-supervised cluster algorithms
-         * $LastChangedDate$
-         **/
+        /** namespace for all non-supervised cluster algorithms **/
         namespace nonsupervised {
         
             /** abstract class for all non-supervised clustering classes
-             * $LastChangedDate$
              * @todo add method for setting prototypes
              * @todo implement serializable interface
              * @todo remove set logging and add to cluster method
@@ -156,7 +150,6 @@ namespace machinelearning {
             
 
             /** abstract class for patch clustering
-             * $LastChangedDate$
              * @todo add method for setting weights
              * @todo implement serializable interface
              **/
@@ -180,9 +173,7 @@ namespace machinelearning {
             
             #ifdef MACHINELEARNING_MPI
             
-            /** abstract class for clustering with MPI interface
-             * $LastChangedDate$
-             **/           
+            /** abstract class for clustering with MPI interface **/           
             template<typename T> class mpiclustering
             {
                 BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
@@ -211,7 +202,6 @@ namespace machinelearning {
             
             
             /** abstract class for clustering with MPI patch interface
-             * $LastChangedDate$
              * @todo add method for setting weights
              **/ 
             template<typename T> class mpipatch
