@@ -29,7 +29,7 @@
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/matrix_sparse.hpp>
 
-#include "../dimensionreduce.hpp"
+#include "reduce.hpp"
 #include "../../neighborhood/neighborhood.h"
 #include "../../errorhandling/exception.hpp"
 #include "../../tools/tools.h"

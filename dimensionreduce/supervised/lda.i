@@ -27,6 +27,9 @@
 #ifdef SWIGJAVA
 %module "ldamodule"
 %include "../../swig/java/java.i"
+
+%typemap(javabase) machinelearning::dimensionreduce::supervised::lda<double, std::string> "ReduceString";
+%typemap(javabase) machinelearning::dimensionreduce::supervised::lda<double, std::size_t> "ReduceLong";
 #endif
 
 

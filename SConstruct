@@ -391,9 +391,6 @@ def swigjava_emitter(target, source, env) :
           "cppnamespace"        : re.compile( r"namespace(.*?)class", re.DOTALL ),
           "cppstaticfunction"   : re.compile( r"static (.*) (.*)\(" ), 
           
-          # regex for abstract Java class
-          "abstractclass"       : re.compile( r"javaclassmodifiers(.*)public abstract class" ),
-        
           # regex helpers
           "cppremove"           : re.compile( r"(\(|\)|<(.*)>)" )
     }
@@ -441,7 +438,9 @@ def swigjava_emitter(target, source, env) :
                  # stores a list of cpp classnames
                  "cppclass"          : [],
                  # stores a list of static function names
-                 "cppstaticfunction" : []
+                 "cppstaticfunction" : [],
+                 # list with class names that are abstract
+                 "abstract"          : []
         }
         
         # getting C++ class name (read the %include file name)
@@ -464,9 +463,9 @@ def swigjava_emitter(target, source, env) :
 
         # determine class and namespace connection (which class exists in which namespace)
         namespaces = re.findall(regex["cppnamespace"], cpptext)
-        
+ 
         # remove all chars from the end till the latest {
-        namespaces = [ n.replace("\n", " ") for n in namespaces ]
+        namespaces = [ n.replace("\n", " ").replace("#", "").replace("endif", "") for n in namespaces ]
         namespaces = [ n[0:n.rfind("{")] for n in namespaces ]
         
         nslist     = [ n.replace("{", "").split("namespace") for n in namespaces ]
@@ -474,15 +473,19 @@ def swigjava_emitter(target, source, env) :
         
         for k in classnames :
             for ns in nslist :
+                if len(ns) < 2 :
+                    continue
+            
                 # create the regex for searching the class in the namespace
                 nc = [ "namespace(.*)"+s+"(.*){" for s in ns ]
                 nc = "(.*)".join(nc) + "(.*)class(.*)" + k
                 if re.search( re.compile(nc, re.DOTALL ), cpptext ) :
                     data["cppnamespace"][k] = ns
+                    
         
         # add classnames to the dict
         data["cppclass"].extend( classnames  )
-
+        data["cppclass"] = list(set(data["cppclass"]))
 
         # create the remap dict { cpp class name : swig rename}
         help = {}
@@ -499,7 +502,7 @@ def swigjava_emitter(target, source, env) :
         data["template"] = help
         
         # create a unique list of the static functions
-        data["cppstaticfunction"] = set(data["cppstaticfunction"])
+        data["cppstaticfunction"] = list(set(data["cppstaticfunction"]))
 
         # determine classname of each template parameter and
         # change the template parameter in this way, that we get a dict with { cpp class name : [target names] }
@@ -513,11 +516,15 @@ def swigjava_emitter(target, source, env) :
                     help[newval[0]] = [k]
         data["template"] = help
         
-        
         # adding target filenames with path (first the cpp name, second the java names),
         # on abstract classes wie do not create any cpp file
-        if not re.search(regex["abstractclass"], ifacetext) :
-            target.append( os.path.normpath(os.path.join(nbuilddir, data["sourcename"]+".cpp" )) )
+        for i in data["cppclass"] :
+            if data["cppnamespace"].has_key(i) :
+                lc = "::".join(data["cppnamespace"][i]) + "::" + i
+                if re.search( re.compile("javaclassmodifiers(.+?)" +lc+ "(.*?)public abstract class"), ifacetext) :
+                    data["abstract"].append(i)
+                else :
+                    target.append( os.path.normpath(os.path.join(nbuilddir, data["sourcename"]+".cpp" )) )
             
         # we read the cpp classname, get the template parameter which matchs the cpp class name in the value
         # if the rename option is not empty and matches the cpp class name, we use this result for the java class name
@@ -525,8 +532,9 @@ def swigjava_emitter(target, source, env) :
         for n in data["cppclass"] :
             
             # add module java file
-            for i in data["module"] :
-                target.append(  os.path.normpath(os.path.join(jbuilddir, os.sep.join(data["cppnamespace"][n]), i + "JNI" + env["JAVASUFFIX"]))  )
+            if not n in data["abstract"] :
+                for i in data["module"] :
+                    target.append(  os.path.normpath(os.path.join(jbuilddir, os.sep.join(data["cppnamespace"][n]), i + "JNI" + env["JAVASUFFIX"]))  )
 
             # class file
             if data["rename"].has_key(n) :

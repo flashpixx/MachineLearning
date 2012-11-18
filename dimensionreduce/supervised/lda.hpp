@@ -31,7 +31,7 @@
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 
-#include "../dimensionreduce.hpp"
+#include "reduce.hpp"
 #include "../../errorhandling/exception.hpp"
 #include "../../tools/tools.h"
 

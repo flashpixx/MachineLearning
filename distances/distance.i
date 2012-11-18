@@ -30,14 +30,14 @@
 %module "distancemodule"
 
 %typemap(javaclassmodifiers) machinelearning::distances::distance<double> "public abstract class"
-%typemap(javabody) machinelearning::distances::distance<double> ""
-%typemap(javafinalize) machinelearning::distances::distance<double> ""
-%typemap(javadestruct) machinelearning::distances::distance<double> ""
+%typemap(javabody)           machinelearning::distances::distance<double> ""
+%typemap(javafinalize)       machinelearning::distances::distance<double> ""
+%typemap(javadestruct)       machinelearning::distances::distance<double> ""
 #endif
 
 
-%nodefaultctor machinelearning::distances::distance<double>;
-%nodefaultdtor machinelearning::distances::distance<double>;
+%nodefaultctor               machinelearning::distances::distance<double>;
+%nodefaultdtor               machinelearning::distances::distance<double>;
 
 
 %include "distance.hpp"

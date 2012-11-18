@@ -22,8 +22,8 @@
  **/
 
 
-#ifndef __MACHINELEARNING_DIMENSIONREDUCE_HPP
-#define __MACHINELEARNING_DIMENSIONREDUCE_HPP
+#ifndef __MACHINELEARNING_DIMENSIONREDUCE_NONSUPERVISED_REDUCE_HPP
+#define __MACHINELEARNING_DIMENSIONREDUCE_NONSUPERVISED_REDUCE_HPP
 
 
 #include <boost/static_assert.hpp>
@@ -33,57 +33,46 @@
 #include <boost/mpi.hpp>
 #endif
 
-#include "../errorhandling/exception.hpp"
-#include "../tools/tools.h"
+#include "../../errorhandling/exception.hpp"
+#include "../../tools/tools.h"
 
 
-namespace machinelearning { 
+namespace machinelearning { namespace dimensionreduce {
     
-    /** namespace for all algorithms to reduce data dimension **/    
-    namespace dimensionreduce {
- 
-        #ifndef SWIG
-        namespace ublas = boost::numeric::ublas;
-        #ifdef MACHINELEARNING_MPI
-        namespace mpi   = boost::mpi;
-        #endif
-        #endif
-        
-        
-        /** namespace for all non-supervised reducing algorithms
-         * $LastChangedDate$
-         **/
+        /** namespace for all non-supervised reducing algorithms **/
         namespace nonsupervised {
-   
             
-            /** abstract class for nonsupervised dimension reducing classes
-             * $LastChangedDate$
-             * @todo implement serializable interface
-             **/      
+            #ifndef SWIG
+            namespace ublas = boost::numeric::ublas;
+            #ifdef MACHINELEARNING_MPI
+            namespace mpi   = boost::mpi;
+            #endif
+            #endif
+            
+            
+            /** abstract class for nonsupervised dimension reducing classes **/      
             template<typename T> class reduce
             {
                 #ifndef SWIG
                 BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
-                #endif
                 
                 
                 public :
-
+                
                     /** maps data to target dimension **/
                     virtual ublas::matrix<T> map( const ublas::matrix<T>& ) = 0;
-                      
+                
                     /** returns the mapped dimension **/
                     virtual std::size_t getDimension( void ) const = 0;
-
+                
+                #endif
+                
             };
             
             
             #ifdef MACHINELEARNING_MPI
             
-            /** abstract class for nonsupervised dimension reducing classes with MPI support
-             * $LastChangedDate$
-             * @todo implement serializable interface
-             **/      
+            /** abstract class for nonsupervised dimension reducing classes with MPI support **/      
             template<typename T> class reducempi
             {
                 BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
@@ -95,38 +84,11 @@ namespace machinelearning {
                     virtual ublas::matrix<T> map( const mpi::communicator&, const ublas::matrix<T>& ) = 0;
                 
             };
-
+            
             #endif
-
-        }
-        
-        
-        
-        
-        /** namespace for all supervised reducing algorithms
-         * $LastChangedDate$
-         * @todo implement serializable interface
-         **/
-        namespace supervised {
-        
-            /** abstract class for supervised dimension reducing classes
-             * $LastChangedDate$
-             **/      
-            template<typename T, typename L> class reduce
-            {
-                
-                public :
-                
-                    /** maps data to target dimension **/
-                    virtual ublas::matrix<T> map( const ublas::matrix<T>&, const std::vector<L>& ) = 0; 
-                
-                    /** returns the mapped dimension **/
-                    virtual std::size_t getDimension( void ) const = 0; 
-                
-            };
             
         }
-        
+          
     }
 }
 #endif

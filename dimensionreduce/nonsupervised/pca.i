@@ -27,6 +27,8 @@
 #ifdef SWIGJAVA
 %module "pcamodule"
 %include "../../swig/java/java.i"
+
+%typemap(javabase) machinelearning::dimensionreduce::nonsupervised::pca<double> "Reduce";
 #endif
 
 

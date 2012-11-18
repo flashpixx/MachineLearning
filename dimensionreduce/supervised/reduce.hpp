@@ -21,16 +21,52 @@
  @endcond
  **/
 
-/** interface file for MDS **/
+
+#ifndef __MACHINELEARNING_DIMENSIONREDUCE_SUPERVISED_REDUCE_HPP
+#define __MACHINELEARNING_DIMENSIONREDUCE_SUPERVISED_REDUCE_HPP
 
 
-#ifdef SWIGJAVA
-%module "mdsmodule"
-%include "../../swig/java/java.i"
+#include <boost/static_assert.hpp>
+#include <boost/numeric/ublas/matrix.hpp>
 
-%typemap(javabase) machinelearning::dimensionreduce::nonsupervised::mds<double> "Reduce";
+#ifdef MACHINELEARNING_MPI
+#include <boost/mpi.hpp>
 #endif
 
+#include "../../errorhandling/exception.hpp"
+#include "../../tools/tools.h"
 
-%include "mds.hpp"
-%template(MDS) machinelearning::dimensionreduce::nonsupervised::mds<double>;
+
+namespace machinelearning { namespace dimensionreduce {
+        
+        /** namespace for all supervised reducing algorithms **/
+        namespace supervised {
+            
+            #ifndef SWIG
+            namespace ublas = boost::numeric::ublas;
+            #endif
+            
+            
+            /** abstract class for supervised dimension reducing classes **/      
+            template<typename T, typename L> class reduce
+            {
+                #ifndef SWIG
+                BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
+                
+                public :
+                
+                    /** maps data to target dimension **/
+                    virtual ublas::matrix<T> map( const ublas::matrix<T>&, const std::vector<L>& ) = 0; 
+                
+                    /** returns the mapped dimension **/
+                    virtual std::size_t getDimension( void ) const = 0; 
+                
+                #endif
+                
+            };
+            
+        }
+        
+    }
+}
+#endif

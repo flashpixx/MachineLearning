@@ -27,7 +27,7 @@
 #include <boost/static_assert.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 
-#include "../dimensionreduce.hpp"
+#include "reduce.hpp"
 #include "../../errorhandling/exception.hpp"
 #include "../../tools/tools.h"
 

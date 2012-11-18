@@ -34,7 +34,7 @@
 #include <boost/mpi.hpp>
 #endif
 
-#include "../dimensionreduce.hpp"
+#include "reduce.hpp"
 #include "../../errorhandling/exception.hpp"
 #include "../../tools/tools.h"
 

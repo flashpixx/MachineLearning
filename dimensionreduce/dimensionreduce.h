@@ -26,8 +26,19 @@
 #ifndef __MACHINELEARNING_DIMENSIONREDUCE_H
 #define __MACHINELEARNING_DIMENSIONREDUCE_H
 
-#include "dimensionreduce.hpp"
+
+namespace machinelearning { 
+    
+    /** namespace for all algorithms to reduce data dimension **/    
+    namespace dimensionreduce { }
+    
+}
+
+
+#include "supervised/reduce.hpp"
 #include "supervised/lda.hpp"
+
+#include "nonsupervised/reduce.hpp"
 #include "nonsupervised/pca.hpp"
 #include "nonsupervised/lle.hpp"
 #include "nonsupervised/mds.hpp"

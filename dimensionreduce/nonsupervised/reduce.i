@@ -21,16 +21,24 @@
  @endcond
  **/
 
-/** interface file for MDS **/
+/** interface file for the nonsupervived reduce class,
+ * the class must be abstract, so we disable all generator parts
+ **/
 
 
 #ifdef SWIGJAVA
-%module "mdsmodule"
-%include "../../swig/java/java.i"
+%module "nonsupervicedreduceemodule"
 
-%typemap(javabase) machinelearning::dimensionreduce::nonsupervised::mds<double> "Reduce";
+%typemap(javaclassmodifiers) machinelearning::dimensionreduce::nonsupervised::reduce<double> "public abstract class"
+%typemap(javabody)           machinelearning::dimensionreduce::nonsupervised::reduce<double> ""
+%typemap(javafinalize)       machinelearning::dimensionreduce::nonsupervised::reduce<double> ""
+%typemap(javadestruct)       machinelearning::dimensionreduce::nonsupervised::reduce<double> ""
 #endif
 
 
-%include "mds.hpp"
-%template(MDS) machinelearning::dimensionreduce::nonsupervised::mds<double>;
+%nodefaultctor               machinelearning::dimensionreduce::nonsupervised::reduce<double>;
+%nodefaultdtor               machinelearning::dimensionreduce::nonsupervised::reduce<double>;
+
+
+%include "reduce.hpp"
+%template(Reduce) machinelearning::dimensionreduce::nonsupervised::reduce<double>;
