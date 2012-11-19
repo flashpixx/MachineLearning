@@ -163,9 +163,13 @@ def checkCPPEnv(conf, localconf) :
         if not conf.CheckLib(i, language="C") :
             sys.exit(1)
         
+    # boost_mpi breaks CheckLib, so we does not check it
     for i in localconf["cpplibraries"] :
-        if not conf.CheckLib(i, language="C++") :
-            sys.exit(1)
+        if i == "boost_mpi" :                                                                                                                                                                                                                                                 
+            conf.env.Append(LIBS = i)
+            continue                                                                                                                                                                                                                                       
+        if not conf.CheckLib(i, language="C++") :                                                                                                                                                                                                                         
+            sys.exit(1) 
 
     # setup DistCC or on local color-compiler
     if "DISTCC_HOSTS" in os.environ  or  conf.env["usedistcc"] :
