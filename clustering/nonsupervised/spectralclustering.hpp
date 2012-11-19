@@ -30,7 +30,7 @@
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/bindings/blas.hpp>
 
-#include "../clustering.hpp"
+#include "clustering.hpp"
 #include "kmeans.hpp"
 #include "../../errorhandling/exception.hpp"
 #include "../../tools/tools.h"

@@ -39,34 +39,33 @@
 
 namespace machinelearning { namespace dimensionreduce {
         
-        /** namespace for all supervised reducing algorithms **/
-        namespace supervised {
-            
+    /** namespace for all supervised reducing algorithms **/
+    namespace supervised {
+        
+        #ifndef SWIG
+        namespace ublas = boost::numeric::ublas;
+        #endif
+        
+        
+        /** abstract class for supervised dimension reducing classes **/      
+        template<typename T, typename L> class reduce
+        {
             #ifndef SWIG
-            namespace ublas = boost::numeric::ublas;
+            BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
             #endif
             
             
-            /** abstract class for supervised dimension reducing classes **/      
-            template<typename T, typename L> class reduce
-            {
-                #ifndef SWIG
-                BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
-                #endif
-                
-                
-                public :
-                
-                    /** maps data to target dimension **/
-                    virtual ublas::matrix<T> map( const ublas::matrix<T>&, const std::vector<L>& ) = 0; 
-                
-                    /** returns the mapped dimension **/
-                    virtual std::size_t getDimension( void ) const = 0; 
-                
-            };
+            public :
             
-        }
+                /** maps data to target dimension **/
+                virtual ublas::matrix<T> map( const ublas::matrix<T>&, const std::vector<L>& ) = 0; 
+            
+                /** returns the mapped dimension **/
+                virtual std::size_t getDimension( void ) const = 0; 
+            
+        };
         
     }
-}
+        
+} }
 #endif

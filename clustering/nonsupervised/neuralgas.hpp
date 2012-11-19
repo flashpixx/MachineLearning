@@ -36,7 +36,7 @@
 #include <boost/mpi.hpp>
 #endif
 
-#include "../clustering.hpp"
+#include "clustering.hpp"
 #include "../../errorhandling/exception.hpp"
 #include "../../tools/tools.h"
 #include "../../distances/distances.h"
@@ -59,9 +59,9 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * methods must be called in the correct order, so the MPI calls must be run
      * on each process.
      **/
-    template<typename T> class neuralgas : public clustering<T>, public patch<T>
+    template<typename T> class neuralgas : public clustering<T>, public patchclustering<T>
         #ifdef MACHINELEARNING_MPI 
-        , public mpiclustering<T>, public mpipatch<T>
+        , public mpiclustering<T>, public mpipatchclustering<T>
         #endif
     {
         

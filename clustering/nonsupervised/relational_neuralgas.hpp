@@ -35,7 +35,7 @@
 #include <boost/mpi.hpp>
 #endif
 
-#include "../clustering.hpp"
+#include "clustering.hpp"
 #include "../../errorhandling/exception.hpp"
 #include "../../tools/tools.h"
 #include "../../neighborhood/neighborhood.h"

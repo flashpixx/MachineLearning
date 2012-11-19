@@ -26,12 +26,23 @@
 #ifndef __MACHINELEARNING_CLUSTERING_H
 #define __MACHINELEARNING_CLUSTERING_H
 
-#include "clustering.hpp"
+namespace machinelearning { 
+    
+    /** namespace for all clustering algorithms
+     * @todo adding SOM http://www.cis.hut.fi/research/som-research/
+     **/
+    namespace clustering { }
+    
+}
 
+
+#include "nonsupervised/clustering.hpp"
 #include "nonsupervised/neuralgas.hpp"
 #include "nonsupervised/relational_neuralgas.hpp"
 #include "nonsupervised/kmeans.hpp"
 #include "nonsupervised/spectralclustering.hpp"
+
+#include "supervised/clustering.hpp"
 #include "supervised/rlvq.hpp"
 
 #endif
