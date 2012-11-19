@@ -27,6 +27,8 @@
 #ifdef SWIGJAVA
 %module "spectralclusteringmodule"
 %include "../../swig/java/java.i"
+
+%typemap(javainterfaces)    machinelearning::clustering::nonsupervised::spectralclustering<double>      "Clustering";
 #endif
 
 

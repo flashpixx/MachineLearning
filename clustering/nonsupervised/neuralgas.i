@@ -27,6 +27,8 @@
 #ifdef SWIGJAVA
 %module "neuralgasmodule"
 %include "../../swig/java/java.i"
+
+%typemap(javainterfaces)    machinelearning::clustering::nonsupervised::neuralgas<double>      "Clustering, PatchClustering";
 #endif
 
 

@@ -27,6 +27,9 @@
 #ifdef SWIGJAVA
 %module "rlvqmodule"
 %include "../../swig/java/java.i"
+
+%typemap(javainterfaces)    machinelearning::clustering::supervised::rlvq<double, std::string>      "ClusteringString";
+%typemap(javainterfaces)    machinelearning::clustering::supervised::rlvq<double, std::size_t>      "ClusteringLong";
 #endif
 
 

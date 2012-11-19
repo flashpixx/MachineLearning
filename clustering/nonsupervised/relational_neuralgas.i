@@ -27,6 +27,8 @@
 #ifdef SWIGJAVA
 %module "rngmodule"
 %include "../../swig/java/java.i"
+
+%typemap(javainterfaces)    machinelearning::clustering::nonsupervised::relational_neuralgas<double>      "Clustering";
 #endif
 
 

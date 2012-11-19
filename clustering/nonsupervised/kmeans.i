@@ -27,6 +27,8 @@
 #ifdef SWIGJAVA
 %module "kmeansmodule"
 %include "../../swig/java/java.i"
+
+%typemap(javainterfaces)    machinelearning::clustering::nonsupervised::kmeans<double>      "Clustering";
 #endif
 
 
