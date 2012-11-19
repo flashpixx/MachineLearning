@@ -31,10 +31,13 @@
 %module "nonsupervicedreduceemodule"
 %include "../../swig/java/java.i"
 
-%typemap(javaclassmodifiers)    machinelearning::dimensionreduce::nonsupervised::reduce<double> "public interface"
-%typemap(javabody)              machinelearning::dimensionreduce::nonsupervised::reduce<double> ""
-%typemap(javafinalize)          machinelearning::dimensionreduce::nonsupervised::reduce<double> ""
-%typemap(javadestruct)          machinelearning::dimensionreduce::nonsupervised::reduce<double> ""
+%typemap(javaclassmodifiers)    machinelearning::dimensionreduce::nonsupervised::reduce<double>                             "public interface"
+%typemap(javabody)              machinelearning::dimensionreduce::nonsupervised::reduce<double>                             ""
+%typemap(javafinalize)          machinelearning::dimensionreduce::nonsupervised::reduce<double>                             ""
+%typemap(javadestruct)          machinelearning::dimensionreduce::nonsupervised::reduce<double>                             ""
+
+%typemap(javaout)               ublas::matrix<double> machinelearning::dimensionreduce::nonsupervised::reduce<double>::map  ";"
+%typemap(javaout)               std::size_t machinelearning::dimensionreduce::nonsupervised::reduce<double>::getDimension   ";"
 #endif
 
 

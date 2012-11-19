@@ -31,15 +31,22 @@
 %module "supervicedreduceemodule"
 %include "../../swig/java/java.i"
 
-%typemap(javaclassmodifiers) machinelearning::dimensionreduce::supervised::reduce<double, std::string> "public interface"
-%typemap(javabody)           machinelearning::dimensionreduce::supervised::reduce<double, std::string> ""
-%typemap(javafinalize)       machinelearning::dimensionreduce::supervised::reduce<double, std::string> ""
-%typemap(javadestruct)       machinelearning::dimensionreduce::supervised::reduce<double, std::string> ""
+%typemap(javaclassmodifiers) machinelearning::dimensionreduce::supervised::reduce<double, std::string>                               "public interface"
+%typemap(javabody)           machinelearning::dimensionreduce::supervised::reduce<double, std::string>                               ""
+%typemap(javafinalize)       machinelearning::dimensionreduce::supervised::reduce<double, std::string>                               ""
+%typemap(javadestruct)       machinelearning::dimensionreduce::supervised::reduce<double, std::string>                               ""
 
-%typemap(javaclassmodifiers) machinelearning::dimensionreduce::supervised::reduce<double, std::size_t> "public interface"
-%typemap(javabody)           machinelearning::dimensionreduce::supervised::reduce<double, std::size_t> ""
-%typemap(javafinalize)       machinelearning::dimensionreduce::supervised::reduce<double, std::size_t> ""
-%typemap(javadestruct)       machinelearning::dimensionreduce::supervised::reduce<double, std::size_t> ""
+%typemap(javaout)            ublas::matrix<double> machinelearning::dimensionreduce::supervised::reduce<double, std::string>::map    ";"
+%typemap(javaout)            std::size_t machinelearning::dimensionreduce::supervised::reduce<double, std::string>::getDimension     ";"
+
+
+%typemap(javaclassmodifiers) machinelearning::dimensionreduce::supervised::reduce<double, std::size_t>                               "public interface"
+%typemap(javabody)           machinelearning::dimensionreduce::supervised::reduce<double, std::size_t>                               ""
+%typemap(javafinalize)       machinelearning::dimensionreduce::supervised::reduce<double, std::size_t>                               ""
+%typemap(javadestruct)       machinelearning::dimensionreduce::supervised::reduce<double, std::size_t>                               ""
+
+%typemap(javaout)            ublas::matrix<double> machinelearning::dimensionreduce::supervised::reduce<double, std::size_t>::map    ";"
+%typemap(javaout)            std::size_t machinelearning::dimensionreduce::supervised::reduce<double, std::size_t>::getDimension     ";"
 #endif
 
 
