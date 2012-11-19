@@ -521,7 +521,7 @@ def swigjava_emitter(target, source, env) :
         for i in data["cppclass"] :
             if data["cppnamespace"].has_key(i) :
                 lc = "::".join(data["cppnamespace"][i]) + "::" + i
-                if re.search( re.compile("javaclassmodifiers(.+?)" +lc+ "(.*?)public abstract class"), ifacetext) :
+                if re.search( re.compile("javaclassmodifiers(.+?)" +lc+ "(.*?)public abstract class"), ifacetext) or re.search( re.compile("javaclassmodifiers(.+?)" +lc+ "(.*?)public interface"), ifacetext) :
                     data["abstract"].append(i)
                 else :
                     target.append( os.path.normpath(os.path.join(nbuilddir, data["sourcename"]+".cpp" )) )

@@ -21,23 +21,25 @@
  @endcond
  **/
 
-/** interface file for the nonsupervived reduce class,
- * the class must be abstract, so we disable all generator parts
+/** interface file for the supervived reduce class, that should be
+ * an java interface, because we can use the multiple inheritance and
+ * disable all body parts
  **/
 
 
 #ifdef SWIGJAVA
 %module "nonsupervicedreduceemodule"
+%include "../../swig/java/java.i"
 
-%typemap(javaclassmodifiers) machinelearning::dimensionreduce::nonsupervised::reduce<double> "public abstract class"
-%typemap(javabody)           machinelearning::dimensionreduce::nonsupervised::reduce<double> ""
-%typemap(javafinalize)       machinelearning::dimensionreduce::nonsupervised::reduce<double> ""
-%typemap(javadestruct)       machinelearning::dimensionreduce::nonsupervised::reduce<double> ""
+%typemap(javaclassmodifiers)    machinelearning::dimensionreduce::nonsupervised::reduce<double> "public interface"
+%typemap(javabody)              machinelearning::dimensionreduce::nonsupervised::reduce<double> ""
+%typemap(javafinalize)          machinelearning::dimensionreduce::nonsupervised::reduce<double> ""
+%typemap(javadestruct)          machinelearning::dimensionreduce::nonsupervised::reduce<double> ""
 #endif
 
 
-%nodefaultctor               machinelearning::dimensionreduce::nonsupervised::reduce<double>;
-%nodefaultdtor               machinelearning::dimensionreduce::nonsupervised::reduce<double>;
+%nodefaultctor                  machinelearning::dimensionreduce::nonsupervised::reduce<double>;
+%nodefaultdtor                  machinelearning::dimensionreduce::nonsupervised::reduce<double>;
 
 
 %include "reduce.hpp"

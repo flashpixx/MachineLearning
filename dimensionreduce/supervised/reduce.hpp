@@ -52,6 +52,8 @@ namespace machinelearning { namespace dimensionreduce {
             {
                 #ifndef SWIG
                 BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );
+                #endif
+                
                 
                 public :
                 
@@ -60,8 +62,6 @@ namespace machinelearning { namespace dimensionreduce {
                 
                     /** returns the mapped dimension **/
                     virtual std::size_t getDimension( void ) const = 0; 
-                
-                #endif
                 
             };
             

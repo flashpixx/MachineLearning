@@ -21,8 +21,9 @@
  @endcond
  **/
 
-/** interface file for the distance class,
- * the class must be abstract, so we disable all generator parts
+/** interface file for the distance class, that must create an abstract class
+ * without any methods and properties, because the C++ class are pure virtual
+ * and the methods are only called in the implementated JNI functions
  **/
 
 

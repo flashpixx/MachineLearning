@@ -21,20 +21,22 @@
  @endcond
  **/
 
-/** interface file for the supervived reduce class,
- * the class must be abstract, so we disable all generator parts
+/** interface file for the supervived reduce class, that should be
+ * an java interface, because we can use the multiple inheritance and
+ * disable all body parts
  **/
 
 
 #ifdef SWIGJAVA
 %module "supervicedreduceemodule"
+%include "../../swig/java/java.i"
 
-%typemap(javaclassmodifiers) machinelearning::dimensionreduce::supervised::reduce<double, std::string> "public abstract class"
+%typemap(javaclassmodifiers) machinelearning::dimensionreduce::supervised::reduce<double, std::string> "public interface"
 %typemap(javabody)           machinelearning::dimensionreduce::supervised::reduce<double, std::string> ""
 %typemap(javafinalize)       machinelearning::dimensionreduce::supervised::reduce<double, std::string> ""
 %typemap(javadestruct)       machinelearning::dimensionreduce::supervised::reduce<double, std::string> ""
 
-%typemap(javaclassmodifiers) machinelearning::dimensionreduce::supervised::reduce<double, std::size_t> "public abstract class"
+%typemap(javaclassmodifiers) machinelearning::dimensionreduce::supervised::reduce<double, std::size_t> "public interface"
 %typemap(javabody)           machinelearning::dimensionreduce::supervised::reduce<double, std::size_t> ""
 %typemap(javafinalize)       machinelearning::dimensionreduce::supervised::reduce<double, std::size_t> ""
 %typemap(javadestruct)       machinelearning::dimensionreduce::supervised::reduce<double, std::size_t> ""

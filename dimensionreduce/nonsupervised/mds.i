@@ -28,7 +28,7 @@
 %module "mdsmodule"
 %include "../../swig/java/java.i"
 
-%typemap(javabase) machinelearning::dimensionreduce::nonsupervised::mds<double> "Reduce";
+%typemap(javainterfaces) machinelearning::dimensionreduce::nonsupervised::mds<double> "Reduce";
 #endif
 
 
