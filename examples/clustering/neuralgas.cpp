@@ -122,11 +122,11 @@ int main(int argc, char* argv[])
     const std::size_t pathpos = l_map["inputepath"].as< std::vector<std::size_t> >().size() > 1 ? static_cast<std::size_t>(loMPICom.rank()) : 0;
 
     tools::files::hdf source( l_map["inputefile"].as< std::vector<std::string> >()[filepos] );
-    ublas::matrix<double> data = source.readBlasMatrix<double>( l_map["inputpath"].as< std::vector<std::string> >()[pathpos], H5::PredType::NATIVE_DOUBLE);
+    ublas::matrix<double> data = source.readBlasMatrix<double>( l_map["inputpath"].as< std::vector<std::string> >()[pathpos], tools::files::hdf::NATIVE_DOUBLE);
 
     #else
     tools::files::hdf source( l_map["inputfile"].as<std::string>() );
-    ublas::matrix<double> data = source.readBlasMatrix<double>( l_map["inputpath"].as<std::string>(), H5::PredType::NATIVE_DOUBLE);
+    ublas::matrix<double> data = source.readBlasMatrix<double>( l_map["inputpath"].as<std::string>(), tools::files::hdf::NATIVE_DOUBLE);
     #endif
 
     // create distance object
@@ -154,14 +154,14 @@ int main(int argc, char* argv[])
     if (loMPICom.rank() == 0) {
         tools::files::hdf target( l_map["outfile"].as<std::string>(), true);
 
-        target.writeBlasMatrix<double>( "/protos",  protos, H5::PredType::NATIVE_DOUBLE );
-        target.writeValue<double>( "/numprotos",  protos.size1(), H5::PredType::NATIVE_DOUBLE );
-        target.writeValue<std::size_t>( "/iteration", l_iteration, H5::PredType::NATIVE_ULONG );
+        target.writeBlasMatrix<double>( "/protos",  protos, tools::files::hdf::NATIVE_DOUBLE );
+        target.writeValue<double>( "/numprotos",  protos.size1(), tools::files::hdf::NATIVE_DOUBLE );
+        target.writeValue<std::size_t>( "/iteration", l_iteration, tools::files::hdf::NATIVE_ULONG );
 
         if (ng.getLogging()) {
-            target.writeBlasVector<double>( "/error", qerror, H5::PredType::NATIVE_DOUBLE );
+            target.writeBlasVector<double>( "/error", qerror, tools::files::hdf::NATIVE_DOUBLE );
             for(std::size_t i=0; i < logproto.size(); ++i)
-                target.writeBlasMatrix<double>("/log" + boost::lexical_cast<std::string>( i )+"/protos", logproto[i], H5::PredType::NATIVE_DOUBLE );
+                target.writeBlasMatrix<double>("/log" + boost::lexical_cast<std::string>( i )+"/protos", logproto[i], tools::files::hdf::NATIVE_DOUBLE );
         }
     }
 
@@ -174,15 +174,15 @@ int main(int argc, char* argv[])
 
     // create target file
     tools::files::hdf target(l_map["outfile"].as<std::string>(), true);
-    target.writeValue<std::size_t>( "/numprotos",  l_map["prototype"].as<std::size_t>(), H5::PredType::NATIVE_ULONG );
-    target.writeBlasMatrix<double>( "/protos",  ng.getPrototypes(), H5::PredType::NATIVE_DOUBLE );
-    target.writeValue<std::size_t>( "/iteration",  l_iteration, H5::PredType::NATIVE_ULONG );
+    target.writeValue<std::size_t>( "/numprotos",  l_map["prototype"].as<std::size_t>(), tools::files::hdf::NATIVE_ULONG );
+    target.writeBlasMatrix<double>( "/protos",  ng.getPrototypes(), tools::files::hdf::NATIVE_DOUBLE );
+    target.writeValue<std::size_t>( "/iteration",  l_iteration, tools::files::hdf::NATIVE_ULONG );
 
     if (ng.getLogging()) {
-        target.writeBlasVector<double>( "/error",  tools::vector::copy(ng.getLoggedQuantizationError()), H5::PredType::NATIVE_DOUBLE );
+        target.writeBlasVector<double>( "/error",  tools::vector::copy(ng.getLoggedQuantizationError()), tools::files::hdf::NATIVE_DOUBLE );
         std::vector< ublas::matrix<double> > logproto =  ng.getLoggedPrototypes();
         for(std::size_t i=0; i < logproto.size(); ++i)
-            target.writeBlasMatrix<double>("/log" + boost::lexical_cast<std::string>( i )+"/protos", logproto[i], H5::PredType::NATIVE_DOUBLE );
+            target.writeBlasMatrix<double>("/log" + boost::lexical_cast<std::string>( i )+"/protos", logproto[i], tools::files::hdf::NATIVE_DOUBLE );
     }
 
     #endif

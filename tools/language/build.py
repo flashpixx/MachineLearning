@@ -30,7 +30,7 @@ env.Tool("gettext")
 env.AppendUnique(MSGMERGEFLAGS   = ["--no-wrap", "--update"])
 env.AppendUnique(XGETTEXTFLAGS   = ["--keyword=_", "--language=c++", "--no-wrap"])
 
-po = env.Translate(["de"], GlobRekursiv(os.path.join("..", ".."), env["CPPSUFFIXES"], ["swig", "examples", "documentation", "library"]), POAUTOINIT = True) 
+po = env.Translate(["de"], GlobRekursiv(os.path.join("..", ".."), env["CPPSUFFIXES"], ["swig", "examples", "documentation", "library", "buildenvironment"]), POAUTOINIT = True) 
 mo = env.MOFiles(po)
 
 env.Clean(

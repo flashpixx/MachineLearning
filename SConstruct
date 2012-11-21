@@ -395,20 +395,25 @@ def swigjava_emitter(target, source, env) :
           "cppnamespace"        : re.compile( r"namespace(.*?)class", re.DOTALL ),
           "cppstaticfunction"   : re.compile( r"static (.*) (.*)\(" ), 
           
-          # regex helpers
+          # regex helpers 
           "cppremove"           : re.compile( r"(\(|\)|<(.*)>)" )
     }
     
-    if not env["withsources"] :
-        regex["remove"].append( re.compile( r"#ifndef MACHINELEARNING_SOURCES(.*?)#endif", re.DOTALL ) )
-    if not env["withlogger"] :
-        regex["remove"].append( re.compile( r"#ifndef MACHINELEARNING_LOGGER(.*?)#endif", re.DOTALL ) )
-    if not env["withfiles"] :
-        regex["remove"].append( re.compile( r"#ifndef MACHINELEARNING_FILES(.*?)#endif", re.DOTALL ) )
-    if not env["withsymbolicmath"] :
-        regex["remove"].append( re.compile( r"#ifndef MACHINELEARNING_SYMBOLICMATH(.*?)#endif", re.DOTALL ) )
-    if not env["withmultilanguage"] :
-        regex["remove"].append( re.compile( r"#ifndef MACHINELEARNING_MULTILANGUAGE(.*?)#endif", re.DOTALL ) )
+    cppdefines = [q[0] for q in env["CPPDEFINES"]]
+    if not "MACHINELEARNING_SOURCES" in cppdefines :
+        regex["remove"].append( re.compile( r"#(.*?)MACHINELEARNING_SOURCES(.*?)#endif", re.DOTALL ) )
+    if not "MACHINELEARNING_SOURCES_TWITTER" in cppdefines :
+        regex["remove"].append( re.compile( r"#(.*?)MACHINELEARNING_SOURCES_TWITTER(.*?)#endif", re.DOTALL ) )
+    if not "MACHINELEARNING_LOGGER" in cppdefines :
+        regex["remove"].append( re.compile( r"#(.*?)MACHINELEARNING_LOGGER(.*?)#endif", re.DOTALL ) )
+    if not "MACHINELEARNING_FILES" in cppdefines :
+        regex["remove"].append( re.compile( r"#(.*?)MACHINELEARNING_FILES(.*?)#endif", re.DOTALL ) )
+    if not "MACHINELEARNING_FILES_HDF" in cppdefines :
+        regex["remove"].append( re.compile( r"#(.*?)MACHINELEARNING_FILES_HDF(.*?)#endif", re.DOTALL ) )
+    if not "MACHINELEARNING_SYMBOLICMATH" in cppdefines :
+        regex["remove"].append( re.compile( r"#(.*?)MACHINELEARNING_SYMBOLICMATH(.*?)#endif", re.DOTALL ) )
+    if not "MACHINELEARNING_MULTILANGUAGE" in cppdefines :
+        regex["remove"].append( re.compile( r"#(.*?)MACHINELEARNING_MULTILANGUAGE(.*?)#endif", re.DOTALL ) )
 
     target = []
     for input in source :
@@ -422,6 +427,9 @@ def swigjava_emitter(target, source, env) :
         for n in regex["remove"] :
             ifacetext = re.sub(n, "", ifacetext)
         ifacetext = re.sub(regex["cppcomment"], "", ifacetext)
+        ifacetext = ifacetext.replace("#endif", "").strip()
+        if not ifacetext :
+            continue
         
         #getting all needed informations if the interface file
         data = {
@@ -459,6 +467,7 @@ def swigjava_emitter(target, source, env) :
             oFile.close()
             for rx in regex["remove"] :
                 cpptext = re.sub(rx, "", cpptext)
+            cpptext = cpptext.replace("#endif", "").strip()
         
         # get class names and static function
         classnames = re.findall(regex["cppclass"], cpptext)
@@ -529,7 +538,7 @@ def swigjava_emitter(target, source, env) :
                     data["abstract"].append(i)
                 else :
                     target.append( os.path.normpath(os.path.join(nbuilddir, data["sourcename"]+".cpp" )) )
-            
+        
         # we read the cpp classname, get the template parameter which matchs the cpp class name in the value
         # if the rename option is not empty and matches the cpp class name, we use this result for the java class name
         # because the template parameter points to a static function, otherwise we use the template name
@@ -596,7 +605,7 @@ def swigjava_cppdiraction(source, interface, targets) :
         pass
     return "-o " + os.path.join(path, str(source) + ".cpp")
     
-SwigJavaBuilder = Builder( action = SCons.Action.Action("swig -Wall -O -templatereduce -c++ -java ${SwigJavaPackage(SOURCE)} ${SwigJavaOutDir(SOURCE.dir, TARGETS)} ${SwigJavaCppDir(SOURCE.filebase, SOURCE, TARGETS)} $SOURCE"), emitter=swigjava_emitter, single_source = True, src_suffix=".i", target_factory=Entry, source_factory=File )
+SwigJavaBuilder = Builder( action = SCons.Action.Action("swig $_CPPDEFFLAGS -O -templatereduce -c++ -java ${SwigJavaPackage(SOURCE)} ${SwigJavaOutDir(SOURCE.dir, TARGETS)} ${SwigJavaCppDir(SOURCE.filebase, SOURCE, TARGETS)} $SOURCE"), emitter=swigjava_emitter, single_source = True, src_suffix=".i", target_factory=Entry, source_factory=File )
 # ---------------------------------------------------------------------------
 
 

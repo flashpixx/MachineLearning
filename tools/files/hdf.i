@@ -21,48 +21,24 @@
  @endcond
  **/
 
-/** implementation for initialization of static member 
- * or different code structures that must run only once
- **/
+/** interface file for the HDF calls **/
 
+#ifdef MACHINELEARNING_FILES_HDF
 
-#include <boost/random.hpp>
-
-#ifdef MACHINELEARNING_MPI
-#include <boost/mpi.hpp>
-#endif
-
-#ifdef MACHINELEARNING_RANDOMDEVICE
-#include <boost/nondet_random.hpp>
+#ifdef SWIGJAVA
+%module "hdfmodule"
+%include "../../swig/java/java.i"
+%rename(HDF) hdf;
 #endif
 
 
-#include "machinelearning.h"
+%include "hdf.hpp"
 
+%template(readBlasMatrix) machinelearning::tools::files::hdf::readBlasMatrix<double>;
+%template(readBlasVector) machinelearning::tools::files::hdf::readBlasVector<double>;
+%template(readValue) machinelearning::tools::files::hdf::readValue<double>;
 
-
-namespace machinelearning {
-    
-    /** initialization of the random device **/
-    #ifdef MACHINELEARNING_RANDOMDEVICE
-    boost::random_device tools::random::m_random;
-    #else
-        #ifdef MACHINELEARNING_MPI
-        {
-        boost::mpi::communicator g_mpi;
-        boost::mt19937 tools::random::m_random( time(NULL) * (g_mpi.rank()+1) );
-        }
-        #else
-        boost::mt19937 tools::random::m_random( time(NULL) );
-        #endif
-    #endif
-    
-    /** initialization of the logger instance **/
-    #ifdef MACHINELEARNING_LOGGER
-    tools::logger::logger* tools::logger::m_instance = NULL;
-    #endif
-
-}
-
-
-
+%template(writeBlasMatrix) machinelearning::tools::files::hdf::writeBlasMatrix<double>;
+%template(writeBlasVector) machinelearning::tools::files::hdf::writeBlasVector<double>;
+%template(writeValue) machinelearning::tools::files::hdf::writeValue<double>;
+#endif

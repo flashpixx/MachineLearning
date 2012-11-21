@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Machinelearning Framework 2010-2012\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-30 01:28+0100\n"
-"PO-Revision-Date: 2012-09-24 01:40+0100\n"
+"POT-Creation-Date: 2012-11-21 17:00+0100\n"
+"PO-Revision-Date: 2012-11-21 17:01+0100\n"
 "Last-Translator: Philipp Kraus <philipp.kraus@flashpixx.de>\n"
 "Language-Team: Philipp Kraus <philipp.kraus@flashpixx.de>\n"
 "MIME-Version: 1.0\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: de_DE\n"
 "Plural-Forms: nplurals=2; plural=n == 1 ? 0 : 1;\n"
-"X-Generator: Poedit 1.5.3\n"
+"X-Generator: Poedit 1.5.4\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
 #: ../../classifier/lazylearner.hpp:192
@@ -97,9 +97,9 @@ msgstr "Lambda muss größer Null sein"
 #: ../../clustering/nonsupervised/relational_neuralgas.hpp:277
 #: ../../clustering/nonsupervised/relational_neuralgas.hpp:555
 #: ../../dimensionreduce/nonsupervised/mds.hpp:191
-#: ../../dimensionreduce/nonsupervised/mds.hpp:513 ../lapack.hpp:91
-#: ../lapack.hpp:133 ../lapack.hpp:243 ../lapack.hpp:264 ../lapack.hpp:282
-#: ../matrix.hpp:289
+#: ../../dimensionreduce/nonsupervised/mds.hpp:513 ../lapack.hpp:95
+#: ../lapack.hpp:137 ../lapack.hpp:247 ../lapack.hpp:268 ../lapack.hpp:286
+#: ../matrix.hpp:291
 msgid "matrix must be square"
 msgstr "Matrix muss quadratisch sein"
 
@@ -149,13 +149,13 @@ msgstr "Centering kann mit MPI nicht verwendet werden"
 msgid "MPI project option is unkown"
 msgstr "MPI Projektionsioption nicht bekannt"
 
-#: ../../dimensionreduce/nonsupervised/pca.hpp:105 ../matrix.hpp:141
-#: ../matrix.hpp:448 ../files/csv.hpp:162
+#: ../../dimensionreduce/nonsupervised/pca.hpp:105 ../matrix.hpp:143
+#: ../matrix.hpp:450 ../files/csv.hpp:164
 msgid "row size must be greater than zero"
 msgstr "Zeilenanzahl muss größer Null sein"
 
-#: ../../dimensionreduce/nonsupervised/pca.hpp:107 ../matrix.hpp:143
-#: ../files/csv.hpp:160
+#: ../../dimensionreduce/nonsupervised/pca.hpp:107 ../matrix.hpp:145
+#: ../files/csv.hpp:162
 msgid "column size must be greater than zero"
 msgstr "Spaltenanzahl muss größer Null sein"
 
@@ -220,8 +220,11 @@ msgid "only one variable for the data must be added"
 msgstr "nur eine Variable darf für die Daten hinzugefügt werden"
 
 #: ../../functionoptimization/gradientdescent.hpp:295
-msgid "static variable is not in the symbol table or is an optimazation variable"
-msgstr "statische Variable ist nicht in der Symboltabelle oder ist keine Variablen, die optimiert wird"
+msgid ""
+"static variable is not in the symbol table or is an optimazation variable"
+msgstr ""
+"statische Variable ist nicht in der Symboltabelle oder ist keine Variablen, "
+"die optimiert wird"
 
 #: ../../functionoptimization/gradientdescent.hpp:313
 msgid "stepsize must be greater than zero"
@@ -291,7 +294,7 @@ msgstr "kNN ist größer als Datenpunkte"
 msgid "stopwordlist can not be empty"
 msgstr "Stopwortliste kann nicht leer sein"
 
-#: ../../textprocess/termfrequency.h:101 ../files/csv.hpp:115
+#: ../../textprocess/termfrequency.h:101 ../files/csv.hpp:117
 msgid "separator can not be empty"
 msgstr "Separator darf nicht leer sein"
 
@@ -303,25 +306,83 @@ msgstr "Bereich muss zwischen [0,1] liegen"
 msgid "no words within the map"
 msgstr "keine Worte in der Map"
 
-#: ../lapack.hpp:93
+#: ../lapack.hpp:97
 msgid "both matrices have not the same size"
 msgstr "beide Matrizen haben nicht die gleiche Größe"
 
-#: ../lapack.hpp:245
-msgid "number of rows / columns of the matrix must have the same dimension like the initialisation vector"
-msgstr "Anzahl der Zeilen / Spalten der Matrix müssen die selbe Dimension haben, wie der Initialisierungsvektor"
+#: ../lapack.hpp:249
+msgid ""
+"number of rows / columns of the matrix must have the same dimension like the "
+"initialisation vector"
+msgstr ""
+"Anzahl der Zeilen / Spalten der Matrix müssen die selbe Dimension haben, wie "
+"der Initialisierungsvektor"
 
 #: ../random.hpp:149
 msgid "distribution is not kwon"
 msgstr "Verteilung unbekannt"
 
-#: ../files/csv.hpp:84
+#: ../files/csv.hpp:86
 msgid "vector dimension must be greater than zero"
 msgstr "Vektordimension muss größer Null sein"
 
-#: ../files/csv.hpp:133
+#: ../files/csv.hpp:135
 msgid "can not separate size"
 msgstr "kann Größe nicht separieren "
+
+#: ../files/hdf.hpp:312 ../files/hdf.hpp:328 ../files/hdf.hpp:342
+#: ../files/hdf.hpp:380 ../files/hdf.hpp:416 ../files/hdf.hpp:451
+#: ../files/hdf.hpp:501 ../files/hdf.hpp:537 ../files/hdf.hpp:562
+#: ../files/hdf.hpp:617 ../files/hdf.hpp:645 ../files/hdf.hpp:665
+msgid "path is not an absolute path"
+msgstr "Pfad ist kein absoluter Pfad"
+
+#: ../files/hdf.hpp:349
+msgid "dataset must be two-dimensional"
+msgstr "Daten müssen zweidimensional sein"
+
+#: ../files/hdf.hpp:351 ../files/hdf.hpp:389 ../files/hdf.hpp:425
+#: ../files/hdf.hpp:460 ../files/hdf.hpp:510
+msgid "dataset must be a simple datatype"
+msgstr "Daten müssen ein einfacher Typ sein"
+
+#: ../files/hdf.hpp:359 ../files/hdf.hpp:396
+msgid "dimension need not be zero"
+msgstr "Dimension darf nicht null sein"
+
+#: ../files/hdf.hpp:387 ../files/hdf.hpp:423 ../files/hdf.hpp:458
+#: ../files/hdf.hpp:508
+msgid "dataset must be one-dimensional"
+msgstr "Daten müssen eindimensional sein"
+
+#: ../files/hdf.hpp:431
+msgid "element is not a single value"
+msgstr "Element ist kein Einzelwert"
+
+#: ../files/hdf.hpp:473
+msgid "block size can not seperated by the string length"
+msgstr "Blockgröße kann nicht durch die Stringlänge getrennt werden"
+
+#: ../files/hdf.hpp:534 ../files/hdf.hpp:559 ../files/hdf.hpp:575
+#: ../files/hdf.hpp:614 ../files/hdf.hpp:642
+msgid "can not write empty data"
+msgstr "kann keine leeren Daten schreiben"
+
+#: ../files/hdf.hpp:706 ../files/hdf.hpp:739
+msgid "one dimension is required"
+msgstr "eine Dimension ist notwendig"
+
+#: ../files/hdf.hpp:718 ../files/hdf.hpp:751 ../files/hdf.hpp:780
+msgid "empty path is forbidden"
+msgstr "leerer Pfad ist verboten"
+
+#: ../files/hdf.hpp:808
+msgid "can not create path structure"
+msgstr "kann keine Pfadstruktur erzeugen"
+
+#: ../files/hdf.hpp:951
+msgid "datatype unkown"
+msgstr "Datentyp unbekannt"
 
 #: language.h:63
 msgid "parameter is not a language code"
