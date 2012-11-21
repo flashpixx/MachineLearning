@@ -41,7 +41,9 @@
 
 namespace machinelearning { namespace tools {
     
+    #ifndef SWIG
     namespace ublas     = boost::numeric::ublas;
+    #endif
     
     
     /** class for matrix operations **/

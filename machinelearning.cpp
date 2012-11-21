@@ -26,7 +26,20 @@
  **/
 
 
+#include <boost/random.hpp>
+
+#ifdef MACHINELEARNING_MPI
+#include <boost/mpi.hpp>
+#endif
+
+#ifdef MACHINELEARNING_RANDOMDEVICE
+#include <boost/nondet_random.hpp>
+#endif
+
+
 #include "machinelearning.h"
+
+
 
 namespace machinelearning {
     
@@ -34,12 +47,14 @@ namespace machinelearning {
     #ifdef MACHINELEARNING_RANDOMDEVICE
     boost::random_device tools::random::m_random;
     #else
-    #ifdef MACHINELEARNING_MPI
-    mpi::communicator l_mpi;
-    boost::mt19937 tools::random::m_random( time(NULL)* (l_mpi.rank()+1) );
-    #else
-    boost::mt19937 tools::random::m_random( time(NULL) );
-    #endif
+        #ifdef MACHINELEARNING_MPI
+        {
+        boost::mpi::communicator g_mpi;
+        boost::mt19937 tools::random::m_random( time(NULL) * (g_mpi.rank()+1) );
+        }
+        #else
+        boost::mt19937 tools::random::m_random( time(NULL) );
+        #endif
     #endif
     
     /** initialization of the logger instance **/

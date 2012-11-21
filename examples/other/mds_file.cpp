@@ -203,7 +203,7 @@ int main(int argc, char* argv[])
     
 
     // write data
-    target.writeBlasMatrix<double>( "/project",  project, H5::PredType::NATIVE_DOUBLE );
+    target.writeBlasMatrix<double>( "/project",  project, tools::files::hdf::NATIVE_DOUBLE );
     target.writeStringVector("/files", l_files);
 
     std::cout << "within the target file there are four datasets: /project = projected data (first row = first input file ...), /files = filename list, /stopwords = list with stopwords (if enable)" << std::endl;

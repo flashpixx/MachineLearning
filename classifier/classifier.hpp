@@ -45,7 +45,6 @@ namespace machinelearning {
          * @note every data matrix must be row orientated.
          * data matrix NxM with n number of datapoints and M data dimension
          * @todo checking method names and parameters (it's not optimal for using)
-         * @todo implement serializable interface
          **/      
         template<typename T, typename L> class classifier
         {

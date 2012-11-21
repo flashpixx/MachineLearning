@@ -31,7 +31,7 @@
 #include <boost/numeric/ublas/matrix_sparse.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 
-#include "../clustering.hpp"
+#include "clustering.hpp"
 #include "../../errorhandling/exception.hpp"
 #include "../../tools/tools.h"
 #include "../../distances/distances.h"

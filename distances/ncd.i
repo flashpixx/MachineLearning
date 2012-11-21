@@ -21,26 +21,14 @@
  @endcond
  **/
 
-/** header file to connect all dimensional reducing algorithm for one include **/
-
-#ifndef __MACHINELEARNING_DIMENSIONREDUCE_H
-#define __MACHINELEARNING_DIMENSIONREDUCE_H
+/** interface file for the NCD **/
 
 
-namespace machinelearning { 
-    
-    /** namespace for all algorithms to reduce data dimension **/    
-    namespace dimensionreduce { }
-    
-}
-
-
-#include "supervised/reduce.hpp"
-#include "supervised/lda.hpp"
-
-#include "nonsupervised/reduce.hpp"
-#include "nonsupervised/pca.hpp"
-#include "nonsupervised/lle.hpp"
-#include "nonsupervised/mds.hpp"
-
+#ifdef SWIGJAVA
+%module "ncdmodule"
+%include "../swig/java/java.i"
 #endif
+
+
+%include "ncd.hpp"
+%template(NCD) machinelearning::distances::ncd<double>;

@@ -21,19 +21,15 @@
  @endcond
  **/
 
-/** interface file for MDS **/
+/** interface file for the Random calls **/
 
 
 #ifdef SWIGJAVA
-%module "mdsmodule"
-%include "../../..//target/java/java.i"
-#endif
-
-#ifdef SWIGPYTHON
-%module "mds"
-%include "../../../target/python/python.i"
+%module "randommodule"
+%include "../swig/java/java.i"
+%rename(Random) random;
 #endif
 
 
-%include "../../../../dimensionreduce/nonsupervised/mds.hpp"
-%template(MDS) machinelearning::dimensionreduce::nonsupervised::mds<double>;
+%include "random.hpp"
+%template(get) machinelearning::tools::random::get<double>;

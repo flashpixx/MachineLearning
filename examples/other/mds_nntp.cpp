@@ -356,7 +356,7 @@ int main(int argc, char* argv[])
     tools::files::hdf target( l_map["outfile"].as<std::string>(), true);
     #endif
     
-    target.writeBlasMatrix<double>( "/project",  project, H5::PredType::NATIVE_DOUBLE );
+    target.writeBlasMatrix<double>( "/project",  project, tools::files::hdf::NATIVE_DOUBLE );
     target.writeStringVector( "/group",  l_articlegroup );
     target.writeStringVector( "/uniquegroup",  tools::vector::unique(l_articlegroup) );
     

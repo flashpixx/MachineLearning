@@ -35,13 +35,15 @@
 #include <boost/algorithm/string.hpp> 
 #include <boost/lexical_cast.hpp>
 
+#include "../language/language.h"
 #include "../../errorhandling/exception.hpp"
 
 
 namespace machinelearning { namespace tools { namespace files {
     
+    #ifndef SWIG
     namespace ublas  = boost::numeric::ublas;
-    
+    #endif
     
     
     /** class for reading vector and matrix structur from csv file **/
@@ -52,10 +54,10 @@ namespace machinelearning { namespace tools { namespace files {
             
             template<typename T> ublas::vector<T> readBlasVector( const std::string&, const bool& = false ) const;
             template<typename T> ublas::matrix<T> readBlasMatrix( const std::string&, const std::string& = ",; \t", const bool& = false ) const;
-            template<typename T> std::vector<std::string> readVector( const std::string& ) const;
+            std::vector<std::string> readVector( const std::string& ) const;
             template<typename T> void write( const std::string&, const ublas::vector<T>&, const bool& = false ) const;
-            template<typename T> void write( const std::string&, const ublas::matrix<T>&, const char& = ' ', const bool& = false ) const;
             template<typename T> void write( const std::string&, const std::vector<T>&, const bool& = false ) const;
+            template<typename T> void write( const std::string&, const ublas::matrix<T>&, const char& = ' ', const bool& = false ) const;
         
     };
     
@@ -175,7 +177,7 @@ namespace machinelearning { namespace tools { namespace files {
      * @param p_file filename as string
      * @return std::vector
      **/    
-    template<typename T> inline std::vector<std::string> csv::readVector( const std::string& p_file ) const
+    inline std::vector<std::string> csv::readVector( const std::string& p_file ) const
     {
         std::vector<std::string> l_vec;
 

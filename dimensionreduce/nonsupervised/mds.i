@@ -21,19 +21,16 @@
  @endcond
  **/
 
-/** interface file for PCA **/
+/** interface file for MDS **/
 
 
 #ifdef SWIGJAVA
-%module "pcamodule"
-%include "../../../target/java/java.i"
-#endif
+%module "mdsmodule"
+%include "../../swig/java/java.i"
 
-#ifdef SWIGPYTHON
-%module "pca"
-%include "../../../target/python/python.i"
+%typemap(javainterfaces) machinelearning::dimensionreduce::nonsupervised::mds<double> "Reduce";
 #endif
 
 
-%include "../../../../dimensionreduce/nonsupervised/pca.hpp"
-%template(PCA) machinelearning::dimensionreduce::nonsupervised::pca<double>;
+%include "mds.hpp"
+%template(MDS) machinelearning::dimensionreduce::nonsupervised::mds<double>;

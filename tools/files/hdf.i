@@ -21,19 +21,24 @@
  @endcond
  **/
 
-/** interface file for relational neuralgas **/
+/** interface file for the HDF calls **/
 
+#ifdef MACHINELEARNING_FILES_HDF
 
 #ifdef SWIGJAVA
-%module "rngmodule"
-%include "../../../target/java/java.i"
-#endif
-
-#ifdef SWIGPYTHON
-%module "rng"
-%include "../../../target/python/python.i"
+%module "hdfmodule"
+%include "../../swig/java/java.i"
+%rename(HDF) hdf;
 #endif
 
 
-%include "../../../../clustering/nonsupervised/relational_neuralgas.hpp"
-%template(RelationalNeuralGas) machinelearning::clustering::nonsupervised::relational_neuralgas<double>;
+%include "hdf.hpp"
+
+%template(readBlasMatrix) machinelearning::tools::files::hdf::readBlasMatrix<double>;
+%template(readBlasVector) machinelearning::tools::files::hdf::readBlasVector<double>;
+%template(readValue) machinelearning::tools::files::hdf::readValue<double>;
+
+%template(writeBlasMatrix) machinelearning::tools::files::hdf::writeBlasMatrix<double>;
+%template(writeBlasVector) machinelearning::tools::files::hdf::writeBlasVector<double>;
+%template(writeValue) machinelearning::tools::files::hdf::writeValue<double>;
+#endif

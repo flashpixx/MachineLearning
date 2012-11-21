@@ -21,19 +21,18 @@
  @endcond
  **/
 
-/** interface file for the NCD **/
+/** interface file for rlvq **/
 
 
 #ifdef SWIGJAVA
-%module "ncdmodule"
-%include "../../target/java/java.i"
+%module "rlvqmodule"
+%include "../../swig/java/java.i"
+
+%typemap(javainterfaces)    machinelearning::clustering::supervised::rlvq<double, std::string>      "ClusteringString";
+%typemap(javainterfaces)    machinelearning::clustering::supervised::rlvq<double, std::size_t>      "ClusteringLong";
 #endif
 
-#ifdef SWIGPYTHON
-%module "ncd"
-%include "../../target/python/python.i"
-#endif
 
-
-%include "../../../distances/ncd.hpp"
-%template(NCD) machinelearning::distances::ncd<double>;
+%include "rlvq.hpp"
+%template(RLVQString) machinelearning::clustering::supervised::rlvq<double, std::string>;
+%template(RLVQLong) machinelearning::clustering::supervised::rlvq<double, std::size_t>;

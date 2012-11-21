@@ -26,14 +26,11 @@
 
 #ifdef SWIGJAVA
 %module "spectralclusteringmodule"
-%include "../../../target/java/java.i"
-#endif
+%include "../../swig/java/java.i"
 
-#ifdef SWIGPYTHON
-%module "spectralclustering"
-%include "../../../target/python/python.i"
+%typemap(javainterfaces)    machinelearning::clustering::nonsupervised::spectralclustering<double>      "Clustering";
 #endif
 
 
-%include "../../../../clustering/nonsupervised/spectralclustering.hpp"
+%include "spectralclustering.hpp"
 %template(SpectralClustering) machinelearning::clustering::nonsupervised::spectralclustering<double>;

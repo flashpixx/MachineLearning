@@ -116,7 +116,7 @@ int main(int argc, char* argv[])
     target.writeBlasMatrix<double>(
                 l_map["outpath"].as<std::string>(),
                 cloud.generate( l_typecreate, l_probability, l_shuffle ),
-                H5::PredType::NATIVE_DOUBLE );
+                tools::files::hdf::NATIVE_DOUBLE );
 
     return EXIT_SUCCESS;
 }

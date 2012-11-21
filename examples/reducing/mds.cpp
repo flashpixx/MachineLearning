@@ -103,11 +103,11 @@ int main(int argc, char* argv[])
     if (l_center == "double")
         mds.setCentering( dim::mds<double>::doublecenter );
 
-    const ublas::matrix<double> project = mds.map( source.readBlasMatrix<double>(l_map["inpath"].as<std::string>(), H5::PredType::NATIVE_DOUBLE) );
+    const ublas::matrix<double> project = mds.map( source.readBlasMatrix<double>(l_map["inpath"].as<std::string>(), tools::files::hdf::NATIVE_DOUBLE) );
 
     // create file and write data to hdf
     tools::files::hdf target(l_map["outfile"].as<std::string>(), true);
-    target.writeBlasMatrix<double>( l_outpath,  project, H5::PredType::NATIVE_DOUBLE );
+    target.writeBlasMatrix<double>( l_outpath,  project, tools::files::hdf::NATIVE_DOUBLE );
 
     return EXIT_SUCCESS;
 

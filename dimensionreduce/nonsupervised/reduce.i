@@ -21,26 +21,29 @@
  @endcond
  **/
 
-/** header file to connect all dimensional reducing algorithm for one include **/
-
-#ifndef __MACHINELEARNING_DIMENSIONREDUCE_H
-#define __MACHINELEARNING_DIMENSIONREDUCE_H
-
-
-namespace machinelearning { 
-    
-    /** namespace for all algorithms to reduce data dimension **/    
-    namespace dimensionreduce { }
-    
-}
+/** interface file for the supervived reduce class, that should be
+ * an java interface, because we can use the multiple inheritance and
+ * disable all body parts
+ **/
 
 
-#include "supervised/reduce.hpp"
-#include "supervised/lda.hpp"
+#ifdef SWIGJAVA
+%module "nonsupervicedreduceemodule"
+%include "../../swig/java/java.i"
 
-#include "nonsupervised/reduce.hpp"
-#include "nonsupervised/pca.hpp"
-#include "nonsupervised/lle.hpp"
-#include "nonsupervised/mds.hpp"
+%typemap(javaclassmodifiers)    machinelearning::dimensionreduce::nonsupervised::reduce<double>                             "public interface"
+%typemap(javabody)              machinelearning::dimensionreduce::nonsupervised::reduce<double>                             ""
+%typemap(javafinalize)          machinelearning::dimensionreduce::nonsupervised::reduce<double>                             ""
+%typemap(javadestruct)          machinelearning::dimensionreduce::nonsupervised::reduce<double>                             ""
 
+%typemap(javaout)               ublas::matrix<double> machinelearning::dimensionreduce::nonsupervised::reduce<double>::map  ";"
+%typemap(javaout)               std::size_t machinelearning::dimensionreduce::nonsupervised::reduce<double>::getDimension   ";"
 #endif
+
+
+%nodefaultctor                  machinelearning::dimensionreduce::nonsupervised::reduce<double>;
+%nodefaultdtor                  machinelearning::dimensionreduce::nonsupervised::reduce<double>;
+
+
+%include "reduce.hpp"
+%template(Reduce) machinelearning::dimensionreduce::nonsupervised::reduce<double>;

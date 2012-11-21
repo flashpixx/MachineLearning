@@ -85,7 +85,7 @@ def setupToolkitEnv(vars) :
     # we disable all tools and set it manually on the platform
     env = Environment( tools = [], variables=vars,
         BUILDERS = { "LibraryCopy" : LibraryCopyBuilder, "SwigJava" : SwigJavaBuilder, "Download" : DownloadBuilder, "Extract" : ExtractBuilder },
-        LIBRARYCOPY = librarycopy_action, SwigJavaPackage = swigjava_packageaction, SwigJavaOutDir  = swigjava_outdiraction, SwigJavaCppDir  = swigjava_cppdiraction, SwigJavaRemove  = swigjava_remove,
+        LIBRARYCOPY = librarycopy_action, SwigJavaPackage = swigjava_packageaction, SwigJavaOutDir  = swigjava_outdiraction, SwigJavaCppDir  = swigjava_cppdiraction
     )
     
     # adding OS environment data
@@ -163,9 +163,13 @@ def checkCPPEnv(conf, localconf) :
         if not conf.CheckLib(i, language="C") :
             sys.exit(1)
         
+    # boost_mpi breaks CheckLib, so we does not check it
     for i in localconf["cpplibraries"] :
-        if not conf.CheckLib(i, language="C++") :
-            sys.exit(1)
+        if i == "boost_mpi" :                                                                                                                                                                                                                                                 
+            conf.env.Append(LIBS = i)
+            continue                                                                                                                                                                                                                                       
+        if not conf.CheckLib(i, language="C++") :                                                                                                                                                                                                                         
+            sys.exit(1) 
 
     # setup DistCC or on local color-compiler
     if "DISTCC_HOSTS" in os.environ  or  conf.env["usedistcc"] :
@@ -361,13 +365,20 @@ ExtractBuilder = Builder( action = SCons.Action.Action("$EXTRACT_CMD$extractsuff
 
 # --- Java Swig Builder -----------------------------------------------------
 def swigjava_emitter(target, source, env) :
+    if env["withmpi"] :
+        raise SCons.Errors.UserError("Java Swig Builder does not work with MPI")
+
     # create build dir path
     jbuilddir = os.path.join(str(target[0]), "java")
     nbuilddir = os.path.join(str(target[0]), "native")
 
     regex = {
           # remove expression of the interface file (store a list with expressions)
-          "remove"              : [ re.compile( r"#ifdef SWIGPYTHON(.*)#endif", re.DOTALL ) ],
+          "remove"              : [ re.compile( r"#ifdef SWIGPYTHON(.*)#endif", re.DOTALL ),
+                                    re.compile( r"#ifndef SWIG(.*?)#endif", re.DOTALL ),
+                                    re.compile( r"#ifdef MACHINELEARNING_MPI(.*?)#endif", re.DOTALL ), 
+                                    re.compile( r"%pragma(.*?)%}", re.DOTALL ) 
+                                  ],
           
           # regex for extracting data of the interface file
           "template"            : re.compile( r"%template(.*);" ),
@@ -381,12 +392,28 @@ def swigjava_emitter(target, source, env) :
           # regex for the C++ class name
           "cppclass"            : re.compile( r"class (.*)" ),
           "cppbaseclass"        : re.compile( r":(.*)" ),
-          "cppnamespace"        : re.compile( r"namespace(.*){" ),
+          "cppnamespace"        : re.compile( r"namespace(.*?)class", re.DOTALL ),
           "cppstaticfunction"   : re.compile( r"static (.*) (.*)\(" ), 
           
-          # regex helpers
+          # regex helpers 
           "cppremove"           : re.compile( r"(\(|\)|<(.*)>)" )
     }
+    
+    cppdefines = [q[0] for q in env["CPPDEFINES"]]
+    if not "MACHINELEARNING_SOURCES" in cppdefines :
+        regex["remove"].append( re.compile( r"#(.*?)MACHINELEARNING_SOURCES(.*?)#endif", re.DOTALL ) )
+    if not "MACHINELEARNING_SOURCES_TWITTER" in cppdefines :
+        regex["remove"].append( re.compile( r"#(.*?)MACHINELEARNING_SOURCES_TWITTER(.*?)#endif", re.DOTALL ) )
+    if not "MACHINELEARNING_LOGGER" in cppdefines :
+        regex["remove"].append( re.compile( r"#(.*?)MACHINELEARNING_LOGGER(.*?)#endif", re.DOTALL ) )
+    if not "MACHINELEARNING_FILES" in cppdefines :
+        regex["remove"].append( re.compile( r"#(.*?)MACHINELEARNING_FILES(.*?)#endif", re.DOTALL ) )
+    if not "MACHINELEARNING_FILES_HDF" in cppdefines :
+        regex["remove"].append( re.compile( r"#(.*?)MACHINELEARNING_FILES_HDF(.*?)#endif", re.DOTALL ) )
+    if not "MACHINELEARNING_SYMBOLICMATH" in cppdefines :
+        regex["remove"].append( re.compile( r"#(.*?)MACHINELEARNING_SYMBOLICMATH(.*?)#endif", re.DOTALL ) )
+    if not "MACHINELEARNING_MULTILANGUAGE" in cppdefines :
+        regex["remove"].append( re.compile( r"#(.*?)MACHINELEARNING_MULTILANGUAGE(.*?)#endif", re.DOTALL ) )
 
     target = []
     for input in source :
@@ -399,6 +426,10 @@ def swigjava_emitter(target, source, env) :
         ifacepath = os.sep.join( str(input).split(os.sep)[0:-1] )
         for n in regex["remove"] :
             ifacetext = re.sub(n, "", ifacetext)
+        ifacetext = re.sub(regex["cppcomment"], "", ifacetext)
+        ifacetext = ifacetext.replace("#endif", "").strip()
+        if not ifacetext :
+            continue
         
         #getting all needed informations if the interface file
         data = {
@@ -419,38 +450,55 @@ def swigjava_emitter(target, source, env) :
                  # stores a list of cpp classnames
                  "cppclass"          : [],
                  # stores a list of static function names
-                 "cppstaticfunction" : []
+                 "cppstaticfunction" : [],
+                 # list with class names that are abstract
+                 "abstract"          : []
         }
         
         # getting C++ class name (read the %include file name)
         # [bug: if a class with the same name exists in different namespaces, the dict stores only the last namespace entry]
         # [bug: namespace and target directory that is extracted by the builder can be different]
+        cpptext = ""
         for n in data["include"] :
-        
+
             # read cpp data
             oFile   = open( os.path.normpath(os.path.join(ifacepath, n)), "r" )
             cpptext = re.sub(regex["cppcomment"], "", oFile.read()) 
             oFile.close()
-            
-            # get class names and static function
-            classnames = re.findall(regex["cppclass"], cpptext)
-            classnames = [ re.sub(regex["cppbaseclass"], "", k).strip() for k in classnames ]
-            data["cppstaticfunction"].extend( [ k[1] for k in re.findall(regex["cppstaticfunction"], cpptext) ] ) 
+            for rx in regex["remove"] :
+                cpptext = re.sub(rx, "", cpptext)
+            cpptext = cpptext.replace("#endif", "").strip()
+        
+        # get class names and static function
+        classnames = re.findall(regex["cppclass"], cpptext)
+        classnames = [ re.sub(regex["cppbaseclass"], "", k).strip() for k in classnames ]
+        data["cppstaticfunction"].extend( [ k[1] for k in re.findall(regex["cppstaticfunction"], cpptext) ] ) 
 
-            # determine class and namespace connection (which class exists in which namespace)
-            namespaces = re.findall(regex["cppnamespace"], cpptext)
-            nslist     = [ n.replace("{", "").split("namespace") for n in namespaces ]
-            nslist     = [ [ k.strip() for k in i ] for i in nslist ]
+        # determine class and namespace connection (which class exists in which namespace)
+        namespaces = re.findall(regex["cppnamespace"], cpptext)
+ 
+        # remove all chars from the end till the latest {
+        namespaces = [ n.replace("\n", " ").replace("#", "").replace("endif", "") for n in namespaces ]
+        namespaces = [ n[0:n.rfind("{")] for n in namespaces ]
+        
+        nslist     = [ n.replace("{", "").split("namespace") for n in namespaces ]
+        nslist     = [ [ k.strip() for k in i ] for i in nslist ]
+        
+        for k in classnames :
+            for ns in nslist :
+                if len(ns) < 2 :
+                    continue
             
-            for k in classnames :
-                for l,j in enumerate(namespaces) :
-                    if re.search( re.compile( r"namespace" + j + "{(.*)class " + k, re.DOTALL ), cpptext ) :
-                        data["cppnamespace"][k] = nslist[l]
-            
-            # add classnames ti the dict
-            data["cppclass"].extend( classnames  )
-
-
+                # create the regex for searching the class in the namespace
+                nc = [ "namespace(.*)"+s+"(.*){" for s in ns ]
+                nc = "(.*)".join(nc) + "(.*)class(.*)" + k
+                if re.search( re.compile(nc, re.DOTALL ), cpptext ) :
+                    data["cppnamespace"][k] = ns
+                    
+        
+        # add classnames to the dict
+        data["cppclass"].extend( classnames  )
+        data["cppclass"] = list(set(data["cppclass"]))
 
         # create the remap dict { cpp class name : swig rename}
         help = {}
@@ -459,92 +507,105 @@ def swigjava_emitter(target, source, env) :
         data["rename"]            = help
         
         # remove template parameters <> or brackets
-        data["template"]          = [ re.sub(regex["cppremove"], "", i) for i in data["template"] ]
+        data["template"] = [ re.sub(regex["cppremove"], "", i) for i in data["template"] ]
         help = {}
         for n in data["template"] :
             k = n.split()
             help[k[0]] = k[1].split("::")[-2:]
-        data["template"]          = help
+        data["template"] = help
         
         # create a unique list of the static functions
-        noDupes = []
-        [noDupes.append(i) for i in data["cppstaticfunction"] if not noDupes.count(i)]
-        data["cppstaticfunction"] = noDupes
+        data["cppstaticfunction"] = list(set(data["cppstaticfunction"]))
 
         # determine classname of each template parameter and
         # change the template parameter in this way, that we get a dict with { cpp class name : [target names] }
         help = {}
         for k,v in data["template"].items() :
-            newval = list(set(data["cppclass"]) & set(v))[0]
-            if help.has_key(newval) :
-                help[newval].append(k)
-            else :
-                help[newval] = [k]
+            newval = list(set(data["cppclass"]) & set(v))
+            if newval : 
+                if help.has_key(newval[0]) :
+                    help[newval[0]].append(k)
+                else :
+                    help[newval[0]] = [k]
         data["template"] = help
         
-        
-        # adding target filenames with path (first the cpp name, second the java names)
-        target.append( os.path.normpath(os.path.join(nbuilddir, data["sourcename"]+".cpp" )) )
+        # adding target filenames with path (first the cpp name, second the java names),
+        # on abstract classes wie do not create any cpp file
+        for i in data["cppclass"] :
+            if data["cppnamespace"].has_key(i) :
+                lc = "::".join(data["cppnamespace"][i]) + "::" + i
+                if re.search( re.compile("javaclassmodifiers(.+?)" +lc+ "(.*?)public abstract class"), ifacetext) or re.search( re.compile("javaclassmodifiers(.+?)" +lc+ "(.*?)public interface"), ifacetext) :
+                    data["abstract"].append(i)
+                else :
+                    target.append( os.path.normpath(os.path.join(nbuilddir, data["sourcename"]+".cpp" )) )
         
         # we read the cpp classname, get the template parameter which matchs the cpp class name in the value
         # if the rename option is not empty and matches the cpp class name, we use this result for the java class name
         # because the template parameter points to a static function, otherwise we use the template name
         for n in data["cppclass"] :
+            
+            # add module java file
+            if not n in data["abstract"] :
+                for i in data["module"] :
+                    target.append(  os.path.normpath(os.path.join(jbuilddir, os.sep.join(data["cppnamespace"][n]), i + "JNI" + env["JAVASUFFIX"]))  )
+
+            # class file
             if data["rename"].has_key(n) :
-                target.append( os.path.normpath(os.path.join(jbuilddir, os.sep.join(data["cppnamespace"][n]), data["rename"][n]+".java")) )
-            else :
+                target.append( os.path.normpath(os.path.join(jbuilddir, os.sep.join(data["cppnamespace"][n]), data["rename"][n] + env["JAVASUFFIX"])) )
+            else : 
                 for l in data["template"][n] :
-                    target.append( os.path.normpath(os.path.join(jbuilddir, os.sep.join(data["cppnamespace"][n]), l+".java")) )
-                    
-            #adding generated file, that should be deleted later to the targets (with the extension .del)
-            #target.append( os.path.join(jbuilddir, os.sep.join(data["cppnamespace"][n]), str(data["module"]).replace("'","").replace("]","").replace("[","")+".java.del") )
-                    
+                    target.append( os.path.normpath(os.path.join(jbuilddir, os.sep.join(data["cppnamespace"][n]), l + env["JAVASUFFIX"])) )
+    target = list(set(target))
     return target, source
     
-def swigjava_packageaction(dirname) :
-    return ".".join( str(dirname).split(os.path.sep)[1:] )
+def swigjava_packageaction(iface) :
+    dirname = os.path.dirname(str(iface)).split(os.path.sep)
+
+    if dirname[-1] == "norm" :
+        dirname = dirname[0:-1]
+    dirname = ["machinelearning"] + dirname
+    
+    return "-package " +  ".".join(dirname)
+
     
 def swigjava_outdiraction(sourcedir, targets) :
-    path = os.path.join( os.path.commonprefix([str(i) for i in targets]), "java", os.path.sep.join(str(sourcedir).split(os.path.sep)[1:]) )
+    if not "java" in COMMAND_LINE_TARGETS :
+        return ""
 
-    try :
-        if "java" in COMMAND_LINE_TARGETS :
-            os.makedirs(path)
-    except :
-        pass
-    return path
-    
-def swigjava_cppdiraction(source, targets) :
-    path = os.path.join( os.path.commonprefix([str(i) for i in targets]), "native" )
-    try :
-        if "java" in COMMAND_LINE_TARGETS :
-            os.makedirs(path)
-    except :
-        pass
-    return os.path.join(path, str(source)+".cpp")
-    
-def swigjava_remove(sources, target) :
-    jbuilddir = os.path.sep.join(  str(target).split(os.path.sep)[0:-2]  )
-
-    remove = re.compile( r"#ifdef SWIGPYTHON(.*)#endif", re.DOTALL )
-    module = re.compile( r"%module \"(.*)\"" )
-
-    for input in sources :
-        delpath = os.path.join( jbuilddir, "java", os.path.sep.join(str(input).split(os.path.sep)[1:-1]) )
-    
-        # read source file
-        oFile = open( str(input), "r" )
-        ifacetext = oFile.read()
-        oFile.close()
-
-        ifacetext = re.sub(remove, "", ifacetext)
-        for i in re.findall(module , ifacetext) :
+    for i in targets :
+        if str(i).endswith(env["JAVASUFFIX"]) :
+            path = os.path.dirname(str(i))
             try :
-                os.remove(os.path.join(delpath, i+".java"))
+                os.makedirs(path)
             except :
                 pass
+            return "-outdir " + path
+    return ""
     
-SwigJavaBuilder = Builder( action = SCons.Action.Action(["swig -Wall -O -templatereduce -c++ -java -package ${SwigJavaPackage(SOURCE.dir)} -outdir ${SwigJavaOutDir(SOURCE.dir, TARGETS)} -o ${SwigJavaCppDir(SOURCE.filebase, TARGETS)} $SOURCE", "${SwigJavaRemove(SOURCES, TARGET)}"]), emitter=swigjava_emitter, single_source = True, src_suffix=".i", target_factory=Entry, source_factory=File )
+def swigjava_cppdiraction(source, interface, targets) :
+    if not "java" in COMMAND_LINE_TARGETS :
+        return ""
+        
+    # read source file
+    oFile = open( str(interface), "r" )
+    ifacetext = oFile.read()
+    oFile.close()
+    
+    path = None
+    for i in targets :
+        if str(i).endswith(".cpp") :
+            path = os.path.dirname(str(i))
+            break
+    
+    if not path :
+        return "-o " + os.path.join( "build",  str(source) + ".tmp") 
+    try :
+        os.makedirs(path)
+    except :
+        pass
+    return "-o " + os.path.join(path, str(source) + ".cpp")
+    
+SwigJavaBuilder = Builder( action = SCons.Action.Action("swig $_CPPDEFFLAGS -O -templatereduce -c++ -java ${SwigJavaPackage(SOURCE)} ${SwigJavaOutDir(SOURCE.dir, TARGETS)} ${SwigJavaCppDir(SOURCE.filebase, SOURCE, TARGETS)} $SOURCE"), emitter=swigjava_emitter, single_source = True, src_suffix=".i", target_factory=Entry, source_factory=File )
 # ---------------------------------------------------------------------------
 
 
@@ -606,7 +667,9 @@ env.Clean(defaultcpp, [
     "build",
     "config.log",
     ".sconf_temp",
-    ".sconsign.dblite"
+    ".sconsign.dblite",
+    Glob("*.o"),
+    Glob("*.os")
 ])
 
 
@@ -614,7 +677,7 @@ env.Clean(defaultcpp, [
 if "language" in COMMAND_LINE_TARGETS :
     env.SConscript( os.path.join("tools", "language", "build.py"), exports="env defaultcpp GlobRekursiv" )
 if "java" in COMMAND_LINE_TARGETS :
-    env.SConscript( os.path.join("swig", "target", "java", "build.py"), exports="env defaultcpp GlobRekursiv" )
+    env.SConscript( os.path.join("swig", "java", "build.py"), exports="env defaultcpp GlobRekursiv" )
 if any([i in COMMAND_LINE_TARGETS for i in ["javatools", "javaclustering", "javareduce"]]) :
     for i in ["clustering", "tools", "reducing"] :
         env.SConscript( os.path.join("examples", "java", i, "build.py"), exports="env defaultcpp" )

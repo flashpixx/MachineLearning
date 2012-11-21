@@ -39,9 +39,11 @@
 
 namespace machinelearning { namespace distances {
     
+    #ifndef SWIG
     namespace ublas  = boost::numeric::ublas;
     namespace blas   = boost::numeric::bindings::blas;
-
+    #endif
+    
     
     /** class for calculating euclid distance beween datapoints
      * @todo portage this class to the Intel Math Kernel Library http://software.intel.com/en-us/articles/intel-mkl/
@@ -49,7 +51,7 @@ namespace machinelearning { namespace distances {
     template<typename T> class euclid : public distance<T>
     {
         
-
+        #ifndef SWIG
         public:
         
             void normalize( ublas::vector<T>& ) const;
@@ -71,7 +73,8 @@ namespace machinelearning { namespace distances {
             ublas::vector<T> getWeightedDistance( const ublas::matrix<T>&, const ublas::vector<T>&, const ublas::vector<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const;        
             ublas::vector<T> getWeightedDistance( const ublas::matrix<T>&, const ublas::matrix<T>&, const ublas::matrix<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const;
             ublas::vector<T> getWeightedDistance( const ublas::matrix<T>&, const ublas::vector<T>&, const ublas::matrix<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const;
-        
+      
+        #endif
     };
     
     

@@ -21,26 +21,16 @@
  @endcond
  **/
 
-/** header file to connect all dimensional reducing algorithm for one include **/
-
-#ifndef __MACHINELEARNING_DIMENSIONREDUCE_H
-#define __MACHINELEARNING_DIMENSIONREDUCE_H
+/** interface file for PCA **/
 
 
-namespace machinelearning { 
-    
-    /** namespace for all algorithms to reduce data dimension **/    
-    namespace dimensionreduce { }
-    
-}
+#ifdef SWIGJAVA
+%module "pcamodule"
+%include "../../swig/java/java.i"
 
-
-#include "supervised/reduce.hpp"
-#include "supervised/lda.hpp"
-
-#include "nonsupervised/reduce.hpp"
-#include "nonsupervised/pca.hpp"
-#include "nonsupervised/lle.hpp"
-#include "nonsupervised/mds.hpp"
-
+%typemap(javainterfaces) machinelearning::dimensionreduce::nonsupervised::pca<double> "Reduce";
 #endif
+
+
+%include "pca.hpp"
+%template(PCA) machinelearning::dimensionreduce::nonsupervised::pca<double>;

@@ -38,7 +38,9 @@ namespace machinelearning {
     /** distance namespace for structures which calculates distances **/
     namespace distances {
         
+        #ifndef SWIG
         namespace ublas = boost::numeric::ublas;
+        #endif
         
         
         /** abstract class for distance classes. Calculates 
@@ -47,6 +49,7 @@ namespace machinelearning {
          **/      
         template<typename T> class distance
         {
+            #ifndef SWIG
             BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );            
             
             
@@ -106,7 +109,7 @@ namespace machinelearning {
                 /** distances between row / column vectors of matrix and  row / column of the weighted matrix **/
                 virtual ublas::vector<T> getWeightedDistance( const ublas::matrix<T>&, const ublas::vector<T>&, const ublas::matrix<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const = 0;
 
-            
+            #endif
         };
 
     }

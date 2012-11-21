@@ -21,20 +21,18 @@
  @endcond
  **/
 
-/** interface file for the Random calls **/
+/** interface file for LDA **/
 
 
 #ifdef SWIGJAVA
-%module "randommodule"
-%include "../../target/java/java.i"
-%rename(Random) random;
-#endif
+%module "ldamodule"
+%include "../../swig/java/java.i"
 
-#ifdef SWIGPYTHON
-%module "random"
-%include "../../target/python/python.i"
+%typemap(javainterfaces) machinelearning::dimensionreduce::supervised::lda<double, std::string> "ReduceString";
+%typemap(javainterfaces) machinelearning::dimensionreduce::supervised::lda<double, std::size_t> "ReduceLong";
 #endif
 
 
-%include "../../../tools/random.hpp"
-%template(get) machinelearning::tools::random::get<double>;
+%include "lda.hpp"
+%template(LDAString) machinelearning::dimensionreduce::supervised::lda<double, std::string>;
+%template(LDALong) machinelearning::dimensionreduce::supervised::lda<double, std::size_t>;

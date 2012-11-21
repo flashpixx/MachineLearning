@@ -21,26 +21,25 @@
  @endcond
  **/
 
-/** header file to connect all dimensional reducing algorithm for one include **/
-
-#ifndef __MACHINELEARNING_DIMENSIONREDUCE_H
-#define __MACHINELEARNING_DIMENSIONREDUCE_H
-
-
-namespace machinelearning { 
-    
-    /** namespace for all algorithms to reduce data dimension **/    
-    namespace dimensionreduce { }
-    
-}
+/** interface file for the distance class, that must create an abstract class
+ * without any methods and properties, because the C++ class are pure virtual
+ * and the methods are only called in the implementated JNI functions
+ **/
 
 
-#include "supervised/reduce.hpp"
-#include "supervised/lda.hpp"
+#ifdef SWIGJAVA
+%module "distancemodule"
 
-#include "nonsupervised/reduce.hpp"
-#include "nonsupervised/pca.hpp"
-#include "nonsupervised/lle.hpp"
-#include "nonsupervised/mds.hpp"
-
+%typemap(javaclassmodifiers) machinelearning::distances::distance<double> "public abstract class"
+%typemap(javabody)           machinelearning::distances::distance<double> ""
+%typemap(javafinalize)       machinelearning::distances::distance<double> ""
+%typemap(javadestruct)       machinelearning::distances::distance<double> ""
 #endif
+
+
+%nodefaultctor               machinelearning::distances::distance<double>;
+%nodefaultdtor               machinelearning::distances::distance<double>;
+
+
+%include "distance.hpp"
+%template(Distance) machinelearning::distances::distance<double>;
