@@ -629,18 +629,20 @@
  * @file classifier/lazylearner.hpp lazy learner algorithm
  *
  * @file clustering/clustering.h main header for all clustering algorithms
- * @file clustering/clustering.hpp header for abstract clustering classes
+ * @file clustering/nonsupervised/clustering.hpp header for nonsupervised abstract clustering classes
  * @file clustering/nonsupervised/kmeans.hpp k-means implementation
  * @file clustering/nonsupervised/neuralgas.hpp neuralgas implemention for real vector space
  * @file clustering/nonsupervised/relational_neuralgas.hpp neuralgas implemention for distance / relational data
  * @file clustering/nonsupervised/spectralclustering.hpp implementation of the spectral clustering
+ * @file clustering/supervised/clustering.hpp header for supervised abstract clustering classes
  * @file clustering/supervised/rlvq.hpp implementation of relevance vector quantization
  *
  * @file dimensionreduce/dimensionreduce.h main header of dimension reducing algorithms
- * @file dimensionreduce/dimensionreduce.hpp abstract class for dimension reducing classes
+ * @file dimensionreduce/nonsupervised/reduce.hpp  abstract class for nonsupervised dimension reducing classes
  * @file dimensionreduce/nonsupervised/lle.hpp local linear embedding implementation
  * @file dimensionreduce/nonsupervised/pca.hpp principal component analysis implementation
  * @file dimensionreduce/nonsupervised/mds.hpp multidimensional scaling implementation
+ * @file dimensionreduce/supervised/reduce.hpp  abstract class for supervised dimension reducing classes
  * @file dimensionreduce/supervised/lda.hpp lineare discriminant analysis implementation
  * 
  * @file distances/distances.h main header for all distance structures
@@ -672,6 +674,7 @@
  *
  * @file neighborhood/neighborhood.h main header for neighborhood structurs
  * @file neighborhood/neighborhood.hpp abstract class for neighborhood implementation
+ * @file neighborhood/kapproximation.hpp k-approximation class
  * @file neighborhood/knn.hpp k-nearest-neighborhood implementation
  *
  * @file tools/tools.h main header for tools algorithms
