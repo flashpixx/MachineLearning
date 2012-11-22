@@ -59,6 +59,7 @@ def createVariables(vars) :
     
     vars.Add(EnumVariable("buildtype", "value of the buildtype", "release", allowed_values=("debug", "release")))
     vars.Add(BoolVariable("uselocallibrary", "use the library in the local directory only", False))
+    vars.Add(PathVariable("jnipath",  "path to jni.h",  None))
     vars.Add(BoolVariable("usedistcc", "use distributed compiling with DistCC", False))
     vars.Add(BoolVariable("usecolorcompiler", "enable / disable searching for color compiler", colorcompiler))
     vars.Add(BoolVariable("copylibrary", "copy the dynamic link libraries into the build dir", False))
@@ -101,6 +102,9 @@ def setupToolkitEnv(vars) :
         env.Tool("default")
     elif env["TOOLKIT"] == "msys":
         env.Tool("mingw")
+        if "java" in COMMAND_LINE_TARGETS :
+            env.Tool("javac")
+            env.Tool("jar")
         
         # set unix environment only on librarybuild, otherwise we get problems on compiler calls
         if "librarybuild" in COMMAND_LINE_TARGETS :        

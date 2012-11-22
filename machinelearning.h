@@ -163,11 +163,13 @@
  * <li><dfn>withsymbolicmath</dfn> support for symbolic math (eg: machinelearning::functionaloptimization::gradientdescent )</li>
  * </ul><ul>
  * <li><dfn>buildtype</dfn> build type [allowed valus: debug | release, default value is set to release]</li>
- * <li><dfn>atlaslink</dfn> link option for the atlas library [allowed values: multi | single] </li>
  * <li><dfn>uselocallibrary</dfn> uses only the libraries which are stores within the library directory</li>
+ * <li><dfn>jnipath</dfn> optional path to the <dfn>jni.h</dfn> file</li>
  * <li><dfn>usedistcc</dfn> the build process forces distcc on building</li>
  * <li><dfn>usecolorcompiler</dfn> enable / disable searching for color compiler</li>
  * <li><dfn>copylibrary</dfn> copy the dynamic libraries into the build directory</li>
+ * <li><dfn>atlaslink</dfn> link option for the atlas library [allowed values: multi | single] </li>
+ * <li><dfn>winversion</dfn> Windows version (only used on MinGW / MinGW) [allowed values: win7 | srv2008 | vista | srv2003sp1 | xpsp2 | srv2003 | xp | w2000]</li>
  * </ul>
  * Option flag, that are used during building the library package:
  * <ul>

@@ -32,8 +32,6 @@ Import("*")
 
 if conf.env["withmpi"] :
     raise RuntimeError("MPI build does not work under Msys")
-if any(i in COMMAND_LINE_TARGETS for i in ["java", "javatools", "javaclustering", "javareduce"] ) :
-    raise RuntimeError("Java builds do not work under Msys")
 
 
 # === default configuration ================================================
@@ -209,6 +207,10 @@ else :
     elif "LIBRARY_PATH" in os.environ :
         conf.env.AppendUnique(LIBPATH = os.environ["LIBRARY_PATH"].split(os.pathsep)) 
         print("Appending custom posix library path (LIBRARY_PATH)")
+        
+#manual pathes
+if "jnipath" in conf.env and conf.env["jnipath"] :
+    conf.env.AppendUnique(CPPPATH = conf.env["jnipath"])
     
 # append main framework directory directory (read mingw/bin directory from path)
 conf.env.AppendUnique(CPPPATH = [Dir("#")])
