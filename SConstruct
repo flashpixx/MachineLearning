@@ -275,7 +275,8 @@ def librarycopy_emitter(target, source, env) :
     removelib = set(removelib)
         
     pathlist = []
-    pathlist.extend(env["LIBPATH"])
+    if "LIBPATH" in env :
+        pathlist.extend(env["LIBPATH"])
     if ("COPYLIBRARYPATH" in env) and SCons.Util.is_List(env["COPYLIBRARYPATH"]) :
         pathlist.extend(env["COPYLIBRARYPATH"])
     pathlist = set(pathlist)
