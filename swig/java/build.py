@@ -24,7 +24,6 @@
 
 import os
 import re
-import platform
 import subprocess
 Import("*")
 
@@ -54,11 +53,9 @@ def libchange_osx(source) :
 
 # builder command function that is run on the build JNI library for setup relative links
 def libchange(target, source, env) :
-    if platform.system().lower() == "posix" :
+    if env["TOOLKIT"] == "msys" :
         pass
-    elif platform.system().lower() == "linux" :
-        pass
-    elif platform.system().lower() == "darwin" :
+    elif env["TOOLKIT"] == "darwin" :
         libchange_osx(str(source[0]))
     else :
         raise RuntimeError("platform not known")

@@ -210,7 +210,7 @@ else :
         
 #manual pathes
 if "jnipath" in conf.env and conf.env["jnipath"] :
-    conf.env.AppendUnique(CPPPATH = conf.env["jnipath"])
+    conf.env.AppendUnique(CPPPATH = [conf.env["jnipath"], os.path.join(conf.env["jnipath"], "win32")])
     
 # append main framework directory directory (read mingw/bin directory from path)
 conf.env.AppendUnique(CPPPATH = [Dir("#")])

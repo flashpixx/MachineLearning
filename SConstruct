@@ -102,7 +102,7 @@ def setupToolkitEnv(vars) :
         env.Tool("default")
     elif env["TOOLKIT"] == "msys":
         env.Tool("mingw")
-        if "java" in COMMAND_LINE_TARGETS :
+        if any([i in COMMAND_LINE_TARGETS for i in ["java", "javareduce", "javaclustering", "javatools"]]) :
             env.Tool("javac")
             env.Tool("jar")
         
