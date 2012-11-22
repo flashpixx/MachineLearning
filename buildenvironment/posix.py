@@ -200,6 +200,10 @@ else :
         conf.env.AppendUnique(LIBPATH = os.environ["LIBRARY_PATH"].split(os.pathsep)) 
         print("Appending custom posix library path (LIBRARY_PATH)")
     
+#manual pathes
+if "jnipath" in conf.env and conf.env["jnipath"] :
+    conf.env.AppendUnique(CPPPATH = conf.env["jnipath"])
+    
 # append main framework directory
 conf.env.AppendUnique(CPPPATH = [Dir("#")])
 

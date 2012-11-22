@@ -201,6 +201,10 @@ else :
     elif "LIBRARY_PATH" in os.environ :
         conf.env.AppendUnique(LIBPATH = os.environ["LIBRARY_PATH"].split(os.pathsep)) 
         print("Appending custom posix library path (LIBRARY_PATH)")
+        
+#manual pathes
+if "jnipath" in conf.env and conf.env["jnipath"] :
+    conf.env.AppendUnique(CPPPATH = conf.env["jnipath"])
     
 # append main framework directory
 conf.env.AppendUnique(CPPPATH = [Dir("#")])
@@ -246,6 +250,9 @@ elif "documentation" in COMMAND_LINE_TARGETS :
 
 
 # === build configuration ==================================================
+if "java" in COMMAND_LINE_TARGETS :
+     localconf["cheaders"].append("jni.h")
+
 if conf.env["withrandomdevice"] :
     conf.env.AppendUnique(CPPDEFINES  = ["MACHINELEARNING_RANDOMDEVICE"])
     localconf["cpplibraries"].append(
