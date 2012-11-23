@@ -107,7 +107,7 @@ def setupToolkitEnv(vars) :
             env.Tool("jar")
         
         # set unix environment only on librarybuild, otherwise we get problems on compiler calls
-        if "librarybuild" in COMMAND_LINE_TARGETS :        
+        if "librarybuild" in COMMAND_LINE_TARGETS or "librarydownload" in COMMAND_LINE_TARGETS :        
             if not( "msyscon" in os.environ ) :
                 raise RuntimeError("MSYS environment shell not found")
             shell = findfile( os.environ["msyscon"], env["ENV"]["PATH"] )
