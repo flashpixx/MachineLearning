@@ -277,6 +277,7 @@ elif "documentation" in COMMAND_LINE_TARGETS :
 # === build configuration ==================================================
 if "java" in COMMAND_LINE_TARGETS :
     localconf["cheaders"].append("jni.h")
+    conf.env["COPYLIBRARY"].append("quserex")
      
 if conf.env["withrandomdevice"] :
     conf.env.AppendUnique(CPPDEFINES  = ["MACHINELEARNING_RANDOMDEVICE"])
