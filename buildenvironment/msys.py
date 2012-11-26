@@ -278,6 +278,7 @@ elif "documentation" in COMMAND_LINE_TARGETS :
 if "java" in COMMAND_LINE_TARGETS :
     localconf["cheaders"].append("jni.h")
     conf.env["COPYLIBRARY"].append("quserex")
+    # we need the kill-at flag, because the JRE & g++ name mangeling are different, so we disable it under g++ http://en.wikipedia.org/wiki/Name_mangling
     conf.env.AppendUnique(LINKFLAGS    = ["-Wl,--kill-at"])
 
      
