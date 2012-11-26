@@ -278,6 +278,8 @@ elif "documentation" in COMMAND_LINE_TARGETS :
 if "java" in COMMAND_LINE_TARGETS :
     localconf["cheaders"].append("jni.h")
     conf.env["COPYLIBRARY"].append("quserex")
+    conf.env.AppendUnique(LINKFLAGS    = ["-Wl,--kill-at"])
+
      
 if conf.env["withrandomdevice"] :
     conf.env.AppendUnique(CPPDEFINES  = ["MACHINELEARNING_RANDOMDEVICE"])
