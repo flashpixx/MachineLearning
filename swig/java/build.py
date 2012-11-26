@@ -70,7 +70,11 @@ for i in GlobRekursiv( os.path.join("..", ".."), [".i"], ["swig", "examples", "d
     cpp.extend( filter(lambda n: not str(n).endswith(env["JAVASUFFIX"]), env.SwigJava( os.path.join("#build", env["buildtype"], "jar", "source"), i ) ) )
 
 # call Java & C++ builder
-dll    = env.SharedLibrary( os.path.join("#build", env["buildtype"], "jar", "build", "native", "machinelearning"), defaultcpp + cpp )
+builddll = env.SharedLibrary( os.path.join("#build", env["buildtype"], "jar", "dll", "machinelearning"), defaultcpp + cpp )
+dll      = []
+for i in filter(lambda x: str(x).endswith(env["SHLIBSUFFIX"]), builddll) :
+    dll.append( env.Install(os.path.join("#build", env["buildtype"], "jar", "build", "native"), i) )
+
 java   = env.Java(  os.path.join("#build", env["buildtype"], "jar", "build"), os.path.join("#build", env["buildtype"], "jar", "source", "java")  )
 libcp  = env.LibraryCopy( os.path.join("#build", env["buildtype"], "jar", "build", "native"), [] )
 rellib = env.Command("rellib_dll", dll, libchange )
