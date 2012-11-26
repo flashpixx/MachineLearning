@@ -37,10 +37,7 @@ if conf.env["withmpi"] :
 # === default configuration ================================================
 localconf = {
     "cpplibraries"          : [  "stdc++",
-                                 "boost_system",
-                                 "boost_regex",
-                                 "boost_iostreams",
-                                 "boost_exception"
+                                 "boost_iostreams"
     ],
     
     # gfortran must be linked after Lapack, otherwise a linker error is shown
@@ -338,7 +335,7 @@ if conf.env["withsources"] :
     conf.env.AppendUnique(CPPDEFINES  = ["MACHINELEARNING_SOURCES", "MACHINELEARNING_SOURCES_TWITTER"])
     conf.env["COPYLIBRARY"].extend(["xml2-2", "libiconv-2"])
     localconf["clibraries"].extend(["xml2", "ws2_32"])
-    localconf["cpplibraries"].append("json")
+    localconf["cpplibraries"].extend(["boost_regex", "json", "boost_system"])
     localconf["cheaders"].extend([
                             os.path.join("libxml", "parser.h"),
                             os.path.join("libxml", "tree.h"),

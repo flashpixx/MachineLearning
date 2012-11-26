@@ -185,8 +185,9 @@ namespace ublas     = boost::numeric::ublas;
      * @todo the memory management can be worked with addShutDownHook(), so on this
      * event objects can be destroyed ( http://download.oracle.com/javase/1.4.2/docs/api/java/lang/Runtime.html#addShutdownHook%28java.lang.Thread%29 )
      **/    
-    static {
-        
+    static
+    {
+    
         // first try to load the JNI library directly
         try {
             System.loadLibrary("machinelearning");
@@ -202,67 +203,103 @@ namespace ublas     = boost::numeric::ublas;
             if (System.getProperty("os.name").toLowerCase().indexOf( "mac" ) >= 0)
                 l_lib = l_lib.substring(0, l_lib.indexOf(".jnilib")) + ".dylib";
             
-            // try to load the libraries manually from the temporary directory
+            // try to read class name
+            if (Thread.currentThread().getStackTrace().length < 2)
+                throw new RuntimeException("can not determine class name");
+                            
+            // extract files from the Jar
             try {
-                System.load(l_lib);
-            } catch (UnsatisfiedLinkError e_link2) {
+                // extract from the classname the location of the JAR (remove URL prefix jar:file: and suffix after .jar)
+                String l_jarfile = java.net.URLDecoder.decode(Class.forName(Thread.currentThread().getStackTrace()[1].getClassName()).getResource("").toString(),"UTF-8");
+                l_jarfile        = l_jarfile.substring(9, l_jarfile.lastIndexOf(".jar!")) + ".jar";
                 
-                // try to read class name
-                if (Thread.currentThread().getStackTrace().length < 2)
-                    throw new RuntimeException("can not determine class name");
-                                
-                // extract files from the Jar
-                try {
-                    // extract from the classname the location of the JAR (remove URL prefix jar:file: and suffix after .jar)
-                    String l_jarfile = java.net.URLDecoder.decode(Class.forName(Thread.currentThread().getStackTrace()[1].getClassName()).getResource("").toString(),"UTF-8");
-                    l_jarfile        = l_jarfile.substring(9, l_jarfile.lastIndexOf(".jar!")) + ".jar";
+                // open the Jar file to get all Jar entries and extract the "native" subdirectory
+                java.util.jar.JarFile l_jar = new java.util.jar.JarFile( l_jarfile, true );
+                java.util.Enumeration<java.util.jar.JarEntry> l_list = l_jar.entries();
+                
+                while (l_list.hasMoreElements()) {
                     
-                    // open the Jar file to get all Jar entries and extract the "native" subdirectory
-                    java.util.jar.JarFile l_jar = new java.util.jar.JarFile( l_jarfile, true );
-                    java.util.Enumeration<java.util.jar.JarEntry> l_list = l_jar.entries();
-                    
-                    while (l_list.hasMoreElements()) {
+                    String l_fileentry = l_list.nextElement().getName();
+                    if ( (l_fileentry.startsWith("native/")) && (l_fileentry.charAt(l_fileentry.length()-1) != '/') ) {
+                        java.io.File l_outfile                    = new java.io.File( l_temp.toString() + System.getProperty("file.separator") + l_fileentry.substring(7, l_fileentry.length()) );
+                        if (l_outfile.exists())
+                            continue;
                         
-                        String l_fileentry = l_list.nextElement().getName();
-
-                        if ( (l_fileentry.startsWith("native/")) && (l_fileentry.charAt(l_fileentry.length()-1) != '/') ) {
-                            
-                            // copy stream with buffered stream because it's faster
-                            java.io.InputStream l_instream            = l_jar.getInputStream(l_jar.getEntry(l_fileentry));
-                            java.io.BufferedInputStream l_binstream   = new java.io.BufferedInputStream(l_instream);
-                            
-                            java.io.FileOutputStream l_outstream      = new java.io.FileOutputStream(l_temp.toString() + System.getProperty("file.separator") + l_fileentry.substring(7, l_fileentry.length()) );
-                            java.io.BufferedOutputStream l_boutstream = new java.io.BufferedOutputStream(l_outstream);
-                            
-                            int l_data;
-                            while ((l_data = l_binstream.read ()) != -1)
-                                l_boutstream.write(l_data);
-                            
-                            l_binstream.close();
-                            l_instream.close();
-                            
-                            l_boutstream.close();
-                            l_outstream.close();
-                            
-                            l_binstream  = null;
-                            l_instream   = null;
-                            l_boutstream = null;
-                            l_outstream  = null;
-                        }
+                        // copy stream with buffered stream because it's faster
+                        java.io.InputStream l_instream            = l_jar.getInputStream(l_jar.getEntry(l_fileentry));
+                        java.io.BufferedInputStream l_binstream   = new java.io.BufferedInputStream(l_instream);
                         
-                        l_fileentry = null;
+                        java.io.FileOutputStream l_outstream      = new java.io.FileOutputStream(l_outfile);
+                        java.io.BufferedOutputStream l_boutstream = new java.io.BufferedOutputStream(l_outstream);
+                        
+                        int l_data;
+                        while ((l_data = l_binstream.read ()) != -1)
+                            l_boutstream.write(l_data);
+                        
+                        l_binstream.close();
+                        l_instream.close();
+                        
+                        l_boutstream.close();
+                        l_outstream.close();
+                        
+                        l_binstream  = null;
+                        l_instream   = null;
+                        l_boutstream = null;
+                        l_outstream  = null;
                     }
                     
-                    l_list    = null;
-                    l_jar     = null;
-                    l_jarfile = null;
-                } catch(Exception e_file) { e_file.printStackTrace(); } finally {
-                    System.load(l_lib);
+                    l_fileentry = null;
                 }
-            }
+%}
+                        
+                #ifdef _WIN32_WINNT
+                %pragma(java) jniclasscode=%{
+                // on Windows the load process of the DLL must be manually set, because the DLL search path is not known by the OS (order is important)
+                System.load( l_temp + System.getProperty("file.separator") + System.mapLibraryName("libgcc_s_dw2-1") );
+                System.load( l_temp + System.getProperty("file.separator") + System.mapLibraryName("libstdc++-6") );
+                System.load( l_temp + System.getProperty("file.separator") + System.mapLibraryName("libquadmath-0") );
+                System.load( l_temp + System.getProperty("file.separator") + System.mapLibraryName("libgfortran-3") );
+                System.load( l_temp + System.getProperty("file.separator") + System.mapLibraryName("quserex") );
+                System.load( l_temp + System.getProperty("file.separator") + System.mapLibraryName("pthreadgc2") );
+                System.load( l_temp + System.getProperty("file.separator") + System.mapLibraryName("libgomp-1") );
+                System.load( l_temp + System.getProperty("file.separator") + System.mapLibraryName("libboost_iostreams") );
+                %}
+
+                #ifdef MACHINELEARNING_FILES_HDF
+                %pragma(java) jniclasscode=%{
+                System.load( l_temp + System.getProperty("file.separator") + System.mapLibraryName("hdf5") );
+                System.load( l_temp + System.getProperty("file.separator") + System.mapLibraryName("hdf5_cpp") );
+                System.load( l_temp + System.getProperty("file.separator") + System.mapLibraryName("hdf5_hl") );
+                %}
+                #endif
+                
+                #ifdef MACHINELEARNING_RANDOMDEVICE
+                %pragma(java) jniclasscode=%{
+                System.load( l_temp + System.getProperty("file.separator") + System.mapLibraryName("libboost_random") );
+                %}
+                #endif
+                
+                %pragma(java) jniclasscode=%{
+                System.load(l_lib);
+                %}
+                #endif
+      
+            %pragma(java) jniclasscode=%{  
+                l_list    = null;
+                l_jar     = null;
+                l_jarfile = null;
+            } catch(Exception e_file) { e_file.printStackTrace(); }
+            %}
+
+            #ifndef _WIN32_WINNT
+            %pragma(java) jniclasscode=%{          
+            finally { System.load(l_lib); }
+            %}
+            #endif
+            
+%pragma(java) jniclasscode=%{ 
             l_lib = null;
             l_temp = null;
         }
     }    
-    
 %}
