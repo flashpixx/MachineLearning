@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
 
 
     // create distance object, k-means object and enable logging
-    distance::euclid<double> d;
+    distance::norm::euclid<double> d;
     cluster::kmeans<double> kmeans(d, l_map["prototype"].as<std::size_t>(), data.size2());
     kmeans.setLogging(l_log);
 

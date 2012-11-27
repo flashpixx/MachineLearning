@@ -93,6 +93,7 @@ namespace machinelearning { namespace neighborhood {
     /** run approximation
      * @param p_prototypes prototype matrix
      * @param p_multiplier multiplier vector
+     * @param p_distance distance values
      * @return index array
      **/
     template<typename T> inline typename kapproximation<T>::approximateddata kapproximation<T>::approximate( const ublas::matrix<T>& p_prototypes, const ublas::vector<T>& p_multiplier, const ublas::matrix<T>& p_distance ) const
@@ -111,6 +112,7 @@ namespace machinelearning { namespace neighborhood {
     /** create k-nearest-neighbour approximation
      * @param p_prototypes prototype matrix
      * @param p_multiplier multiplier vector
+     * @param p_distance distance values
      * @return index array
      **/
     template<typename T> inline typename kapproximation<T>::approximateddata kapproximation<T>::approx_knn( const ublas::matrix<T>& p_prototypes, const ublas::vector<T>& p_multiplier, const ublas::matrix<T>& p_distance ) const

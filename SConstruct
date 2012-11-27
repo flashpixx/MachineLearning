@@ -509,7 +509,7 @@ def swigjava_emitter(target, source, env) :
         help = {}
         for targetname,sourcename in data["rename"] :
             help[sourcename.replace(";","").strip()] = targetname.strip()
-        data["rename"]            = help
+        data["rename"] = help
         
         # remove template parameters <> or brackets
         data["template"] = [ re.sub(regex["cppremove"], "", i) for i in data["template"] ]
@@ -564,13 +564,7 @@ def swigjava_emitter(target, source, env) :
     return target, source
     
 def swigjava_packageaction(iface) :
-    dirname = os.path.dirname(str(iface)).split(os.path.sep)
-
-    if dirname[-1] == "norm" :
-        dirname = dirname[0:-1]
-    dirname = ["machinelearning"] + dirname
-    
-    return "-package " +  ".".join(dirname)
+    return "-package " +  ".".join(  ["machinelearning"] + os.path.dirname(str(iface)).split(os.path.sep) )
 
     
 def swigjava_outdiraction(sourcedir, targets) :

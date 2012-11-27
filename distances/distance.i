@@ -29,11 +29,21 @@
 
 #ifdef SWIGJAVA
 %module "distancemodule"
+%include "../swig/java/java.i"
 
-%typemap(javaclassmodifiers) machinelearning::distances::distance<double> "public abstract class"
-%typemap(javabody)           machinelearning::distances::distance<double> ""
-%typemap(javafinalize)       machinelearning::distances::distance<double> ""
-%typemap(javadestruct)       machinelearning::distances::distance<double> ""
+%typemap(javaclassmodifiers) machinelearning::distances::distance<double>                                         "public interface"
+%typemap(javabody)           machinelearning::distances::distance<double>                                         ""
+%typemap(javafinalize)       machinelearning::distances::distance<double>                                         ""
+%typemap(javadestruct)       machinelearning::distances::distance<double>                                         ""
+
+%typemap(javaout)            ublas::vector<double> machinelearning::distances::distance<double>::getNormalize     ";"
+%typemap(javaout)            ublas::matrix<double> machinelearning::distances::distance<double>::getNormalize     ";"
+%typemap(javaout)            double machinelearning::distances::distance<double>::getLength                       ";"
+%typemap(javaout)            ublas::vector<double> machinelearning::distances::distance<double>::getLength        ";"
+%typemap(javaout)            double machinelearning::distances::distance<double>::getInvert                       ";"
+%typemap(javaout)            ublas::vector<double> machinelearning::distances::distance<double>::getAbs           ";"
+%typemap(javaout)            double machinelearning::distances::distance<double>::getDistance                     ";"
+%typemap(javaout)            ublas::vector<double> machinelearning::distances::distance<double>::getDistance      ";"
 #endif
 
 

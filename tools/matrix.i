@@ -21,28 +21,22 @@
  @endcond
  **/
 
+/** interface file for the Lapack calls **/
 
 
-/** header file to connect all tools library for one includ **/
+#ifdef SWIGJAVA
+%module "matrixmodule"
+%include "../swig/java/java.i"
+%rename(Matrix) matrix;
 
-#ifndef __MACHINELEARNING_DISTANCES_H
-#define __MACHINELEARNING_DISTANCES_H
-
-
-namespace machinelearning { 
-    
-    /** distance namespace for structures which calculates distances **/
-    namespace distances {
-        
-        /** namespace for norm structures **/
-        namespace norm { }
-        
-    }
-}
-        
-
-#include "distance.hpp"
-#include "ncd.hpp"
-#include "norm/euclid.hpp"
-
+%typemap(javabody)           machinelearning::tools::matrix ""
+%typemap(javafinalize)       machinelearning::tools::matrix ""
+%typemap(javadestruct)       machinelearning::tools::matrix ""
 #endif
+
+
+%nodefaultctor               machinelearning::tools::matrix;
+%nodefaultdtor               machinelearning::tools::matrix;
+
+
+%include "matrix.hpp"

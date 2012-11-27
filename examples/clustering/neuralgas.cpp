@@ -130,7 +130,7 @@ int main(int argc, char* argv[])
     #endif
 
     // create distance object
-    distance::euclid<double> d;
+    distance::norm::euclid<double> d;
 
 
     #ifdef MACHINELEARNING_MPI

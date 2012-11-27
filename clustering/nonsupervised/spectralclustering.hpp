@@ -73,8 +73,8 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
         
             ublas::matrix<T> getEigenGraphLaplacian( const ublas::matrix<T>& p_adjacency ) const;
         
-            /** distance object for clustering **/
-            const distances::euclid<T> m_distance;
+            /** distance object for clustering (we use euclidan distances) **/
+            const distances::norm::euclid<T> m_distance;
             /** neural gas for clustering the graph laplacian **/
             kmeans<T> m_kmeans;
         
@@ -85,7 +85,7 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
      * @param p_prototypes number of prototypes
      **/
     template<typename T> inline spectralclustering<T>::spectralclustering( const std::size_t& p_prototypes ) :
-        m_distance( distances::euclid<T>() ),
+        m_distance( distances::norm::euclid<T>() ),
         m_kmeans( kmeans<T>( m_distance, p_prototypes, p_prototypes) )
     {}
     

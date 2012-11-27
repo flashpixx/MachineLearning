@@ -65,6 +65,7 @@ CONSTTYPES( jobjectArray,        Long[],                                ublas::i
 CONSTTYPES( jlong,               long,                                  std::size_t )
 CONSTTYPES( jstring,             String,                                std::string )
 CONSTTYPES( jobject,             machinelearning.distances.Distance,    distances::distance<double> )
+CONSTTYPES( jobject,             machinelearning.tools.Matrix.rowtype,  tools::matrix::rowtype )
 
 NONCONSTTYPES( jobject,          java.util.ArrayList<Double>,           ublas::vector<double> )
 NONCONSTTYPES( jobject,          java.util.ArrayList<Double[]>,         ublas::matrix<double> )
@@ -222,7 +223,7 @@ namespace ublas     = boost::numeric::ublas;
                     String l_fileentry = l_list.nextElement().getName();
                     if ( (l_fileentry.startsWith("native/")) && (l_fileentry.charAt(l_fileentry.length()-1) != '/') ) {
                         java.io.File l_outfile                    = new java.io.File( l_temp.toString() + System.getProperty("file.separator") + l_fileentry.substring(7, l_fileentry.length()) );
-                        if (l_outfile.exists())
+                        if ( (l_outfile.exists()) && (System.getProperty("MACHINELEARNING_DLL_OVERWRITE") == null) )
                             continue;
                         
                         // copy stream with buffered stream because it's faster

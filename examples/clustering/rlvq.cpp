@@ -96,7 +96,7 @@ int main(int argc, char* argv[])
     target.writeValue<std::size_t>( "/iteration",  l_iteration, tools::files::hdf::NATIVE_ULONG );
 
     // create data
-    distance::euclid<double> dist;
+    distance::norm::euclid<double> dist;
 
 
 

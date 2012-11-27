@@ -33,10 +33,7 @@
 
 
 
-namespace machinelearning { 
-    
-    /** distance namespace for structures which calculates distances **/
-    namespace distances {
+namespace machinelearning { namespace distances {
         
         #ifndef SWIG
         namespace ublas = boost::numeric::ublas;
@@ -51,19 +48,22 @@ namespace machinelearning {
         {
             #ifndef SWIG
             BOOST_STATIC_ASSERT( !boost::is_integral<T>::value );            
+            #endif
             
             
             public :
             
+                #ifndef SWIG
                 /** normalize a vector */
                 virtual void normalize( ublas::vector<T>& ) const = 0;
 
+                /** normalize a matrix on the rows or columns **/
+                virtual void normalize( ublas::matrix<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const = 0;  
+                #endif
+            
                 /** returns a normalized vector **/
                 virtual ublas::vector<T> getNormalize( const ublas::vector<T>& ) const = 0;
             
-                /** normalize a matrix on the rows or columns **/
-                virtual void normalize( ublas::matrix<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const = 0;        
-                
                 /** returns a normalized matrix on the rows or columns **/
                 virtual ublas::matrix<T> getNormalize( const ublas::matrix<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const = 0;           
                 
@@ -81,8 +81,10 @@ namespace machinelearning {
                 /** returns a vector with their absolute values **/
                 virtual ublas::vector<T> getAbs( const ublas::vector<T>& ) const = 0;
             
+                #ifndef SWIG
                 /** changes every element of the vector to their absolute value **/
                 virtual void abs( ublas::vector<T>& ) const = 0;
+                #endif
             
                    
             
@@ -96,7 +98,7 @@ namespace machinelearning {
                 virtual ublas::vector<T> getDistance( const ublas::matrix<T>&, const ublas::matrix<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const = 0;
             
             
-            
+                #ifndef SWIG
                 /** weight distance between two vectors **/
                 virtual T getWeightedDistance( const ublas::vector<T>&, const ublas::vector<T>&, const ublas::vector<T>& ) const = 0;       
             
@@ -108,10 +110,9 @@ namespace machinelearning {
             
                 /** distances between row / column vectors of matrix and  row / column of the weighted matrix **/
                 virtual ublas::vector<T> getWeightedDistance( const ublas::matrix<T>&, const ublas::vector<T>&, const ublas::matrix<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const = 0;
+                #endif
 
-            #endif
         };
 
-    }
-}
+} }
 #endif

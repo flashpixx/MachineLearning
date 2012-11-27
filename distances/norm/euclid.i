@@ -28,9 +28,9 @@
 %module "euclidmodule"
 %include "../../swig/java/java.i"
 
-%typemap(javabase) machinelearning::distances::euclid<double> "Distance";
+%typemap(javainterfaces) machinelearning::distances::norm::euclid<double> "machinelearning.distances.Distance";
 #endif
 
  
 %include "euclid.hpp"
-%template(Euclid) machinelearning::distances::euclid<double>;
+%template(Euclid) machinelearning::distances::norm::euclid<double>;

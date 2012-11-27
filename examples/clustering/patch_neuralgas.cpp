@@ -118,7 +118,7 @@ int main(int argc, char* argv[])
 
 
     // create ng objects
-    distance::euclid<double> d;
+    distance::norm::euclid<double> d;
     #ifdef MACHINELEARNING_MPI
     cluster::neuralgas<double> ng(d,
                 l_map["prototype"].as< std::vector<std::size_t> >()[static_cast<std::size_t>(loMPICom.rank())],

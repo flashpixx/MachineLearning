@@ -97,7 +97,7 @@ int main(int argc, char* argv[])
 
 
     // distance / neighbourhood
-    distance::euclid<double> d;
+    distance::norm::euclid<double> d;
     neighbor::knn<double> n(d, l_knn);
 
     if (l_map["labeltype"].as<std::string>() == "int") {

@@ -37,7 +37,8 @@
 #include "../../tools/tools.h"
 
 
-namespace machinelearning { namespace distances {
+namespace machinelearning { namespace distances { namespace norm {
+    
     
     #ifndef SWIG
     namespace ublas  = boost::numeric::ublas;
@@ -51,11 +52,12 @@ namespace machinelearning { namespace distances {
     template<typename T> class euclid : public distance<T>
     {
         
-        #ifndef SWIG
         public:
         
+            #ifndef SWIG
             void normalize( ublas::vector<T>& ) const;
             void normalize( ublas::matrix<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const;        
+            #endif
             ublas::vector<T> getNormalize( const ublas::vector<T>& ) const;
             ublas::matrix<T> getNormalize( const ublas::matrix<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const;
         
@@ -63,17 +65,21 @@ namespace machinelearning { namespace distances {
             ublas::vector<T> getLength( const ublas::matrix<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const;
             T getInvert( const T& ) const;
             ublas::vector<T> getAbs( const ublas::vector<T>& ) const;
+            #ifndef SWIG
             void abs( ublas::vector<T>& ) const;
+            #endif
         
             T getDistance( const ublas::vector<T>&, const ublas::vector<T>& ) const;        
             ublas::vector<T> getDistance( const ublas::matrix<T>&, const ublas::vector<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const;
             ublas::vector<T> getDistance( const ublas::matrix<T>&, const ublas::matrix<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const;
         
+            #ifndef SWIG
             T getWeightedDistance( const ublas::vector<T>&, const ublas::vector<T>&, const ublas::vector<T>& ) const;        
             ublas::vector<T> getWeightedDistance( const ublas::matrix<T>&, const ublas::vector<T>&, const ublas::vector<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const;        
             ublas::vector<T> getWeightedDistance( const ublas::matrix<T>&, const ublas::matrix<T>&, const ublas::matrix<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const;
             ublas::vector<T> getWeightedDistance( const ublas::matrix<T>&, const ublas::vector<T>&, const ublas::matrix<T>&, const tools::matrix::rowtype& = tools::matrix::row ) const;
-        #endif
+            #endif
+
     };
     
     
@@ -406,5 +412,5 @@ namespace machinelearning { namespace distances {
     }
     
     
-}}
+} } }
 #endif
