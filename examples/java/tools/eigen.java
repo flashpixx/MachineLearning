@@ -75,15 +75,14 @@ public class eigen {
         
             
         // get the largest eigenvector with perron-frobenius
-        Double[] l_perron = Lapack.perronFrobenius( l_data, l_data.length );
+        Double[] l_perron = Lapack.perronFrobenius( l_data, 2*l_data.length );
             
         System.out.println("\nlargest eigenvector with perron-frobenius-theorem:");
         for(int i=0; i < l_perron.length; i++)
             System.out.print(l_perron[i] + "\t");
         System.out.println("");
-        
-        
         l_perron = null;
+        
         l_data   = null;
         l_rand   = null;
     }
