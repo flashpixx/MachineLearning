@@ -65,21 +65,21 @@ namespace machinelearning { namespace tools {
         
             enum distribution
             {
-                uniform     = 0,
-                bernoulli   = 1,
-                cauchy      = 2,
-                gamma       = 3,
-                poisson     = 4,
-                exponential = 5,
-                normal      = 6,
-                student     = 7,
-                weibull     = 8,
-                rayleigh    = 9,
-                chisquared  = 10,
-                pareto      = 11,
-                triangular  = 12,
-                beta        = 13
-                //binomial    = 14
+                uniform,
+                bernoulli,
+                cauchy,
+                gamma,
+                poisson,
+                exponential,
+                normal,
+                student,
+                weibull,
+                rayleigh,
+                chisquared,
+                pareto,
+                triangular,
+                beta
+                //binomial
             };
             
             template<typename T> T get( const distribution&, const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon() );

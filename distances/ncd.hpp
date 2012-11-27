@@ -80,15 +80,15 @@ namespace machinelearning { namespace distances {
             
             enum compresstype
             {
-                gzip    = 0, 
-                bzip2   = 1
+                gzip, 
+                bzip2
             };
             
             enum compresslevel
             {
-                defaultcompression  = 0,
-                bestspeed           = 1,
-                bestcompression     = 2
+                defaultcompression,
+                bestspeed,
+                bestcompression
             };
             
             

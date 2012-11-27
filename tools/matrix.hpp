@@ -55,11 +55,11 @@ namespace machinelearning { namespace tools {
             /** row type **/
             enum rowtype
             {
-                row     = 0,
-                column  = 1
+                row,
+                column
             };
         
-        
+            #ifndef SWIG
             template<typename T> static ublas::matrix<T> random( const std::size_t&, const std::size_t&, const tools::random::distribution& = tools::random::uniform, const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon() );
             template<typename T> static ublas::matrix<T> random( const std::size_t&, const tools::random::distribution& = tools::random::uniform, const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon(), const T& = std::numeric_limits<T>::epsilon() );
             template<typename T> static ublas::mapped_matrix<T> eye( const std::size_t&, const std::size_t&, const T& = 1 );
@@ -81,6 +81,7 @@ namespace machinelearning { namespace tools {
             template<typename T> static ublas::matrix<T> invert( const ublas::matrix<T>&);
             template<typename T> static ublas::matrix<T> repeat( const ublas::vector<T>&, const rowtype& p_which = row);
             template<typename T> static ublas::matrix<T> repeat( const ublas::vector<T>&, const std::size_t&, const rowtype& p_which = row);
+            #endif
     };
     
     
