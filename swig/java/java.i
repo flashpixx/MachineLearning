@@ -177,7 +177,9 @@ namespace ublas     = boost::numeric::ublas;
 
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------
-// Java code for loading the dynamic library
+// Java code for loading the dynamic library and setting up the JNI module class type
+%pragma(java) jniclassclassmodifiers="class"
+
 %pragma(java) jniclasscode=%{
     
     /** static call of the external library, each class that uses the native
