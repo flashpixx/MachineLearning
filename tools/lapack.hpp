@@ -69,9 +69,9 @@ namespace machinelearning { namespace tools {
         
         public :
         
-            template<typename T> static void eigen( const ublas::matrix<T>&, ublas::vector<T>&, ublas::matrix<T>& );
-            template<typename T> static void eigen( const ublas::matrix<T>&, const ublas::matrix<T>&, ublas::vector<T>&, ublas::matrix<T>& );
-            template<typename T> static void svd( const ublas::matrix<T>&, ublas::vector<T>&, ublas::matrix<T>&, ublas::matrix<T>& );
+            template<typename T> static void eigen( const ublas::matrix<T>&, ublas::vector<T>&, ublas::matrix<T>&, const bool& = true );
+            template<typename T> static void eigen( const ublas::matrix<T>&, const ublas::matrix<T>&, ublas::vector<T>&, ublas::matrix<T>&, const bool& = true );
+            template<typename T> static void svd( const ublas::matrix<T>&, ublas::vector<T>&, ublas::matrix<T>&, ublas::matrix<T>&, const bool& = true );
             template<typename T> static void solve( const ublas::matrix<T>&, const ublas::vector<T>&, ublas::vector<T>& );
             //template<typename T> static ublas::matrix<T> expm( const ublas::matrix<T>& );
             template<typename T> static ublas::vector<T> perronfrobenius( const ublas::matrix<T>&, const std::size_t& );
@@ -88,8 +88,9 @@ namespace machinelearning { namespace tools {
      * @param p_diag diagonal matrix
      * @param p_eigval blas vector for eigenvalues [initialisation is not needed]
      * @param p_eigvec blas matrix for (normalized) eigenvectors (every column is a eigenvector) [initialisation is not needed]
+     * @param p_normalize normalize eigenvectors
      **/
-    template<typename T> inline void lapack::eigen( const ublas::matrix<T>& p_matrix, const ublas::matrix<T>& p_diag, ublas::vector<T>& p_eigval, ublas::matrix<T>& p_eigvec )
+    template<typename T> inline void lapack::eigen( const ublas::matrix<T>& p_matrix, const ublas::matrix<T>& p_diag, ublas::vector<T>& p_eigval, ublas::matrix<T>& p_eigvec, const bool& p_normalize )
     {
         if (  (p_matrix.size1() != p_matrix.size2()) || (p_diag.size1() != p_diag.size2())  )
             throw exception::runtime( _("matrix must be square") );
@@ -117,8 +118,9 @@ namespace machinelearning { namespace tools {
             l_eigval(i) /= l_div(i);
         
         // normalize every eigenvector
-        for(std::size_t i=0; i < l_eigvec.size2(); ++i)
-            ublas::column(l_eigvec, i) /= blas::nrm2( static_cast< ublas::vector<T> >(ublas::column(l_eigvec, i)) );        
+        if (p_normalize)
+            for(std::size_t i=0; i < l_eigvec.size2(); ++i)
+                ublas::column(l_eigvec, i) /= blas::nrm2( static_cast< ublas::vector<T> >(ublas::column(l_eigvec, i)) );        
         
         // we must copy the reference
         p_eigvec = l_eigvec;
@@ -130,8 +132,9 @@ namespace machinelearning { namespace tools {
      * @param p_matrix input matrix
      * @param p_eigval blas vector for eigenvalues [initialisation is not needed]
      * @param p_eigvec blas matrix for (normalized) eigenvectors (every column is a eigenvector) [initialisation is not needed]
+     * @param p_normalize normalize eigenvectors
     **/
-    template<typename T> inline void lapack::eigen( const ublas::matrix<T>& p_matrix, ublas::vector<T>& p_eigval, ublas::matrix<T>& p_eigvec )
+    template<typename T> inline void lapack::eigen( const ublas::matrix<T>& p_matrix, ublas::vector<T>& p_eigval, ublas::matrix<T>& p_eigvec, const bool& p_normalize )
     {
         if (p_matrix.size1() != p_matrix.size2())
             throw exception::runtime(_("matrix must be square"));
@@ -153,8 +156,9 @@ namespace machinelearning { namespace tools {
         
         
         // normalize every eigenvector
-        for(std::size_t i=0; i < l_eigvec.size2(); ++i)
-             ublas::column(l_eigvec, i) /= blas::nrm2( static_cast< ublas::vector<T> >(ublas::column(l_eigvec, i)) );
+        if (p_normalize)
+            for(std::size_t i=0; i < l_eigvec.size2(); ++i)
+                ublas::column(l_eigvec, i) /= blas::nrm2( static_cast< ublas::vector<T> >(ublas::column(l_eigvec, i)) );
         
         // we must copy the reference
         p_eigvec = l_eigvec;
@@ -167,8 +171,9 @@ namespace machinelearning { namespace tools {
      * @param p_svdval blas vector for eigenvalues [initialisation is not needed]
      * @param p_svdvec1 blas matrix for singular values vectors (every column is a vector) [initialisation is not needed]
      * @param p_svdvec2 blas matrix for singular values vectors (every column is a vector) [initialisation is not needed]
+     * @param p_normalize normalize svd vectors
      **/
-    template<typename T> inline void lapack::svd( const ublas::matrix<T>& p_matrix, ublas::vector<T>& p_svdval, ublas::matrix<T>& p_svdvec1, ublas::matrix<T>& p_svdvec2 )
+    template<typename T> inline void lapack::svd( const ublas::matrix<T>& p_matrix, ublas::vector<T>& p_svdval, ublas::matrix<T>& p_svdvec1, ublas::matrix<T>& p_svdvec2, const bool& p_normalize )
     {
         // copy matrix for LAPACK
         ublas::matrix<T, ublas::column_major> l_matrix(p_matrix);
@@ -185,11 +190,13 @@ namespace machinelearning { namespace tools {
         l_svdvec2 = ublas::trans( l_svdvec2 );
         
         // normalize
-        for(std::size_t i=0; i < l_svdvec1.size2(); ++i)
-            ublas::column(l_svdvec1, i) /= blas::nrm2( static_cast< ublas::vector<T> >(ublas::column(l_svdvec1, i)) );
-        for(std::size_t i=0; i < l_svdvec2.size2(); ++i)
-            ublas::column(l_svdvec2, i) /= blas::nrm2( static_cast< ublas::vector<T> >(ublas::column(l_svdvec2, i)) );
-        
+        if (p_normalize)
+        {
+            for(std::size_t i=0; i < l_svdvec1.size2(); ++i)
+                ublas::column(l_svdvec1, i) /= blas::nrm2( static_cast< ublas::vector<T> >(ublas::column(l_svdvec1, i)) );
+            for(std::size_t i=0; i < l_svdvec2.size2(); ++i)
+                ublas::column(l_svdvec2, i) /= blas::nrm2( static_cast< ublas::vector<T> >(ublas::column(l_svdvec2, i)) );
+        }
         
         // we must copy the reference
         p_svdval    = l_svdval;

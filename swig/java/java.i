@@ -278,10 +278,6 @@ namespace ublas     = boost::numeric::ublas;
                 System.load( l_temp + System.getProperty("file.separator") + System.mapLibraryName("libboost_random") );
                 %}
                 #endif
-                
-                %pragma(java) jniclasscode=%{
-                System.load(l_lib);
-                %}
                 #endif
       
             %pragma(java) jniclasscode=%{  
@@ -289,15 +285,8 @@ namespace ublas     = boost::numeric::ublas;
                 l_jar     = null;
                 l_jarfile = null;
             } catch(Exception e_file) { e_file.printStackTrace(); }
-            %}
-
-            #ifndef _WIN32_WINNT
-            %pragma(java) jniclasscode=%{          
             finally { System.load(l_lib); }
-            %}
-            #endif
-            
-%pragma(java) jniclasscode=%{ 
+
             l_lib = null;
             l_temp = null;
         }
