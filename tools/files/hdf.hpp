@@ -649,7 +649,7 @@ namespace machinelearning { namespace tools { namespace files {
         std::vector<H5::Group> l_groups;
         
         createDataSpace(p_path, getHDFType(p_datatype), ublas::vector<std::size_t>(1,p_dataset.size()), l_dataspace, l_dataset, l_groups);
-        l_dataset.write( &(p_dataset.data()[0]), getHDFType(p_datatype), l_dataspace  );
+        l_dataset.write( &p_dataset.data(), getHDFType(p_datatype), l_dataspace  );
         closeSpace(l_groups, l_dataset, l_dataspace);
     }
     

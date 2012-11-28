@@ -56,6 +56,7 @@ namespace machinelearning { namespace swig {
             
             
             static ublas::matrix<double> getDoubleMatrixFrom2DArray( JNIEnv*, const jobjectArray& );
+            static ublas::vector<double> getDoubleVectorFrom1DArray( JNIEnv*, const jobjectArray& );
             
             static jobjectArray getArray( JNIEnv*, const ublas::matrix<double>&, const rowtype& = row );
             static jobjectArray getArray( JNIEnv*, const ublas::vector<double>& );
@@ -191,6 +192,35 @@ namespace machinelearning { namespace swig {
             }
         }
         
+        return l_data;
+    }
+
+    
+    /** creates a ublas double vector from a java 1D array
+     * @param p_env JNI environment
+     * @param p_data java array
+     * @return ublas vector if vector have zero columns the array can not be read
+     **/
+    inline ublas::vector<double> java::getDoubleVectorFrom1DArray( JNIEnv* p_env, const jobjectArray& p_data )
+    {
+        ublas::vector<double> l_data(0);
+
+        // convert the java array to a ublas vector
+        const std::size_t l_items = p_env->GetArrayLength(p_data);
+        if (l_items == 0)
+            return l_data;
+        
+        // each element in the array is a "java.lang.Double" value, for reading the value the method "double doubleValue()" must be called, so get the ID
+        const jmethodID l_valueof = getMethodID(p_env, "java/lang/Double", "doubleValue", "()D"); 
+        
+        // read array data
+        l_data = ublas::vector<double>(l_items);
+        for(std::size_t i=0; i < l_items; ++i) {
+            l_data(i) = p_env->CallDoubleMethod( p_env->GetObjectArrayElement(p_data, i), l_valueof );
+            if (tools::function::isNumericalZero(l_data(i))) 
+                l_data(i) = static_cast<double>(0);
+        }
+
         return l_data;
     }
     

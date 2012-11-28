@@ -137,6 +137,12 @@ NONCONSTTYPES( jobject,          java.util.ArrayList<Double[]>,         ublas::m
     $1 = &l_param;
 }
 
+%typemap(in, optimal=1, noblock=1) ublas::vector<double>, const ublas::vector<double>& (ublas::vector<double> l_param)
+{
+    l_param = swig::java::getDoubleVectorFrom1DArray(jenv, $input);
+    $1 = &l_param;
+}
+
 %typemap(in, optimal=1, noblock=1) std::string, const std::string& (std::string l_param)
 {
     l_param = swig::java::getString(jenv, $input);
