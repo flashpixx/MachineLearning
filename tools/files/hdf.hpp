@@ -626,7 +626,7 @@ namespace machinelearning { namespace tools { namespace files {
         
         createDataSpace(p_path,  getHDFType(p_datatype), l_dim, l_dataspace, l_dataset, l_groups);
         ublas::matrix<T> l_matrix = ublas::trans(p_dataset);
-        l_dataset.write( &(l_matrix.data()[0]), p_datatype, l_dataspace  );        
+        l_dataset.write( &(l_matrix.data()[0]), getHDFType(p_datatype), l_dataspace  );        
         closeSpace(l_groups, l_dataset, l_dataspace);
     }
     
