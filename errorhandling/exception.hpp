@@ -36,18 +36,6 @@ namespace machinelearning {
     namespace exception {
     
         
-        /** exception class for throwing on not implementated method **/
-        class classmethod : public std::logic_error
-        { 
-            public : 
-            
-                explicit classmethod( const std::string& );            
-                template <typename T> explicit classmethod( const std::string&, const T* );
-                template <typename T> explicit classmethod( const std::string&, const T& );
-        };
-        
-        
-        
         /** exception class for throwing on runtime errors **/
         class runtime : public std::runtime_error
         { 

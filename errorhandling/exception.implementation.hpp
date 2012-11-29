@@ -40,51 +40,6 @@ namespace machinelearning { namespace exception {
     /** creates the exception with a message
      * @param p_msg error message
      **/
-    inline classmethod::classmethod( const std::string& p_msg) :
-        std::logic_error( p_msg )
-    {
-        #ifdef MACHINELEARNING_LOGGER
-        if (tools::logger::exists())
-            tools::logger::getInstance()->write( tools::logger::exception, _("classmethod exception is thrown: ") + p_msg);
-        #endif
-    }
-
-
-    /** creates the exception with a message and a classname
-     * @param p_msg error message
-     * @param p_ptr pointer to a class object
-     **/
-    template <typename T> inline classmethod::classmethod( const std::string& p_msg, const T* p_ptr ) :
-        std::logic_error( p_msg + ( !tools::typeinfo::getClassName(p_ptr).empty() ? " ["+tools::typeinfo::getClassName(p_ptr)+"]" : "") )
-    {
-        #ifdef MACHINELEARNING_LOGGER
-        if (tools::logger::exists())
-            tools::logger::getInstance()->write( tools::logger::exception, _("classmethod exception is thrown: ") + p_msg + ( !tools::typeinfo::getClassName(p_ptr).empty() ? " ["+tools::typeinfo::getClassName(p_ptr)+"]" : ""));
-        #endif
-    }  
-
-
-    /** creates the exception with a message and a classname
-     * @param p_msg error message
-     * @param p_obj reference to an class object
-     **/
-    template <typename T> inline classmethod::classmethod( const std::string& p_msg, const T& p_obj ) :
-        std::logic_error( p_msg + ( !tools::typeinfo::getClassName(p_obj).empty() ? " ["+tools::typeinfo::getClassName(p_obj)+"]" : "") )
-    {
-        #ifdef MACHINELEARNING_LOGGER
-        if (tools::logger::exists())
-            tools::logger::getInstance()->write( tools::logger::exception, _("classmethod exception is thrown: ") + p_msg + ( !tools::typeinfo::getClassName(p_obj).empty() ? " ["+tools::typeinfo::getClassName(p_obj)+"]" : ""));
-        #endif
-    }  
-
-        
-        
-        
-
-            
-    /** creates the exception with a message
-     * @param p_msg error message
-     **/
     inline runtime::runtime( const std::string& p_msg ) :
         std::runtime_error( p_msg )
     {
