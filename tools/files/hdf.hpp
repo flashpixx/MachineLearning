@@ -948,7 +948,7 @@ namespace machinelearning { namespace tools { namespace files {
             case NATIVE_INT64			: return H5::PredType::NATIVE_INT64;
             case NATIVE_UINT64			: return H5::PredType::NATIVE_UINT64;
         }
-        throw exception::runtime(_("datatype unkown"));
+        throw exception::runtime(_("HDF datatype unkown"));
     }
     
     

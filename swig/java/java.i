@@ -78,39 +78,39 @@ NONCONSTTYPES( jobject,          java.util.ArrayList<Double[]>,         ublas::m
 // ---------------------------------------------------------------------------------------------------------------------------------------------
 // main typemaps for "return / output types" (output = return type and call-by-reference)
 
-%typemap(out, optimal=1, noblock=1) ublas::matrix<double>,                const ublas::matrix<double>&,
-                                    ublas::vector<double>,                const ublas::vector<double>&,
-                                    ublas::indirect_array<>,              const ublas::indirect_array<>&
-                                    std::vector<double>,                  const std::vector<double>&
+%typemap(out, noblock=1) ublas::matrix<double>,                const ublas::matrix<double>&,
+                         ublas::vector<double>,                const ublas::vector<double>&,
+                         ublas::indirect_array<>,              const ublas::indirect_array<>&
+                         std::vector<double>,                  const std::vector<double>&
 {
     $result = swig::java::getArray(jenv, $1);
 }
 
-%typemap(out, optimal=1, noblock=1) std::vector< ublas::matrix<double> >, const std::vector< ublas::matrix<double> >&
+%typemap(out, noblock=1) std::vector< ublas::matrix<double> >, const std::vector< ublas::matrix<double> >&
 {
     $result = swig::java::getArrayList(jenv, $1);
 }
 
-%typemap(out, optimal=1, noblock=1) std::vector< ublas::vector<double> >, const std::vector< ublas::vector<double> >&
+%typemap(out, noblock=1) std::vector< ublas::vector<double> >, const std::vector< ublas::vector<double> >&
 {
     $result = swig::java::getArrayList(jenv, $1);
 }
 
-%typemap(out, optimal=1, noblock=1) ublas::symmetric_matrix<double, ublas::upper>, const ublas::symmetric_matrix<double, ublas::upper>&
+%typemap(out, noblock=1) ublas::symmetric_matrix<double, ublas::upper>, const ublas::symmetric_matrix<double, ublas::upper>&
 {
     $result = swig::java::getArray(jenv, static_cast< ublas::matrix<double> >($1));
 }
 
-%typemap(argout, optimal=1, noblock=1) const ublas::vector<double>&, const ublas::matrix<double>&,ublas::vector<double>, ublas::matrix<double>
+%typemap(argout, noblock=1) const ublas::vector<double>&, const ublas::matrix<double>&,ublas::vector<double>, ublas::matrix<double>
 {
 }
 
-%typemap(argout, optimal=1, noblock=1) ublas::vector<double>&, ublas::matrix<double>&
+%typemap(argout, noblock=1) ublas::vector<double>&, ublas::matrix<double>&
 {
     swig::java::setArrayList(jenv, $input, *$1);
 }
 
-%typemap(out, optimal=1, noblock=1) std::size_t, const std::size_t&
+%typemap(out, noblock=1) std::size_t, const std::size_t&
 {
     $result = $1;
 }
@@ -121,49 +121,49 @@ NONCONSTTYPES( jobject,          java.util.ArrayList<Double[]>,         ublas::m
 // typemaps for input paramter, that are used for type convert and declaration of additional variables. The typemaps are called before the method
 // is called
 
-%typemap(in, optimal=1, noblock=1) ublas::vector<double>& (ublas::vector<double> l_return)
+%typemap(in, noblock=1) ublas::vector<double>& (ublas::vector<double> l_return)
 {
     $1 = &l_return;
 }
 
-%typemap(in, optimal=1, noblock=1) ublas::matrix<double>& (ublas::matrix<double> l_return)
+%typemap(in, noblock=1) ublas::matrix<double>& (ublas::matrix<double> l_return)
 {
     $1 = &l_return;
 }
 
-%typemap(in, optimal=1, noblock=1) ublas::matrix<double>, const ublas::matrix<double>& (ublas::matrix<double> l_param)
+%typemap(in, noblock=1) ublas::matrix<double>, const ublas::matrix<double>& (ublas::matrix<double> l_param)
 {
     l_param = swig::java::getDoubleMatrixFrom2DArray(jenv, $input);
     $1 = &l_param;
 }
 
-%typemap(in, optimal=1, noblock=1) ublas::vector<double>, const ublas::vector<double>& (ublas::vector<double> l_param)
+%typemap(in, noblock=1) ublas::vector<double>, const ublas::vector<double>& (ublas::vector<double> l_param)
 {
     l_param = swig::java::getDoubleVectorFrom1DArray(jenv, $input);
     $1 = &l_param;
 }
 
-%typemap(in, optimal=1, noblock=1) std::string, const std::string& (std::string l_param)
+%typemap(in, noblock=1) std::string, const std::string& (std::string l_param)
 {
     l_param = swig::java::getString(jenv, $input);
     $1 = &l_param;
 }
 
-%typemap(in, optimal=1, noblock=1) std::vector<std::string>, const std::vector<std::string>& (std::vector<std::string> l_param)
+%typemap(in, noblock=1) std::vector<std::string>, const std::vector<std::string>& (std::vector<std::string> l_param)
 {
     l_param = swig::java::getStringVectorFromArray(jenv, $input);
     $1 = &l_param;
 }
 
 
-%typemap(in, optimal=1, noblock=1) std::vector<std::size_t>, const std::vector<std::size_t>& (std::vector<std::size_t> l_param)
+%typemap(in, noblock=1) std::vector<std::size_t>, const std::vector<std::size_t>& (std::vector<std::size_t> l_param)
 {
     l_param = swig::java::getSizetVectorFromArray(jenv, $input);
     $1 = &l_param;
 }
 
 
-%typemap(in, optimal=1, noblock=1) std::size_t, const std::size_t&
+%typemap(in, noblock=1) std::size_t, const std::size_t&
 {
     $1 = ($1_ltype)& $input;
 }
@@ -172,15 +172,14 @@ NONCONSTTYPES( jobject,          java.util.ArrayList<Double[]>,         ublas::m
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------
 // global exception handling, rethrow C++ exception to Java
-/*
-%exception(noblock=1) {
+%exception %{
     try {
         $action
     }
     catch (const std::exception& e) { SWIG_JavaThrowException(jenv, SWIG_JavaRuntimeException, e.what() ); }
-    catch (...) { SWIG_JavaThrowException(jenv, SWIG_JavaRuntimeException,  "an unkown exception in machinelearning framework is caught"); }
-}
-*/
+    catch (...) { SWIG_JavaThrowException(jenv, SWIG_JavaRuntimeException,  "exception in machinelearning framework"); }
+%}
+
 
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------

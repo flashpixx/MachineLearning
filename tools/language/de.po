@@ -7,14 +7,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Machinelearning Framework 2010-2012\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-21 17:00+0100\n"
-"PO-Revision-Date: 2012-11-21 17:01+0100\n"
+"POT-Creation-Date: 2012-11-29 15:25+0100\n"
+"PO-Revision-Date: 2012-11-29 15:27+0100\n"
 "Last-Translator: Philipp Kraus <philipp.kraus@flashpixx.de>\n"
 "Language-Team: Philipp Kraus <philipp.kraus@flashpixx.de>\n"
+"Language: de_DE\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: de_DE\n"
 "Plural-Forms: nplurals=2; plural=n == 1 ? 0 : 1;\n"
 "X-Generator: Poedit 1.5.4\n"
 "X-Poedit-SourceCharset: UTF-8\n"
@@ -97,9 +97,9 @@ msgstr "Lambda muss größer Null sein"
 #: ../../clustering/nonsupervised/relational_neuralgas.hpp:277
 #: ../../clustering/nonsupervised/relational_neuralgas.hpp:555
 #: ../../dimensionreduce/nonsupervised/mds.hpp:191
-#: ../../dimensionreduce/nonsupervised/mds.hpp:513 ../lapack.hpp:95
-#: ../lapack.hpp:137 ../lapack.hpp:247 ../lapack.hpp:268 ../lapack.hpp:286
-#: ../matrix.hpp:291
+#: ../../dimensionreduce/nonsupervised/mds.hpp:513 ../lapack.hpp:96
+#: ../lapack.hpp:140 ../lapack.hpp:254 ../lapack.hpp:275 ../lapack.hpp:293
+#: ../matrix.hpp:292
 msgid "matrix must be square"
 msgstr "Matrix muss quadratisch sein"
 
@@ -124,7 +124,7 @@ msgid "datapoint dimension are less than target dimension"
 msgstr "Datenpunkt Dimension ist kleiner als Zieldimension"
 
 #: ../../dimensionreduce/nonsupervised/mds.hpp:225
-#: ../../neighborhood/kapproximation.hpp:106
+#: ../../neighborhood/kapproximation.hpp:107
 msgid "project option is unkown"
 msgstr "Projektionsoption unbekannt"
 
@@ -149,12 +149,12 @@ msgstr "Centering kann mit MPI nicht verwendet werden"
 msgid "MPI project option is unkown"
 msgstr "MPI Projektionsioption nicht bekannt"
 
-#: ../../dimensionreduce/nonsupervised/pca.hpp:105 ../matrix.hpp:143
-#: ../matrix.hpp:450 ../files/csv.hpp:164
+#: ../../dimensionreduce/nonsupervised/pca.hpp:105 ../matrix.hpp:144
+#: ../matrix.hpp:451 ../files/csv.hpp:164
 msgid "row size must be greater than zero"
 msgstr "Zeilenanzahl muss größer Null sein"
 
-#: ../../dimensionreduce/nonsupervised/pca.hpp:107 ../matrix.hpp:145
+#: ../../dimensionreduce/nonsupervised/pca.hpp:107 ../matrix.hpp:146
 #: ../files/csv.hpp:162
 msgid "column size must be greater than zero"
 msgstr "Spaltenanzahl muss größer Null sein"
@@ -179,12 +179,6 @@ msgstr "Datei konnte nicht geöffnet werden"
 #: ../../errorhandling/exception.implementation.hpp:48
 #: ../../errorhandling/exception.implementation.hpp:62
 #: ../../errorhandling/exception.implementation.hpp:76
-msgid "classmethod exception is thrown: "
-msgstr "Klassenmethoden-Exception wird geworfen:"
-
-#: ../../errorhandling/exception.implementation.hpp:93
-#: ../../errorhandling/exception.implementation.hpp:107
-#: ../../errorhandling/exception.implementation.hpp:121
 msgid "runtime exception is thrown: "
 msgstr "Runtime-Exception wird geworfen:"
 
@@ -306,11 +300,11 @@ msgstr "Bereich muss zwischen [0,1] liegen"
 msgid "no words within the map"
 msgstr "keine Worte in der Map"
 
-#: ../lapack.hpp:97
+#: ../lapack.hpp:98
 msgid "both matrices have not the same size"
 msgstr "beide Matrizen haben nicht die gleiche Größe"
 
-#: ../lapack.hpp:249
+#: ../lapack.hpp:256
 msgid ""
 "number of rows / columns of the matrix must have the same dimension like the "
 "initialisation vector"
@@ -381,8 +375,8 @@ msgid "can not create path structure"
 msgstr "kann keine Pfadstruktur erzeugen"
 
 #: ../files/hdf.hpp:951
-msgid "datatype unkown"
-msgstr "Datentyp unbekannt"
+msgid "HDF datatype unkown"
+msgstr "HDF Datentyp unbekannt"
 
 #: language.h:63
 msgid "parameter is not a language code"
@@ -743,3 +737,6 @@ msgstr "Konnte Namespace nicht ermitteln"
 #: ../sources/wikipedia.h:588
 msgid "can not connect to wikipedia server"
 msgstr "Konnte Wikiepdia Server nicht erreichen"
+
+#~ msgid "classmethod exception is thrown: "
+#~ msgstr "Klassenmethoden-Exception wird geworfen:"
