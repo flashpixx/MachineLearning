@@ -21,7 +21,10 @@
  @endcond
  **/
 
-/** interface file for the HDF calls **/
+/** interface file for the HDF calls,
+ * we use always double types, so for writing we
+ * set the HDF datatype by a fixed value
+ **/
 
 #ifdef MACHINELEARNING_FILES_HDF
 
@@ -38,7 +41,10 @@
 %template(readBlasVector) machinelearning::tools::files::hdf::readBlasVector<double>;
 %template(readValue) machinelearning::tools::files::hdf::readValue<double>;
 
-%template(writeBlasMatrix) machinelearning::tools::files::hdf::writeBlasMatrix<double>;
-%template(writeBlasVector) machinelearning::tools::files::hdf::writeBlasVector<double>;
-%template(writeValue) machinelearning::tools::files::hdf::writeValue<double>;
+%extend machinelearning::tools::files::hdf {
+    void writeValue( const std::string& p_path, const double& p_val ) { $self->writeValue<double>(p_path, p_val, tools::files::hdf::NATIVE_DOUBLE); }
+    void writeBlasVector( const std::string& p_path, const ublas::vector<double>& p_vector ) { $self->writeBlasVector<double>(p_path, p_vector, tools::files::hdf::NATIVE_DOUBLE); }
+    void writeBlasMatrix( const std::string& p_path, const ublas::matrix<double>& p_matrix ) { $self->writeBlasMatrix<double>(p_path, p_matrix, tools::files::hdf::NATIVE_DOUBLE); }
+}
+
 #endif

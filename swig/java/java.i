@@ -172,14 +172,15 @@ NONCONSTTYPES( jobject,          java.util.ArrayList<Double[]>,         ublas::m
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------
 // global exception handling, rethrow C++ exception to Java
-%exception {
+/*
+%exception(noblock=1) {
     try {
         $action
     }
     catch (const std::exception& e) { SWIG_JavaThrowException(jenv, SWIG_JavaRuntimeException, e.what() ); }
     catch (...) { SWIG_JavaThrowException(jenv, SWIG_JavaRuntimeException,  "an unkown exception in machinelearning framework is caught"); }
 }
-
+*/
 
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------
