@@ -32,7 +32,18 @@
 %module "hdfmodule"
 %include "../../swig/java/java.i"
 %rename(HDF) hdf;
+
+%exception %{
+    try {
+        $action
+    }
+    catch (const std::exception& e) { SWIG_JavaThrowException(jenv, SWIG_JavaRuntimeException, e.what() ); }
+    catch( const H5::Exception& e) { SWIG_JavaThrowException(jenv, SWIG_JavaRuntimeException, e.getCDetailMsg() ); }
+    catch (...) { SWIG_JavaThrowException(jenv, SWIG_JavaRuntimeException,  "exception in machinelearning framework"); }
+%}
 #endif
+
+
 
 
 %include "hdf.hpp"
