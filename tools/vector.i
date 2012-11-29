@@ -21,29 +21,26 @@
  @endcond
  **/
 
-/** interface file for the matrix calls **/
+/** interface file for the vector calls **/
 
 
 #ifdef SWIGJAVA
-%module "matrixmodule"
+%module "vectormodule"
 %include "../swig/java/java.i"
-%rename(Matrix) matrix;
+%rename(Vector) vector;
 
-%typemap(javabody)           machinelearning::tools::matrix ""
-%typemap(javafinalize)       machinelearning::tools::matrix ""
-%typemap(javadestruct)       machinelearning::tools::matrix ""
+%typemap(javabody)           machinelearning::tools::vector ""
+%typemap(javafinalize)       machinelearning::tools::vector ""
+%typemap(javadestruct)       machinelearning::tools::vector ""
 #endif
 
 
-%nodefaultctor               machinelearning::tools::matrix;
-%nodefaultdtor               machinelearning::tools::matrix;
+%nodefaultctor               machinelearning::tools::vector;
+%nodefaultdtor               machinelearning::tools::vector;
 
 
-%include "matrix.hpp"
-%template(max) machinelearning::tools::matrix::max<double>;
-%template(min) machinelearning::tools::matrix::min<double>;
-%template(mean) machinelearning::tools::matrix::mean<double>;
-%template(variance) machinelearning::tools::matrix::variance<double>;
-%template(sum) machinelearning::tools::matrix::sum<double>;
-%template(trace) machinelearning::tools::matrix::trace<double>;
-%template(cov) machinelearning::tools::matrix::cov<double>;
+%include "vector.hpp"
+%template(min) machinelearning::tools::vector::min<double>;
+%template(max) machinelearning::tools::vector::max<double>;
+%template(mean) machinelearning::tools::vector::mean<double>;
+%template(variance) machinelearning::tools::vector::variance<double>;

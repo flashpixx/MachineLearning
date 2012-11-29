@@ -50,6 +50,7 @@
 
 
 
+#ifndef SWIG
 namespace boost { namespace lambda {
     
     namespace ublas         = boost::numeric::ublas;
@@ -63,14 +64,17 @@ namespace boost { namespace lambda {
     };
     
 }}
+#endif
 
 
 
 namespace machinelearning { namespace tools {
     
+    #ifndef SWIG
     namespace ublas = boost::numeric::ublas;
     namespace bac   = boost::accumulators;
     namespace lam   = boost::lambda;
+    #endif
     
     
     /** class for vector operations **/
@@ -92,7 +96,9 @@ namespace machinelearning { namespace tools {
             template<typename T> static ublas::vector<std::size_t> rankIndexVector( ublas::vector<T>& );
             template<typename T> static ublas::indirect_array<> rankIndex( ublas::vector<T>& );
             template<typename T> static ublas::vector<T> setNumericalZero( const ublas::vector<T>&, const T& = 0 );
+            #ifndef SWIG
             static ublas::indirect_array<> toIndirectArray( const std::vector<std::size_t>& );
+            #endif
     };
     
     
