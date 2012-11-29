@@ -171,6 +171,18 @@ NONCONSTTYPES( jobject,          java.util.ArrayList<Double[]>,         ublas::m
 
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------
+// global exception handling, rethrow C++ exception to Java
+%exception {
+    try {
+        $action
+    }
+    catch (const std::exception& e) { SWIG_JavaThrowException(jenv, SWIG_JavaRuntimeException, e.what() ); }
+    catch (...) { SWIG_JavaThrowException(jenv, SWIG_JavaRuntimeException,  "an unkown exception in machinelearning framework is caught"); }
+}
+
+
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------
 // structure that is included in each cpp file
 %{
 #include "swig/java/java.hpp"
