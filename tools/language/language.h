@@ -21,8 +21,8 @@
  @endcond
  **/
 
-#ifndef __MACHINELEARNING_TOOLS_LANGUAGE_H
-#define __MACHINELEARNING_TOOLS_LANGUAGE_H
+#ifndef __MACHINELEARNING_TOOLS_LANGUAGE_LANGUAGE_H
+#define __MACHINELEARNING_TOOLS_LANGUAGE_LANGUAGE_H
 
 #include <vector>
 #include <boost/algorithm/string.hpp> 
