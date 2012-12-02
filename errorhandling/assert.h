@@ -46,21 +46,25 @@
 
         #define MACHINELEARNING_ASSERT( p_expression, p_message ) \
             { \
-                if (machinelearning::tools::logger::exists()) {   \
-                    std::stringstream l_msg; \
-                    l_msg << p_message << ", " << __FILE__ << ", line " << __LINE__; \
-                    machinelearning::tools::logger::getInstance()->write( machinelearning::tools::logger::assert, l_msg.str() ); \
+                if (!p_expression) { \
+                    if (machinelearning::tools::logger::exists()) {   \
+                        std::stringstream l_msg; \
+                        l_msg << p_message << ", " << __FILE__ << ", line " << __LINE__; \
+                        machinelearning::tools::logger::getInstance()->write( machinelearning::tools::logger::assert, l_msg.str() ); \
+                    } \
+                    std::cerr << "Machinlearning Assertion failed: " << p_message << ", " << __FILE__ << ", line " << __LINE__ << std::endl; \
+                    exit(EXIT_FAILURE); \
                 } \
-                std::cerr << "Machinlearning Assertion failed: " << p_message << ", " << __FILE__ << ", line " << __LINE__ << std::endl; \
-                exit(EXIT_FAILURE); \
             }
 
     #else
     
         #define MACHINELEARNING_ASSERT( p_expression, p_message ) \
             { \
-                std::cerr << "Machinlearning Assertion failed: " << p_message << ", " << __FILE__ << ", line " << __LINE__ << std::endl; \
-                exit(EXIT_FAILURE); \
+                if (!p_expression) { \
+                    std::cerr << "Machinlearning Assertion failed: " << p_message << ", " << __FILE__ << ", line " << __LINE__ << std::endl; \
+                    exit(EXIT_FAILURE); \
+                } \
             }
 
     #endif
