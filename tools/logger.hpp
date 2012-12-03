@@ -64,14 +64,14 @@ namespace machinelearning { namespace tools {
         public :
         
             enum logstate {
-                none        = 0,
+                none,
                 #ifndef MACHINELEARNING_NDEBUG
-                assert      = 1,
+                assert,
                 #endif
-                exception   = 2,
-                error       = 3,
-                warn        = 4,
-                info        = 5
+                exception,
+                error,
+                warn,
+                info
             };
                 
             static bool exists( void );
