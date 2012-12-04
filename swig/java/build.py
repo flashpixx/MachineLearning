@@ -28,17 +28,22 @@ import subprocess
 Import("*")
 
 
-
-# library change for Mac OS X
-def libchange_osx(source) :
-    cmd = subprocess.Popen( "otool -L "+source, shell=True, stdout=subprocess.PIPE)
+# run os command
+def processcommand( command ) :
+    cmd = subprocess.Popen( command, shell=True, stdout=subprocess.PIPE)
     output = cmd.stdout.readlines()
     cmd.communicate()
     if cmd.returncode <> 0 :
         raise SCons.Errors.UserError("error reading output")
+    return output
 
+
+# library change for Mac OS X
+def libchange_osx(source) :
     # get linked libs and change the path
     os.system("install_name_tool -id " + os.path.basename(source) + " " + source )
+    output = processcommand( "otool -L "+source )
+    
     for n in [i.strip().split(" ")[0] for i in output[2:]] :
         fname  = os.path.splitext(os.path.basename(n))
         fname  = re.sub(r"\.[0-9]+", "", fname[0])+fname[1]
@@ -47,6 +52,15 @@ def libchange_osx(source) :
             os.system("install_name_tool -change " + n + " @loader_path" + os.path.sep + fname + " " + source)
             libchange_osx( os.path.join( os.path.dirname(source), fname) )
 
+
+# library change for Linux
+def libchange_posix(source) :
+    output = processcommand( "ldd "+source+" | grep -i \"not found\"" )
+    
+    for n in  [i.strip().split(" ")[0] for i in output] :
+	fname = n.split(os.path.sep)[-1]
+        #print fname
+        #libchange_posix(fname)
 
 # linux change: os.system( "objdump -p " + pathfile + " | grep -i soname | awk '{system(\"mv " + pathfile + " "+nativepath+os.path.sep+"\"$2)}'" )
 
@@ -57,6 +71,8 @@ def libchange(target, source, env) :
         pass
     elif env["TOOLKIT"] == "darwin" :
         libchange_osx(str(source[0]))
+    elif env["TOOLKIT"] == "posix" :
+        libchange_posix(str(source[0]))
     else :
         raise RuntimeError("platform not known")
 
@@ -70,6 +86,7 @@ for i in GlobRekursiv( os.path.join("..", ".."), [".i"], ["swig", "examples", "d
     cpp.extend( filter(lambda n: not str(n).endswith(env["JAVASUFFIX"]), env.SwigJava( os.path.join("#build", env["buildtype"], "jar", "source"), i ) ) )
 
 # call Java & C++ builder
+
 builddll = env.SharedLibrary( os.path.join("#build", env["buildtype"], "jar", "dll", "machinelearning"), defaultcpp + cpp )
 dll      = []
 for i in filter(lambda x: str(x).endswith(env["SHLIBSUFFIX"]), builddll) :

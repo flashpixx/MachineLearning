@@ -32,6 +32,8 @@ Import("*")
 
 # === default configuration ================================================
 localconf = {
+    "linkflags"             : [ ],
+
     "cpplibraries"          : [  "stdc++",
                                  "boost_iostreams"
     ],

@@ -175,6 +175,8 @@ def checkCPPEnv(conf, localconf) :
         if not conf.CheckLib(i, language="C++") :                                                                                                                                                                                                                         
             sys.exit(1) 
 
+    conf.env.AppendUnique(LINKFLAGS = localconf["linkflags"])
+
     # setup DistCC or on local color-compiler
     if "DISTCC_HOSTS" in os.environ  or  conf.env["usedistcc"] :
         if "DISTCC_VERBOSE" in os.environ :
@@ -292,10 +294,13 @@ def librarycopy_emitter(target, source, env) :
             libnames.append( str(i)+env["SHLIBSUFFIX"] )
             
         for n in libnames :
-            lib  = findfile(n, pathlist)
-            if lib <> None :
-                listsources.append(lib)
-                listtargets.append( os.path.join(str(target[0]), n) )
+            targetfile = n
+            found      = findfile(targetfile, pathlist)
+            if found <> None :
+                if env["TOOLKIT"] == "posix" and os.path.islink(found) :
+                    targetfile = os.path.basename(os.readlink(found))
+                listsources.append(found)
+                listtargets.append( os.path.join(str(target[0]), targetfile) )
                 break
     return listtargets, listsources
     

@@ -36,6 +36,8 @@ if conf.env["withmpi"] :
 
 # === default configuration ================================================
 localconf = {
+    "linkflags"             : [ ],
+
     "cpplibraries"          : [  "stdc++",
                                  "boost_iostreams"
     ],

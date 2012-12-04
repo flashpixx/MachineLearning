@@ -32,6 +32,8 @@ Import("*")
 
 # === default configuration ================================================
 localconf = {
+    "linkflags"             : [ ],
+
     "cpplibraries"          : [  "stdc++",
                                  "boost_iostreams"
     ],
@@ -247,6 +249,7 @@ elif "documentation" in COMMAND_LINE_TARGETS :
 # === build configuration ==================================================
 if "java" in COMMAND_LINE_TARGETS :
     localconf["cheaders"].append("jni.h")
+    localconf["linkflags"].append("-Wl,-rpath,'./'")
 
 if conf.env["withrandomdevice"] :
     conf.env.AppendUnique(CPPDEFINES  = ["MACHINELEARNING_RANDOMDEVICE"])

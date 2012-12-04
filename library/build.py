@@ -383,13 +383,22 @@ def LapackAtlas_BuildInstall(env, atlasdir, lapacktargz) :
     # Atlas need a temporary build directory
     builddir = env.Command( str(atlasdir).replace("['", "").replace("']", "")+"-buildtmp", atlasdir, Mkdir("$TARGET"))
     version  = str(atlasdir).replace("atlas", "").replace("['", "").replace("']", "")
+    prefix   = os.path.join("..", "build_"+env["buildtype"], "atlas", version)
     
     cmd = "cd " + os.path.join("library", str(builddir).replace("['", "").replace("']", "")) + " && " + os.path.join("..", "ATLAS", "configure") + " --dylibs"
     if env["atlaspointerwidth"] == "32" :
         cmd += " -b 32"
     elif env["atlaspointerwidth"] == "64" :
         cmd += " -b 64"
-    cmd += " --with-netlib-lapack-tarfile=" + os.path.join("..", str(lapacktargz).replace("['", "").replace("']", "")) + " --prefix=" + os.path.join("..", "build_"+env["buildtype"], "atlas", version) + " && make && make install"
+    cmd += " --with-netlib-lapack-tarfile=" + os.path.join("..", str(lapacktargz).replace("['", "").replace("']", "")) + " --prefix=" + prefix
+    
+    # change Soname of the Linux library
+    if env["TOOLKIT"] == "posix" :
+        cmd = cmd + " && sed -e \"s/soname \\$$(LIBINSTdir)\\/\\$$(outso)/soname \\$$(outso).\\$$(VER)/\" lib/Makefile > lib/Makefile.tmp && mv -f lib/Makefile.tmp lib/Makefile"
+    cmd = cmd + " && make && make install"
+    if env["TOOLKIT"] == "posix" :
+        cmd = cmd + " && cd "+prefix+"/lib && mv libsatlas.so libsatlas.so."+version+" && mv libtatlas.so libtatlas.so.+"+version+" && ln -s libsatlas.so."+version+" libsatlas.so && ln -s libtatlas.so."+version+" libtatlas.so"
+    
     return env.Command("buildatlas-"+version, [atlasdir, lapacktargz, builddir], cmd)
 
 
@@ -400,7 +409,7 @@ def HDF5_BuildInstall(env, hdfdir) :
     if env["TOOLKIT"] == "msys" :
         cmd = "cd $SOURCE && cmake . -G \"MSYS Makefiles\" -DBUILD_SHARED_LIBS:BOOL=\"1\" -DHDF5_BUILD_HL_LIB:BOOL=\"1\" -DHDF5_BUILD_CPP_LIB:BOOL=\"1\" -DCMAKE_INSTALL_PREFIX:PATH=\"" + prefix + "\" && make && make install"
     else :
-        cmd = "cd $SOURCE && ./configure --enable-cxx --prefix=" + prefix + " && make && make install"
+        cmd = "cd $SOURCE && ./configure --enable-cxx --disable-sharedlib-rpath --prefix=" + prefix + " && make && make install"
     return env.Command("buildhdf5-"+version, hdfdir, cmd)
 
 

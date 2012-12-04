@@ -38,6 +38,8 @@ if any(i in COMMAND_LINE_TARGETS for i in ["java", "javatools", "javaclustering"
 
 # === default configuration ================================================
 localconf = {
+    "linkflags"             : [ ],
+
     "cpplibraries"          : [  "stdc++",
                                  "boost_iostreams"
     ],
