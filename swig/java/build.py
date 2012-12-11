@@ -100,14 +100,15 @@ def libchange(target, source, env) :
 
 
 
-cpp    = []
+cpp        = []
 
 # glob all Swig files and call the builder
 for i in GlobRekursiv( os.path.join("..", ".."), [".i"], ["swig", "examples", "documentation", "library", "buildenvironment"]) :
-    cpp.extend( filter(lambda n: not str(n).endswith(env["JAVASUFFIX"]), env.SwigJava( os.path.join("#build", env["buildtype"], "jar", "source"), i ) ) )
+    swigjava = env.SwigJava( os.path.join("#build", env["buildtype"], "jar", "source"), i )
+    cpp.extend( filter(lambda n: not str(n).endswith(env["JAVASUFFIX"]),  swigjava ) )
+
 
 # call Java & C++ builder
-
 builddll = env.SharedLibrary( os.path.join("#build", env["buildtype"], "jar", "dll", "machinelearning"), defaultcpp + cpp )
 dll      = []
 for i in filter(lambda x: str(x).endswith(env["SHLIBSUFFIX"]), builddll) :
@@ -117,6 +118,7 @@ java   = env.Java(  os.path.join("#build", env["buildtype"], "jar", "build"), os
 libcp  = env.LibraryCopy( os.path.join("#build", env["buildtype"], "jar", "build", "native"), [] )
 rellib = env.Command("rellib_dll", dll, libchange )
 Depends(rellib, libcp)
+
     
 # set Jar flags (we need a own command for the -C option)   
 env["JARCOM"] = "$JAR $_JARFLAGS $TARGET $_JARMANIFEST $_JARCHDIR $_JARSOURCES -C " + os.path.join("build", env["buildtype"], "jar", "build") + " ."
