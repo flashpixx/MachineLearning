@@ -29,12 +29,12 @@ Import("*")
 
 
 # run os command
-def processcommand( command ) :
+def processcommand( command, raiseexceptiononerror = True ) :
     cmd = subprocess.Popen( command, shell=True, stdout=subprocess.PIPE)
     output = cmd.stdout.readlines()
     cmd.communicate()
-    if cmd.returncode <> 0 :
-        raise SCons.Errors.UserError("error reading output")
+    if raiseexceptiononerror and cmd.returncode :
+        raise RuntimeError("error reading output on command ["+command+"]")
     return output
 
 
@@ -54,15 +54,36 @@ def libchange_osx(source) :
 
 
 # library change for Linux
-def libchange_posix(source) :
-    output = processcommand( "ldd "+source+" | grep -i \"not found\"" )
-    
-    for n in  [i.strip().split(" ")[0] for i in output] :
-	fname = n.split(os.path.sep)[-1]
-        #print fname
-        #libchange_posix(fname)
+def libchange_posix(source, env) :
 
-# linux change: os.system( "objdump -p " + pathfile + " | grep -i soname | awk '{system(\"mv " + pathfile + " "+nativepath+os.path.sep+"\"$2)}'" )
+    # change the rpath name of the current library
+    output = processcommand( "objdump -x "+source+" | grep -i \"rpath\"", False )
+    if output :
+        os.system("chrpath -r ./ "+source)
+
+    # path of the build libraries
+    libpath = os.path.join("build", env["buildtype"], "jar", "build", "native")
+
+    # get all relative DLLs (they are defined as "not found") 
+    output = processcommand( "ldd "+source )
+    for i in output :
+        parts = [n.strip() for n in i.split("=>")]
+        if len(parts) != 2 or parts[1] != "not found" :
+            continue
+
+        # check the library file if exsits, that traverse down
+        if os.path.isfile( os.path.join(libpath, parts[0]) ) :
+            libchange_posix( os.path.join(libpath, parts[0]), env )
+        
+        # if the file not exists, try to find it in the file list and rename the file
+        else :
+            for n in os.listdir(libpath) :
+                if parts[0] in n :
+                    os.rename( os.path.join(libpath, n), os.path.join(libpath, parts[0]) )
+                    libchange_posix( os.path.join(libpath, parts[0]), env )
+                    break
+
+
 
 
 # builder command function that is run on the build JNI library for setup relative links
@@ -72,7 +93,7 @@ def libchange(target, source, env) :
     elif env["TOOLKIT"] == "darwin" :
         libchange_osx(str(source[0]))
     elif env["TOOLKIT"] == "posix" :
-        libchange_posix(str(source[0]))
+        libchange_posix(str(source[0]), env)
     else :
         raise RuntimeError("platform not known")
 

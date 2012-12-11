@@ -409,7 +409,7 @@ def HDF5_BuildInstall(env, hdfdir) :
     if env["TOOLKIT"] == "msys" :
         cmd = "cd $SOURCE && cmake . -G \"MSYS Makefiles\" -DBUILD_SHARED_LIBS:BOOL=\"1\" -DHDF5_BUILD_HL_LIB:BOOL=\"1\" -DHDF5_BUILD_CPP_LIB:BOOL=\"1\" -DCMAKE_INSTALL_PREFIX:PATH=\"" + prefix + "\" && make && make install"
     else :
-        cmd = "cd $SOURCE && ./configure --enable-cxx --disable-sharedlib-rpath --prefix=" + prefix + " && make && make install"
+        cmd = "cd $SOURCE && ./configure --enable-cxx --prefix=" + prefix + " && make && make install"
     return env.Command("buildhdf5-"+version, hdfdir, cmd)
 
 
