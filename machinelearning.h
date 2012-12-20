@@ -727,6 +727,7 @@
  * @todo adding http://en.wikipedia.org/wiki/Ford–Fulkerson_algorithm / http://en.wikipedia.org/wiki/Edmonds–Karp_algorithm / http://en.wikipedia.org/wiki/Dinic%27s_algorithm
  * @todo adding PAPI support http://icl.cs.utk.edu/papi/
  * @todo adding Cuda support http://thrust.github.com/
+ * @todo adding NN sparse encoding http://en.wikipedia.org/wiki/Sparse_coding
  * @todo adding LSH for distance calculation ( http://en.wikipedia.org/wiki/Locality-sensitive_hashing )
  * @todo adding optimization algorithmus http://en.wikipedia.org/wiki/Levenberg–Marquardt_algorithm
  * @todo thinking about http://en.wikipedia.org/wiki/Conceptual_graph

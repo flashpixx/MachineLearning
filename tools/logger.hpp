@@ -75,7 +75,7 @@ namespace machinelearning { namespace tools {
             };
                 
             static bool exists( void );
-            static void createInstance( void );
+            static void createInstance( const std::string& = "", const std::string& = "" );
             static void releaseInstance( void );
             static logger* getInstance( void );
             void setLevel( const logstate& );
@@ -105,7 +105,7 @@ namespace machinelearning { namespace tools {
             boost::mutex m_muxwriter;
         
         
-            logger( void );  
+            logger( const std::string& = "", const std::string& = "" );  
             ~logger( void ); 
             logger( const logger& ) {};
             logger& operator=( const logger& );
@@ -116,6 +116,10 @@ namespace machinelearning { namespace tools {
         
             #ifdef MACHINELEARNING_MPI
         
+            /** ID for the MPI logger message **/
+            static std::size_t m_mpitag;
+            /** end-of-transmission string for closing the MPI logger listener **/
+            static std::string m_mpieot;
             /** mutex for creating the listener **/
             boost::mutex m_muxlistener;
             /** mutex for finalizing **/

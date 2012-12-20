@@ -25,7 +25,8 @@
  * or different code structures that must run only once
  **/
 
-
+#include <string>
+#include <cstddef>
 #include <boost/random.hpp>
 
 #ifdef MACHINELEARNING_MPI
@@ -40,29 +41,36 @@
 #include "machinelearning.h"
 
 
-
 namespace machinelearning {
-    
+
     /** initialization of the random device **/
     #ifdef MACHINELEARNING_RANDOMDEVICE
     boost::random_device tools::random::m_random;
     #else
+
         #ifdef MACHINELEARNING_MPI
-        {
         boost::mpi::communicator g_mpi;
         boost::mt19937 tools::random::m_random( time(NULL) * (g_mpi.rank()+1) );
-        }
         #else
         boost::mt19937 tools::random::m_random( time(NULL) );
         #endif
-    #endif
-    
-    /** initialization of the logger instance **/
-    #ifdef MACHINELEARNING_LOGGER
-    tools::logger::logger* tools::logger::m_instance = NULL;
+
     #endif
 
+
+    /** initialization of the logger instance **/
+    #ifdef MACHINELEARNING_LOGGER
+    tools::logger* tools::logger::m_instance = NULL;
+
+        #ifdef MACHINELEARNING_MPI
+        std::size_t tools::logger::m_mpitag = 999;
+        std::string tools::logger::m_mpieot = "$EOT$";
+        #endif
+
+    #endif
+    
 }
+
 
 
 

@@ -308,9 +308,7 @@ if conf.env["withsymbolicmath"] :
 
 if conf.env["withlogger"] :
     conf.env.AppendUnique(CPPDEFINES  = ["MACHINELEARNING_LOGGER"])
-    localconf["cpplibraries"].append(
-                            "boost_thread"
-    )    
+    localconf["cpplibraries"].extend(["boost_thread", "boost_system"])  
 
 
 if conf.env["withsources"] :

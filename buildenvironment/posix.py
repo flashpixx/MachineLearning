@@ -266,7 +266,9 @@ if conf.env["withmpi"] and not("librarybuild" in COMMAND_LINE_TARGETS) :
     conf.env.AppendUnique(CPPDEFINES  = ["MACHINELEARNING_MPI"])
     localconf["cpplibraries"].extend([
                             "boost_mpi",
-                            "boost_serialization"
+                            "boost_serialization",
+                            "mpi",
+                            "mpi_cxx"
     ])
     localconf["cppheaders"].append(
                             os.path.join("boost", "mpi.hpp")
@@ -311,9 +313,7 @@ if conf.env["withsymbolicmath"] :
 
 if conf.env["withlogger"] :
     conf.env.AppendUnique(CPPDEFINES  = ["MACHINELEARNING_LOGGER"])
-    localconf["cpplibraries"].append(
-                            "boost_thread"
-    )    
+    localconf["cpplibraries"].extend(["boost_thread", "boost_system"])    
 
 
 if conf.env["withsources"] :

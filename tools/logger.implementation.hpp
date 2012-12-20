@@ -29,10 +29,6 @@
 #define __MACHINELEARNING_TOOLS_LOGGER_IMPLEMENTAION_HPP
 
 
-
-#define MACHINELEARNING_LOGGER_PATHSUFFIX "machinelearning_%%%%%"
-#define MACHINELEARNING_LOGGER_FILENAME   "log.txt"
-
 #include <cassert>
 #include <string>
 #include <iostream>
@@ -43,12 +39,8 @@
 #include <boost/filesystem.hpp>
 
 #ifdef MACHINELEARNING_MPI
-
-#define MACHINELEARNING_LOGGER_MPI_TAG  999
-#define MACHINELEARNING_LOGGER_MPI_EOT  "$EOT$"
 #include <boost/mpi.hpp>
 #include <boost/bind.hpp>
-
 #endif
 
 #include "../errorhandling/exception.hpp"
@@ -65,8 +57,11 @@ namespace machinelearning { namespace tools {
 
      
 
-    /** constructor **/
-    inline logger::logger( void ) :
+    /** constructor
+     * @param p_pathsuffix path suffix
+     * @param p_filename log filename
+     **/
+    inline logger::logger( const std::string& p_pathsuffix, const std::string& p_filename ) :
         m_filename(),
         m_logstate(none),
         m_muxwriter()
@@ -78,11 +73,18 @@ namespace machinelearning { namespace tools {
     {
         // create temporary path for logging
         fsys::path temppath(fsys::temp_directory_path());
-        temppath /= MACHINELEARNING_LOGGER_PATHSUFFIX;
+        if (!p_pathsuffix.empty())
+            temppath /= p_pathsuffix;
+        else
+            temppath /= "machinelearning_%%%%%%";
         temppath = fsys::unique_path(temppath);
         
         // create filename with path
-        temppath /= MACHINELEARNING_LOGGER_FILENAME;
+        if (!p_filename.empty())
+            temppath /= p_filename;
+        else 
+            temppath /= "log.txt";
+
         m_filename = temppath.string();
     };
 
@@ -123,11 +125,14 @@ namespace machinelearning { namespace tools {
     }
 
 
-    /** creates a logger instance, run on main first **/
-    inline void logger::createInstance( void )
+    /** creates a logger instance, run on main first
+     * @param p_pathsuffix path suffix
+     * @param p_filename log filename
+     **/
+    inline void logger::createInstance( const std::string& p_pathsuffix, const std::string& p_filename )
     {
         assert(!m_instance);
-        m_instance = new logger();
+        m_instance = new logger( p_pathsuffix, p_filename );
     }
 
 
@@ -275,11 +280,11 @@ namespace machinelearning { namespace tools {
         if (p_mpi.rank() == 0) {
             std::size_t l_eot = p_mpi.size() - 1;
             while (l_eot > 0) {
-                while (boost::optional<mpi::status> l_status = p_mpi.iprobe(mpi::any_source, MACHINELEARNING_LOGGER_MPI_TAG)) {
+                while (boost::optional<mpi::status> l_status = p_mpi.iprobe(mpi::any_source, m_mpitag)) {
                     std::string l_str;               
                     p_mpi.recv(  l_status->source(), l_status->tag(), l_str );
                     
-                    if (l_str != MACHINELEARNING_LOGGER_MPI_EOT) {
+                    if (l_str != m_mpieot) {
                         std::ostringstream l_stream;
                         l_stream << l_str;
                         write2file( l_stream );
@@ -289,7 +294,7 @@ namespace machinelearning { namespace tools {
                 boost::this_thread::yield();
             }
         } else 
-            p_mpi.isend(0, MACHINELEARNING_LOGGER_MPI_TAG, std::string(MACHINELEARNING_LOGGER_MPI_EOT));
+            p_mpi.isend(0, m_mpitag, m_mpieot);
         
         p_mpi.barrier();
     }
@@ -313,7 +318,7 @@ namespace machinelearning { namespace tools {
         if (p_mpi.rank() == 0)
             write2file( l_stream );
         else
-            p_mpi.isend(0, MACHINELEARNING_LOGGER_MPI_TAG, l_stream.str());
+            p_mpi.isend(0, m_mpitag, l_stream.str());
     }
 
 
@@ -325,7 +330,7 @@ namespace machinelearning { namespace tools {
         boost::lock_guard<boost::mutex> l_lock(m_muxfinalize);
         
         while (m_listenerrunning) {
-            while (boost::optional<mpi::status> l_status = p_mpi.iprobe(mpi::any_source, MACHINELEARNING_LOGGER_MPI_TAG)) {
+            while (boost::optional<mpi::status> l_status = p_mpi.iprobe(mpi::any_source, m_mpitag)) {
                 std::string l_str;
                 std::ostringstream l_stream;
                 
@@ -340,8 +345,7 @@ namespace machinelearning { namespace tools {
     #endif
 
 
-}}
+} }
 
 #endif
-
 #endif
