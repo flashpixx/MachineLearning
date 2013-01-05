@@ -51,8 +51,8 @@ namespace machinelearning { namespace tools {
         
         public :
 
-            template<typename T> static bool isNumericalEqual( const T& p1, const T& p2 );
-            template<typename T> static bool isNumericalZero( const T& p );
+            template<typename T> static bool isNumericalEqual( const T&, const T& );
+            template<typename T> static bool isNumericalZero( const T& );
             static ublas::indirect_array<> unique( const ublas::indirect_array<>& );
             static bool fileExists( const std::string& );
             static std::string urlencode( const std::string& );
