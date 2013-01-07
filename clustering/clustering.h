@@ -23,8 +23,8 @@
 
 /** header file to connect all clustering algorithm for one include **/
 
-#ifndef __MACHINELEARNING_CLUSTERING_H
-#define __MACHINELEARNING_CLUSTERING_H
+#ifndef __MACHINELEARNING_CLUSTERING_CLUSTERING_H
+#define __MACHINELEARNING_CLUSTERING_CLUSTERING_H
 
 namespace machinelearning { 
     

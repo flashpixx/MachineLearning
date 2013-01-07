@@ -21,8 +21,8 @@
  @endcond
  **/
 
-#ifndef __MACHINELEARNING_TOOLS_IOSTREAMS_H
-#define __MACHINELEARNING_TOOLS_IOSTREAMS_H
+#ifndef __MACHINELEARNING_TOOLS_IOSTREAMS_IOSTREAMS_H
+#define __MACHINELEARNING_TOOLS_IOSTREAMS_IOSTREAMS_H
 
 namespace machinelearning { 
     namespace tools { 

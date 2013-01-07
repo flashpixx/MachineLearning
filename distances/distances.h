@@ -25,8 +25,8 @@
 
 /** header file to connect all tools library for one includ **/
 
-#ifndef __MACHINELEARNING_DISTANCES_H
-#define __MACHINELEARNING_DISTANCES_H
+#ifndef __MACHINELEARNING_DISTANCES_DISTANCES_H
+#define __MACHINELEARNING_DISTANCES_DISTANCES_H
 
 
 namespace machinelearning { 

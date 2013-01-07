@@ -23,8 +23,8 @@
 
 /** header file to connect all genetic algorithm for one include **/
 
-#ifndef __MACHINELEARNING_GENETICALGORITHM_H
-#define __MACHINELEARNING_GENETICALGORITHM_H
+#ifndef __MACHINELEARNING_GENETICALGORITHM_GENETICALGORITHM_H
+#define __MACHINELEARNING_GENETICALGORITHM_GENETICALGORITHM_H
 
 
 namespace machinelearning { 

@@ -23,8 +23,8 @@
 
 /** header file to connect all dimensional reducing algorithm for one include **/
 
-#ifndef __MACHINELEARNING_DIMENSIONREDUCE_H
-#define __MACHINELEARNING_DIMENSIONREDUCE_H
+#ifndef __MACHINELEARNING_DIMENSIONREDUCE_DIMENSIONREDUCE_H
+#define __MACHINELEARNING_DIMENSIONREDUCE_DIMENSIONREDUCE_H
 
 
 namespace machinelearning { 

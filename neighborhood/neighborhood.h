@@ -23,8 +23,8 @@
 
 /** header file to connect all neighborhood algorithms for one include **/
 
-#ifndef __MACHINELEARNING_NEIGHBORHOOD_H
-#define __MACHINELEARNING_NEIGHBORHOOD_H
+#ifndef __MACHINELEARNING_NEIGHBORHOOD_NEIGHBORHOOD_H
+#define __MACHINELEARNING_NEIGHBORHOOD_NEIGHBORHOOD_H
 
 #include "neighborhood.hpp"
 #include "knn.hpp"

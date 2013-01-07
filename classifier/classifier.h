@@ -23,8 +23,8 @@
 
 /** header file to connect all clustering algorithm for one include **/
 
-#ifndef __MACHINELEARNING_CLASSIFIER_H
-#define __MACHINELEARNING_CLASSIFIER_H
+#ifndef __MACHINELEARNING_CLASSIFIER_CLASSIFIER_H
+#define __MACHINELEARNING_CLASSIFIER_CLASSIFIER_H
 
 #include "classifier.hpp"
 

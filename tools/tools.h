@@ -23,8 +23,8 @@
 
 
 
-#ifndef __MACHINELEARNING_TOOLS_H
-#define __MACHINELEARNING_TOOLS_H
+#ifndef __MACHINELEARNING_TOOLS_TOOLS_H
+#define __MACHINELEARNING_TOOLS_TOOLS_H
 
 namespace machinelearning { 
     

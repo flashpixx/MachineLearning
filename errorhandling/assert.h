@@ -25,8 +25,8 @@
  * if the logger exists
  **/
 
-#ifndef __MACHINELEARNING_ASSERT_H
-#define __MACHINELEARNING_ASSERT_H
+#ifndef __MACHINELEARNING_ERRORHANDLING_ASSERT_H
+#define __MACHINELEARNING_ERRORHANDLING_ASSERT_H
 
 #include <cstdlib>
 #include <sstream>
