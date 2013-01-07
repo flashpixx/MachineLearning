@@ -42,7 +42,7 @@ namespace machinelearning { namespace tools { namespace iostreams {
         public :
         
             urlencoder( const unsigned int& );
-            template<typename SINK> bool put(SINK&, int);
+            template<typename S> bool put(S&, int);
         
         private :
         
@@ -100,7 +100,7 @@ namespace machinelearning { namespace tools { namespace iostreams {
      * @param p_char input character
      * @return bool for writing
      **/
-    template<typename SINK> inline bool urlencoder::put(SINK& p_dest, int p_char)
+    template<typename S> inline bool urlencoder::put(S& p_dest, int p_char)
     {
         // unreserved characters
         if ((isalnum(p_char)) || (p_char == '_') || (p_char == '~') || (p_char == '.') || (p_char == '-'))
