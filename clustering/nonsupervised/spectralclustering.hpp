@@ -101,11 +101,11 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     
     
     /** enabled logging for training
-     * @param p bool
+     * @param p_log bool
      **/
-    template<typename T> inline void spectralclustering<T>::setLogging( const bool& p )
+    template<typename T> inline void spectralclustering<T>::setLogging( const bool& p_log )
     {
-        m_kmeans.setLogging(p);
+        m_kmeans.setLogging(p_log);
     }
     
     

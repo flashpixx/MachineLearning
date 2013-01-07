@@ -198,6 +198,12 @@ def check_ParameterVar( filename, name, typelst ) :
 # @param typelst of the variable (list or string)
 # @param tuple with messagetype and message
 def check_LocalVar( filename, name, typelst ) :
+    # check special variables
+    if filename.endswith("machinelearning.cpp") :
+        if name == "m_random" and "machinelearning::tools::random" in typelst :
+            return None, None
+
+
     # check iterator variables (we check the types for iterator types or
     # std::map, std::vector or std::multimap, because in some case the AST does not shown the iterator type)
     if name == "it" :

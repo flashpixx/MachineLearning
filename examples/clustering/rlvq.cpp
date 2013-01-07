@@ -102,15 +102,15 @@ int main(int p_argc, char* p_argv[])
 
     // rlvq with uint labels
     if (l_map["labeltype"].as<std::string>() == "uint") {
-        std::vector<std::size_t> labels = tools::vector::copy( source.readBlasVector<std::size_t>(l_map["labelpath"].as<std::string>(), tools::files::hdf::NATIVE_ULONG) );
-        std::vector<std::size_t> unique = tools::vector::unique(labels);
+        std::vector<std::size_t> l_labels = tools::vector::copy( source.readBlasVector<std::size_t>(l_map["labelpath"].as<std::string>(), tools::files::hdf::NATIVE_ULONG) );
+        std::vector<std::size_t> unique = tools::vector::unique(l_labels);
 
         // create rlvq object
         cluster::rlvq<double, std::size_t> rlvq(dist, unique, data.size2());
         rlvq.setLogging( l_log );
 
         // train data
-        rlvq.train( data, labels, l_iteration );
+        rlvq.train( data, l_labels, l_iteration );
 
 
         // write target data
@@ -130,15 +130,15 @@ int main(int p_argc, char* p_argv[])
 
     // rlvq with int labels
     if (l_map["labeltype"].as<std::string>() == "int") {
-        std::vector<std::ptrdiff_t> labels = tools::vector::copy( source.readBlasVector<std::ptrdiff_t>(l_map["labelpath"].as<std::string>(), tools::files::hdf::NATIVE_LONG) );
-        std::vector<std::ptrdiff_t> unique = tools::vector::unique(labels);
+        std::vector<std::ptrdiff_t> l_labels = tools::vector::copy( source.readBlasVector<std::ptrdiff_t>(l_map["labelpath"].as<std::string>(), tools::files::hdf::NATIVE_LONG) );
+        std::vector<std::ptrdiff_t> unique = tools::vector::unique(l_labels);
 
         // create rlvq object
         cluster::rlvq<double, std::ptrdiff_t> rlvq(dist, unique, data.size2());
         rlvq.setLogging( l_log );
 
         // train data
-        rlvq.train( data, labels, l_iteration );
+        rlvq.train( data, l_labels, l_iteration );
 
 
         // write target data
@@ -158,15 +158,15 @@ int main(int p_argc, char* p_argv[])
 
     // rlvq with string labels
     if (l_map["labeltype"].as<std::string>() == "string") {
-        std::vector<std::string> labels = source.readStringVector(l_map["labelpath"].as<std::string>());
-        std::vector<std::string> unique = tools::vector::unique(labels);
+        std::vector<std::string> l_labels = source.readStringVector(l_map["labelpath"].as<std::string>());
+        std::vector<std::string> unique = tools::vector::unique(l_labels);
 
         // create rlvq object
         cluster::rlvq<double, std::string> rlvq(dist, unique, data.size2());
         rlvq.setLogging( l_log );
 
         // train data
-        rlvq.train( data, labels, l_iteration );
+        rlvq.train( data, l_labels, l_iteration );
 
 
         // write target data

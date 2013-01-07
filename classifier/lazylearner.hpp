@@ -148,11 +148,11 @@ namespace machinelearning { namespace classifier {
     
     
     /** enabled / disable logging
-     * @param p bool
+     * @param p_log bool
      **/
-    template<typename T, typename L> inline void lazylearner<T, L>::setLogging( const bool& p )
+    template<typename T, typename L> inline void lazylearner<T, L>::setLogging( const bool& p_log )
     {
-        m_logging = p;
+        m_logging = p_log;
     }
     
     

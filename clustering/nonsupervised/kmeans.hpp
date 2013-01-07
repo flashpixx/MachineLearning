@@ -114,11 +114,11 @@ namespace machinelearning { namespace clustering { namespace nonsupervised {
     
     
     /** enabled logging for training
-     * @param p bool
+     * @param p_val bool
      **/
-    template<typename T> inline void kmeans<T>::setLogging( const bool& p )
+    template<typename T> inline void kmeans<T>::setLogging( const bool& p_val )
     {
-        m_logging = p;
+        m_logging = p_val;
         m_logprototypes.clear();
         m_quantizationerror.clear();
     }

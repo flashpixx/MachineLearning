@@ -37,17 +37,17 @@ namespace po = boost::program_options;
  **/
 void output( tools::sources::wikipedia& p_wiki ) {
     // extract article data (if article exists read data else get acronyms)
-    std::vector<std::string> label;
+    std::vector<std::string> l_label;
     if (p_wiki.isArticle()) {
         std::cout << p_wiki.getArticleContent() << "\n-----------------------------------------------------------------------------------" << std::endl;
-        label = p_wiki.getArticleLabel();
+        l_label = p_wiki.getArticleLabel();
     } else
-        label = p_wiki.getArticleAcronym();
+        l_label = p_wiki.getArticleAcronym();
 
 
     // show label data
-    for(std::size_t i=0; i < label.size(); ++i)
-        std::cout << label[i] << std::endl;
+    for(std::size_t i=0; i < l_label.size(); ++i)
+        std::cout << l_label[i] << std::endl;
 }
 
 

@@ -94,10 +94,10 @@ namespace machinelearning { namespace tools {
         // the indirect_array: begin() returns a const reference iterator
         // @see http://answerpot.com/showthread.php?726979-submatrix+with+indexvector
         std::sort( &l_ar(0), &l_ar(l_ar.size()-1) );
-        std::size_t* it = std::unique( &l_ar(0), &l_ar(l_ar.size()-1) );
+        std::size_t* l_ptr = std::unique( &l_ar(0), &l_ar(l_ar.size()-1) );
         
-        ublas::indirect_array<> l_unique( std::distance(&l_ar(0), it) );
-        std::copy( &l_ar(0), it, &l_unique(0) );
+        ublas::indirect_array<> l_unique( std::distance(&l_ar(0), l_ptr) );
+        std::copy( &l_ar(0), l_ptr, &l_unique(0) );
         
         return l_unique;
     }

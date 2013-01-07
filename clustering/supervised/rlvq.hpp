@@ -125,11 +125,11 @@ namespace machinelearning { namespace clustering { namespace supervised {
     
     
     /** enabled / disable logging for training
-     * @param p bool
+     * @param p_log bool
     **/
-    template<typename T, typename L> inline void rlvq<T, L>::setLogging( const bool& p )
+    template<typename T, typename L> inline void rlvq<T, L>::setLogging( const bool& p_log )
     {
-        m_logging = p;
+        m_logging = p_log;
         m_logprototypes.clear();
         m_quantizationerror.clear();
     }

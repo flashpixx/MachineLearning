@@ -246,12 +246,12 @@ namespace machinelearning { namespace tools {
     template<typename T> inline ublas::vector<std::size_t> vector::rank( ublas::vector<T>& p_vec )
     {
         
-        std::vector<std::size_t> temp(boost::counting_iterator<std::size_t>(0), boost::counting_iterator<std::size_t>(p_vec.size()));
-        std::sort(temp.begin(), temp.end(), lam::var(p_vec)[lam::_1] < lam::var(p_vec)[lam::_2]);
+        std::vector<std::size_t> l_temp(boost::counting_iterator<std::size_t>(0), boost::counting_iterator<std::size_t>(p_vec.size()));
+        std::sort(l_temp.begin(), l_temp.end(), lam::var(p_vec)[lam::_1] < lam::var(p_vec)[lam::_2]);
         
-        ublas::vector<std::size_t> l_ranking(temp.size());
+        ublas::vector<std::size_t> l_ranking(l_temp.size());
         std::copy( boost::counting_iterator<std::size_t>(0), boost::counting_iterator<std::size_t>(p_vec.size()),
-                   boost::make_permutation_iterator(l_ranking.begin(), temp.begin())
+                   boost::make_permutation_iterator(l_ranking.begin(), l_temp.begin())
                  );
         
         return l_ranking;
@@ -267,11 +267,11 @@ namespace machinelearning { namespace tools {
      **/
     template<typename T> inline ublas::vector<std::size_t> vector::rankIndexVector( ublas::vector<T>& p_vec )
     {
-        std::vector<std::size_t> temp(boost::counting_iterator<std::size_t>(0), boost::counting_iterator<std::size_t>(p_vec.size()));
-        std::sort(temp.begin(), temp.end(), lam::var(p_vec)[lam::_1] < lam::var(p_vec)[lam::_2]);
+        std::vector<std::size_t> l_temp(boost::counting_iterator<std::size_t>(0), boost::counting_iterator<std::size_t>(p_vec.size()));
+        std::sort(l_temp.begin(), l_temp.end(), lam::var(p_vec)[lam::_1] < lam::var(p_vec)[lam::_2]);
         
-        ublas::vector<std::size_t> l_rank( temp.size() );
-        std::copy( temp.begin(), temp.end(), l_rank.begin() );
+        ublas::vector<std::size_t> l_rank( l_temp.size() );
+        std::copy( l_temp.begin(), l_temp.end(), l_rank.begin() );
         
         return l_rank;
         
