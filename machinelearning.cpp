@@ -49,8 +49,8 @@ namespace machinelearning {
     #else
 
         #ifdef MACHINELEARNING_MPI
-        boost::mpi::communicator g_mpi;
-        boost::mt19937 tools::random::m_random( time(NULL) * (g_mpi.rank()+1) );
+        boost::mpi::communicator l_mpi;
+        boost::mt19937 tools::random::m_random( time(NULL) * (l_mpi.rank()+1) );
         #else
         boost::mt19937 tools::random::m_random( time(NULL) );
         #endif

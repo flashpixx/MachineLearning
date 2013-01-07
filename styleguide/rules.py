@@ -170,6 +170,10 @@ def check_Method( filename, name, full ) :
 # @param typelst of the variable (list or string)
 # @param tuple with messagetype and message
 def check_MemberVar( filename, name, typelst ) :
+    if filename.endswith(os.path.join("geneticalgorithm","population.hpp")) and \
+       (name == "probabilityvalue" or name == "first" or name == "second" or name == "third") :
+        return None, None
+
     if not name.startswith("m_") :
         if name.startswith("m") :
             return "warning", "member variable [%s] with type [%s] begins only with 'm', but should begin with 'm_'" % (name, typelst)
