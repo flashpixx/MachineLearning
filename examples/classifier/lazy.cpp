@@ -87,73 +87,70 @@ int main(int p_argc, char* p_argv[])
 
 
     // read source hdf file and data
-    tools::files::hdf source( l_map["inputfile"].as<std::string>() );
-    const ublas::matrix<double> data        = source.readBlasMatrix<double>( l_map["datapath"].as<std::string>(), tools::files::hdf::NATIVE_DOUBLE);
-    const ublas::matrix<double> unknowndata = source.readBlasMatrix<double>( l_map["unkowndata"].as<std::string>(), tools::files::hdf::NATIVE_DOUBLE);
+    tools::files::hdf l_source( l_map["inputfile"].as<std::string>() );
+    const ublas::matrix<double> l_data        = l_source.readBlasMatrix<double>( l_map["datapath"].as<std::string>(), tools::files::hdf::NATIVE_DOUBLE);
+    const ublas::matrix<double> l_unknowndata = l_source.readBlasMatrix<double>( l_map["unkowndata"].as<std::string>(), tools::files::hdf::NATIVE_DOUBLE);
 
     // create target file
-    tools::files::hdf target(l_map["outfile"].as<std::string>(), true);
-
-
+    tools::files::hdf l_target(l_map["outfile"].as<std::string>(), true);
 
     // distance / neighbourhood
-    distance::norm::euclid<double> d;
-    neighbor::knn<double> n(d, l_knn);
+    neighbor::knn<double> l_neighbor( distance::norm::euclid<double>(), l_knn);
 
     if (l_map["labeltype"].as<std::string>() == "int") {
-        classifier::lazylearner<double, std::ptrdiff_t>::weighttype dist = classifier::lazylearner<double, std::ptrdiff_t>::inversedistance;
+        classifier::lazylearner<double, std::ptrdiff_t>::weighttype l_dist = classifier::lazylearner<double, std::ptrdiff_t>::inversedistance;
         if (l_distance == "distance")
-            dist = classifier::lazylearner<double, std::ptrdiff_t>::distance;
+            l_dist = classifier::lazylearner<double, std::ptrdiff_t>::distance;
 
         // create lazy-learner
-        classifier::lazylearner<double, std::ptrdiff_t> lazy(n, dist);
+        classifier::lazylearner<double, std::ptrdiff_t> l_lazy(neighbor, l_dist);
 
         // set data and read new labels for unkown data
-        lazy.setLogging(l_log);
-        lazy.setDatabase( data, tools::vector::copy( source.readBlasVector<std::ptrdiff_t>(l_map["datalabel"].as<std::string>(), tools::files::hdf::NATIVE_INT) ) );
-        target.writeBlasVector<std::ptrdiff_t>( "/unkwonlabel", tools::vector::copy(lazy.use(unknowndata)), tools::files::hdf::NATIVE_INT );
+        l_lazy.setLogging(l_log);
+        l_lazy.setDatabase( data, tools::vector::copy( l_source.readBlasVector<std::ptrdiff_t>(l_map["datalabel"].as<std::string>(), tools::files::hdf::NATIVE_INT) ) );
+        l_target.writeBlasVector<std::ptrdiff_t>( "/unkwonlabel", tools::vector::copy(l_lazy.use(l_unknowndata)), tools::files::hdf::NATIVE_INT );
 
         // if logging exists write data to file
-        if (lazy.getLogging())
-            target.writeBlasVector<double>( "/error",  tools::vector::copy(lazy.getLoggedQuantizationError()), tools::files::hdf::NATIVE_DOUBLE );
+        if (l_lazy.getLogging())
+            l_target.writeBlasVector<double>( "/error",  tools::vector::copy(l_lazy.getLoggedQuantizationError()), tools::files::hdf::NATIVE_DOUBLE );
     }
 
 
     if (l_map["labeltype"].as<std::string>() == "uint") {
-        classifier::lazylearner<double, std::size_t>::weighttype dist = classifier::lazylearner<double, std::size_t>::inversedistance;
+        classifier::lazylearner<double, std::size_t>::weighttype l_dist = classifier::lazylearner<double, std::size_t>::inversedistance;
         if (l_distance == "distance")
-            dist = classifier::lazylearner<double, std::size_t>::distance;
+            l_dist = classifier::lazylearner<double, std::size_t>::distance;
 
         // create lazy-learner
-        classifier::lazylearner<double, std::size_t> lazy(n, dist);
+        classifier::lazylearner<double, std::size_t> l_lazy(neighbor, l_dist);
 
         // set data and read new labels for unkown data
-        lazy.setLogging(l_log);
-        lazy.setDatabase( data, tools::vector::copy( source.readBlasVector<std::size_t>(l_map["datalabel"].as<std::string>(), tools::files::hdf::NATIVE_UINT) ) );
-        target.writeBlasVector<std::size_t>( "/unkwonlabel", tools::vector::copy(lazy.use(unknowndata)), tools::files::hdf::NATIVE_UINT );
+        l_lazy.setLogging(l_log);
+        l_lazy.setDatabase( l_data, tools::vector::copy( l_source.readBlasVector<std::size_t>(l_map["datalabel"].as<std::string>(), tools::files::hdf::NATIVE_UINT) ) );
+        l_target.writeBlasVector<std::size_t>( "/unkwonlabel", tools::vector::copy(l_lazy.use(l_unknowndata)), tools::files::hdf::NATIVE_UINT );
 
         // if logging exists write data to file
-        if (lazy.getLogging())
-            target.writeBlasVector<double>( "/error",  tools::vector::copy(lazy.getLoggedQuantizationError()), tools::files::hdf::NATIVE_DOUBLE );
+        if (l_lazy.getLogging())
+            l_target.writeBlasVector<double>( "/error",  tools::vector::copy(l_lazy.getLoggedQuantizationError()), tools::files::hdf::NATIVE_DOUBLE );
     }
 
 
     if (l_map["labeltype"].as<std::string>() == "string") {
-        classifier::lazylearner<double, std::string>::weighttype dist = classifier::lazylearner<double, std::string>::inversedistance;
+        classifier::lazylearner<double, std::string>::weighttype l_dist = classifier::lazylearner<double, std::string>::inversedistance;
         if (l_distance == "distance")
-            dist = classifier::lazylearner<double, std::string>::distance;
+            l_dist = classifier::lazylearner<double, std::string>::distance;
 
         // create lazy-learner
-        classifier::lazylearner<double, std::string> lazy(n, dist);
+        classifier::lazylearner<double, std::string> lazy(neighbor, l_dist);
 
         // set data and read new labels for unkown data
-        lazy.setLogging(l_log);
-        lazy.setDatabase( data, source.readStringVector(l_map["datalabel"].as<std::string>()) );
-        target.writeStringVector( "/unkwonlabel", lazy.use(unknowndata) );
+        l_lazy.setLogging(l_log);
+        l_lazy.setDatabase( l_data, l_source.readStringVector(l_map["datalabel"].as<std::string>()) );
+        l_target.writeStringVector( "/unkwonlabel", l_lazy.use(l_unknowndata) );
 
         // if logging exists write data to file
-        if (lazy.getLogging())
-            target.writeBlasVector<double>( "/error",  tools::vector::copy(lazy.getLoggedQuantizationError()), tools::files::hdf::NATIVE_DOUBLE );
+        if (l_lazy.getLogging())
+            l_target.writeBlasVector<double>( "/error",  tools::vector::copy(l_lazy.getLoggedQuantizationError()), tools::files::hdf::NATIVE_DOUBLE );
     }
 
 

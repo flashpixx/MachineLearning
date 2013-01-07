@@ -106,7 +106,7 @@ int main(int p_argc, char* p_argv[])
     if (l_spectral.getLogging()) {
         target.writeBlasVector<double>( "/error",  tools::vector::copy(l_spectral.getLoggedQuantizationError()), tools::files::hdf::NATIVE_DOUBLE );
         std::vector< ublas::matrix<double> > l_proto = l_spectral.getLoggedPrototypes();
-        for(std::size_t i=0; i < p.size(); ++i)
+        for(std::size_t i=0; i < l_proto.size(); ++i)
             target.writeBlasMatrix<double>("/log" + boost::lexical_cast<std::string>( i )+"/protos", l_proto[i], tools::files::hdf::NATIVE_DOUBLE );
     }
 
