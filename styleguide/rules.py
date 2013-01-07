@@ -113,8 +113,8 @@ def check_NamespaceAlias( filename, name, full ) :
 # @param filename filename (and path) of the file
 # @param name class string
 # @param tuple with messagetype and message
-def check_Class( filename, name ) :
-    return None, None
+#def check_Class( filename, name ) :
+#    return None, None
     
     
     
@@ -138,8 +138,8 @@ def check_Method( filename, name, full ) :
 # @param name name of the method
 # @param full full method signature
 # @param tuple with messagetype and message
-def check_Ctor( filename, name, full ) :
-    return None, None
+#def check_Ctor( filename, name, full ) :
+#    return None, None
     
     
     
@@ -147,8 +147,8 @@ def check_Ctor( filename, name, full ) :
 # @param filename filename (and path) of the file
 # @param name name of the method
 # @param tuple with messagetype and message
-def check_Dtor( filename, name ) :
-    return None, None
+#def check_Dtor( filename, name ) :
+#    return None, None
     
 
 
@@ -157,8 +157,8 @@ def check_Dtor( filename, name ) :
 # @param name name of the method
 # @param full full method signature
 # @param tuple with messagetype and message
-def check_FunctionTemplate( filename, name, full ) :
-    return None, None   
+#def check_FunctionTemplate( filename, name, full ) :
+#    return None, None   
     
     
     

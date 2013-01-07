@@ -1,21 +1,21 @@
 #!/usr/bin/env python
 
 ############################################################################
-# LGPL License                                                             #
+# GPL License                                                              #
 #                                                                          #
-# This file is part of the Machine Learning Framework.                     #
-# Copyright (c) 2010-2012, Philipp Kraus, <philipp.kraus@flashpixx.de>     #
+# This file is part of the Cellular Automaton Simulation.                  #
+# Copyright (c) 2012, Philipp Kraus, <philipp.kraus@tu-clausthal.de>       #
 # This program is free software: you can redistribute it and/or modify     #
-# it under the terms of the GNU Lesser General Public License as           #
+# it under the terms of the GNU General Public License as                  #
 # published by the Free Software Foundation, either version 3 of the       #
 # License, or (at your option) any later version.                          #
 #                                                                          #
 # This program is distributed in the hope that it will be useful,          #
 # but WITHOUT ANY WARRANTY; without even the implied warranty of           #
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
-# GNU Lesser General Public License for more details.                      #
+# GNU General Public License for more details.                             #
 #                                                                          #
-# You should have received a copy of the GNU Lesser General Public License #
+# You should have received a copy of the GNU General Public License        #
 # along with this program. If not, see <http://www.gnu.org/licenses/>.     #
 ############################################################################
 
@@ -138,38 +138,38 @@ def treeNode( rules, node, parentnode, source, messages ) :
     msg     = None
     msgtype = None
 
-    if node.kind == clang.cindex.CursorKind.NAMESPACE :
+    if  hasattr(rules, "check_Namespace") and callable(getattr(rules, "check_Namespace")) and node.kind == clang.cindex.CursorKind.NAMESPACE :
         msgtype, msg = rules.check_Namespace(filename, node.spelling)
         
-    if node.kind == clang.cindex.CursorKind.NAMESPACE_ALIAS :
+    if hasattr(rules, "check_NamespaceAlias") and callable(getattr(rules, "check_NamespaceAlias")) and node.kind == clang.cindex.CursorKind.NAMESPACE_ALIAS :
         msgtype, msg = rules.check_NamespaceAlias(filename, node.spelling, getNamespaceList(node))
         
-    elif node.kind == clang.cindex.CursorKind.CLASS_DECL :
+    elif hasattr(rules, "check_Class") and callable(getattr(rules, "check_Class")) and node.kind == clang.cindex.CursorKind.CLASS_DECL :
         msgtype, msg = rules.check_Class(filename, node.spelling)
     
-    elif node.kind == clang.cindex.CursorKind.CXX_METHOD :
+    elif hasattr(rules, "check_Method") and callable(getattr(rules, "check_Method")) and node.kind == clang.cindex.CursorKind.CXX_METHOD :
         msgtype, msg = rules.check_Method(filename, node.spelling, node.displayname)
     
-    elif node.kind == clang.cindex.CursorKind.CONSTRUCTOR :
+    elif hasattr(rules, "check_Ctor") and callable(getattr(rules, "check_Ctor")) and node.kind == clang.cindex.CursorKind.CONSTRUCTOR :
         msgtype, msg = rules.check_Ctor(filename, node.spelling, node.displayname)
     
-    elif node.kind == clang.cindex.CursorKind.DESTRUCTOR :
+    elif hasattr(rules, "check_Dtor") and callable(getattr(rules, "check_Dtor")) and node.kind == clang.cindex.CursorKind.DESTRUCTOR :
         msgtype, msg = rules.check_Dtor(filename, node.spelling)
     
-    elif node.kind == clang.cindex.CursorKind.FUNCTION_TEMPLATE :
+    elif hasattr(rules, "check_FunctionTemplate") and callable(getattr(rules, "check_FunctionTemplate")) and node.kind == clang.cindex.CursorKind.FUNCTION_TEMPLATE :
         msgtype, msg = rules.check_FunctionTemplate(filename, node.spelling, node.displayname)
     
             
-    elif node.kind == clang.cindex.CursorKind.FIELD_DECL :
+    elif hasattr(rules, "check_MemberVar") and callable(getattr(rules, "check_MemberVar")) and node.kind == clang.cindex.CursorKind.FIELD_DECL :
         msgtype, msg = rules.check_MemberVar(filename, node.displayname, getTypeList(node))
     
-    elif node.kind == clang.cindex.CursorKind.PARM_DECL and node.spelling :
+    elif hasattr(rules, "check_ParameterVar") and callable(getattr(rules, "check_ParameterVar")) and node.kind == clang.cindex.CursorKind.PARM_DECL and node.spelling :
         msgtype, msg = rules.check_ParameterVar(filename, node.spelling, getTypeList(node))
     
-    elif node.kind == clang.cindex.CursorKind.VAR_DECL and parentnode and not parentnode.kind == clang.cindex.CursorKind.CLASS_DECL:
+    elif hasattr(rules, "check_LocalVar") and callable(getattr(rules, "check_LocalVar")) and node.kind == clang.cindex.CursorKind.VAR_DECL and parentnode and not parentnode.kind == clang.cindex.CursorKind.CLASS_DECL:
         msgtype, msg = rules.check_LocalVar(filename, node.spelling, getTypeList(node))
     
-    elif node.kind == clang.cindex.CursorKind.TEMPLATE_TYPE_PARAMETER :
+    elif hasattr(rules, "check_TemplateVar") and callable(getattr(rules, "check_TemplateVar")) and node.kind == clang.cindex.CursorKind.TEMPLATE_TYPE_PARAMETER :
         msgtype, msg = rules.check_TemplateVar(filename, node.spelling)
 
     addMessage( messages, filename, int(node.location.line), msgtype, msg )
@@ -221,7 +221,7 @@ def stylecheck( rules, source, printtree = False, includedir = [], defines = [] 
         fp = open( i, "r" )
         filecontent = fp.read()
         fp.close()
-        if rules :
+        if rules and hasattr(rules, "check_Raw") and callable(getattr(rules, "check_Raw")) :
             msgtype, msg = rules.check_Raw(i, filecontent)
             addMessage( messages, i, 0, msgtype, msg )
 
@@ -236,7 +236,7 @@ def stylecheck( rules, source, printtree = False, includedir = [], defines = [] 
     # print all messages
     stop    = False
     stoplst = None
-    if rules :
+    if rules and hasattr(rules, "abort") and callable(getattr(rules, "abort")) :
         stoplst = rules.abort()
     if type([]) <> type(stoplst) :
         stoplst = [stoplst]
@@ -363,8 +363,11 @@ if __name__ == "__main__":
         try :
             ignorelst = [i[2:] for i in arglst if i.startswith("-X")]   
             starttime = time.time()
-            if "-ENV" in arglst and "CPPPATH" in os.environ :
-                include = os.environ["CPPPATH"].split(os.pathsep)
+            if "-ENV" in arglst :
+                if "CPPPATH" in os.environ :
+                    include.extend(os.environ["CPPPATH"].split(os.pathsep))
+                if "CPATH" in os.environ :
+                    include.extend(os.environ["CPATH"].split(os.pathsep))
                 
             for i in arglst :
 
@@ -396,12 +399,12 @@ if __name__ == "__main__":
             
             stylecheck( rules, files, printtree, include, defines )
             if "-TIME" in arglst :
-                print "\nexecution time: " + str(time.time() - starttime) + "sec"
+                print "execution time: " + str(time.time() - starttime) + "sec"
         
         except Exception as e :
             print e
             if "-TIME" in arglst :
                 print "\nexecution time: " + str(time.time() - starttime) + "sec"
             sys.exit(1)
-        
+                    
 #=====================================================================================================================================
