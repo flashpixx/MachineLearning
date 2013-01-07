@@ -55,8 +55,8 @@ namespace mpi       = boost::mpi;
 int main(int p_argc, char* p_argv[])
 {
 	#ifdef MACHINELEARNING_MPI
-    mpi::environment loMPIenv(p_argc, p_argv);
-    mpi::communicator loMPICom;
+    mpi::environment l_mpienv(p_argc, p_argv);
+    mpi::communicator l_mpicom;
     #endif
 	
     #ifdef MACHINELEARNING_MULTILANGUAGE
@@ -110,7 +110,7 @@ int main(int p_argc, char* p_argv[])
     // create basis data and twitter objects
     const std::vector<std::string> l_tweet = l_map["search"].as< std::vector<std::string> >();
     #ifdef MACHINELEARNING_MPI
-    if (l_tweet.size() != static_cast<std::size_t>(loMPICom.size()))
+    if (l_tweet.size() != static_cast<std::size_t>(l_mpicom.size()))
         throw std::runtime_error("number of tweet searches and used CPUs are not equal");
     #endif
     
@@ -167,19 +167,19 @@ int main(int p_argc, char* p_argv[])
 
     // get tweets
     #ifdef MACHINELEARNING_MPI
-    loMPICom.barrier();
-    std::cout << "CPU " << loMPICom.rank() << ": ";
+    l_mpicom.barrier();
+    std::cout << "CPU " << l_mpicom.rank() << ": ";
     #endif
     std::cout << "read tweets..." << std::endl;
     std::vector<std::string> l_tweetdata;
     std::vector<std::string> l_tweetlabel;
 
     #ifdef MACHINELEARNING_MPI
-    std::vector<tools::sources::twitter::searchtweet> l_data = l_twitter.search( l_tweet[static_cast<std::size_t>(loMPICom.rank())], l_params, l_tweetmax[static_cast<std::size_t>(loMPICom.rank())] );
+    std::vector<tools::sources::twitter::searchtweet> l_data = l_twitter.search( l_tweet[static_cast<std::size_t>(l_mpicom.rank())], l_params, l_tweetmax[static_cast<std::size_t>(l_mpicom.rank())] );
 
     for(std::size_t i=0; i < l_data.size(); ++i) {
         l_tweetdata.push_back( l_data[i].getText() );
-        l_tweetlabel.push_back( l_tweet[static_cast<std::size_t>(loMPICom.rank())] );
+        l_tweetlabel.push_back( l_tweet[static_cast<std::size_t>(l_mpicom.rank())] );
     }
 
     #else
@@ -200,8 +200,8 @@ int main(int p_argc, char* p_argv[])
 
     // create ncd object and calculate the distances
     #ifdef MACHINELEARNING_MPI
-    loMPICom.barrier();
-    std::cout << "CPU " << loMPICom.rank() << ": ";
+    l_mpicom.barrier();
+    std::cout << "CPU " << l_mpicom.rank() << ": ";
     #endif
     std::cout << "calculate normalized compression distance..." << std::endl;
 
@@ -214,7 +214,7 @@ int main(int p_argc, char* p_argv[])
         ncd.setCompressionLevel( distances::ncd<double>::bestcompression );
 
     #ifdef MACHINELEARNING_MPI
-    ublas::matrix<double> distancematrix = ncd.unsquare( loMPICom, l_tweetdata );
+    ublas::matrix<double> distancematrix = ncd.unsquare( l_mpicom, l_tweetdata );
     #else
     ublas::matrix<double> distancematrix = ncd.unsymmetric( l_tweetdata );
     #endif
@@ -225,8 +225,8 @@ int main(int p_argc, char* p_argv[])
 
     // run hit mds over the distance matrix
     #ifdef MACHINELEARNING_MPI
-    loMPICom.barrier();
-    std::cout << "CPU " << loMPICom.rank() << ": ";
+    l_mpicom.barrier();
+    std::cout << "CPU " << l_mpicom.rank() << ": ";
     #endif
     std::cout << "run mds projection..." << std::endl;
 
@@ -244,7 +244,7 @@ int main(int p_argc, char* p_argv[])
     mds.setRate( l_rate );
 
     #ifdef MACHINELEARNING_MPI
-    ublas::matrix<double> project = mds.map( loMPICom, distancematrix );
+    ublas::matrix<double> project = mds.map( l_mpicom, distancematrix );
     #else
     ublas::matrix<double> project = mds.map( distancematrix );
     #endif
@@ -255,8 +255,8 @@ int main(int p_argc, char* p_argv[])
     
     // create file and write data to hdf
     #ifdef MACHINELEARNING_MPI
-    loMPICom.barrier();
-    tools::files::hdf target( "node"+tools::function::toString(loMPICom.rank())+"_"+l_map["outfile"].as<std::string>(), true);
+    l_mpicom.barrier();
+    tools::files::hdf target( "node"+tools::function::toString(l_mpicom.rank())+"_"+l_map["outfile"].as<std::string>(), true);
     #else
     tools::files::hdf target( l_map["outfile"].as<std::string>(), true);
     #endif
@@ -267,7 +267,7 @@ int main(int p_argc, char* p_argv[])
     
     
     #ifdef MACHINELEARNING_MPI
-    if (loMPICom.rank() == 0)
+    if (l_mpicom.rank() == 0)
     #endif
     std::cout << "within the target file there are three datasets: /project = projected data, /label = datapoint label, /uniquegroup = list of unique labels" << std::endl;
 

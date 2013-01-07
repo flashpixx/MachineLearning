@@ -183,8 +183,8 @@ void getArticles( tools::sources::nntp& p_nntp, const std::size_t& p_numarticles
 int main(int p_argc, char* p_argv[])
 {
 	#ifdef MACHINELEARNING_MPI
-    mpi::environment loMPIenv(p_argc, p_argv);
-    mpi::communicator loMPICom;
+    mpi::environment l_mpienv(p_argc, p_argv);
+    mpi::communicator l_mpicom;
     #endif
 	
     #ifdef MACHINELEARNING_MULTILANGUAGE
@@ -243,16 +243,16 @@ int main(int p_argc, char* p_argv[])
 
     // read group list
     #ifdef MACHINELEARNING_MPI
-    loMPICom.barrier();
-    std::cout << "CPU " << loMPICom.rank() << ": ";
+    l_mpicom.barrier();
+    std::cout << "CPU " << l_mpicom.rank() << ": ";
     #endif
     std::cout << "getting group data..." << std::endl;
     std::vector<std::string> l_groups = createGroupList(l_nntp, l_map["groups"].as< std::vector<std::string> >());
 
     // read article data
     #ifdef MACHINELEARNING_MPI
-    loMPICom.barrier();
-    std::cout << "CPU " << loMPICom.rank() << ": ";
+    l_mpicom.barrier();
+    std::cout << "CPU " << l_mpicom.rank() << ": ";
     #endif
     std::cout << "read article data..." << std::endl;
     std::vector<std::string> l_article;
@@ -260,10 +260,10 @@ int main(int p_argc, char* p_argv[])
 
     #ifdef MACHINELEARNING_MPI
     std::vector<std::size_t> l_artnum = l_map["articles"].as< std::vector<std::size_t> >();
-    if (l_artnum.size() != static_cast<std::size_t>(loMPICom.size()))
+    if (l_artnum.size() != static_cast<std::size_t>(l_mpicom.size()))
         throw std::runtime_error("number of articles and used CPUs are not equal");
 
-    getArticles( l_nntp, l_artnum[loMPICom.rank()], l_groups, l_article, l_articlegroup );
+    getArticles( l_nntp, l_artnum[l_mpicom.rank()], l_groups, l_article, l_articlegroup );
     #else
     getArticles( l_nntp, l_map["articles"].as<std::size_t>(), l_groups, l_article, l_articlegroup );
     #endif
@@ -276,8 +276,8 @@ int main(int p_argc, char* p_argv[])
     // do stopword reduction
     if (l_map.count("stopword")) {
         #ifdef MACHINELEARNING_MPI
-        loMPICom.barrier();
-        std::cout << "CPU " << loMPICom.rank() << ": ";
+        l_mpicom.barrier();
+        std::cout << "CPU " << l_mpicom.rank() << ": ";
         #endif
         std::cout << "stopword reduction..." << std::endl;
         
@@ -295,8 +295,8 @@ int main(int p_argc, char* p_argv[])
 
     // create ncd object and calculate the distances
     #ifdef MACHINELEARNING_MPI
-    loMPICom.barrier();
-    std::cout << "CPU " << loMPICom.rank() << ": ";
+    l_mpicom.barrier();
+    std::cout << "CPU " << l_mpicom.rank() << ": ";
     #endif
     std::cout << "calculate normalized compression distance..." << std::endl;
 
@@ -308,7 +308,7 @@ int main(int p_argc, char* p_argv[])
         ncd.setCompressionLevel( distances::ncd<double>::bestcompression );
 
     #ifdef MACHINELEARNING_MPI
-    ublas::matrix<double> distancematrix = ncd.unsquare( loMPICom, l_article );
+    ublas::matrix<double> distancematrix = ncd.unsquare( l_mpicom, l_article );
     #else
     ublas::matrix<double> distancematrix = ncd.unsymmetric( l_article );
     #endif
@@ -319,8 +319,8 @@ int main(int p_argc, char* p_argv[])
 
     // run hit mds over the distance matrix
     #ifdef MACHINELEARNING_MPI
-    loMPICom.barrier();
-    std::cout << "CPU " << loMPICom.rank() << ": ";
+    l_mpicom.barrier();
+    std::cout << "CPU " << l_mpicom.rank() << ": ";
     #endif
     std::cout << "run mds projection..." << std::endl;
 
@@ -339,7 +339,7 @@ int main(int p_argc, char* p_argv[])
 
     
     #ifdef MACHINELEARNING_MPI
-    ublas::matrix<double> project = mds.map( loMPICom, distancematrix );
+    ublas::matrix<double> project = mds.map( l_mpicom, distancematrix );
     #else
     ublas::matrix<double> project = mds.map( distancematrix );
     #endif
@@ -350,8 +350,8 @@ int main(int p_argc, char* p_argv[])
     
     // create file and write data to hdf
     #ifdef MACHINELEARNING_MPI
-    loMPICom.barrier();
-    tools::files::hdf target( "node"+tools::function::toString(loMPICom.rank())+"_"+l_map["outfile"].as<std::string>(), true);
+    l_mpicom.barrier();
+    tools::files::hdf target( "node"+tools::function::toString(l_mpicom.rank())+"_"+l_map["outfile"].as<std::string>(), true);
     #else
     tools::files::hdf target( l_map["outfile"].as<std::string>(), true);
     #endif
@@ -362,7 +362,7 @@ int main(int p_argc, char* p_argv[])
     
     
     #ifdef MACHINELEARNING_MPI
-    if (loMPICom.rank() == 0)
+    if (l_mpicom.rank() == 0)
     #endif
     std::cout << "within the target file there are three datasets: /project = projected data, /group = newsgroup label of each dataset, /uniquegroup = list of unique newsgroups" << std::endl;
 

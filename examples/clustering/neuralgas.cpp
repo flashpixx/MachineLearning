@@ -51,8 +51,8 @@ int main(int p_argc, char* p_argv[])
 {
 
     #ifdef MACHINELEARNING_MPI
-    mpi::environment loMPIenv(p_argc, p_argv);
-    mpi::communicator loMPICom;
+    mpi::environment l_mpienv(p_argc, p_argv);
+    mpi::communicator l_mpicom;
     #endif
     
     #ifdef MACHINELEARNING_MULTILANGUAGE
@@ -103,13 +103,13 @@ int main(int p_argc, char* p_argv[])
 
     #ifdef MACHINELEARNING_MPI
     if(!(
-         ((l_map["inputfile"].as< std::vector<std::string> >().size() == static_cast<std::size_t>(loMPICom.size())) && (l_map["inputpath"].as< std::vector<std::string> >().size() == 1)) ||
-         ((l_map["inputpath"].as< std::vector<std::string> >().size() == static_cast<std::size_t>(loMPICom.size())) && (l_map["inputfile"].as< std::vector<std::string> >().size() == 1)) ||
-         ((l_map["inputpath"].as< std::vector<std::string> >().size() == static_cast<std::size_t>(loMPICom.size())) && (l_map["inputfile"].as< std::vector<std::string> >().size() == static_cast<std::size_t>(loMPICom.size())))
+         ((l_map["inputfile"].as< std::vector<std::string> >().size() == static_cast<std::size_t>(l_mpicom.size())) && (l_map["inputpath"].as< std::vector<std::string> >().size() == 1)) ||
+         ((l_map["inputpath"].as< std::vector<std::string> >().size() == static_cast<std::size_t>(l_mpicom.size())) && (l_map["inputfile"].as< std::vector<std::string> >().size() == 1)) ||
+         ((l_map["inputpath"].as< std::vector<std::string> >().size() == static_cast<std::size_t>(l_mpicom.size())) && (l_map["inputfile"].as< std::vector<std::string> >().size() == static_cast<std::size_t>(l_mpicom.size())))
          ))
         throw std::runtime_error("number of files or number of path must be equal to CPU rank");
 
-    if (l_map["prototype"].as< std::vector<std::size_t> >().size() != static_cast<std::size_t>(loMPICom.size()))
+    if (l_map["prototype"].as< std::vector<std::size_t> >().size() != static_cast<std::size_t>(l_mpicom.size()))
         throw std::runtime_error("number of prototypes must be equal to CPU rank");
     #endif
 
@@ -118,8 +118,8 @@ int main(int p_argc, char* p_argv[])
 
     // read source hdf file and data
     #ifdef MACHINELEARNING_MPI
-    const std::size_t filepos = l_map["inputefile"].as< std::vector<std::size_t> >().size() > 1 ? static_cast<std::size_t>(loMPICom.rank()) : 0;
-    const std::size_t pathpos = l_map["inputepath"].as< std::vector<std::size_t> >().size() > 1 ? static_cast<std::size_t>(loMPICom.rank()) : 0;
+    const std::size_t filepos = l_map["inputefile"].as< std::vector<std::size_t> >().size() > 1 ? static_cast<std::size_t>(l_mpicom.rank()) : 0;
+    const std::size_t pathpos = l_map["inputepath"].as< std::vector<std::size_t> >().size() > 1 ? static_cast<std::size_t>(l_mpicom.rank()) : 0;
 
     tools::files::hdf source( l_map["inputefile"].as< std::vector<std::string> >()[filepos] );
     ublas::matrix<double> data = source.readBlasMatrix<double>( l_map["inputpath"].as< std::vector<std::string> >()[pathpos], tools::files::hdf::NATIVE_DOUBLE);
@@ -134,24 +134,24 @@ int main(int p_argc, char* p_argv[])
 
 
     #ifdef MACHINELEARNING_MPI
-    cluster::neuralgas<double> ng(d, l_map["prototype"].as< std::vector<std::size_t> >()[static_cast<std::size_t>(loMPICom.rank())], data.size2());
+    cluster::neuralgas<double> ng(d, l_map["prototype"].as< std::vector<std::size_t> >()[static_cast<std::size_t>(l_mpicom.rank())], data.size2());
     ng.setLogging( l_log );
 
-    ng.train(loMPICom, data, l_iteration);
+    ng.train(l_mpicom, data, l_iteration);
 
     // collect all data (of each process)
-    ublas::matrix<double> protos = ng.getPrototypes(loMPICom);
+    ublas::matrix<double> protos = ng.getPrototypes(l_mpicom);
     ublas::vector<double> qerror;
     std::vector< ublas::matrix<double> > logproto;
 
     if (ng.getLogging()) {
-        qerror      = tools::vector::copy(ng.getLoggedQuantizationError(loMPICom));
-        logproto    = ng.getLoggedPrototypes(loMPICom);
+        qerror      = tools::vector::copy(ng.getLoggedQuantizationError(l_mpicom));
+        logproto    = ng.getLoggedPrototypes(l_mpicom);
     }
 
 
     // only process 0 writes hdf
-    if (loMPICom.rank() == 0) {
+    if (l_mpicom.rank() == 0) {
         tools::files::hdf target( l_map["outfile"].as<std::string>(), true);
 
         target.writeBlasMatrix<double>( "/protos",  protos, tools::files::hdf::NATIVE_DOUBLE );
@@ -189,7 +189,7 @@ int main(int p_argc, char* p_argv[])
 
 
     #ifdef MACHINELEARNING_MPI
-    if (loMPICom.rank() == 0) {
+    if (l_mpicom.rank() == 0) {
     #endif
 
     std::cout << "structure of the output file" << std::endl;

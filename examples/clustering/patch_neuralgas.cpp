@@ -51,8 +51,8 @@ int main(int p_argc, char* p_argv[])
 {
 
     #ifdef MACHINELEARNING_MPI
-    mpi::environment loMPIenv(p_argc, p_argv);
-    mpi::communicator loMPICom;
+    mpi::environment l_mpienv(p_argc, p_argv);
+    mpi::communicator l_mpicom;
     #endif
 
     #ifdef MACHINELEARNING_MULTILANGUAGE
@@ -100,17 +100,17 @@ int main(int p_argc, char* p_argv[])
 
     #ifdef MACHINELEARNING_MPI
     // we check CPU size and number of files
-    if (l_map["inputfile"].as< std::vector<std::string> >().size() == static_cast<std::size_t>(loMPICom.size()))
+    if (l_map["inputfile"].as< std::vector<std::string> >().size() == static_cast<std::size_t>(l_mpicom.size()))
         throw std::runtime_error("number of process and number of source files must be equal");
 
-    if ( static_cast<std::size_t>(loMPICom.size()) != l_map["prototype"].as< std::vector<std::size_t> >().size())
+    if ( static_cast<std::size_t>(l_mpicom.size()) != l_map["prototype"].as< std::vector<std::size_t> >().size())
         throw std::runtime_error("number of process and number of input prototypes must be equal");
     #endif
 
 
 
     #ifdef MACHINELEARNING_MPI
-    tools::files::hdf source( l_map["inputfile"].as< std::vector<std::string> >()[static_cast<std::size_t>(loMPICom.rank())] );
+    tools::files::hdf source( l_map["inputfile"].as< std::vector<std::string> >()[static_cast<std::size_t>(l_mpicom.rank())] );
     #else
     tools::files::hdf source( l_map["inputfile"].as<std::string>() );
     #endif
@@ -121,7 +121,7 @@ int main(int p_argc, char* p_argv[])
     distance::norm::euclid<double> d;
     #ifdef MACHINELEARNING_MPI
     cluster::neuralgas<double> ng(d,
-                l_map["prototype"].as< std::vector<std::size_t> >()[static_cast<std::size_t>(loMPICom.rank())],
+                l_map["prototype"].as< std::vector<std::size_t> >()[static_cast<std::size_t>(l_mpicom.rank())],
                 source.readBlasMatrix<double>(l_map["inputpath"].as< std::vector<std::string> >()[0], tools::files::hdf::NATIVE_DOUBLE).size2()
     );
     #else
@@ -137,21 +137,21 @@ int main(int p_argc, char* p_argv[])
 
     //create target file (only on the first process)
     tools::files::hdf* target = NULL;
-    if (loMPICom.rank() == 0)
+    if (l_mpicom.rank() == 0)
         target = new tools::files::hdf( l_map["outfile"].as<std::string>(), true );
 
     // do each patch
     for (std::size_t i=0; i < l_map["inputpath"].as< std::vector<std::string> >().size(); ++i) {
 
-        ng.trainpatch( loMPICom,
+        ng.trainpatch( l_mpicom,
                        source.readBlasMatrix<double>( l_map["inputpath"].as< std::vector<std::string> >()[i], tools::files::hdf::NATIVE_DOUBLE),
                        l_iteration
                      );
 
-        ublas::vector<double> weights                  = ng.getPrototypeWeights(loMPICom);
-        ublas::matrix<double> protos                   = ng.getPrototypes(loMPICom);
-        ublas::vector<double> qerror                   = tools::vector::copy(ng.getLoggedQuantizationError(loMPICom));
-        std::vector< ublas::matrix<double> > l_logproto  = ng.getLoggedPrototypes(loMPICom);
+        ublas::vector<double> weights                  = ng.getPrototypeWeights(l_mpicom);
+        ublas::matrix<double> protos                   = ng.getPrototypes(l_mpicom);
+        ublas::vector<double> qerror                   = tools::vector::copy(ng.getLoggedQuantizationError(l_mpicom));
+        std::vector< ublas::matrix<double> > l_logproto  = ng.getLoggedPrototypes(l_mpicom);
 
         if (target) {
             std::string patchpath = "/patch" + boost::lexical_cast<std::string>(i);
@@ -169,8 +169,8 @@ int main(int p_argc, char* p_argv[])
     }
 
 
-    ublas::vector<double> weights    = ng.getPrototypeWeights(loMPICom);
-    ublas::matrix<double> protos     = ng.getPrototypes(loMPICom);
+    ublas::vector<double> weights    = ng.getPrototypeWeights(l_mpicom);
+    ublas::matrix<double> protos     = ng.getPrototypes(l_mpicom);
     if (target) {
         target->writeValue<std::size_t>( "/numprotos",  protos.size1(), tools::files::hdf::NATIVE_ULONG );
         target->writeBlasMatrix<double>( "/protos",  protos, tools::files::hdf::NATIVE_DOUBLE );
@@ -217,7 +217,7 @@ int main(int p_argc, char* p_argv[])
 
     // show info
     #ifdef MACHINELEARNING_MPI
-    if (loMPICom.rank() == 0) {
+    if (l_mpicom.rank() == 0) {
     #endif
 
     std::cout << "structure of the output file" << std::endl;
