@@ -397,7 +397,7 @@ if __name__ == "__main__":
                 else :
                     raise Exception("file / directory ["+i+"] is not found / is incorrect (no C/C++ file)")
             
-            stylecheck( rules, files, printtree, include, defines )
+            stylecheck( rules, files, printtree, set(include), set(defines) )
             if "-TIME" in arglst :
                 print "execution time: " + str(time.time() - starttime) + "sec"
         
