@@ -44,14 +44,14 @@ namespace mpi       = boost::mpi;
 
 
 /** main program
- * @param argc number of arguments
- * @param argv arguments
+ * @param p_argc number of arguments
+ * @param p_argv arguments
  **/
-int main(int argc, char* argv[])
+int main(int p_argc, char* p_argv[])
 {
 
     #ifdef MACHINELEARNING_MPI
-    mpi::environment loMPIenv(argc, argv);
+    mpi::environment loMPIenv(p_argc, p_argv);
     mpi::communicator loMPICom;
     #endif
 
@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
 
     po::variables_map l_map;
     po::positional_options_description l_input;
-    po::store(po::command_line_parser(argc, argv).options(l_description).positional(l_input).run(), l_map);
+    po::store(po::command_line_parser(p_argc, p_argv).options(l_description).positional(l_input).run(), l_map);
     po::notify(l_map);
 
     if (l_map.count("help")) {

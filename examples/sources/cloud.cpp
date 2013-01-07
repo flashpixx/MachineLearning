@@ -34,10 +34,10 @@ namespace po    = boost::program_options;
 
 
 /** main program
- * @param argc number of arguments
- * @param argv arguments
+ * @param p_argc number of arguments
+ * @param p_argv arguments
  **/
-int main(int argc, char* argv[])
+int main(int p_argc, char* p_argv[])
 {
     #ifdef MACHINELEARNING_MULTILANGUAGE
     tools::language::bindings::bind();
@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
     ;
 
     po::variables_map l_map;
-    po::store(po::parse_command_line(argc, argv, l_description), l_map);
+    po::store(po::parse_command_line(p_argc, p_argv, l_description), l_map);
     po::notify(l_map);
 
     if (l_map.count("help")) {
