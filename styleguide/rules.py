@@ -171,7 +171,7 @@ def check_Method( filename, name, full ) :
 # @param tuple with messagetype and message
 def check_MemberVar( filename, name, typelst ) :
     if filename.endswith(os.path.join("geneticalgorithm","population.hpp")) and \
-       (name == "probabilityvalue" or name == "first" or name == "second" or name == "third") :
+       (name == "distribution" or name == "probabilityvalue" or name == "first" or name == "second" or name == "third") :
         return None, None
 
     if not name.startswith("m_") :
