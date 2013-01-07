@@ -347,20 +347,29 @@ if __name__ == "__main__":
             print "first parameter:\tprint for printing the abstract syntax tree"
             print "\t\t\tpython file with check rules"
             print
-            print "list of files or directories for checking"
-            print "include directories must be added with the prefix -I"
-            print "compiler defines must be added with the prefix -D"
-            print "for ignore path parts the flag -X must be added with a string"
+            print "-I\t\t\tdirectory prefix for include directories"
+            print "-D\t\t\tprefix for compiler defines"
+            print "-X\t\t\tprefix for directory ignore"
+            print
+            print "-ENV\t\t\tflag for using environment variables"
+            print
+            print "all other directories parameter can be files or directories which are scanned for C/C++ files"
             sys.exit
         else :
             rules  = imp.load_source("rules", sys.argv[1])
 
         try :
             ignorelst = [i[2:] for i in arglst if i.startswith("-X")]   
+            
+            if "-ENV" in arglst and "CPPPATH" in os.environ :
+                include = os.environ["CPPPATH"].split(os.pathsep)
                       
             for i in arglst :
+
+                if i.startswith("-X") or i.startswith("-ENV"):
+                    pass
             
-                if i.startswith("-I") :
+                elif i.startswith("-I") :
                     dir = i[2:]
                     if not os.path.exists(dir) or not os.path.isdir(dir) :
                         raise Exception("include directory ["+dir+"] is not found")
@@ -369,9 +378,6 @@ if __name__ == "__main__":
                 elif i.startswith("-D") :
                     defines.append(i[2:])
                     
-                elif i.startswith("-X") :
-                    pass
-                
                 elif os.path.exists(i) and os.path.isdir(i) :
                     for root, dirnames, filenames in os.walk(i[:-1]) :
                         if any([i in root for i in ignorelst]) :
@@ -390,4 +396,4 @@ if __name__ == "__main__":
             print e
             sys.exit(1)
         
-    #=====================================================================================================================================
+#=====================================================================================================================================
