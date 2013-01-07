@@ -25,6 +25,7 @@
 import os
 import sys
 import imp
+import time
 import glob
 import hashlib
 import clang.cindex
@@ -352,6 +353,7 @@ if __name__ == "__main__":
             print "-X\t\t\tprefix for directory ignore"
             print
             print "-ENV\t\t\tflag for using environment variables"
+            print "-TIME\t\t\shows execution time"
             print
             print "all other directories parameter can be files or directories which are scanned for C/C++ files"
             sys.exit
@@ -360,13 +362,13 @@ if __name__ == "__main__":
 
         try :
             ignorelst = [i[2:] for i in arglst if i.startswith("-X")]   
-            
+            starttime = time.time()
             if "-ENV" in arglst and "CPPPATH" in os.environ :
                 include = os.environ["CPPPATH"].split(os.pathsep)
-                      
+                
             for i in arglst :
 
-                if i.startswith("-X") or i.startswith("-ENV"):
+                if i.startswith("-X") or i.startswith("-ENV") or i.startswith("-TIME") :
                     pass
             
                 elif i.startswith("-I") :
@@ -391,9 +393,15 @@ if __name__ == "__main__":
                     
                 else :
                     raise Exception("file / directory ["+i+"] is not found / is incorrect (no C/C++ file)")
+            
             stylecheck( rules, files, printtree, include, defines )
+            if "-TIME" in arglst :
+                print "\nexecution time: " + str(time.time() - starttime) + "sec"
+        
         except Exception as e :
             print e
+            if "-TIME" in arglst :
+                print "\nexecution time: " + str(time.time() - starttime) + "sec"
             sys.exit(1)
         
 #=====================================================================================================================================
