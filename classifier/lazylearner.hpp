@@ -92,7 +92,7 @@ namespace machinelearning { namespace classifier {
             std::vector<L> getLabelsWithoutWeight( const ublas::matrix<std::size_t>& ) const;
             std::vector<L> getLabelsWithWeight( const ublas::matrix<std::size_t>&, const ublas::matrix<T>& ) const;
         
-            static bool labelMapCompair( std::pair<L, std::size_t> left, std::pair<L, std::size_t> right);
+            static bool labelMapCompair( const std::pair<L, std::size_t>&, const std::pair<L, std::size_t>& );
         
     };
     
@@ -203,7 +203,7 @@ namespace machinelearning { namespace classifier {
      * @param p_right right element
      * @return bool if first pair (second component) is smaller
     **/
-    template<typename T, typename L> inline bool lazylearner<T,L>::labelMapCompair( std::pair<L, std::size_t> p_left, std::pair<L, std::size_t> p_right)
+    template<typename T, typename L> inline bool lazylearner<T,L>::labelMapCompair( const std::pair<L, std::size_t>& p_left, const std::pair<L, std::size_t>& p_right)
     {
         return p_left.second < p_right.second;
     }
