@@ -23,8 +23,8 @@
 
 
 
-#ifndef __MACHINELEARNING_DISTANCES_EUCLID_HPP
-#define __MACHINELEARNING_DISTANCES_EUCLID_HPP
+#ifndef __MACHINELEARNING_DISTANCES_NORM_EUCLID_HPP
+#define __MACHINELEARNING_DISTANCES_NORM_EUCLID_HPP
 
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>

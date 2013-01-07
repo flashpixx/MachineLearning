@@ -27,7 +27,7 @@
  * @see http://www.sil.org/iso639-3/codes.asp?order=639_1&letter=%25
  **/
 
-#indef __MACHINELEARNING_TOOLS_LANGUAGE_ISO639_H
+#ifndef __MACHINELEARNING_TOOLS_LANGUAGE_ISO639_H
 #define __MACHINELEARNING_TOOLS_LANGUAGE_ISO639_H
 
     LANGUAGE_CODE(AB,ABK,"Abkhazian")
