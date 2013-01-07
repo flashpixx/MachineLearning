@@ -160,23 +160,23 @@ namespace machinelearning { namespace textprocess {
         
         #pragma omp parallel for
         for(std::size_t i=0; i < l_data.size(); ++i) {
-            std::string lc = l_data[i];
+            std::string l_item = l_data[i];
             if (!m_remove.empty())
-                boost::erase_all(lc, m_remove);
-            boost::trim(lc);
+                boost::erase_all(l_item, m_remove);
+            boost::trim(l_item);
             
-            if ( (lc.length() < p_minlen) || (lc.empty()) )
+            if ( (l_item.length() < p_minlen) || (l_item.empty()) )
                 continue;
                 
             if (m_caseinsensitive)
-                boost::to_lower(lc);
+                boost::to_lower(l_item);
             
-            std::map<std::string, std::size_t>::iterator it = m_map.find(lc);
+            std::map<std::string, std::size_t>::iterator it = m_map.find(l_item);
             #pragma omp critical
             {
                 m_wordcount++;
                 if (it == m_map.end())
-                    m_map[lc] = 1;
+                    m_map[l_item] = 1;
                 else
                     it->second++;
             }
@@ -243,16 +243,16 @@ namespace machinelearning { namespace textprocess {
      **/
     inline bool termfrequency::compare( const float& p_val1, const float& p_val2, const comparison& p_comp ) const
     {
-        bool ll = false;
+        bool l_comp = false;
         
         switch (p_comp) {
-            case lessequal      : ll = p_val1 <= p_val2; break;
-            case greaterequal   : ll = p_val1 >= p_val2; break;
-            case less           : ll = p_val1 < p_val2;  break;
-            case greater        : ll = p_val1 > p_val2;  break;
+            case lessequal      : l_comp = p_val1 <= p_val2; break;
+            case greaterequal   : l_comp = p_val1 >= p_val2; break;
+            case less           : l_comp = p_val1 < p_val2;  break;
+            case greater        : l_comp = p_val1 > p_val2;  break;
         }
         
-        return ll;
+        return l_comp;
     }
 
     
@@ -269,11 +269,11 @@ namespace machinelearning { namespace textprocess {
      **/
     inline void termfrequency::erase( const std::string& p_word )
     {
-        std::string lc = p_word;
+        std::string l_word = p_word;
         if (m_caseinsensitive)
-            boost::to_lower(lc);
+            boost::to_lower(l_word);
         
-        std::map<std::string, std::size_t>::iterator it = m_map.find(lc);
+        std::map<std::string, std::size_t>::iterator it = m_map.find(l_word);
         if (it != m_map.end()) {
             m_wordcount -= it->second;
             m_map.erase( it );
