@@ -55,8 +55,8 @@ namespace mpi       = boost::mpi;
 int main(int p_argc, char* p_argv[])
 {
 	#ifdef MACHINELEARNING_MPI
-    mpi::environment loMPIenv(p_argc, p_argv);
-    mpi::communicator loMPICom;
+    mpi::environment l_mpienv(p_argc, p_argv);
+    mpi::communicator l_mpicom;
     #endif
 	
     #ifdef MACHINELEARNING_MULTILANGUAGE
@@ -109,9 +109,9 @@ int main(int p_argc, char* p_argv[])
 
     #ifdef MACHINELEARNING_MPI
     const std::vector<std::size_t> l_artnum = l_map["articles"].as< std::vector<std::size_t> >();
-    if (l_artnum.size() != static_cast<std::size_t>(loMPICom.size()))
+    if (l_artnum.size() != static_cast<std::size_t>(l_mpicom.size()))
         throw std::runtime_error("number of articles and used CPUs are not equal");
-    if (l_artnum[loMPICom.rank()] == 0)
+    if (l_artnum[l_mpicom.rank()] == 0)
     #else
     const std::size_t l_artnum = l_map["articles"].as<std::size_t>();
     if (l_artnum < 2)
@@ -122,8 +122,8 @@ int main(int p_argc, char* p_argv[])
 
     // get n random wikipedia articles
     #ifdef MACHINELEARNING_MPI
-    loMPICom.barrier();
-    std::cout << "CPU " << loMPICom.rank() << ": ";
+    l_mpicom.barrier();
+    std::cout << "CPU " << l_mpicom.rank() << ": ";
     #endif
     std::cout << "read wikipedia articles..." << std::endl;
 
@@ -136,7 +136,7 @@ int main(int p_argc, char* p_argv[])
     tools::sources::wikipedia wiki( l_lang );
 
     #ifdef MACHINELEARNING_MPI
-    for(std::size_t i=0; i < l_artnum[loMPICom.rank()]; )
+    for(std::size_t i=0; i < l_artnum[l_mpicom.rank()]; )
     #else
     for(std::size_t i=0; i < l_artnum; )
     #endif
@@ -144,7 +144,7 @@ int main(int p_argc, char* p_argv[])
             wiki.getRandomArticle();
             if (wiki.isArticle()) {
                 #ifdef MACHINELEARNING_MPI
-                std::cout << "CPU " << loMPICom.rank() << ": ";
+                std::cout << "CPU " << l_mpicom.rank() << ": ";
                 #endif
                 std::cout << (i+1) << "\t" << wiki.getArticleTitle() << std::endl;
 
@@ -159,8 +159,8 @@ int main(int p_argc, char* p_argv[])
     // do stopword reduction
     if (l_map.count("stopword")) {
         #ifdef MACHINELEARNING_MPI
-        loMPICom.barrier();
-        std::cout << "CPU " << loMPICom.rank() << ": ";
+        l_mpicom.barrier();
+        std::cout << "CPU " << l_mpicom.rank() << ": ";
         #endif
         std::cout << "stopword reduction..." << std::endl;
 
@@ -178,8 +178,8 @@ int main(int p_argc, char* p_argv[])
 
     // create ncd object and calculate the distances
     #ifdef MACHINELEARNING_MPI
-    loMPICom.barrier();
-    std::cout << "CPU " << loMPICom.rank() << ": ";
+    l_mpicom.barrier();
+    std::cout << "CPU " << l_mpicom.rank() << ": ";
     #endif
     std::cout << "calculate normalized compression distance..." << std::endl;
 
@@ -192,7 +192,7 @@ int main(int p_argc, char* p_argv[])
 
 
     #ifdef MACHINELEARNING_MPI
-    ublas::matrix<double> distancematrix = ncd.unsquare( loMPICom, l_wikidata );
+    ublas::matrix<double> distancematrix = ncd.unsquare( l_mpicom, l_wikidata );
     #else
     ublas::matrix<double> distancematrix = ncd.unsymmetric( l_wikidata );
     #endif
@@ -202,8 +202,8 @@ int main(int p_argc, char* p_argv[])
 
     // run hit mds over the distance matrix
     #ifdef MACHINELEARNING_MPI
-    loMPICom.barrier();
-    std::cout << "CPU " << loMPICom.rank() << ": ";
+    l_mpicom.barrier();
+    std::cout << "CPU " << l_mpicom.rank() << ": ";
     #endif
     std::cout << "run mds projection..." << std::endl;
 
@@ -222,7 +222,7 @@ int main(int p_argc, char* p_argv[])
 
 
     #ifdef MACHINELEARNING_MPI
-    ublas::matrix<double> project = mds.map( loMPICom, distancematrix );
+    ublas::matrix<double> project = mds.map( l_mpicom, distancematrix );
     #else
     ublas::matrix<double> project = mds.map( distancematrix );
     #endif
@@ -231,8 +231,8 @@ int main(int p_argc, char* p_argv[])
     
     // create file and write data to hdf
     #ifdef MACHINELEARNING_MPI
-    loMPICom.barrier();
-    tools::files::hdf target( "node"+tools::function::toString(loMPICom.rank())+"_"+l_map["outfile"].as<std::string>(), true);
+    l_mpicom.barrier();
+    tools::files::hdf target( "node"+tools::function::toString(l_mpicom.rank())+"_"+l_map["outfile"].as<std::string>(), true);
     #else
     tools::files::hdf target( l_map["outfile"].as<std::string>(), true);
     #endif
@@ -242,7 +242,7 @@ int main(int p_argc, char* p_argv[])
 
     
     #ifdef MACHINELEARNING_MPI
-    if (loMPICom.rank() == 0)
+    if (l_mpicom.rank() == 0)
     #endif
     std::cout << "within the target file there are three datasets: /project = projected data, /label = datapoint label" << std::endl;
 

@@ -79,8 +79,8 @@ int main(int p_argc, char* p_argv[])
     if (!l_map.count("groups")) {
 
         // read group list
-        std::map<std::string, std::size_t> groups = news.getGroupList();
-        for (std::map<std::string, std::size_t>::iterator it = groups.begin(); it != groups.end(); ++it)
+        std::map<std::string, std::size_t> l_groups = news.getGroupList();
+        for (std::map<std::string, std::size_t>::iterator it = l_groups.begin(); it != l_groups.end(); ++it)
             std::cout << it->first << "     (" << it->second << ")" << std::endl;
 
     } else {

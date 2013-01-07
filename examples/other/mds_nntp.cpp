@@ -96,10 +96,10 @@ std::vector<std::string> createGroupList( tools::sources::nntp& p_nntp, const st
             std::map<std::string, std::size_t> l_ingroup = p_nntp.getGroupList();
 
             for(std::size_t i=0; i < l_num; ++i) {
-                const unsigned int id = static_cast<std::size_t>(l_rand.get<double>(tools::random::uniform, 0, l_ingroup.size()-1));
+                const unsigned int l_id = static_cast<std::size_t>(l_rand.get<double>(tools::random::uniform, 0, l_ingroup.size()-1));
                 std::map<std::string, std::size_t>::iterator it = l_ingroup.begin();
 
-                std::advance(it, id);
+                std::advance(it, l_id);
                 l_groups.push_back( (*it).first );
             }
             return l_groups;
@@ -283,11 +283,11 @@ int main(int p_argc, char* p_argv[])
         
         const std::vector<double> l_val = l_map["stopword"].as< std::vector<double> >();
         if (l_val.size() >= 2) {
-            text::termfrequency tfc;
-            tfc.add(l_article);
-            text::stopwordreduction stopword( tfc.getTerms(l_val[0], l_val[1] ), tfc.iscaseinsensitivity() );
+            text::termfrequency l_tfc;
+            l_tfc.add(l_article);
+            text::stopwordreduction l_stopword( l_tfc.getTerms(l_val[0], l_val[1] ), l_tfc.iscaseinsensitivity() );
             for(std::size_t i=0; i < l_article.size(); ++i)
-                l_article[i] = stopword.remove( l_article[i] );
+                l_article[i] = l_stopword.remove( l_article[i] );
         }
     }
 
@@ -300,17 +300,17 @@ int main(int p_argc, char* p_argv[])
     #endif
     std::cout << "calculate normalized compression distance..." << std::endl;
 
-    distances::ncd<double> ncd( (l_algorithm == "gzip") ? distances::ncd<double>::gzip : distances::ncd<double>::bzip2 );
+    distances::ncd<double> l_ncd( (l_algorithm == "gzip") ? distances::ncd<double>::gzip : distances::ncd<double>::bzip2 );
 
     if (l_compress == "bestspeed")
-        ncd.setCompressionLevel( distances::ncd<double>::bestspeed );
+        l_ncd.setCompressionLevel( distances::ncd<double>::bestspeed );
     if (l_compress == "bestcompression")
-        ncd.setCompressionLevel( distances::ncd<double>::bestcompression );
+        l_ncd.setCompressionLevel( distances::ncd<double>::bestcompression );
 
     #ifdef MACHINELEARNING_MPI
-    ublas::matrix<double> distancematrix = ncd.unsquare( l_mpicom, l_article );
+    ublas::matrix<double> l_distancematrix = l_ncd.unsquare( l_mpicom, l_article );
     #else
-    ublas::matrix<double> distancematrix = ncd.unsymmetric( l_article );
+    ublas::matrix<double> l_distancematrix = l_ncd.unsymmetric( l_article );
     #endif
     l_article.clear();
 
@@ -330,18 +330,18 @@ int main(int p_argc, char* p_argv[])
     if (l_mapping == "sammon")
         l_project = dim::mds<double>::sammon;
 
-    dim::mds<double> mds( l_dimension, l_project );
+    dim::mds<double> l_mds( l_dimension, l_project );
     if (l_iteration == 0)
-        mds.setIteration( distancematrix.size2() );
+        l_mds.setIteration( l_distancematrix.size2() );
     else
-        mds.setIteration( l_iteration );
-    mds.setRate( l_rate );
+        l_mds.setIteration( l_iteration );
+    l_mds.setRate( l_rate );
 
     
     #ifdef MACHINELEARNING_MPI
-    ublas::matrix<double> project = mds.map( l_mpicom, distancematrix );
+    ublas::matrix<double> l_project = l_mds.map( l_mpicom, l_distancematrix );
     #else
-    ublas::matrix<double> project = mds.map( distancematrix );
+    ublas::matrix<double> l_project = l_mds.map( l_distancematrix );
     #endif
 
 
@@ -356,7 +356,7 @@ int main(int p_argc, char* p_argv[])
     tools::files::hdf target( l_map["outfile"].as<std::string>(), true);
     #endif
     
-    target.writeBlasMatrix<double>( "/project",  project, tools::files::hdf::NATIVE_DOUBLE );
+    target.writeBlasMatrix<double>( "/project",  l_project, tools::files::hdf::NATIVE_DOUBLE );
     target.writeStringVector( "/group",  l_articlegroup );
     target.writeStringVector( "/uniquegroup",  tools::vector::unique(l_articlegroup) );
     

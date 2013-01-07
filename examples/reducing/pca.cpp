@@ -80,13 +80,13 @@ int main(int p_argc, char* p_argv[])
     tools::files::hdf source( l_map["infile"].as<std::string>() );
 
     // create pca object and map the data
-    dim::pca<double> pca( l_dimension );
-    const ublas::matrix<double> project = pca.map( source.readBlasMatrix<double>( l_map["inpath"].as<std::string>(), tools::files::hdf::NATIVE_DOUBLE) );
+    dim::pca<double> l_pca( l_dimension );
+    const ublas::matrix<double> l_project = l_pca.map( source.readBlasMatrix<double>( l_map["inpath"].as<std::string>(), tools::files::hdf::NATIVE_DOUBLE) );
 
 
     // create file and write data to hdf
     tools::files::hdf target( l_map["outfile"].as<std::string>(), true);
-    target.writeBlasMatrix<double>( l_outpath,  project, tools::files::hdf::NATIVE_DOUBLE );
+    target.writeBlasMatrix<double>( l_outpath,  l_project, tools::files::hdf::NATIVE_DOUBLE );
 
     return EXIT_SUCCESS;
 }

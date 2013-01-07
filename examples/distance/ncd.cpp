@@ -78,27 +78,27 @@ int main(int p_argc, char* p_argv[])
 
 
     // create ncd object
-    distances::ncd<double> ncd( (l_algorithm == "gzip") ? distances::ncd<double>::gzip : distances::ncd<double>::bzip2 );
+    distances::ncd<double> l_ncd( (l_algorithm == "gzip") ? distances::ncd<double>::gzip : distances::ncd<double>::bzip2 );
     if (l_compress == "bestspeed")
-        ncd.setCompressionLevel( distances::ncd<double>::bestspeed );
+        l_ncd.setCompressionLevel( distances::ncd<double>::bestspeed );
     if (l_compress == "bestcompression")
-        ncd.setCompressionLevel( distances::ncd<double>::bestcompression );
+        l_ncd.setCompressionLevel( distances::ncd<double>::bestcompression );
 
 
     // create the distance matrix and use the each element of the vector as a filename
-    ublas::matrix<double> distancematrix;
+    ublas::matrix<double> l_distancematrix;
     if (l_matrix == "unsymmetric")
-        distancematrix = ncd.unsymmetric( l_map["sources"].as< std::vector<std::string> >(), true);
+        l_distancematrix = l_ncd.unsymmetric( l_map["sources"].as< std::vector<std::string> >(), true);
     else
-        distancematrix = ncd.symmetric( l_map["sources"].as< std::vector<std::string> >(), true);
+        l_distancematrix = l_ncd.symmetric( l_map["sources"].as< std::vector<std::string> >(), true);
 
 
     if (!l_map.count("outfile"))
-        std::cout << distancematrix << std::endl;
+        std::cout << l_distancematrix << std::endl;
     else {
         // create hdf file and write data
         tools::files::hdf file(l_map["outfile"].as<std::string>(), true);
-        file.writeBlasMatrix<double>( "/ncd",  distancematrix, tools::files::hdf::NATIVE_DOUBLE );
+        file.writeBlasMatrix<double>( "/ncd",  l_distancematrix, tools::files::hdf::NATIVE_DOUBLE );
         std::cout << "structure of the output file" << std::endl;
         std::cout << "/ncd" << "\t\t" << "distance matrix" << std::endl;
     }

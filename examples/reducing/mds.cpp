@@ -89,25 +89,25 @@ int main(int p_argc, char* p_argv[])
 
 
     // read source hdf file
-    tools::files::hdf source( l_map["infile"].as<std::string>() );
+    tools::files::hdf l_source( l_map["infile"].as<std::string>() );
 
     // create mds object and map the data
-    dim::mds<double> mds( l_dimension, (l_mapping == "metric") ? dim::mds<double>::metric : (l_mapping == "sammon") ? dim::mds<double>::sammon : dim::mds<double>::hit );
+    dim::mds<double> l_mds( l_dimension, (l_mapping == "metric") ? dim::mds<double>::metric : (l_mapping == "sammon") ? dim::mds<double>::sammon : dim::mds<double>::hit );
 
-    mds.setIteration( l_iteration );
-    mds.setStep( l_step );
-    mds.setRate( l_rate );
+    l_mds.setIteration( l_iteration );
+    l_mds.setStep( l_step );
+    l_mds.setRate( l_rate );
 
     if (l_center == "single")
-        mds.setCentering( dim::mds<double>::singlecenter );
+        l_mds.setCentering( dim::mds<double>::singlecenter );
     if (l_center == "double")
-        mds.setCentering( dim::mds<double>::doublecenter );
+        l_mds.setCentering( dim::mds<double>::doublecenter );
 
-    const ublas::matrix<double> project = mds.map( source.readBlasMatrix<double>(l_map["inpath"].as<std::string>(), tools::files::hdf::NATIVE_DOUBLE) );
+    const ublas::matrix<double> l_project = l_mds.map( l_source.readBlasMatrix<double>(l_map["inpath"].as<std::string>(), tools::files::hdf::NATIVE_DOUBLE) );
 
     // create file and write data to hdf
-    tools::files::hdf target(l_map["outfile"].as<std::string>(), true);
-    target.writeBlasMatrix<double>( l_outpath,  project, tools::files::hdf::NATIVE_DOUBLE );
+    tools::files::hdf l_target(l_map["outfile"].as<std::string>(), true);
+    target.writeBlasMatrix<double>( l_outpath,  l_project, tools::files::hdf::NATIVE_DOUBLE );
 
     return EXIT_SUCCESS;
 
