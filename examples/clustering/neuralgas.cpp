@@ -118,11 +118,11 @@ int main(int p_argc, char* p_argv[])
 
     // read source hdf file and data
     #ifdef MACHINELEARNING_MPI
-    const std::size_t filepos = l_map["inputefile"].as< std::vector<std::size_t> >().size() > 1 ? static_cast<std::size_t>(l_mpicom.rank()) : 0;
-    const std::size_t pathpos = l_map["inputepath"].as< std::vector<std::size_t> >().size() > 1 ? static_cast<std::size_t>(l_mpicom.rank()) : 0;
+    const std::size_t l_filepos = l_map["inputefile"].as< std::vector<std::size_t> >().size() > 1 ? static_cast<std::size_t>(l_mpicom.rank()) : 0;
+    const std::size_t l_pathpos = l_map["inputepath"].as< std::vector<std::size_t> >().size() > 1 ? static_cast<std::size_t>(l_mpicom.rank()) : 0;
 
-    tools::files::hdf l_source( l_map["inputefile"].as< std::vector<std::string> >()[filepos] );
-    ublas::matrix<double> l_data = l_source.readBlasMatrix<double>( l_map["inputpath"].as< std::vector<std::string> >()[pathpos], tools::files::hdf::NATIVE_DOUBLE);
+    tools::files::hdf l_source( l_map["inputefile"].as< std::vector<std::string> >()[l_filepos] );
+    ublas::matrix<double> l_data = l_source.readBlasMatrix<double>( l_map["inputpath"].as< std::vector<std::string> >()[l_pathpos], tools::files::hdf::NATIVE_DOUBLE);
 
     #else
     tools::files::hdf l_source( l_map["inputfile"].as<std::string>() );

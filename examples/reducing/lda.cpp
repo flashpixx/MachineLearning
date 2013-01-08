@@ -80,33 +80,33 @@ int main(int p_argc, char* p_argv[])
 
 
     // read source hdf file and data / create target file
-    tools::files::hdf target( l_map["outfile"].as<std::string>(), true);
-    tools::files::hdf source( l_map["infile"].as<std::string>() );
-    const ublas::matrix<double> l_data = source.readBlasMatrix<double>(l_map["inpath"].as<std::string>(), tools::files::hdf::NATIVE_DOUBLE);
+    tools::files::hdf l_target( l_map["outfile"].as<std::string>(), true);
+    tools::files::hdf l_source( l_map["infile"].as<std::string>() );
+    const ublas::matrix<double> l_data = l_source.readBlasMatrix<double>(l_map["inpath"].as<std::string>(), tools::files::hdf::NATIVE_DOUBLE);
 
 
     // lda with uint labels
     if (l_map["labeltype"].as<std::string>() == "uint") {
-        dim::lda<double, std::size_t> lda( l_dimension );
+        dim::lda<double, std::size_t> l_lda( l_dimension );
 
-        const std::vector<std::size_t> l_labels = tools::vector::copy( source.readBlasVector<std::size_t>(l_map["labelpath"].as<std::string>(), tools::files::hdf::NATIVE_ULONG) );
-        target.writeBlasMatrix<double>( l_outpath,  lda.map(l_data, l_labels), tools::files::hdf::NATIVE_DOUBLE );
+        const std::vector<std::size_t> l_labels = tools::vector::copy( l_source.readBlasVector<std::size_t>(l_map["labelpath"].as<std::string>(), tools::files::hdf::NATIVE_ULONG) );
+        l_target.writeBlasMatrix<double>( l_outpath,  l_lda.map(l_data, l_labels), tools::files::hdf::NATIVE_DOUBLE );
     }
 
     // lda with int labels
     if (l_map["labeltype"].as<std::string>() == "int") {
-        dim::lda<double, std::ptrdiff_t> lda( l_dimension );
+        dim::lda<double, std::ptrdiff_t> l_lda( l_dimension );
 
-        const std::vector<std::ptrdiff_t> l_labels = tools::vector::copy( source.readBlasVector<std::ptrdiff_t>(l_map["labelpath"].as<std::string>(), tools::files::hdf::NATIVE_LONG) );
-        target.writeBlasMatrix<double>( l_outpath,  lda.map(data, l_labels), tools::files::hdf::NATIVE_DOUBLE );
+        const std::vector<std::ptrdiff_t> l_labels = tools::vector::copy( l_source.readBlasVector<std::ptrdiff_t>(l_map["labelpath"].as<std::string>(), tools::files::hdf::NATIVE_LONG) );
+        l_target.writeBlasMatrix<double>( l_outpath,  l_lda.map(l_data, l_labels), tools::files::hdf::NATIVE_DOUBLE );
     }
 
     // lda with string labels
     if (l_map["labeltype"].as<std::string>() == "string") {
-        dim::lda<double, std::string> lda( l_dimension );
+        dim::lda<double, std::string> l_lda( l_dimension );
 
-        const std::vector<std::string> l_labels = source.readStringVector(l_map["labelpath"].as<std::string>());
-        target.writeBlasMatrix<double>( l_outpath,  lda.map(l_data, l_labels), tools::files::hdf::NATIVE_DOUBLE );
+        const std::vector<std::string> l_labels = l_source.readStringVector(l_map["labelpath"].as<std::string>());
+        l_target.writeBlasMatrix<double>( l_outpath,  l_lda.map(l_data, l_labels), tools::files::hdf::NATIVE_DOUBLE );
     }
 
 

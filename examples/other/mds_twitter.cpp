@@ -205,18 +205,18 @@ int main(int p_argc, char* p_argv[])
     #endif
     std::cout << "calculate normalized compression distance..." << std::endl;
 
-    distances::ncd<double> ncd( (l_algorithm == "gzip") ? distances::ncd<double>::gzip : distances::ncd<double>::bzip2 );
+    distances::ncd<double> l_ncd( (l_algorithm == "gzip") ? distances::ncd<double>::gzip : distances::ncd<double>::bzip2 );
 
-    ncd.setCompressionLevel( distances::ncd<double>::defaultcompression );
+    l_ncd.setCompressionLevel( distances::ncd<double>::defaultcompression );
     if (l_compress == "bestspeed")
-        ncd.setCompressionLevel( distances::ncd<double>::bestspeed );
+        l_ncd.setCompressionLevel( distances::ncd<double>::bestspeed );
     if (l_compress == "bestcompression")
-        ncd.setCompressionLevel( distances::ncd<double>::bestcompression );
+        l_ncd.setCompressionLevel( distances::ncd<double>::bestcompression );
 
     #ifdef MACHINELEARNING_MPI
-    ublas::matrix<double> distancematrix = ncd.unsquare( l_mpicom, l_tweetdata );
+    ublas::matrix<double> l_distancematrix = l_ncd.unsquare( l_mpicom, l_tweetdata );
     #else
-    ublas::matrix<double> distancematrix = ncd.unsymmetric( l_tweetdata );
+    ublas::matrix<double> l_distancematrix = l_ncd.unsymmetric( l_tweetdata );
     #endif
     l_tweetdata.clear();
 
@@ -236,17 +236,17 @@ int main(int p_argc, char* p_argv[])
     if (l_mapping == "sammon")
         l_project = dim::mds<double>::sammon;
 
-    dim::mds<double> mds( l_dimension, l_project );
+    dim::mds<double> l_mds( l_dimension, l_project );
     if (l_iteration == 0)
-        mds.setIteration( distancematrix.size2() );
+        l_mds.setIteration( l_distancematrix.size2() );
     else
-        mds.setIteration( l_iteration );
-    mds.setRate( l_rate );
+        l_mds.setIteration( l_iteration );
+    l_mds.setRate( l_rate );
 
     #ifdef MACHINELEARNING_MPI
-    ublas::matrix<double> project = mds.map( l_mpicom, distancematrix );
+    ublas::matrix<double> l_projectdata = l_mds.map( l_mpicom, l_distancematrix );
     #else
-    ublas::matrix<double> project = mds.map( distancematrix );
+    ublas::matrix<double> l_projectdata = l_mds.map( l_distancematrix );
     #endif
 
 
@@ -261,7 +261,7 @@ int main(int p_argc, char* p_argv[])
     tools::files::hdf target( l_map["outfile"].as<std::string>(), true);
     #endif
     
-    target.writeBlasMatrix<double>( "/project",  project, tools::files::hdf::NATIVE_DOUBLE );
+    target.writeBlasMatrix<double>( "/project",  l_projectdata, tools::files::hdf::NATIVE_DOUBLE );
     target.writeStringVector( "/label",  l_tweetlabel );
     target.writeStringVector( "/uniquegroup",  l_tweet );
     

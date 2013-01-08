@@ -107,7 +107,7 @@ int main(int p_argc, char* p_argv[])
 
     // create file and write data to hdf
     tools::files::hdf l_target(l_map["outfile"].as<std::string>(), true);
-    target.writeBlasMatrix<double>( l_outpath,  l_project, tools::files::hdf::NATIVE_DOUBLE );
+    l_target.writeBlasMatrix<double>( l_outpath,  l_project, tools::files::hdf::NATIVE_DOUBLE );
 
     return EXIT_SUCCESS;
 
