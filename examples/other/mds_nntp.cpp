@@ -339,9 +339,9 @@ int main(int p_argc, char* p_argv[])
 
     
     #ifdef MACHINELEARNING_MPI
-    ublas::matrix<double> l_project = l_mds.map( l_mpicom, l_distancematrix );
+    ublas::matrix<double> l_projectdata = l_mds.map( l_mpicom, l_distancematrix );
     #else
-    ublas::matrix<double> l_project = l_mds.map( l_distancematrix );
+    ublas::matrix<double> l_projectdata = l_mds.map( l_distancematrix );
     #endif
 
 
@@ -351,14 +351,14 @@ int main(int p_argc, char* p_argv[])
     // create file and write data to hdf
     #ifdef MACHINELEARNING_MPI
     l_mpicom.barrier();
-    tools::files::hdf target( "node"+tools::function::toString(l_mpicom.rank())+"_"+l_map["outfile"].as<std::string>(), true);
+    tools::files::hdf l_target( "node"+tools::function::toString(l_mpicom.rank())+"_"+l_map["outfile"].as<std::string>(), true);
     #else
-    tools::files::hdf target( l_map["outfile"].as<std::string>(), true);
+    tools::files::hdf l_target( l_map["outfile"].as<std::string>(), true);
     #endif
     
-    target.writeBlasMatrix<double>( "/project",  l_project, tools::files::hdf::NATIVE_DOUBLE );
-    target.writeStringVector( "/group",  l_articlegroup );
-    target.writeStringVector( "/uniquegroup",  tools::vector::unique(l_articlegroup) );
+    l_target.writeBlasMatrix<double>( "/project",  l_projectdata, tools::files::hdf::NATIVE_DOUBLE );
+    l_target.writeStringVector( "/group",  l_articlegroup );
+    l_target.writeStringVector( "/uniquegroup",  tools::vector::unique(l_articlegroup) );
     
     
     #ifdef MACHINELEARNING_MPI

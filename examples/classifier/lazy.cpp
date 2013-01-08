@@ -103,11 +103,11 @@ int main(int p_argc, char* p_argv[])
             l_dist = classifier::lazylearner<double, std::ptrdiff_t>::distance;
 
         // create lazy-learner
-        classifier::lazylearner<double, std::ptrdiff_t> l_lazy(neighbor, l_dist);
+        classifier::lazylearner<double, std::ptrdiff_t> l_lazy(l_neighbor, l_dist);
 
         // set data and read new labels for unkown data
         l_lazy.setLogging(l_log);
-        l_lazy.setDatabase( data, tools::vector::copy( l_source.readBlasVector<std::ptrdiff_t>(l_map["datalabel"].as<std::string>(), tools::files::hdf::NATIVE_INT) ) );
+        l_lazy.setDatabase( l_data, tools::vector::copy( l_source.readBlasVector<std::ptrdiff_t>(l_map["datalabel"].as<std::string>(), tools::files::hdf::NATIVE_INT) ) );
         l_target.writeBlasVector<std::ptrdiff_t>( "/unkwonlabel", tools::vector::copy(l_lazy.use(l_unknowndata)), tools::files::hdf::NATIVE_INT );
 
         // if logging exists write data to file
@@ -122,7 +122,7 @@ int main(int p_argc, char* p_argv[])
             l_dist = classifier::lazylearner<double, std::size_t>::distance;
 
         // create lazy-learner
-        classifier::lazylearner<double, std::size_t> l_lazy(neighbor, l_dist);
+        classifier::lazylearner<double, std::size_t> l_lazy(l_neighbor, l_dist);
 
         // set data and read new labels for unkown data
         l_lazy.setLogging(l_log);
@@ -141,7 +141,7 @@ int main(int p_argc, char* p_argv[])
             l_dist = classifier::lazylearner<double, std::string>::distance;
 
         // create lazy-learner
-        classifier::lazylearner<double, std::string> lazy(neighbor, l_dist);
+        classifier::lazylearner<double, std::string> l_lazy(l_neighbor, l_dist);
 
         // set data and read new labels for unkown data
         l_lazy.setLogging(l_log);
