@@ -106,18 +106,18 @@ int main(int p_argc, char* p_argv[])
 
     for(std::size_t i=0; i < l_sources.size(); ++i) {
 
-        boost::filesystem::path data(l_sources[i]);
-        if (!boost::filesystem::exists(data))
+        boost::filesystem::path l_data(l_sources[i]);
+        if (!boost::filesystem::exists(l_data))
             throw std::runtime_error( "data [" + l_sources[i] + "] does not exist");
 
         // if data is a file
-        if (boost::filesystem::is_regular_file(data))
+        if (boost::filesystem::is_regular_file(l_data))
             l_files.push_back(l_sources[i]);
 
         // if data is a directory
-        if (boost::filesystem::is_directory(data)) {
+        if (boost::filesystem::is_directory(l_data)) {
             std::vector<boost::filesystem::path> l_subdata;
-            std::copy(boost::filesystem::directory_iterator(data), boost::filesystem::directory_iterator(), back_inserter(l_subdata));
+            std::copy(boost::filesystem::directory_iterator(l_data), boost::filesystem::directory_iterator(), back_inserter(l_subdata));
             for(std::size_t j=0; j < l_subdata.size(); ++j)
                 if (boost::filesystem::is_regular_file(l_subdata[j]))
                     l_files.push_back(l_subdata[j].generic_string());
@@ -150,13 +150,13 @@ int main(int p_argc, char* p_argv[])
             }
 
             std::cout << "stopword reduction..." << std::endl;
-            text::termfrequency tfc;
-            tfc.add(l_content);
+            text::termfrequency l_tfc;
+            l_tfc.add(l_content);
 
-            const std::vector<std::string> l_stopwords = tfc.getTerms( l_val[0], l_val[1] );
-            text::stopwordreduction stopword( l_stopwords, tfc.iscaseinsensitivity() );
+            const std::vector<std::string> l_stopwords = l_tfc.getTerms( l_val[0], l_val[1] );
+            text::stopwordreduction l_stopword( l_stopwords, l_tfc.iscaseinsensitivity() );
             for(std::size_t i=0; i < l_content.size(); ++i)
-                l_content[i] = stopword.remove( l_content[i] );
+                l_content[i] = l_stopword.remove( l_content[i] );
 
             target.writeStringVector("/stopwords", l_stopwords);
         }
@@ -166,19 +166,19 @@ int main(int p_argc, char* p_argv[])
     // run NCD
     
     std::cout << "calculate normalized compression distance..." << std::endl;
-    distances::ncd<double> ncd( (l_algorithm == "gzip") ? distances::ncd<double>::gzip : distances::ncd<double>::bzip2 );
+    distances::ncd<double> l_ncd( (l_algorithm == "gzip") ? distances::ncd<double>::gzip : distances::ncd<double>::bzip2 );
 
     if (l_compress == "bestspeed")
-        ncd.setCompressionLevel( distances::ncd<double>::bestspeed );
+        l_ncd.setCompressionLevel( distances::ncd<double>::bestspeed );
     if (l_compress == "bestcompression")
-        ncd.setCompressionLevel( distances::ncd<double>::bestcompression );
+        l_ncd.setCompressionLevel( distances::ncd<double>::bestcompression );
 
 
-    ublas::matrix<double> distancematrix;
+    ublas::matrix<double> l_distancematrix;
     if ( (l_map.count("stopwordmin")) && (l_map.count("stopwordmax")) )
-        distancematrix = ncd.unsymmetric( l_content );
+        l_distancematrix = ncd.unsymmetric( l_content );
     else
-        distancematrix = ncd.unsymmetric( l_files, true );
+        l_distancematrix = ncd.unsymmetric( l_files, true );
     
 
 
@@ -192,18 +192,18 @@ int main(int p_argc, char* p_argv[])
     if (l_mapping == "sammon")
         l_project = dim::mds<double>::sammon;
     
-    dim::mds<double> mds( l_dimension, l_project );
+    dim::mds<double> l_mds( l_dimension, l_project );
     if (l_iteration == 0)
-        mds.setIteration( distancematrix.size1() );
+        l_mds.setIteration( l_distancematrix.size1() );
     else
-        mds.setIteration( l_iteration );
-    mds.setRate( l_rate );
+        l_mds.setIteration( l_iteration );
+    l_mds.setRate( l_rate );
 
-    ublas::matrix<double> project = mds.map( distancematrix );
+    ublas::matrix<double> l_projectdata = l_mds.map( distancematrix );
     
 
     // write data
-    target.writeBlasMatrix<double>( "/project",  project, tools::files::hdf::NATIVE_DOUBLE );
+    target.writeBlasMatrix<double>( "/project",  l_projectdata, tools::files::hdf::NATIVE_DOUBLE );
     target.writeStringVector("/files", l_files);
 
     std::cout << "within the target file there are four datasets: /project = projected data (first row = first input file ...), /files = filename list, /stopwords = list with stopwords (if enable)" << std::endl;

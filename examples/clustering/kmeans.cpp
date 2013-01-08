@@ -81,30 +81,29 @@ int main(int p_argc, char* p_argv[])
 
 
     // read source hdf file and data
-    tools::files::hdf source( l_map["inputfile"].as<std::string>() );
-    ublas::matrix<double> data = source.readBlasMatrix<double>( l_map["inputpath"].as<std::string>(), tools::files::hdf::NATIVE_DOUBLE);
+    tools::files::hdf l_source( l_map["inputfile"].as<std::string>() );
+    ublas::matrix<double> l_data = l_source.readBlasMatrix<double>( l_map["inputpath"].as<std::string>(), tools::files::hdf::NATIVE_DOUBLE);
 
 
     // create distance object, k-means object and enable logging
-    distance::norm::euclid<double> d;
-    cluster::kmeans<double> kmeans(d, l_map["prototype"].as<std::size_t>(), data.size2());
-    kmeans.setLogging(l_log);
+    cluster::kmeans<double> l_kmeans(distance::norm::euclid<double>(), l_map["prototype"].as<std::size_t>(), l_data.size2());
+    l_kmeans.setLogging(l_log);
 
     // train prototypes
-    kmeans.train(data, l_iteration);
+    l_kmeans.train(l_data, l_iteration);
 
 
     // create file and write data to hdf
     tools::files::hdf target(l_map["outfile"].as<std::string>(), true);
 
-    target.writeBlasMatrix<double>( "/protos",  kmeans.getPrototypes(), tools::files::hdf::NATIVE_DOUBLE );
+    target.writeBlasMatrix<double>( "/protos",  l_kmeans.getPrototypes(), tools::files::hdf::NATIVE_DOUBLE );
     target.writeValue<std::size_t>( "/numprotos",  l_map["prototype"].as<std::size_t>(), tools::files::hdf::NATIVE_ULONG );
     target.writeValue<std::size_t>( "/iteration",  l_iteration, tools::files::hdf::NATIVE_ULONG );
 
     // if logging exists write data to file
-    if (kmeans.getLogging()) {
-        target.writeBlasVector<double>( "/error",  tools::vector::copy(kmeans.getLoggedQuantizationError()), tools::files::hdf::NATIVE_DOUBLE );
-        std::vector< ublas::matrix<double> > p = kmeans.getLoggedPrototypes();
+    if (l_kmeans.getLogging()) {
+        target.writeBlasVector<double>( "/error",  tools::vector::copy(l_kmeans.getLoggedQuantizationError()), tools::files::hdf::NATIVE_DOUBLE );
+        std::vector< ublas::matrix<double> > p = l_kmeans.getLoggedPrototypes();
         for(std::size_t i=0; i < p.size(); ++i)
             target.writeBlasMatrix<double>("/log" + boost::lexical_cast<std::string>( i )+"/protos", p[i], tools::files::hdf::NATIVE_DOUBLE );
     }
@@ -115,7 +114,7 @@ int main(int p_argc, char* p_argv[])
     std::cout << "/protos \t\t prototype matrix (row orientated)" << std::endl;
     std::cout << "/iteration \t\t number of iterations" << std::endl;
 
-    if (kmeans.getLogging()) {
+    if (l_kmeans.getLogging()) {
         std::cout << "/error \t\t quantization error on each iteration" << std::endl;
         std::cout << "/log<0 to number of iteration-1>/protosos \t\t prototypes on each iteration" << std::endl;
     }

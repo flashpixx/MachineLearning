@@ -110,105 +110,104 @@ int main(int p_argc, char* p_argv[])
 
 
     #ifdef MACHINELEARNING_MPI
-    tools::files::hdf source( l_map["inputfile"].as< std::vector<std::string> >()[static_cast<std::size_t>(l_mpicom.rank())] );
+    tools::files::hdf l_source( l_map["inputfile"].as< std::vector<std::string> >()[static_cast<std::size_t>(l_mpicom.rank())] );
     #else
-    tools::files::hdf source( l_map["inputfile"].as<std::string>() );
+    tools::files::hdf l_source( l_map["inputfile"].as<std::string>() );
     #endif
 
 
 
     // create ng objects
-    distance::norm::euclid<double> d;
     #ifdef MACHINELEARNING_MPI
-    cluster::neuralgas<double> ng(d,
+    cluster::neuralgas<double> l_ng(distance::norm::euclid<double>(),
                 l_map["prototype"].as< std::vector<std::size_t> >()[static_cast<std::size_t>(l_mpicom.rank())],
-                source.readBlasMatrix<double>(l_map["inputpath"].as< std::vector<std::string> >()[0], tools::files::hdf::NATIVE_DOUBLE).size2()
+                l_source.readBlasMatrix<double>(l_map["inputpath"].as< std::vector<std::string> >()[0], tools::files::hdf::NATIVE_DOUBLE).size2()
     );
     #else
-    cluster::neuralgas<double> ng(d,
+    cluster::neuralgas<double> l_ng(distance::norm::euclid<double>(),
                 l_map["prototype"].as<std::size_t>(),
-                source.readBlasMatrix<double>(l_map["inputpath"].as< std::vector<std::string> >()[0], tools::files::hdf::NATIVE_DOUBLE).size2()
+                l_source.readBlasMatrix<double>(l_map["inputpath"].as< std::vector<std::string> >()[0], tools::files::hdf::NATIVE_DOUBLE).size2()
     );
     #endif
-    ng.setLogging( l_log );
+    l_ng.setLogging( l_log );
 
 
     #ifdef MACHINELEARNING_MPI
 
     //create target file (only on the first process)
-    tools::files::hdf* target = NULL;
+    tools::files::hdf* l_target = NULL;
     if (l_mpicom.rank() == 0)
-        target = new tools::files::hdf( l_map["outfile"].as<std::string>(), true );
+        l_target = new tools::files::hdf( l_map["outfile"].as<std::string>(), true );
 
     // do each patch
     for (std::size_t i=0; i < l_map["inputpath"].as< std::vector<std::string> >().size(); ++i) {
 
-        ng.trainpatch( l_mpicom,
-                       source.readBlasMatrix<double>( l_map["inputpath"].as< std::vector<std::string> >()[i], tools::files::hdf::NATIVE_DOUBLE),
+        l_ng.trainpatch( l_mpicom,
+                       l_source.readBlasMatrix<double>( l_map["inputpath"].as< std::vector<std::string> >()[i], tools::files::hdf::NATIVE_DOUBLE),
                        l_iteration
                      );
 
-        ublas::vector<double> weights                  = ng.getPrototypeWeights(l_mpicom);
-        ublas::matrix<double> protos                   = ng.getPrototypes(l_mpicom);
-        ublas::vector<double> qerror                   = tools::vector::copy(ng.getLoggedQuantizationError(l_mpicom));
-        std::vector< ublas::matrix<double> > l_logproto  = ng.getLoggedPrototypes(l_mpicom);
+        ublas::vector<double> l_weights                  = l_ng.getPrototypeWeights(l_mpicom);
+        ublas::matrix<double> l_protos                   = l_ng.getPrototypes(l_mpicom);
+        ublas::vector<double> l_qerror                   = tools::vector::copy(l_ng.getLoggedQuantizationError(l_mpicom));
+        std::vector< ublas::matrix<double> > l_logproto  = l_ng.getLoggedPrototypes(l_mpicom);
 
-        if (target) {
+        if (l_target) {
             std::string patchpath = "/patch" + boost::lexical_cast<std::string>(i);
 
-            target->writeBlasVector<double>( patchpath+"/weights",  weights, tools::files::hdf::NATIVE_DOUBLE );
-            target->writeBlasMatrix<double>( patchpath+"/protos",  protos, tools::files::hdf::NATIVE_DOUBLE );
+            l_target->writeBlasVector<double>( patchpath+"/weights",  l_weights, tools::files::hdf::NATIVE_DOUBLE );
+            l_target->writeBlasMatrix<double>( patchpath+"/protos",  l_protos, tools::files::hdf::NATIVE_DOUBLE );
 
-            if (ng.getLogging()) {
-                target->writeBlasVector<double>( patchpath+"/error", qerror, tools::files::hdf::NATIVE_DOUBLE );
+            if (l_ng.getLogging()) {
+                l_target->writeBlasVector<double>( patchpath+"/error", l_qerror, tools::files::hdf::NATIVE_DOUBLE );
 
                 for(std::size_t j=0; j < l_logproto.size(); ++j)
-                    target->writeBlasMatrix<double>( patchpath+"/log" + boost::lexical_cast<std::string>( j )+"/protos", l_logproto[j], tools::files::hdf::NATIVE_DOUBLE );
+                    l_target->writeBlasMatrix<double>( patchpath+"/log" + boost::lexical_cast<std::string>( j )+"/protos", l_logproto[j], tools::files::hdf::NATIVE_DOUBLE );
             }
         }
     }
 
 
-    ublas::vector<double> weights    = ng.getPrototypeWeights(l_mpicom);
-    ublas::matrix<double> protos     = ng.getPrototypes(l_mpicom);
-    if (target) {
-        target->writeValue<std::size_t>( "/numprotos",  protos.size1(), tools::files::hdf::NATIVE_ULONG );
-        target->writeBlasMatrix<double>( "/protos",  protos, tools::files::hdf::NATIVE_DOUBLE );
-        target->writeBlasVector<double>( "/weights",  weights, tools::files::hdf::NATIVE_DOUBLE );
-        target->writeValue<std::size_t>( "/iteration",   l_iteration, tools::files::hdf::NATIVE_ULONG );
+    ublas::vector<double> l_weights    = l_ng.getPrototypeWeights(l_mpicom);
+    ublas::matrix<double> l_protos     = l_ng.getPrototypes(l_mpicom);
+    if (l_target) {
+        l_target->writeValue<std::size_t>( "/numprotos",  l_protos.size1(), tools::files::hdf::NATIVE_ULONG );
+        l_target->writeBlasMatrix<double>( "/protos",  l_protos, tools::files::hdf::NATIVE_DOUBLE );
+        l_target->writeBlasVector<double>( "/weights",  l_weights, tools::files::hdf::NATIVE_DOUBLE );
+        l_target->writeValue<std::size_t>( "/iteration",   l_iteration, tools::files::hdf::NATIVE_ULONG );
     }
 
-    delete(target);
+    delete(l_target);
 
     #else
 
     //create target file
-    tools::files::hdf target( l_map["outfile"].as<std::string>(), true );
+    tools::files::hdf l_target( l_map["outfile"].as<std::string>(), true );
 
     // do each patch
     for (std::size_t i=0; i < l_map["inputpath"].as< std::vector<std::string> >().size(); ++i) {
-        ng.trainpatch(
-                       source.readBlasMatrix<double>( l_map["inputpath"].as< std::vector<std::string> >()[i], tools::files::hdf::NATIVE_DOUBLE),
+        l_ng.trainpatch(
+                       l_source.readBlasMatrix<double>( l_map["inputpath"].as< std::vector<std::string> >()[i], tools::files::hdf::NATIVE_DOUBLE),
                        l_iteration
                      );
 
         std::string patchpath = "/patch" + boost::lexical_cast<std::string>(i);
-        target.writeBlasVector<double>( patchpath+"/weights",  ng.getPrototypeWeights(), tools::files::hdf::NATIVE_DOUBLE );
-        target.writeBlasMatrix<double>( patchpath+"/protos",  ng.getPrototypes(), tools::files::hdf::NATIVE_DOUBLE );
+        l_target.writeBlasVector<double>( patchpath+"/weights",  l_ng.getPrototypeWeights(), tools::files::hdf::NATIVE_DOUBLE );
+        l_target.writeBlasMatrix<double>( patchpath+"/protos",  l_ng.getPrototypes(), tools::files::hdf::NATIVE_DOUBLE );
 
-        if (ng.getLogging()) {
-            target.writeBlasVector<double>( patchpath+"/error",  tools::vector::copy(ng.getLoggedQuantizationError()), tools::files::hdf::NATIVE_DOUBLE );
+        if (l_ng.getLogging()) {
+            l_target.writeBlasVector<double>( patchpath+"/error",  tools::vector::copy(l_ng.getLoggedQuantizationError()), tools::files::hdf::NATIVE_DOUBLE );
 
-            std::vector< ublas::matrix<double> > l_logproto =  ng.getLoggedPrototypes();
+            std::vector< ublas::matrix<double> > l_logproto = l_ng.getLoggedPrototypes();
             for(std::size_t j=0; j < l_logproto.size(); ++j)
-                target.writeBlasMatrix<double>( patchpath+"/log"+boost::lexical_cast<std::string>(j)+"/protos", l_logproto[j], tools::files::hdf::NATIVE_DOUBLE );
+                l_target.writeBlasMatrix<double>( patchpath+"/log"+boost::lexical_cast<std::string>(j)+"/protos", l_logproto[j], tools::files::hdf::NATIVE_DOUBLE );
         }
     }
 
-    target.writeValue<std::size_t>( "/numprotos",   l_map["prototype"].as<std::size_t>(), tools::files::hdf::NATIVE_ULONG );
-    target.writeBlasMatrix<double>( "/protos",  ng.getPrototypes(), tools::files::hdf::NATIVE_DOUBLE );
-    target.writeBlasVector<double>( "/weights",  ng.getPrototypeWeights(), tools::files::hdf::NATIVE_DOUBLE );
-    target.writeValue<std::size_t>( "/iteration",   l_iteration, tools::files::hdf::NATIVE_ULONG );
+    l_target.writeValue<std::size_t>( "/numprotos",   l_map["prototype"].as<std::size_t>(), tools::files::hdf::NATIVE_ULONG );
+    l_target.writeBlasMatrix<double>( "/protos",  l_ng.getPrototypes(), tools::files::hdf::NATIVE_DOUBLE );
+    l_target.writeBlasVector<double>( "/weights", l_ng.getPrototypeWeights(), tools::files::hdf::NATIVE_DOUBLE );
+    l_target.writeValue<std::size_t>( "/iteration",   l_iteration, tools::files::hdf::NATIVE_ULONG );
 
     #endif
 
@@ -226,7 +225,7 @@ int main(int p_argc, char* p_argv[])
     std::cout << "/weight \t\t prototype weight" << std::endl;
     std::cout << "/iteration \t\t number of iterations" << std::endl;
 
-    if (ng.getLogging()) {
+    if (l_ng.getLogging()) {
         std::cout << "/patch<0 to number of patches-1>/weights \t\t prototype weights after calculating patch" << std::endl;
         std::cout << "/patch<0 to number of patches-1>/protos \t\t prototypes after calculating patch" << std::endl;
         std::cout << "/patch<0 to number of patches-1>/error \t\t quantization error on each patch iteration" << std::endl;
