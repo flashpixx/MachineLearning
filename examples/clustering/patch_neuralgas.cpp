@@ -153,16 +153,16 @@ int main(int p_argc, char* p_argv[])
         std::vector< ublas::matrix<double> > l_logproto  = l_ng.getLoggedPrototypes(l_mpicom);
 
         if (l_target) {
-            std::string patchpath = "/patch" + boost::lexical_cast<std::string>(i);
+            std::string l_patchpath = "/patch" + boost::lexical_cast<std::string>(i);
 
-            l_target->writeBlasVector<double>( patchpath+"/weights",  l_weights, tools::files::hdf::NATIVE_DOUBLE );
-            l_target->writeBlasMatrix<double>( patchpath+"/protos",  l_protos, tools::files::hdf::NATIVE_DOUBLE );
+            l_target->writeBlasVector<double>( l_patchpath+"/weights",  l_weights, tools::files::hdf::NATIVE_DOUBLE );
+            l_target->writeBlasMatrix<double>( l_patchpath+"/protos",  l_protos, tools::files::hdf::NATIVE_DOUBLE );
 
             if (l_ng.getLogging()) {
-                l_target->writeBlasVector<double>( patchpath+"/error", l_qerror, tools::files::hdf::NATIVE_DOUBLE );
+                l_target->writeBlasVector<double>( l_patchpath+"/error", l_qerror, tools::files::hdf::NATIVE_DOUBLE );
 
                 for(std::size_t j=0; j < l_logproto.size(); ++j)
-                    l_target->writeBlasMatrix<double>( patchpath+"/log" + boost::lexical_cast<std::string>( j )+"/protos", l_logproto[j], tools::files::hdf::NATIVE_DOUBLE );
+                    l_target->writeBlasMatrix<double>( l_patchpath+"/log" + boost::lexical_cast<std::string>( j )+"/protos", l_logproto[j], tools::files::hdf::NATIVE_DOUBLE );
             }
         }
     }

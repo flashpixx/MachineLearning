@@ -103,9 +103,9 @@ int main(int p_argc, char* p_argv[])
     // if logging exists write data to file
     if (l_kmeans.getLogging()) {
         target.writeBlasVector<double>( "/error",  tools::vector::copy(l_kmeans.getLoggedQuantizationError()), tools::files::hdf::NATIVE_DOUBLE );
-        std::vector< ublas::matrix<double> > p = l_kmeans.getLoggedPrototypes();
-        for(std::size_t i=0; i < p.size(); ++i)
-            target.writeBlasMatrix<double>("/log" + boost::lexical_cast<std::string>( i )+"/protos", p[i], tools::files::hdf::NATIVE_DOUBLE );
+        std::vector< ublas::matrix<double> > l_logproto = l_kmeans.getLoggedPrototypes();
+        for(std::size_t i=0; i < l_logproto.size(); ++i)
+            target.writeBlasMatrix<double>("/log" + boost::lexical_cast<std::string>( i )+"/protos", l_logproto[i], tools::files::hdf::NATIVE_DOUBLE );
     }
 
 
