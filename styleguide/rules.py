@@ -88,9 +88,10 @@ def check_Raw( filename, content ) :
 
 # function for check namespaces
 # @param filename filename (and path) of the file
+# @param lineno line number
 # @param name namespace string
 # @param tuple with messagetype and message
-def check_Namespace( filename, name ) :
+def check_Namespace( filename, lineno, name ) :
     if not re.match( r'[a-z]+', name ) :
         return "error", "namespaces must be only lowercase letters, [%s] is not correct" % (name)
     return None, None
@@ -99,10 +100,11 @@ def check_Namespace( filename, name ) :
 
 # function for check namespaces alias
 # @param filename filename (and path) of the file
+# @param lineno line number
 # @param name namespace alias
 # @param full full namespace signature
 # @param tuple with messagetype and message
-def check_NamespaceAlias( filename, name, full ) :
+def check_NamespaceAlias( filename, lineno, name, full ) :
     if not re.match( r'[a-z]+', name ) :
         return "error", "namespaces alias must be only lowercase letters, [%s / %s] is not correct" % (name, full)
     return None, None
@@ -111,19 +113,21 @@ def check_NamespaceAlias( filename, name, full ) :
     
 # function for check classes
 # @param filename filename (and path) of the file
+# @param lineno line number
 # @param name class string
 # @param tuple with messagetype and message
-#def check_Class( filename, name ) :
+#def check_Class( filename, lineno, name ) :
 #    return None, None
     
     
     
 # function that checks methods
 # @param filename filename (and path) of the file
+# @param lineno line number
 # @param name name of the method
 # @param full full method signature
 # @param tuple with messagetype and message
-def check_Method( filename, name, full ) :
+def check_Method( filename, lineno, name, full ) :
     if name == "BOOST_STATIC_ASSERT" :
         return None, None
     
@@ -135,29 +139,32 @@ def check_Method( filename, name, full ) :
     
 # function that checks constructors
 # @param filename filename (and path) of the file
+# @param lineno line number
 # @param name name of the method
 # @param full full method signature
 # @param tuple with messagetype and message
-#def check_Ctor( filename, name, full ) :
+#def check_Ctor( filename, lineno, name, full ) :
 #    return None, None
     
     
     
 # function for checking destructors
 # @param filename filename (and path) of the file
+# @param lineno line number
 # @param name name of the method
 # @param tuple with messagetype and message
-#def check_Dtor( filename, name ) :
+#def check_Dtor( filename, lineno, name ) :
 #    return None, None
     
 
 
 # function for check of function templates
 # @param filename filename (and path) of the file
+# @param lineno line number
 # @param name name of the method
 # @param full full method signature
 # @param tuple with messagetype and message
-#def check_FunctionTemplate( filename, name, full ) :
+#def check_FunctionTemplate( filename, lineno, name, full ) :
 #    return None, None   
     
     
@@ -166,10 +173,11 @@ def check_Method( filename, name, full ) :
     
 # function for check member variables
 # @param filename filename (and path) of the file
+# @param lineno line number
 # @param name name of the member
 # @param typelst of the variable (list or string)
 # @param tuple with messagetype and message
-def check_MemberVar( filename, name, typelst ) :
+def check_MemberVar( filename, lineno, name, typelst ) :
     if filename.endswith(os.path.join("geneticalgorithm","population.hpp")) and \
        (name == "distribution" or name == "probabilityvalue" or name == "first" or name == "second" or name == "third") :
         return None, None
@@ -184,10 +192,11 @@ def check_MemberVar( filename, name, typelst ) :
 
 # function for check parameter variables
 # @param filename filename (and path) of the file
+# @param lineno line number
 # @param name name of the parameter
 # @param typelst of the variable (list or string)
 # @param tuple with messagetype and message
-def check_ParameterVar( filename, name, typelst ) :
+def check_ParameterVar( filename, lineno, name, typelst ) :
     if not name.startswith("p_") :
         if name.startswith("p") :
             return "warning", "parameter variable [%s] with type [%s] begins only with 'p', but should begin with 'p_'" % (name, typelst)
@@ -198,14 +207,18 @@ def check_ParameterVar( filename, name, typelst ) :
 
 # function for check local variables
 # @param filename filename (and path) of the file
+# @param lineno line number
 # @param name name of the local variable
 # @param typelst of the variable (list or string)
 # @param tuple with messagetype and message
-def check_LocalVar( filename, name, typelst ) :
+def check_LocalVar( filename, lineno, name, typelst ) :
     # check special variables
     if filename.endswith("machinelearning.cpp") :
         if name == "m_random" and "machinelearning::tools::random" in typelst :
             return None, None
+            
+    if filename.endswith(os.path.join("examples", "sources", "newsgroup.cpp")) and name == "it" :
+        return None, None
 
 
     # check iterator variables (we check the types for iterator types or
@@ -231,9 +244,10 @@ def check_LocalVar( filename, name, typelst ) :
     
 # function for check template variables
 # @param filename filename (and path) of the file
+# @param lineno line number
 # @param name name of the template variable
 # @param tuple with messagetype and message
-def check_TemplateVar( filename, name ) :
+def check_TemplateVar( filename, lineno, name ) :
     if not re.match( r'[A-Z]+', name ) :
         return "error", "template variable must be only uppercase letters, [%s] is not correct" % (name)
     return None, None

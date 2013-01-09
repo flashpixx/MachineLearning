@@ -134,45 +134,46 @@ def treeNode( rules, node, parentnode, source, messages ) :
     filename = os.path.normpath(str(node.location.file))
     if not filename in source :
         return
-
+        
+    lineno  = int(node.location.line)
     msg     = None
     msgtype = None
 
     if  hasattr(rules, "check_Namespace") and callable(getattr(rules, "check_Namespace")) and node.kind == clang.cindex.CursorKind.NAMESPACE :
-        msgtype, msg = rules.check_Namespace(filename, node.spelling)
+        msgtype, msg = rules.check_Namespace(filename, lineno, node.spelling)
         
     if hasattr(rules, "check_NamespaceAlias") and callable(getattr(rules, "check_NamespaceAlias")) and node.kind == clang.cindex.CursorKind.NAMESPACE_ALIAS :
-        msgtype, msg = rules.check_NamespaceAlias(filename, node.spelling, getNamespaceList(node))
+        msgtype, msg = rules.check_NamespaceAlias(filename, lineno, node.spelling, getNamespaceList(node))
         
     elif hasattr(rules, "check_Class") and callable(getattr(rules, "check_Class")) and node.kind == clang.cindex.CursorKind.CLASS_DECL :
-        msgtype, msg = rules.check_Class(filename, node.spelling)
+        msgtype, msg = rules.check_Class(filename, lineno, node.spelling)
     
     elif hasattr(rules, "check_Method") and callable(getattr(rules, "check_Method")) and node.kind == clang.cindex.CursorKind.CXX_METHOD :
-        msgtype, msg = rules.check_Method(filename, node.spelling, node.displayname)
+        msgtype, msg = rules.check_Method(filename, lineno, node.spelling, node.displayname)
     
     elif hasattr(rules, "check_Ctor") and callable(getattr(rules, "check_Ctor")) and node.kind == clang.cindex.CursorKind.CONSTRUCTOR :
-        msgtype, msg = rules.check_Ctor(filename, node.spelling, node.displayname)
+        msgtype, msg = rules.check_Ctor(filename, lineno, node.spelling, node.displayname)
     
     elif hasattr(rules, "check_Dtor") and callable(getattr(rules, "check_Dtor")) and node.kind == clang.cindex.CursorKind.DESTRUCTOR :
-        msgtype, msg = rules.check_Dtor(filename, node.spelling)
+        msgtype, msg = rules.check_Dtor(filename, lineno, node.spelling)
     
     elif hasattr(rules, "check_FunctionTemplate") and callable(getattr(rules, "check_FunctionTemplate")) and node.kind == clang.cindex.CursorKind.FUNCTION_TEMPLATE :
-        msgtype, msg = rules.check_FunctionTemplate(filename, node.spelling, node.displayname)
+        msgtype, msg = rules.check_FunctionTemplate(filename, lineno, node.spelling, node.displayname)
     
             
     elif hasattr(rules, "check_MemberVar") and callable(getattr(rules, "check_MemberVar")) and node.kind == clang.cindex.CursorKind.FIELD_DECL :
-        msgtype, msg = rules.check_MemberVar(filename, node.displayname, getTypeList(node))
+        msgtype, msg = rules.check_MemberVar(filename, lineno, node.displayname, getTypeList(node))
     
     elif hasattr(rules, "check_ParameterVar") and callable(getattr(rules, "check_ParameterVar")) and node.kind == clang.cindex.CursorKind.PARM_DECL and node.spelling :
-        msgtype, msg = rules.check_ParameterVar(filename, node.spelling, getTypeList(node))
+        msgtype, msg = rules.check_ParameterVar(filename, lineno, node.spelling, getTypeList(node))
     
     elif hasattr(rules, "check_LocalVar") and callable(getattr(rules, "check_LocalVar")) and node.kind == clang.cindex.CursorKind.VAR_DECL and parentnode and not parentnode.kind == clang.cindex.CursorKind.CLASS_DECL:
-        msgtype, msg = rules.check_LocalVar(filename, node.spelling, getTypeList(node))
+        msgtype, msg = rules.check_LocalVar(filename, lineno, node.spelling, getTypeList(node))
     
     elif hasattr(rules, "check_TemplateVar") and callable(getattr(rules, "check_TemplateVar")) and node.kind == clang.cindex.CursorKind.TEMPLATE_TYPE_PARAMETER :
-        msgtype, msg = rules.check_TemplateVar(filename, node.spelling)
+        msgtype, msg = rules.check_TemplateVar(filename, lineno, node.spelling)
 
-    addMessage( messages, filename, int(node.location.line), msgtype, msg )
+    addMessage( messages, filename, lineno, msgtype, msg )
 
 
 # recursiv function for parsing the tree
