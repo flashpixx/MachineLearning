@@ -191,16 +191,16 @@ int main(int p_argc, char* p_argv[])
                        l_iteration
                      );
 
-        std::string patchpath = "/patch" + boost::lexical_cast<std::string>(i);
-        l_target.writeBlasVector<double>( patchpath+"/weights",  l_ng.getPrototypeWeights(), tools::files::hdf::NATIVE_DOUBLE );
-        l_target.writeBlasMatrix<double>( patchpath+"/protos",  l_ng.getPrototypes(), tools::files::hdf::NATIVE_DOUBLE );
+        std::string l_patchpath = "/patch" + boost::lexical_cast<std::string>(i);
+        l_target.writeBlasVector<double>( l_patchpath+"/weights",  l_ng.getPrototypeWeights(), tools::files::hdf::NATIVE_DOUBLE );
+        l_target.writeBlasMatrix<double>( l_patchpath+"/protos",  l_ng.getPrototypes(), tools::files::hdf::NATIVE_DOUBLE );
 
         if (l_ng.getLogging()) {
-            l_target.writeBlasVector<double>( patchpath+"/error",  tools::vector::copy(l_ng.getLoggedQuantizationError()), tools::files::hdf::NATIVE_DOUBLE );
+            l_target.writeBlasVector<double>( l_patchpath+"/error",  tools::vector::copy(l_ng.getLoggedQuantizationError()), tools::files::hdf::NATIVE_DOUBLE );
 
             std::vector< ublas::matrix<double> > l_logproto = l_ng.getLoggedPrototypes();
             for(std::size_t j=0; j < l_logproto.size(); ++j)
-                l_target.writeBlasMatrix<double>( patchpath+"/log"+boost::lexical_cast<std::string>(j)+"/protos", l_logproto[j], tools::files::hdf::NATIVE_DOUBLE );
+                l_target.writeBlasMatrix<double>( l_patchpath+"/log"+boost::lexical_cast<std::string>(j)+"/protos", l_logproto[j], tools::files::hdf::NATIVE_DOUBLE );
         }
     }
 
