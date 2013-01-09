@@ -219,6 +219,9 @@ def check_LocalVar( filename, lineno, name, typelst ) :
             
     if filename.endswith(os.path.join("examples", "sources", "newsgroup.cpp")) and name == "it" :
         return None, None
+        
+    if "foreach" in name :
+        return None, None
 
 
     # check iterator variables (we check the types for iterator types or
