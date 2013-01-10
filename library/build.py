@@ -240,48 +240,33 @@ def Boost_BuildInstall(env, source, gzipbuild, bzipbuild)  :
     prefix      = setpath(env, os.path.join("..", "build_"+env["buildtype"], "boost", version))
 
     # set the toolset and compile the bjam and build boost
+    boostlibs = ["exception", "math", "system", "iostreams"]
     boostoptions = [
-        "--with-exception",
-        "--with-math",
-        "--with-system",
-        "--with-iostreams",
-        "--layout=system",
         "link=shared",
         "runtime-link=shared",
         "threading=multi",
         "variant="+env["buildtype"],
         "install",
+        "--layout=system",
         "--prefix="+prefix
     ]
     
     if env["boostbuild"] == "requiredoptional"  or  env["boostbuild"] == "full" :
-        boostoptions.extend([
-            "--with-regex",
-            "--with-random",
-            "--with-thread",
-            "--with-date_time"
-        ])
+        boostlibs.extend(["regex", "random", "thread", "date_time"])
     if env["boostbuild"] == "full" :
-        boostoptions.extend([
-            "--with-program_options",
-            "--with-filesystem"
-        ])
+        boostlibs.extend(["filesystem", "program_options"])
     if env["withmpi"] :
-        boostoptions.extend([
-            "--with-mpi",
-            "--with-serialization"
-        ])
-    
+        boostlibs.extend(["mpi", "serialization"])
+   
     cmd = "cd " + boostpath + " && "
     if env["withmpi"] :
         cmd = cmd + " echo \"using mpi ;\" >> " + setpath(env, os.path.join("tools", "build", "v2", "user-config.jam")) + " && "
-    cmd = cmd + " ./bootstrap.sh"
+    cmd = cmd + " ./bootstrap.sh --prefix=" + prefix + " --without-icu --with-libraries=" + ",".join(boostlibs)
     
     if env["TOOLKIT"] == "msys" :
-        cmd = cmd + " --with-toolset=mingw && rm project-config.jam"
-        boostoptions.append("toolset=gcc")
-    
-    cmd = cmd + " && ./b2 " + " ".join(boostoptions)
+        cmd = cmd + " --with-toolset=mingw && rm project-config.jam && ./b2 " + " ".join(boostoptions) + " --with-"+" --with-".join(boostlibs)
+    else :
+        cmd = cmd + " && ./b2 " + " ".join(boostoptions) + " --with-"+" --with-".join(boostlibs)
     
     # build Boost with Bzip2 and ZLib support and set the dependency
     dependency = [source]
@@ -322,7 +307,7 @@ def BZip2_BuildInstall(env, extract) :
     if env["TOOLKIT"] == "msys" :
         cmd = "cd $SOURCE && grep -v chmod Makefile | grep -v ln > Makefile.msys && make -fMakefile.msys install PREFIX=" + setpath(env, prefix)
     else :
-        cmd = "cd $SOURCE && make install PREFIX=" + prefix
+        cmd = "export CFLAGS=\"-fpic -Wall -Winline -O2 -g -D_FILE_OFFSET_BITS=64\" && cd $SOURCE && make install PREFIX=" + prefix
     
     return env.Command("buildbzip2-"+version, extract, cmd)
       
