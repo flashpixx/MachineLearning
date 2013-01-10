@@ -67,7 +67,7 @@ def check_Raw( filename, content ) :
             msg.append("filename and directories must be only lowercase letters, [%s] is not correct" % (i))
 
     # check ifdef & define name
-    if filename.endswith(".h") or filename.endswith(".hpp") :
+    if (filename.endswith(".h") or filename.endswith(".hpp")) and not filename.endswith(os.path.join("tools", "language", "iso639.h")) :
     
         if filename.endswith("machinelearning.h") :
             defname = "__MACHINELEARNING_H"
