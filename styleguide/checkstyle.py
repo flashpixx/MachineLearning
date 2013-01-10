@@ -126,6 +126,7 @@ def addMessage( messages, filename, lineno, msgtype, msg ) :
 # @param parentnode AST parent node
 # @param source list with files, that should be parsed
 # @param messages message dict
+# @param returns 0 or 1 for the LLOC metric
 def treeNode( rules, node, parentnode, source, messages ) :
 
     # we need the check of the file here, because on extern includes
@@ -133,7 +134,7 @@ def treeNode( rules, node, parentnode, source, messages ) :
     # file is defined in the command line parameter, otherwise we ignore it
     filename = os.path.normpath(str(node.location.file))
     if not filename in source :
-        return
+        return 0 
         
     lineno  = int(node.location.line)
     msg     = None
@@ -174,6 +175,7 @@ def treeNode( rules, node, parentnode, source, messages ) :
         msgtype, msg = rules.check_TemplateVar(filename, lineno, node.spelling)
 
     addMessage( messages, filename, lineno, msgtype, msg )
+    return 1
 
 
 # recursiv function for parsing the tree
@@ -182,17 +184,20 @@ def treeNode( rules, node, parentnode, source, messages ) :
 # @param parentnode AST parent node
 # @param source list with files, that should be parsed
 # @param messages list with error messages
+# @return lloc metric for "logical lines of code"
 def treeParse( rules, node, parentnode, source, messages ) :
-    treeNode(rules, node, parentnode, source, messages)
-
+    lloc = 0
+    lloc = treeNode(rules, node, parentnode, source, messages)
+ 
     if node.kind.is_reference() : 
-        treeNode(rules, node, parentnode, source, messages)
+        lloc = lloc + treeNode(rules, node, parentnode, source, messages)
 
     for i in node.get_children() :
         # ignore some elements
         if i.kind == clang.cindex.CursorKind.CALL_EXPR :
             continue
-        treeParse(rules, i, node, source, messages)
+        lloc = lloc + treeParse(rules, i, node, source, messages)
+    return lloc
 
 
 # main function for checking the AST
@@ -216,6 +221,9 @@ def stylecheck( rules, source, printtree = False, includedir = [], defines = [] 
     for i in defines :
         arglst.extend(["-D", i])
         
+    # metric counter
+    lloc = 0
+        
     for i in source :
     
         # read the file first and call into function
@@ -232,7 +240,7 @@ def stylecheck( rules, source, printtree = False, includedir = [], defines = [] 
             if printtree :
                 print_cursor_and_children(j, source)
             else :
-                treeParse(rules, j, None, source, messages)
+                lloc = lloc + treeParse(rules, j, None, source, messages)
             
     # print all messages
     stop    = False
@@ -265,7 +273,8 @@ def stylecheck( rules, source, printtree = False, includedir = [], defines = [] 
             if i <> len(files)-1 :
                 print "-"*80
         print "="*80
-
+        
+    print "\nLLOC (Logical Lines of Code) metric: " + str(lloc)
     if stop :
         raise Exception("===>> style guide check fails (see log) <<===")
 #=====================================================================================================================================
