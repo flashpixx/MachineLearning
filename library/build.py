@@ -397,7 +397,7 @@ def LapackAtlas_BuildInstall(env, atlasdir, lapacktargz) :
         cmd = cmd + " && sed -e \"s/soname \\$$(LIBINSTdir)\\/\\$$(outso)/soname \\$$(outso).\\$$(VER)/\" lib/Makefile > lib/Makefile.tmp && mv -f lib/Makefile.tmp lib/Makefile"
     cmd = cmd + " && make && make install"
     if env["TOOLKIT"] == "posix" :
-        cmd = cmd + " && cd "+prefix+"/lib && mv libsatlas.so libsatlas.so."+version+" && mv libtatlas.so libtatlas.so.+"+version+" && ln -s libsatlas.so."+version+" libsatlas.so && ln -s libtatlas.so."+version+" libtatlas.so"
+        cmd = cmd + " && cd "+prefix+"/lib && mv libsatlas.so libsatlas.so."+version+" && mv libtatlas.so libtatlas.so."+version+" && ln -s libsatlas.so."+version+" libsatlas.so && ln -s libtatlas.so."+version+" libtatlas.so"
     
     return env.Command("buildatlas-"+version, [atlasdir, lapacktargz, builddir], cmd)
 
