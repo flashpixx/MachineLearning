@@ -307,7 +307,7 @@ def BZip2_BuildInstall(env, extract) :
     if env["TOOLKIT"] == "msys" :
         cmd = "cd $SOURCE && grep -v chmod Makefile | grep -v ln > Makefile.msys && make -fMakefile.msys install PREFIX=" + setpath(env, prefix)
     else :
-        cmd = "export CFLAGS=\"-fpic -Wall -Winline -O2 -g -D_FILE_OFFSET_BITS=64\" && cd $SOURCE && make install PREFIX=" + prefix
+        cmd = "cd $SOURCE && make LDFLAGS=\"-fPIC\" install PREFIX=" + prefix
     
     return env.Command("buildbzip2-"+version, extract, cmd)
       
