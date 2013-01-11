@@ -176,9 +176,9 @@ int main(int p_argc, char* p_argv[])
 
     ublas::matrix<double> l_distancematrix;
     if ( (l_map.count("stopwordmin")) && (l_map.count("stopwordmax")) )
-        l_distancematrix = ncd.unsymmetric( l_content );
+        l_distancematrix = l_ncd.unsymmetric( l_content );
     else
-        l_distancematrix = ncd.unsymmetric( l_files, true );
+        l_distancematrix = l_ncd.unsymmetric( l_files, true );
     
 
 
@@ -199,7 +199,7 @@ int main(int p_argc, char* p_argv[])
         l_mds.setIteration( l_iteration );
     l_mds.setRate( l_rate );
 
-    ublas::matrix<double> l_projectdata = l_mds.map( distancematrix );
+    ublas::matrix<double> l_projectdata = l_mds.map( l_distancematrix );
     
 
     // write data
