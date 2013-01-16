@@ -428,7 +428,7 @@ namespace machinelearning { namespace distances {
      * @param p_mpi MPI object
      * @param p_strvec local dataset
      * @param p_isfile parameter for interpreting the string as a file with path
-     * @return part of distance matrix (local data size x all data size)
+     * @return part of distance matrix (all data size x local data size)
      **/
     template<typename T> inline ublas::matrix<T> ncd<T>::unsquare ( const mpi::communicator& p_mpi, const std::vector<std::string>& p_strvec, const bool& p_isfile ) const
     {
