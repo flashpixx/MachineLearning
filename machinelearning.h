@@ -718,7 +718,7 @@
 
 
 /** main namespace of the framework
- * @todo change vector / datatypes for memory mapped files ( http://en.wikipedia.org/wiki/Mmap / http://en.wikipedia.org/wiki/Memory-mapped_file )
+ * @todo change vector / datatypes for memory mapped files ( http://en.wikipedia.org/wiki/Mmap / http://en.wikipedia.org/wiki/Memory-mapped_file / http://www.boost.org/doc/libs/1_36_0/libs/iostreams/doc/classes/mapped_file.html )
  *
  * @todo split class declaration and implementation in different files for solving guard dependcy problems
  * @todo define testcases http://www.boost.org/doc/libs/1_51_0/libs/test/doc/html/index.html
