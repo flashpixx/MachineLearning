@@ -718,6 +718,8 @@
 
 
 /** main namespace of the framework
+ * @todo change vector / datatypes for memory mapped files ( http://en.wikipedia.org/wiki/Mmap / http://en.wikipedia.org/wiki/Memory-mapped_file )
+ *
  * @todo split class declaration and implementation in different files for solving guard dependcy problems
  * @todo define testcases http://www.boost.org/doc/libs/1_51_0/libs/test/doc/html/index.html
  * @todo adding LUA ( http://en.wikipedia.org/wiki/Lua_(programming_language) ) support for dynamic programming ( http://en.wikipedia.org/wiki/Dynamic_programming )
