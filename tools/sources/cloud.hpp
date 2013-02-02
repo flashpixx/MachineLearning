@@ -233,7 +233,7 @@ namespace machinelearning { namespace tools { namespace sources {
             if (m_randompoints && (m_points.first != m_points.second))
                 l_numpoints = static_cast<std::size_t>(l_rand.get<T>( tools::random::uniform, m_points.first, m_points.second ));
             else
-                l_numpoints = 0.5 * (m_points.second + m_points.first) ;
+                l_numpoints = (m_points.second + m_points.first) / 2;
             
             
             // sets the variance
