@@ -274,7 +274,7 @@ def stylecheck( rules, source, printtree = False, includedir = [], defines = [] 
                 print "-"*80
         print "="*80
         
-    print "\nLLOC (Logical Lines of Code) metric: " + str(lloc)
+    print "\nLLOC (Logical Lines of Code) metric [%s]: %d" % (i, lloc)
     if stop :
         raise Exception("===>> style guide check fails (see log) <<===")
 #=====================================================================================================================================
