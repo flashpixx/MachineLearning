@@ -36,7 +36,7 @@ def Boost_DownloadURL(env)  :
     html = f.read()
     f.close()
     
-    found = re.search("<a href=\"http://sourceforge.net/projects/boost/files/(.*)\">Download</a>", html)
+    found = re.search("<a href=\"https://sourceforge.net/projects/boost/files/(.*)\">Download</a>", html)
     if found == None :
         raise RuntimeError("Boost Download URL not found")
         
