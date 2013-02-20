@@ -41,15 +41,8 @@ localconf = {
     "linkflags"             : [ ],
 
     "cpplibraries"          : [  "stdc++",
-                                 "boost_iostreams"
+                                 "boost_iostreams-mt"
     ],
-    
-    "staticlinkonly"        : [  "boost_exception"
-    ],
-    
-    "cppdylibrariesonly"    : [ ], 
-    
-    "cdylibrariesonly"      : [ ], 
     
     "clibraries"            : [ ],
     
@@ -238,7 +231,7 @@ elif conf.env["atlaslink"] == "single" :
     
 if not("java" in COMMAND_LINE_TARGETS) :
     localconf["cpplibraries"].extend([
-                            "boost_program_options", "boost_filesystem"
+                            "boost_program_options-mt", "boost_filesystem-mt"
     ])
     localconf["cppheaders"].extend([
                             "cstdlib",
@@ -263,7 +256,7 @@ if "java" in COMMAND_LINE_TARGETS :
 if conf.env["withrandomdevice"] :
     conf.env.AppendUnique(CPPDEFINES  = ["MACHINELEARNING_RANDOMDEVICE"])
     localconf["cpplibraries"].append(
-                            "boost_random"
+                            "boost_random-mt"
     )
     localconf["cppheaders"].append(
                             os.path.join("boost", "nondet_random.hpp")
@@ -308,13 +301,13 @@ if conf.env["withsymbolicmath"] :
 
 if conf.env["withlogger"] :
     conf.env.AppendUnique(CPPDEFINES  = ["MACHINELEARNING_LOGGER"])
-    localconf["cpplibraries"].extend(["boost_thread", "boost_system"])  
+    localconf["cpplibraries"].extend(["boost_thread-mt", "boost_system-mt"])  
 
 
 if conf.env["withsources"] :
     conf.env.AppendUnique(CPPDEFINES  = ["MACHINELEARNING_SOURCES", "MACHINELEARNING_SOURCES_TWITTER"])
     localconf["clibraries"].append("xml2")
-    localconf["cpplibraries"].extend(["boost_regex", "json", "boost_system"])
+    localconf["cpplibraries"].extend(["boost_regex-mt", "json", "boost_system-mt"])
     localconf["cheaders"].extend([
                             os.path.join("libxml", "parser.h"),
                             os.path.join("libxml", "tree.h"),

@@ -247,7 +247,7 @@ def Boost_BuildInstall(env, source, gzipbuild, bzipbuild)  :
         "threading=multi",
         "variant="+env["buildtype"],
         "install",
-        "--layout=system",
+        "--layout=tagged",
         "--prefix="+prefix
     ]
     

@@ -664,9 +664,12 @@ if not(os.path.isfile(os.path.join("buildenvironment", env["TOOLKIT"]+".py"))) :
 env.SConscript( os.path.join("buildenvironment", env["TOOLKIT"]+".py"), exports="conf checkCPPEnv checkExecutables" )
 env = conf.Finish()
 
+if not env.GetOption("clean") :
+    Default(None)
+
 # setup default builds and default clean
 defaultcpp = [os.path.join(os.path.abspath(os.curdir), "machinelearning.cpp")]
-env.Clean(defaultcpp, [
+env.Clean("pseudo", [
     "build",
     "config.log",
     ".sconf_temp",
