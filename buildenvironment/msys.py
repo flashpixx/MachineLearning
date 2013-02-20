@@ -165,7 +165,7 @@ if conf.env["uselocallibrary"] :
     libdir      = []
     includedir  = []
     
-    path   = os.path.abspath(os.path.join(os.path.abspath(os.curdir), "..", "library", "build_"+conf.env["buildtype"]))
+    path   = os.path.abspath(os.path.join(os.path.abspath(os.curdir), "..", "library", "build"))
     reg    = re.compile("\d(.*)")
     
     for i in ["lapack", "boost", "cln", "ginac", "hdf", "jsoncpp", "xml"] :
