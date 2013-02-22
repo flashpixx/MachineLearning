@@ -333,18 +333,20 @@ def JsonCPP_BuildInstall(env, targz, extract) :
         if header <> None :
             libheader.append( i ) 
 
-    envjson = env.Clone()
+    envjson = Environment()
     envjson.Replace(CPPPATH = os.path.join(sourcepath, "include"))
+    envjson.AppendUnique(CXXFLAGS  = ["-O2"])
+
     if env["TOOLKIT"] == "msys" :
         envjson["SPAWN"] = env["MSYSSPAWN"]
         envjson["SHELL"] = env["MSYSSHELL"]
         
-    libbuild = []
-    libbuild.append( envjson.Library(target="json", source=libsrc) )
-    libbuild.append( envjson.SharedLibrary(target="json", source=libsrc) )
+    elif env["TOOLKIT"] == "darwin" :
+        envjson.AppendUnique(LINKFLAGS = ["-Wl,-install_name,libjson.dylib"])
         
-    # install header and libraries
-    libinstall      = env.Install( setpath(env, os.path.join(os.curdir, "build", "jsoncpp", version, "lib")), libbuild )
+    # create shared lib, install header and libraries
+    lib             = envjson.SharedLibrary(target="json", source=libsrc)
+    libinstall      = env.Install( setpath(env, os.path.join(os.curdir, "build", "jsoncpp", version, "lib")), lib )
     headerdir       = env.Command( setpath(env, os.path.join(os.curdir, "build", "jsoncpp", version, "include", "json")), "", Mkdir("$TARGET"))
     headerinstall   = []
     for i in libheader :
