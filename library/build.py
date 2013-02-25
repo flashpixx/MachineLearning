@@ -402,54 +402,66 @@ def JsonCPP_BuildInstall(env, targz, extract) :
 
 
 def Lapack_BuildInstall(env, lapackdir) :
-    # build Lapack only with MSYS
     dir     = str(lapackdir).replace("']", "").replace("['", "")
     version = dir.replace("lapack-", "")
     
-    cmd = "cd $SOURCE && cmake . -DCMAKE_BUILD_TYPE:String=release -DLAPACKE:BOOL=\"1\" -DCMAKE_INSTALL_PREFIX:PATH=\"" + setpath(env, os.path.abspath(os.path.join("build", "lapack", version))) + "\" && make && make install"
-    return env.Command("buildlapack-"+version, lapackdir, cmd)
+    cmd = "cd $SOURCE && cmake . -DCMAKE_BUILD_TYPE:String=release -DLAPACKE:BOOL=\"1\" -DCMAKE_INSTALL_PREFIX:PATH=\"" + setpath(env, os.path.abspath(os.path.join("build", "lapack", version))) + "\" && ";
+    
+    if env["TOOLKIT"] in ["darwin", "posix", "cygwin", "msys"] :
+        return env.Command("buildlapack-"+version, lapackdir, cmd + "make && make install")
+
+    elif env["TOOLKIT"] == "msvc" :
+        return env.Command("buildlapack-"+version, lapackdir, cmd + "devenv lapack.sln /build release /Project Install")
+
+    else :
+        raise RuntimeError("Lapack can not be build with toolkit ["+env["TOOLKIT"]+"]")
 
 
 def HDF5_BuildInstall(env, hdfdir) :
     version = str(hdfdir).replace("']", "").replace("['", "").replace("hdf5-", "")
     prefix  = setpath(env, os.path.abspath(os.path.join(os.curdir, "build", "hdf", version)))
     
-    if env["TOOLKIT"] == "msys" :
-        cmd = "cd $SOURCE && cmake . -G \"MSYS Makefiles\" -DCMAKE_BUILD_TYPE:String=release -DBUILD_SHARED_LIBS:BOOL=\"1\" -DHDF5_BUILD_HL_LIB:BOOL=\"1\" -DHDF5_BUILD_CPP_LIB:BOOL=\"1\" -DCMAKE_INSTALL_PREFIX:PATH=\"" + prefix + "\" && make && make install"
+    cmd = "cd $SOURCE && cmake . -DCMAKE_BUILD_TYPE:String=release -DBUILD_SHARED_LIBS:BOOL=\"1\" -DHDF5_BUILD_HL_LIB:BOOL=\"1\" -DHDF5_BUILD_CPP_LIB:BOOL=\"1\" -DCMAKE_INSTALL_PREFIX:PATH=\"" + prefix + "\" &&"
+    
+    if env["TOOLKIT"] in ["darwin", "posix", "cygwin", "msys"] :
+        return env.Command("buildhdf5-"+version, hdfdir, cmd + "make && make install")
+        
+    elif env["TOOLKIT"] == "msvc" :
+        return env.Command("buildhdf5-"+version, hdfdir, cmd + "devenv hdf5.sln /build release /Project Install")
+    
     else :
-        cmd = "cd $SOURCE && ./configure --enable-cxx --prefix=" + prefix + " && make && make install"
-    return env.Command("buildhdf5-"+version, hdfdir, cmd)
+        raise RuntimeError("HDF5 can not be build with toolkit ["+env["TOOLKIT"]+"]")
 
 
-def LibXML2_BuildInstall(env, libxmldir) :
-    version   = str(libxmldir).replace("']", "").replace("['", "").replace("libxml2-", "")
+def LibXML2_BuildInstall(env, libxml2dir) :
+    version   = str(libxml2dir).replace("']", "").replace("['", "").replace("libxml2-", "")
     prefix    = setpath(env, os.path.abspath(os.path.join(os.curdir, "build", "xml", version)))
+        
+    if env["TOOLKIT"] in ["darwin", "posix", "cygwin", "msys"] :
     
-    cmd = "cd $SOURCE && ./configure --without-python --without-threads --without-debug"
-    cmd = cmd + " --prefix=" + prefix + " && make && make install"
-    return env.Command("buildlibxml2-"+version, libxmldir, cmd)
+        return env.Command("buildxml2-"+version, libxml2dir, "cd $SOURCE && ./configure --without-python --without-threads --without-debug --prefix=" + prefix + " && make && make install")
+    
+    else :
+        raise RuntimeError("LibXML2 can not be build with toolkit ["+env["TOOLKIT"]+"]")
+    
+    
+def CLNGiNaC_BuildInstall(env, clndir, ginacdir) :
+    clnversion   = str(clndir).replace("']", "").replace("['", "").replace("cln-", "")
+    clnprefix    = setpath(env, os.path.abspath(os.path.join(os.curdir, "build", "cln", version)))
+    
+    ginacversion = str(ginacdir).replace("']", "").replace("['", "").replace("ginac-", "")
+    ginacprefix  = setpath(env, os.path.abspath(os.path.join(os.curdir, "build", "ginac", version)))
+
+
+    if env["TOOLKIT"] in ["darwin", "posix", "cygwin", "msys"] :
+        
+        clnbuild = env.Command("buildcln-"+clnversion, clndir, "cd $SOURCE && ./configure --prefix=" + clnprefix + " && make && make install")
+        return env.Command("buildclnginac-"+version, [ginacdir, clnbuild], "cd $SOURCE && export CLN_CFLAGS=-I" + clninclude + " && export CLN_LIBS=\"-L" + clnlib + " -lcln\" && ./configure --prefix=" + ginacprefix + " && make && make install")
+    
+    else :
+        raise RuntimeError("CLN & GiNaC can not be build with toolkit ["+env["TOOLKIT"]+"]")
     
         
-def GiNaC_BuildInstall(env, ginacdir, clnbuild) :
-    version    = str(ginacdir).replace("']", "").replace("['", "").replace("ginac-", "")
-    prefix     = setpath(env, os.path.abspath(os.path.join(os.curdir, "build", "ginac", version)))
-    
-    clnversion = str(clnbuild).replace("']", "").replace("['", "").replace("buildcln-", "")
-    clninclude = setpath(env, os.path.abspath(os.path.join(os.curdir, "build", "cln", clnversion, "include")))
-    clnlib     = setpath(env, os.path.abspath(os.path.join(os.curdir, "build", "cln", clnversion, "lib")))
-    
-    cmd = "cd $SOURCE && export CLN_CFLAGS=-I" + clninclude + " && export CLN_LIBS=\"-L" + clnlib + " -lcln\" && ./configure --prefix=" + prefix + " && make && make install"
-    return env.Command("buildginac-"+version, [ginacdir, clnbuild], cmd)
-        
-        
-def CLN_BuildInstall(env, clndir) :
-    version = str(clndir).replace("']", "").replace("['", "").replace("cln-", "")
-    prefix  = setpath(env, os.path.abspath(os.path.join(os.curdir, "build", "cln", version)))
-    
-    cmd = "cd $SOURCE && ./configure --prefix=" + prefix + " && make && make install"
-    return env.Command("buildcln-"+version, clndir, cmd)
-    
-    
 def setpath(env, path) :
     if env["TOOLKIT"] == "msys" :
         if path[1] == ":" :
@@ -526,7 +538,7 @@ if ("librarybuild" in COMMAND_LINE_TARGETS) or ("librarydownload" in COMMAND_LIN
         ginacdir   = env.Command(str(ginactarbz).replace("[", "").replace("]", "").replace("'", "").replace(".tar.bz2", ""), ginactarbz, env["EXTRACT_CMDBZ"]+env["extractsuffix"]+"library")
         lstdownload.append(clntarbz)
         lstdownload.append(ginactarbz)
-        lstbuild.append( GiNaC_BuildInstall(env, ginacdir, CLN_BuildInstall(env, clndir)) )
+        lstbuild.append( CLNGiNaC_BuildInstall(env, clndir, ginacdir) )
 
     #download JSON library, extract & install
     if not("json" in skiplist) :

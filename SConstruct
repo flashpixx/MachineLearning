@@ -42,9 +42,12 @@ def createVariables(vars) :
 
     zipsupport    = False
     colorcompiler = True
-    if (platform == "cygwin")  or  (platform == "msys") :
+    if platform in ["cygwin", "msys", "msvc"] :
         zipsupport    = True
         colorcompiler = False
+        
+    if platform in ["msys", "msvc"]
+        vars.Add(EnumVariable("winversion", "value of the Windows version", "win7", allowed_values=("win7", "srv2008", "vista", "srv2003sp1", "xpsp2", "srv2003", "xp", "w2000")))
 
     vars.Add(BoolVariable("withrandomdevice", "installation with random device support", False))
     vars.Add(BoolVariable("withmpi", "installation with MPI support", False))
@@ -60,9 +63,6 @@ def createVariables(vars) :
     vars.Add(BoolVariable("usedistcc", "use distributed compiling with DistCC", False))
     vars.Add(BoolVariable("usecolorcompiler", "enable / disable searching for color compiler", colorcompiler))
     vars.Add(BoolVariable("copylibrary", "copy the dynamic link libraries into the build dir", False))
-    
-    if platform == "msys" :
-        vars.Add(EnumVariable("winversion", "value of the Windows version", "win7", allowed_values=("win7", "srv2008", "vista", "srv2003sp1", "xpsp2", "srv2003", "xp", "w2000")))
     
     vars.Add(ListVariable("skiplibrary", "skipping library builds / downloads", "", ["lapack", "boost", "hdf", "ginac", "json", "xml"]))
     vars.Add(BoolVariable("zipsupport", "build Bzip2 and ZLib support for Boost", zipsupport))
@@ -132,6 +132,8 @@ def detectPlatform() :
         return "cygwin", arch
     elif "msystem" in os.environ  and  os.environ["msystem"].lower() == "mingw32":
         return "msys", arch
+    elif platform.system().lower() == "windows" and ("MSVC_SETUP_RUN" in env) and (env["MSVC_SETUP_RUN"]) :
+        return "msvc", arch
    
     raise RuntimeError("toolkit ["+platform.system()+"] not known")
     
