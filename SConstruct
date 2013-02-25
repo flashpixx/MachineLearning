@@ -46,7 +46,7 @@ def createVariables(vars) :
         zipsupport    = True
         colorcompiler = False
         
-    if platform in ["msys", "msvc"]
+    if platform in ["msys", "msvc"] :
         vars.Add(EnumVariable("winversion", "value of the Windows version", "win7", allowed_values=("win7", "srv2008", "vista", "srv2003sp1", "xpsp2", "srv2003", "xp", "w2000")))
 
     vars.Add(BoolVariable("withrandomdevice", "installation with random device support", False))
