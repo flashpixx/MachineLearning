@@ -140,34 +140,6 @@ def LaPack_DownloadURL(env) :
     filename    = downloadurl.replace("http://www.netlib.org/lapack/", "")
     
     return downloadurl, filename
-
-
-def Atlas_DownloadURL(env) :
-    if env["atlasversion"] == "stable" :     
-        # read download path of the Atlas (latest stableversion)
-        f = urllib2.urlopen("http://sourceforge.net/projects/math-atlas/")
-        html = f.read()
-        f.close()
-    
-        found = re.search("<small title=\"(.*)\">(.*)</small>", html)
-        if found == None :
-            raise RuntimeError("Atlas Download URL not found")
-        return "http://sourceforge.net/projects/math-atlas/files/latest/download?source=files", found.group(2)
-
-    elif env["atlasversion"] == "devel" : 
-        # read download path of the Atlas (latest developer version)
-        f = urllib2.urlopen("https://sourceforge.net/projects/math-atlas/files/Developer%20%28unstable%29/")
-        html = f.read()
-        f.close()
-
-        found = re.search("<a href=\"/projects/math-atlas/files/Developer%20%28unstable%29/(.+)/\"", html)
-        if found == None :
-            raise RuntimeError("Atlas Version Download URL not found")
-        version  = found.group(0).replace("\"", "").replace("<a href=", "").strip("/").split("/")[-1]     
-        filename = "atlas" + version + ".tar.bz2"
-        return "https://downloads.sourceforge.net/project/math-atlas/Developer%20%28unstable%29/"+version+"/"+filename, filename
-        
-    raise RuntimeError("Atlas Download unknown")
     
     
 def CLN_DownloadURL(env) :
@@ -200,7 +172,7 @@ def Ginac_DownloadURL(env) :
     return "http://www.ginac.de/"+filename, filename
     
     
-def GZip_DownloadURL(env) :
+def Zlib_DownloadURL(env) :
     # read download path of the ZLib (latest version)
     f = urllib2.urlopen("http://www.zlib.net/")
     html = f.read()
@@ -232,7 +204,7 @@ def BZip2_DownloadURL(env) :
 
 
 #=== building libraries ==============================================================================================================
-def Boost_BuildInstall(env, source, gzipbuild, bzipbuild)  :
+def Boost_BuildInstall(env, source, zlibbuild, bzipbuild)  :
     # extract path and version of the source name
     boostdir    = str(source).replace("['", "").replace("']", "").replace(".", "_").replace("-", "_")
     version     = boostdir.replace("boost_", "").replace("_", ".")
@@ -270,46 +242,111 @@ def Boost_BuildInstall(env, source, gzipbuild, bzipbuild)  :
     
     # build Boost with Bzip2 and ZLib support and set the dependency
     dependency = [source]
-    if (gzipbuild <> None) and (bzipbuild <> None) :
-        zipcmd   = "export BZIP2_BINARY=bz2 && export ZLIB_BINARY=z && "
-        dependency.append(gzipbuild)
-        dependency.append(bzipbuild)
-        gzipversion = str(gzipbuild).replace("['", "").replace("']", "").replace("buildgzip-", "")
-        bzipversion = str(bzipbuild).replace("['", "").replace("']", "").replace("buildbzip2-", "")
+    if (zlibbuild <> None) and (bzipbuild <> None) :
+        zlibpath = os.path.sep.join( str(zlibbuild[0]).split(os.path.sep)[0:-2] )
+        bzippath = os.path.sep.join( str(bzipbuild[0]).split(os.path.sep)[0:-2] )
         
-        zipcmd  += "export ZLIB_INCLUDE="  + setpath(env, os.path.abspath(os.path.join(os.curdir, "build", "zlib", gzipversion, "include"))) + " && "
-        zipcmd  += "export ZLIB_LIBPATH="  + setpath(env, os.path.abspath(os.path.join(os.curdir, "build", "zlib", gzipversion, "lib"))) + " && "
-        zipcmd  += "export BZIP2_INCLUDE=" + setpath(env, os.path.abspath(os.path.join(os.curdir, "build", "bzip2", bzipversion, "include"))) + " && "
-        zipcmd  += "export BZIP2_LIBPATH=" + setpath(env, os.path.abspath(os.path.join(os.curdir, "build", "bzip2", bzipversion, "lib"))) + " && "
+        zipcmd   = "export BZIP2_BINARY=bz2 && export ZLIB_BINARY=z && "
+        dependency.append(zlibbuild)
+        dependency.append(bzipbuild)
+        
+        zipcmd  += "export ZLIB_INCLUDE="  + setpath(env, os.path.abspath(os.path.join(os.curdir, zlibpath, "include"))) + " && "
+        zipcmd  += "export ZLIB_LIBPATH="  + setpath(env, os.path.abspath(os.path.join(os.curdir, zlibpath, "lib"))) + " && "
+        zipcmd  += "export BZIP2_INCLUDE=" + setpath(env, os.path.abspath(os.path.join(os.curdir, bzippath, "include"))) + " && "
+        zipcmd  += "export BZIP2_LIBPATH=" + setpath(env, os.path.abspath(os.path.join(os.curdir, bzippath, "lib"))) + " && "
         cmd      = zipcmd + cmd
         
     return env.Command("buildboost-"+version, dependency, cmd)
       
       
-def Gzip_BuildInstall(env, extract) :
-    version = str(extract).replace("['", "").replace("']", "").replace("zlib-", "")
-    prefix  = os.path.join("..", "build", "zlib", version)
+def Zlib_BuildInstall(env, zlibtargz, extract) :
+    sourcepath = str(zlibtargz).replace("['", "").replace("']", "").replace(".tar.gz", "")
+    version    = sourcepath.replace("zlib-", "")
 
-    cmd = "cd $SOURCE && ";
-    if env["TOOLKIT"] == "msys" :
-        lib = setpath(env, os.path.join(prefix, "lib"))
-        inc = setpath(env, os.path.join(prefix, "include"))
-        cmd = cmd + "make -fwin32/Makefile.gcc && make install -fwin32/Makefile.gcc INCLUDE_PATH="+inc+" BINARY_PATH="+lib+" LIBRARY_PATH="+lib
-    else :
-        cmd = cmd + "./configure --prefix=" + prefix + " && make && make install"
-    return env.Command("buildgzip-"+version, extract, cmd)
+    headers = [ "zconf.h", "zlib.h" ]
+    
+    sources = [ "adler32.c",   "crc32.c",   "deflate.c",   "infback.c",   "inffast.c", "inflate.c",
+                "inftrees.c",  "trees.c",   "zutil.c",     "compress.c",  "uncompr.c", "gzclose.c",
+                "gzlib.c",     "gzread.c",  "gzwrite.c"
+              ]
+              
+    # extract the needed source from the list
+    libsrc      = []
+    libheader   = []
+    for i in extract :
+        name = str(i)
+        if any([n == os.path.basename(name) for n in headers]) :
+            libheader.append( i ) 
+        elif any([n == os.path.basename(name) for n in sources]) :
+            libsrc.append( i )
+    
+    envzlib = Environment()
+    envzlib.Replace(CPATH = os.path.join(sourcepath, "include"))
+    envzlib.AppendUnique(CFLAGS  = ["-O2", "-DHAVE_HIDDEN"])
+
+    # create lib, install header and libraries
+    lib             = envzlib.StaticLibrary(target="z", source=libsrc)   
+    libinstall      = env.Install( setpath(env, os.path.join(os.curdir, "build", "zlib", version, "lib")), lib )
+    headerdir       = env.Command( setpath(env, os.path.join(os.curdir, "build", "zlib", version, "include")), "", Mkdir("$TARGET"))
+    headerinstall   = []
+    for i in libheader :
+        headerinstall.append( env.Command( os.path.join(str(headerdir).replace("']", "").replace("['", ""), os.path.basename(str(i))), i, Copy("$TARGET", "$SOURCE")) )
+    
+    # prevent libs and headers during clean
+    env.NoClean(libinstall)
+    env.NoClean(headerinstall)
+
+    builds = []
+    for i in libinstall :
+        builds.append(i)
+    for i in headerinstall :
+        builds.extend( i )
+    return builds
    
    
-def BZip2_BuildInstall(env, extract) :
-    version = str(extract).replace("['", "").replace("']", "").replace("bzip2-", "")
-    prefix  = setpath(env, os.path.join("..", "build", "bzip2", version))
+def BZip2_BuildInstall(env, bziptargz, extract) :
+    sourcepath = str(bziptargz).replace("['", "").replace("']", "").replace(".tar.gz", "")
+    version    = sourcepath.replace("bzip2-", "")
     
-    if env["TOOLKIT"] == "msys" :
-        cmd = "cd $SOURCE && grep -v chmod Makefile | grep -v ln > Makefile.msys && make -fMakefile.msys install PREFIX=" + setpath(env, prefix)
-    else :
-        cmd = "cd $SOURCE && make CFLAGS=\"-Wall -Winline -O2 -g -D_FILE_OFFSET_BITS=64 -fPIC\" LDFLAGS=\"-fPIC\" install PREFIX=" + prefix
+    headers = [ "bzlib.h", "bzlib_private.h" ]
     
-    return env.Command("buildbzip2-"+version, extract, cmd)
+    sources = [ "blocksort.c",   "huffman.c",   "crctable.c",   "randtable.c",
+                "compress.c",  "decompress.c",  "bzlib.c"
+              ]
+              
+    # extract the needed source from the list
+    libsrc      = []
+    libheader   = []
+    for i in extract :
+        name = str(i)
+        if any([n == os.path.basename(name) for n in headers]) :
+            libheader.append( i ) 
+        elif any([n == os.path.basename(name) for n in sources]) :
+            libsrc.append( i )
+            
+    envbzip = Environment()
+    envbzip.Replace(CPATH = os.path.join(sourcepath, "include"))
+    envbzip.AppendUnique(CFLAGS  = ["-Winline", "-O2", "-g", "-D_FILE_OFFSET_BITS=64"])
+    
+    # create shared lib, install header and libraries
+    lib             = envbzip.StaticLibrary(target="bz2", source=libsrc)
+    libinstall      = env.Install( setpath(env, os.path.join(os.curdir, "build", "bzip2", version, "lib")), lib )
+    headerdir       = env.Command( setpath(env, os.path.join(os.curdir, "build", "bzip2", version, "include")), "", Mkdir("$TARGET"))
+    headerinstall   = []
+    for i in libheader :
+        headerinstall.append( env.Command( os.path.join(str(headerdir).replace("']", "").replace("['", ""), os.path.basename(str(i))), i, Copy("$TARGET", "$SOURCE")) )
+    
+    # prevent libs and headers during clean
+    env.NoClean(libinstall)
+    env.NoClean(headerinstall)
+
+    builds = []
+    for i in libinstall :
+        builds.append(i)
+    for i in headerinstall :
+        builds.extend( i )
+    return builds
+
       
         
 def JsonCPP_BuildInstall(env, targz, extract) :
@@ -356,37 +393,21 @@ def JsonCPP_BuildInstall(env, targz, extract) :
     env.NoClean(libinstall)
     env.NoClean(headerinstall)
     
-    return libinstall + headerinstall
+    builds = []
+    for i in libinstall :
+        builds.append(i)
+    for i in headerinstall :
+        builds.extend( i )
+    return builds
+
 
 def Lapack_BuildInstall(env, lapackdir) :
     # build Lapack only with MSYS
     dir     = str(lapackdir).replace("']", "").replace("['", "")
     version = dir.replace("lapack-", "")
     
-    cmd = "cd $SOURCE && cmake . -G \"MSYS Makefiles\" -DCMAKE_BUILD_TYPE:String=release -DLAPACKE:BOOL=\"1\" -DCMAKE_INSTALL_PREFIX:PATH=\"" + setpath(env, os.path.abspath(os.path.join("build", "lapack", version))) + "\" && make && make install"
+    cmd = "cd $SOURCE && cmake . -DCMAKE_BUILD_TYPE:String=release -DLAPACKE:BOOL=\"1\" -DCMAKE_INSTALL_PREFIX:PATH=\"" + setpath(env, os.path.abspath(os.path.join("build", "lapack", version))) + "\" && make && make install"
     return env.Command("buildlapack-"+version, lapackdir, cmd)
-
-def LapackAtlas_BuildInstall(env, atlasdir, lapacktargz) :
-    # Atlas need a temporary build directory
-    builddir = env.Command( str(atlasdir).replace("['", "").replace("']", "")+"-buildtmp", atlasdir, Mkdir("$TARGET"))
-    version  = str(atlasdir).replace("atlas", "").replace("['", "").replace("']", "")
-    prefix   = os.path.join("..", "build", "atlas", version)
-    
-    cmd = "cd " + os.path.join("library", str(builddir).replace("['", "").replace("']", "")) + " && " + os.path.join("..", "ATLAS", "configure") + " --dylibs"
-    if env["atlaspointerwidth"] == "32" :
-        cmd += " -b 32"
-    elif env["atlaspointerwidth"] == "64" :
-        cmd += " -b 64"
-    cmd += " --with-netlib-lapack-tarfile=" + os.path.join("..", str(lapacktargz).replace("['", "").replace("']", "")) + " --prefix=" + prefix
-    
-    # change Soname of the Linux library
-    if env["TOOLKIT"] == "posix" :
-        cmd = cmd + " && sed -e \"s/soname \\$$(LIBINSTdir)\\/\\$$(outso)/soname \\$$(outso).\\$$(VER)/\" lib/Makefile > lib/Makefile.tmp && mv -f lib/Makefile.tmp lib/Makefile"
-    cmd = cmd + " && make && make install"
-    if env["TOOLKIT"] == "posix" :
-        cmd = cmd + " && cd "+prefix+"/lib && mv libsatlas.so libsatlas.so."+version+" && mv libtatlas.so libtatlas.so."+version+" && ln -s libsatlas.so."+version+" libsatlas.so && ln -s libtatlas.so."+version+" libtatlas.so"
-    
-    return env.Command("buildatlas-"+version, [atlasdir, lapacktargz, builddir], cmd)
 
 
 def HDF5_BuildInstall(env, hdfdir) :
@@ -465,35 +486,36 @@ if ("librarybuild" in COMMAND_LINE_TARGETS) or ("librarydownload" in COMMAND_LIN
     if " " in os.curdir :
         raise RuntimeError("there are spaces within the path, use a path without spaces")
 
-    # download Atlas / LaPack, extract & install
+    # download LaPack, extract & install
     if not("lapack" in skiplist) :
         lapacktargz = env.ParseAndDownload( LaPack_DownloadURL )
         lstdownload.append(lapacktargz)
-        if env["TOOLKIT"] == "msys" :
-            lstbuild.append( Lapack_BuildInstall(env, env.Command(str(lapacktargz).replace("[", "").replace("]", "").replace("'", "").replace(".tgz", ""), lapacktargz, env["EXTRACT_CMD"]+env["extractsuffix"]+"library")) )
-        else :
-            atlastarbz  = env.ParseAndDownload( Atlas_DownloadURL )
-            lstdownload.append(atlastarbz)
-            atlasdir    = env.Command(str(atlastarbz).replace("[", "").replace("]", "").replace("'", "").replace(".tar.bz2", ""), atlastarbz, env["EXTRACT_CMDBZ"]+env["extractsuffix"]+"library")
-            lstbuild.append( LapackAtlas_BuildInstall(env, atlasdir, lapacktargz) )
+        lstbuild.append( Lapack_BuildInstall(env, env.Command(str(lapacktargz).replace("[", "").replace("]", "").replace("'", "").replace(".tgz", ""), lapacktargz, env["EXTRACT_CMD"]+env["extractsuffix"]+"library")) )
 
     # download Boost, extract & install
     if not("boost" in skiplist) :
         bzipbuild = None
-        gzipbuild = None
+        zlibbuild = None
+        
         if env["zipsupport"] :
-            gziptargz = env.ParseAndDownload( GZip_DownloadURL )
-            bziptargz = env.ParseAndDownload( BZip2_DownloadURL )
-            bzipbuild = BZip2_BuildInstall(env, env.Command(str(bziptargz).replace("[", "").replace("]", "").replace("'", "").replace(".tar.gz", ""), bziptargz, env["EXTRACT_CMD"]+env["extractsuffix"]+"library") )
-            gzipbuild = Gzip_BuildInstall(env,  env.Command(str(gziptargz).replace("[", "").replace("]", "").replace("'", "").replace(".tar.gz", ""), gziptargz, env["EXTRACT_CMD"]+env["extractsuffix"]+"library") )
-            lstdownload.append(gziptargz)
+            zlibtargz = env.ParseAndDownload( Zlib_DownloadURL )
+            zlibfiles = env.Extract(str(zlibtargz).replace("[", "").replace("]", "").replace("'", "").replace(".tar.gz", ""), zlibtargz, extractsuffix=env["extractsuffix"]+"library")
+            zlibbuild = Zlib_BuildInstall(env, zlibtargz, zlibfiles)
+            lstbuild.extend( zlibbuild )
+            lstdownload.append(zlibtargz)
+            
+            bziptargz  = env.ParseAndDownload( BZip2_DownloadURL )
+            bzlibfiles = env.Extract(str(bziptargz).replace("[", "").replace("]", "").replace("'", "").replace(".tar.gz", ""), bziptargz, extractsuffix=env["extractsuffix"]+"library")
+            bzipbuild  = BZip2_BuildInstall(env, bziptargz, bzlibfiles)
+            lstbuild.extend( bzipbuild )
             lstdownload.append(bziptargz)
-    
+         
         boosttargz = env.ParseAndDownload( Boost_DownloadURL )
         boostdir   = env.Command(str(boosttargz).replace("[", "").replace("]", "").replace("'", "").replace(".tar.gz", ""), boosttargz, env["EXTRACT_CMD"]+env["extractsuffix"]+"library")
-        boostbuild = Boost_BuildInstall(env, boostdir, gzipbuild, bzipbuild)
+        boostbuild = Boost_BuildInstall(env, boostdir, zlibbuild, bzipbuild)
+        lstbuild.append( boostbuild )
         
-        lstbuild.append( env.Command("boostnumericbindings", boostbuild, "svn checkout http://svn.boost.org/svn/boost/sandbox/numeric_bindings/ "+setpath(env, os.path.join("library", "build", "boost", "numeric_bindings"))) )
+        #lstbuild.append( env.Command("boostnumericbindings", boostbuild, "svn checkout http://svn.boost.org/svn/boost/sandbox/numeric_bindings/ "+setpath(env, os.path.join("library", "build", "boost", "numeric_bindings"))) )
         lstdownload.append(boosttargz)
         
         

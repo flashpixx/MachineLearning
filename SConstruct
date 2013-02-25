@@ -39,15 +39,12 @@ import SCons.Node
 #=== CLI parameters ====================================================================================================================
 def createVariables(vars) :
     [platform, arch] = detectPlatform()
-    
-    atlaslink     = "multi"
+
     zipsupport    = False
     colorcompiler = True
     if (platform == "cygwin")  or  (platform == "msys") :
-        atlaslink     = "single"
         zipsupport    = True
         colorcompiler = False
-    
 
     vars.Add(BoolVariable("withrandomdevice", "installation with random device support", False))
     vars.Add(BoolVariable("withmpi", "installation with MPI support", False))
@@ -63,7 +60,6 @@ def createVariables(vars) :
     vars.Add(BoolVariable("usedistcc", "use distributed compiling with DistCC", False))
     vars.Add(BoolVariable("usecolorcompiler", "enable / disable searching for color compiler", colorcompiler))
     vars.Add(BoolVariable("copylibrary", "copy the dynamic link libraries into the build dir", False))
-    vars.Add(EnumVariable("atlaslink", "type of the ATLAS link file", atlaslink, allowed_values=("single", "multi")))
     
     if platform == "msys" :
         vars.Add(EnumVariable("winversion", "value of the Windows version", "win7", allowed_values=("win7", "srv2008", "vista", "srv2003sp1", "xpsp2", "srv2003", "xp", "w2000")))
@@ -71,8 +67,6 @@ def createVariables(vars) :
     vars.Add(ListVariable("skiplibrary", "skipping library builds / downloads", "", ["lapack", "boost", "hdf", "ginac", "json", "xml"]))
     vars.Add(BoolVariable("zipsupport", "build Bzip2 and ZLib support for Boost", zipsupport))
     vars.Add(EnumVariable("boostbuild", "Boost build option: required builds all libraries, requiredoptional build the required libraries with optional libraries, full build all libraries", "requiredoptional", allowed_values=("required", "requiredoptional", "full")))
-    vars.Add(EnumVariable("atlaspointerwidth", "pointer width for compiling ATLAS (empty = system default, 32 = 32 Bit, 64 = 64 Bit)", "", allowed_values=("", "32", "64")))
-    vars.Add(EnumVariable("atlasversion", "version of the ATLAS library (developer or stable version)", "devel", allowed_values=("stable", "devel")))
     vars.Add(EnumVariable("jsoncppversion", "version of the Json-Cpp library (developer or stable version)", "devel", allowed_values=("stable", "devel")))
 
     

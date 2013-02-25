@@ -163,7 +163,7 @@ if conf.env["uselocallibrary"] :
     path   = os.path.abspath(os.path.join(os.path.abspath(os.curdir), "..", "library", "build"))
     reg    = re.compile("\d(.*)")
     
-    for i in ["atlas", "boost", "cln", "ginac", "hdf", "jsoncpp", "xml"] :
+    for i in ["lapack", "boost", "cln", "ginac", "hdf", "jsoncpp", "xml"] :
         dir = os.path.join(path, i)
         if not(os.path.isdir(dir)) :
             continue
@@ -214,7 +214,7 @@ conf.env["NOTCOPYLIBRARY"] = ["stdc++", "intl"]
 # main configuration
 conf.env.AppendUnique(LINKFLAGS   = ["-fopenmp", "-pthread"])
 conf.env.AppendUnique(CXXFLAGS    = ["-fopenmp", "-pthread", "-pipe"])
-conf.env.AppendUnique(CPPDEFINES  = ["BOOST_FILESYSTEM_NO_DEPRECATED", "BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"])
+conf.env.AppendUnique(CPPDEFINES  = ["BOOST_FILESYSTEM_NO_DEPRECATED"])
 
 if conf.env["buildtype"] == "release" :
     conf.env.AppendUnique(CPPDEFINES  = ["NDEBUG", "BOOST_UBLAS_NDEBUG", "MACHINELEARNING_NDEBUG"])
@@ -223,10 +223,7 @@ elif conf.env["buildtype"] == "debug" :
     conf.env.AppendUnique(LINKFLAGS   = ["-g"])
     conf.env.AppendUnique(CXXFLAGS    = ["-g"])
     
-if conf.env["atlaslink"] == "multi" :
-    localconf["clibraries"].append("tatlas")
-elif conf.env["atlaslink"] == "single" :
-    localconf["clibraries"].append("satlas")
+localconf["clibraries"].extend(["lapack", "blas"])
     
 if not("java" in COMMAND_LINE_TARGETS) :
     localconf["cpplibraries"].extend([
