@@ -231,7 +231,7 @@ def check_LocalVar( filename, lineno, name, typelst ) :
             return None, None
         elif type(typelst) == type("") and "iterator" in typelst :
             return None, None
-        elif type(typelst) == type([]) and len(filter(lambda x: "std::map" in x or "std::vetcor" in x or "std::multimap" in x, typelst)) > 0 :
+        elif type(typelst) == type([]) and len(filter(lambda x: "std::map" in x or "std::vector" in x or "std::multimap" in x, typelst)) > 0 :
             return None, None
 
     # check all other variables
