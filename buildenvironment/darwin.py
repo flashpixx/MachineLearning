@@ -213,7 +213,7 @@ conf.env["NOTCOPYLIBRARY"] = ["stdc++", "intl"]
 
 # main configuration
 conf.env.AppendUnique(LINKFLAGS   = ["-fopenmp", "-pthread"])
-conf.env.AppendUnique(CXXFLAGS    = ["-fopenmp", "-pthread", "-pipe"])
+conf.env.AppendUnique(CXXFLAGS    = ["-fopenmp", "-pthread"])
 conf.env.AppendUnique(CPPDEFINES  = ["BOOST_FILESYSTEM_NO_DEPRECATED"])
 
 if conf.env["buildtype"] == "release" :

@@ -214,7 +214,7 @@ conf.env["COPYLIBRARY"] = ["win1", "gcc_s-1", "gomp-1", "stdc++-6"]
 
 # main configuration
 conf.env.AppendUnique(LINKFLAGS   = ["-fopenmp"])
-conf.env.AppendUnique(CXXFLAGS    = ["-fopenmp", "-pipe"])
+conf.env.AppendUnique(CXXFLAGS    = ["-fopenmp"])
 conf.env.AppendUnique(CPPDEFINES  = ["BOOST_FILESYSTEM_NO_DEPRECATED", "BOOST_NUMERIC_BINDINGS_BLAS_CBLAS"])
 
 if conf.env["buildtype"] == "release" :
