@@ -43,11 +43,10 @@ namespace machinelearning { namespace tools {
     
 
     /** logger class for writing log information 
-     * @note there are two defines for setting the logger directory (MACHINELEARNING_LOGGER_PATHSUFFIX) and logger file (MACHINELEARNING_LOGGER_FILENAME). Within the path suffix the % characters will be
-     * substitute to a random hexadecimal value and the directory is created under the temporary path. The value of the filename is append to this directory for writing the log items
-     * @note for MPI using every process must call startListener and shutdownListener for synchronize the CPUs and the tag for logtargets is set with a preprocessor flag (MACHINELEARNING_LOGGER_MPI_TAG).
-     * The singleton object works only "between" the calls start- and shutdownListener because the MPI object must exists. The connection is closed in the shutdown call and use a message
-     * that is defined with the preprocessor flog MACHINELEARNING_LOGGER_MPI_EOT.
+     * @note the logger directory and logger file can be pushed with the createInstance call. Within the path suffix the % characters will be substitute to a random hexadecimal value and the directory
+     * is created under the temporary path. The value of the filename is append to this directory for writing the log items for MPI using every process must call startListener and shutdownListener for
+     * synchronize the CPUs and the tag for logtargets is set with a global constant (m_mpitag). The singleton object works only "between" the calls start- and shutdownListener because the MPI object
+     * must exists. The connection is closed in the shutdown call and use a message that is defined with the global constant (m_mpieot).
      * @note If the listener function is used, you don't use the Boost::MPI::Environmental initialisation. Use the default MPI calls of the mpi.h: 
      * @code
         #include <mpi.h>
