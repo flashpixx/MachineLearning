@@ -32,36 +32,18 @@ Import("*")
 #=== download packages ===============================================================================================================
 def Boost_DownloadURL(env)  :
     # read download path of the Boost (latest version)
-    f = urllib2.urlopen("http://www.boost.org/users/download/")
-    html = f.read()
-    f.close()
-    
-    found = re.search("<a href=\"https://sourceforge.net/projects/boost/files/(.*)\">Download</a>", html)
+    found = re.search( "<a href=\"http://sourceforge.net/projects/boost/files/boost/(.*)\">Download</a>", Utilities.URLReader("http://www.boost.org/users/download/") )
     if found == None :
-        raise RuntimeError("Boost Download URL not found")
-        
-    downloadurl = found.group(0)
-    downloadurl = downloadurl.replace("<a href=\"", "")
-    downloadurl = downloadurl.replace("\">Download</a>", "")
-    
-    version     = found.group(1).replace("boost", "")
-    version     = version.replace("/", "")
-    
-    
-    # read url of the tar.gz
-    f = urllib2.urlopen(downloadurl)
-    html = f.read()
-    f.close()
+        raise SCons.Errors.StopError("Boost Download URL not found")
 
-    found = re.search("<a href=\"http://sourceforge.net/projects/boost/files/boost(.*).tar.gz/download", html)
+    # read url of the tar.bz2
+    found = re.search( "http://sourceforge.net/projects/boost/files/boost/(.*).tar.bz2/download", Utilities.URLReader(found.group(0).replace("<a href=\"", "").replace("\">Download</a>", "")) )
     if found == None :
-        raise RuntimeError("Boost Download URL not found")
+        raise SCons.Errors.StopError("Boost file Download URL not found")
 
-    downloadurl = found.group(0)
-    downloadurl = downloadurl.replace("<a href=\"", "")
-   
-    return downloadurl, "boost-" + version + ".tar.gz"
-    
+    # create download URL and version
+    return "http://downloads.sourceforge.net/project/boost/boost/"+found.group(1)+".tar.bz2", found.group(1).split("/")[0]
+
     
     
 def JsonCPP_DownloadURL(env) :
