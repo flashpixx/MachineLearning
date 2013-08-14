@@ -32,12 +32,19 @@ Import("*")
 #=== download packages ===============================================================================================================
 def Boost_DownloadURL(env)  :
     # read download path of the Boost (latest version)
-    found = re.search( "<a href=\"http://sourceforge.net/projects/boost/files/boost/(.*)\">Download</a>", Utilities.URLReader("http://www.boost.org/users/download/") )
+    f = urllib2.urlopen("http://www.boost.org/users/download/")
+    html = f.read()
+    f.close()
+
+    found = re.search( "<a href=\"http://sourceforge.net/projects/boost/files/boost/(.*)\">Download</a>", html )
     if found == None :
         raise SCons.Errors.StopError("Boost Download URL not found")
 
     # read url of the tar.bz2
-    found = re.search( "http://sourceforge.net/projects/boost/files/boost/(.*).tar.bz2/download", Utilities.URLReader(found.group(0).replace("<a href=\"", "").replace("\">Download</a>", "")) )
+    f = urllib2.urlopen(found.group(0).replace("<a href=\"", "").replace("\">Download</a>", ""))
+    html = f.read()
+    f.close()
+    found = re.search( "http://sourceforge.net/projects/boost/files/boost/(.*).tar.bz2/download", html )
     if found == None :
         raise SCons.Errors.StopError("Boost file Download URL not found")
 
