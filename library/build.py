@@ -49,7 +49,7 @@ def Boost_DownloadURL(env)  :
         raise SCons.Errors.StopError("Boost file Download URL not found")
 
     # create download URL and version
-    return "http://downloads.sourceforge.net/project/boost/boost/"+found.group(1)+".tar.bz2", found.group(1).split("/")[0]
+    return "http://downloads.sourceforge.net/project/boost/boost/"+found.group(1)+".tar.bz2", found.group(1)+".tar.bz2",
 
     
     
