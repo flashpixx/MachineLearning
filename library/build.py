@@ -38,7 +38,7 @@ def Boost_DownloadURL(env)  :
 
     found = re.search( "<a href=\"http://sourceforge.net/projects/boost/files/boost/(.*)\">Download</a>", html )
     if found == None :
-        raise SCons.Errors.StopError("Boost Download URL not found")
+        raise RuntimeError("Boost Download URL not found")
 
     # read url of the tar.bz2
     f = urllib2.urlopen(found.group(0).replace("<a href=\"", "").replace("\">Download</a>", ""))
@@ -46,10 +46,10 @@ def Boost_DownloadURL(env)  :
     f.close()
     found = re.search( "http://sourceforge.net/projects/boost/files/boost/(.*).tar.bz2/download", html )
     if found == None :
-        raise SCons.Errors.StopError("Boost file Download URL not found")
+        raise RuntimeError("Boost file Download URL not found")
 
     # create download URL and version
-    return "http://downloads.sourceforge.net/project/boost/boost/"+found.group(1)+".tar.bz2", found.group(1)+".tar.bz2",
+    return "http://downloads.sourceforge.net/project/boost/boost/"+found.group(1)+".tar.bz2", (found.group(1)+".tar.bz2").split("/")[1]
 
     
     
@@ -479,7 +479,7 @@ if ("librarybuild" in COMMAND_LINE_TARGETS) or ("librarydownload" in COMMAND_LIN
             lstdownload.append(bziptargz)
     
         boosttargz = env.ParseAndDownload( Boost_DownloadURL )
-        boostdir   = env.Command(str(boosttargz).replace("[", "").replace("]", "").replace("'", "").replace(".tar.gz", ""), boosttargz, env["EXTRACT_CMD"]+env["extractsuffix"]+"library")
+        boostdir   = env.Command("dir-"+str(boosttargz).replace("[", "").replace("]", "").replace("'", "").replace(".tar.gz", ""), boosttargz, env["EXTRACT_CMD"]+env["extractsuffix"]+"library")
         boostbuild = Boost_BuildInstall(env, boostdir, gzipbuild, bzipbuild)
         
         lstbuild.append( env.Command("boostnumericbindings", boostbuild, "svn checkout http://svn.boost.org/svn/boost/sandbox/numeric_bindings/ "+setpath(env, os.path.join("library", "build", "boost", "numeric_bindings"))) )
