@@ -223,7 +223,7 @@ def BZip2_DownloadURL(env) :
 #=== building libraries ==============================================================================================================
 def Boost_BuildInstall(env, source, gzipbuild, bzipbuild)  :
     # extract path and version of the source name
-    boostdir    = str(source).replace("['", "").replace("']", "").replace(".", "_").replace("-", "_")
+    boostdir    = str(source).replace("['", "").replace("']", "").replace(".", "_").replace("-", "_").replace("extractdir-")
     version     = boostdir.replace("boost_", "").replace("_", ".")
     boostpath   = setpath(env, os.path.join("library", boostdir))
     prefix      = setpath(env, os.path.join("..", "build", "boost", version))
@@ -479,7 +479,7 @@ if ("librarybuild" in COMMAND_LINE_TARGETS) or ("librarydownload" in COMMAND_LIN
             lstdownload.append(bziptargz)
     
         boosttargz = env.ParseAndDownload( Boost_DownloadURL )
-        boostdir   = env.Command("dir-"+str(boosttargz).replace("[", "").replace("]", "").replace("'", "").replace(".tar.gz", ""), boosttargz, env["EXTRACT_CMD"]+env["extractsuffix"]+"library")
+        boostdir   = env.Command("extractdir-"+str(boosttargz).replace("[", "").replace("]", "").replace("'", "").replace(".tar.gz", ""), boosttargz, env["EXTRACT_CMD"]+env["extractsuffix"]+"library")
         boostbuild = Boost_BuildInstall(env, boostdir, gzipbuild, bzipbuild)
         
         lstbuild.append( env.Command("boostnumericbindings", boostbuild, "svn checkout http://svn.boost.org/svn/boost/sandbox/numeric_bindings/ "+setpath(env, os.path.join("library", "build", "boost", "numeric_bindings"))) )
