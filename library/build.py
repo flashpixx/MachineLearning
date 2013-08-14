@@ -223,7 +223,7 @@ def BZip2_DownloadURL(env) :
 #=== building libraries ==============================================================================================================
 def Boost_BuildInstall(env, source, gzipbuild, bzipbuild)  :
     # extract path and version of the source name
-    boostdir    = str(source).replace("['", "").replace("']", "").replace(".", "_").replace("-", "_").replace("extractdir-", "")
+    boostdir    = str(source).replace("extractdir-", "").replace("['", "").replace("']", "").replace(".", "_").replace("-", "_")
     version     = boostdir.replace("boost_", "").replace("_", ".")
     boostpath   = setpath(env, os.path.join("library", boostdir))
     prefix      = setpath(env, os.path.join("..", "build", "boost", version))
