@@ -44,12 +44,12 @@ def Boost_DownloadURL(env)  :
     f = urllib2.urlopen(found.group(0).replace("<a href=\"", "").replace("\">Download</a>", ""))
     html = f.read()
     f.close()
-    found = re.search( "http://sourceforge.net/projects/boost/files/boost/(.*).tar.bz2/download", html )
+    found = re.search( "http://sourceforge.net/projects/boost/files/boost/(.*).tar.gz/download", html )
     if found == None :
         raise RuntimeError("Boost file Download URL not found")
 
     # create download URL and version
-    return "http://downloads.sourceforge.net/project/boost/boost/"+found.group(1)+".tar.bz2", (found.group(1)+".tar.bz2").split("/")[1]
+    return "http://downloads.sourceforge.net/project/boost/boost/"+found.group(1)+".tar.gz", (found.group(1)+".tar.gz").split("/")[1]
 
     
     
