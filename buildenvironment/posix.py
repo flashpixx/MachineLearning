@@ -228,7 +228,7 @@ elif conf.env["atlaslink"] == "single" :
     
 if not("java" in COMMAND_LINE_TARGETS) :
     localconf["cpplibraries"].extend([
-                            "boost_program_options-mt"t, "boost_filesystem-mt"
+                            "boost_program_options-mt", "boost_filesystem-mt"
     ])
     localconf["cppheaders"].extend([
                             "cstdlib",
